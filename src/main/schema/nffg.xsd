@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+		xmlns:tns="http://www.example.org/nffg/"
+		xmlns:net="http://www.example.org/net/" 
+		targetNamespace="http://www.example.org/nffg/" 
+		elementFormDefault="qualified">
+		
+	<import namespace="http://www.example.org/net/" schemaLocation="net_types.xsd"/>
+		
+	<annotation>
+    	<documentation xml:lang="it">
+     		 Il formato prevede si possa avere come radice "nffg-set" oppure "nffg".
+     		 Nel primo caso ci sono più nf-fg contenuti nello stesso documento XML.
+    	</documentation>
+  	</annotation>
+	
+	<group name="L2HeaderParameters">
+		<sequence>
+			<element name="Mac" minOccurs="0">
+				<complexType>
+					<attribute name="src" type="net:macAddressType" use="optional"/>
+					<attribute name="dst" type="net:macAddressType" use="optional"/>
+					<attribute name="ethertype" type="net:ethertypeType" use="optional"/>
+					<attribute name="vlanId" type="net:vlanIdType" use="optional"/>
+					<attribute name="vlanPcp" type="net:vlanPcpType" use="optional"/>
+				</complexType>
+			</element>
+		</sequence>
+	</group>
+	
+	<group name="L3HeaderParameters">
+		<sequence>
+			<element name="Ip" minOccurs="0">
+				<complexType>
+					<attribute name="src" type="net:ipAddressType" use="optional"/>
+					<attribute name="dst" type="net:ipAddressType" use="optional"/>
+					<attribute name="ipProtocol" type="unsignedByte" use="optional"/>
+					<attribute name="tos" type="unsignedByte" use="optional"/>
+				</complexType>
+			</element>
+		</sequence>
+	</group>
+	
+	<!-- controllare nel programma che non ci siano combinazioni non ammesse -->
+	<group name="L4HeaderParameters">
+		<choice>
+			<element name="Tcp" minOccurs="0">
+				<complexType>
+					<attribute name="src" type="net:portNumberType" use="optional"/>
+					<attribute name="dst" type="net:portNumberType" use="optional"/>
+				</complexType>
+			</element>
+			<element name="Udp" minOccurs="0">
+				<complexType>
+					<attribute name="src" type="net:portNumberType" use="optional"/>
+					<attribute name="dst" type="net:portNumberType" use="optional"/>
+				</complexType>
+			</element>
+		</choice>
+	</group>
+	
+	<!-- alla fine controlloare tutti gli xpath perchè dopo dei cambiamenti potrebbero non andare più bene -->
+	<element name="nffg-set" type="tns:nffg-setType">
+		<unique name="nffgIdUnique">
+	      	<selector xpath="tns:nf-fg"/>
+	      	<field xpath="@id"/>
+	    </unique>
+	    
+	    <!-- forse la NF va spostata dentro graphs e resa referenziabile (condivisibile da più nffg) -->
+	    <!-- così facendo però, si deve trovare un modo per avere le NF dentro nffg nel caso sia questo la radice -->
+	    <unique name="nfIdUnique">
+	      	<selector xpath="tns:nf-fg/tns:network_functions/tns:network_function"/>
+	      	<field xpath="@id"/>
+	    </unique>
+	</element>
+		
+	<element name="nffg" type="tns:nffgType">
+		<unique name="epIdUnique">
+	      	<selector xpath="tns:endpoints/tns:endpoint"/>
+	      	<field xpath="@id"/>
+	    </unique>
+	    
+	    <unique name="cpIdUnique">
+	      	<selector xpath="tns:network_functions/tns:network_function/tns:connection_points/tns:connection_point"/>
+	      	<field xpath="@id"/>
+	    </unique>
+	    
+	    <unique name="portIdUnique">
+	      	<selector xpath="tns:network_functions/tns:network_function/tns:connection_points/tns:connection_point/tns:port"/>
+	      	<field xpath="@id"/>
+	    </unique>
+	    
+	    <unique name="ciIdUnique">
+	      	<selector xpath="tns:network_functions/tns:network_function/tns:control_interfaces/tns:control_interface"/>
+	      	<field xpath="@id"/>
+	    </unique>
+	    
+	    <unique name="neIdUnique">
+	      	<selector xpath="tns:network_elements/tns:network_element"/>
+	      	<field xpath="@id"/>
+	    </unique>
+	    
+	    <unique name="epcpIdRefUnique">
+	    	<selector xpath="tns:network_elements/tns:network_element/tns:eps-cps/tns:ep-cp"/>
+	    	<field xpath="@id_ref"/>
+	    </unique>
+	</element>
+	
+	<complexType name="monParamsType">
+		<sequence>
+			<element name="parameter" maxOccurs="unbounded">
+				<complexType>
+					<attribute name="value" type="NMTOKENS" use="required"/>
+				</complexType>
+			</element>		
+		</sequence>
+	</complexType>
+    
+    <complexType name="nffg-setType">
+		<sequence>
+			<element ref="tns:nffg" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+    
+    <complexType name="nffgType">
+    	<sequence>
+    		<element name="endpoints" type="tns:epointsType" nillable="true"/>
+    		<element name="network_functions" type="tns:nfunctionsType" nillable="true"/>
+    		<element name="network_elements" type="tns:nelementsType" nillable="true"/>
+    		<element name="monitoring_parameters" type="tns:monParamsType" nillable="true"/>	
+    	</sequence>
+    	<attribute name="id" type="tns:nffgIdType" use="optional"/>
+    	<attribute name="version" type="string" use="optional"/>
+    </complexType>
+
+    <simpleType name="nffgIdType">
+    	<restriction base="string">
+    		<pattern value="nffg_\d+"/> 
+    	</restriction>
+    </simpleType>
+    
+    <complexType name="epointsType">
+    	<sequence>
+    		<element name="endpoint" type="tns:epType" maxOccurs="unbounded"/>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="epType">
+    	<sequence>
+    		<!-- valutare se renderlo nillable o tenere la cardinalità a * -->
+			<element name="flowspace">
+		    	<complexType>
+		    		<sequence>
+		    			<group ref="tns:L2HeaderParameters"/>
+		    			<group ref="tns:L3HeaderParameters"/> 
+		    			<group ref="tns:L4HeaderParameters"/> 
+		    		</sequence>
+		    		<attribute name="nodeId" type="string" use="optional"/>
+		    		<attribute name="ingPhysPort" type="string" use="optional"/>
+		    	</complexType>
+		    </element>
+    	</sequence>
+    	<attribute name="id" type="tns:epIdType" use="required"/>
+    </complexType>
+    
+    <simpleType name="epIdType">
+    	<restriction base="string">
+    		<pattern value="[a-z]*_\d+"/> 
+    	</restriction>
+    </simpleType>
+    
+    <complexType name="nfunctionsType">
+    	<sequence>
+    		<element name="network_function" type="tns:nfType" maxOccurs="unbounded"/>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="nfType">
+    	<sequence>
+    		<element name="specification" type="tns:specType"/>
+    		<element name="connection_points" type="tns:cpointsType"/>
+    		<element name="control_interfaces" type="tns:ctrlInterfacesType"/>
+    		<element name="monitoring_parameters" type="tns:monParamsType" nillable="true"/>
+    	</sequence>
+    	<attribute name="id" type="tns:nfIdType" use="required"/>
+    	<attribute name="functionalType" type="string" use="required"/>
+    </complexType>
+    
+    <simpleType name="nfIdType">
+    	<restriction base="string">
+    		<pattern value="[a-z]*_\d+"/> 
+    	</restriction>
+    </simpleType>
+    
+    <complexType name="specType">
+    	<sequence>
+    		<element name="deployment">
+    			<complexType>
+    				<attribute name="type" type="string" use="optional" default="N.A."/>
+    			</complexType>
+    		</element>
+    		<element name="image">
+    			<complexType>
+    				<!-- controllare come viene mappata la info -->
+    				<attribute name="uri" type="anyURI" use="optional" default="N.A."/>
+    			</complexType>
+    		</element>
+    		<element name="cpu">
+    			<complexType>
+    				<attribute name="model" type="string" use="optional" default="N.A."/>
+    				<attribute name="architecture" type="string" use="optional" default="N.A."/>
+    				<attribute name="numCores" type="unsignedByte" use="optional" default="1"/>
+    				<attribute name="clockSpeed" type="string" use="optional" default="N.A."/>
+    			</complexType>
+    		</element>
+    		<element name="memory">
+    			<complexType>
+    				<attribute name="type" type="string" use="optional" default="N.A."/>
+    				<attribute name="size" type="string" use="optional" default="N.A."/>
+    			</complexType>
+    		</element>
+    		<element name="storage">
+    			<complexType>
+    				<attribute name="type" type="string" use="optional" default="N.A."/>
+    				<attribute name="size" type="string" use="optional" default="N.A."/>
+    			</complexType>
+    		</element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="cpointsType">
+    	<sequence>
+    		<element name="connection_point" type="tns:cpType" maxOccurs="unbounded"/>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="cpType">
+    	<sequence>
+    		<element name="port" type="tns:portType"/>
+    	</sequence>
+    	<attribute name="id" type="tns:cpIdType" use="required"/>
+    </complexType>
+    
+    <complexType name="portType">
+    	<attribute name="id" type="unsignedShort" use="required"/>
+    	<attribute name="direction" type="tns:portDirEnumType" use="required"/>
+    	<attribute name="type" type="string" use="optional" default="N.A."/>
+    </complexType>
+    
+    <simpleType name="portDirEnumType">
+    	<restriction base="string">
+    		<enumeration value="in"/>
+    		<enumeration value="out"/>
+    		<enumeration value="both"/>
+    	</restriction>
+    </simpleType>
+    
+    <simpleType name="cpIdType">
+    	<restriction base="string">
+    		<pattern value="cp_\d+"/> 
+    	</restriction>
+    </simpleType>
+    
+    <complexType name="ctrlInterfacesType">
+    	<sequence>
+    		<!-- valutare se renderlo nillable -->
+    		<element name="control_interface" type="tns:ciType" minOccurs="0" maxOccurs="unbounded"/>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="ciType">
+    	<sequence>
+    		<element name="attributes">
+    			<complexType>
+    				<sequence>
+    					<element name="attribute" minOccurs="0" maxOccurs="unbounded">
+    						<complexType>
+    							<attribute name="value" type="string" use="required"/>
+    						</complexType>
+    					</element>
+    				</sequence>
+    			</complexType>
+    		</element>
+    	</sequence>
+    	<attribute name="id" type="tns:ciIdType" use="required"/>
+    </complexType>
+    
+    <simpleType name="ciIdType">
+    	<restriction base="string">
+    		<pattern value="ci_\d+"/> 
+    	</restriction>
+    </simpleType>
+    
+    <complexType name="nelementsType">
+    	<sequence>
+    		<element name="network_element" type="tns:neType" maxOccurs="unbounded"/>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="neType">
+    	<sequence>
+    		<element name="eps-cps" type="tns:eps-cpsType"/>
+    		<element name="monitoring_parameters" type="tns:monParamsType" nillable="true"/>
+    	</sequence>
+    	<attribute name="id" type="tns:neIdType" use="required"/>
+    	<attribute name="type" type="string" use="required"/>
+    </complexType>
+    
+    <simpleType name="neIdType">
+    	<restriction base="string">
+    		<pattern value="ne_\d+"/> 
+    	</restriction>
+    </simpleType>
+    
+    <complexType name="eps-cpsType">
+    	<sequence>
+    		<element name="ep-cp" type="tns:ep-cpType" minOccurs="0" maxOccurs="unbounded"/>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="ep-cpType">
+    	<sequence>
+    		<element name="flowrules" type="tns:flowrulesType" minOccurs="0" maxOccurs="unbounded"/>
+    	</sequence>
+    	<attribute name="id_ref" type="string" use="required"/>
+    </complexType>
+    
+    <complexType name="flowrulesType">
+    	<sequence>
+    		<!-- da fare valutazioni analoghe al flowspace di sopra -->
+    		<element name="flowspace">
+		    	<complexType>
+		    		<sequence>
+		    			<group ref="tns:L2HeaderParameters"/>
+		    			<group ref="tns:L3HeaderParameters"/> 
+		    			<group ref="tns:L4HeaderParameters"/>
+		    		</sequence>
+		    		<attribute name="ingPort" type="string" use="optional"/>
+		    	</complexType>
+    		</element>
+    		<element name="actions" type="tns:actionsType"/>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="actionsType">
+	    <sequence>
+	    	<element name="action" type="tns:actionType" maxOccurs="unbounded"/>
+	    </sequence>
+    </complexType>
+    
+    <complexType name="actionType">
+    	<attribute name="type" type="tns:actionEnumType" use="required"/>
+    	<attribute name="port" type="string" use="optional"/>
+    </complexType>
+    
+    <!-- controllare via SW che se l'aziione è output la porta deve esserci -->
+  	<simpleType name="actionEnumType">
+    	<restriction base="string">
+    		<enumeration value="discard"/>
+    		<enumeration value="output"/>
+    	</restriction>
+    </simpleType>	
+</schema>

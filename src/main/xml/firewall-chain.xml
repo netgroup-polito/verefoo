@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nffg id="nffg_1" version="0.1 D3.1"
+      xmlns="http://www.example.org/nffg/" 
+	  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	  xsi:schemaLocation="http://www.example.org/nffg/ ../schema/nffg.xsd">
+	<endpoints>
+		<endpoint id="client_1">
+			<flowspace ingPhysPort="10">
+				<Tcp src="80"/>
+			</flowspace>
+		</endpoint>
+		<endpoint id="server_1">
+			<flowspace ingPhysPort="13">
+				<Tcp src="80"/>
+			</flowspace>
+		</endpoint>
+	</endpoints>
+	<network_functions>
+		<network_function id="firewall_1" functionalType="firewall">
+			<specification>
+				<deployment type="PolitoFirewall"/>
+				<image uri="http://www.polito.it"/>
+				<cpu numCores="7"/>
+				<memory size="10MiB"/>
+				<storage size="100MiB"/>
+			</specification>
+			<connection_points>
+				<connection_point id="cp_1">
+					<port id="79" direction="in" type="GbE"/>
+				</connection_point>
+				<connection_point id="cp_2">
+					<port id="77" direction="out" type="10GbE"/>
+				</connection_point>
+			</connection_points>
+			<control_interfaces>
+				<control_interface id="ci_1">
+					<attributes>
+						<attribute value="tcp://127.0.0.1:5555"/>
+						<attribute value="Netconf"/>
+					</attributes>
+				</control_interface>
+			</control_interfaces>
+			<monitoring_parameters>
+				<parameter value="Measure_Script"/>
+			</monitoring_parameters>
+		</network_function>
+	</network_functions>
+	<network_elements>
+		<network_element id="ne_1" type="BiSBiS">
+			<eps-cps>
+				<ep-cp id_ref="client_1">
+					<flowrules>
+						<flowspace/>
+						<actions>
+							<action type="output" port="cp_1"/>
+						</actions>
+					</flowrules>
+				</ep-cp>
+				<ep-cp id_ref="server_1">
+					<flowrules>
+						<flowspace/>
+						<actions>
+							<action type="output" port="cp_2"/>
+						</actions>
+					</flowrules>
+				</ep-cp>
+				<ep-cp id_ref="cp_2">
+					<flowrules>
+						<flowspace/>
+						<actions>
+							<action type="output" port="server_1"/>
+						</actions>
+					</flowrules>
+				</ep-cp>
+			</eps-cps>
+			<monitoring_parameters>
+				<parameter value="Bandwith ep_1 cp_1 100mbit"/>
+				<parameter value="Delay ep_1 cp_1 50ms"/>
+			</monitoring_parameters>
+		</network_element>
+	</network_elements>
+	<monitoring_parameters xsi:nil="true"/>
+</nffg>
