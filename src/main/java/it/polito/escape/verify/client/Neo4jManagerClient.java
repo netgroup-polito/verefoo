@@ -97,7 +97,8 @@ public class Neo4jManagerClient {
 		
 		Client client = ClientBuilder.newClient();
 		
-		WebTarget baseTarget = client.target("http://localhost:8080/Project-Neo4jManager/rest/");
+		//WebTarget baseTarget = client.target("http://localhost:8080/Project-Neo4jManager/rest/");
+		WebTarget baseTarget = client.target("http://localhost:8080/neo4jmanager/rest/");
 		WebTarget graphsTarget = baseTarget.path("graphs");		
 		WebTarget pathSourceDestination = graphsTarget.path("{graphId}/paths");
 		WebTarget deleteNffg = graphsTarget.path("{graphId}");
