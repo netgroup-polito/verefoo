@@ -18,6 +18,9 @@ import javax.ws.rs.core.UriInfo;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
 import it.polito.escape.verify.resources.NeighbourResource;
 import it.polito.escape.verify.model.Node;
 import it.polito.escape.verify.service.NodeService;
@@ -32,10 +35,12 @@ public class NodeResource {
 	NodeService nodeService = new NodeService();
 	
     @GET
-    @Path("/prova")
-    @ApiOperation(value = "Returns a string",
-    notes = "Useless method",
-    response = String.class)
+    @Path("/test")
+    @ApiOperation(
+	    httpMethod = "GET",
+	    value = "Returns a test string",
+	    notes = "Test method",
+	    response = String.class)
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
     public String getIt() {
@@ -43,12 +48,28 @@ public class NodeResource {
     }
     
     @GET
+    @ApiOperation(
+    	    httpMethod = "GET",
+    	    value = "Returns all the nodes",
+    	    notes = "Returns multiple nodes",
+    	    response = Node.class,
+    	    responseContainer = "List")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
     public List<Node> getNodes(){
     	return nodeService.getAllNodes();
     }
     
     @POST
-    public Response addNode(Node node, @Context UriInfo uriInfo) {
+    @ApiOperation(
+    	    httpMethod = "POST",
+    	    value = "Creates a node",
+    	    notes = "A single node can be created",
+    	    response = Response.class)
+    @ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid node supplied") })
+    public Response addNode(
+    		@ApiParam(value = "New node object", required = true) Node node,
+    		@Context UriInfo uriInfo) {
         Node newNode = nodeService.addNode(node);
         String newId = String.valueOf(newNode.getId());
         URI uri = uriInfo.getAbsolutePathBuilder().path(newId).build();
@@ -59,7 +80,16 @@ public class NodeResource {
     
     @GET
     @Path("/{nodeId}")
-    public Node getNode(@PathParam("nodeId") long id, @Context UriInfo uriInfo){
+    @ApiOperation(
+    	    httpMethod = "GET",
+    	    value = "Returns a node",
+    	    notes = "A single node can be returned",
+    	    response = Node.class)
+    @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid node id"),
+    						@ApiResponse(code = 404, message = "Node not found")})
+    public Node getNode(
+    		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long id,
+    		@Context UriInfo uriInfo){
     	Node node = nodeService.getNode(id);
     	node.addLink(getUriForSelf(uriInfo, node), "self");
     	node.addLink(getUriForNeighbours(uriInfo, node), "neighbours");
@@ -69,14 +99,30 @@ public class NodeResource {
 
 	@PUT
     @Path("/{nodeId}")
-    public Node updateNode(@PathParam("nodeId") long id, Node node){
+    @ApiOperation(
+    	    httpMethod = "PUT",
+    	    value = "Edits a node",
+    	    notes = "A single node can be edited",
+    	    response = Node.class)
+	@ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid node object"),
+							@ApiResponse(code = 403, message = "Invalid node id"),
+							@ApiResponse(code = 404, message = "Node not found")})
+    public Node updateNode(
+    		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long id,
+    		@ApiParam(value = "Updated node object", required = true) Node node){
     	node.setId(id);
     	return nodeService.updateNode(node);
     }
     
     @DELETE
     @Path("/{nodeId}")
-    public void deleteNode(@PathParam("nodeId") long id){
+    @ApiOperation(
+    	    httpMethod = "DELETE",
+    	    value = "Deletes a node",
+    	    notes = "A single node can be deleted")
+    @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid node id")})
+    public void deleteNode(
+    		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long id){
     	nodeService.removeNode(id);
     }
     
@@ -100,7 +146,7 @@ public class NodeResource {
     	return uri;
 	}
     
-	@Path("/{nodeId}/neighbours")
+	@Path("/{nodeId}/neighbours")	
 	public NeighbourResource getNeighbourResource(){
 		return new NeighbourResource();
 	}

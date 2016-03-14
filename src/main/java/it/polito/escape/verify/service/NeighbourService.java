@@ -21,6 +21,9 @@ public class NeighbourService {
 	private Map<Long, Node> nodes = DatabaseClass.getNodes();
 	
 	public List<Neighbour> getAllNeighbours(long nodeId){
+		if (nodeId <= 0){
+			throw new ForbiddenException("Illegal node id: " + nodeId);
+		}		
 		Node node = nodes.get(nodeId);
 		if (node == null)
 			throw new DataNotFoundException("Node with id " + nodeId + " not found");
@@ -29,7 +32,9 @@ public class NeighbourService {
 	}
 	
 	public Neighbour getNeighbour(long nodeId, long neighbourId){		
-		
+		if (nodeId <= 0){
+			throw new ForbiddenException("Illegal node id: " + nodeId);
+		}
 		Node node = nodes.get(nodeId);
 		if (node == null){
 			throw new DataNotFoundException("Node with id " + nodeId + " not found");
@@ -43,6 +48,9 @@ public class NeighbourService {
 	}
 	
 	public Neighbour addNeighbour(long nodeId, Neighbour neighbour){
+		if (nodeId <= 0){
+			throw new ForbiddenException("Illegal node id: " + nodeId);
+		}
 		Node node = nodes.get(nodeId);
 		if (node == null){
 			throw new DataNotFoundException("Node with id " + nodeId + " not found");
@@ -60,6 +68,9 @@ public class NeighbourService {
 	
 
 	public Neighbour updateNeighbour(long nodeId, Neighbour neighbour){
+		if (nodeId <= 0){
+			throw new ForbiddenException("Illegal node id: " + nodeId);
+		}
 		Node node = nodes.get(nodeId);
 		if (node == null){
 			throw new DataNotFoundException("Node with id " + nodeId + " not found");
@@ -76,6 +87,9 @@ public class NeighbourService {
 	}
 	
 	public Neighbour removeNeighbour(long nodeId, long neighbourId){
+		if (nodeId <= 0){
+			throw new ForbiddenException("Illegal node id: " + nodeId);
+		}
 		Node node = nodes.get(nodeId);
 		if (node == null){
 			throw new DataNotFoundException("Node with id " + nodeId + " not found");

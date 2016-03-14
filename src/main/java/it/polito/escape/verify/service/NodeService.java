@@ -23,6 +23,9 @@ public class NodeService {
 	}
 	
 	public Node getNode(long id){
+		if (id <= 0){
+			throw new ForbiddenException("Illegal node id: " + id);
+		}
 		Node node = nodes.get(id);
 		if (node == null){
 			throw new DataNotFoundException("Node with id " + id + " not found");
@@ -49,6 +52,9 @@ public class NodeService {
 	}
 	
 	public Node removeNode(long id){
+		if (id <= 0){
+			throw new ForbiddenException("Illegal node id: " + id);
+		}
 		return nodes.remove(id);
 	}
 
@@ -56,7 +62,9 @@ public class NodeService {
 		if (isValidNode(node) == false)
 			throw new BadRequestException("Node is not valid: name and functional_type are required fields");
 		
-		node.setId(DatabaseClass.getNumberOfNodes() + 1);
+		synchronized(this){
+			node.setId(DatabaseClass.getNumberOfNodes() + 1);
+		}
 				
 		nodes.put(node.getId(), node);
 		return node;
