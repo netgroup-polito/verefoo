@@ -2,3 +2,4 @@
 /bin/**
 /service/generated/classes/
 /service/generated/classes/**
+**.pyc
