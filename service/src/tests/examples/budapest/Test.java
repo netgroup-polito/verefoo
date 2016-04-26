@@ -8,7 +8,7 @@ import com.microsoft.z3.Model;
 import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
 import mcnet.components.IsolationResult;
-import tests.examples.Scenario_1;
+import tests.examples.budapest.Scenario_1;
 public class Test{
     Context ctx;
     public void resetZ3() throws Z3Exception{
