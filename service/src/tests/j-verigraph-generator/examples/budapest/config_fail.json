@@ -1,0 +1,43 @@
+{
+	"nodes":[
+		{
+			"configuration":[
+				
+			],
+			"id":"user1",
+			"description":"source"
+		},
+		{
+			"configuration":[
+				"ip_user1",
+				"ip_user2"
+			],
+			"id":"nat",
+			"description":"internal addresses"
+		},
+		{
+			"configuration":[
+				{
+					"ip_webserver":"ip_nat"
+				}
+			],
+			"id":"firewall",
+			"description":"no blacklist"
+		},
+		{
+			"configuration":[
+				
+			],
+			"id":"webserver",
+			"description":"destination"
+		},
+		{
+			"configuration":[
+				"ip_user1",
+				"ip_user2"
+			],
+			"id":"dpi",
+			"description":"known addresses"
+		}
+	]
+}

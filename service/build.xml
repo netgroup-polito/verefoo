@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<!--
+   Ant script for building and running the Counter Webservice
+   by the jax-ws Endpoint server (run.jaxws.server target).
+   
+   
+   !!! IMPORTANT !!!
+   It is important to compile with Java 8 so let Ant use a Java8+ version
+   
+   
+-->
+<project name="vnfchainverification-service" default="run.jaxws.server" basedir=".">
+
+   <!-- define directories -->
+   <property name="src.dir" location="${basedir}/src"/>
+   <property name="gen.dir" location="${basedir}/generated"/>
+   <property name="build.dir" location="${gen.dir}/classes"/>
+   <property name="gen-src.dir" location="${gen.dir}/gen-src"/>
+   <property name="gen-service.dir" location="${gen.dir}/gen-service"/>
+   <property name="wsdl.dir" location="${basedir}/resources"/>
+   <property name="jaxws.wsdl.dir" location="${basedir}/resources"/>
+
+   <!-- define wsdl filename and endpoint address -->
+	<property name="wsdl.filename" value="j-verigraph.wsdl"/>    
+	<property name="wsdl.orig" 
+		      location="${wsdl.dir}/${wsdl.filename}"/>
+	<property name="jaxws.endpoint"
+			  value="http://localhost:8086/WebServiceSample/VNFChainVerificationService"/>
+
+	<!-- define service and server package and class names -->
+	<property name="service.package"
+	      	  value="it.polito.vnfchainverification"/>
+	<property name="service.package.dir"
+	      	  value="it/polito/vnfchainverification"/>
+	<property name="service.class"
+		      value="VNFChainVerificationImpl"/>
+	<property name="service.name"
+			  value="VNFChainVerificationService"/>
+	<property name="server.class"
+			  value="VNFChainVerificationServer"/>
+	<property name="server.package"
+	      	  value="it.polito.vnfchainverification.server"/>
+
+	<property name="tns" value="http://www.example.org/checkisolation"/>
+	
+   <!-- define the execution classpath for jaxws server -->
+   <path id="server.classpath">
+	    <pathelement path="${build.dir}" />
+   </path>
+
+   <!-- define the "init" target -->
+	<target name="init" depends="clean">
+		<!-- make directories -->
+	    <mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.dir}/META-INF"/>
+		<mkdir dir="${gen-src.dir}"/>
+		<mkdir dir="${gen-service.dir}"/>		
+		<!-- configure wsdl file with endpoint addresses -->
+		<mkdir dir="${jaxws.wsdl.dir}"/>
+		<copy file="${wsdl.orig}" toDir="${jaxws.wsdl.dir}" overwrite="true"/>
+		<replace file="${jaxws.wsdl.dir}/${wsdl.filename}" token="REPLACE_WITH_ACTUAL_URL" value="${jaxws.endpoint}"/>
+	</target>  
+	
+   <!-- define the "compile.wsdl" target -->
+   <target name="compile.wsdl" depends="init">
+	  <property name="WSDL"
+	      	  location="${jaxws.wsdl.dir}/${wsdl.filename}"/>
+      <exec executable="wsimport">
+        <arg line="-d ${build.dir} -p ${service.package} -s ${gen-src.dir} -keep ${WSDL}"/>
+      </exec>
+   </target>   
+	
+   <!-- define the "build.jaxws.service" target -->
+   <target name="build.jaxws.service" depends="compile.wsdl">
+    	<!-- copy wsdl, schema, and chain file to META-INF directory -->
+    	<copy toDir="${build.dir}/META-INF" overwrite="true">
+        	<fileset dir="${jaxws.wsdl.dir}">
+ 		  		<include name="*"/>
+			</fileset>
+      	</copy>
+		<javac debug="on" 
+		       fork="true"
+		       destdir="${build.dir}" 
+		       srcdir="${src.dir}"
+			   includeantruntime="false"
+			   classpath="${basedir}/build/com.microsoft.z3.jar"
+		 />
+   </target>
+	
+   <!-- define the "run.jaxws.server" target -->
+   <target name="run.jaxws.server" depends="build.jaxws.service">
+      <java classname="${server.package}.${server.class}" classpath="${basedir}/build/com.microsoft.z3.jar" fork="true">
+        <classpath refid="server.classpath"/>
+      </java>
+   </target>
+
+	<!-- define the "clean" target -->
+    <target name="clean">
+        <delete dir="${gen.dir}"/>
+    </target>
+   
+</project>

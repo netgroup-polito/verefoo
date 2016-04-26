@@ -1,0 +1,230 @@
+<xsd:schema version="1.0" 
+elementFormDefault="qualified" 
+attributeFormDefault="qualified" 
+targetNamespace="http://www.example.org/checkisolation" 
+xmlns:tns="http://www.example.org/checkisolation" 
+xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
+jaxb:version="1.0">
+
+	<xsd:annotation>
+		<xsd:appinfo>
+			<jaxb:globalBindings choiceContentProperty="true" /> 
+		</xsd:appinfo>
+	</xsd:annotation>
+	
+	<xsd:element name="checkIsolationProperty">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="source" type="tns:VNFName" /> 
+				<xsd:element name="destination" type="tns:VNFName" /> 
+				<xsd:element name="VNF" type="tns:VNF" minOccurs="2" maxOccurs="unbounded">
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	
+		<xsd:key name="nameKey">
+			<xsd:selector xpath="tns:VNF/tns:Name" /> <xsd:field xpath="@tns:id" /> 
+		</xsd:key>
+		<xsd:keyref name="nameKeyRef1" refer="tns:nameKey">
+			<xsd:selector xpath="tns:VNF/tns:PolitoCache/tns:InternalNodes/tns:InternalNodeName" /> <xsd:field xpath="@tns:id" /> 
+		</xsd:keyref>
+		<xsd:keyref name="nameKeyRef2" refer="tns:nameKey">
+			<xsd:selector xpath="tns:VNF/tns:RoutingTable/tns:Entry/tns:Name" /> <xsd:field xpath="@tns:id" /> 
+		</xsd:keyref>
+		<xsd:keyref name="nameKeyRef3" refer="tns:nameKey">
+			<xsd:selector xpath="tns:source" /> <xsd:field xpath="@tns:id" /> 
+		</xsd:keyref>
+		<xsd:keyref name="nameKeyRef4" refer="tns:nameKey">
+			<xsd:selector xpath="tns:destination" /> <xsd:field xpath="@tns:id" /> 
+		</xsd:keyref>
+		<xsd:key name="ipKey">
+			<xsd:selector xpath="tns:VNF/tns:IPs" /> <xsd:field xpath="@tns:id" /> 
+		</xsd:key>
+		<xsd:keyref name="ipKeyRef1" refer="tns:ipKey">
+			<xsd:selector xpath="tns:VNF/tns:AclFirewall/tns:Acls/tns:Acl/tns:IP1" /> <xsd:field xpath="@tns:id" /> 
+		</xsd:keyref>
+		<xsd:keyref name="ipKeyRef2" refer="tns:ipKey">
+			<xsd:selector xpath="tns:VNF/tns:AclFirewall/tns:Acls/tns:Acl/tns:IP2" /> <xsd:field xpath="@tns:id" /> 
+		</xsd:keyref>
+		<xsd:keyref name="ipKeyRef3" refer="tns:ipKey">
+			<xsd:selector xpath="tns:VNF/tns:PolitoNat/tns:InternalIPs/tns:InternalIP" /> <xsd:field xpath="@tns:id" /> 
+		</xsd:keyref>
+		<xsd:keyref name="ipKeyRef4" refer="tns:ipKey">
+			<xsd:selector xpath="tns:VNF/tns:PolitoNF/tns:NFRules/tns:Rule/tns:IP1" /> <xsd:field xpath="@tns:id" /> 
+		</xsd:keyref>
+		<xsd:keyref name="ipKeyRef5" refer="tns:ipKey">
+			<xsd:selector xpath="tns:VNF/tns:PolitoNF/tns:NFRules/tns:Rule/tns:IP2" /> <xsd:field xpath="@tns:id" /> 
+		</xsd:keyref>
+		<xsd:keyref name="ipKeyRef6" refer="tns:ipKey">
+			<xsd:selector xpath="tns:VNF/tns:PolitoWebClient/tns:ServerIP" /> <xsd:field xpath="@tns:id" /> 
+		</xsd:keyref>
+		<xsd:keyref name="ipKeyRef7" refer="tns:ipKey">
+			<xsd:selector xpath="tns:VNF/tns:RoutingTable/tns:Entry/tns:IP" /> <xsd:field xpath="@tns:id" /> 
+		</xsd:keyref>
+	</xsd:element>
+	
+	<xsd:element name="checkIsolationPropertyResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Satisfied" type="xsd:boolean" /> 
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="WebServiceException">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Message" type="xsd:string" /> 
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="MalformedArgument">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Message" type="xsd:string" /> 
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="Z3Error">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Message" type="xsd:string" /> 
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:complexType name="VNF">
+		<xsd:sequence>
+			<xsd:element name="Name" type="tns:VNFName" /> 
+			<xsd:element name="IPs" type="tns:VNFIp" minOccurs="1" maxOccurs="unbounded" /> 
+			<xsd:choice>
+				<xsd:element name="AclFirewall">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Acl" minOccurs="1" maxOccurs="unbounded">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="IP1" type="tns:VNFIp" /> 
+										<xsd:element name="IP2" type="tns:VNFIp" /> 
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="DumbNode">
+					<xsd:complexType>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="EndHost">
+					<xsd:complexType>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="PolitoAntispam">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Blacklist" type="xsd:int" minOccurs="1" maxOccurs="unbounded">
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="PolitoCache">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="InternalNodes" type="tns:VNFName" minOccurs="1" maxOccurs="unbounded" /> 
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="PolitoErrFunction">
+					<xsd:complexType>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="PolitoMailClient">
+					<xsd:complexType>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="PolitoMailServer">
+					<xsd:complexType>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="PolitoNat">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="InternalIPs" type="tns:VNFIp" minOccurs="1" maxOccurs="unbounded" /> 
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="PolitoNF">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="NFRule" minOccurs="1" maxOccurs="unbounded">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="IP1" type="tns:VNFIp" /> 
+										<xsd:element name="IP2" type="tns:VNFIp" /> 
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="PolitoWebClient">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="ServerIP" type="tns:VNFIp" /> 
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="PolitoWebServer">
+					<xsd:complexType>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element name="RoutingTable">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Entry" minOccurs="0" maxOccurs="unbounded">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="IP" type="tns:VNFIp" /> 
+									<xsd:element name="Name" type="tns:VNFName" /> 
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="VNFIp">
+		<xsd:attribute name="id"  use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string" >
+					<xsd:minLength value="1">
+					</xsd:minLength>
+					<xsd:maxLength value="20">
+					</xsd:maxLength>
+					<xsd:whiteSpace value="collapse">
+					</xsd:whiteSpace>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="VNFName">
+		<xsd:attribute name="id"  use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:minLength value="1">
+					</xsd:minLength>
+					<xsd:maxLength value="20">
+					</xsd:maxLength>
+					<xsd:whiteSpace value="collapse">
+					</xsd:whiteSpace>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+</xsd:schema>

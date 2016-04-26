@@ -1,0 +1,4 @@
+/bin/
+/bin/**
+/service/generated/classes/
+/service/generated/classes/**
