@@ -12,7 +12,7 @@ public class BadRequestExceptionManager implements ExceptionMapper<BadRequestExc
 
 	@Override
 	public Response toResponse(BadRequestException exception) {
-		ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(), 400, "http://www.polito.it");
+		ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(), 400, "http://localhost:8080/verify/api-docs/#/nodes");
 		return Response.status(Status.BAD_REQUEST)
 				.entity(errorMessage)
 				.build();

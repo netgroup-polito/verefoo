@@ -54,8 +54,6 @@ public class NodeResource {
     	    notes = "Returns multiple nodes",
     	    response = Node.class,
     	    responseContainer = "List")
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Produces(MediaType.TEXT_PLAIN)
     public List<Node> getNodes(){
     	return nodeService.getAllNodes();
     }

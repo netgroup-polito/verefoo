@@ -22,7 +22,7 @@ import it.polito.escape.verify.model.Node;
 import it.polito.escape.verify.service.NeighbourService;
 
 @Path("/")
-@Api( value = "", description = "Manage neighbours" )
+@Api( hidden= true, value = "", description = "Manage neighbours" )
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class NeighbourResource {
