@@ -1,0 +1,65 @@
+{
+	"nodes":[
+		{
+			"configuration":[
+				
+			],
+			"id":"webclient",
+			"description":"source"
+		},
+		{
+			"configuration":[
+				
+			],
+			"id":"mailclient",
+			"description":"source2"
+		},
+		{
+			"configuration":[
+				
+			],
+			"id":"cache",
+			"description":"cache"
+		},
+		{
+			"configuration":[
+				
+			],
+			"id":"antispam",
+			"description":"antispam"
+		},
+		{
+			"configuration":[
+				"ip_weblient",
+				"ip_mailclient",
+				"ip_cache",
+				"ip_antispam"
+			],
+			"id":"nat",
+			"description":"internal addresses"
+		},
+		{
+			"configuration":[
+				{
+					"ip_webserver":"ip_nat"
+				}
+			],
+			"id":"firewall",
+			"description":"no blacklist"
+		},
+		{
+			"configuration":[
+				
+			],
+			"id":"webserver",
+			"description":"destination"
+		},
+		{
+			"configuration":[
+				
+			],
+			"id":"mailserver",
+			"description":"destination2"
+		}
+	]
+}

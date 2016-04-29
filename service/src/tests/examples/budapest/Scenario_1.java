@@ -1,0 +1,71 @@
+package tests.examples.budapest;
+import java.util.ArrayList;
+import com.microsoft.z3.Context;
+import com.microsoft.z3.DatatypeExpr;
+import mcnet.components.Checker;
+import mcnet.components.NetContext;
+import mcnet.components.Network;
+import mcnet.components.NetworkObject;
+import mcnet.components.Tuple;
+import mcnet.netobjs.AclFirewall;
+import mcnet.netobjs.EndHost;
+import mcnet.netobjs.PolitoNat;
+
+public class Scenario_1{
+    public Checker check;
+    public AclFirewall firewall;
+    public EndHost webserver;
+    public PolitoNat nat;
+    public EndHost user1;
+    public Scenario_1(Context ctx){
+        NetContext nctx = new NetContext (ctx,new String[]{"firewall", "webserver", "nat", "user1"}, new String[]{"ip_firewall", "ip_webserver", "ip_nat", "ip_user1"});
+        Network net = new Network (ctx,new Object[]{nctx});
+        firewall = new AclFirewall(ctx, new Object[]{nctx.nm.get("firewall"), net, nctx});
+        webserver = new EndHost(ctx, new Object[]{nctx.nm.get("webserver"), net, nctx});
+        nat = new PolitoNat(ctx, new Object[]{nctx.nm.get("nat"), net, nctx});
+        user1 = new EndHost(ctx, new Object[]{nctx.nm.get("user1"), net, nctx});
+        ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>> adm = new ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>>();
+        ArrayList<DatatypeExpr> al0 = new ArrayList<DatatypeExpr>();
+        al0.add(nctx.am.get("ip_firewall"));
+        adm.add(new Tuple<>(firewall, al0));
+        ArrayList<DatatypeExpr> al1 = new ArrayList<DatatypeExpr>();
+        al1.add(nctx.am.get("ip_webserver"));
+        adm.add(new Tuple<>(webserver, al1));
+        ArrayList<DatatypeExpr> al2 = new ArrayList<DatatypeExpr>();
+        al2.add(nctx.am.get("ip_nat"));
+        adm.add(new Tuple<>(nat, al2));
+        ArrayList<DatatypeExpr> al3 = new ArrayList<DatatypeExpr>();
+        al3.add(nctx.am.get("ip_user1"));
+        adm.add(new Tuple<>(user1, al3));
+        net.setAddressMappings(adm);
+        ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt_firewall = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
+        rt_firewall.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_webserver"), webserver));
+        rt_firewall.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_user1"), nat));
+        rt_firewall.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_nat"), nat));
+        net.routingTable(firewall, rt_firewall);
+        ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt_webserver = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
+        rt_webserver.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_firewall"), firewall));
+        rt_webserver.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_user1"), firewall));
+        rt_webserver.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_nat"), firewall));
+        net.routingTable(webserver, rt_webserver);
+        ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt_nat = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
+        rt_nat.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_firewall"), firewall));
+        rt_nat.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_user1"), user1));
+        rt_nat.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_webserver"), firewall));
+        net.routingTable(nat, rt_nat);
+        ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt_user1 = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
+        rt_user1.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_firewall"), nat));
+        rt_user1.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_nat"), nat));
+        rt_user1.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_webserver"), nat));
+        net.routingTable(user1, rt_user1);
+        net.attach(firewall, webserver, nat, user1);
+        ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+        acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_webserver"),nctx.am.get("ip_nat")));
+        firewall.addAcls(acl);
+        ArrayList<DatatypeExpr> ia = new ArrayList<DatatypeExpr>();
+        ia.add(nctx.am.get("ip_user1"));
+        nat.setInternalAddress(ia);
+        check = new Checker(ctx,nctx,net);
+    }
+}
+

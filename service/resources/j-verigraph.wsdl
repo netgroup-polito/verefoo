@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+
+<definitions 
+targetNamespace="http://www.example.org/checkisolation"
+name="j-verigraph" 
+xmlns="http://schemas.xmlsoap.org/wsdl/" 
+xmlns:tns="http://www.example.org/checkisolation"  
+xmlns:xi="http://www.w3.org/2001/XMLSchema" 
+xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+>
+    
+   
+<types>
+	<xi:schema>
+      <xi:import namespace="http://www.example.org/checkisolation" schemaLocation="checkIsolationProperty.xsd"/>
+    </xi:schema>
+
+  </types>
+   
+   
+   <message name="checkIsolationProperty">
+    <part element="tns:checkIsolationProperty" name="parameters"/>
+  </message>
+  <message name="checkIsolationPropertyResponse">
+    <part element="tns:checkIsolationPropertyResponse" name="parameters"/>
+  </message>
+   <message name="WebServiceException">
+    <part name="fault" element="tns:WebServiceException"/>
+  </message>
+     <message name="Z3Error">
+    <part name="fault" element="tns:Z3Error"/>
+  </message>
+   <message name="MalformedArgument">
+    <part name="fault" element="tns:MalformedArgument"/>
+  </message>
+  
+  
+  <portType name="VNFChainVerification">
+    <operation name="checkIsolationProperty">
+      <input message="tns:checkIsolationProperty"/>
+      <output message="tns:checkIsolationPropertyResponse"/>
+      <fault message="tns:WebServiceException" name="WebServiceException"/>
+      <fault message="tns:Z3Error" name="Z3Error"/>
+      <fault message="tns:MalformedArgument" name="MalformedArgument"/>
+    </operation>
+  </portType>
+  <binding name="VNFChainVerificationPortBinding" type="ns1:VNFChainVerification" xmlns:ns1="http://www.example.org/checkisolation">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="checkIsolationProperty">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+       <fault name="WebServiceException">
+        <soap:fault name="WebServiceException" use="literal"/>
+      </fault>
+       <fault name="Z3Error">
+        <soap:fault name="Z3Error" use="literal"/>
+      </fault>
+       <fault name="MalformedArgument">
+        <soap:fault name="MalformedArgument" use="literal"/>
+      </fault>
+    </operation>
+  </binding>
+  <service name="VNFChainVerificationService">
+    <port binding="tns:VNFChainVerificationPortBinding" name="VNFChainVerificationPort">
+       <soap:address location="http://localhost:8086/WebServiceSample/VNFChainVerificationService"/>
+    </port>
+  </service>
+</definitions>

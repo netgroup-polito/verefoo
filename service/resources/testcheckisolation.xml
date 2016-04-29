@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<tns:checkIsolationProperty 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tns="http://www.example.org/checkisolation" 
+	xsi:schemaLocation="http://www.example.org/checkisolation checkisolationschema.xsd" >
+	
+	<tns:source tns:id="politoMailClient"/>	
+	<tns:destination tns:id="politoAntispam"/>
+	<tns:VNF>
+		<tns:Name tns:id="politoMailClient"/>
+		<tns:IPs  tns:id="ip_client"/>
+		<tns:PolitoMailClient/>
+		<tns:RoutingTable>	
+	      	<tns:Entry>
+    	    	<tns:IP  />
+        		<tns:Name/>
+      		</tns:Entry>
+    	</tns:RoutingTable>
+	</tns:VNF>
+	
+	<tns:VNF>
+		<tns:Name tns:id="politoAntispam"/>
+		<tns:IPs  tns:id="ip_antispam"/>
+		<tns:PolitoAntispam>
+			<tns:Blacklist>1</tns:Blacklist>
+		</tns:PolitoAntispam>
+		<tns:RoutingTable>	
+	      	<tns:Entry>
+    	    	<tns:IP tns:id="ip_client" />
+        		<tns:Name tns:id="politoMailClient" />
+      		</tns:Entry>
+    	</tns:RoutingTable>
+	</tns:VNF>
+	
+</tns:checkIsolationProperty>
