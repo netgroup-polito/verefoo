@@ -20,15 +20,17 @@
 #  You should have received a copy of the GNU Affero General Public
 #  License along with Verigraph.  If not, see
 #  <http://www.gnu.org/licenses/>.
-#  
+#
 
 from pprint import pprint
+from pprint import pformat
 import sys, getopt
 from code_generator import CodeGeneratorBackend
 import os, errno
 from config import *
 from utility import *
 from routing_generator import *
+import logging
 
 
 #global variables
@@ -63,12 +65,12 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                 if key != "name":
                     chn[node["name"]][key] = value
             except KeyError, e:
-                print "Field " + str(key) + " not found for node " + str(node["name"])
-                print "Cotinuing..."
+                logging.debug("Field " + str(key) + " not found for node " + str(node["name"]))
+                logging.debug("Cotinuing...")
                 continue
     #debug print of the chain        
-    if debug == True:
-        pprint(chn)
+    
+    logging.debug(pformat((chn)))
         
 #OLD ROUTING FROM FILE    
 #     #set route values ---> route(name, [list of addresses])
@@ -88,7 +90,7 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
     
     for node_name, node_rt in routing["routing_table"].items():
         route[node_name] = node_rt  
-    pprint(route)
+    logging.debug(pformat((route)))
         
     #pprint(configuration["nodes"])
     
@@ -121,14 +123,14 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                         config[node["id"]][key] = value
                 except KeyError, e:
                     #node not found in current chain 
-                    print "Field " + key + " not found for node " + str(node["id"])
-                    print key + " probably doesn't belong to the current chain, thus it will be skipped"
+                    logging.debug("Field " + key + " not found for node " + str(node["id"]))
+                    logging.debug(key + " probably doesn't belong to the current chain, thus it will be skipped")
                     #sys.exit(1)
                     continue
-    pprint(config)
+    logging.debug(pformat((config)))
     #debug print of the configuration                
-    if debug == True:
-        pprint(config)
+    
+    logging.debug(pformat((config)))
         
     #prepare a few more helpful data structures
     nodes_names = []
@@ -170,11 +172,11 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                 nodes_rt[node].append(row)
             except KeyError, e:
                 #node not found, notify and exit
-                print "Node " + node + " not found!"
+                logging.debug("Node " + node + " not found!")
                 sys.exit(1)
                      
     #begin file generation    
-    print "* instantiating chain #" + str(number)
+    logging.debug("* instantiating chain #" + str(number))
     dirname = os.path.dirname(output_file)
     basename = os.path.basename(output_file)
     basename = os.path.splitext(basename)[0].capitalize()
@@ -309,7 +311,7 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
         #rename class to upper case
         #os.rename(dirname + "/" + basename + "_" + str(number) + ".java", dirname + "/" + basename + "_" + str(number) + ".java")
 
-        print "wrote test file " + os.path.abspath(dirname + "/" + basename + "_" + str(number)) + ".java" + " successfully!"
+        logging.debug("wrote test file " + os.path.abspath(dirname + "/" + basename + "_" + str(number)) + ".java" + " successfully!")
 
 
 def main(argv):
@@ -339,7 +341,9 @@ def main(argv):
         elif opt in ("-o", "--ofile"):
             output_file = arg
 
-    
+    #set logging
+    logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+
     #parse chains file
     chains = convert_unicode_to_ascii(parse_json_file(chains_file))
     
@@ -352,9 +356,9 @@ def main(argv):
     
     
     #debug prints with pprint
-    if debug == True:
-        pprint(chains)
-        pprint(configuration)
+    
+    logging.debug(pformat((chains)))
+    logging.debug(pformat((configuration)))
     
     #custom formatted prints
     print_chains(chains)

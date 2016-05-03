@@ -5,7 +5,7 @@
 				
 			],
 			"id":"user1",
-			"description":"source"
+			"description":"user1"
 		},
 		{
 			"configuration":[
@@ -38,6 +38,13 @@
 			],
 			"id":"dpi",
 			"description":"known addresses"
+		},
+		{
+			"configuration":[
+				
+			],
+			"id":"user2",
+			"description":"user2"
 		}
 	]
 }

@@ -20,7 +20,7 @@
 #  You should have received a copy of the GNU Affero General Public
 #  License along with Verigraph.  If not, see
 #  <http://www.gnu.org/licenses/>.
-#  
+#
 
 devices_to_classes = {  "webclient" : "PolitoWebClient",
                         "webserver" : "PolitoWebServer",

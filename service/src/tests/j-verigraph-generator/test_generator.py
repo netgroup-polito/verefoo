@@ -20,7 +20,7 @@
 #  You should have received a copy of the GNU Affero General Public
 #  License along with Verigraph.  If not, see
 #  <http://www.gnu.org/licenses/>.
-#  
+#
 
 from pprint import pprint
 from code_generator import CodeGeneratorBackend
@@ -28,6 +28,7 @@ import sys, getopt
 import contextlib
 import os
 from utility import *
+import logging
 
 def main(argv):
     if len(argv) < 8:
@@ -56,17 +57,18 @@ def main(argv):
             source = arg
         elif opt in ("-d", "--destination"):
             destination = arg
-
+    #set logging
+    logging.basicConfig(stream=sys.stderr, level=logging.INFO)
     #capitalize ouput filename
     dirname = os.path.dirname(outputfile)
     basename = os.path.basename(outputfile)
     basename = os.path.splitext(basename)[0].capitalize()
 
     #print arguments    
-    print 'Input file is', inputfile
-    print 'Output file is', dirname + "/" + basename
-    print 'Source node is', source
-    print 'Destination node is', destination
+    logging.debug('Input file is', inputfile)
+    logging.debug('Output file is', dirname + "/" + basename)
+    logging.debug('Source node is', source)
+    logging.debug('Destination node is', destination)
     
 
     #begin file generation
@@ -164,7 +166,7 @@ def main(argv):
         c.writeln("}")
 
         print >>f, c.end()
-    print "File " + os.path.abspath(dirname + "/" + basename + ".java") + " has been successfully generated!!"
+    logging.debug("File " + os.path.abspath(dirname + "/" + basename + ".java") + " has been successfully generated!!")
                
 
 if __name__ == "__main__":

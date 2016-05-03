@@ -41,6 +41,9 @@
 		{
 			"configuration":[
 				{
+					"ip_webserver":"ip_nat"
+				},
+				{
 					"ip_mailserver":"ip_nat"
 				}
 			],
