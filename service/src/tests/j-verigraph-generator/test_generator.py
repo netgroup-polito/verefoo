@@ -149,8 +149,10 @@ def main(argv):
 
         c.writeln("if (ret.result == Status.UNSATISFIABLE){\n\
                 System.out.println(\"UNSAT\");\n\
-            }else{\n\
+            }else if (ret.result == Status.SATISFIABLE){\n\
                 System.out.println(\"SAT\");\n\
+            }else{\n\
+                System.out.println(\"UNPREDICTED\");\n\
             \r\t\t\t}")
 
         c.dedent()

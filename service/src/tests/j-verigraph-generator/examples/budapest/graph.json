@@ -1,0 +1,50 @@
+{
+    "nodes": [
+        {
+            "name": "user1",
+            "functional_type": "endpoint"
+        },
+        {
+            "name": "nat",
+            "functional_type": "nat"
+        },
+        {
+            "name": "firewall",
+            "functional_type": "firewall"
+        },
+        {
+            "name": "webserver",
+            "functional_type": "endpoint"
+        },
+        {
+            "name": "user2",
+            "functional_type": "endpoint"
+        },
+        {
+            "name": "dpi",
+            "functional_type": "nat"
+        }
+    ],
+    "links": [
+        {
+            "source": "user1",
+            "destination": "nat"
+        },
+        {
+            "source": "nat",
+            "destination": "firewall"
+        },
+        {
+            "source": "firewall",
+            "destination": "webserver"
+        },
+        {
+            "source": "user2",
+            "destination": "dpi"
+        },
+        {
+            "source": "dpi",
+            "destination": "firewall"
+        }
+    ]
+}

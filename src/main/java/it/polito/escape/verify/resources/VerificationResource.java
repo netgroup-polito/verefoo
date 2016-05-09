@@ -16,6 +16,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import it.polito.escape.verify.Entry;
 import it.polito.escape.verify.client.Neo4jManagerClient;
 import it.polito.escape.verify.model.ErrorMessage;
@@ -26,6 +30,7 @@ import it.polito.escape.verify.service.NodeService;
 import it.polito.nffg.neo4j.jaxb.Paths;
 
 @Path("/chains")
+@Api( value = "/chains", description = "Manage nodes" )
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 //@Produces(MediaType.TEXT_PLAIN)
@@ -33,13 +38,19 @@ public class VerificationResource {
 	NodeService nodeService = new NodeService();
 	
 	@GET
+	@ApiOperation(
+    	    httpMethod = "GET",
+    	    value = "Returns all the paths between a given source and destination",
+    	    notes = "Returns possibly multiple paths",
+    	    response = Paths.class)
+	@ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid request")})
 	//@Produces(MediaType.TEXT_PLAIN)
 	public Paths getChains(@BeanParam VerificationBean validationBean){		
 		String source = validationBean.getSource() + "_" + nodeService.searchByName(validationBean.getSource()).getId();
 		String destination = validationBean.getDestination() + "_" + nodeService.searchByName(validationBean.getDestination()).getId();
 		//System.out.println("Source: " + source + ", destination: " + destination);
-		if (source == null || destination ==null){
-			ErrorMessage errorMessage = new ErrorMessage("Bad request", 400, "http://www.polito.it");
+		if (source == null || destination == null){
+			ErrorMessage errorMessage = new ErrorMessage("Bad request", 400, "http://localhost:8080/verify/api-docs/");
 			Response response = Response.status(Status.BAD_REQUEST)
 					.entity(errorMessage)
 					.build();

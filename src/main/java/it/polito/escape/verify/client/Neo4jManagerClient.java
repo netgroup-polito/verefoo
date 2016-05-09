@@ -53,24 +53,24 @@ public class Neo4jManagerClient {
 	
 
 	public Neo4jManagerClient() {
-		this.source = "client_1";
-		this.destination = "server_1";
-		
-		this.endpoints.add("client_1");
-		this.endpoints.add("server_1");
-		
-		this.firewalls.add("firewall_1");
-		
-		for (String node : endpoints){
-			this.routingTable.put(node, new ArrayList<Entry>());
-		}
-		for (String firewall : firewalls){
-			this.routingTable.put(firewall + "_in", new ArrayList<Entry>());
-			this.routingTable.put(firewall + "_out", new ArrayList<Entry>());
-		}
-		this.routingTable.get("client_1").add(new Entry("output", "firewall_1_in"));
-		//this.routingTable.get("server_1").add(new Entry("output", "firewall_1_out"));
-		this.routingTable.get("firewall_1_out").add(new Entry("output", "server_1"));
+//		this.source = "client_1";
+//		this.destination = "server_1";
+//		
+//		this.endpoints.add("client_1");
+//		this.endpoints.add("server_1");
+//		
+//		this.firewalls.add("firewall_1");
+//		
+//		for (String node : endpoints){
+//			this.routingTable.put(node, new ArrayList<Entry>());
+//		}
+//		for (String firewall : firewalls){
+//			this.routingTable.put(firewall + "_in", new ArrayList<Entry>());
+//			this.routingTable.put(firewall + "_out", new ArrayList<Entry>());
+//		}
+//		this.routingTable.get("client_1").add(new Entry("output", "firewall_1_in"));
+//		//this.routingTable.get("server_1").add(new Entry("output", "firewall_1_out"));
+//		this.routingTable.get("firewall_1_out").add(new Entry("output", "server_1"));
 		
 	}
 	
@@ -97,7 +97,7 @@ public class Neo4jManagerClient {
 		
 		Client client = ClientBuilder.newClient();
 		
-		WebTarget baseTarget = client.target("http://localhost:8080/Project-Neo4jManager/rest/");
+		WebTarget baseTarget = client.target("http://localhost:8090/Project-Neo4jManager/rest/");
 		//WebTarget baseTarget = client.target("http://localhost:8080/neo4jmanager/rest/");
 		WebTarget graphsTarget = baseTarget.path("graphs");		
 		WebTarget pathSourceDestination = graphsTarget.path("{graphId}/paths");
@@ -155,8 +155,8 @@ public class Neo4jManagerClient {
 		Client client = ClientBuilder.newBuilder()
 						.register(PathsMessageBodyReader.class).build();
 		
-		//WebTarget baseTarget = client.target("http://localhost:8080/Project-Neo4jManager/rest/");
-		WebTarget baseTarget = client.target("http://localhost:8080/neo4jmanager/rest/");
+		WebTarget baseTarget = client.target("http://localhost:8090/Project-Neo4jManager/rest/");
+		//WebTarget baseTarget = client.target("http://localhost:8080/neo4jmanager/rest/");
 		WebTarget graphsTarget = baseTarget.path("graphs");		
 		WebTarget pathSourceDestination = graphsTarget.path("{graphId}/paths");
 		WebTarget deleteNffg = graphsTarget.path("{graphId}");

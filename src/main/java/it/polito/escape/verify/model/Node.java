@@ -7,14 +7,19 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import it.polito.escape.verify.model.Link;
 
+@ApiModel(value = "Node")
 public class Node {
+	@ApiModelProperty(required = false, hidden = true)
 	private long id;
 	private String name;
 	private String functional_type;
 
 	private Map<Long, Neighbour> neighbours = new HashMap<>();
+	@ApiModelProperty(required = false, hidden = true)
 	private List<Link> links = new ArrayList<>();
 	
 	public Node(){
