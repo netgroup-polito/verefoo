@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<xml-bindings
+    xmlns="http://www.eclipse.org/eclipselink/xsds/persistence/oxm"
+    package-name="blog.bindingfile">
+    <xml-schema
+        namespace="http://www.example.com/graph"
+        element-form-default="QUALIFIED"/>
+    <java-types>
+        <java-type name="Graph">
+            <xml-root-element/>
+            <xml-type prop-order="node name and neighbours"/>
+            <java-attributes>
+                <xml-element java-attribute="name" name="name"/>
+                <xml-sequence>
+                	<xml-element java-attribute="neighbour" name="neighbour"/>
+                </xml-sequence>
+            </java-attributes>
+        </java-type>
+    </java-types>
+</xml-bindings>

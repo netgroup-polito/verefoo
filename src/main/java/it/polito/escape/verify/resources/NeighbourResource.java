@@ -21,7 +21,7 @@ import it.polito.escape.verify.model.Neighbour;
 import it.polito.escape.verify.model.Node;
 import it.polito.escape.verify.service.NeighbourService;
 
-@Path("/")
+//@Path("/")
 @Api( hidden= true, value = "", description = "Manage neighbours" )
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -38,8 +38,9 @@ public class NeighbourResource {
 	@ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid node id"),
 							@ApiResponse(code = 404, message = "Node not found")})
 	public List<Neighbour> getAllNeighbours(
+			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
 			@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId){
-		return neighboursService.getAllNeighbours(nodeId);
+		return neighboursService.getAllNeighbours(graphId, nodeId);
 	}
 	
 	@POST
@@ -52,13 +53,14 @@ public class NeighbourResource {
 							@ApiResponse(code = 404, message = "Node not found"),
 							@ApiResponse(code = 400, message = "Invalid neighbour object")})
 	public Neighbour addNeighbour(
+			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
 			@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId, 
 			@ApiParam(value = "New neighbour object", required = true) Neighbour neighbour){
-		return neighboursService.addNeighbour(nodeId, neighbour);
+		return neighboursService.addNeighbour(graphId, nodeId, neighbour);
 	}
 	
 	@PUT
-	@Path("/{neighbourId}")
+	@Path("{neighbourId}")
 	@ApiOperation(
     	    httpMethod = "PUT",
     	    value = "Edits a neighbour of a given node",
@@ -68,15 +70,16 @@ public class NeighbourResource {
 							@ApiResponse(code = 404, message = "Node not found"),
 							@ApiResponse(code = 400, message = "Invalid neighbour object")})
 	public Neighbour updateNeighbour(
+			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
 			@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
 			@ApiParam(value = "Neighbour id", required = true) @PathParam("neighbourId") long neighbourId,
 			@ApiParam(value = "Updated neighbour object", required = true) Neighbour neighbour){
 		neighbour.setId(neighbourId);
-		return neighboursService.updateNeighbour(nodeId, neighbour);
+		return neighboursService.updateNeighbour(graphId, nodeId, neighbour);
 	}
 	
 	@DELETE
-	@Path("/{neighbourId}")
+	@Path("{neighbourId}")
 	@ApiOperation(
     	    httpMethod = "DELETE",
     	    value = "Removes a neighbour from a given node",
@@ -85,21 +88,23 @@ public class NeighbourResource {
 	@ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid node id"),
 							@ApiResponse(code = 404, message = "Node not found")})
 	public void deleteNeighbour(
+			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
 			@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
 			@ApiParam(value = "Neighbour id", required = true) @PathParam("neighbourId") long neighbourId){
-		neighboursService.removeNeighbour(nodeId, neighbourId);
+		neighboursService.removeNeighbour(graphId, nodeId, neighbourId);
 	}
 	
 	@GET
-	@Path("/{neighbourId}")
+	@Path("{neighbourId}")
 	@ApiOperation(
     	    httpMethod = "GET",
     	    value = "Returns a neighbour of a given node",
     	    notes = "A single neighbour of a given node can be returned",
     	    response = Neighbour.class)
 	public Neighbour getNeighbour(
+			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
 			@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
 			@ApiParam(value = "Neighbour id", required = true) @PathParam("neighbourId") long neighbourId){
-		return neighboursService.getNeighbour(nodeId, neighbourId);
+		return neighboursService.getNeighbour(graphId, nodeId, neighbourId);
 	}
 }

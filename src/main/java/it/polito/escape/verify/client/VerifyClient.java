@@ -55,7 +55,7 @@ public class VerifyClient {
 	
 	public VerifyClient() {
 		this.projectFolder = System.getProperty("user.dir");
-		this.baseTarget = "http://localhost:8080/verify/api/";
+		this.baseTarget = "http://localhost:8090/verify/api/";
 		this.graphFilePath = this.projectFolder + "/service/src/tests/j-verigraph-generator/examples/budapest/graph.json";
 		this.source = "user1";
 		this.destination = "webserver";

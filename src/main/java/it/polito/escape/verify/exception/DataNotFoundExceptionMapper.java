@@ -12,7 +12,7 @@ public class DataNotFoundExceptionMapper implements ExceptionMapper<DataNotFound
 
 	@Override
 	public Response toResponse(DataNotFoundException exception) {
-		ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(), 404, "http://localhost:8080/verify/api-docs/#/nodes");
+		ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(), 404, "http://localhost:8080/verify/api-docs/");
 		return Response.status(Status.NOT_FOUND)
 				.entity(errorMessage)
 				.build();

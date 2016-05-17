@@ -25,9 +25,10 @@ public class VerifyApplication extends Application{
 	@Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> resources = new HashSet<>();
-
-        resources.add(it.polito.escape.verify.resources.NodeResource.class);
-        resources.add(it.polito.escape.verify.resources.NeighbourResource.class);
+        
+        resources.add(it.polito.escape.verify.resources.GraphResource.class);
+//        resources.add(it.polito.escape.verify.resources.NodeResource.class);
+//        resources.add(it.polito.escape.verify.resources.NeighbourResource.class);
         resources.add(it.polito.escape.verify.resources.VerificationResource.class);
         
 

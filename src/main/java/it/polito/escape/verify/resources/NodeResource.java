@@ -25,27 +25,14 @@ import it.polito.escape.verify.resources.NeighbourResource;
 import it.polito.escape.verify.model.Node;
 import it.polito.escape.verify.service.NodeService;
 
-
-@Path("/nodes")
-@Api( value = "/nodes", description = "Manage nodes" )
+//@Path("/")
+@Api( hidden= true, value = "", description = "Manage nodes" )
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class NodeResource {
 	
 	NodeService nodeService = new NodeService();
 	
-    @GET
-    @Path("/test")
-    @ApiOperation(
-	    httpMethod = "GET",
-	    value = "Returns a test string",
-	    notes = "Test method",
-	    response = String.class)
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getIt() {
-        return "Got it!";
-    }
     
     @GET
     @ApiOperation(
@@ -54,8 +41,8 @@ public class NodeResource {
     	    notes = "Returns multiple nodes",
     	    response = Node.class,
     	    responseContainer = "List")
-    public List<Node> getNodes(){
-    	return nodeService.getAllNodes();
+    public List<Node> getNodes(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId){
+    	return nodeService.getAllNodes(graphId);
     }
     
     @POST
@@ -66,9 +53,10 @@ public class NodeResource {
     	    response = Response.class)
     @ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid node supplied") })
     public Response addNode(
+    		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
     		@ApiParam(value = "New node object", required = true) Node node,
     		@Context UriInfo uriInfo) {
-        Node newNode = nodeService.addNode(node);
+        Node newNode = nodeService.addNode(graphId, node);
         String newId = String.valueOf(newNode.getId());
         URI uri = uriInfo.getAbsolutePathBuilder().path(newId).build();
         return Response.created(uri)
@@ -77,7 +65,7 @@ public class NodeResource {
     }
     
     @GET
-    @Path("/{nodeId}")
+    @Path("{nodeId}")
     @ApiOperation(
     	    httpMethod = "GET",
     	    value = "Returns a node",
@@ -86,17 +74,18 @@ public class NodeResource {
     @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid node id"),
     						@ApiResponse(code = 404, message = "Node not found")})
     public Node getNode(
-    		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long id,
+    		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
+    		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
     		@Context UriInfo uriInfo){
-    	Node node = nodeService.getNode(id);
-    	node.addLink(getUriForSelf(uriInfo, node), "self");
-    	node.addLink(getUriForNeighbours(uriInfo, node), "neighbours");
+    	Node node = nodeService.getNode(graphId, nodeId);
+    	node.addLink(getUriForSelf(uriInfo, graphId, node), "self");
+    	node.addLink(getUriForNeighbours(uriInfo, graphId, node), "neighbours");
     	return node;
     }
     
 
 	@PUT
-    @Path("/{nodeId}")
+    @Path("{nodeId}")
     @ApiOperation(
     	    httpMethod = "PUT",
     	    value = "Edits a node",
@@ -106,45 +95,57 @@ public class NodeResource {
 							@ApiResponse(code = 403, message = "Invalid node id"),
 							@ApiResponse(code = 404, message = "Node not found")})
     public Node updateNode(
-    		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long id,
+    		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
+    		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
     		@ApiParam(value = "Updated node object", required = true) Node node){
-    	node.setId(id);
-    	return nodeService.updateNode(node);
+    	node.setId(nodeId);
+    	return nodeService.updateNode(graphId, node);
     }
     
     @DELETE
-    @Path("/{nodeId}")
+    @Path("{nodeId}")
     @ApiOperation(
     	    httpMethod = "DELETE",
     	    value = "Deletes a node",
     	    notes = "A single node can be deleted")
     @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid node id")})
     public void deleteNode(
-    		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long id){
-    	nodeService.removeNode(id);
+    		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
+    		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId){
+    	nodeService.removeNode(graphId, nodeId);
     }
     
-    private String getUriForSelf(UriInfo uriInfo, Node node) {
+    private String getUriForSelf(UriInfo uriInfo, long graphId, Node node) {
 		String uri = uriInfo.getBaseUriBuilder()
-		 .path(NodeResource.class)
+		 //.path(NodeResource.class)
+		 .path(GraphResource.class)
+		 .path(GraphResource.class, "getNodeResource")
+		 .resolveTemplate("graphId", graphId)
 		 .path(Long.toString(node.getId()))
 		 .build()
 		 .toString();
 		return uri;
 	}
     
-    private String getUriForNeighbours(UriInfo uriInfo, Node node) {
-    	String uri = uriInfo.getBaseUriBuilder()
-    			 .path(NodeResource.class)
-    			 .path(NodeResource.class, "getNeighbourResource")
-    			 .path(NeighbourResource.class)
-    			 .resolveTemplate("nodeId", node.getId())
-    			 .build()
-    			 .toString();
+    private String getUriForNeighbours(UriInfo uriInfo, long graphId, Node node) {
+		String uri = uriInfo.getBaseUriBuilder()
+				.path(GraphResource.class)
+				.path(GraphResource.class, "getNodeResource")
+				.resolveTemplate("graphId", graphId)
+				.path(Long.toString(node.getId()))
+				.path("neighbours")
+				.build()
+				.toString();
+//    	 .path(NodeResource.class)
+//		 .path(NodeResource.class, "getNeighbourResource")
+//		 .path(NeighbourResource.class)
+//		 .resolveTemplate("nodeId", node.getId())
+//		 .build()
+//		 .toString();
     	return uri;
 	}
     
-	@Path("/{nodeId}/neighbours")	
+	@Path("{nodeId}/neighbours")	
 	public NeighbourResource getNeighbourResource(){
 		return new NeighbourResource();
 	}

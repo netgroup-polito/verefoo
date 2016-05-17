@@ -12,7 +12,7 @@ public class ForbiddenExceptionManager implements ExceptionMapper<ForbiddenExcep
 
 	@Override
 	public Response toResponse(ForbiddenException exception) {
-		ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(), 403, "http://localhost:8080/verify/api-docs/#/nodes");
+		ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(), 403, "http://localhost:8080/verify/api-docs/");
 		return Response.status(Status.FORBIDDEN)
 				.entity(errorMessage)
 				.build();
