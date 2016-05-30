@@ -82,7 +82,7 @@ public class NeighbourService {
 			throw new DataNotFoundException("Node with id " + nodeId + " not found in graph with id " + graphId);
 		}
 		Map<Long, Neighbour> neighbours = node.getNeighbours();
-		if ( isValidNeighbour(graph, neighbour) == false){
+		if ( isValidNeighbourAddition(graph, node, neighbour) == false){
 			throw new BadRequestException("Given neighbour is not valid!");
 		}
 		synchronized(this){
@@ -116,7 +116,7 @@ public class NeighbourService {
 		if (currentNeighbour == null){
 			throw new DataNotFoundException("Neighbour with id " + neighbour.getId() + " not found for node with id " + nodeId + " in graph with id " + graphId);
 		}
-		if ( isValidNeighbour(graph, neighbour) == false){
+		if ( isValidNeighbourUpdate(graph, node, neighbour) == false){
 			throw new BadRequestException("Given neighbour is not valid!");
 		}
 		neighbours.put(neighbour.getId(), neighbour);
@@ -145,23 +145,44 @@ public class NeighbourService {
 		return neighbours.remove(neighbourId);
 	}
 	
-	public static boolean isValidNeighbour(Graph graph, Neighbour neighbour) {
+	public static boolean isValidNeighbourAddition(Graph graph, Node node, Neighbour neighbour) {
+		if (neighbour.getName() == null)
+			return false;
+		
+		Map<Long, Node> nodesMap = graph.getNodes();
+		if (nodesMap == null)
+			return false;
+		
+		boolean isAcceptableNode = false;
+		Collection<Node> nodes = nodesMap.values();
+		if (nodes == null)
+			return false;
+		for (Node n : nodes){
+			if ( (n.getName().equals(neighbour.getName())) && (n.getName().equals(node.getName()) == false)){
+				if (node.neighboursWithName(neighbour.getName()) < 1)
+					isAcceptableNode = true;
+			}
+		}
+		return isAcceptableNode;
+	}
+	
+	public static boolean isValidNeighbourUpdate(Graph graph, Node node, Neighbour neighbour) {
 		if (neighbour.getName() == null)
 			return false;
 		Map<Long, Node> nodesMap = graph.getNodes();
 		if (nodesMap == null)
 			return false;
-		boolean nodeFound = false;
+		
+		boolean isAcceptableNode = false;
 		Collection<Node> nodes = nodesMap.values();
 		if (nodes == null)
 			return false;
-		for (Node node : nodes){
-			if (node.getName() == neighbour.getName())
-				nodeFound = true;
+		for (Node n : nodes){
+			if ( (n.getName().equals(neighbour.getName())) && (n.getName().equals(node.getName()) == false)){
+				if (node.neighboursWithName(neighbour.getName()) <= 1)
+					isAcceptableNode = true;
+			}
 		}
-		if (!nodeFound)
-			return false;
-		else
-			return true;
+		return isAcceptableNode;
 	}
 }

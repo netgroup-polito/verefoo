@@ -20,7 +20,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import it.polito.escape.verify.Entry;
+import it.polito.escape.verify.model.Entry;
 import it.polito.escape.verify.client.Neo4jManagerClient;
 import it.polito.escape.verify.model.ErrorMessage;
 import it.polito.escape.verify.model.Neighbour;
@@ -30,7 +30,7 @@ import it.polito.escape.verify.service.NodeService;
 import it.polito.nffg.neo4j.jaxb.Paths;
 
 @Path("/chains")
-@Api( value = "/chains", description = "Manage nodes" )
+//@Api( value = "/chains", description = "Manage nodes" )
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 //@Produces(MediaType.TEXT_PLAIN)

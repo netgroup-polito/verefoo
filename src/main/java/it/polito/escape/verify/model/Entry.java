@@ -1,4 +1,4 @@
-package it.polito.escape.verify;
+package it.polito.escape.verify.model;
 
 public class Entry {
 	private String direction;

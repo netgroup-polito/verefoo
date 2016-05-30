@@ -67,13 +67,20 @@ public class GraphService {
 		}
 		int numberOfNodes = 0;
 		for (Node node : graph.getNodes().values()){
-			synchronized(this){
-				node.setId(++numberOfNodes);
-			}
+			
+			node.setId(++numberOfNodes);
+			
 			int numberOfNodeNeighbours = 0;
 			for (Neighbour neighbour : node.getNeighbours().values()){
-				synchronized(this){
 					neighbour.setId(++numberOfNodeNeighbours);
+			}
+		}
+		//check neighbours
+		for (Node node : graph.getNodes().values()){
+			for (Neighbour neighbour : node.getNeighbours().values()){
+				boolean validNeighbour = NeighbourService.isValidNeighbourUpdate(graph, node, neighbour);
+				if (!validNeighbour){
+					throw new BadRequestException("Given graph is not valid: please check the names of the nodes and neighbours!");
 				}
 			}
 		}
@@ -84,7 +91,7 @@ public class GraphService {
 	
 	public static boolean isValidGraph(Graph graph){
 		for (Node node : graph.getNodes().values()){
-			if (NodeService.isValidNode(node) == false)
+			if (NodeService.isValidNode(graph, node) == false)
 				return false;
 		}
 		return true;

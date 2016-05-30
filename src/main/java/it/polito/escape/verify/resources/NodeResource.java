@@ -22,6 +22,9 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
 import it.polito.escape.verify.resources.NeighbourResource;
+import it.polito.escape.verify.model.Configuration;
+import it.polito.escape.verify.model.ErrorMessage;
+import it.polito.escape.verify.model.Graph;
 import it.polito.escape.verify.model.Node;
 import it.polito.escape.verify.service.NodeService;
 
@@ -37,10 +40,13 @@ public class NodeResource {
     @GET
     @ApiOperation(
     	    httpMethod = "GET",
-    	    value = "Returns all the nodes",
-    	    notes = "Returns multiple nodes",
+    	    value = "Returns all nodes of a given graph",
+    	    notes = "Returns an array of nodes belonging to a given graph",
     	    response = Node.class,
     	    responseContainer = "List")
+    @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph id", response = ErrorMessage.class),
+    						@ApiResponse(code = 404, message = "Graph not found", response = ErrorMessage.class),
+    						@ApiResponse(code = 200, message = "All the nodes have been returned in the message body", response = Node.class, responseContainer = "List") })
     public List<Node> getNodes(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId){
     	return nodeService.getAllNodes(graphId);
     }
@@ -48,10 +54,13 @@ public class NodeResource {
     @POST
     @ApiOperation(
     	    httpMethod = "POST",
-    	    value = "Creates a node",
-    	    notes = "A single node can be created",
+    	    value = "Creates a node in a given graph",
+    	    notes = "Creates a single node for a given graph",
     	    response = Response.class)
-    @ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid node supplied") })
+    @ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid node supplied", response = ErrorMessage.class),
+    						@ApiResponse(code = 403, message = "Invalid graph id", response = ErrorMessage.class),
+    						@ApiResponse(code = 404, message = "Graph not found", response = ErrorMessage.class),
+    						@ApiResponse(code = 201, message = "Node successfully created", response = Node.class)})
     public Response addNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
     		@ApiParam(value = "New node object", required = true) Node node,
@@ -68,11 +77,12 @@ public class NodeResource {
     @Path("{nodeId}")
     @ApiOperation(
     	    httpMethod = "GET",
-    	    value = "Returns a node",
-    	    notes = "A single node can be returned",
+    	    value = "Returns a node of a given graph",
+    	    notes = "Returns a single node of a given graph",
     	    response = Node.class)
-    @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid node id"),
-    						@ApiResponse(code = 404, message = "Node not found")})
+    @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph and/or node id", response = ErrorMessage.class),
+    						@ApiResponse(code = 404, message = "Graph and/or node not found", response = ErrorMessage.class),
+    						@ApiResponse(code = 200, message = "The requested node has been returned in the message body", response = Node.class)})
     public Node getNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
     		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
@@ -83,17 +93,35 @@ public class NodeResource {
     	return node;
     }
     
+    @PUT
+    @Path("{nodeId}/configuration")
+    @ApiOperation(
+    	    httpMethod = "PUT",
+    	    value = "Adds/edits a configuration to a node of a given graph",
+    	    notes = "Configures a node. Once all the nodes of a graph have been configured a given policy can be verified for the graph (e.g. 'reachability' between two nodes).")
+    @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph and/or node id", response = ErrorMessage.class),
+    						@ApiResponse(code = 404, message = "Graph and/or node not found", response = ErrorMessage.class),
+    						@ApiResponse(code = 200, message = "Configuration updated for the requested node")})
+    public void addNodeConfiguration(
+    		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
+    		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
+    		@ApiParam(value = "Node configuration", required = true) Configuration nodeConfiguration){
+    	Node node = nodeService.getNode(graphId, nodeId);
+    	//nodeService.addNodeConfiguration();
+    }
+    
 
 	@PUT
     @Path("{nodeId}")
     @ApiOperation(
     	    httpMethod = "PUT",
-    	    value = "Edits a node",
-    	    notes = "A single node can be edited",
+    	    value = "Edits a node of a given graph",
+    	    notes = "Edits a single node of a given graph",
     	    response = Node.class)
-	@ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid node object"),
-							@ApiResponse(code = 403, message = "Invalid node id"),
-							@ApiResponse(code = 404, message = "Node not found")})
+	@ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid node object", response = ErrorMessage.class),
+							@ApiResponse(code = 403, message = "Invalid graph and/or node id", response = ErrorMessage.class),
+							@ApiResponse(code = 404, message = "Graph and/or node not found", response = ErrorMessage.class),
+							@ApiResponse(code = 200, message = "Node edited successfully", response = Node.class)})
     public Node updateNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
     		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
@@ -106,9 +134,10 @@ public class NodeResource {
     @Path("{nodeId}")
     @ApiOperation(
     	    httpMethod = "DELETE",
-    	    value = "Deletes a node",
-    	    notes = "A single node can be deleted")
-    @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid node id")})
+    	    value = "Deletes a node of a given graph",
+    	    notes = "Deletes a single node of a given graph")
+    @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph and/or node id", response = ErrorMessage.class),
+    						@ApiResponse(code = 204, message = "Node successfully deleted")})
     public void deleteNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
     		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId){

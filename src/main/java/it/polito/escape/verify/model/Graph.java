@@ -1,45 +1,38 @@
 package it.polito.escape.verify.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-//import org.eclipse.persistence.oxm.annotations.XmlPath;
-//import org.eclipse.persistence.oxm.annotations.XmlVariableNode;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import it.polito.escape.verify.resources.GraphMapAdapter;
+import it.polito.escape.verify.resources.GraphCustomDeserializer;
+import it.polito.escape.verify.resources.CustomMapSerializer;
 
 @ApiModel(value = "Graph")
 @XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
+@JsonDeserialize(using = GraphCustomDeserializer.class)
 public class Graph {
 	@ApiModelProperty(required = false, hidden = true)
+	@XmlTransient
 	private long id;
 	
-//	@XmlPath(".")
-//    @XmlJavaTypeAdapter(GraphMapAdapter.class)
-	
-	
-//	@XmlElementWrapper
-//    @XmlVariableNode("id")
-	//@ApiModelProperty(name ="nodes", notes = "Nodes", dataType = "Map[java.lang.Long,it.polito.escape.verify.model.Node]")
 	@ApiModelProperty(name ="nodes", notes = "Nodes", dataType = "List[it.polito.escape.verify.model.Node]")
 	private Map<Long, Node> nodes = new HashMap<Long,Node>();
 	
 	@ApiModelProperty(required = false, hidden = true)
+	@XmlTransient
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private Set<Link> links = new HashSet<Link>();
 	
 	public Graph(){
@@ -57,15 +50,17 @@ public class Graph {
 	public void setId(long id) {
 		this.id = id;
 	}
-	//@XmlTransient
+
+	@JsonSerialize(using = CustomMapSerializer.class)
 	public Map<Long, Node> getNodes() {
 		return nodes;
 	}
-
+	
 	public void setNodes(Map<Long, Node> nodes) {
 		this.nodes = nodes;
 	}
 	
+	@XmlTransient
 	public Set<Link> getLinks() {
 		return links;
 	}
@@ -79,6 +74,14 @@ public class Graph {
 		link.setLink(url);
 		link.setRel(rel);
 		links.add(link);
+	}
+	
+	public Node searchNodeByName(String name){
+		for (Node node : this.nodes.values()){
+			if (node.getName().equals(name))
+				return node;
+		}
+		return null;
 	}
 	
 }

@@ -3,6 +3,7 @@ package it.polito.escape.verify.resources;
 import java.net.URI;
 import java.util.List;
 
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -21,9 +22,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import it.polito.escape.verify.model.ErrorMessage;
 import it.polito.escape.verify.model.Graph;
 import it.polito.escape.verify.model.Node;
+import it.polito.escape.verify.model.Policy;
+import it.polito.escape.verify.resources.beans.VerificationBean;
 import it.polito.escape.verify.service.GraphService;
+import it.polito.escape.verify.service.VerificationService;
+import it.polito.nffg.neo4j.jaxb.Paths;
 
 @Path("/graphs")
 @Api(value = "/graphs", description = "Manage graphs")
@@ -31,16 +37,19 @@ import it.polito.escape.verify.service.GraphService;
 @Produces(MediaType.APPLICATION_JSON)
 public class GraphResource {
 	GraphService graphService = new GraphService();
+	VerificationService verificationService = new VerificationService();
 
 	@GET
-	@ApiOperation(httpMethod = "GET", value = "Returns all the graphs", notes = "Returns multiple graphs", response = Graph.class, responseContainer = "List")
+	@ApiOperation(httpMethod = "GET", value = "Returns all graphs", notes = "Returns an array of graphs", response = Graph.class, responseContainer = "List")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "All the graphs have been returned in the message body", response=Graph.class, responseContainer = "List") })
 	public List<Graph> getGraphs() {
 		return graphService.getAllGraphs();
 	}
 
 	@POST
-	@ApiOperation(httpMethod = "POST", value = "Creates a graph", notes = "A single graph can be created", response = Response.class)
-	@ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid graph supplied") })
+	@ApiOperation(httpMethod = "POST", value = "Creates a graph", notes = "Creates a signle graph", response = Response.class)
+	@ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid graph supplied", response = ErrorMessage.class),
+							@ApiResponse(code = 201, message = "Graph successfully created", response=Graph.class)})
 	public Response addGraph(@ApiParam(value = "New graph object", required = true) Graph graph, @Context UriInfo uriInfo) {	
 		Graph newGraph = graphService.addGraph(graph);
 		String newId = String.valueOf(newGraph.getId());
@@ -50,9 +59,10 @@ public class GraphResource {
 
 	@GET
 	@Path("/{graphId}")
-	@ApiOperation(httpMethod = "GET", value = "Returns a graph", notes = "A single graph can be returned", response = Graph.class)
-	@ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph id"),
-			@ApiResponse(code = 404, message = "Graph not found") })
+	@ApiOperation(httpMethod = "GET", value = "Returns a graph", notes = "Returns a signle graph", response = Graph.class)
+	@ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph id", response = ErrorMessage.class),
+							@ApiResponse(code = 404, message = "Graph not found", response = ErrorMessage.class),
+							@ApiResponse(code = 200, message = "The requested graph has been returned in the message body", response = Graph.class)})
 	public Graph getGraph(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
 			@Context UriInfo uriInfo) {
 		Graph graph = graphService.getGraph(graphId);
@@ -63,10 +73,11 @@ public class GraphResource {
 
 	@PUT
 	@Path("/{graphId}")
-	@ApiOperation(httpMethod = "PUT", value = "Edits a graph", notes = "A single graph can be edited", response = Graph.class)
-	@ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid graph object"),
-			@ApiResponse(code = 403, message = "Invalid graph id"),
-			@ApiResponse(code = 404, message = "Graph not found") })
+	@ApiOperation(httpMethod = "PUT", value = "Edits a graph", notes = "Edits a single graph", response = Graph.class)
+	@ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid graph object", response = ErrorMessage.class),
+							@ApiResponse(code = 403, message = "Invalid graph id", response = ErrorMessage.class),
+							@ApiResponse(code = 404, message = "Graph not found", response = ErrorMessage.class),
+							@ApiResponse(code = 200, message = "Graph edited successfully", response = Graph.class)})
 	public Graph updateGraph(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long id,
 			@ApiParam(value = "Updated graph object", required = true) Graph graph) {
 		graph.setId(id);
@@ -75,10 +86,27 @@ public class GraphResource {
 
 	@DELETE
 	@Path("/{graphId}")
-	@ApiOperation(httpMethod = "DELETE", value = "Deletes a graph", notes = "A single graph can be deleted")
-	@ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph id") })
+	@ApiOperation(httpMethod = "DELETE", value = "Deletes a graph", notes = "Deletes a signle graph")
+	@ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph id", response = ErrorMessage.class),
+							@ApiResponse(code = 204, message = "Graph successfully deleted")})
 	public void deleteGraph(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long id) {
 		graphService.removeGraph(id);
+	}
+	
+	@GET
+	@Path("/{graphId}/policy")
+	@ApiOperation(
+				httpMethod = "GET",
+				value = "Verifies a given policy in a graph",
+				notes = "In order to verify a given policy (e.g. 'reachability') all nodes of the desired graph must have a valid configuration.")
+	@ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph id or invalid configuration for source and/or destination node", response = ErrorMessage.class),
+							@ApiResponse(code = 404, message = "Graph not found or source node not found or destination node not found or configuration for source and/or destination node not available", response = ErrorMessage.class),
+							})
+	public Policy verifyGraph(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long id, @ApiParam(value = "'source' and 'destination' must refer to names of existing nodes in the same graph, 'type' refers to the required verification between the two (e.g. 'reachability')", required = true) @BeanParam VerificationBean verificationBean) {
+		Graph graph = graphService.getGraph(id);
+		Paths paths = verificationService.getPaths(graph, verificationBean);
+		verificationService.runTests(graph, paths);
+		return new Policy("SAT");
 	}
 
 	private String getUriForSelf(UriInfo uriInfo, Graph graph) {

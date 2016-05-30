@@ -23,7 +23,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import it.polito.escape.verify.Entry;
+import it.polito.escape.verify.model.Entry;
 import it.polito.escape.verify.resources.PathsMessageBodyReader;
 import it.polito.nffg.neo4j.jaxb.*;
 import it.polito.nffg.neo4j.jaxb.CiType.Attributes;

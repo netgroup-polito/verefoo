@@ -8,7 +8,7 @@ import javax.ws.rs.ext.Provider;
 import it.polito.escape.verify.model.ErrorMessage;
 
 @Provider
-public class ForbiddenExceptionManager implements ExceptionMapper<ForbiddenException>{
+public class ForbiddenExceptionMapper implements ExceptionMapper<ForbiddenException>{
 
 	@Override
 	public Response toResponse(ForbiddenException exception) {

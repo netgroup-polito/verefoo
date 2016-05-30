@@ -64,7 +64,7 @@ public class NodeService {
 		if (localNode == null){
 			throw new DataNotFoundException("Node with id " + node.getId() + " not found in graph with id " + graphId);
 		}
-		if (!isValidNode(node))
+		if (!isValidNode(graph, node))
 			throw new BadRequestException("Given node is not valid!");
 		
 		nodes.put(node.getId(), node);
@@ -96,7 +96,7 @@ public class NodeService {
 			throw new DataNotFoundException("Graph with id " + graphId + " not found");
 		Map<Long, Node> nodes = graph.getNodes();
 		
-		if (isValidNode(node) == false)
+		if (isValidNode(graph, node) == false)
 			throw new BadRequestException("Given node is not valid!");
 		
 		synchronized(this){
@@ -123,13 +123,13 @@ public class NodeService {
 		return null;
 	}
 	
-	public static boolean isValidNode(Node node){
+	public static boolean isValidNode(Graph graph, Node node){
 		if (node.getName() == null || node.getFunctional_type() == null)
 			return false;
-		for(Neighbour neighbour : node.getNeighbours().values()){
-			if (NeighbourService.isValidNeighbour(neighbour) == false)
-				return false;
-		}
+//		for(Neighbour neighbour : node.getNeighbours().values()){
+//			if (NeighbourService.isValidNeighbour(graph, neighbour) == false)
+//				return false;
+//		}
 		return true;
 	}
 }

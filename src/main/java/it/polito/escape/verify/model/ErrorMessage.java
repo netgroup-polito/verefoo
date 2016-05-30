@@ -2,11 +2,18 @@ package it.polito.escape.verify.model;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(value = "Error")
 @XmlRootElement
 public class ErrorMessage {
-
+	
+	@ApiModelProperty(example="Error message")
 	private String errorMessage;
+	@ApiModelProperty(allowableValues="400,403,404", value="HTTP error code", example="[400,403,404]")
 	private int errorCode;
+	@ApiModelProperty(example="http://localhost:8080/verify/api-docs/")
 	private String documentation;
 	
 	public ErrorMessage() {

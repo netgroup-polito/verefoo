@@ -8,7 +8,7 @@ import javax.ws.rs.ext.Provider;
 import it.polito.escape.verify.model.ErrorMessage;
 
 @Provider
-public class BadRequestExceptionManager implements ExceptionMapper<BadRequestException>{
+public class BadRequestExceptionMapper implements ExceptionMapper<BadRequestException>{
 
 	@Override
 	public Response toResponse(BadRequestException exception) {
