@@ -59,6 +59,9 @@ public class Scenario_1{
         rt_user1.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_webserver"), nat));
         net.routingTable(user1, rt_user1);
         net.attach(firewall, webserver, nat, user1);
+        ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+        acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_webserver"),nctx.am.get("ip_nat")));
+        firewall.addAcls(acl);
         ArrayList<DatatypeExpr> ia = new ArrayList<DatatypeExpr>();
         ia.add(nctx.am.get("ip_user1"));
         nat.setInternalAddress(ia);

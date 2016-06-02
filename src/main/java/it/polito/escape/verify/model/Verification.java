@@ -4,16 +4,16 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "Policy")
-public class Policy {
+public class Verification {
 
 	@ApiModelProperty(example="SAT | UNSAT")
 	private String result;
 	
-	public Policy(){
+	public Verification(){
 		
 	}
 	
-	public Policy(String result) {
+	public Verification(String result) {
 		this.result = result;
 	}
 

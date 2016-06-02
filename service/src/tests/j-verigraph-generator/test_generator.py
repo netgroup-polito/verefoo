@@ -122,44 +122,47 @@ def main(argv):
         }\n\
         \r\t}\n")
 
-        c.writeln("public static void main(String[] args) throws Z3Exception{")
+        c.writeln("public int run() throws Z3Exception{")
         c.indent()
 
         c.writeln(basename + " p = new " + basename + "();")
 
         #adding time estimation
-        c.writeln("int k = 0;")
-        c.writeln("long t = 0;")
+        #c.writeln("int k = 0;")
+        #c.writeln("long t = 0;")
         
-        c.writeln("for(;k<10;k++){")
-        c.indent()
+        #c.writeln("for(;k<1;k++){")
+        #c.indent()
         
         c.writeln("p.resetZ3();")
 
         c.write(os.path.splitext(inputfile)[0] + " model = new " + os.path.splitext(inputfile)[0] + "(p.ctx);\n")
         
-        c.writeln("Calendar cal = Calendar.getInstance();")
-        c.writeln("Date start_time = cal.getTime();")
+        #c.writeln("Calendar cal = Calendar.getInstance();")
+        #c.writeln("Date start_time = cal.getTime();")
 
         c.write("IsolationResult ret =model.check.checkIsolationProperty(model.")
         c.append(source + ", model." + destination + ");\n")
         
-        c.writeln("Calendar cal2 = Calendar.getInstance();")
-        c.writeln("t = t+(cal2.getTime().getTime() - start_time.getTime());")
+        #c.writeln("Calendar cal2 = Calendar.getInstance();")
+        #c.writeln("t = t+(cal2.getTime().getTime() - start_time.getTime());")
 
         c.writeln("if (ret.result == Status.UNSATISFIABLE){\n\
-                System.out.println(\"UNSAT\");\n\
-            }else if (ret.result == Status.SATISFIABLE){\n\
-                System.out.println(\"SAT\");\n\
-            }else{\n\
-                System.out.println(\"UNPREDICTED\");\n\
-            \r\t\t\t}")
+            System.out.println(\"UNSAT\");\n\
+            return -1;\n\
+        }else if (ret.result == Status.SATISFIABLE){\n\
+            System.out.println(\"SAT\");\n\
+            return 0;\n\
+        }else{\n\
+            System.out.println(\"UNPREDICTED\");\n\
+            return -2;\n\
+        \r\t\t}")
 
-        c.dedent()
-        c.writeln("}")
+        #c.dedent()
+        #c.writeln("}")
 
-
-        c.writeln("System.out.printf(\"Mean execution time " + source + " -> " + destination + ": %.16f\", ((float) t/(float)1000)/k);")
+        #c.writeln("")
+        #c.writeln("System.out.printf(\"Mean execution time " + source + " -> " + destination + ": %.16f\", ((float) t/(float)1000)/k);")
 
         c.dedent()
         c.writeln("}")

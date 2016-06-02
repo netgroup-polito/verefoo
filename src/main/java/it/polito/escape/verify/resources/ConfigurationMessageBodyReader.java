@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -53,11 +54,23 @@ public class ConfigurationMessageBodyReader implements MessageBodyReader<Configu
 			JSONArray configurationArray = (JSONArray) jsonObject.get("configuration");
 			if (configurationArray == null)
 				throw new ProcessingException("Error deserializing a configuration object: configuration field not found");
-			String configurationField = "";
-			for (int i = 0; i < configurationArray.size(); i++){
-				configurationField += configurationArray.get(i);
+			List<String> configurationFields = new ArrayList<String>();
+
+			for (int i=0; i < configurationArray.size(); i++) {
+				configurationFields.add((String)configurationArray.get(i));
 			}
-			System.out.println("Got following config: " + configurationField);
+
+			System.out.println("Got following config: ");
+			configurationFields.replaceAll(s -> "ip_" + s);
+			Iterator<String> iter = configurationFields.iterator();
+			while(iter.hasNext()){
+				String field = iter.next();
+				System.out.printf(field);
+				if (iter.hasNext()) {
+	                System.out.printf(", ");
+	            }
+			}
+
 			
 			String[] paths = uriInfo.getPath().split("/");
 			long graphId = Long.parseLong(paths[1], 10);
@@ -73,9 +86,10 @@ public class ConfigurationMessageBodyReader implements MessageBodyReader<Configu
 			if (node == null){
 				throw new ProcessingException("Invalid node id");
 			}
-			node.setConfiguration(configurationField);
-			Configuration config = new Configuration(configurationField);
-			return config;
+			//Configuration config = new Configuration(node.getName(),"", configurationFields);
+			node.getConfiguration().setConfigurationList(configurationFields);
+			
+			return node.getConfiguration();
 		} catch (ParseException e) {
 			e.printStackTrace();
 			throw new ProcessingException("Error deserializing a Configuration object.", e);

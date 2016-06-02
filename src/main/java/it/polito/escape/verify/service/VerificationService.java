@@ -27,6 +27,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import it.polito.escape.verify.client.Neo4jManagerClient;
+import it.polito.escape.verify.model.Configuration;
+import it.polito.escape.verify.model.ConfigurationObject;
 import it.polito.escape.verify.model.Entry;
 import it.polito.escape.verify.model.ErrorMessage;
 import it.polito.escape.verify.model.Graph;
@@ -37,14 +39,16 @@ import it.polito.nffg.neo4j.jaxb.Paths;
 
 public class VerificationService {
 	private static final String projectFolder = System.getProperty("user.dir");
-	private String chainsFile =  projectFolder+ "/service/src/tests/j-verigraph-generator/examples/chains.json";
-	private String configFile = projectFolder + "/service/src/tests/j-verigraph-generator/examples/budapest/config_success.json";
+	//private String projectFolder = System.getProperty("catalina.base");
+	private String chainsFile =  projectFolder + "/service/src/tests/j-verigraph-generator/examples/chains.json";
+	private String configFile = projectFolder + "/service/src/tests/j-verigraph-generator/examples/config.json";
 	
 	public VerificationService(){
 		
 	}
 
-	public Paths getPaths(Graph graph, VerificationBean verificationBean) {
+	public Paths getPaths(String projectRoot, Graph graph, VerificationBean verificationBean) {
+		//this.projectFolder = projectRoot;
 		Node sourceNode = graph.searchNodeByName(verificationBean.getSource());
 		Node destinationNode = graph.searchNodeByName(verificationBean.getDestination());
 		if (sourceNode == null || destinationNode == null){
@@ -129,10 +133,11 @@ public class VerificationService {
 		
 	}
 	
-	public void runTests(Graph graph, Paths paths){
+	public String runTests(Graph graph, Paths paths, String source, String destination){
 		if (paths == null){
+			// throw error or return UNSAT because there are no paths
 			System.out.println("There was an error getting the paths.");
-			return;
+			return null;
 		}
 		
 		List<List<String>> sanitizedPaths = new ArrayList<List<String>>();
@@ -153,11 +158,71 @@ public class VerificationService {
 		
 		generateChainsFile(graph, sanitizedPaths, chainsFile);
 		
+		generateConfigFile(graph, configFile);
+		
 		generateTestScenarios(chainsFile, configFile);
 		
-		compileAndRunTests();
+		generateTests(sanitizedPaths, source, destination);
+		
+		int result = compileAndRunTests(sanitizedPaths);
+		
+		if (result == 0){
+			return "SAT";
+		}
+		else if (result == -1){
+			return "UNSAT";
+		}
+		else if (result == -2)
+			return "UNPREDICTED";
+		else
+			return "ERROR";
 	}
 	
+	private void generateConfigFile(Graph graph, String configFile) {
+		JSONObject root = new JSONObject();
+		JSONArray nodes = new JSONArray();
+		
+		for (Node n : graph.getNodes().values()){
+			JSONObject node = new JSONObject();
+			JSONArray configuration = new JSONArray();
+			Configuration nodeConfig = n.getConfiguration(); 
+			List<String> configurationList = nodeConfig.getConfigurationList();
+			List<ConfigurationObject> configurationMap = nodeConfig.getConfigurationMap();
+			if (configurationList.size() > 0){
+				for (String s : configurationList){
+					configuration.add("ip_" + s);
+				}
+			}			
+			else if (configurationMap.size() > 0){
+				for (ConfigurationObject c : configurationMap){
+					Iterator<java.util.Map.Entry<String, String>> iter = c.getMap().entrySet().iterator();
+					while(iter.hasNext()){
+						java.util.Map.Entry<String, String> entry = iter.next();
+						JSONObject configItem = new JSONObject();
+						configItem.put("ip_" + entry.getKey(), "ip_" + entry.getValue());
+						configuration.add(configItem);
+					}
+				}
+				
+			}
+			node.put("configuration", configuration);
+			node.put("id", nodeConfig.getId());
+			node.put("description", nodeConfig.getDescription());
+			
+			nodes.add(node);
+		}		
+		root.put("nodes", nodes);
+
+		try (FileWriter file = new FileWriter(configFile)) {
+			file.write(root.toJSONString());
+			System.out.println("Successfully Copied JSON Object to File...");
+			System.out.println("JSON Object: " + root);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
 	private List<String> sanitizePath(String path) {
 		List<String> newPath = new ArrayList<String>();
 	     Matcher m = Pattern.compile("\\(([^)]+)\\)").matcher(path);
@@ -222,7 +287,7 @@ public class VerificationService {
 		        "-c",
 		        platfromIndependentPath(chainsFile),
 		        "-f",
-		        platfromIndependentPath(projectRootFolder + configFile),
+		        platfromIndependentPath(configFile),
 		        "-o",
 		        platfromIndependentPath(projectRootFolder + "/service/src/tests/examples/Scenario")
 		    };
@@ -259,23 +324,93 @@ public class VerificationService {
 		
 	}
 	
-	private void compileAndRunTests(){
-		File sourceFile = new File("service/src/tests/Test.java");
+	private int generateTests(List<List<String>> paths, String source, String destination) {
+		String projectRootFolder = System.getProperty("user.dir");
+		
+		List<String> scenarios = new ArrayList<String>();
+		for (int i=0; i< paths.size();i++){
+			scenarios.add("Scenario_" + (i+1));
+		}
+		
+		for (String scenario : scenarios) {
+			String[] cmd = { 
+					"python",
+					platfromIndependentPath(projectRootFolder + "/service/src/tests/j-verigraph-generator/test_generator.py"),
+					"-i",
+					platfromIndependentPath(projectRootFolder + "/service/src/tests/examples/" + scenario + ".java"),
+					"-o",
+					platfromIndependentPath(projectRootFolder + "/service/src/tests/" + scenario + "_test.java"),
+					"-s",
+					source,
+					"-d",
+					destination};
+			for (String c : cmd) {
+				System.out.printf(c + " ");
+			}
+			System.out.println("");
+			try {
+				String s = null;
+				Process p = Runtime.getRuntime().exec(cmd);
+
+				BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+				// read the output from the command
+				//            System.out.println("Here is the standard output of the command:\n");
+				//            while ((s = stdInput.readLine()) != null) {
+				//                System.out.println(s);
+				//            }
+
+				//            System.out.println("Here is the standard error of the command (if any):\n");
+				//            while ((s = stdError.readLine()) != null) {
+				//                System.out.println(s);
+				//            }
+			} catch (IOException e) {
+				e.printStackTrace();
+				return -1;
+			} 
+		}
+		return 0;
+		
+	}
+	
+	private int compileAndRunTests(List<List<String>> sanitizedPaths){
+		List<File> testFiles = new ArrayList<File>();
+		for (int i=0; i<sanitizedPaths.size();i++){
+			testFiles.add(new File(projectFolder + "/service/src/tests/Scenario_" + (i+1) + "_test.java"));
+		}
+		
+		//File sourceFile = new File(projectFolder + "/service/src/tests/Test.java");
 
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
 
 		try {
-			fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(new File("service/src/tests/")));
+			fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(new File(projectFolder + "/service/src/tests/")));
+			
 
 			// Compile the file
+			
+			//boolean success = compiler.getTask(null, fileManager, null, null, null,
+			//		fileManager.getJavaFileObjectsFromFiles(Arrays.asList(sourceFile))).call();
+			
 			boolean success = compiler.getTask(null, fileManager, null, null, null,
-					fileManager.getJavaFileObjectsFromFiles(Arrays.asList(sourceFile))).call();
+					fileManager.getJavaFileObjectsFromFiles(testFiles)).call();
+			
 			fileManager.close();
-			runIt();
+			for (File file : testFiles){
+				System.out.println("Running a test");
+				int result = runIt(file.getName());
+				System.out.println("Compile and result returned: " + result);
+				if (result < 0)
+					return result;
+			}
+			//SAT
+			return 0;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// IO exception, return -3
 			e.printStackTrace();
+			return -3;
 		}
 	      
 	}
@@ -285,19 +420,25 @@ public class VerificationService {
 		return path;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public static void runIt() {
+	//@SuppressWarnings("unchecked")
+	public static int runIt(String filename) {
 		try {
 			Class params[] = {};
 			Object paramsObj[] = {};
-			Class thisClass = Class.forName("tests.Test");
+			System.out.println("Filename: " + filename);
+			//String[] parts = filename.split("\\.");
+			filename = filename.split("\\.")[0];
+			System.out.println("Filename: " + filename);
+			Class thisClass = Class.forName("tests." + filename);
 			Object iClass = thisClass.newInstance();
-			Method thisMethod = thisClass.getDeclaredMethod("doStuff2", params);
+			Method thisMethod = thisClass.getDeclaredMethod("run", params);
 			int result = (int) thisMethod.invoke(iClass, paramsObj);
 			System.out.println("\nTest returned " + result);
+			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return -1;
 	}
 
 }

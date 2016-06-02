@@ -9,7 +9,7 @@ import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
 import mcnet.components.IsolationResult;
 import tests.examples.Scenario_1;
-public class Test{
+public class TestOld{
     Context ctx;
     public void resetZ3() throws Z3Exception{
         HashMap<String, String> cfg = new HashMap<String, String>();
@@ -32,9 +32,9 @@ public class Test{
               System.out.println("");
         }
         	}
-    //public static void main(String[] args) throws Z3Exception{
-    public void doStuff(){
-        Test p = new Test();
+    public static void main(String[] args) throws Z3Exception{
+    //public void doStuff(){
+        TestOld p = new TestOld();
         int k = 0;
         long t = 0;
         int result = -1;
@@ -61,7 +61,7 @@ public class Test{
     }
     
     public int doStuff2(){
-        Test p = new Test();
+        TestOld p = new TestOld();
         int k = 0;
         long t = 0;
         int result = -1;

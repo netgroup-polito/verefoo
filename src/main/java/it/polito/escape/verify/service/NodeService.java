@@ -9,7 +9,6 @@ import it.polito.escape.verify.exception.DataNotFoundException;
 import it.polito.escape.verify.exception.ForbiddenException;
 import it.polito.escape.verify.database.DatabaseClass;
 import it.polito.escape.verify.model.Graph;
-import it.polito.escape.verify.model.Neighbour;
 import it.polito.escape.verify.model.Node;
 
 public class NodeService {
@@ -126,10 +125,7 @@ public class NodeService {
 	public static boolean isValidNode(Graph graph, Node node){
 		if (node.getName() == null || node.getFunctional_type() == null)
 			return false;
-//		for(Neighbour neighbour : node.getNeighbours().values()){
-//			if (NeighbourService.isValidNeighbour(graph, neighbour) == false)
-//				return false;
-//		}
+
 		return true;
 	}
 }

@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -30,7 +31,7 @@ public class Node {
 	private String functional_type;
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
-	private String configuration;
+	private Configuration configuration = new Configuration();
 	
 	@ApiModelProperty(name ="neighbours", notes = "Neighbours", dataType = "List[it.polito.escape.verify.model.Neighbour]")
 	private Map<Long, Neighbour> neighbours = new HashMap<Long,Neighbour>();
@@ -42,7 +43,7 @@ public class Node {
 
 	}
 	
-	public Node(long id, String name, String functional_type, String configuration) {
+	public Node(long id, String name, String functional_type, Configuration configuration) {
 		this.id = id;
 		this.name = name;
 		this.functional_type = functional_type;
@@ -65,12 +66,12 @@ public class Node {
 		this.functional_type = functional_type;
 	}
 	
-	@XmlTransient
-	public String getConfiguration(){
+	//@XmlTransient
+	public Configuration getConfiguration(){
 		return configuration;
 	}
 	
-	public void setConfiguration(String configuration){
+	public void setConfiguration(Configuration configuration){
 		this.configuration = configuration;
 	}
 	
