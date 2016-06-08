@@ -21,5 +21,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="service/build/com.microsoft.z3.jar"/>
 	<classpathentry kind="lib" path="service/build/mcnet.jar"/>
+	<classpathentry kind="lib" path="service/build/qjutils.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
