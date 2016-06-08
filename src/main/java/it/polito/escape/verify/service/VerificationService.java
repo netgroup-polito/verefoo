@@ -5,17 +5,25 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticListener;
 import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
@@ -38,17 +46,34 @@ import it.polito.escape.verify.resources.beans.VerificationBean;
 import it.polito.nffg.neo4j.jaxb.Paths;
 
 public class VerificationService {
-	private static final String projectFolder = System.getProperty("user.dir");
-	//private String projectFolder = System.getProperty("catalina.base");
-	private String chainsFile =  projectFolder + "/service/src/tests/j-verigraph-generator/examples/chains.json";
-	private String configFile = projectFolder + "/service/src/tests/j-verigraph-generator/examples/config.json";
+//	static {
+//		try {
+//			Class.forName("it.polito.escape.verify.model.DLLBootstrapper");
+//		} catch (ClassNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//    }
+	
+//	private static final String projectFolder = System.getProperty("user.dir") + "/service/src/tests/";
+//	LINUX
+	private static final String projectFolder = System.getProperty("catalina.base") + "/webapps/verify/WEB-INF/classes/tests/";
+//	WINDOWS
+//	private static final String projectFolder = System.getProperty("catalina.base") + "/wtpwebapps/verify/WEB-INF/classes/tests/";
+	private String chainsFile =  projectFolder + "j-verigraph-generator/examples/chains.json";
+	private String configFile = projectFolder + "j-verigraph-generator/examples/config.json";
+	private String testClassGenerator = projectFolder + "j-verigraph-generator/test_class_generator.py";
+	private String scenarioFile = projectFolder + "examples/Scenario";
+	private String testGenerator = projectFolder + "j-verigraph-generator/test_generator.py";
+	
+	/** where shall the compiled class be saved to (should exist already) */
+	private static String classOutputFolder = System.getProperty("catalina.base");
 	
 	public VerificationService(){
 		
 	}
 
-	public Paths getPaths(String projectRoot, Graph graph, VerificationBean verificationBean) {
-		//this.projectFolder = projectRoot;
+	public Paths getPaths(Graph graph, VerificationBean verificationBean) {
 		Node sourceNode = graph.searchNodeByName(verificationBean.getSource());
 		Node destinationNode = graph.searchNodeByName(verificationBean.getDestination());
 		if (sourceNode == null || destinationNode == null){
@@ -279,17 +304,16 @@ public class VerificationService {
 	}
 	
 	private int generateTestScenarios(String chainsFile, String configFile) {
-		String projectRootFolder = System.getProperty("user.dir");
 		
 		String[] cmd = {
 		        "python",
-		        platfromIndependentPath(projectRootFolder + "/service/src/tests/j-verigraph-generator/test_class_generator.py"),
+		        platfromIndependentPath(testClassGenerator),
 		        "-c",
 		        platfromIndependentPath(chainsFile),
 		        "-f",
 		        platfromIndependentPath(configFile),
 		        "-o",
-		        platfromIndependentPath(projectRootFolder + "/service/src/tests/examples/Scenario")
+		        platfromIndependentPath(scenarioFile)
 		    };
 		for (String c : cmd){
 			System.out.printf(c + " ");
@@ -325,7 +349,6 @@ public class VerificationService {
 	}
 	
 	private int generateTests(List<List<String>> paths, String source, String destination) {
-		String projectRootFolder = System.getProperty("user.dir");
 		
 		List<String> scenarios = new ArrayList<String>();
 		for (int i=0; i< paths.size();i++){
@@ -335,11 +358,11 @@ public class VerificationService {
 		for (String scenario : scenarios) {
 			String[] cmd = { 
 					"python",
-					platfromIndependentPath(projectRootFolder + "/service/src/tests/j-verigraph-generator/test_generator.py"),
+					platfromIndependentPath(testGenerator),
 					"-i",
-					platfromIndependentPath(projectRootFolder + "/service/src/tests/examples/" + scenario + ".java"),
+					platfromIndependentPath(projectFolder + "examples/" + scenario + ".java"),
 					"-o",
-					platfromIndependentPath(projectRootFolder + "/service/src/tests/" + scenario + "_test.java"),
+					platfromIndependentPath(projectFolder + scenario + "_test.java"),
 					"-s",
 					source,
 					"-d",
@@ -375,33 +398,78 @@ public class VerificationService {
 	}
 	
 	private int compileAndRunTests(List<List<String>> sanitizedPaths){
+//		try {
+////			Class.forName("it.polito.escape.verify.model.DLLBootstrapper");
+////			Class.forName("com.microsoft.z3.*");
+//			Package.getPackage("com.microsoft.z3");
+//			Package.getPackage("mcnet");
+//		} catch (Exception e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
 		List<File> testFiles = new ArrayList<File>();
+		List<File> runFiles = new ArrayList<File>();
 		for (int i=0; i<sanitizedPaths.size();i++){
-			testFiles.add(new File(projectFolder + "/service/src/tests/Scenario_" + (i+1) + "_test.java"));
+			System.out.println("Creating a test file: " + sanitizedPaths.get(i).toString());
+			//add scenario to compilation
+			testFiles.add(new File(this.scenarioFile + "_" + (i+1) + ".java"));
+			//add test to compilation
+			testFiles.add(new File(projectFolder + "Scenario_" + (i+1) + "_test.java"));
+			//add test to execution
+			runFiles.add(new File(projectFolder + "Scenario_" + (i+1) + "_test.java"));
 		}
 		
-		//File sourceFile = new File(projectFolder + "/service/src/tests/Test.java");
+		//print test files
+		for (File f : testFiles){
+			System.out.println("Test file: " + f.getName());
+		}
+		//print run files
+		for (File f : runFiles){
+			System.out.println("Run file: " + f.getName());
+		}
+		
+//		Iterable<? extends JavaFileObject> files = Arrays.asList(testFiles);
+//		
+//		compile(testFiles);
+	
 
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
 
 		try {
-			fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(new File(projectFolder + "/service/src/tests/")));
+			fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(new File(projectFolder)));
 			
-
 			// Compile the file
 			
 			//boolean success = compiler.getTask(null, fileManager, null, null, null,
 			//		fileManager.getJavaFileObjectsFromFiles(Arrays.asList(sourceFile))).call();
 			
-			boolean success = compiler.getTask(null, fileManager, null, null, null,
+			System.out.println("Path is: " + System.getProperty("java.class.path"));
+			List<String> optionList = new ArrayList<String>();
+            optionList.add("-classpath");
+//            String z3 = System.getProperty("catalina.home") + "\\shared\\lib\\com.microsoft.z3.jar";
+            String z3 = "/usr/lib/com.microsoft.z3.jar";
+            
+            //WINDOWS
+//            System.out.println("Z3 is: " + z3);
+//			optionList.add(System.getProperty("java.class.path") + ";" + z3);
+			//LINUX
+            System.out.println("Z3 is: " + z3);
+			optionList.add(System.getProperty("java.class.path") + ":" + z3 + ":.");
+//            List<String> optionList = null;
+            
+			boolean success = compiler.getTask(null, fileManager, null, optionList, null,
 					fileManager.getJavaFileObjectsFromFiles(testFiles)).call();
+			if(success){
+				System.out.println("Compilation succeded!");
+				System.out.println("Classes have been compiled here: " + StandardLocation.CLASS_OUTPUT.toString());
+			}
 			
 			fileManager.close();
-			for (File file : testFiles){
+			for (File file : runFiles){
 				System.out.println("Running a test");
-				int result = runIt(file.getName());
-				System.out.println("Compile and result returned: " + result);
+				int result = runIt(file);
+				System.out.println("runIt returned: " + result);
 				if (result < 0)
 					return result;
 			}
@@ -420,22 +488,120 @@ public class VerificationService {
 		return path;
 	}
 	
+    public static class MyDiagnosticListener implements DiagnosticListener<JavaFileObject>
+    {
+        public void report(Diagnostic<? extends JavaFileObject> diagnostic)
+        {
+ 
+            System.out.println("Line Number->" + diagnostic.getLineNumber());
+            System.out.println("code->" + diagnostic.getCode());
+            System.out.println("Message->"
+                               + diagnostic.getMessage(Locale.ENGLISH));
+            System.out.println("Source->" + diagnostic.getSource());
+            System.out.println(" ");
+        }
+    }
+	
+    /** compile your files by JavaCompiler */
+    public static void compile(Iterable<? extends JavaFileObject> files)
+    {
+        //get system compiler:
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+ 
+        // for compilation diagnostic message processing on compilation WARNING/ERROR
+        MyDiagnosticListener c = new MyDiagnosticListener();
+        StandardJavaFileManager fileManager = compiler.getStandardFileManager(c,
+                                                                              Locale.ENGLISH,
+                                                                              null);
+        //specify classes output folder
+        Iterable options = Arrays.asList("-d", classOutputFolder);
+        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager,
+                                                             c, options, null,
+                                                             files);
+        Boolean result = task.call();
+        if (result == true)
+        {
+            System.out.println("Compilation succeeded");
+        }
+    }
+    
+    /** run class from the compiled byte code file by URLClassloader */
+    @SuppressWarnings("deprecation")
+	public static int runFile(File file)
+    {
+        // Create a File object on the root of the directory
+        // containing the class file
+        File directory = new File(classOutputFolder);
+ 
+        try
+        {
+            // Convert File to a URL
+            URL url = directory.toURL(); // file:/classes/demo
+            URL[] urls = new URL[] { url };
+ 
+            // Create a new class loader with the directory
+            ClassLoader loader = new URLClassLoader(urls);
+ 
+            // Load in the class; Class.childclass should be located in
+            // the directory file:/class/demo/
+            Class thisClass = loader.loadClass(directory.getName());
+ 
+            Class params[] = {};
+            Object paramsObj[] = {};
+            Object instance = thisClass.newInstance();
+            Method thisMethod = thisClass.getDeclaredMethod("run", params);
+ 
+            // run the testAdd() method on the instance:
+            return (int) thisMethod.invoke(instance, paramsObj);
+        }
+        catch (MalformedURLException e)
+        {
+        }
+        catch (ClassNotFoundException e)
+        {
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return -10;
+    }
+	
 	//@SuppressWarnings("unchecked")
-	public static int runIt(String filename) {
+	public int runIt(File filename) {
 		try {
+			
+			System.out.println("Filename: " + filename.getAbsolutePath());
+			String filenameNoExtension = filename.getName().split("\\.")[0];
+			System.out.println("Filename without extension: " + filenameNoExtension);
+			
 			Class params[] = {};
 			Object paramsObj[] = {};
-			System.out.println("Filename: " + filename);
-			//String[] parts = filename.split("\\.");
-			filename = filename.split("\\.")[0];
-			System.out.println("Filename: " + filename);
-			Class thisClass = Class.forName("tests." + filename);
+//			Class.forName("it.polito.escape.verify.model.DLLBootstrapper");
+			Class thisClass = Class.forName("tests." + filenameNoExtension);
 			Object iClass = thisClass.newInstance();
 			Method thisMethod = thisClass.getDeclaredMethod("run", params);
 			int result = (int) thisMethod.invoke(iClass, paramsObj);
 			System.out.println("\nTest returned " + result);
 			return result;
-		} catch (Exception e) {
+			
+			//NEW VERSION
+			//WINDOWS
+//			File file = new File("C:\\Program Files\\z3-master\\build\\com.microsoft.z3.jar");
+			//LINUX
+//			File file = new File(projectFolder + "tests/" + filenameNoExtension);
+//			System.out.println("Running file: " + file.getAbsolutePath());
+//		    URL url = file.toURI().toURL();
+//
+//		    URLClassLoader classLoader = (URLClassLoader)ClassLoader.getSystemClassLoader();
+//		    Method method = URLClassLoader.class.getDeclaredMethod("run", URL.class);
+//		    method.setAccessible(true);
+//		    return (int) method.invoke(classLoader, url);
+		} catch(InvocationTargetException e){
+			System.out.println(e.getCause().getMessage());
+			e.printStackTrace();
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		return -1;

@@ -4,7 +4,6 @@ import java.io.File;
 import java.net.URI;
 import java.util.List;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -106,9 +105,9 @@ public class GraphResource {
 	@ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph id or invalid configuration for source and/or destination node", response = ErrorMessage.class),
 							@ApiResponse(code = 404, message = "Graph not found or source node not found or destination node not found or configuration for source and/or destination node not available", response = ErrorMessage.class),
 							})
-	public Verification verifyGraph(@Context ServletContext context, @ApiParam(value = "Graph id", required = true) @PathParam("graphId") long id, @ApiParam(value = "'source' and 'destination' must refer to names of existing nodes in the same graph, 'type' refers to the required verification between the two (e.g. 'reachability')", required = true) @BeanParam VerificationBean verificationBean) {
+	public Verification verifyGraph(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long id, @ApiParam(value = "'source' and 'destination' must refer to names of existing nodes in the same graph, 'type' refers to the required verification between the two (e.g. 'reachability')", required = true) @BeanParam VerificationBean verificationBean) {
 		Graph graph = graphService.getGraph(id);
-		Paths paths = verificationService.getPaths(context.getRealPath(File.separator),graph, verificationBean);
+		Paths paths = verificationService.getPaths(graph, verificationBean);
 		String result = verificationService.runTests(graph, paths, verificationBean.getSource(), verificationBean.getDestination());
 		return new Verification(result);
 	}

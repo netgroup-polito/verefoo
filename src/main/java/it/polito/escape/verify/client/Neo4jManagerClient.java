@@ -82,62 +82,62 @@ public class Neo4jManagerClient {
 		this.routingTable = routingTable;
 	}
 	
-	public static void main(String[] args) {
-		
-		Neo4jManagerClient manager = new Neo4jManagerClient();
-		
-		try {
-			manager.generateCustomXml();
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.out.println("Fatal error in the XML generation!");
-			System.exit(1);
-		}
-		
-		Client client = ClientBuilder.newClient();
-		
-		WebTarget baseTarget = client.target("http://localhost:8090/Project-Neo4jManager/rest/");
-		//WebTarget baseTarget = client.target("http://localhost:8080/neo4jmanager/rest/");
-		WebTarget graphsTarget = baseTarget.path("graphs");		
-		WebTarget pathSourceDestination = graphsTarget.path("{graphId}/paths");
-		WebTarget deleteNffg = graphsTarget.path("{graphId}");
-		
-		System.out.println("Deleting graph with id 1...");
-		
-		Response deleteNffgResponse = deleteNffg
-							.resolveTemplate("graphId", "1")
-							.request()
-							.delete();
-		
-		System.out.println( "Graph 1 deletion status: " + deleteNffgResponse.getStatus());
-		
-		System.out.println("Creating graph with id 1 from xml file...");
-		
-		Response createNffgResponse = graphsTarget
-							.request()
-							.post(Entity.xml(manager.xmlString));
-							//.post(Entity.xml(new File("nffg.xml")));
-		
-		System.out.println( "Graph 1 creation status: " + createNffgResponse.getStatus());
-		
-		System.out.println("Getting paths from node \"" + manager.source + "\" to node \"" + manager.destination + "\"...");
-		Response getPath = pathSourceDestination
-							.resolveTemplate("graphId", "1")
-							.queryParam("src", manager.source)
-							.queryParam("dst", manager.destination)
-							.queryParam("dir", "outgoing")
-							.request()
-							.get();
-		System.out.println("Paths from node \"" + manager.source + "\" to node \"" + manager.destination + "\":");
-		Paths paths = getPath.readEntity(Paths.class);
-		
-		for (String path : paths.getPath()){
-			System.out.println(path);
-		}
-		
-		
-	}
+//	public static void main(String[] args) {
+//		
+//		Neo4jManagerClient manager = new Neo4jManagerClient();
+//		
+//		try {
+//			manager.generateCustomXml();
+//		} catch (JAXBException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			System.out.println("Fatal error in the XML generation!");
+//			System.exit(1);
+//		}
+//		
+//		Client client = ClientBuilder.newClient();
+//		
+//		WebTarget baseTarget = client.target("http://localhost:8090/Project-Neo4jManager/rest/");
+//		//WebTarget baseTarget = client.target("http://localhost:8080/neo4jmanager/rest/");
+//		WebTarget graphsTarget = baseTarget.path("graphs");		
+//		WebTarget pathSourceDestination = graphsTarget.path("{graphId}/paths");
+//		WebTarget deleteNffg = graphsTarget.path("{graphId}");
+//		
+//		System.out.println("Deleting graph with id 1...");
+//		
+//		Response deleteNffgResponse = deleteNffg
+//							.resolveTemplate("graphId", "1")
+//							.request()
+//							.delete();
+//		
+//		System.out.println( "Graph 1 deletion status: " + deleteNffgResponse.getStatus());
+//		
+//		System.out.println("Creating graph with id 1 from xml file...");
+//		
+//		Response createNffgResponse = graphsTarget
+//							.request()
+//							.post(Entity.xml(manager.xmlString));
+//							//.post(Entity.xml(new File("nffg.xml")));
+//		
+//		System.out.println( "Graph 1 creation status: " + createNffgResponse.getStatus());
+//		
+//		System.out.println("Getting paths from node \"" + manager.source + "\" to node \"" + manager.destination + "\"...");
+//		Response getPath = pathSourceDestination
+//							.resolveTemplate("graphId", "1")
+//							.queryParam("src", manager.source)
+//							.queryParam("dst", manager.destination)
+//							.queryParam("dir", "outgoing")
+//							.request()
+//							.get();
+//		System.out.println("Paths from node \"" + manager.source + "\" to node \"" + manager.destination + "\":");
+//		Paths paths = getPath.readEntity(Paths.class);
+//		
+//		for (String path : paths.getPath()){
+//			System.out.println(path);
+//		}
+//		
+//		
+//	}
 	
 	public Paths runClient(){
 		
@@ -155,8 +155,8 @@ public class Neo4jManagerClient {
 		Client client = ClientBuilder.newBuilder()
 						.register(PathsMessageBodyReader.class).build();
 		
-		WebTarget baseTarget = client.target("http://localhost:8090/Project-Neo4jManager/rest/");
-		//WebTarget baseTarget = client.target("http://localhost:8080/neo4jmanager/rest/");
+//		WebTarget baseTarget = client.target("http://localhost:8090/Project-Neo4jManager/rest/");
+		WebTarget baseTarget = client.target("http://localhost:8080/neo4jmanager/rest/");
 		WebTarget graphsTarget = baseTarget.path("graphs");		
 		WebTarget pathSourceDestination = graphsTarget.path("{graphId}/paths");
 		WebTarget deleteNffg = graphsTarget.path("{graphId}");
@@ -192,9 +192,6 @@ public class Neo4jManagerClient {
 		Paths paths = getPath.readEntity(Paths.class);
 		
 		return paths;
-		/*for (String path : paths.getPath()){
-			System.out.println(path);
-		}*/
 	}
 	
 	private void generateCustomXml() throws JAXBException {

@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "Policy")
 public class Verification {
 
-	@ApiModelProperty(example="SAT | UNSAT")
+	@ApiModelProperty(example="SAT | UNSAT | UNPREDICTED")
 	private String result;
 	
 	public Verification(){

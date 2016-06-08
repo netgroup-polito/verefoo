@@ -241,7 +241,7 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
         for i in range(0, len(nodes_names)):
             c.writeln("ArrayList<DatatypeExpr> al" + str(i) + " = new ArrayList<DatatypeExpr>();")
             c.writeln("al" + str(i) + ".add(nctx.am.get(\"" + nodes_ip_mappings[i] + "\"));")
-            c.writeln("adm.add(new Tuple<>(" + nodes_names[i] + ", al" + str(i) + "));")
+            c.writeln("adm.add(new Tuple<>((NetworkObject)" + nodes_names[i] + ", al" + str(i) + "));")
 
         #SET ADDRESS MAPPINGS
         c.writeln("net.setAddressMappings(adm);")
@@ -291,8 +291,9 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                 elif nodes_types[i] == "firewall":
                     c.writeln("ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();")
                     for config_element in config[nodes_names[i]]["configuration"]:
-                        for key, value in config_element.items():
-                            c.writeln("acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(\"" + key + "\"),nctx.am.get(\"" + value + "\")));")
+                        if isinstance(config_element,dict):
+                            for key, value in config_element.items():
+                                c.writeln("acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(\"" + key + "\"),nctx.am.get(\"" + value + "\")));")
                     c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(acl);")
                 elif nodes_types[i] == "antispam":
                     c.write(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(new int[]")
