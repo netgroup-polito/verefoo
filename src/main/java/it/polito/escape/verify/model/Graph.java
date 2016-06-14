@@ -25,21 +25,21 @@ import it.polito.escape.verify.resources.CustomMapSerializer;
 public class Graph {
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
-	private long id;
-	
-	@ApiModelProperty(name ="nodes", notes = "Nodes", dataType = "List[it.polito.escape.verify.model.Node]")
-	private Map<Long, Node> nodes = new HashMap<Long,Node>();
-	
+	private long			id;
+
+	@ApiModelProperty(name = "nodes", notes = "Nodes", dataType = "List[it.polito.escape.verify.model.Node]")
+	private Map<Long, Node>	nodes	= new HashMap<Long, Node>();
+
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private Set<Link> links = new HashSet<Link>();
-	
-	public Graph(){
-		
+	private Set<Link>		links	= new HashSet<Link>();
+
+	public Graph() {
+
 	}
-	
-	public Graph(long id){
+
+	public Graph(long id) {
 		this.id = id;
 	}
 
@@ -55,11 +55,11 @@ public class Graph {
 	public Map<Long, Node> getNodes() {
 		return nodes;
 	}
-	
+
 	public void setNodes(Map<Long, Node> nodes) {
 		this.nodes = nodes;
 	}
-	
+
 	@XmlTransient
 	public Set<Link> getLinks() {
 		return links;
@@ -68,20 +68,20 @@ public class Graph {
 	public void setLinks(Set<Link> links) {
 		this.links = links;
 	}
-	
+
 	public void addLink(String url, String rel) {
 		Link link = new Link();
 		link.setLink(url);
 		link.setRel(rel);
 		links.add(link);
 	}
-	
-	public Node searchNodeByName(String name){
-		for (Node node : this.nodes.values()){
+
+	public Node searchNodeByName(String name) {
+		for (Node node : this.nodes.values()) {
 			if (node.getName().equals(name))
 				return node;
 		}
 		return null;
 	}
-	
+
 }

@@ -42,6 +42,7 @@ public class NeighbourResource {
     	    responseContainer = "List")
 	@ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph and/or node id", response=ErrorMessage.class),
 							@ApiResponse(code = 404, message = "Graph and/or node not found", response=ErrorMessage.class),
+							@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
 							@ApiResponse(code = 200, message = "All the neighbours have been returned in the message body", response=Neighbour.class, responseContainer="List")})
 	public List<Neighbour> getAllNeighbours(
 			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
@@ -58,6 +59,7 @@ public class NeighbourResource {
 	@ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph and/or node id", response=ErrorMessage.class),
 							@ApiResponse(code = 404, message = "Graph and/or node not found", response=ErrorMessage.class),
 							@ApiResponse(code = 400, message = "Invalid neighbour object", response=ErrorMessage.class),
+							@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
 							@ApiResponse(code = 201, message = "Neighbour successfully created", response=Neighbour.class)})
 	public Response addNeighbour(
 			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
@@ -82,6 +84,7 @@ public class NeighbourResource {
 	@ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph and/or node and/or neighbour id", response=ErrorMessage.class),
 							@ApiResponse(code = 404, message = "Graph and/or node and /or neighbour not found", response=ErrorMessage.class),
 							@ApiResponse(code = 400, message = "Invalid neighbour object", response=ErrorMessage.class),
+							@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
 							@ApiResponse(code = 200, message = "Neighbour edited successfully", response=Neighbour.class)})
 	public Neighbour updateNeighbour(
 			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
@@ -101,6 +104,7 @@ public class NeighbourResource {
     	    response = Neighbour.class)
 	@ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph and/or node and/or neighbour id", response=ErrorMessage.class),
 							@ApiResponse(code = 404, message = "Graph and/or node not found", response=ErrorMessage.class),
+							@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
 							@ApiResponse(code = 204, message = "Node successfully deleted")})
 	public void deleteNeighbour(
 			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
@@ -118,6 +122,7 @@ public class NeighbourResource {
     	    response = Neighbour.class)
 	@ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph and/or node and/or neighbour id", response=ErrorMessage.class),
 							@ApiResponse(code = 404, message = "Graph and/or node and /or neighbour not found", response=ErrorMessage.class),
+							@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
 							@ApiResponse(code = 200, message = "The requested neighbour has been returned in the message body", response=Neighbour.class)})
 	public Neighbour getNeighbour(
 			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,

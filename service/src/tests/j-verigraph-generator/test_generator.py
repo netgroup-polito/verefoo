@@ -154,7 +154,7 @@ def main(argv):
             System.out.println(\"SAT\");\n\
             return 0;\n\
         }else{\n\
-            System.out.println(\"UNPREDICTED\");\n\
+            System.out.println(\"UNKNOWN\");\n\
             return -2;\n\
         \r\t\t}")
 

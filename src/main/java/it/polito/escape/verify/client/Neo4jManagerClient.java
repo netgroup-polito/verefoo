@@ -23,6 +23,8 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import com.sun.org.apache.xerces.internal.impl.dtd.models.CMLeaf;
+
 import it.polito.escape.verify.model.Entry;
 import it.polito.escape.verify.resources.PathsMessageBodyReader;
 import it.polito.nffg.neo4j.jaxb.*;
@@ -40,7 +42,9 @@ import it.polito.nffg.neo4j.jaxb.SpecType.Storage;
 public class Neo4jManagerClient {
 	
 	private JAXBContext jc; 
-	private NffgType nffg;
+//	private NffgType nffg;
+	private String address;
+	private Nffg nffg;
 	
 	private List<String> endpoints = new LinkedList<String>();
 	private List<String> firewalls = new LinkedList<String>();
@@ -53,91 +57,18 @@ public class Neo4jManagerClient {
 	
 
 	public Neo4jManagerClient() {
-//		this.source = "client_1";
-//		this.destination = "server_1";
-//		
-//		this.endpoints.add("client_1");
-//		this.endpoints.add("server_1");
-//		
-//		this.firewalls.add("firewall_1");
-//		
-//		for (String node : endpoints){
-//			this.routingTable.put(node, new ArrayList<Entry>());
-//		}
-//		for (String firewall : firewalls){
-//			this.routingTable.put(firewall + "_in", new ArrayList<Entry>());
-//			this.routingTable.put(firewall + "_out", new ArrayList<Entry>());
-//		}
-//		this.routingTable.get("client_1").add(new Entry("output", "firewall_1_in"));
-//		//this.routingTable.get("server_1").add(new Entry("output", "firewall_1_out"));
-//		this.routingTable.get("firewall_1_out").add(new Entry("output", "server_1"));
 		
 	}
 	
-	public Neo4jManagerClient(String source, String destination, List<String> endpoints, List<String> firewalls, Map<String, List<Entry>> routingTable){
+	public Neo4jManagerClient(String address, String source, String destination, List<String> endpoints, List<String> firewalls, Map<String, List<Entry>> routingTable){
+		this.address = address;
 		this.source = source;
 		this.destination = destination;
 		this.endpoints = endpoints;
 		this.firewalls = firewalls;
 		this.routingTable = routingTable;
 	}
-	
-//	public static void main(String[] args) {
-//		
-//		Neo4jManagerClient manager = new Neo4jManagerClient();
-//		
-//		try {
-//			manager.generateCustomXml();
-//		} catch (JAXBException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			System.out.println("Fatal error in the XML generation!");
-//			System.exit(1);
-//		}
-//		
-//		Client client = ClientBuilder.newClient();
-//		
-//		WebTarget baseTarget = client.target("http://localhost:8090/Project-Neo4jManager/rest/");
-//		//WebTarget baseTarget = client.target("http://localhost:8080/neo4jmanager/rest/");
-//		WebTarget graphsTarget = baseTarget.path("graphs");		
-//		WebTarget pathSourceDestination = graphsTarget.path("{graphId}/paths");
-//		WebTarget deleteNffg = graphsTarget.path("{graphId}");
-//		
-//		System.out.println("Deleting graph with id 1...");
-//		
-//		Response deleteNffgResponse = deleteNffg
-//							.resolveTemplate("graphId", "1")
-//							.request()
-//							.delete();
-//		
-//		System.out.println( "Graph 1 deletion status: " + deleteNffgResponse.getStatus());
-//		
-//		System.out.println("Creating graph with id 1 from xml file...");
-//		
-//		Response createNffgResponse = graphsTarget
-//							.request()
-//							.post(Entity.xml(manager.xmlString));
-//							//.post(Entity.xml(new File("nffg.xml")));
-//		
-//		System.out.println( "Graph 1 creation status: " + createNffgResponse.getStatus());
-//		
-//		System.out.println("Getting paths from node \"" + manager.source + "\" to node \"" + manager.destination + "\"...");
-//		Response getPath = pathSourceDestination
-//							.resolveTemplate("graphId", "1")
-//							.queryParam("src", manager.source)
-//							.queryParam("dst", manager.destination)
-//							.queryParam("dir", "outgoing")
-//							.request()
-//							.get();
-//		System.out.println("Paths from node \"" + manager.source + "\" to node \"" + manager.destination + "\":");
-//		Paths paths = getPath.readEntity(Paths.class);
-//		
-//		for (String path : paths.getPath()){
-//			System.out.println(path);
-//		}
-//		
-//		
-//	}
+
 	
 	public Paths runClient(){
 		
@@ -149,14 +80,11 @@ public class Neo4jManagerClient {
 			System.out.println("Fatal error in the XML generation!");
 			System.exit(1);
 		}
-		//return this.xmlString;
-		
-		//Client client = ClientBuilder.newClient();
+
 		Client client = ClientBuilder.newBuilder()
 						.register(PathsMessageBodyReader.class).build();
 		
-		WebTarget baseTarget = client.target("http://localhost:8090/Project-Neo4jManager/rest/");
-//		WebTarget baseTarget = client.target("http://localhost:8080/neo4jmanager/rest/");
+		WebTarget baseTarget = client.target(this.address);
 		WebTarget graphsTarget = baseTarget.path("graphs");		
 		WebTarget pathSourceDestination = graphsTarget.path("{graphId}/paths");
 		WebTarget deleteNffg = graphsTarget.path("{graphId}");
@@ -198,14 +126,22 @@ public class Neo4jManagerClient {
 		
 		jc = JAXBContext.newInstance( "it.polito.nffg.neo4j.jaxb" );
 		
-		nffg = new NffgType();
+//		nffg = new NffgType();
+		nffg = new Nffg();
 		nffg.setId("nffg_1");
 		
 		generateEndpoints();
 		generateFirewalls();
 		generateConnections();
 		
-		JAXBElement<NffgType> root = (new ObjectFactory()).createNffg(nffg);
+		//ADDED
+		MonParamsType monitoring_parameters = new MonParamsType();
+		nffg.setMonitoringParameters(monitoring_parameters);
+		
+		
+//		JAXBElement<NffgType> root = (new ObjectFactory()).createNffg(nffg);
+		JAXBElement<Nffg> root = (new ObjectFactory()).createNffg(nffg);
+		
 		Marshaller m;
 		try {
 			m = jc.createMarshaller();
@@ -215,6 +151,7 @@ public class Neo4jManagerClient {
 			try {
 				XMLStreamWriter xmlStreamWriter = XMLOutputFactory.newInstance().createXMLStreamWriter(stringWriter);
 				m.marshal( root, xmlStreamWriter );
+//				m.marshal(nffg, xmlStreamWriter );
 				xmlString = stringWriter.getBuffer().toString();
 			} catch (XMLStreamException e) {
 				// TODO Auto-generated catch block
@@ -223,7 +160,8 @@ public class Neo4jManagerClient {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	        //m.marshal( root, new File("nffg.xml") );
+//	        m.marshal( root, new File("nffg.xml") );
+			System.out.println(xmlString);
 			
 		} catch (JAXBException e) {
 			// TODO Auto-generated catch block

@@ -13,46 +13,46 @@ import it.polito.escape.verify.model.Neighbour;
 import it.polito.escape.verify.model.Node;
 
 public class GraphService {
-	
+
 	private Map<Long, Graph> graphs = DatabaseClass.getGraphs();
-	
-	public GraphService(){
-		
+
+	public GraphService() {
+
 	}
-	
-	public List<Graph> getAllGraphs(){
+
+	public List<Graph> getAllGraphs() {
 		return new ArrayList<Graph>(graphs.values());
 	}
-	
-	public Graph getGraph(long id){
-		if (id <= 0){
+
+	public Graph getGraph(long id) {
+		if (id <= 0) {
 			throw new ForbiddenException("Illegal graph id: " + id);
 		}
 		Graph graph = graphs.get(id);
-		if (graph == null){
+		if (graph == null) {
 			throw new DataNotFoundException("Graph with id " + id + " not found");
 		}
 		return graph;
 	}
-	
-	public Graph updateGraph(Graph graph){
-		if (graph.getId() <= 0){
+
+	public Graph updateGraph(Graph graph) {
+		if (graph.getId() <= 0) {
 			throw new ForbiddenException("Illegal graph id: " + graph.getId());
-		}		
+		}
 		Graph localGraph = graphs.get(graph.getId());
-		if (localGraph == null){
+		if (localGraph == null) {
 			throw new DataNotFoundException("Graph with id " + graph.getId() + " not found");
 		}
 		if (!isValidGraph(graph))
 			throw new BadRequestException("Given graph is not valid!");
-		
+
 		graphs.put(graph.getId(), graph);
-		
+
 		return graph;
 	}
-	
-	public Graph removeGraph(long id){
-		if (id <= 0){
+
+	public Graph removeGraph(long id) {
+		if (id <= 0) {
 			throw new ForbiddenException("Illegal graph id: " + id);
 		}
 		return graphs.remove(id);
@@ -61,25 +61,25 @@ public class GraphService {
 	public Graph addGraph(Graph graph) {
 		if (isValidGraph(graph) == false)
 			throw new BadRequestException("Given graph is not valid!");
-		
-		synchronized(this){
+
+		synchronized (this) {
 			graph.setId(DatabaseClass.getNumberOfGraphs() + 1);
 		}
 		int numberOfNodes = 0;
-		for (Node node : graph.getNodes().values()){
-			
+		for (Node node : graph.getNodes().values()) {
+
 			node.setId(++numberOfNodes);
-			
+
 			int numberOfNodeNeighbours = 0;
-			for (Neighbour neighbour : node.getNeighbours().values()){
-					neighbour.setId(++numberOfNodeNeighbours);
+			for (Neighbour neighbour : node.getNeighbours().values()) {
+				neighbour.setId(++numberOfNodeNeighbours);
 			}
 		}
-		//check neighbours
-		for (Node node : graph.getNodes().values()){
-			for (Neighbour neighbour : node.getNeighbours().values()){
+		// check neighbours
+		for (Node node : graph.getNodes().values()) {
+			for (Neighbour neighbour : node.getNeighbours().values()) {
 				boolean validNeighbour = NeighbourService.isValidNeighbourUpdate(graph, node, neighbour);
-				if (!validNeighbour){
+				if (!validNeighbour) {
 					throw new BadRequestException("Given graph is not valid: please check the names of the nodes and neighbours!");
 				}
 			}
@@ -87,10 +87,9 @@ public class GraphService {
 		graphs.put(graph.getId(), graph);
 		return graph;
 	}
-	
-	
-	public static boolean isValidGraph(Graph graph){
-		for (Node node : graph.getNodes().values()){
+
+	public static boolean isValidGraph(Graph graph) {
+		for (Node node : graph.getNodes().values()) {
 			if (NodeService.isValidNode(graph, node) == false)
 				return false;
 		}

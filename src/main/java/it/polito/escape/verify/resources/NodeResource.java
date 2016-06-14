@@ -46,6 +46,7 @@ public class NodeResource {
     	    responseContainer = "List")
     @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph id", response = ErrorMessage.class),
     						@ApiResponse(code = 404, message = "Graph not found", response = ErrorMessage.class),
+    						@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
     						@ApiResponse(code = 200, message = "All the nodes have been returned in the message body", response = Node.class, responseContainer = "List") })
     public List<Node> getNodes(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId){
     	return nodeService.getAllNodes(graphId);
@@ -60,6 +61,7 @@ public class NodeResource {
     @ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid node supplied", response = ErrorMessage.class),
     						@ApiResponse(code = 403, message = "Invalid graph id", response = ErrorMessage.class),
     						@ApiResponse(code = 404, message = "Graph not found", response = ErrorMessage.class),
+    						@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
     						@ApiResponse(code = 201, message = "Node successfully created", response = Node.class)})
     public Response addNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
@@ -82,6 +84,7 @@ public class NodeResource {
     	    response = Node.class)
     @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph and/or node id", response = ErrorMessage.class),
     						@ApiResponse(code = 404, message = "Graph and/or node not found", response = ErrorMessage.class),
+    						@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
     						@ApiResponse(code = 200, message = "The requested node has been returned in the message body", response = Node.class)})
     public Node getNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
@@ -101,6 +104,7 @@ public class NodeResource {
     	    notes = "Configures a node. Once all the nodes of a graph have been configured a given policy can be verified for the graph (e.g. 'reachability' between two nodes).")
     @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph and/or node id", response = ErrorMessage.class),
     						@ApiResponse(code = 404, message = "Graph and/or node not found", response = ErrorMessage.class),
+    						@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
     						@ApiResponse(code = 200, message = "Configuration updated for the requested node")})
     public void addNodeConfiguration(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
@@ -121,6 +125,7 @@ public class NodeResource {
 	@ApiResponses(value = { @ApiResponse(code = 400, message = "Invalid node object", response = ErrorMessage.class),
 							@ApiResponse(code = 403, message = "Invalid graph and/or node id", response = ErrorMessage.class),
 							@ApiResponse(code = 404, message = "Graph and/or node not found", response = ErrorMessage.class),
+							@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
 							@ApiResponse(code = 200, message = "Node edited successfully", response = Node.class)})
     public Node updateNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
@@ -137,6 +142,7 @@ public class NodeResource {
     	    value = "Deletes a node of a given graph",
     	    notes = "Deletes a single node of a given graph")
     @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph and/or node id", response = ErrorMessage.class),
+                            @ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
     						@ApiResponse(code = 204, message = "Node successfully deleted")})
     public void deleteNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,

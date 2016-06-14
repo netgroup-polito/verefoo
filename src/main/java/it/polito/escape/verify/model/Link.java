@@ -6,22 +6,26 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "Link")
 public class Link {
 	@ApiModelProperty(required = false, hidden = true)
-	private String link;
+	private String	link;
 	@ApiModelProperty(required = false, hidden = true)
-	private String rel;
-	
+	private String	rel;
+
 	public String getLink() {
 		return link;
 	}
+
 	public void setLink(String link) {
 		this.link = link;
 	}
+
 	public String getRel() {
 		return rel;
 	}
+
 	public void setRel(String rel) {
 		this.rel = rel;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -30,6 +34,7 @@ public class Link {
 		result = prime * result + ((rel == null) ? 0 : rel.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -42,15 +47,16 @@ public class Link {
 		if (link == null) {
 			if (other.link != null)
 				return false;
-		} else if (!link.equals(other.link))
+		}
+		else if (!link.equals(other.link))
 			return false;
 		if (rel == null) {
 			if (other.rel != null)
 				return false;
-		} else if (!rel.equals(other.rel))
+		}
+		else if (!rel.equals(other.rel))
 			return false;
 		return true;
 	}
-	
-	
+
 }

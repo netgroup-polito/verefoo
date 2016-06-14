@@ -24,25 +24,31 @@ import it.polito.escape.verify.resources.NodeCustomDeserializer;
 public class Node {
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
-	private long id;
-	@ApiModelProperty(required=true, example="ep", value="The name of the node can be any string")
-	private String name;
-	@ApiModelProperty(required=true, example="endpoint", value="The functional types that are currently supported are: endpoint, firewall, nat, antispam, webclient, webserver, mailclient, mailserver")
-	private String functional_type;
+	private long					id;
+	@ApiModelProperty(required = true, example = "ep", value = "The name of the node can be any string")
+	private String					name;
+	@ApiModelProperty(
+						required = true,
+						example = "endpoint",
+						value = "The functional types that are currently supported are: endpoint, firewall, nat, antispam, webclient, webserver, mailclient, mailserver")
+	private String					functional_type;
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
-	private Configuration configuration = new Configuration();
-	
-	@ApiModelProperty(name ="neighbours", notes = "Neighbours", dataType = "List[it.polito.escape.verify.model.Neighbour]")
-	private Map<Long, Neighbour> neighbours = new HashMap<Long,Neighbour>();
+	private Configuration			configuration	= new Configuration();
+
+	@ApiModelProperty(
+						name = "neighbours",
+						notes = "Neighbours",
+						dataType = "List[it.polito.escape.verify.model.Neighbour]")
+	private Map<Long, Neighbour>	neighbours		= new HashMap<Long, Neighbour>();
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
-	private Set<Link> links = new HashSet<>();
-	
-	public Node(){
+	private Set<Link>				links			= new HashSet<>();
+
+	public Node() {
 
 	}
-	
+
 	public Node(long id, String name, String functional_type, Configuration configuration) {
 		this.id = id;
 		this.name = name;
@@ -65,33 +71,33 @@ public class Node {
 	public void setFunctional_type(String functional_type) {
 		this.functional_type = functional_type;
 	}
-	
-	//@XmlTransient
-	public Configuration getConfiguration(){
+
+	// @XmlTransient
+	public Configuration getConfiguration() {
 		return configuration;
 	}
-	
-	public void setConfiguration(Configuration configuration){
+
+	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
 	}
-	
+
 	@JsonSerialize(using = CustomMapSerializer.class)
-	public Map<Long,Neighbour> getNeighbours() {
+	public Map<Long, Neighbour> getNeighbours() {
 		return neighbours;
 	}
 
-	public void setNeighbours(Map<Long,Neighbour> neighbours) {
+	public void setNeighbours(Map<Long, Neighbour> neighbours) {
 		this.neighbours = neighbours;
 	}
 
 	public long getId() {
 		return this.id;
 	}
-	
-	public void setId(long id){
+
+	public void setId(long id) {
 		this.id = id;
 	}
-	
+
 	public Set<Link> getLinks() {
 		return links;
 	}
@@ -99,7 +105,7 @@ public class Node {
 	public void setLinks(Set<Link> links) {
 		this.links = links;
 	}
-	
+
 	public void addLink(String url, String rel) {
 		Link link = new Link();
 		link.setLink(url);
@@ -109,7 +115,7 @@ public class Node {
 
 	public int neighboursWithName(String name) {
 		int occurrences = 0;
-		for (Neighbour neighbour : this.neighbours.values()){
+		for (Neighbour neighbour : this.neighbours.values()) {
 			if (neighbour.getName().equals(name))
 				occurrences++;
 
@@ -117,6 +123,4 @@ public class Node {
 		return occurrences;
 	}
 
-	
-	
 }

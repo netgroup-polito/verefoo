@@ -1,9 +1,9 @@
 package it.polito.escape.verify.model;
 
 public class Entry {
-	private String direction;
-	private String destination;
-	
+	private String	direction;
+	private String	destination;
+
 	public Entry(String direction, String destination) {
 		this.direction = direction;
 		this.destination = destination;
@@ -24,6 +24,5 @@ public class Entry {
 	public void setDestination(String destination) {
 		this.destination = destination;
 	}
-	
-	
+
 }
