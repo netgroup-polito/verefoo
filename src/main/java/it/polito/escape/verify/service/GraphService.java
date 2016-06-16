@@ -43,8 +43,8 @@ public class GraphService {
 		if (localGraph == null) {
 			throw new DataNotFoundException("Graph with id " + graph.getId() + " not found");
 		}
-		if (!isValidGraph(graph))
-			throw new BadRequestException("Given graph is not valid!");
+		
+		validateGraph(graph);
 
 		graphs.put(graph.getId(), graph);
 
@@ -59,9 +59,8 @@ public class GraphService {
 	}
 
 	public Graph addGraph(Graph graph) {
-		if (isValidGraph(graph) == false)
-			throw new BadRequestException("Given graph is not valid!");
-
+		validateGraph(graph);
+		
 		synchronized (this) {
 			graph.setId(DatabaseClass.getNumberOfGraphs() + 1);
 		}
@@ -76,23 +75,21 @@ public class GraphService {
 			}
 		}
 		// check neighbours
-		for (Node node : graph.getNodes().values()) {
-			for (Neighbour neighbour : node.getNeighbours().values()) {
-				boolean validNeighbour = NeighbourService.isValidNeighbourUpdate(graph, node, neighbour);
-				if (!validNeighbour) {
-					throw new BadRequestException("Given graph is not valid: please check the names of the nodes and neighbours!");
-				}
-			}
-		}
+//		for (Node node : graph.getNodes().values()) {
+//			for (Neighbour neighbour : node.getNeighbours().values()) {
+//				boolean validNeighbour = NeighbourService.isValidNeighbourUpdate(graph, node, neighbour);
+//				if (!validNeighbour) {
+//					throw new BadRequestException("Given graph is not valid: please check the names of the nodes and neighbours!");
+//				}
+//			}
+//		}
 		graphs.put(graph.getId(), graph);
 		return graph;
 	}
 
-	public static boolean isValidGraph(Graph graph) {
+	public static void validateGraph(Graph graph) {
 		for (Node node : graph.getNodes().values()) {
-			if (NodeService.isValidNode(graph, node) == false)
-				return false;
+			NodeService.validateNode(graph, node);
 		}
-		return true;
 	}
 }

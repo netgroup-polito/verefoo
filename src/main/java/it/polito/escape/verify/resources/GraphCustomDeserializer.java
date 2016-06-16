@@ -51,7 +51,7 @@ public class GraphCustomDeserializer extends JsonDeserializer<Graph>{
 			throw new BadRequestException("Invalid content for a graph: " + e.getMessage());
 		}
 		catch (JsonMappingException e) {
-//			throw new BadRequestException("Invalid input json structure for a graph: " + e.getMessage());
+			throw new BadRequestException("Invalid input json structure for a graph: " + e.getMessage());
 		}
 		catch (IOException e) {
 			throw new InternalServerErrorException("I/O error parsing a graph: " + e.getMessage());

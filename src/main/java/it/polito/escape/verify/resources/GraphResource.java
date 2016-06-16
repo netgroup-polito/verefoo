@@ -1,7 +1,5 @@
 package it.polito.escape.verify.resources;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -19,10 +17,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.glassfish.jersey.servlet.ServletContainer;
-
-import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,11 +24,9 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import it.polito.escape.verify.model.ErrorMessage;
 import it.polito.escape.verify.model.Graph;
-import it.polito.escape.verify.model.Node;
 import it.polito.escape.verify.model.Verification;
 import it.polito.escape.verify.resources.beans.VerificationBean;
 import it.polito.escape.verify.service.GraphService;
-import it.polito.escape.verify.service.ValidationUtils;
 import it.polito.escape.verify.service.VerificationService;
 import it.polito.nffg.neo4j.jaxb.Paths;
 
@@ -143,41 +135,6 @@ public class GraphResource {
 														verificationBean.getSource(),
 														verificationBean.getDestination());
 		return v;
-	}
-	
-	@GET
-	@Path("/{graphId}/prova")
-	@ApiOperation(	httpMethod = "GET",
-					value = "Verifies a given policy in a graph",
-					notes = "In order to verify a given policy (e.g. 'reachability') all nodes of the desired graph must have a valid configuration.")
-	@ApiResponses(value = {	@ApiResponse(	code = 403,
-											message = "Invalid graph id or invalid configuration for source and/or destination node",
-											response = ErrorMessage.class),
-							@ApiResponse(	code = 404,
-											message = "Graph not found or source node not found or destination node not found or configuration for source and/or destination node not available",
-											response = ErrorMessage.class),
-							@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),})
-	public String verifyGraph2(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long id,
-									@ApiParam(	value = "'source' and 'destination' must refer to names of existing nodes in the same graph, 'type' refers to the required verification between the two (e.g. 'reachability')",
-												required = true) @BeanParam VerificationBean verificationBean) {
-		File schemaFile = new File(System.getProperty("catalina.base") + "/shared/schema.json");
-	    File jsonFile = new File(System.getProperty("catalina.base") + "/shared/data.json");
-	    
-	    String message = "";
-	    try {
-	    	ValidationUtils.validateJson(schemaFile, jsonFile);
-		}
-		catch (ProcessingException e) {
-			message += "Error. Something went wrong trying to process json data: #<#<"+jsonFile.getName()+
-	                ">#># with json schema: @<@<"+schemaFile.getName()+">@>@ "+e.getMessage();
-//			e.printStackTrace();
-		}
-		catch (IOException e) {
-			message += "Error. Something went wrong trying to read json data: #<#<"+jsonFile.getName()+
-	                ">#># or json schema: @<@<"+schemaFile.getName()+">@>@";
-//			e.printStackTrace();
-		}
-	    return message;
 	}
 
 	private String getUriForSelf(UriInfo uriInfo, Graph graph) {

@@ -83,9 +83,9 @@ public class NeighbourService {
 			throw new DataNotFoundException("Node with id " + nodeId + " not found in graph with id " + graphId);
 		}
 		Map<Long, Neighbour> neighbours = node.getNeighbours();
-		if (isValidNeighbourAddition(graph, node, neighbour) == false) {
-			throw new BadRequestException("Given neighbour is not valid!");
-		}
+		
+		validateNeighbour(graph, node, neighbour);
+		
 		synchronized (this) {
 			neighbour.setId(neighbours.size() + 1);
 		}
@@ -117,9 +117,9 @@ public class NeighbourService {
 			throw new DataNotFoundException("Neighbour with id "+ neighbour.getId() + " not found for node with id "
 											+ nodeId + " in graph with id " + graphId);
 		}
-		if (isValidNeighbourUpdate(graph, node, neighbour) == false) {
-			throw new BadRequestException("Given neighbour is not valid!");
-		}
+		
+		validateNeighbour(graph, node, neighbour);
+		
 		neighbours.put(neighbour.getId(), neighbour);
 		return neighbour;
 	}
@@ -146,44 +146,66 @@ public class NeighbourService {
 		return neighbours.remove(neighbourId);
 	}
 
-	public static boolean isValidNeighbourAddition(Graph graph, Node node, Neighbour neighbour) {
+//	public static boolean isValidNeighbourAddition(Graph graph, Node node, Neighbour neighbour) {
+//		if (neighbour.getName() == null)
+//			return false;
+//
+//		Map<Long, Node> nodesMap = graph.getNodes();
+//		if (nodesMap == null)
+//			return false;
+//
+//		boolean isAcceptableNode = false;
+//		Collection<Node> nodes = nodesMap.values();
+//		if (nodes == null)
+//			return false;
+//		for (Node n : nodes) {
+//			if ((n.getName().equals(neighbour.getName())) && (n.getName().equals(node.getName()) == false)) {
+//				if (node.neighboursWithName(neighbour.getName()) < 1)
+//					isAcceptableNode = true;
+//			}
+//		}
+//		return isAcceptableNode;
+//	}
+
+//	public static boolean isValidNeighbourUpdate(Graph graph, Node node, Neighbour neighbour) {
+//		if(graph==null || node == null || neighbour == null)
+//			return false;
+//		if (neighbour.getName() == null || neighbour.getName().equals(""))
+//			return false;
+//		Map<Long, Node> nodesMap = graph.getNodes();
+//		if (nodesMap == null)
+//			return false;
+//
+//		boolean isAcceptableNode = false;
+//		Collection<Node> nodes = nodesMap.values();
+//		if (nodes == null)
+//			return false;
+//		for (Node currentNode : nodes) {
+//			if ((currentNode.getName().equals(neighbour.getName())) && (currentNode.getName().equals(node.getName()) == false)) {
+//				if (node.neighboursWithName(neighbour.getName()) <= 1)
+//					isAcceptableNode = true;
+//			}
+//		}
+//		return isAcceptableNode;
+//	}
+	
+	public static void validateNeighbour(Graph graph, Node node, Neighbour neighbour) {
+		if (node == null)
+			throw new BadRequestException("Neighbour validation failed: cannot validate null node");
+		if (neighbour == null)
+			throw new BadRequestException("Neighbour validation failed: cannot validate null neighbour");
+		
 		if (neighbour.getName() == null)
-			return false;
-
-		Map<Long, Node> nodesMap = graph.getNodes();
-		if (nodesMap == null)
-			return false;
-
-		boolean isAcceptableNode = false;
-		Collection<Node> nodes = nodesMap.values();
-		if (nodes == null)
-			return false;
-		for (Node n : nodes) {
-			if ((n.getName().equals(neighbour.getName())) && (n.getName().equals(node.getName()) == false)) {
-				if (node.neighboursWithName(neighbour.getName()) < 1)
-					isAcceptableNode = true;
-			}
-		}
-		return isAcceptableNode;
-	}
-
-	public static boolean isValidNeighbourUpdate(Graph graph, Node node, Neighbour neighbour) {
-		if (neighbour.getName() == null)
-			return false;
-		Map<Long, Node> nodesMap = graph.getNodes();
-		if (nodesMap == null)
-			return false;
-
-		boolean isAcceptableNode = false;
-		Collection<Node> nodes = nodesMap.values();
-		if (nodes == null)
-			return false;
-		for (Node n : nodes) {
-			if ((n.getName().equals(neighbour.getName())) && (n.getName().equals(node.getName()) == false)) {
-				if (node.neighboursWithName(neighbour.getName()) <= 1)
-					isAcceptableNode = true;
-			}
-		}
-		return isAcceptableNode;
+			throw new BadRequestException("Neighbour validation failed: neighbour 'name' field cannot be null");
+		if (neighbour.getName().equals(""))
+			throw new BadRequestException("Neighbour validation failed: neighbour 'name' field cannot be an empty string");
+		
+		Node nodeFound = graph.searchNodeByName(neighbour.getName());
+		if ((nodeFound == null) || (nodeFound.getName().equals(node.getName())))
+			throw new BadRequestException("Neighbour validation failed: '" + neighbour.getName() + "' is not a valid name for a neighbour of node '" + node.getName() + "'");
+		
+		Neighbour neighbourFound = node.searchNeighbourByName(neighbour.getName());
+		if((neighbourFound != null) && (neighbourFound.equals(neighbour) == false) )
+			throw new BadRequestException("Neighbour validation failed: node '" + node.getName() + "' already has a neighbour named '" + neighbour.getName() + "'");
 	}
 }

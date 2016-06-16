@@ -113,12 +113,19 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                         for value_item in value:
                             if isinstance(value_item, dict):
                                 for config_item_key, config_item_value in value_item.items():
-                                    if config_item_key in ips and config_item_value in ips:
+                                    #if config_item_key in ips and config_item_value in ips:
+                                    if config_item_key in chn.keys() and config_item_value in chn.keys():
                                         #valid config, add it
+                                        #config[node["id"]][key].append(value_item)
+                                        #add new value in map with the "ip_" prefix and remove old value from map
+                                        value_item["ip_" + str(config_item_key)] = "ip_" + str(config_item_value)
+                                        del value_item[config_item_key]
                                         config[node["id"]][key].append(value_item)
                             else:
-                                if value_item in ips:
-                                    config[node["id"]][key].append(value_item)
+                                #if value_item in ips:
+                                if value_item in chn.keys():
+                                    #config[node["id"]][key].append(value_item)
+                                    config[node["id"]][key].append("ip_" + str(value_item))
                     else:
                         config[node["id"]][key] = value
                 except KeyError, e:

@@ -8,16 +8,14 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import it.polito.escape.verify.resources.GraphCustomDeserializer;
 import it.polito.escape.verify.resources.CustomMapSerializer;
+import it.polito.escape.verify.resources.GraphCustomDeserializer;
 
 @ApiModel(value = "Graph")
 @XmlRootElement
@@ -82,6 +80,16 @@ public class Graph {
 				return node;
 		}
 		return null;
+	}
+
+	public int nodesWithName(String name) {
+		int occurrences = 0;
+		for (Node node : this.nodes.values()) {
+			if (node.getName().equals(name))
+				occurrences++;
+
+		}
+		return occurrences;
 	}
 
 }

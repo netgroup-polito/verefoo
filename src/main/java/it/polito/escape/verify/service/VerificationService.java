@@ -1,19 +1,11 @@
 package it.polito.escape.verify.service;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,8 +18,6 @@ import java.util.regex.Pattern;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
-import javax.tools.DiagnosticListener;
-import javax.tools.DocumentationTool.Location;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
@@ -40,10 +30,11 @@ import javax.ws.rs.core.Response.Status;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import it.polito.escape.verify.client.Neo4jManagerClient;
 import it.polito.escape.verify.exception.InternalServerErrorException;
-import it.polito.escape.verify.model.Configuration;
-import it.polito.escape.verify.model.ConfigurationObject;
+import it.polito.escape.verify.model.Configuration2;
 import it.polito.escape.verify.model.Entry;
 import it.polito.escape.verify.model.ErrorMessage;
 import it.polito.escape.verify.model.Graph;
@@ -54,7 +45,6 @@ import it.polito.escape.verify.model.Verification;
 import it.polito.escape.verify.resources.beans.VerificationBean;
 import it.polito.nffg.neo4j.jaxb.Paths;
 import qj.util.ReflectUtil;
-import qj.util.ThreadUtil;
 import qj.util.lang.DynamicClassLoader;
 
 public class VerificationService {
@@ -354,38 +344,68 @@ public class VerificationService {
 
 	}
 
+	private void generateConfigFileOld(Graph graph, String configFile) {
+//		JSONObject root = new JSONObject();
+//		JSONArray nodes = new JSONArray();
+//
+//		for (Node n : graph.getNodes().values()) {
+//			JSONObject node = new JSONObject();
+//			JSONArray configuration = new JSONArray();
+//			Configuration nodeConfig = n.getConfiguration();
+//			List<String> configurationList = nodeConfig.getConfigurationList();
+//			List<ConfigurationObject> configurationMap = nodeConfig.getConfigurationMap();
+//			if (configurationList.size() > 0) {
+//				for (String s : configurationList) {
+//					configuration.add("ip_" + s);
+//				}
+//			}
+//			else if (configurationMap.size() > 0) {
+//				for (ConfigurationObject c : configurationMap) {
+//					Iterator<java.util.Map.Entry<String, String>> iter = c.getMap().entrySet().iterator();
+//					while (iter.hasNext()) {
+//						java.util.Map.Entry<String, String> entry = iter.next();
+//						JSONObject configItem = new JSONObject();
+//						configItem.put("ip_" + entry.getKey(), "ip_" + entry.getValue());
+//						configuration.add(configItem);
+//					}
+//				}
+//
+//			}
+//			node.put("configuration", configuration);
+//			node.put("id", nodeConfig.getId());
+//			node.put("description", nodeConfig.getDescription());
+//
+//			nodes.add(node);
+//		}
+//		root.put("nodes", nodes);
+//
+//		try (FileWriter file = new FileWriter(configFile)) {
+//			file.write(root.toJSONString());
+//			System.out.println("Successfully created 'config.json' with the following content:");
+//			System.out.println(root);
+//		}
+//		catch (IOException e) {
+//			throw new InternalServerErrorException("Error saving 'config.json' for neo4jmanager");
+//		}
+
+	}
+	
 	private void generateConfigFile(Graph graph, String configFile) {
 		JSONObject root = new JSONObject();
 		JSONArray nodes = new JSONArray();
 
 		for (Node n : graph.getNodes().values()) {
 			JSONObject node = new JSONObject();
-			JSONArray configuration = new JSONArray();
-			Configuration nodeConfig = n.getConfiguration();
-			List<String> configurationList = nodeConfig.getConfigurationList();
-			List<ConfigurationObject> configurationMap = nodeConfig.getConfigurationMap();
-			if (configurationList.size() > 0) {
-				for (String s : configurationList) {
-					configuration.add("ip_" + s);
-				}
-			}
-			else if (configurationMap.size() > 0) {
-				for (ConfigurationObject c : configurationMap) {
-					Iterator<java.util.Map.Entry<String, String>> iter = c.getMap().entrySet().iterator();
-					while (iter.hasNext()) {
-						java.util.Map.Entry<String, String> entry = iter.next();
-						JSONObject configItem = new JSONObject();
-						configItem.put("ip_" + entry.getKey(), "ip_" + entry.getValue());
-						configuration.add(configItem);
-					}
-				}
-
-			}
+//			JSONArray configuration = new JSONArray();
+			Configuration2 nodeConfig = n.getConfiguration();
+			JsonNode configuration = nodeConfig.getConfiguration();
+			
 			node.put("configuration", configuration);
 			node.put("id", nodeConfig.getId());
 			node.put("description", nodeConfig.getDescription());
-
+			
 			nodes.add(node);
+
 		}
 		root.put("nodes", nodes);
 

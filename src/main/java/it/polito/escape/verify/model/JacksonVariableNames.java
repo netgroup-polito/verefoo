@@ -1,6 +1,10 @@
 package it.polito.escape.verify.model;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +26,7 @@ public class JacksonVariableNames {
             + "    \"value\": \"3\"\n"
             + "  }\n"
             + "}";
+
     static class Value {
         private final String value;
 
@@ -51,9 +56,20 @@ public class JacksonVariableNames {
                     '}';
         }
     }
+    
+	static String readFile(String path, Charset encoding) throws IOException {
+		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		return new String(encoded, encoding);
+	}
+
     public static void main(String[] args) throws IOException {
-        final ObjectMapper mapper = new ObjectMapper();
-        System.out.println(mapper.readValue(JSON, Values.class));
+        String filename = "C:/Program Files/Java/apache-tomcat-8.0.30/shared/test.json";
+        String content = readFile(filename, Charset.defaultCharset());
+        System.out.println(content);
+    	
+    	final ObjectMapper mapper = new ObjectMapper();
+//        System.out.println(mapper.readValue(JSON, Values.class));
+        System.out.println(mapper.readValue(content, Values.class));
 
     }
 }

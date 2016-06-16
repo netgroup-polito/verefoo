@@ -15,19 +15,24 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
 import it.polito.escape.verify.exception.BadRequestException;
 import it.polito.escape.verify.exception.InternalServerErrorException;
 import it.polito.escape.verify.model.Configuration;
+import it.polito.escape.verify.model.Configuration2;
 import it.polito.escape.verify.model.ConfigurationObject;
 import it.polito.escape.verify.model.Neighbour;
 import it.polito.escape.verify.model.Node;
+import it.polito.escape.verify.service.NodeService;
 
 public class NodeCustomDeserializer extends JsonDeserializer<Node> {
 
 	@Override
 	public Node deserialize(JsonParser jp, DeserializationContext context) {
+		
+		NodeService nodeService = new NodeService();
 		try {
 			JsonNode root = jp.getCodec().readTree(jp);
 			Node node = new Node();
@@ -39,19 +44,33 @@ public class NodeCustomDeserializer extends JsonDeserializer<Node> {
 
 			String functionalType = root.get("functional_type").asText();
 			node.setFunctional_type(functionalType);
+			
 
 			JsonNode configurationJson = root.get("configuration");
+			//ADDED CALL HERE
+//			nodeService.validateConfiguration(node, configurationJson);
+			
 			if (configurationJson == null)
-				node.setConfiguration(new Configuration(node.getName(),
-														"",
-														new ArrayList<String>(),
-														new ArrayList<ConfigurationObject>()));
+//				node.setConfiguration(new Configuration(node.getName(),
+//														"",
+//														new ArrayList<String>(),
+//														new ArrayList<ConfigurationObject>()));
+
+				node.setConfiguration(new Configuration2(node.getName(), "",new ObjectMapper().createArrayNode()));
 			else {
-				Configuration conf = node.getConfiguration();
+//				Configuration conf = node.getConfiguration();
+				Configuration2 conf = node.getConfiguration();
 				conf.setId(node.getName());
 				conf.setDescription("");
+				
+//				nodeService.validateNodeConfigurationAgainstSchemaFile(node, configurationJson);
+				
+				System.out.println("The following configuration has been validated:");
+				System.out.println(configurationJson.toString());
+				
+				conf.setConfiguration(configurationJson);
 
-				try {
+				/*try {
 					List<String> configurationList = new ObjectMapper().readValue(	configurationJson.toString(),
 																		TypeFactory	.defaultInstance()
 																					.constructCollectionType(	List.class,
@@ -98,7 +117,7 @@ public class NodeCustomDeserializer extends JsonDeserializer<Node> {
 				// conf.getConfigurationMap().put(entry.getKey(), entry.getValue());
 				// }
 
-				
+				*/
 
 			}
 			// int nodeId = (Integer) ((IntNode) root.get("id")).numberValue();

@@ -8,13 +8,11 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import it.polito.escape.verify.model.Link;
 import it.polito.escape.verify.resources.CustomMapSerializer;
 import it.polito.escape.verify.resources.NodeCustomDeserializer;
 
@@ -34,7 +32,7 @@ public class Node {
 	private String					functional_type;
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
-	private Configuration			configuration	= new Configuration();
+	private Configuration2			configuration	= new Configuration2();
 
 	@ApiModelProperty(
 						name = "neighbours",
@@ -49,7 +47,7 @@ public class Node {
 
 	}
 
-	public Node(long id, String name, String functional_type, Configuration configuration) {
+	public Node(long id, String name, String functional_type, Configuration2 configuration) {
 		this.id = id;
 		this.name = name;
 		this.functional_type = functional_type;
@@ -73,11 +71,11 @@ public class Node {
 	}
 
 	// @XmlTransient
-	public Configuration getConfiguration() {
+	public Configuration2 getConfiguration() {
 		return configuration;
 	}
 
-	public void setConfiguration(Configuration configuration) {
+	public void setConfiguration(Configuration2 configuration) {
 		this.configuration = configuration;
 	}
 
@@ -113,14 +111,39 @@ public class Node {
 		links.add(link);
 	}
 
-	public int neighboursWithName(String name) {
-		int occurrences = 0;
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Node other = (Node) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		}
+		else if (!name.equals(other.name))
+			return false;
+//		return true;
+		return false;
+	}
+
+	public Neighbour searchNeighbourByName(String name) {
 		for (Neighbour neighbour : this.neighbours.values()) {
 			if (neighbour.getName().equals(name))
-				occurrences++;
-
+				return neighbour;
 		}
-		return occurrences;
+		return null;
 	}
 
 }

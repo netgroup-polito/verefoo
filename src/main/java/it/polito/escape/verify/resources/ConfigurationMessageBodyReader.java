@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.Consumes;
@@ -28,6 +27,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import it.polito.escape.verify.database.DatabaseClass;
+import it.polito.escape.verify.exception.DataNotFoundException;
 import it.polito.escape.verify.model.Configuration;
 import it.polito.escape.verify.model.Graph;
 import it.polito.escape.verify.model.Node;
@@ -79,12 +79,12 @@ public class ConfigurationMessageBodyReader implements MessageBodyReader<Configu
 			ConcurrentHashMap<Long, Graph> graphs = DatabaseClass.getGraphs();
 			Graph graph = graphs.get(graphId);
 			if (graph == null){
-				throw new ProcessingException("Invalid graph id");
+				throw new DataNotFoundException("Illegal graph id: " + graphId);
 			}
 			Map<Long, Node> nodes = graph.getNodes();
 			Node node = nodes.get(nodeId);
 			if (node == null){
-				throw new ProcessingException("Invalid node id");
+				throw new DataNotFoundException("Invalid node id");
 			}
 			//Configuration config = new Configuration(node.getName(),"", configurationFields);
 			node.getConfiguration().setConfigurationList(configurationFields);
