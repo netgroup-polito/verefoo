@@ -4,15 +4,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import it.polito.escape.verify.resources.Configuration2CustomDeserializer;
 import it.polito.escape.verify.resources.CustomConfiguration2Serializer;
+import it.polito.escape.verify.resources.NodeCustomDeserializer;
 
 @XmlRootElement
 @ApiModel("Configuration")
 @JsonSerialize(using = CustomConfiguration2Serializer.class)
+@JsonDeserialize(using = Configuration2CustomDeserializer.class)
 public class Configuration2 {
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient

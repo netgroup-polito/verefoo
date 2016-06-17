@@ -19,12 +19,10 @@ import javax.ws.rs.core.UriInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
-import it.polito.escape.verify.resources.NeighbourResource;
-import it.polito.escape.verify.model.Configuration;
+import io.swagger.annotations.ApiResponses;
+import it.polito.escape.verify.model.Configuration2;
 import it.polito.escape.verify.model.ErrorMessage;
-import it.polito.escape.verify.model.Graph;
 import it.polito.escape.verify.model.Node;
 import it.polito.escape.verify.service.NodeService;
 
@@ -109,7 +107,8 @@ public class NodeResource {
     public void addNodeConfiguration(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
     		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
-    		@ApiParam(value = "Node configuration", required = true) Configuration nodeConfiguration){
+    		@ApiParam(value = "Node configuration", required = true) Configuration2 nodeConfiguration,
+    		@Context UriInfo uriInfo){
     	Node node = nodeService.getNode(graphId, nodeId);
     	//nodeService.addNodeConfiguration();
     }
