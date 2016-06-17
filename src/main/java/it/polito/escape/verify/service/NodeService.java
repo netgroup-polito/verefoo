@@ -187,7 +187,7 @@ public class NodeService {
 	public static void validateNodeConfigurationAgainstSchemaFile(Node node, JsonNode configurationJson) {
 		String schemaFileName = node.getFunctional_type() + ".json";
 
-		File schemaFile = new File(System.getProperty("catalina.base") + "/shared/" + schemaFileName);
+		File schemaFile = new File(System.getProperty("catalina.base") + "/webapps/verify/json/" + schemaFileName);
 
 		if (!schemaFile.exists()) {
 			throw new ForbiddenException("Functional type '"+ node.getFunctional_type()
