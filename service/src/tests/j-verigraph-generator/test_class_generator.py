@@ -118,16 +118,15 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                                         if chn[node["id"]]["functional_type"] == "webclient":
                                             value_item[str(config_item_key)] = "ip_" + str(config_item_value)
                                             config[node["id"]][key].append(value_item)
-                                            continue
-                                        value_item["ip_" + str(config_item_key)] = "ip_" + str(config_item_value)
-                                        del value_item[config_item_key]
-                                        config[node["id"]][key].append(value_item)
+                                        else:
+                                            value_item["ip_" + str(config_item_key)] = "ip_" + str(config_item_value)
+                                            del value_item[config_item_key]
+                                            config[node["id"]][key].append(value_item)
                                     else:
                                         #key is not a node or value is not a node
-                                        if chn[node["id"]]["functional_type"] == "webclient":
+                                        if chn[node["id"]]["functional_type"] == "webclient" and config_item_value in chn.keys():
                                             value_item[str(config_item_key)] = "ip_" + str(config_item_value)
-                                            config[node["id"]][key].append(value_item)
-                                            continue
+                                        config[node["id"]][key].append(value_item)
                             else:
                                 #if value_item in ips:
                                 if value_item in chn.keys():

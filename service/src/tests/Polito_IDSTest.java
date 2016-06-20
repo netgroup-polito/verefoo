@@ -70,7 +70,7 @@ public class Polito_IDSTest {
     	
     	System.out.println("Wait and be faithful, this program will terminate, sooner or later...");
     	
-    	ret = model.check.checkIsolationProperty(model.server,model.hostA );
+    	ret = model.check.checkIsolationProperty(model.server,model.hostA);
     	
     	p.printVector(ret.assertions);
     	if (ret.result == Status.UNSATISFIABLE){
