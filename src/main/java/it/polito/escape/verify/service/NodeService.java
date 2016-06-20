@@ -171,8 +171,10 @@ public class NodeService {
 			//validate configuration against schema file
 			validateNodeConfigurationAgainstSchemaFile(node, configurationJsonNode);
 			//validate configuration names
-			JsonValidationService jsonValidator = new JsonValidationService(graph, node);
-			jsonValidator.myValidation(configurationJsonNode);
+			if (!node.getFunctional_type().equals("dpi")){
+				JsonValidationService jsonValidator = new JsonValidationService(graph, node);
+				jsonValidator.myValidation(configurationJsonNode);
+			}
 		}
 		
 		//validate neighbours

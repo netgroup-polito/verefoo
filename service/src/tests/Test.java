@@ -41,14 +41,11 @@ public class Test{
         Test p = new Test();
         p.resetZ3();
         Test_1 model = new Test_1(p.ctx);
-//        IsolationResult ret =model.check.checkIsolationProperty(model.user2, model.webserver);
-        DataIsolationResult dataIsolation = model.check.CheckDataIsolationProperty(model.user2, model.webserver);
-        IsolationResult checkNodeTraversalProperty = model.check.CheckNodeTraversalProperty(model.webserver, model.user2, model.user2);
-        System.out.println(checkNodeTraversalProperty.result);
-        if (checkNodeTraversalProperty.result == Status.UNSATISFIABLE){
+        IsolationResult ret =model.check.checkIsolationProperty(model.webserver, model.user2);
+        if (ret.result == Status.UNSATISFIABLE){
             System.out.println("UNSAT");
 //            return -1;
-        }else if (checkNodeTraversalProperty.result == Status.SATISFIABLE){
+        }else if (ret.result == Status.SATISFIABLE){
             System.out.println("SAT");
 //            return 0;
         }else{

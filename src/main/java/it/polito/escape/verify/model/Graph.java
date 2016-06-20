@@ -20,6 +20,7 @@ import it.polito.escape.verify.resources.GraphCustomDeserializer;
 @ApiModel(value = "Graph")
 @XmlRootElement
 @JsonDeserialize(using = GraphCustomDeserializer.class)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Graph {
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient

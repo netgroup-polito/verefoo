@@ -99,7 +99,7 @@ public class PolitoIDSTest {
 	    net.attach(hostA, politoCache, politoIDS, server);
 	    
 	    
-	    politoIDS.installIDS(new int[]{PolitoIDS.DROGA});
+	    politoIDS.installIDS(new int[]{PolitoIDS.GATTINI});
 	    politoCache.installCache(new NetworkObject[]{hostA});
 	    
 	    check = new Checker(ctx, nctx, net);

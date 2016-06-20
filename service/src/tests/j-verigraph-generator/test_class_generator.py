@@ -113,19 +113,28 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                         for value_item in value:
                             if isinstance(value_item, dict):
                                 for config_item_key, config_item_value in value_item.items():
-                                    #if config_item_key in ips and config_item_value in ips:
-                                    if config_item_key in chn.keys() and config_item_value in chn.keys():
-                                        #valid config, add it
-                                        #config[node["id"]][key].append(value_item)
-                                        #add new value in map with the "ip_" prefix and remove old value from map
+                                    #key is a node and value is a node
+                                    if config_item_key in chn.keys() and config_item_value in chn.keys():                                                                              #valid config, add it
+                                        if chn[node["id"]]["functional_type"] == "webclient":
+                                            value_item[str(config_item_key)] = "ip_" + str(config_item_value)
+                                            config[node["id"]][key].append(value_item)
+                                            continue
                                         value_item["ip_" + str(config_item_key)] = "ip_" + str(config_item_value)
                                         del value_item[config_item_key]
                                         config[node["id"]][key].append(value_item)
+                                    else:
+                                        #key is not a node or value is not a node
+                                        if chn[node["id"]]["functional_type"] == "webclient":
+                                            value_item[str(config_item_key)] = "ip_" + str(config_item_value)
+                                            config[node["id"]][key].append(value_item)
+                                            continue
                             else:
                                 #if value_item in ips:
                                 if value_item in chn.keys():
                                     #config[node["id"]][key].append(value_item)
                                     config[node["id"]][key].append("ip_" + str(value_item))
+                                elif chn[node["id"]]["functional_type"] == "dpi":
+                                    config[node["id"]][key].append("PolitoIDS." + str(value_item))
                     else:
                         config[node["id"]][key] = value
                 except KeyError, e:
@@ -241,7 +250,12 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
             c.write(str(nodes_names[i]) + " = new " + devices_to_classes[str(nodes_types[i])] + "(ctx, new Object[]{nctx.nm.get(\"" + nodes_names[i] + "\"), net, nctx")
             if devices_initialization[nodes_types[i]] != [] :
                 for param in devices_initialization[nodes_types[i]]:
-                    c.append(", nctx.am.get(\"" + config[nodes_names[i]][param] + "\")")
+                    print "configuring node " + nodes_names[i]
+                    pprint(config[nodes_names[i]])
+                    for config_param in config[nodes_names[i]]["configuration"]:
+                        if param in config_param:
+                            c.append(", nctx.am.get(\"" + config_param[param] + "\")")
+                    #c.append(", nctx.am.get(\"" + config[nodes_names[i]]["configuration"][0][param] + "\")")
             c.append("});\n")
         
         c.writeln("ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>> adm = new ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>>();")
@@ -289,22 +303,26 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                     c.write_list(formatted_list_from_list_of_maps(cache_hosts), wrapper="")
                     c.append(");\n")
                 elif nodes_types[i] == "nat":
-                    c.writeln("ArrayList<DatatypeExpr> ia = new ArrayList<DatatypeExpr>();")
+                    c.writeln("ArrayList<DatatypeExpr> ia" + str(i) +" = new ArrayList<DatatypeExpr>();")
                     config_elements = []
                     config_elements = formatted_list_from_list_of_maps(config[nodes_names[i]]["configuration"])
                     for address in config_elements:
-                        c.writeln("ia.add(nctx.am.get(\"" + address + "\"));")
-                    c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(ia);")
+                        c.writeln("ia" + str(i) + ".add(nctx.am.get(\"" + address + "\"));")
+                    c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(ia" + str(i) +");")
                 elif nodes_types[i] == "firewall":
-                    c.writeln("ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();")
+                    c.writeln("ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl" + str(i) + " = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();")
                     for config_element in config[nodes_names[i]]["configuration"]:
                         if isinstance(config_element,dict):
                             for key, value in config_element.items():
-                                c.writeln("acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(\"" + key + "\"),nctx.am.get(\"" + value + "\")));")
-                    c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(acl);")
+                                c.writeln("acl" + str(i) + ".add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(\"" + key + "\"),nctx.am.get(\"" + value + "\")));")
+                    c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(acl" + str(i) + ");")
                 elif nodes_types[i] == "antispam":
                     c.write(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(new int[]")
                     c.write_list(formatted_list_from_list_of_maps(config[nodes_names[i]]["configuration"]))
+                    c.append(");\n")
+                elif nodes_types[i] == "dpi":
+                    c.write(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(new int[]")
+                    c.write_list(formatted_list_from_list_of_maps(config[nodes_names[i]]["configuration"]), wrapper="")
                     c.append(");\n")
 
         c.writeln("check = new Checker(ctx,nctx,net);")

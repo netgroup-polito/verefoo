@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -19,6 +20,7 @@ import it.polito.escape.verify.resources.NodeCustomDeserializer;
 @ApiModel(value = "Node")
 @XmlRootElement
 @JsonDeserialize(using = NodeCustomDeserializer.class)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Node {
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient

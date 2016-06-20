@@ -30,7 +30,8 @@ devices_to_classes = {  "webclient" : "PolitoWebClient",
                         "mailclient" : "PolitoMailClient",
                         "mailserver" : "PolitoMailServer",
                         "antispam" : "PolitoAntispam",
-                        "endpoint": "EndHost"
+                        "endpoint": "EndHost",
+                        "dpi": "PolitoIDS"
                      }
 devices_to_configuration_methods = {"webclient" : "",
                                     "webserver" : "",
@@ -40,7 +41,8 @@ devices_to_configuration_methods = {"webclient" : "",
                                     "mailclient" : "",
                                     "mailserver" : "",
                                     "antispam" : "",
-                                    "endpoint": ""
+                                    "endpoint": "",
+                                    "dpi": "installIDS"
                                     }
 devices_initialization = {  "webclient" : ["webserver"],
                             "webserver" : [],
@@ -50,7 +52,8 @@ devices_initialization = {  "webclient" : ["webserver"],
                             "mailclient" : ["mailserver"],
                             "mailserver" : [],
                             "antispam" : [],
-                            "endpoint": []                          
+                            "endpoint": [],
+                            "dpi":[]                          
                           }
 
 devices_configuration_methods = {   "webclient" : "list",
@@ -61,7 +64,8 @@ devices_configuration_methods = {   "webclient" : "list",
                                     "mailclient" : "list",
                                     "mailserver" : "list",
                                     "antispam" : "list",
-                                    "endpoint": "list" 
+                                    "endpoint": "list" ,
+                                    "dpi":"list"
                                  }
 
 devices_configuration_fields = {    "webclient" : "",
@@ -72,5 +76,6 @@ devices_configuration_fields = {    "webclient" : "",
                                     "mailclient" : "",
                                     "mailserver" : "",
                                     "antispam" : "",
-                                    "endpoint": "" 
+                                    "endpoint": "",
+                                    "dpi":"words blacklist" 
                                  }

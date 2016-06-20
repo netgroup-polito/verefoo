@@ -45,6 +45,17 @@ public class GraphService {
 		}
 		
 		validateGraph(graph);
+		
+		int numberOfNodes = 0;
+		for (Node node : graph.getNodes().values()) {
+
+			node.setId(++numberOfNodes);
+
+			int numberOfNodeNeighbours = 0;
+			for (Neighbour neighbour : node.getNeighbours().values()) {
+				neighbour.setId(++numberOfNodeNeighbours);
+			}
+		}
 
 		graphs.put(graph.getId(), graph);
 

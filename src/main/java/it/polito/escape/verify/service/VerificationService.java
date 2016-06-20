@@ -1,9 +1,11 @@
 package it.polito.escape.verify.service;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -183,6 +186,18 @@ public class VerificationService {
 		}
 
 		sanitizePaths(paths);
+		
+		System.out.println("Before pruning");
+		for (List<String> path : sanitizedPaths){
+			System.out.println(path);
+		}
+		
+		prunePaths();
+		
+		System.out.println("After pruning");
+		for (List<String> path : sanitizedPaths){
+			System.out.println(path);
+		}
 
 		deletePreviousTestFiles(this.scenarioFolder, this.testFolder);
 
@@ -203,15 +218,37 @@ public class VerificationService {
 		return evaluateResult();
 	}
 
+	private void prunePaths() {
+		List<List<String>> pathsToBeRemoved = new ArrayList<List<String>>();
+		
+		for(List<String> path : sanitizedPaths){
+			Map<String, Long> occurrencesMap = toMap(path);
+			for (long occurrences : occurrencesMap.values()){
+				if (occurrences > 1){
+					pathsToBeRemoved.add(path);
+					break;
+				}
+			}
+		}
+		for (List<String> path : pathsToBeRemoved){
+			sanitizedPaths.remove(path);
+		}
+	}
+	
+	static public Map<String,Long> toMap(List<String> lst){
+	    return lst.stream().collect(Collectors.groupingBy(s -> s, 
+	                                  Collectors.counting()));
+	}
+	
 	private Verification evaluateResult() {
 		Verification v = new Verification();
+		boolean sat = false;
 		int unsat = 0;
 		for (Test t : this.tests) {
 			v.getTests().add(t);
 
 			if (t.getResult().equals("SAT")) {
-				v.setResult("SAT");
-				return v;
+				sat = true;
 			}
 			if (t.getResult().equals("UNKNOWN")) {
 				v.setResult("UNKNWON");
@@ -220,7 +257,9 @@ public class VerificationService {
 				unsat++;
 			}
 		}
-		if (unsat == tests.size())
+		if (sat)
+			v.setResult("SAT");
+		else if (unsat == tests.size())
 			v.setResult("UNSAT");
 		return v;
 	}
@@ -303,12 +342,13 @@ public class VerificationService {
 	private void generateChainsFile(Graph graph, String chainsFile) {
 		JSONObject root = new JSONObject();
 		JSONArray chains = new JSONArray();
-		JSONObject chain = new JSONObject();
+		
 
 		int chainCounter = 0;
 
 		for (List<String> path : this.sanitizedPaths) {
 			Iterator pathsIterator = path.iterator();
+			JSONObject chain = new JSONObject();
 			chain.put("id", ++chainCounter);
 			chain.put("flowspace", "tcp=80");
 			JSONArray nodes = new JSONArray();
@@ -426,15 +466,51 @@ public class VerificationService {
 							platfromIndependentPath(chainsFile), "-f", platfromIndependentPath(configFile), "-o",
 							platfromIndependentPath(scenarioFile) };
 		printCommand(cmd);
+//		String s = null;
+//		try {
+//			Process p = Runtime.getRuntime().exec(cmd);
+//			
+//			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//
+//			BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+//
+//			// read the output from the command
+//			System.out.println("Here is the standard output of the command:\n");
+//			while ((s = stdInput.readLine()) != null) {
+//				System.out.println(s);
+//			}
+//
+//			// read any errors from the attempted command
+//			System.out.println("Here is the standard error of the command (if any):\n");
+//			while ((s = stdError.readLine()) != null) {
+//				System.out.println(s);
+//			}
+//			p.waitFor();
+//		}
+//		catch (IOException e) {
+//			throw new InternalServerErrorException("Error generating test scenarios for Z3: unable to execute generator");
+//		}
+//		catch (InterruptedException e) {
+//			throw new InternalServerErrorException("Error generating test scenarios for Z3: generator got interrupted during execution");
+//		}
+		
+		ProcessBuilder pb = new ProcessBuilder(cmd);
+		pb.redirectErrorStream(true);
+		Process process;
 		try {
-			Process p = Runtime.getRuntime().exec(cmd);
-			p.waitFor();
+			process = pb.start();
+			
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String line;
+			while ((line = reader.readLine()) != null)
+			    System.out.println("test_class_generator.py: " + line);
+			process.waitFor();
 		}
 		catch (IOException e) {
-			throw new InternalServerErrorException("Error generating test scenarios for Z3: unable to execute generator");
+			throw new InternalServerErrorException("Error generating tests for Z3: unable to execute generator");
 		}
 		catch (InterruptedException e) {
-			throw new InternalServerErrorException("Error generating test scenarios for Z3: generator got interrupted during execution");
+			throw new InternalServerErrorException("Error generating tests for Z3: generator got interrupted during execution");
 		}
 
 	}
@@ -459,9 +535,46 @@ public class VerificationService {
 								platfromIndependentPath(projectFolder + scenario + "_test.java"), "-s", source, "-d",
 								destination };
 			printCommand(cmd);
+//			String s = null;
+//			try {
+//				Process p = Runtime.getRuntime().exec(cmd);
+//				
+//				BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//
+//				BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+//
+//				// read the output from the command
+//				System.out.println("Here is the standard output of the command:\n");
+//				while ((s = stdInput.readLine()) != null) {
+//					System.out.println(s);
+//				}
+//
+//				// read any errors from the attempted command
+//				System.out.println("Here is the standard error of the command (if any):\n");
+//				while ((s = stdError.readLine()) != null) {
+//					System.out.println(s);
+//				}
+//				
+//				p.waitFor();
+//			}
+//			catch (IOException e) {
+//				throw new InternalServerErrorException("Error generating tests for Z3: unable to execute generator");
+//			}
+//			catch (InterruptedException e) {
+//				throw new InternalServerErrorException("Error generating tests for Z3: generator got interrupted during execution");
+//			}
+			
+			ProcessBuilder pb = new ProcessBuilder(cmd);
+			pb.redirectErrorStream(true);
+			Process process;
 			try {
-				Process p = Runtime.getRuntime().exec(cmd);
-				p.waitFor();
+				process = pb.start();
+				
+				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				String line;
+				while ((line = reader.readLine()) != null)
+				    System.out.println("test_generator.py: " + line);
+				process.waitFor();
 			}
 			catch (IOException e) {
 				throw new InternalServerErrorException("Error generating tests for Z3: unable to execute generator");
@@ -469,6 +582,7 @@ public class VerificationService {
 			catch (InterruptedException e) {
 				throw new InternalServerErrorException("Error generating tests for Z3: generator got interrupted during execution");
 			}
+			
 		}
 
 	}

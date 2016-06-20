@@ -10,8 +10,7 @@ public class Neighbour {
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
 	private long	id;
-	@ApiModelProperty(
-						required = true,
+	@ApiModelProperty(	required = true,
 						example = "nat",
 						value = "The neighbour name must refer to an existing node of the same graph")
 	private String	name;
@@ -53,20 +52,8 @@ public class Neighbour {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		else
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Neighbour other = (Neighbour) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		}
-		else if (!name.equals(other.name))
-			return false;
-//		return true;
-		return false;
 	}
-	
-	
+
 }
