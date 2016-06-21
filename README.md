@@ -10,7 +10,7 @@ How to deploy **rest-verigraph** on Apache Tomcat:
 - download `mcnet.jar`, `com.microsoft.z3.jar` and `qjutils.jar` from [here](https://github.com/netgroup-polito/verigraph/tree/master/service/build) and copy them to `%CATALINA_HOME%\shared` 
 - create custom file setenv.bat under `%CATALINA_HOME%\bin` with the following content:
 ```bat
-set CLASSPATH=%CLASSPATH%\;%CATALINA_HOME%\shared\qjutils.jar;%CATALINA_HOME%\shared\mcnet.jar;%CATALINA_HOME%\shared\com.microsoft.z3.jar;.;%CATALINA_HOME%\webapps\verify\WEB-INF\classes\tests
+set CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\shared\qjutils.jar;%CATALINA_HOME%\shared\mcnet.jar;%CATALINA_HOME%\shared\com.microsoft.z3.jar;.;%CATALINA_HOME%\webapps\verify\WEB-INF\classes\tests
 ```
 - download `neo4jmanager.war` and `verify.war` from [here](https://github.com/netgroup-polito/verigraph/tree/master/dist)
 - copy downloaded WARs into `%CATALINA_HOME%\webapps`
