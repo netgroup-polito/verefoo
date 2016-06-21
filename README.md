@@ -12,7 +12,7 @@ How to deploy **rest-verigraph** on Apache Tomcat:
 ```bat
 set CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\shared\qjutils.jar;%CATALINA_HOME%\shared\mcnet.jar;%CATALINA_HOME%\shared\com.microsoft.z3.jar;.;%CATALINA_HOME%\webapps\verify\WEB-INF\classes\tests
 ```
-- download `neo4jmanager.war` and `verify.war` from [here](https://github.com/netgroup-polito/verigraph/tree/master/dist)
+- download `neo4jmanager.war` and `verify.war` from [here](https://github.com/netgroup-polito/verigraph/tree/master/service/build/windows)
 - copy downloaded WARs into `%CATALINA_HOME%\webapps`
 - (optional) configure Tomcat Manager:
   - open the file `%CATALINA_HOME%\conf\tomcat-users.xml`
@@ -69,7 +69,7 @@ e.g.
 `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CATALINA_HOME/shared`  
 `export JAVA_OPTS="-Djava.library.path=$CATALINA_HOME/shared"`  
 - `exec bash`
-- download `mcnet.jar`, `com.microsoft.z3.jar` and `qjutils.jar` from [here](https://github.com/netgroup-polito/verigraph/tree/master/service/build) and copy them to `$CATALINA_HOME/shared`
+- download `mcnet.jar`, `com.microsoft.z3.jar` and `qjutils.jar` from [here](https://github.com/netgroup-polito/verigraph/tree/master/service/build/linux) and copy them to `$CATALINA_HOME/shared`
 - customize Tomcat classpath  
   `nano $CATALINA_HOME/bin/setenv.sh`
   - paste the following content and save file:
