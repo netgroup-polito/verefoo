@@ -25,22 +25,23 @@ public class Configuration2CustomDeserializer extends JsonDeserializer<Configura
 	@Override
 	public Configuration2 deserialize(JsonParser jp, DeserializationContext ctxt)	throws IOException,
 																			JsonProcessingException {
-		String[] paths = uriInfo.getPath().split("/");
-		long graphId = Long.parseLong(paths[1], 10);
-		long nodeId = Long.parseLong(paths[3], 10);
-		
-		Node node = nodeService.getNode(graphId, nodeId);
+//		String[] paths = uriInfo.getPath().split("/");
+//		long graphId = Long.parseLong(paths[1], 10);
+//		long nodeId = Long.parseLong(paths[3], 10);
+//		
+//		Node node = nodeService.getNode(graphId, nodeId);
 		try {
 			JsonNode root = jp.getCodec().readTree(jp);
-			if(root==null)
-				return new Configuration2(node.getName(), "",new ObjectMapper().createArrayNode());
-			else{				
-				NodeService.validateNodeConfigurationAgainstSchemaFile(node, root);
-				Configuration2 conf = node.getConfiguration();
-				conf.setId(node.getName());
-				conf.setDescription("");
-				conf.setConfiguration(root);
-			}
+//			if(root==null)
+//			return new Configuration2("", "",new ObjectMapper().createArrayNode());
+			return new Configuration2("", "",root);
+//			else{				
+//				NodeService.validateNodeConfigurationAgainstSchemaFile(node, root);
+//				Configuration2 conf = node.getConfiguration();
+//				conf.setId(node.getName());
+//				conf.setDescription("");
+//				conf.setConfiguration(root);
+//			}
 		}
 		catch (JsonProcessingException e) {
 			throw new InternalServerErrorException("Error parsing configuration: " + e.getMessage());
@@ -49,7 +50,7 @@ public class Configuration2CustomDeserializer extends JsonDeserializer<Configura
 			throw new InternalServerErrorException("I/O error parsing configuration: " + e.getMessage());
 		}
 		
-		return null;
+//		return null;
 	}
 
 }

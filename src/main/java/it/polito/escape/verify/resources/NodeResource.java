@@ -1,6 +1,7 @@
 package it.polito.escape.verify.resources;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -21,9 +22,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import it.polito.escape.verify.exception.BadRequestException;
 import it.polito.escape.verify.model.Configuration2;
 import it.polito.escape.verify.model.ErrorMessage;
+import it.polito.escape.verify.model.Graph;
 import it.polito.escape.verify.model.Node;
+import it.polito.escape.verify.service.GraphService;
 import it.polito.escape.verify.service.NodeService;
 
 //@Path("/")
@@ -109,8 +113,29 @@ public class NodeResource {
     		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
     		@ApiParam(value = "Node configuration", required = true) Configuration2 nodeConfiguration,
     		@Context UriInfo uriInfo){
+    	Graph graph = new GraphService().getGraph(graphId);
+    	if (graph == null){
+    		throw new BadRequestException("Graph with id " + graphId + " not found");
+    	}
     	Node node = nodeService.getNode(graphId, nodeId);
-    	//nodeService.addNodeConfiguration();
+    	if (node == null){
+    		throw new BadRequestException("Node with id " + nodeId + " not found in graph with id " + graphId);
+    	}
+    	Node nodeCopy = new Node();
+    	nodeCopy.setId(node.getId());
+    	nodeCopy.setName(node.getName());
+    	nodeCopy.setFunctional_type(node.getFunctional_type());
+    	nodeConfiguration.setId(nodeCopy.getName());
+    	nodeCopy.setConfiguration(nodeConfiguration);
+    	
+    	Graph graphCopy = new Graph();
+		graphCopy.setId(graph.getId());
+		graphCopy.setNodes(new HashMap<Long, Node>(graph.getNodes()));
+		graphCopy.getNodes().remove(node.getId());
+		
+		NodeService.validateNode(graphCopy, nodeCopy);
+		
+    	graph.getNodes().put(nodeId, nodeCopy);
     }
     
 
