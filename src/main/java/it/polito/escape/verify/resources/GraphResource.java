@@ -28,7 +28,6 @@ import it.polito.escape.verify.model.Verification;
 import it.polito.escape.verify.resources.beans.VerificationBean;
 import it.polito.escape.verify.service.GraphService;
 import it.polito.escape.verify.service.VerificationService;
-import it.polito.nffg.neo4j.jaxb.Paths;
 
 @Path("/graphs")
 @Api(value = "/graphs", description = "Manage graphs")
@@ -125,16 +124,17 @@ public class GraphResource {
 											message = "Graph not found or source node not found or destination node not found or configuration for source and/or destination node not available",
 											response = ErrorMessage.class),
 							@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),})
-	public Verification verifyGraph(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long id,
+	public Verification verifyGraph(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
 									@ApiParam(	value = "'source' and 'destination' must refer to names of existing nodes in the same graph, 'type' refers to the required verification between the two (e.g. 'reachability')",
 												required = true) @BeanParam VerificationBean verificationBean) {
-		Graph graph = graphService.getGraph(id);
-		Paths paths = verificationService.getPaths(graph, verificationBean);
-		Verification v = verificationService.runTests(	graph,
-														paths,
-														verificationBean.getSource(),
-														verificationBean.getDestination());
-		return v;
+		
+		return verificationService.verify(graphId, verificationBean);
+//		Graph graph = graphService.getGraph(id);
+//		Paths paths = verificationService.getPaths(graph, verificationBean);
+//		Verification v = verificationService.runTests(	graph,
+//														paths,
+//														verificationBean.getSource(),
+//														verificationBean.getDestination());
 	}
 
 	private String getUriForSelf(UriInfo uriInfo, Graph graph) {

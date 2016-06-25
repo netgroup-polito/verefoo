@@ -36,6 +36,9 @@ import org.json.simple.JSONObject;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import it.polito.escape.verify.client.Neo4jManagerClient;
+import it.polito.escape.verify.exception.BadRequestException;
+import it.polito.escape.verify.exception.DataNotFoundException;
+import it.polito.escape.verify.exception.ForbiddenException;
 import it.polito.escape.verify.exception.InternalServerErrorException;
 import it.polito.escape.verify.model.Configuration2;
 import it.polito.escape.verify.model.Entry;
@@ -63,29 +66,20 @@ public class VerificationService {
 	private String				configFile			= projectFolder + "j-verigraph-generator/examples/config.json";
 	private String				testClassGenerator	= projectFolder + "j-verigraph-generator/test_class_generator.py";
 	private String				scenarioFolder		= projectFolder + "examples";
-	private String				scenarioFile		= projectFolder + "examples/Scenario";
+	private String				scenarioName		= "Scenario";
+	private String				scenarioFile		= this.scenarioFolder + "/" + scenarioName;
 	private String				testFolder			= projectFolder;
 	private String				testGenerator		= projectFolder + "j-verigraph-generator/test_generator.py";
-	List<List<String>>			sanitizedPaths		= new ArrayList<List<String>>();
-	private List<File>			testFiles			= new ArrayList<File>();
-	private List<File>			runFiles			= new ArrayList<File>();
-	private List<Test>			tests				= new ArrayList<Test>();
+//	List<List<String>>			sanitizedPaths		= new ArrayList<List<String>>();
 
 	public VerificationService() {
 
 	}
 
-	public Paths getPaths(Graph graph, VerificationBean verificationBean) {
-		Node sourceNode = graph.searchNodeByName(verificationBean.getSource());
-		Node destinationNode = graph.searchNodeByName(verificationBean.getDestination());
-		String verificationType = verificationBean.getType();
-		if (sourceNode == null || destinationNode == null || verificationType == null) {
-			ErrorMessage errorMessage = new ErrorMessage("Bad request", 400, "http://localhost:8080/verify/api-docs/");
-			Response response = Response.status(Status.BAD_REQUEST).entity(errorMessage).build();
-			throw new WebApplicationException(response);
-		}
-		String source = verificationBean.getSource() + "_" + sourceNode.getId();
-		String destination = verificationBean.getDestination() + "_" + destinationNode.getId();
+	public Paths getPaths(Graph graph, Node sourceNode, Node destinationNode) {
+
+		String source = sourceNode.getName() + "_" + sourceNode.getId();
+		String destination = destinationNode.getName() + "_" + destinationNode.getId();
 
 		List<String> endpoints = new ArrayList<>();
 		List<String> firewalls = new ArrayList<>();
@@ -179,46 +173,49 @@ public class VerificationService {
 
 	}
 
-	public Verification runTests(Graph graph, Paths paths, String source, String destination) {
+	public Verification runReachabilityTests(Graph graph, Paths paths, String source, String destination) {
 		if (paths.getPath().size() == 0) {
 			System.out.println("No paths between '" + source + "' and '" + destination + "'");
 			return new Verification("UNSAT");
 		}
 
-		sanitizePaths(paths);
+		List<List<String>> sanitizedPaths = sanitizePaths(paths);
+		//debug print
+		printListsOfStrings("Before pruning", sanitizedPaths);
 		
-		System.out.println("Before pruning");
-		for (List<String> path : sanitizedPaths){
-			System.out.println(path);
-		}
-		
-		prunePaths();
-		
-		System.out.println("After pruning");
-		for (List<String> path : sanitizedPaths){
-			System.out.println(path);
-		}
+		prunePaths(sanitizedPaths);
+		//debug print
+		printListsOfStrings("After pruning", sanitizedPaths);
 
-		deletePreviousTestFiles(this.scenarioFolder, this.testFolder);
+		deletePreviousReachabilityTestFiles(this.scenarioFolder, this.testFolder);
 
-		generateChainsFile(graph, chainsFile);
+		generateChainsFile(graph, sanitizedPaths, chainsFile);
 
 		generateConfigFile(graph, configFile);
 
 		generateTestScenarios(chainsFile, configFile);
 
-		generateTests(source, destination);
+		generateTests(sanitizedPaths, source, destination);
+		
+		List<File> sourceFiles = new ArrayList<File>();
+		List<File> classFiles = new ArrayList<File>();
+		prepareForCompilationAndExecution(sanitizedPaths.size(), sourceFiles, classFiles);
 
-		prepareForCompilationAndExecution();
+		compileFiles(sourceFiles);
 
-		compileTestScenarios(sanitizedPaths);
+		List<Test> tests = runFiles(sanitizedPaths, graph, classFiles);
 
-		runFiles(graph, runFiles);
-
-		return evaluateResult();
+		return evaluateResult(tests);
 	}
 
-	private void prunePaths() {
+	private void printListsOfStrings(String message, List<List<String>> lists) {
+		System.out.println(message);
+		for (List<String> element : lists){
+			System.out.println(element);
+		}
+	}
+
+	private void prunePaths(List<List<String>> sanitizedPaths) {
 		List<List<String>> pathsToBeRemoved = new ArrayList<List<String>>();
 		
 		for(List<String> path : sanitizedPaths){
@@ -240,11 +237,11 @@ public class VerificationService {
 	                                  Collectors.counting()));
 	}
 	
-	private Verification evaluateResult() {
+	private Verification evaluateResult(List<Test> tests) {
 		Verification v = new Verification();
 		boolean sat = false;
 		int unsat = 0;
-		for (Test t : this.tests) {
+		for (Test t : tests) {
 			v.getTests().add(t);
 
 			if (t.getResult().equals("SAT")) {
@@ -264,20 +261,27 @@ public class VerificationService {
 		return v;
 	}
 
-	private void sanitizePaths(Paths paths) {
+	private List<List<String>> sanitizePaths(Paths paths) {
+		List<List<String>> sanitizedPaths = new ArrayList<List<String>>();
 		for (String path : paths.getPath()) {
 			System.out.println("Original path: " + path);
 			List<String> newPath = sanitizePath(path);
 			sanitizedPaths.add(newPath);
 		}
+		return sanitizedPaths;
 	}
 
-	private void deletePreviousTestFiles(String scenarioDir, String Testdir) {
-		final File scenarioFolder = new File(scenarioDir);
+	private void deletePreviousReachabilityTestFiles(String scenarioDir, String TestDir) {
+		deleteFiles(scenarioDir, "Scenario_", "java");
+		deleteFiles(TestDir, "Scenario_", "java");
+	}
+
+	private void deleteFiles(String directory, String prefix, String extension) {
+		final File scenarioFolder = new File(directory);
 		final File[] scenarioFiles = scenarioFolder.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(final File dir, final String name) {
-				return name.matches("Scenario_.*\\.java");
+				return name.matches(prefix + ".*\\." + extension);
 			}
 		});
 		for (final File file : scenarioFiles) {
@@ -288,23 +292,6 @@ public class VerificationService {
 				System.out.println("Removed file " + file.getAbsolutePath());
 			}
 		}
-
-		final File testFolder = new File(Testdir);
-		final File[] testFiles = testFolder.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(final File dir, final String name) {
-				return name.matches("Scenario_.*\\.java");
-			}
-		});
-		for (final File file : testFiles) {
-			if (!file.delete()) {
-				System.err.println("Can't remove " + file.getAbsolutePath());
-			}
-			else {
-				System.out.println("Removed file " + file.getAbsolutePath());
-			}
-		}
-
 	}
 
 	public static boolean deleteDir(File dir) {
@@ -339,14 +326,14 @@ public class VerificationService {
 
 	}
 
-	private void generateChainsFile(Graph graph, String chainsFile) {
+	private void generateChainsFile(Graph graph, List<List<String>> sanitizedPaths, String chainsFile) {
 		JSONObject root = new JSONObject();
 		JSONArray chains = new JSONArray();
 		
 
 		int chainCounter = 0;
 
-		for (List<String> path : this.sanitizedPaths) {
+		for (List<String> path : sanitizedPaths) {
 			Iterator pathsIterator = path.iterator();
 			JSONObject chain = new JSONObject();
 			chain.put("id", ++chainCounter);
@@ -381,52 +368,6 @@ public class VerificationService {
 		catch (IOException e) {
 			throw new InternalServerErrorException("Error saving 'chains.json' for neo4jmanager");
 		}
-
-	}
-
-	private void generateConfigFileOld(Graph graph, String configFile) {
-//		JSONObject root = new JSONObject();
-//		JSONArray nodes = new JSONArray();
-//
-//		for (Node n : graph.getNodes().values()) {
-//			JSONObject node = new JSONObject();
-//			JSONArray configuration = new JSONArray();
-//			Configuration nodeConfig = n.getConfiguration();
-//			List<String> configurationList = nodeConfig.getConfigurationList();
-//			List<ConfigurationObject> configurationMap = nodeConfig.getConfigurationMap();
-//			if (configurationList.size() > 0) {
-//				for (String s : configurationList) {
-//					configuration.add("ip_" + s);
-//				}
-//			}
-//			else if (configurationMap.size() > 0) {
-//				for (ConfigurationObject c : configurationMap) {
-//					Iterator<java.util.Map.Entry<String, String>> iter = c.getMap().entrySet().iterator();
-//					while (iter.hasNext()) {
-//						java.util.Map.Entry<String, String> entry = iter.next();
-//						JSONObject configItem = new JSONObject();
-//						configItem.put("ip_" + entry.getKey(), "ip_" + entry.getValue());
-//						configuration.add(configItem);
-//					}
-//				}
-//
-//			}
-//			node.put("configuration", configuration);
-//			node.put("id", nodeConfig.getId());
-//			node.put("description", nodeConfig.getDescription());
-//
-//			nodes.add(node);
-//		}
-//		root.put("nodes", nodes);
-//
-//		try (FileWriter file = new FileWriter(configFile)) {
-//			file.write(root.toJSONString());
-//			System.out.println("Successfully created 'config.json' with the following content:");
-//			System.out.println(root);
-//		}
-//		catch (IOException e) {
-//			throw new InternalServerErrorException("Error saving 'config.json' for neo4jmanager");
-//		}
 
 	}
 	
@@ -466,33 +407,6 @@ public class VerificationService {
 							platfromIndependentPath(chainsFile), "-f", platfromIndependentPath(configFile), "-o",
 							platfromIndependentPath(scenarioFile) };
 		printCommand(cmd);
-//		String s = null;
-//		try {
-//			Process p = Runtime.getRuntime().exec(cmd);
-//			
-//			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//
-//			BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-//
-//			// read the output from the command
-//			System.out.println("Here is the standard output of the command:\n");
-//			while ((s = stdInput.readLine()) != null) {
-//				System.out.println(s);
-//			}
-//
-//			// read any errors from the attempted command
-//			System.out.println("Here is the standard error of the command (if any):\n");
-//			while ((s = stdError.readLine()) != null) {
-//				System.out.println(s);
-//			}
-//			p.waitFor();
-//		}
-//		catch (IOException e) {
-//			throw new InternalServerErrorException("Error generating test scenarios for Z3: unable to execute generator");
-//		}
-//		catch (InterruptedException e) {
-//			throw new InternalServerErrorException("Error generating test scenarios for Z3: generator got interrupted during execution");
-//		}
 		
 		ProcessBuilder pb = new ProcessBuilder(cmd);
 		pb.redirectErrorStream(true);
@@ -522,10 +436,10 @@ public class VerificationService {
 		System.out.println("");
 	}
 
-	private void generateTests(String source, String destination) {
+	private void generateTests(List<List<String>> sanitizedPaths, String source, String destination) {
 
 		List<String> scenarios = new ArrayList<String>();
-		for (int i = 0; i < this.sanitizedPaths.size(); i++) {
+		for (int i = 0; i < sanitizedPaths.size(); i++) {
 			scenarios.add("Scenario_" + (i + 1));
 		}
 
@@ -535,34 +449,6 @@ public class VerificationService {
 								platfromIndependentPath(projectFolder + scenario + "_test.java"), "-s", source, "-d",
 								destination };
 			printCommand(cmd);
-//			String s = null;
-//			try {
-//				Process p = Runtime.getRuntime().exec(cmd);
-//				
-//				BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//
-//				BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-//
-//				// read the output from the command
-//				System.out.println("Here is the standard output of the command:\n");
-//				while ((s = stdInput.readLine()) != null) {
-//					System.out.println(s);
-//				}
-//
-//				// read any errors from the attempted command
-//				System.out.println("Here is the standard error of the command (if any):\n");
-//				while ((s = stdError.readLine()) != null) {
-//					System.out.println(s);
-//				}
-//				
-//				p.waitFor();
-//			}
-//			catch (IOException e) {
-//				throw new InternalServerErrorException("Error generating tests for Z3: unable to execute generator");
-//			}
-//			catch (InterruptedException e) {
-//				throw new InternalServerErrorException("Error generating tests for Z3: generator got interrupted during execution");
-//			}
 			
 			ProcessBuilder pb = new ProcessBuilder(cmd);
 			pb.redirectErrorStream(true);
@@ -587,22 +473,22 @@ public class VerificationService {
 
 	}
 
-	private void prepareForCompilationAndExecution() {
-		for (int i = 0; i < sanitizedPaths.size(); i++) {
-			System.out.println("Creating a test file for path: " + sanitizedPaths.get(i).toString());
+	private void prepareForCompilationAndExecution(int size, List<File> sourceFiles, List<File> classFiles) {
+		for (int i = 0; i < size; i++) {
+			System.out.println("Creating reachability test file #" + (i+1));
 			String scenario = this.scenarioFile + "_" + (i + 1) + ".java";
-			testFiles.add(new File(scenario));
+			sourceFiles.add(new File(scenario));
 			System.out.println("Scenario file " + scenario + " added to compilation");
 			String testSourceFile = projectFolder + "Scenario_" + (i + 1) + "_test.java";
 			String testClassFile = projectFolder + "Scenario_" + (i + 1) + "_test";
-			testFiles.add(new File(testSourceFile));
+			sourceFiles.add(new File(testSourceFile));
 			System.out.println("Test file " + testSourceFile + " added to copilation");
-			runFiles.add(new File(testClassFile));
+			classFiles.add(new File(testClassFile));
 			System.out.println("Test file " + testClassFile + " added to execution");
 		}
 	}
 
-	private void compileTestScenarios(List<List<String>> sanitizedPaths) {
+	private void compileFiles(List<File> files) {
 
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 		if (compiler == null) {
@@ -613,12 +499,13 @@ public class VerificationService {
 		try {
 			fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(new File(projectFolder)));
 
-			System.out.println("Java class path is: " + System.getProperty("java.class.path"));
+//			System.out.println("Java class path is: " + System.getProperty("java.class.path"));
 
-			String z3 = "/usr/lib/com.microsoft.z3.jar";
-			List<String> optionList = new ArrayList<String>();
-			optionList.add("-classpath");
-			optionList.add(System.getProperty("java.class.path") + ":" + z3);
+//			String z3 = "/usr/lib/com.microsoft.z3.jar";
+//			List<String> optionList = new ArrayList<String>();
+//			optionList.add("-classpath");
+//			optionList.add(System.getProperty("java.class.path") + ":" + z3);
+			List<String> optionList = null;
 			DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 
 			boolean success = compiler.getTask(	null,
@@ -626,7 +513,7 @@ public class VerificationService {
 												diagnostics,
 												optionList,
 												null,
-												fileManager.getJavaFileObjectsFromFiles(testFiles))
+												fileManager.getJavaFileObjectsFromFiles(files))
 										.call();
 			if (!success) {
 				Locale myLocale = Locale.getDefault();
@@ -655,20 +542,22 @@ public class VerificationService {
 
 	}
 
-	public void runFiles(Graph graph, List<File> files) {
+	public List<Test> runFiles(List<List<String>> sanitizedPaths, Graph graph, List<File> files) {
+		List<Test> tests = new ArrayList<Test>();
 		for (int i = 0; i < files.size(); i++) {
 			System.out.println("Running test file " + files.get(i).getAbsolutePath());
 			int result = runIt(files.get(i));
 			System.out.println("Execution returned: " + result);
 
 			List<Node> path = new ArrayList<Node>();
-			for (String nodeString : this.sanitizedPaths.get(i)) {
+			for (String nodeString : sanitizedPaths.get(i)) {
 				Node node = graph.searchNodeByName(nodeString);
 				path.add(node);
 			}
 			Test t = new Test(path, result);
-			this.tests.add(t);
+			tests.add(t);
 		}
+		return tests;
 	}
 
 	private String platfromIndependentPath(String path) {
@@ -704,6 +593,161 @@ public class VerificationService {
 			throw new InternalServerErrorException("Error executing Z3 tests: "+ e.getMessage()
 													+ ". There are errors in the Z3 model.");
 		}
+	}
+
+	public Verification verify(long graphId, VerificationBean verificationBean) {
+		if (graphId <= 0) {
+			throw new ForbiddenException("Illegal graph id: " + graphId);
+		}		
+		GraphService graphService = new GraphService();
+		Graph graph = graphService.getGraph(graphId);
+		if (graph == null) {
+			throw new DataNotFoundException("Graph with id " + graphId + " not found");
+		}		
+		String source = verificationBean.getSource();
+		String destination = verificationBean.getDestination();
+		String type = verificationBean.getType();
+		if (source == null || source.equals("")){
+			throw new BadRequestException("Please specify the 'source' parameter in your request");
+		}
+		if (destination == null || destination.equals("")){
+			throw new BadRequestException("Please specify the 'destination' parameter in your request");
+		}
+		if (type == null || type.equals("")){
+			throw new BadRequestException("Please specify the 'type' parameter in your request");
+		}
+		
+		Node sourceNode = graph.searchNodeByName(verificationBean.getSource());
+		Node destinationNode = graph.searchNodeByName(verificationBean.getDestination());
+
+		if (sourceNode == null) {
+			throw new BadRequestException("The 'source' parameter is not valid, please insert the name of an existing node");
+		}
+		if (destinationNode == null) {
+			throw new BadRequestException("The 'destination' parameter is not valid, please insert the name of an existing node");
+		}
+		if ((!type.equals("reachability")) && (!type.equals("isolation")) && (!type.equals("traversal"))){
+			throw new BadRequestException("The 'verification' parameter '" + type + "' is not valid: valid types are: 'reachability', 'isolation' and 'traversal'");
+		}
+		
+		Verification v = null;
+		
+		switch(type){
+			case "reachability":
+				v = reachabilityVerification(graph, sourceNode, destinationNode);
+				break;
+			case "isolation":
+				String middlebox = verificationBean.getMiddlebox();
+				if (middlebox == null || middlebox.equals("")){
+					throw new BadRequestException("Please specify the 'middlebox' parameter in your request");
+				}
+				
+				Node middleboxNode = graph.searchNodeByName(middlebox);
+				if (middleboxNode == null) {
+					throw new BadRequestException("The 'middlebox' parameter is not valid, please insert the name of an existing node");
+				}
+				if(middleboxNode.getFunctional_type().equals("endpoint")){
+					throw new BadRequestException("'" + middlebox + "' is of type 'endpoint', please choose a valid endpoint");
+				}
+				v = isolationVerification(graph, sourceNode, destinationNode, middleboxNode);
+				break;
+			default:
+				break;
+		}
+		
+		return v;
+	}
+
+	private Verification isolationVerification(Graph graph, Node sourceNode, Node destinationNode, Node middleboxNode) {
+		
+		Paths paths = getPaths(graph, sourceNode, destinationNode);
+		if (paths.getPath().size() == 0) {
+			System.out.println("No paths between '" + sourceNode.getName() + "' and '" + destinationNode.getName() + "'");
+			return new Verification("UNSAT");
+		}
+
+		List<List<String>> sanitizedPaths = sanitizePaths(paths);
+		
+		printListsOfStrings("Before pruning", sanitizedPaths);
+		
+		prunePaths(sanitizedPaths);
+		
+		printListsOfStrings("After pruning", sanitizedPaths);
+		
+		extractPathsWithMiddlebox(sanitizedPaths, middleboxNode.getName());
+		
+		printListsOfStrings("After middlebox research", sanitizedPaths);
+		
+		generateChainsFile(graph, sanitizedPaths, chainsFile);
+
+		generateConfigFile(graph, configFile);
+
+		generateTestScenarios(chainsFile, configFile);
+
+		generateTests(sanitizedPaths, sourceNode.getName(), middleboxNode.getName());
+		
+		List<File> sourceFiles = new ArrayList<File>();
+		List<File> classFiles = new ArrayList<File>();
+		prepareForCompilationAndExecution(sanitizedPaths.size(), sourceFiles, classFiles);
+
+		compileFiles(sourceFiles);
+
+		List<Test> tests = runFiles(sanitizedPaths, graph, classFiles);
+		
+		return evaluateIsolationResults(tests);
+		
+	}
+
+	private Verification evaluateIsolationResults(List<Test> tests) {
+		Verification v = new Verification();
+		boolean isUnsat = false;
+		int unsatCounter = 0;
+		for (Test t : tests) {
+			v.getTests().add(t);
+
+			if (t.getResult().equals("SAT")) {
+				isUnsat = true;
+			}
+			if (t.getResult().equals("UNKNOWN")) {
+				v.setResult("UNKNWON");
+			}
+			if (t.getResult().equals("UNSAT")) {
+				unsatCounter++;
+			}
+		}
+		if (isUnsat)
+			v.setResult("UNSAT");
+		else if (unsatCounter == tests.size())
+			v.setResult("SAT");
+		return v;
+		
+	}
+
+	private void extractPathsWithMiddlebox(List<List<String>> sanitizedPaths, String middleboxName) {
+		List<List<String>> pathsToBeRemoved = new ArrayList<List<String>>();
+		for (List<String> path : sanitizedPaths){
+			boolean middleboxFound = false;
+			for (String node : path){
+				if (node.equals(middleboxName)){
+					middleboxFound = true;
+					break;
+				}
+			}
+			if (!middleboxFound){
+				pathsToBeRemoved.add(path);
+			}
+		}
+		
+		for (List<String> path : pathsToBeRemoved){
+			sanitizedPaths.remove(path);
+		}
+		
+	}
+
+	private Verification reachabilityVerification(Graph graph, Node sourceNode, Node destinationNode) {
+		Paths paths = getPaths(graph, sourceNode, destinationNode);
+		Verification v = runReachabilityTests(graph, paths, sourceNode.getName(), destinationNode.getName());
+		return v;
 	}
 
 }

@@ -10,7 +10,7 @@ public class Test {
 	public Test() {
 
 	}
-
+	
 	public Test(List<Node> paths, int result) {
 		switch (result) {
 			case 0:
