@@ -1,1 +1,0 @@
-{"chains":[{"nodes":[{"address":"ip_user1","functional_type":"endpoint","name":"user1"},{"address":"ip_nat","functional_type":"nat","name":"nat"},{"address":"ip_firewall","functional_type":"firewall","name":"firewall"},{"address":"ip_webserver","functional_type":"endpoint","name":"webserver"}],"flowspace":"tcp=80","id":1}]}
