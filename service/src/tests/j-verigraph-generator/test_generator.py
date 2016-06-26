@@ -62,7 +62,8 @@ def main(argv):
     #capitalize ouput filename
     dirname = os.path.dirname(outputfile)
     basename = os.path.basename(outputfile)
-    basename = os.path.splitext(basename)[0].capitalize()
+    basename = os.path.splitext(basename)[0]
+    basename = basename[0].upper() + basename[1:]
 
     #print arguments    
     logging.debug('Input file is', inputfile)
