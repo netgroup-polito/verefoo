@@ -91,7 +91,7 @@ def main(argv):
 
 
         inputfile = os.path.basename(inputfile)
-        c.writeln("import tests.examples." + os.path.splitext(inputfile)[0] + ";")
+        c.writeln("import tests.scenarios." + os.path.splitext(inputfile)[0] + ";")
         
         c.writeln("public class " + basename + "{")
 

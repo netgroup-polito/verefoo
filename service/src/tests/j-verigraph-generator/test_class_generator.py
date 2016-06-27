@@ -200,7 +200,7 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
         c = CodeGeneratorBackend()
         c.begin(tab="    ")
         
-        c.writeln("package tests.examples;")
+        c.writeln("package tests.scenarios;")
 
         #imports here
         c.writeln("import java.util.ArrayList;")
