@@ -94,7 +94,7 @@ public class PolitoWebServer extends NetworkObject{
                     ctx.mkImplies((BoolExpr)nctx.send.apply(node, n_0, p_0, t_0), 
                     		ctx.mkEq(nctx.pf.get("origin").apply(p_0),node)),1,null,null,null,null));
 			
-	    	//Constraint3		send(politoWebServer, n_0, p, t_0) -> p.orig_body == p.body && p.body == 1 //added
+	    	//Constraint3		send(politoWebServer, n_0, p, t_0) -> p.orig_body == p.body
 	    	constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0}, 
                     ctx.mkImplies((BoolExpr)nctx.send.apply(node, n_0, p_0, t_0), 
                     		ctx.mkEq(nctx.pf.get("orig_body").apply(p_0),nctx.pf.get("body").apply(p_0))),

@@ -1,4 +1,4 @@
-How to deploy **rest-verigraph** on Apache Tomcat:
+How to deploy **VeriGraph** on Apache Tomcat:
 
 **Windows**
 - install `jdk1.8.X_YY` [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
