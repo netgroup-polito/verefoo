@@ -97,8 +97,7 @@ public class PolitoWebServer extends NetworkObject{
 	    	//Constraint3		send(politoWebServer, n_0, p, t_0) -> p.orig_body == p.body && p.body == 1 //added
 	    	constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0}, 
                     ctx.mkImplies((BoolExpr)nctx.send.apply(node, n_0, p_0, t_0), 
-                    		ctx.mkAnd(ctx.mkEq(nctx.pf.get("orig_body").apply(p_0),nctx.pf.get("body").apply(p_0)),
-                    				  ctx.mkEq(nctx.pf.get("body").apply(p_0), ctx.mkInt(PolitoIDS.DROGA)))),
+                    		ctx.mkEq(nctx.pf.get("orig_body").apply(p_0),nctx.pf.get("body").apply(p_0))),
                     1,null,null,null,null));
 	        
 	    	//Constraint4		recv(n_0, politoWebServer, p, t_0) -> nodeHasAddr(politoWebServer,p.dest)
