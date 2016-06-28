@@ -36,7 +36,7 @@ import mcnet.netobjs.PolitoEndHost;
 import mcnet.netobjs.PolitoIDS;
 import mcnet.netobjs.PolitoWebServer;
 
-// | WebClient | ---------- | PolitoIDS | ---------- | WebServer |
+// | PolitoEndHost | ---------- | PolitoIDS | ---------- | WebServer |
 
 
 public class PolitoEndHostTest {
@@ -53,7 +53,7 @@ public class PolitoEndHostTest {
 		
 		Network net = new Network (ctx,new Object[]{nctx});
 		
-		hostA = new PolitoEndHost(ctx, new Object[]{nctx.nm.get("hostA"), net, nctx,nctx.am.get("ip_server")});
+		hostA = new PolitoEndHost(ctx, new Object[]{nctx.nm.get("hostA"), net, nctx});
 		server = new PolitoWebServer(ctx, new Object[]{nctx.nm.get("server"), net, nctx});
 		politoIDS = new PolitoIDS(ctx, new Object[]{nctx.nm.get("politoIDS"), net, nctx});
 		
@@ -91,14 +91,15 @@ public class PolitoEndHostTest {
 	    net.attach(hostA, politoIDS, server);
 	    
 	    PacketModel pModel = new PacketModel();
-	    pModel.setBody(String.valueOf("droga").hashCode());
+	    pModel.setBody(String.valueOf("music").hashCode());
 	    pModel.setIp_dest(nctx.am.get("ip_server"));
 	    pModel.setProto(nctx.HTTP_REQUEST);
 	    hostA.installEndHost(pModel);
 	    
 	    politoIDS.installIDS(new int[]{
-	    								String.valueOf("droga").hashCode(), 
-	    								String.valueOf("sex").hashCode()
+	    								String.valueOf("drug").hashCode(), 
+	    								String.valueOf("sex").hashCode(),
+	    								String.valueOf("weapons").hashCode()
 	    							  });
 	    
 	    check = new Checker(ctx, nctx, net);
