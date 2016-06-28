@@ -7,9 +7,11 @@ import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "Neighbour")
 public class Neighbour {
+
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
 	private long	id;
+
 	@ApiModelProperty(	required = true,
 						example = "nat",
 						value = "The neighbour name must refer to an existing node of the same graph")

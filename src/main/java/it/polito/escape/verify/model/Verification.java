@@ -6,7 +6,7 @@ import java.util.List;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel(value = "Policy")
+@ApiModel(value = "Policy verification")
 public class Verification {
 
 	@ApiModelProperty(example = "SAT | UNSAT | UNKNOWN")

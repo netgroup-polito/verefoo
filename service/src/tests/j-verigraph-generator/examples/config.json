@@ -1,1 +1,0 @@
-{"nodes":[{"configuration":[],"description":"","id":"user1"},{"configuration":["ip_user1","ip_user2"],"description":"","id":"nat"},{"configuration":[],"description":"","id":"firewall"},{"configuration":[],"description":"","id":"webserver"},{"configuration":[],"description":"","id":"user2"},{"configuration":["ip_user1","ip_user2"],"description":"","id":"dpi"}]}

@@ -10,13 +10,12 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import it.polito.escape.verify.exception.InternalServerErrorException;
 
 public class CustomMapSerializer extends JsonSerializer<Map<?, ?>> {
-    @Override
-    public void serialize(final Map<?, ?> value, final JsonGenerator jgen, final SerializerProvider provider){
-        try {
+	@Override
+	public void serialize(final Map<?, ?> value, final JsonGenerator jgen, final SerializerProvider provider) {
+		try {
 			jgen.writeObject(value.values());
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw new InternalServerErrorException("I/O error serializing a map: " + e.getMessage());
 		}
-    }
+	}
 }

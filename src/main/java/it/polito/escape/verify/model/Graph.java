@@ -22,6 +22,7 @@ import it.polito.escape.verify.resources.GraphCustomDeserializer;
 @JsonDeserialize(using = GraphCustomDeserializer.class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Graph {
+
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
 	private long			id;

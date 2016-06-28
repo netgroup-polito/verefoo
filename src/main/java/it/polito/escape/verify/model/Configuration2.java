@@ -11,28 +11,29 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import it.polito.escape.verify.resources.Configuration2CustomDeserializer;
 import it.polito.escape.verify.resources.CustomConfiguration2Serializer;
-import it.polito.escape.verify.resources.NodeCustomDeserializer;
 
 @XmlRootElement
 @ApiModel("Configuration")
 @JsonSerialize(using = CustomConfiguration2Serializer.class)
 @JsonDeserialize(using = Configuration2CustomDeserializer.class)
 public class Configuration2 {
+
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
-	private String						id;
+	private String		id;
+
 	@ApiModelProperty(required = false)
 	@XmlTransient
-	private String						description			= "";
+	private String		description	= "";
+
 	@ApiModelProperty(required = true)
-	private JsonNode configuration;
+	private JsonNode	configuration;
 
 	public Configuration2() {
-		
+
 	}
 
-
-	public Configuration2(	String id, String description, JsonNode configuration) {
+	public Configuration2(String id, String description, JsonNode configuration) {
 		this.id = id;
 		this.description = description;
 		this.configuration = configuration;
@@ -61,5 +62,5 @@ public class Configuration2 {
 	public void setConfiguration(JsonNode configuration) {
 		this.configuration = configuration;
 	}
-	
+
 }

@@ -194,12 +194,13 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
     logging.debug("* instantiating chain #" + str(number))
     dirname = os.path.dirname(output_file)
     basename = os.path.basename(output_file)
-    basename = os.path.splitext(basename)[0].capitalize()
+    basename = os.path.splitext(basename)[0]
+    basename = basename[0].upper() + basename[1:]
     with smart_open(dirname + "/" + basename + "_" + str(number) + ".java") as f:
         c = CodeGeneratorBackend()
         c.begin(tab="    ")
         
-        c.writeln("package tests.examples;")
+        c.writeln("package tests.scenarios;")
 
         #imports here
         c.writeln("import java.util.ArrayList;")

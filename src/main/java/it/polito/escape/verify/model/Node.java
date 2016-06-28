@@ -22,25 +22,28 @@ import it.polito.escape.verify.resources.NodeCustomDeserializer;
 @JsonDeserialize(using = NodeCustomDeserializer.class)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Node {
+
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
 	private long					id;
+
 	@ApiModelProperty(required = true, example = "ep", value = "The name of the node can be any string")
 	private String					name;
-	@ApiModelProperty(
-						required = true,
+
+	@ApiModelProperty(	required = true,
 						example = "endpoint",
 						value = "The functional types that are currently supported are: endpoint, firewall, nat, antispam, webclient, webserver, mailclient, mailserver")
 	private String					functional_type;
+
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
 	private Configuration2			configuration	= new Configuration2();
 
-	@ApiModelProperty(
-						name = "neighbours",
+	@ApiModelProperty(	name = "neighbours",
 						notes = "Neighbours",
 						dataType = "List[it.polito.escape.verify.model.Neighbour]")
 	private Map<Long, Neighbour>	neighbours		= new HashMap<Long, Neighbour>();
+
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
 	private Set<Link>				links			= new HashSet<>();
@@ -125,19 +128,8 @@ public class Node {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		else
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Node other = (Node) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		}
-		else if (!name.equals(other.name))
-			return false;
-//		return true;
-		return false;
 	}
 
 	public Neighbour searchNeighbourByName(String name) {
