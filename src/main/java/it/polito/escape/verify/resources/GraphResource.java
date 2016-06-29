@@ -129,12 +129,6 @@ public class GraphResource {
 												required = true) @BeanParam VerificationBean verificationBean) {
 		
 		return verificationService.verify(graphId, verificationBean);
-//		Graph graph = graphService.getGraph(id);
-//		Paths paths = verificationService.getPaths(graph, verificationBean);
-//		Verification v = verificationService.runTests(	graph,
-//														paths,
-//														verificationBean.getSource(),
-//														verificationBean.getDestination());
 	}
 
 	private String getUriForSelf(UriInfo uriInfo, Graph graph) {

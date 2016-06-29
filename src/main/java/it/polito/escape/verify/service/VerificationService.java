@@ -246,7 +246,7 @@ public class VerificationService {
 
 		return resultDir;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void generateChainsFile(Graph graph, List<List<String>> sanitizedPaths, String chainsFile) {
 		JSONObject root = new JSONObject();
@@ -291,7 +291,7 @@ public class VerificationService {
 		}
 
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void generateConfigFile(Graph graph, String configFile) {
 		JSONObject root = new JSONObject();
@@ -353,6 +353,10 @@ public class VerificationService {
 			while ((line = reader.readLine()) != null)
 				System.out.println("test_class_generator.py: " + line);
 			process.waitFor();
+			if (process.exitValue() != 0) {
+				throw new InternalServerErrorException("Unable to generate test scenario file for the verification request: test_class_generator returned "
+														+ process.exitValue());
+			}
 		}
 		catch (IOException e) {
 			throw new InternalServerErrorException("Error generating tests for Z3: unable to execute generator");
@@ -390,6 +394,10 @@ public class VerificationService {
 				while ((line = reader.readLine()) != null)
 					System.out.println("test_generator.py: " + line);
 				process.waitFor();
+				if (process.exitValue() != 0) {
+					throw new InternalServerErrorException("Unable to generate test file for the verification request: test_generator returned "
+															+ process.exitValue());
+				}
 			}
 			catch (IOException e) {
 				throw new InternalServerErrorException("Error generating tests for Z3: unable to execute generator");
@@ -475,7 +483,6 @@ public class VerificationService {
 
 	}
 
-	// @SuppressWarnings("unchecked")
 	public int runIt(File filename, String folder) {
 		int endIndex = filename.getName().lastIndexOf(".");
 		String filenameNoExtension;
@@ -505,21 +512,22 @@ public class VerificationService {
 		}
 	}
 
-	public List<Test> runFiles(String folder, List<List<String>> sanitizedPaths, Graph graph, List<File> files) {
+	public List<Test> runFiles(String folder, List<List<String>> paths, Graph graph, List<File> files) {
 		List<Test> tests = new ArrayList<Test>();
 		for (int i = 0; i < files.size(); i++) {
-			System.out.println("Running test file " + files.get(i).getAbsolutePath());
+			System.out.println("Running test file \"" + files.get(i).getAbsolutePath() + "\"");
 			int result = runIt(files.get(i), folder);
 			System.out.println("Execution returned: " + result);
 
 			List<Node> path = new ArrayList<Node>();
-			for (String nodeString : sanitizedPaths.get(i)) {
+			for (String nodeString : paths.get(i)) {
 				Node node = graph.searchNodeByName(nodeString);
 				path.add(node);
 			}
 			Test t = new Test(path, result);
 			tests.add(t);
 		}
+
 		return tests;
 	}
 
@@ -538,6 +546,7 @@ public class VerificationService {
 
 	}
 
+	@SuppressWarnings("unused")
 	private void deleteFilesWithPrefix(String directory, String prefix, String extension) {
 		final File scenarioFolder = new File(directory);
 		final File[] scenarioFiles = scenarioFolder.listFiles(new FilenameFilter() {
@@ -643,9 +652,9 @@ public class VerificationService {
 
 		Paths paths = getPaths(graph, sourceNode, destinationNode);
 		if (paths.getPath().size() == 0) {
-			System.out.println("No paths between '"	+ sourceNode.getName() + "' and '" + destinationNode.getName()
-								+ "'");
-			return new Verification("UNSAT");
+			return new Verification("UNSAT",
+									"There are no available paths between '"	+ sourceNode.getName() + "' and '"
+												+ destinationNode.getName() + "'");
 		}
 
 		List<List<String>> sanitizedPaths = sanitizePaths(paths);
@@ -656,7 +665,23 @@ public class VerificationService {
 
 		printListsOfStrings("After pruning", sanitizedPaths);
 
+		if (sanitizedPaths.isEmpty()) {
+			return new Verification("UNSAT",
+									"There are no available paths between '"	+ sourceNode.getName() + "' and '"
+												+ destinationNode.getName() + "'");
+		}
+
+		List<Test> tests = extractTestsFromPaths(graph, sanitizedPaths, "UNKNWON");
+
 		extractPathsWithMiddlebox(sanitizedPaths, middleboxNode.getName());
+
+		if (sanitizedPaths.isEmpty()) {
+			return new Verification("UNSAT",
+									tests,
+									"There are no available paths between '"	+ sourceNode.getName() + "' and '"
+											+ destinationNode.getName() + "' which traverse middlebox '"
+											+ middleboxNode.getName() + "'. See below all the available paths.");
+		}
 
 		printListsOfStrings("After middlebox research", sanitizedPaths);
 
@@ -695,33 +720,67 @@ public class VerificationService {
 
 		compileFiles(sourceFiles, tempDir.getAbsolutePath());
 
-		List<Test> tests = runFiles(tempDir.getAbsolutePath(), sanitizedPaths, graph, classFiles);
+		tests = runFiles(tempDir.getAbsolutePath(), sanitizedPaths, graph, classFiles);
 
-		return evaluateIsolationResults(tests);
+		return evaluateIsolationResults(tests,
+										sourceNode.getName(),
+										destinationNode.getName(),
+										middleboxNode.getName());
 
 	}
 
-	private Verification evaluateIsolationResults(List<Test> tests) {
+	private List<Test> extractTestsFromPaths(Graph graph, List<List<String>> paths, String result) {
+		List<Test> tests = new ArrayList<Test>();
+		for (List<String> path : paths) {
+			List<Node> nodes = new ArrayList<Node>();
+			for (String nodeName : path) {
+				nodes.add(graph.searchNodeByName(nodeName));
+			}
+			tests.add(new Test(nodes, result));
+		}
+		return tests;
+	}
+
+	private Verification evaluateIsolationResults(	List<Test> tests, String source, String destination,
+													String middlebox) {
 		Verification v = new Verification();
-		boolean isUnsat = false;
+		boolean isSat = false;
 		int unsatCounter = 0;
 		for (Test t : tests) {
 			v.getTests().add(t);
 
 			if (t.getResult().equals("SAT")) {
-				isUnsat = true;
+				isSat = true;
 			}
-			if (t.getResult().equals("UNKNOWN")) {
+			else if (t.getResult().equals("UNKNOWN")) {
 				v.setResult("UNKNWON");
+				v.setComment("Isolation property with source '"	+ source + "', destination '" + destination
+								+ "' and middlebox '" + middlebox + "' is UNKNOWN because although '" + source
+								+ "' cannot reach '" + middlebox + "' in any path from '" + source + "' to '"
+								+ destination + "' which traverses middlebox '" + middlebox
+								+ "' at least one reachability test between '" + source + "' and '" + middlebox
+								+ "' returned UNKNOWN (see below all the paths that have been checked)");
 			}
-			if (t.getResult().equals("UNSAT")) {
+			else if (t.getResult().equals("UNSAT")) {
 				unsatCounter++;
 			}
 		}
-		if (isUnsat)
+		if (isSat) {
 			v.setResult("UNSAT");
-		else if (unsatCounter == tests.size())
+			v.setComment("Isolation property with source '"	+ source + "', destination '" + destination
+							+ "' and middlebox '" + middlebox + "' is UNSATISFIED because reachability between '"
+							+ source + "' and '" + middlebox + "' is SATISFIED in at least one path between '" + source
+							+ "' and '" + destination + "' which traverses middlebox '" + middlebox
+							+ "' (see below all the paths that have been checked)");
+		}
+		else if (unsatCounter == tests.size()) {
 			v.setResult("SAT");
+			v.setComment("Isolation property with source '"	+ source + "', destination '" + destination
+							+ "' and middlebox '" + middlebox + "' is SATISFIED because reachability between '" + source
+							+ "' and '" + middlebox + "' is UNSATISFIED in all paths between '" + source + "' and '"
+							+ destination + "' which traverse middlebox '" + middlebox
+							+ "' (see below all the paths that have been checked)");
+		}
 		return v;
 
 	}
@@ -747,26 +806,68 @@ public class VerificationService {
 
 	}
 
+	private void extractPathsWithoutMiddlebox(List<List<String>> sanitizedPaths, String middleboxName) {
+		List<List<String>> pathsToBeRemoved = new ArrayList<List<String>>();
+		for (List<String> path : sanitizedPaths) {
+			boolean middleboxFound = false;
+			for (String node : path) {
+				if (node.equals(middleboxName)) {
+					middleboxFound = true;
+					break;
+				}
+			}
+			if (middleboxFound) {
+				pathsToBeRemoved.add(path);
+			}
+		}
+
+		for (List<String> path : pathsToBeRemoved) {
+			sanitizedPaths.remove(path);
+		}
+
+	}
+
 	private Verification traversalVerification(Graph graph, Node sourceNode, Node destinationNode, Node middleboxNode) {
 
 		Paths paths = getPaths(graph, sourceNode, destinationNode);
 		if (paths.getPath().size() == 0) {
-			System.out.println("No paths between '"	+ sourceNode.getName() + "' and '" + destinationNode.getName()
-								+ "'");
-			return new Verification("UNSAT");
+			return new Verification("UNSAT",
+									"There are no available paths between '"	+ sourceNode.getName() + "' and '"
+												+ destinationNode.getName() + "'");
 		}
 
-		List<List<String>> sanitizedPaths = sanitizePaths(paths);
+		List<List<String>> pathsBetweenSourceAndDestination = sanitizePaths(paths);
 
-		printListsOfStrings("Before pruning", sanitizedPaths);
+		printListsOfStrings("Before pruning", pathsBetweenSourceAndDestination);
 
-		eliminateLoopsInPaths(sanitizedPaths);
+		eliminateLoopsInPaths(pathsBetweenSourceAndDestination);
 
-		printListsOfStrings("After pruning", sanitizedPaths);
+		printListsOfStrings("After pruning", pathsBetweenSourceAndDestination);
 
-		extractPathsWithMiddlebox(sanitizedPaths, middleboxNode.getName());
+		if (pathsBetweenSourceAndDestination.isEmpty()) {
+			return new Verification("UNSAT",
+									"There are no available paths between '"	+ sourceNode.getName() + "' and '"
+												+ destinationNode.getName() + "'");
+		}
 
-		printListsOfStrings("After middlebox research", sanitizedPaths);
+		List<Test> tests = extractTestsFromPaths(graph, pathsBetweenSourceAndDestination, "UNKNOWN");
+
+		List<List<String>> pathsWithMiddlebox = new ArrayList<List<String>>();
+		for (List<String> path : pathsBetweenSourceAndDestination) {
+			pathsWithMiddlebox.add(path);
+		}
+
+		extractPathsWithMiddlebox(pathsWithMiddlebox, middleboxNode.getName());
+
+		if (pathsWithMiddlebox.isEmpty()) {
+			return new Verification("UNSAT",
+									tests,
+									"There are no paths between '"	+ sourceNode.getName() + "' and '"
+											+ destinationNode.getName() + "' which traverse middlebox '"
+											+ middleboxNode.getName() + "'. See below all the available paths");
+		}
+
+		printListsOfStrings("After middlebox research", pathsWithMiddlebox);
 
 		File tempDir = null;
 
@@ -778,7 +879,7 @@ public class VerificationService {
 		}
 
 		String chainsFile = tempDir.getAbsolutePath() + "/chains.json";
-		generateChainsFile(graph, sanitizedPaths, chainsFile);
+		generateChainsFile(graph, pathsWithMiddlebox, chainsFile);
 
 		String configFile = tempDir.getAbsolutePath() + "/config.json";
 		generateConfigFile(graph, configFile);
@@ -787,15 +888,15 @@ public class VerificationService {
 		generateTestScenarios(chainsFile, configFile, traversalScenariosBasename);
 
 		String traversalTestsBasename = tempDir.getAbsolutePath() + "/TraversalTest";
-		generateTests(	sanitizedPaths.size(),
+		generateTests(	pathsWithMiddlebox.size(),
 						traversalScenariosBasename,
 						sourceNode.getName(),
-						middleboxNode.getName(),
+						destinationNode.getName(),
 						traversalTestsBasename);
 
 		List<File> sourceFiles = new ArrayList<File>();
 		List<File> classFiles = new ArrayList<File>();
-		prepareForCompilationAndExecution(	sanitizedPaths.size(),
+		prepareForCompilationAndExecution(	pathsWithMiddlebox.size(),
 											traversalScenariosBasename,
 											traversalTestsBasename,
 											sourceFiles,
@@ -803,13 +904,89 @@ public class VerificationService {
 
 		compileFiles(sourceFiles, tempDir.getAbsolutePath());
 
-		List<Test> tests = runFiles(tempDir.getAbsolutePath(), sanitizedPaths, graph, classFiles);
+		tests = runFiles(tempDir.getAbsolutePath(), pathsWithMiddlebox, graph, classFiles);
 
-		return evaluateTraversalResults(tests);
+		for (Test t : tests) {
+			if (t.getResult().equals("UNSAT")) {
+				return new Verification("UNSAT",
+										tests,
+										"There is at least a path between '"	+ sourceNode.getName() + "' and '"
+												+ destinationNode.getName() + "' traversing middlebox '"
+												+ middleboxNode.getName() + "' where '" + sourceNode.getName()
+												+ "' cannot reach '" + destinationNode.getName()
+												+ "'. See below the paths that have been checked");
+			}
+			if (t.getResult().equals("UNKNOWN")) {
+				return new Verification("UNKNOWN",
+										tests,
+										"There is at least a path between '"	+ sourceNode.getName() + "' and '"
+												+ destinationNode.getName() + "' traversing middlebox '"
+												+ middleboxNode.getName() + "' where it is not guaranteed that '"
+												+ sourceNode.getName() + "' can effectively reach '"
+												+ destinationNode.getName()
+												+ "'. See below the paths that have been checked");
+			}
+		}
+
+		extractPathsWithoutMiddlebox(pathsBetweenSourceAndDestination, middleboxNode.getName());
+
+		if (pathsBetweenSourceAndDestination.isEmpty()) {
+			return new Verification("SAT",
+									tests,
+									"All the paths between node '"	+ sourceNode.getName() + "' and '"
+											+ destinationNode.getName() + "' traverse middlebox '"
+											+ middleboxNode.getName() + "'");
+		}
+
+		printListsOfStrings("Paths that don't contain middlebox '"	+ middleboxNode.getName() + "':",
+							pathsBetweenSourceAndDestination);
+
+		tempDir = null;
+
+		try {
+			tempDir = createTempDir("traversal");
+		}
+		catch (IOException e) {
+			throw new InternalServerErrorException("Unable to perform verification: " + e.getMessage());
+		}
+
+		chainsFile = tempDir.getAbsolutePath() + "/chains.json";
+		generateChainsFile(graph, pathsBetweenSourceAndDestination, chainsFile);
+
+		configFile = tempDir.getAbsolutePath() + "/config.json";
+		generateConfigFile(graph, configFile);
+
+		traversalScenariosBasename = tempDir.getAbsolutePath() + "/TraversalScenario";
+		generateTestScenarios(chainsFile, configFile, traversalScenariosBasename);
+
+		traversalTestsBasename = tempDir.getAbsolutePath() + "/TraversalTest";
+		generateTests(	pathsBetweenSourceAndDestination.size(),
+						traversalScenariosBasename,
+						sourceNode.getName(),
+						destinationNode.getName(),
+						traversalTestsBasename);
+
+		sourceFiles = new ArrayList<File>();
+		classFiles = new ArrayList<File>();
+		prepareForCompilationAndExecution(	pathsBetweenSourceAndDestination.size(),
+											traversalScenariosBasename,
+											traversalTestsBasename,
+											sourceFiles,
+											classFiles);
+
+		compileFiles(sourceFiles, tempDir.getAbsolutePath());
+
+		tests = runFiles(tempDir.getAbsolutePath(), pathsBetweenSourceAndDestination, graph, classFiles);
+
+		return evaluateTraversalResults(tests,
+										sourceNode.getName(),
+										destinationNode.getName(),
+										middleboxNode.getName());
 
 	}
 
-	private Verification evaluateTraversalResults(List<Test> tests) {
+	private Verification evaluateTraversalResults(	List<Test> tests, String source, String destination,
+													String middlebox) {
 		Verification v = new Verification();
 		boolean isSat = false;
 		int unsatCounter = 0;
@@ -819,17 +996,28 @@ public class VerificationService {
 			if (t.getResult().equals("SAT")) {
 				isSat = true;
 			}
-			if (t.getResult().equals("UNKNOWN")) {
+			else if (t.getResult().equals("UNKNOWN")) {
 				v.setResult("UNKNWON");
+				v.setComment("There is at least one path from '"	+ source + "' to '" + destination
+								+ "' that doesn't traverse middlebox '" + middlebox
+								+ "' (see below all the paths that have been checked)");
 			}
-			if (t.getResult().equals("UNSAT")) {
+			else if (t.getResult().equals("UNSAT")) {
 				unsatCounter++;
 			}
 		}
-		if (isSat)
-			v.setResult("SAT");
-		else if (unsatCounter == tests.size())
+		if (isSat) {
 			v.setResult("UNSAT");
+			v.setComment("There is at least one path from '"	+ source + "' to '" + destination
+							+ "' that doesn't traverse middlebox '" + middlebox
+							+ "' (see below all the paths that have been checked)");
+		}
+		else if (unsatCounter == tests.size()) {
+			v.setResult("SAT");
+			v.setComment("The only available paths from '"	+ source + "' to '" + destination
+							+ "' are those that traverse middlebox '" + middlebox
+							+ "' (see below the alternative paths that have been checked and are unusable)");
+		}
 		return v;
 	}
 
@@ -837,18 +1025,24 @@ public class VerificationService {
 		Paths paths = getPaths(graph, sourceNode, destinationNode);
 
 		if (paths.getPath().size() == 0) {
-			System.out.println("No paths between '"	+ sourceNode.getName() + "' and '" + destinationNode.getName()
-								+ "'");
-			return new Verification("UNSAT");
+			return new Verification("UNSAT",
+									"There are no available paths between '"	+ sourceNode.getName() + "' and '"
+												+ destinationNode.getName() + "'");
 		}
 
 		List<List<String>> sanitizedPaths = sanitizePaths(paths);
-		// debug print
+
 		printListsOfStrings("Before pruning", sanitizedPaths);
 
 		eliminateLoopsInPaths(sanitizedPaths);
-		// debug print
+
 		printListsOfStrings("After pruning", sanitizedPaths);
+
+		if (sanitizedPaths.isEmpty()) {
+			return new Verification("UNSAT",
+									"There are no available paths between '"	+ sourceNode.getName() + "' and '"
+												+ destinationNode.getName() + "'");
+		}
 
 		File tempDir = null;
 
@@ -887,10 +1081,10 @@ public class VerificationService {
 
 		List<Test> tests = runFiles(tempDir.getAbsolutePath(), sanitizedPaths, graph, classFiles);
 
-		return evaluateReachabilityResult(tests);
+		return evaluateReachabilityResult(tests, sourceNode.getName(), destinationNode.getName());
 	}
 
-	private Verification evaluateReachabilityResult(List<Test> tests) {
+	private Verification evaluateReachabilityResult(List<Test> tests, String source, String destination) {
 		Verification v = new Verification();
 		boolean sat = false;
 		int unsat = 0;
@@ -900,17 +1094,25 @@ public class VerificationService {
 			if (t.getResult().equals("SAT")) {
 				sat = true;
 			}
-			if (t.getResult().equals("UNKNOWN")) {
+			else if (t.getResult().equals("UNKNOWN")) {
 				v.setResult("UNKNWON");
+				v.setComment("Reachability from '"	+ source + "' to '" + destination
+								+ "' is unknown. See all the checked paths below");
 			}
-			if (t.getResult().equals("UNSAT")) {
+			else if (t.getResult().equals("UNSAT")) {
 				unsat++;
 			}
 		}
-		if (sat)
+		if (sat) {
 			v.setResult("SAT");
-		else if (unsat == tests.size())
+			v.setComment("There is at least one path '"	+ source + "' can use to reach '" + destination
+							+ "'. See all the available paths below");
+		}
+		else if (unsat == tests.size()) {
 			v.setResult("UNSAT");
+			v.setComment("There isn't any path '"	+ source + "' can use to reach '" + destination
+							+ "'. See all the checked paths below");
+		}
 		return v;
 	}
 

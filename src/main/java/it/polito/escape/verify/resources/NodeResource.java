@@ -3,6 +3,7 @@ package it.polito.escape.verify.resources;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -26,11 +27,11 @@ import it.polito.escape.verify.exception.BadRequestException;
 import it.polito.escape.verify.model.Configuration2;
 import it.polito.escape.verify.model.ErrorMessage;
 import it.polito.escape.verify.model.Graph;
+import it.polito.escape.verify.model.Neighbour;
 import it.polito.escape.verify.model.Node;
 import it.polito.escape.verify.service.GraphService;
 import it.polito.escape.verify.service.NodeService;
 
-//@Path("/")
 @Api( hidden= true, value = "", description = "Manage nodes" )
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -125,6 +126,9 @@ public class NodeResource {
     	nodeCopy.setId(node.getId());
     	nodeCopy.setName(node.getName());
     	nodeCopy.setFunctional_type(node.getFunctional_type());
+    	Map<Long,Neighbour> nodes = new HashMap<Long,Neighbour>();
+    	nodes.putAll(node.getNeighbours());
+    	nodeCopy.setNeighbours(nodes);
     	nodeConfiguration.setId(nodeCopy.getName());
     	nodeCopy.setConfiguration(nodeConfiguration);
     	

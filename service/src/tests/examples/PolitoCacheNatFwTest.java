@@ -156,6 +156,7 @@ public class PolitoCacheNatFwTest {
 	    acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_politoNat"),nctx.am.get("ip_hostB")));
 	    
 	    //Configuring middleboxes
+	    politoNat.natModel(nctx.am.get("ip_politoNat"));
 	    politoNat.setInternalAddress(ia);
 	    politoCache.installCache(new NetworkObject[]{hostA});
 	    politoFw.addAcls(acl);

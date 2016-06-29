@@ -31,7 +31,8 @@ devices_to_classes = {  "webclient" : "PolitoWebClient",
                         "mailserver" : "PolitoMailServer",
                         "antispam" : "PolitoAntispam",
                         "endpoint": "EndHost",
-                        "dpi": "PolitoIDS"
+                        "dpi": "PolitoIDS",
+                        "endhost": "PolitoEndHost"
                      }
 devices_to_configuration_methods = {"webclient" : "",
                                     "webserver" : "",
@@ -42,7 +43,8 @@ devices_to_configuration_methods = {"webclient" : "",
                                     "mailserver" : "",
                                     "antispam" : "",
                                     "endpoint": "",
-                                    "dpi": "installIDS"
+                                    "dpi": "installIDS",
+                                    "endhost": "installEndHost"
                                     }
 devices_initialization = {  "webclient" : ["webserver"],
                             "webserver" : [],
@@ -53,7 +55,8 @@ devices_initialization = {  "webclient" : ["webserver"],
                             "mailserver" : [],
                             "antispam" : [],
                             "endpoint": [],
-                            "dpi":[]                          
+                            "dpi":[] ,
+                            "endhost":[]                         
                           }
 
 devices_configuration_methods = {   "webclient" : "list",
@@ -65,7 +68,8 @@ devices_configuration_methods = {   "webclient" : "list",
                                     "mailserver" : "list",
                                     "antispam" : "list",
                                     "endpoint": "list" ,
-                                    "dpi":"list"
+                                    "dpi":"list",
+                                    "endhost":"list"
                                  }
 
 devices_configuration_fields = {    "webclient" : "",
@@ -77,5 +81,6 @@ devices_configuration_fields = {    "webclient" : "",
                                     "mailserver" : "",
                                     "antispam" : "",
                                     "endpoint": "",
-                                    "dpi":"words blacklist" 
+                                    "dpi":"words blacklist",
+                                    "endhost":""
                                  }

@@ -23,7 +23,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import it.polito.escape.verify.model.ErrorMessage;
 import it.polito.escape.verify.model.Neighbour;
-import it.polito.escape.verify.model.Node;
 import it.polito.escape.verify.service.NeighbourService;
 
 //@Path("/")

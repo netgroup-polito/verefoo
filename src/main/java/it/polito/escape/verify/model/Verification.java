@@ -11,6 +11,7 @@ public class Verification {
 
 	@ApiModelProperty(example = "SAT | UNSAT | UNKNOWN")
 	private String		result;
+	private String comment;
 	private List<Test>	tests	= new ArrayList<Test>();
 
 	public Verification() {
@@ -19,6 +20,17 @@ public class Verification {
 
 	public Verification(String result) {
 		this.result = result;
+	}
+	
+	public Verification(String result, List<Test> tests, String comment){
+		this.result = result;
+		this.tests = tests;
+		this.comment = comment;
+	}
+	
+	public Verification(String result, String comment){
+		this.result = result;
+		this.comment = comment;
 	}
 
 	public String getResult() {
@@ -36,5 +48,13 @@ public class Verification {
 	public void setTests(List<Test> tests) {
 		this.tests = tests;
 	}
-
+	
+	public String getComment() {
+		return comment;
+	}
+	
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+	
 }

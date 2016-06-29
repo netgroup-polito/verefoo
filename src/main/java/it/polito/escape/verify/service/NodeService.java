@@ -171,7 +171,7 @@ public class NodeService {
 			//validate configuration against schema file
 			validateNodeConfigurationAgainstSchemaFile(node, configurationJsonNode);
 			//validate configuration names
-			if (!node.getFunctional_type().equals("dpi")){
+			if (!node.getFunctional_type().equals("dpi") && !node.getFunctional_type().equals("endhost")){
 				JsonValidationService jsonValidator = new JsonValidationService(graph, node);
 				jsonValidator.myValidation(configurationJsonNode);
 			}

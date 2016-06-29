@@ -31,6 +31,7 @@ from config import *
 from utility import *
 from routing_generator import *
 import logging
+from pip._vendor.pkg_resources import null_ns_handler
 
 
 #global variables
@@ -118,6 +119,8 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                                         if chn[node["id"]]["functional_type"] == "webclient":
                                             value_item[str(config_item_key)] = "ip_" + str(config_item_value)
                                             config[node["id"]][key].append(value_item)
+                                        elif chn[node["id"]]["functional_type"] == "endhost":
+                                            config[node["id"]][key].append(value_item)
                                         else:
                                             value_item["ip_" + str(config_item_key)] = "ip_" + str(config_item_value)
                                             del value_item[config_item_key]
@@ -126,6 +129,8 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                                         #key is not a node or value is not a node
                                         if chn[node["id"]]["functional_type"] == "webclient" and config_item_value in chn.keys():
                                             value_item[str(config_item_key)] = "ip_" + str(config_item_value)
+                                        else:
+                                            value_item[str(config_item_key)] = str(config_item_value)    
                                         config[node["id"]][key].append(value_item)
                             else:
                                 #if value_item in ips:
@@ -133,7 +138,7 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                                     #config[node["id"]][key].append(value_item)
                                     config[node["id"]][key].append("ip_" + str(value_item))
                                 elif chn[node["id"]]["functional_type"] == "dpi":
-                                    config[node["id"]][key].append("PolitoIDS." + str(value_item))
+                                    config[node["id"]][key].append("String.valueOf(\"" + str(value_item) + "\").hashCode()")
                     else:
                         config[node["id"]][key] = value
                 except KeyError, e:
@@ -142,9 +147,7 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                     logging.debug(key + " probably doesn't belong to the current chain, thus it will be skipped")
                     #sys.exit(1)
                     continue
-    logging.debug(pformat((config)))
-    #debug print of the configuration                
-    
+                
     logging.debug(pformat((config)))
         
     #prepare a few more helpful data structures
@@ -212,7 +215,8 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
         c.writeln("import mcnet.components.Network;")
         c.writeln("import mcnet.components.NetworkObject;")
         c.writeln("import mcnet.components.Tuple;")
-
+        c.writeln("import mcnet.netobjs.PacketModel;")
+        
         #import components
         for i in range(0, len(nodes_names)):
             c.writeln("import mcnet.netobjs." + devices_to_classes[str(nodes_types[i])] + ";")
@@ -308,13 +312,15 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                     config_elements = formatted_list_from_list_of_maps(config[nodes_names[i]]["configuration"])
                     for address in config_elements:
                         c.writeln("ia" + str(i) + ".add(nctx.am.get(\"" + address + "\"));")
+                    c.writeln(nodes_names[i] + ".natModel(nctx.am.get(\"ip_" + nodes_names[i] + "\"));")
                     c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(ia" + str(i) +");")
                 elif nodes_types[i] == "firewall":
                     c.writeln("ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl" + str(i) + " = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();")
                     for config_element in config[nodes_names[i]]["configuration"]:
                         if isinstance(config_element,dict):
                             for key, value in config_element.items():
-                                c.writeln("acl" + str(i) + ".add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(\"" + key + "\"),nctx.am.get(\"" + value + "\")));")
+                                if key in chn.keys() and value in chn.keys():
+                                    c.writeln("acl" + str(i) + ".add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(\"" + key + "\"),nctx.am.get(\"" + value + "\")));")
                     c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(acl" + str(i) + ");")
                 elif nodes_types[i] == "antispam":
                     c.write(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(new int[]")
@@ -324,6 +330,24 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                     c.write(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(new int[]")
                     c.write_list(formatted_list_from_list_of_maps(config[nodes_names[i]]["configuration"]), wrapper="")
                     c.append(");\n")
+                elif nodes_types[i] == "endhost":
+                    c.writeln("PacketModel pModel" + str(i) + " = new PacketModel();")
+                    if "body" in config[nodes_names[i]]["configuration"][0]:
+                        c.writeln("pModel" + str(i) + ".setBody(String.valueOf(\"" + config[nodes_names[i]]["configuration"][0]["body"] + "\").hashCode());")
+                    if "sequence" in config[nodes_names[i]]["configuration"][0]:
+                        c.writeln("pModel" + str(i) + ".setSeq(" + config[nodes_names[i]]["configuration"][0]["sequence"] + ");")
+                    if "protocol" in config[nodes_names[i]]["configuration"][0]:
+                        c.writeln("pModel" + str(i) + ".setProto(nctx." + config[nodes_names[i]]["configuration"][0]["protocol"] + ");")
+                    if "email_from" in config[nodes_names[i]]["configuration"][0]:
+                        c.writeln("pModel" + str(i) + ".setEmailFrom(String.valueOf(\"" + config[nodes_names[i]]["configuration"][0]["email_from"] + "\").hashCode());")
+                    if "url" in config[nodes_names[i]]["configuration"][0]:
+                        c.writeln("pModel" + str(i) + ".setUrl(String.valueOf(\"" + config[nodes_names[i]]["configuration"][0]["url"] + "\").hashCode());")
+                    if "options" in config[nodes_names[i]]["configuration"][0]:
+                        c.writeln("pModel" + str(i) + ".setOptions(String.valueOf(\"" + config[nodes_names[i]]["configuration"][0]["options"] + "\").hashCode());")
+                    if "destination" in config[nodes_names[i]]["configuration"][0]:
+                        c.writeln("pModel" + str(i) + ".setIp_dest(nctx.am.get(\"" + config[nodes_names[i]]["configuration"][0]["destination"] + "\"));")
+                        
+                    c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(pModel" + str(i) + ");")
 
         c.writeln("check = new Checker(ctx,nctx,net);")
         c.dedent()
