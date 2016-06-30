@@ -63,7 +63,8 @@ public class PolitoMailClient extends NetworkObject{
 	        politoMailClient = z3Node;
 	        net = (Network)args[0][1];
 	        nctx = (NetContext)args[0][2];
-	        mailClientRules();
+	        DatatypeExpr ipServer = (DatatypeExpr) args[0][3];
+	        mailClientRules(ipServer);
 	        //net.saneSend(this);
 	    }
 		
@@ -79,7 +80,7 @@ public class PolitoMailClient extends NetworkObject{
 			solver.add(constraints.toArray(constr));
 		}
 
-	    private void mailClientRules (){
+	    private void mailClientRules (DatatypeExpr ipServer){
 	    	Expr n_0 = ctx.mkConst("PolitoMailClient_"+politoMailClient+"_n_0", nctx.node);
 	    	Expr p_0 = ctx.mkConst("PolitoMailClient_"+politoMailClient+"_p_0", nctx.packet);
 	    	IntExpr t_0 = ctx.mkIntConst("PolitoMailClient_"+politoMailClient+"_t_0");
@@ -113,7 +114,7 @@ public class PolitoMailClient extends NetworkObject{
 //            Constraint6		send(politoMailClient, n_0, p, t_0) -> p.dest == ip_mailServer
             constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0}, 
                     ctx.mkImplies((BoolExpr)nctx.send.apply(politoMailClient, n_0, p_0, t_0), 
-                            ctx.mkEq(nctx.pf.get("dest").apply(p_0), nctx.am.get("ip_mailServer"))),1,null,null,null,null));
+                            ctx.mkEq(nctx.pf.get("dest").apply(p_0), ipServer)),1,null,null,null,null));
 		}
 }	
 	

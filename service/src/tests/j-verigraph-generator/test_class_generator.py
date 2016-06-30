@@ -116,7 +116,7 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                                 for config_item_key, config_item_value in value_item.items():
                                     #key is a node and value is a node
                                     if config_item_key in chn.keys() and config_item_value in chn.keys():                                                                              #valid config, add it
-                                        if chn[node["id"]]["functional_type"] == "webclient":
+                                        if chn[node["id"]]["functional_type"] == "webclient" or chn[node["id"]]["functional_type"] == "mailclient":
                                             value_item[str(config_item_key)] = "ip_" + str(config_item_value)
                                             config[node["id"]][key].append(value_item)
                                         elif chn[node["id"]]["functional_type"] == "endhost":
@@ -127,7 +127,7 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                                             config[node["id"]][key].append(value_item)
                                     else:
                                         #key is not a node or value is not a node
-                                        if chn[node["id"]]["functional_type"] == "webclient" and config_item_value in chn.keys():
+                                        if (chn[node["id"]]["functional_type"] == "webclient" or chn[node["id"]]["functional_type"] == "mailclient") and config_item_value in chn.keys():
                                             value_item[str(config_item_key)] = "ip_" + str(config_item_value)
                                         else:
                                             value_item[str(config_item_key)] = str(config_item_value)    

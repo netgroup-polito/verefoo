@@ -11,30 +11,7 @@ public class DatabaseClass {
 	
 	private static ConcurrentHashMap<Long, Graph> graphs = new ConcurrentHashMap<>();
 	
-	public static ConcurrentHashMap<Long, Graph> getGraphs() {
-		Graph graph = new Graph();
-		graph.setId(1L);
-		//node 1
-		Node node = new Node();
-		node.setId(1);
-		node.setName("matteo");
-		node.setFunctional_type("endpoint");
-		//neighbour 1 of node 1
-		Neighbour neighbour = new Neighbour();
-		neighbour.setId(1);
-		neighbour.setName("ciccone");
-		node.getNeighbours().put(1L, neighbour);
-		//node 2
-		Node node2 = new Node();
-		node2.setId(2);
-		node2.setName("ciccone");
-		node2.setFunctional_type("nat");
-		//add node 1
-		graph.getNodes().put(1L, node);
-		//add node 2
-		graph.getNodes().put(2L, node2);
-		graphs.put(1L, graph);
-		
+	public static ConcurrentHashMap<Long, Graph> getGraphs() {	
 		return graphs;
 	}
 	public synchronized static int getNumberOfGraphs(){
