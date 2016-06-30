@@ -1,0 +1,52 @@
+{
+   "nodes":[
+      {
+         "name":"user1",
+         "functional_type":"endhost",
+         "neighbours":[
+            {
+               "name":"nat"
+            }
+         ],
+        "configuration": 
+            [
+				{
+					"body": "sex",
+					"protocol": "HTTP_REQUEST",
+					"destination": "webserver"
+				}
+            ]
+      },
+      {
+         "name":"nat",
+         "functional_type":"nat",
+         "neighbours":[
+            {
+               "name":"dpi"
+            }
+         ],
+         "configuration":[
+            "user1"
+         ]
+      },
+      {
+         "name":"dpi",
+         "functional_type":"dpi",
+         "neighbours":[
+            {
+               "name":"webserver"
+            }
+         ],
+         "configuration":[
+           "sex", "droga"
+         ]
+      },
+      {
+         "name":"webserver",
+         "functional_type":"endpoint",
+         "neighbours":[
+
+         ]
+      }
+   ]
+}
