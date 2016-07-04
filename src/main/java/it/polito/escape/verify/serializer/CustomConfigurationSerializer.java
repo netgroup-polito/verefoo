@@ -1,4 +1,4 @@
-package it.polito.escape.verify.resources;
+package it.polito.escape.verify.serializer;
 
 import java.io.IOException;
 
@@ -8,12 +8,12 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 import it.polito.escape.verify.exception.InternalServerErrorException;
-import it.polito.escape.verify.model.Configuration2;
+import it.polito.escape.verify.model.Configuration;
 
-public class CustomConfiguration2Serializer extends JsonSerializer<Configuration2> {
+public class CustomConfigurationSerializer extends JsonSerializer<Configuration> {
 
 	@Override
-	public void serialize(Configuration2 conf, JsonGenerator jgen, SerializerProvider provider)
+	public void serialize(Configuration conf, JsonGenerator jgen, SerializerProvider provider)
 			throws IOException, JsonProcessingException {
 		try {
 			jgen.writeObject(conf.getConfiguration());

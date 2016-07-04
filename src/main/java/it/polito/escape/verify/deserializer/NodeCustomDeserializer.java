@@ -1,4 +1,4 @@
-package it.polito.escape.verify.resources;
+package it.polito.escape.verify.deserializer;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 
 import it.polito.escape.verify.exception.BadRequestException;
 import it.polito.escape.verify.exception.InternalServerErrorException;
-import it.polito.escape.verify.model.Configuration2;
+import it.polito.escape.verify.model.Configuration;
 import it.polito.escape.verify.model.Neighbour;
 import it.polito.escape.verify.model.Node;
 
@@ -38,9 +38,9 @@ public class NodeCustomDeserializer extends JsonDeserializer<Node> {
 			node.setFunctional_type(functionalType);
 
 			if (configurationJson == null)
-				node.setConfiguration(new Configuration2(node.getName(), "", new ObjectMapper().createArrayNode()));
+				node.setConfiguration(new Configuration(node.getName(), "", new ObjectMapper().createArrayNode()));
 			else {
-				Configuration2 conf = node.getConfiguration();
+				Configuration conf = node.getConfiguration();
 				conf.setId(node.getName());
 				conf.setDescription("");
 				conf.setConfiguration(configurationJson);

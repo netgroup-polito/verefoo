@@ -14,8 +14,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import it.polito.escape.verify.resources.CustomMapSerializer;
-import it.polito.escape.verify.resources.NodeCustomDeserializer;
+import it.polito.escape.verify.deserializer.NodeCustomDeserializer;
+import it.polito.escape.verify.serializer.CustomMapSerializer;
 
 @ApiModel(value = "Node")
 @XmlRootElement
@@ -37,7 +37,7 @@ public class Node {
 
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
-	private Configuration2			configuration	= new Configuration2();
+	private Configuration			configuration	= new Configuration();
 
 	@ApiModelProperty(	name = "neighbours",
 						notes = "Neighbours",
@@ -52,7 +52,7 @@ public class Node {
 
 	}
 
-	public Node(long id, String name, String functional_type, Configuration2 configuration) {
+	public Node(long id, String name, String functional_type, Configuration configuration) {
 		this.id = id;
 		this.name = name;
 		this.functional_type = functional_type;
@@ -76,11 +76,11 @@ public class Node {
 	}
 
 	// @XmlTransient
-	public Configuration2 getConfiguration() {
+	public Configuration getConfiguration() {
 		return configuration;
 	}
 
-	public void setConfiguration(Configuration2 configuration) {
+	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
 	}
 

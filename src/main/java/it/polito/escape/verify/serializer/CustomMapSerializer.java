@@ -1,4 +1,4 @@
-package it.polito.escape.verify.resources;
+package it.polito.escape.verify.serializer;
 
 import java.io.IOException;
 import java.util.Map;

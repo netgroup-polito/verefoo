@@ -24,6 +24,8 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+import javax.ws.rs.ProcessingException;
+import javax.xml.bind.JAXBException;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -35,7 +37,7 @@ import it.polito.escape.verify.exception.BadRequestException;
 import it.polito.escape.verify.exception.DataNotFoundException;
 import it.polito.escape.verify.exception.ForbiddenException;
 import it.polito.escape.verify.exception.InternalServerErrorException;
-import it.polito.escape.verify.model.Configuration2;
+import it.polito.escape.verify.model.Configuration;
 import it.polito.escape.verify.model.Entry;
 import it.polito.escape.verify.model.Graph;
 import it.polito.escape.verify.model.Neighbour;
@@ -60,7 +62,7 @@ public class VerificationService {
 
 	}
 
-	public Paths getPaths(Graph graph, Node sourceNode, Node destinationNode) {
+	private Paths getPaths(Graph graph, Node sourceNode, Node destinationNode) {
 
 		String source = sourceNode.getName() + "_" + sourceNode.getId();
 		String destination = destinationNode.getName() + "_" + destinationNode.getId();
@@ -141,9 +143,6 @@ public class VerificationService {
 		}
 		// end debug print
 
-		// Neo4jManagerClient client = new
-		// Neo4jManagerClient("http://localhost:8080/Project-Neo4jManager/rest/",
-		// source, destination, endpoints, firewalls, routingTable);
 		Neo4jManagerClient client = new Neo4jManagerClient(	"http://localhost:8080/neo4jmanager/rest/",
 															source,
 															destination,
@@ -151,7 +150,24 @@ public class VerificationService {
 															firewalls,
 															routingTable);
 
-		Paths paths = client.runClient();
+		Paths paths = null;
+		try {
+			paths = client.getPaths();
+		}
+		catch (JAXBException e) {
+			throw new InternalServerErrorException("Error generating input for neo4jmanager: " + e.getMessage());
+		}
+		catch (ProcessingException e) {
+			throw new InternalServerErrorException("Response of neo4jmanager doesn't contain any path: "
+													+ e.getMessage());
+		}
+		catch (IllegalStateException e) {
+			throw new InternalServerErrorException("Error getting a response from neo4jmanager, no input stream for paths or input stream already consumed: "
+													+ e.getMessage());
+		}
+		catch (Exception e) {
+			throw new InternalServerErrorException("Unable to continue due to a neo4jmanager error: " + e.getMessage());
+		}
 
 		return paths;
 
@@ -184,7 +200,7 @@ public class VerificationService {
 		return sanitizedPaths;
 	}
 
-	static public Map<String, Long> toMap(List<String> lst) {
+	static private Map<String, Long> toMap(List<String> lst) {
 		return lst.stream().collect(Collectors.groupingBy(s -> s, Collectors.counting()));
 	}
 
@@ -212,7 +228,7 @@ public class VerificationService {
 		}
 	}
 
-	public static File createTempDir(String prefix) throws IOException {
+	private static File createTempDir(String prefix) throws IOException {
 		String tmpDirStr = System.getProperty("java.io.tmpdir");
 		if (tmpDirStr == null) {
 			throw new IOException("System property 'java.io.tmpdir' does not specify a tmp dir");
@@ -300,7 +316,7 @@ public class VerificationService {
 		for (Node n : graph.getNodes().values()) {
 			JSONObject node = new JSONObject();
 			// JSONArray configuration = new JSONArray();
-			Configuration2 nodeConfig = n.getConfiguration();
+			Configuration nodeConfig = n.getConfiguration();
 			JsonNode configuration = nodeConfig.getConfiguration();
 
 			node.put("configuration", configuration);
@@ -483,7 +499,7 @@ public class VerificationService {
 
 	}
 
-	public int runIt(File filename, String folder) {
+	private int runIt(File filename, String folder) {
 		int endIndex = filename.getName().lastIndexOf(".");
 		String filenameNoExtension;
 		if (endIndex == -1) {
@@ -512,7 +528,7 @@ public class VerificationService {
 		}
 	}
 
-	public List<Test> runFiles(String folder, List<List<String>> paths, Graph graph, List<File> files) {
+	private List<Test> runFiles(String folder, List<List<String>> paths, Graph graph, List<File> files) {
 		List<Test> tests = new ArrayList<Test>();
 		for (int i = 0; i < files.size(); i++) {
 			System.out.println("Running test file \"" + files.get(i).getAbsolutePath() + "\"");
@@ -530,8 +546,9 @@ public class VerificationService {
 
 		return tests;
 	}
-
-	public static boolean deleteDir(File dir) {
+	
+	@SuppressWarnings("unused")
+	private static boolean deleteDir(File dir) {
 		if (dir.isDirectory()) {
 			String[] children = dir.list();
 			for (int i = 0; i < children.length; i++) {
@@ -592,13 +609,13 @@ public class VerificationService {
 		Node destinationNode = graph.searchNodeByName(verificationBean.getDestination());
 
 		if (sourceNode == null) {
-			throw new BadRequestException("The 'source' parameter is not valid, please insert the name of an existing node");
+			throw new BadRequestException("The 'source' parameter '" + source + "' is not valid, please insert the name of an existing node");
 		}
 		if (destinationNode == null) {
-			throw new BadRequestException("The 'destination' parameter is not valid, please insert the name of an existing node");
+			throw new BadRequestException("The 'destination' parameter '" + destination + "' is not valid, please insert the name of an existing node");
 		}
 		if ((!type.equals("reachability")) && (!type.equals("isolation")) && (!type.equals("traversal"))) {
-			throw new BadRequestException("The 'verification' parameter '"	+ type
+			throw new BadRequestException("The 'type' parameter '"	+ type
 											+ "' is not valid: valid types are: 'reachability', 'isolation' and 'traversal'");
 		}
 
@@ -617,7 +634,7 @@ public class VerificationService {
 
 				middleboxNode = graph.searchNodeByName(middlebox);
 				if (middleboxNode == null) {
-					throw new BadRequestException("The 'middlebox' parameter is not valid, please insert the name of an existing node");
+					throw new BadRequestException("The 'middlebox' parameter '" + middlebox + "' is not valid, please insert the name of an existing node");
 				}
 				if (middleboxNode.getFunctional_type().equals("endpoint")) {
 					throw new BadRequestException("'"	+ middlebox
@@ -633,7 +650,7 @@ public class VerificationService {
 
 				middleboxNode = graph.searchNodeByName(middlebox);
 				if (middleboxNode == null) {
-					throw new BadRequestException("The 'middlebox' parameter is not valid, please insert the name of an existing node");
+					throw new BadRequestException("The 'middlebox' parameter '" + middlebox + "' is not valid, please insert the name of an existing node");
 				}
 				if (middleboxNode.getFunctional_type().equals("endpoint")) {
 					throw new BadRequestException("'"	+ middlebox
@@ -659,11 +676,11 @@ public class VerificationService {
 
 		List<List<String>> sanitizedPaths = sanitizePaths(paths);
 
-		printListsOfStrings("Before pruning", sanitizedPaths);
+		printListsOfStrings("Before loops removal", sanitizedPaths);
 
 		eliminateLoopsInPaths(sanitizedPaths);
 
-		printListsOfStrings("After pruning", sanitizedPaths);
+		printListsOfStrings("After loops removal", sanitizedPaths);
 
 		if (sanitizedPaths.isEmpty()) {
 			return new Verification("UNSAT",
@@ -683,7 +700,7 @@ public class VerificationService {
 											+ middleboxNode.getName() + "'. See below all the available paths.");
 		}
 
-		printListsOfStrings("After middlebox research", sanitizedPaths);
+		printListsOfStrings("Paths with middlebox '" + middleboxNode.getName() + "'", sanitizedPaths);
 
 		File tempDir = null;
 
@@ -838,11 +855,11 @@ public class VerificationService {
 
 		List<List<String>> pathsBetweenSourceAndDestination = sanitizePaths(paths);
 
-		printListsOfStrings("Before pruning", pathsBetweenSourceAndDestination);
+		printListsOfStrings("Before loops removal", pathsBetweenSourceAndDestination);
 
 		eliminateLoopsInPaths(pathsBetweenSourceAndDestination);
 
-		printListsOfStrings("After pruning", pathsBetweenSourceAndDestination);
+		printListsOfStrings("After loops removal", pathsBetweenSourceAndDestination);
 
 		if (pathsBetweenSourceAndDestination.isEmpty()) {
 			return new Verification("UNSAT",
@@ -867,7 +884,7 @@ public class VerificationService {
 											+ middleboxNode.getName() + "'. See below all the available paths");
 		}
 
-		printListsOfStrings("After middlebox research", pathsWithMiddlebox);
+		printListsOfStrings("Paths with middlebox '" + middleboxNode.getName() + "'", pathsWithMiddlebox);
 
 		File tempDir = null;
 
@@ -929,7 +946,8 @@ public class VerificationService {
 		}
 
 		extractPathsWithoutMiddlebox(pathsBetweenSourceAndDestination, middleboxNode.getName());
-
+		printListsOfStrings("Paths without middlebox '" + middleboxNode.getName() + "'", pathsBetweenSourceAndDestination);
+		
 		if (pathsBetweenSourceAndDestination.isEmpty()) {
 			return new Verification("SAT",
 									tests,
@@ -937,9 +955,6 @@ public class VerificationService {
 											+ destinationNode.getName() + "' traverse middlebox '"
 											+ middleboxNode.getName() + "'");
 		}
-
-		printListsOfStrings("Paths that don't contain middlebox '"	+ middleboxNode.getName() + "':",
-							pathsBetweenSourceAndDestination);
 
 		tempDir = null;
 
@@ -1032,11 +1047,11 @@ public class VerificationService {
 
 		List<List<String>> sanitizedPaths = sanitizePaths(paths);
 
-		printListsOfStrings("Before pruning", sanitizedPaths);
+		printListsOfStrings("Before loops removal", sanitizedPaths);
 
 		eliminateLoopsInPaths(sanitizedPaths);
 
-		printListsOfStrings("After pruning", sanitizedPaths);
+		printListsOfStrings("After loops removal", sanitizedPaths);
 
 		if (sanitizedPaths.isEmpty()) {
 			return new Verification("UNSAT",

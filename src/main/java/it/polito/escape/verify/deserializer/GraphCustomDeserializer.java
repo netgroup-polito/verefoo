@@ -1,4 +1,4 @@
-package it.polito.escape.verify.resources;
+package it.polito.escape.verify.deserializer;
 
 import java.io.IOException;
 import java.util.List;
@@ -56,9 +56,7 @@ public class GraphCustomDeserializer extends JsonDeserializer<Graph>{
 		catch (IOException e) {
 			throw new InternalServerErrorException("I/O error parsing a graph: " + e.getMessage());
 		}
-		for (Node node : nodeList){
-			System.out.println("Node name: " + node.getName());
-		}
+
 		Graph graph = new Graph();
 		Map<Long, Node> nodes = graph.getNodes();
 		

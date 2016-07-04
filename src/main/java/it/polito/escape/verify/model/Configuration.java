@@ -9,14 +9,14 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import it.polito.escape.verify.resources.Configuration2CustomDeserializer;
-import it.polito.escape.verify.resources.CustomConfiguration2Serializer;
+import it.polito.escape.verify.deserializer.ConfigurationCustomDeserializer;
+import it.polito.escape.verify.serializer.CustomConfigurationSerializer;
 
 @XmlRootElement
 @ApiModel("Configuration")
-@JsonSerialize(using = CustomConfiguration2Serializer.class)
-@JsonDeserialize(using = Configuration2CustomDeserializer.class)
-public class Configuration2 {
+@JsonSerialize(using = CustomConfigurationSerializer.class)
+@JsonDeserialize(using = ConfigurationCustomDeserializer.class)
+public class Configuration {
 
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
@@ -29,11 +29,11 @@ public class Configuration2 {
 	@ApiModelProperty(required = true)
 	private JsonNode	configuration;
 
-	public Configuration2() {
+	public Configuration() {
 
 	}
 
-	public Configuration2(String id, String description, JsonNode configuration) {
+	public Configuration(String id, String description, JsonNode configuration) {
 		this.id = id;
 		this.description = description;
 		this.configuration = configuration;

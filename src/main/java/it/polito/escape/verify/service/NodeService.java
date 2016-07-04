@@ -17,14 +17,14 @@ import it.polito.escape.verify.database.DatabaseClass;
 import it.polito.escape.verify.exception.BadRequestException;
 import it.polito.escape.verify.exception.DataNotFoundException;
 import it.polito.escape.verify.exception.ForbiddenException;
-import it.polito.escape.verify.model.Configuration2;
+import it.polito.escape.verify.model.Configuration;
 import it.polito.escape.verify.model.Graph;
 import it.polito.escape.verify.model.Neighbour;
 import it.polito.escape.verify.model.Node;
 
 public class NodeService {
 
-	private Map<Long, Graph> graphs = DatabaseClass.getGraphs();
+	private Map<Long, Graph> graphs = DatabaseClass.getInstance().getGraphs();
 
 	public NodeService() {
 
@@ -80,16 +80,21 @@ public class NodeService {
 		graphCopy.setNodes(new HashMap<Long, Node>(graph.getNodes()));
 		graphCopy.getNodes().remove(node.getId());
 		
-		int numberOfNeighbours = 0;
-		for(Neighbour neighbour : node.getNeighbours().values()){
-			neighbour.setId(++numberOfNeighbours);
+//		int numberOfNeighbours = 0;
+//		for(Neighbour neighbour : node.getNeighbours().values()){
+//			neighbour.setId(++numberOfNeighbours);
+//		}
+		
+		for (Map.Entry<Long, Neighbour> neighbourEntry : node.getNeighbours().entrySet()){
+			neighbourEntry.getValue().setId(neighbourEntry.getKey());
 		}
 		
 		validateNode(graphCopy, node);
-
-		nodes.put(node.getId(), node);
-
-		return node;
+		
+		synchronized(this){
+			nodes.put(node.getId(), node);
+			return node;
+		}
 	}
 
 	public Node removeNode(long graphId, long nodeId) {
@@ -103,8 +108,10 @@ public class NodeService {
 		if (graph == null)
 			throw new DataNotFoundException("Graph with id " + graphId + " not found");
 		Map<Long, Node> nodes = graph.getNodes();
-
-		return nodes.remove(nodeId);
+		
+		synchronized(this){
+			return nodes.remove(nodeId);
+		}
 	}
 
 	public Node addNode(long graphId, Node node) {
@@ -119,15 +126,23 @@ public class NodeService {
 		validateNode(graph, node);
 
 		synchronized (this) {
-			node.setId(DatabaseClass.getGraphNumberOfNodes(graphId) + 1);
+			node.setId(DatabaseClass.getInstance().getGraphNumberOfNodes(graphId) + 1);
 		}
 		
-		int numberOfNeighbours = 0;
-		for(Neighbour neighbour : node.getNeighbours().values()){
-			neighbour.setId(++numberOfNeighbours);
+//		int numberOfNeighbours = 0;
+		
+		for (Map.Entry<Long, Neighbour> neighbourEntry : node.getNeighbours().entrySet()){
+			neighbourEntry.getValue().setId(neighbourEntry.getKey());
 		}
-		nodes.put(node.getId(), node);
-		return node;
+		
+//		for (Neighbour neighbour : node.getNeighbours().values()) {
+//			neighbour.setId(++numberOfNeighbours);
+//		}
+		
+		synchronized(this){
+			nodes.put(node.getId(), node);
+			return node;
+		}
 	}
 
 	public Node searchByName(long graphId, String nodeName) {
@@ -165,7 +180,7 @@ public class NodeService {
 		Node nodeFound = graph.searchNodeByName(node.getName());
 		if( (nodeFound!= null) && (nodeFound.equals(node) == false))
 			throw new BadRequestException("Node validation failed: graph already has a node named '" + node.getName() + "'");
-		Configuration2 configuration = node.getConfiguration();
+		Configuration configuration = node.getConfiguration();
 		if (configuration != null){
 			JsonNode configurationJsonNode = configuration.getConfiguration();
 			//validate configuration against schema file

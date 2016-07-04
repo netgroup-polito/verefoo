@@ -14,8 +14,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import it.polito.escape.verify.resources.CustomMapSerializer;
-import it.polito.escape.verify.resources.GraphCustomDeserializer;
+import it.polito.escape.verify.deserializer.GraphCustomDeserializer;
+import it.polito.escape.verify.serializer.CustomMapSerializer;
 
 @ApiModel(value = "Graph")
 @XmlRootElement

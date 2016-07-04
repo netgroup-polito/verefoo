@@ -319,7 +319,7 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                     for config_element in config[nodes_names[i]]["configuration"]:
                         if isinstance(config_element,dict):
                             for key, value in config_element.items():
-                                if key in chn.keys() and value in chn.keys():
+                                if key in ips and value in ips:
                                     c.writeln("acl" + str(i) + ".add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(\"" + key + "\"),nctx.am.get(\"" + value + "\")));")
                     c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(acl" + str(i) + ");")
                 elif nodes_types[i] == "antispam":

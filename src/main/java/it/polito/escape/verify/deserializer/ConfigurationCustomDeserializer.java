@@ -1,4 +1,4 @@
-package it.polito.escape.verify.resources;
+package it.polito.escape.verify.deserializer;
 
 import java.io.IOException;
 
@@ -9,17 +9,17 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import it.polito.escape.verify.exception.InternalServerErrorException;
-import it.polito.escape.verify.model.Configuration2;
+import it.polito.escape.verify.model.Configuration;
 
-public class Configuration2CustomDeserializer extends JsonDeserializer<Configuration2> {
+public class ConfigurationCustomDeserializer extends JsonDeserializer<Configuration> {
 
 	@Override
-	public Configuration2 deserialize(JsonParser jp, DeserializationContext ctxt)	throws IOException,
+	public Configuration deserialize(JsonParser jp, DeserializationContext ctxt)	throws IOException,
 																					JsonProcessingException {
 		try {
 			JsonNode root = jp.getCodec().readTree(jp);
 
-			return new Configuration2("", "", root);
+			return new Configuration("", "", root);
 		}
 		catch (JsonProcessingException e) {
 			throw new InternalServerErrorException("Error parsing configuration: " + e.getMessage());

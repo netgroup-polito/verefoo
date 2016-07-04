@@ -1,4 +1,4 @@
-package it.polito.escape.verify.resources;
+package it.polito.escape.verify.deserializer;
 
 import java.io.IOException;
 import java.io.InputStream;
