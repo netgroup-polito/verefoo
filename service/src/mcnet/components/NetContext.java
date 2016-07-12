@@ -117,7 +117,12 @@ public class NetContext extends Core{
 	    	}
 	        
 	        //Addresses for this network
-	    	address = ctx.mkEnumSort("Address", addresses);
+	        String[] new_addr = new String[addresses.length+1];
+	        for(int k=0;k<addresses.length;k++)
+	        	new_addr[k] = addresses[k];
+	        
+	        new_addr[new_addr.length-1] = "null";
+	    	address = ctx.mkEnumSort("Address", new_addr);
 	    	for(int i=0;i<address.getConsts().length;i++){
 	    		DatatypeExpr fd  = (DatatypeExpr)address.getConst(i);
 	    		am.put(fd.toString(),fd);
@@ -132,10 +137,10 @@ public class NetContext extends Core{
 	        // -   options: A representation for IP options. (Integer)
 
 	        String[] fieldNames = new String[]{
-	        		"src","dest","origin","orig_body","body","seq","proto","emailFrom","url","options"};
+	        		"src","dest","inner_src","inner_dest","origin","orig_body","body","seq","proto","emailFrom","url","options","encrypted"};
 	        Sort[] srt = new Sort[]{
-	        		address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),
-	        		ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort()};
+	        		address,address,address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),
+	        		ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkBoolSort()};
 	        Constructor packetcon = ctx.mkConstructor("packet", "is_packet", fieldNames, srt, null);
 	        packet = ctx.mkDatatypeSort("packet",  new Constructor[] {packetcon});
 
@@ -172,7 +177,9 @@ public class NetContext extends Core{
 	    	// Basic constraints for the overall model
 	        Expr n_0 = ctx.mkConst("ctx_base_n_0", node);
 	        Expr n_1 = ctx.mkConst("ctx_base_n_1", node);
+	        Expr n_2 = ctx.mkConst("ctx_base_n_2", node);
 	        Expr p_0 = ctx.mkConst("ctx_base_p_0", packet);
+	        Expr p_1 = ctx.mkConst("ctx_base_p_1", packet);
 	        IntExpr t_0 = ctx.mkIntConst("ctx_base_t_0");
 	        IntExpr t_1 = ctx.mkIntConst("ctx_base_t_1");
 
@@ -231,6 +238,71 @@ public class NetContext extends Core{
 	                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0}, 
 	                    ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0, t_0), 
 	                    		ctx.mkGt(t_0,ctx.mkInt(0))),1,null,null,null,null));
+	        
+	        // Extra constriants for supporting the VPN gateway
+	        constraints.add(
+	                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0}, 
+	                    ctx.mkImplies(
+	                    	ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0, t_0),
+	                    			  ctx.mkNot(ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.am.get("null")))),
+	                    	ctx.mkNot(ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.pf.get("inner_dest").apply(p_0)))),1,null,null,null,null));
+	        
+	        constraints.add(
+	                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0}, 
+	                    ctx.mkImplies(
+	                    	ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0, t_0),
+	                    			  ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.am.get("null"))),
+	                    			  ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.pf.get("inner_dest").apply(p_0))),1,null,null,null,null));
+	        
+	        constraints.add(
+	                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0}, 
+	                    ctx.mkImplies(
+	                    	ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0, t_0),
+	                    			  ctx.mkEq(this.pf.get("inner_dest").apply(p_0), this.am.get("null"))),
+	                    			  ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.pf.get("inner_dest").apply(p_0))),1,null,null,null,null));
+	        
+	        constraints.add(
+	                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0}, 
+	                    ctx.mkImplies(
+	                    	ctx.mkAnd((BoolExpr)recv.apply(n_0, n_1, p_0, t_0),
+	                    			  ctx.mkNot(ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.am.get("null")))),
+	                    			  ctx.mkNot(ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.pf.get("inner_dest").apply(p_0)))),1,null,null,null,null));
+	        
+	        constraints.add(
+	                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0}, 
+	                    ctx.mkImplies(
+	                    	ctx.mkAnd((BoolExpr)recv.apply(n_0, n_1, p_0, t_0),
+	                    			  ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.am.get("null"))),
+	                    			  ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.pf.get("inner_dest").apply(p_0))),1,null,null,null,null));
+	        
+	        constraints.add(
+	                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0}, 
+	                    ctx.mkImplies(
+	                    	ctx.mkAnd((BoolExpr)recv.apply(n_0, n_1, p_0, t_0),
+	                    			  ctx.mkEq(this.pf.get("inner_dest").apply(p_0), this.am.get("null"))),
+	                    			  ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.pf.get("inner_dest").apply(p_0))),1,null,null,null,null));
+	        
+	        constraints.add(
+	        		ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0, n_2, p_1, t_1},
+	        			ctx.mkImplies(
+	        				ctx.mkAnd(
+	        					ctx.mkLt(t_1, t_0),
+	        					(BoolExpr)send.apply(n_0, n_1, p_0, t_0),
+	        					(BoolExpr)this.pf.get("encrypted").apply(p_1),
+	        					(BoolExpr)recv.apply(n_2, n_0, p_1, t_1),
+	        					(BoolExpr)this.pf.get("encrypted").apply(p_0)),
+	        				ctx.mkAnd(
+	        					ctx.mkEq(this.pf.get("inner_src").apply(p_1), this.pf.get("inner_src").apply(p_0)),
+	        					ctx.mkEq(this.pf.get("inner_dest").apply(p_1), this.pf.get("inner_dest").apply(p_0)),
+	        					ctx.mkEq(this.pf.get("origin").apply(p_1), this.pf.get("origin").apply(p_0)),
+							    ctx.mkEq(this.pf.get("orig_body").apply(p_1), this.pf.get("orig_body").apply(p_0)),
+							    ctx.mkEq(this.pf.get("body").apply(p_1), this.pf.get("body").apply(p_0)),
+							    ctx.mkEq(this.pf.get("seq").apply(p_1), this.pf.get("seq").apply(p_0)),
+							    ctx.mkEq(this.pf.get("proto").apply(p_1), this.pf.get("proto").apply(p_0)),
+							    ctx.mkEq(this.pf.get("emailFrom").apply(p_1), this.pf.get("emailFrom").apply(p_0)),
+							    ctx.mkEq(this.pf.get("url").apply(p_1), this.pf.get("url").apply(p_0)),
+							    ctx.mkEq(this.pf.get("options").apply(p_1), this.pf.get("options").apply(p_0)))),1,null,null,null,null)
+	        		);
 	    }
 
 	    /**

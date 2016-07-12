@@ -115,8 +115,8 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                             if isinstance(value_item, dict):
                                 for config_item_key, config_item_value in value_item.items():
                                     #key is a node and value is a node
-                                    if config_item_key in chn.keys() and config_item_value in chn.keys():                                                                              #valid config, add it
-                                        if chn[node["id"]]["functional_type"] == "webclient" or chn[node["id"]]["functional_type"] == "mailclient":
+                                    if config_item_key in chn.keys() and config_item_value in chn.keys():
+                                        if chn[node["id"]]["functional_type"] == "webclient" or chn[node["id"]]["functional_type"] == "mailclient" or chn[node["id"]]["functional_type"] == "vpnaccess" or chn[node["id"]]["functional_type"] == "vpnexit":
                                             value_item[str(config_item_key)] = "ip_" + str(config_item_value)
                                             config[node["id"]][key].append(value_item)
                                         elif chn[node["id"]]["functional_type"] == "endhost":
@@ -348,6 +348,12 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                         c.writeln("pModel" + str(i) + ".setIp_dest(nctx.am.get(\"" + config[nodes_names[i]]["configuration"][0]["destination"] + "\"));")
                         
                     c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(pModel" + str(i) + ");")
+                elif nodes_types[i] == "vpnaccess":
+                    c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(nctx.am.get(\"" + nodes_addresses[i] + "\"), nctx.am.get(\"" + config[nodes_names[i]]["configuration"][0]["vpnexit"] + "\"));")
+                elif nodes_types[i] == "vpnexit":
+                    c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(nctx.am.get(\"" + config[nodes_names[i]]["configuration"][0]["vpnaccess"] + "\"), nctx.am.get(\"" + nodes_addresses[i] + "\"));")
+            elif nodes_types[i] == "fieldmodifier":
+                c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "();")
 
         c.writeln("check = new Checker(ctx,nctx,net);")
         c.dedent()

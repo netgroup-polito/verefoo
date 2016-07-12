@@ -32,7 +32,10 @@ devices_to_classes = {  "webclient" : "PolitoWebClient",
                         "antispam" : "PolitoAntispam",
                         "endpoint": "EndHost",
                         "dpi": "PolitoIDS",
-                        "endhost": "PolitoEndHost"
+                        "endhost": "PolitoEndHost",
+                        "vpnaccess":"PolitoVpnAccess",
+                        "vpnexit":"PolitoVpnExit",
+                        "fieldmodifier":"PolitoFieldModifier"
                      }
 devices_to_configuration_methods = {"webclient" : "",
                                     "webserver" : "",
@@ -44,7 +47,10 @@ devices_to_configuration_methods = {"webclient" : "",
                                     "antispam" : "",
                                     "endpoint": "",
                                     "dpi": "installIDS",
-                                    "endhost": "installEndHost"
+                                    "endhost": "installEndHost",
+                                    "vpnaccess":"vpnAccessModel",
+                                    "vpnexit":"vpnAccessModel",
+                                    "fieldmodifier":"installFieldModifier"
                                     }
 devices_initialization = {  "webclient" : ["webserver"],
                             "webserver" : [],
@@ -56,7 +62,10 @@ devices_initialization = {  "webclient" : ["webserver"],
                             "antispam" : [],
                             "endpoint": [],
                             "dpi":[] ,
-                            "endhost":[]                         
+                            "endhost":[],
+                            "vpnaccess":[],
+                            "vpnexit":[],
+                            "fieldmodifier":[]                        
                           }
 
 devices_configuration_methods = {   "webclient" : "list",
@@ -69,7 +78,10 @@ devices_configuration_methods = {   "webclient" : "list",
                                     "antispam" : "list",
                                     "endpoint": "list" ,
                                     "dpi":"list",
-                                    "endhost":"list"
+                                    "endhost":"list",
+                                    "vpnaccess":"list",
+                                    "vpnexit":"list",
+                                    "fieldmodifier":"list"
                                  }
 
 devices_configuration_fields = {    "webclient" : "",
@@ -82,5 +94,8 @@ devices_configuration_fields = {    "webclient" : "",
                                     "antispam" : "",
                                     "endpoint": "",
                                     "dpi":"words blacklist",
-                                    "endhost":""
+                                    "endhost":"",
+                                    "vpnaccess":"vpn access",
+                                    "vpnexit":"vpn exit",
+                                    "fieldmodifier":"field modifier"
                                  }
