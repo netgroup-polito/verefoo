@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Testcase",
+    "description": "A testcase for VeriGraph",
+    "type": "object",
+    "properties": {
+        "id": {
+            "description": "The unique identifier for a testcase",
+            "type": "integer"
+        },
+        "name": {
+            "description": "Name of the testcase",
+            "type": "string"
+        },
+        "description": {
+            "description": "A description for the testcase, specifying what is going to be tested",
+            "type": "string"
+        },
+        "policy_url_parameters": {
+            "description": "The set of parameters to be passed in GET request to the verification service",
+            "type": "string"
+        },
+        "result": {
+            "description": "The set of parameters to be passed in GET request to the verification service",
+            "type": "string"
+        },
+        "graph": {
+        	"description": "The graph to be tested",
+        	"type": "object"
+        }
+    },
+    "required": ["id", "name", "policy_url_parameters", "result", "graph"]
+}
