@@ -66,6 +66,7 @@ public class GraphService {
 		
 		synchronized(this){
 			graphs.put(graph.getId(), graph);
+			DatabaseClass.persistDatabase();
 			return graph;
 		}
 	}
@@ -106,6 +107,7 @@ public class GraphService {
 		
 		synchronized(this){
 			graphs.put(graph.getId(), graph);
+			DatabaseClass.persistDatabase();
 			return graph;
 		}
 	}

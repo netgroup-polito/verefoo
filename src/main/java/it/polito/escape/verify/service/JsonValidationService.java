@@ -1,7 +1,11 @@
 package it.polito.escape.verify.service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map.Entry;
+
+import org.apache.commons.lang3.text.WordUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -10,8 +14,10 @@ import it.polito.escape.verify.model.Graph;
 import it.polito.escape.verify.model.Node;
 
 public class JsonValidationService {
-	private Graph graph = new Graph();
-	private Node node = new Node();
+
+	private Graph	graph	= new Graph();
+
+	private Node	node	= new Node();
 
 	public JsonValidationService() {
 
@@ -30,17 +36,19 @@ public class JsonValidationService {
 		return false;
 	}
 
-	public void myValidation(JsonNode node) {
+	public void validateFieldsAgainstNodeNames(JsonNode node) {
 		if (node.isTextual()) {
 			boolean isValid = validateFieldAgainstNodeNames(node.asText());
 			if (!isValid) {
 				System.out.println(node.asText() + " is not a valid string!");
-				throw new BadRequestException("String '" + node.asText() + "' is not valid for the configuration of node '" + this.node.getName() + "'");
+				throw new BadRequestException("String '"	+ node.asText()
+												+ "' is not valid for the configuration of node '" + this.node.getName()
+												+ "'");
 			}
 		}
 		if (node.isArray()) {
 			for (JsonNode object : node) {
-				myValidation(object);
+				validateFieldsAgainstNodeNames(object);
 			}
 		}
 		if (node.isObject()) {
@@ -48,9 +56,72 @@ public class JsonValidationService {
 
 			while (iter.hasNext()) {
 				Entry<String, JsonNode> item = iter.next();
-				myValidation(item.getValue());
+				validateFieldsAgainstNodeNames(item.getValue());
 			}
 		}
 
+	}
+
+	public boolean validateNodeConfiguration() {
+		String className = WordUtils.capitalize(node.getFunctional_type()) + "Validator";
+
+		Class<?> validator;
+		try {
+			validator = Class.forName("it.polito.escape.verify.validation." + className);
+		}
+		catch (ClassNotFoundException e) {
+			System.out.println(className	+ " not found, configuration properties of node '" + node.getName()
+								+ "' will be validated against node names");
+			return false;
+		}
+
+		Class<?> graphClass;
+		Class<?> nodeClass;
+		Class<?> configurationClass;
+		try {
+			graphClass = Class.forName("it.polito.escape.verify.model.Graph");
+			nodeClass = Class.forName("it.polito.escape.verify.model.Node");
+			configurationClass = Class.forName("it.polito.escape.verify.model.Configuration");
+		}
+		catch (ClassNotFoundException e) {
+			throw new RuntimeException("Model classes not found");
+		}
+
+		Class<?>[] paramTypes = new Class[3];
+		paramTypes[0] = graphClass;
+		paramTypes[1] = nodeClass;
+		paramTypes[2] = configurationClass;
+
+		String methodName = "validate";
+
+		Object instance;
+		try {
+			instance = validator.newInstance();
+		}
+		catch (InstantiationException e) {
+			throw new RuntimeException("'" + className + "' cannot be instantiated");
+		}
+		catch (IllegalAccessException e) {
+			throw new RuntimeException("Illegal access to '" + className + "' instantiation");
+		}
+
+		Method myMethod;
+		try {
+			myMethod = validator.getDeclaredMethod(methodName, paramTypes);
+		}
+		catch (NoSuchMethodException e) {
+			throw new RuntimeException("'" + methodName + "' method has to be implemented in " + className + " class");
+		}
+		try {
+			myMethod.invoke(instance, graph, node, node.getConfiguration());
+		}
+		catch (IllegalAccessException e) {
+			throw new RuntimeException("Illegal access to '" + methodName + "' method in " + className + " instance");
+		}
+		catch (InvocationTargetException e) {
+			throw new BadRequestException("Validation failed for node '"	+ node.getName() + "': "
+											+ e.getTargetException().getMessage());
+		}
+		return true;
 	}
 }

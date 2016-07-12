@@ -58,6 +58,10 @@ public class GraphCustomDeserializer extends JsonDeserializer<Graph>{
 		}
 
 		Graph graph = new Graph();
+		if(root.get("id") != null){
+			long graphId = root.get("id").asLong();
+			graph.setId(graphId);
+		}
 		Map<Long, Node> nodes = graph.getNodes();
 		
 		long numberOfNodes = 0;

@@ -83,6 +83,7 @@ public class NeighbourService {
 		synchronized (this) {
 			neighbour.setId(neighbours.size() + 1);
 			neighbours.put(neighbour.getId(), neighbour);
+			DatabaseClass.persistDatabase();
 			return neighbour;
 		}
 	}
@@ -116,6 +117,7 @@ public class NeighbourService {
 		
 		synchronized (this) {
 			neighbours.put(neighbour.getId(), neighbour);
+			DatabaseClass.persistDatabase();
 			return neighbour;
 		}
 	}

@@ -34,6 +34,10 @@ public class NodeCustomDeserializer extends JsonDeserializer<Node> {
 			String functionalType = root.get("functional_type").asText();
 
 			Node node = new Node();
+			if(root.get("id") != null){
+				long nodeId = root.get("id").asLong();
+				node.setId(nodeId);
+			}
 			node.setName(nodeName);
 			node.setFunctional_type(functionalType);
 

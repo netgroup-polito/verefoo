@@ -11,7 +11,7 @@ public class GenericExceptionMapper implements ExceptionMapper<Throwable> {
 
 	@Override
 	public Response toResponse(Throwable exception) {
-		ErrorMessage errorMessage = new ErrorMessage(	exception.getMessage(),
+		ErrorMessage errorMessage = new ErrorMessage("Generic exception: "	+ exception.getMessage(),
 														500,
 														"http://localhost:8080/verify/api-docs/");
 		return Response.status(Status.INTERNAL_SERVER_ERROR).entity(errorMessage).build();

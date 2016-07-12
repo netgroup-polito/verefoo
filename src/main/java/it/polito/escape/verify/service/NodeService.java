@@ -74,25 +74,26 @@ public class NodeService {
 		if (localNode == null) {
 			throw new DataNotFoundException("Node with id " + node.getId() + " not found in graph with id " + graphId);
 		}
-		
+
 		Graph graphCopy = new Graph();
 		graphCopy.setId(graph.getId());
 		graphCopy.setNodes(new HashMap<Long, Node>(graph.getNodes()));
 		graphCopy.getNodes().remove(node.getId());
-		
-//		int numberOfNeighbours = 0;
-//		for(Neighbour neighbour : node.getNeighbours().values()){
-//			neighbour.setId(++numberOfNeighbours);
-//		}
-		
-		for (Map.Entry<Long, Neighbour> neighbourEntry : node.getNeighbours().entrySet()){
+
+		// int numberOfNeighbours = 0;
+		// for(Neighbour neighbour : node.getNeighbours().values()){
+		// neighbour.setId(++numberOfNeighbours);
+		// }
+
+		for (Map.Entry<Long, Neighbour> neighbourEntry : node.getNeighbours().entrySet()) {
 			neighbourEntry.getValue().setId(neighbourEntry.getKey());
 		}
-		
+
 		validateNode(graphCopy, node);
-		
-		synchronized(this){
+
+		synchronized (this) {
 			nodes.put(node.getId(), node);
+			DatabaseClass.persistDatabase();
 			return node;
 		}
 	}
@@ -108,8 +109,8 @@ public class NodeService {
 		if (graph == null)
 			throw new DataNotFoundException("Graph with id " + graphId + " not found");
 		Map<Long, Node> nodes = graph.getNodes();
-		
-		synchronized(this){
+
+		synchronized (this) {
 			return nodes.remove(nodeId);
 		}
 	}
@@ -128,19 +129,20 @@ public class NodeService {
 		synchronized (this) {
 			node.setId(DatabaseClass.getInstance().getGraphNumberOfNodes(graphId) + 1);
 		}
-		
-//		int numberOfNeighbours = 0;
-		
-		for (Map.Entry<Long, Neighbour> neighbourEntry : node.getNeighbours().entrySet()){
+
+		// int numberOfNeighbours = 0;
+
+		for (Map.Entry<Long, Neighbour> neighbourEntry : node.getNeighbours().entrySet()) {
 			neighbourEntry.getValue().setId(neighbourEntry.getKey());
 		}
-		
-//		for (Neighbour neighbour : node.getNeighbours().values()) {
-//			neighbour.setId(++numberOfNeighbours);
-//		}
-		
-		synchronized(this){
+
+		// for (Neighbour neighbour : node.getNeighbours().values()) {
+		// neighbour.setId(++numberOfNeighbours);
+		// }
+
+		synchronized (this) {
 			nodes.put(node.getId(), node);
+			DatabaseClass.persistDatabase();
 			return node;
 		}
 	}
@@ -166,39 +168,40 @@ public class NodeService {
 			throw new BadRequestException("Node validation failed: cannot validate null graph");
 		if (node == null)
 			throw new BadRequestException("Node validation failed: cannot validate null node");
-		
+
 		if (node.getName() == null)
 			throw new BadRequestException("Node validation failed: node 'name' field cannot be null");
 		if (node.getFunctional_type() == null)
 			throw new BadRequestException("Node validation failed: node 'functional_type' field cannot be null");
-		
-		if(node.getName().equals(""))
+
+		if (node.getName().equals(""))
 			throw new BadRequestException("Node validation failed: node 'name' field cannot be an empty string");
-		if(node.getFunctional_type().equals(""))
+		if (node.getFunctional_type().equals(""))
 			throw new BadRequestException("Node validation failed: node 'functional_type' field cannot be an empty string");
-		
+
 		Node nodeFound = graph.searchNodeByName(node.getName());
-		if( (nodeFound!= null) && (nodeFound.equals(node) == false))
-			throw new BadRequestException("Node validation failed: graph already has a node named '" + node.getName() + "'");
+		if ((nodeFound != null) && (nodeFound.equals(node) == false))
+			throw new BadRequestException("Node validation failed: graph already has a node named '"	+ node.getName()
+											+ "'");
 		Configuration configuration = node.getConfiguration();
-		if (configuration != null){
+		if (configuration != null) {
 			JsonNode configurationJsonNode = configuration.getConfiguration();
-			//validate configuration against schema file
+			// validate configuration against schema file
 			validateNodeConfigurationAgainstSchemaFile(node, configurationJsonNode);
-			//validate configuration names
-			if (!node.getFunctional_type().equals("dpi") && !node.getFunctional_type().equals("endhost")){
-				JsonValidationService jsonValidator = new JsonValidationService(graph, node);
-				jsonValidator.myValidation(configurationJsonNode);
+			JsonValidationService jsonValidator = new JsonValidationService(graph, node);
+			boolean hasCustomValidator = jsonValidator.validateNodeConfiguration();
+			if (!hasCustomValidator) {
+				jsonValidator.validateFieldsAgainstNodeNames(configurationJsonNode);
 			}
 		}
-		
-		//validate neighbours
+
+		// validate neighbours
 		Map<Long, Neighbour> nodeNeighboursMap = node.getNeighbours();
-		if(nodeNeighboursMap == null)
+		if (nodeNeighboursMap == null)
 			throw new BadRequestException("Node validation failed: node 'neighbours' cannot be null");
-		for(Neighbour neighbour : nodeNeighboursMap.values()){
+		for (Neighbour neighbour : nodeNeighboursMap.values()) {
 			NeighbourService.validateNeighbour(graph, node, neighbour);
-		}		
+		}
 	}
 
 	public static void validateNodeConfigurationAgainstSchemaFile(Node node, JsonNode configurationJson) {
@@ -207,7 +210,7 @@ public class NodeService {
 		File schemaFile = new File(System.getProperty("catalina.base") + "/webapps/verify/json/" + schemaFileName);
 
 		if (!schemaFile.exists()) {
-			throw new ForbiddenException("Functional type '"+ node.getFunctional_type()
+			throw new ForbiddenException("Functional type '"	+ node.getFunctional_type()
 											+ "' is not supported! Please edit 'functional_type' field of node '"
 											+ node.getName() + "'");
 		}
@@ -220,7 +223,7 @@ public class NodeService {
 			throw new InternalServerErrorException("Unable to load '" + schemaFileName + "' schema file");
 		}
 		catch (ProcessingException e) {
-			throw new InternalServerErrorException("Unable to resolve '"+ schemaFileName
+			throw new InternalServerErrorException("Unable to resolve '"	+ schemaFileName
 													+ "' schema file as a schema node");
 		}
 
@@ -228,9 +231,10 @@ public class NodeService {
 			ValidationUtils.validateJson(schemaNode, configurationJson);
 		}
 		catch (ProcessingException e) {
-			throw new BadRequestException("Something went wrong trying to validate node '" + node.getName() + "' with the following configuration: '"
-											+ configurationJson.toString() + "' against the json schema '"
-											+ schemaFile.getName() + "': " + e.getMessage());
+			throw new BadRequestException("Something went wrong trying to validate node '"	+ node.getName()
+											+ "' with the following configuration: '" + configurationJson.toString()
+											+ "' against the json schema '" + schemaFile.getName() + "': "
+											+ e.getMessage());
 
 		}
 

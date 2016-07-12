@@ -19,71 +19,83 @@ import it.polito.escape.verify.model.Node;
 import it.polito.escape.verify.service.GraphService;
 
 public class DatabaseClass {
-	
-	private static final DatabaseClass instance = new DatabaseClass();
-	
-	private ConcurrentHashMap<Long, Graph>	graphs			= new ConcurrentHashMap<>();
 
-	private static String							persistenceFile	= System.getProperty("catalina.base") + "/webapps/verify/json/" + "database.json";
-	
-	
-	protected DatabaseClass(){
+	private static final DatabaseClass				instance	= new DatabaseClass();
+
+	private static ConcurrentHashMap<Long, Graph>	graphs;
+
+	private static String							persistenceFile;
+
+	private static boolean							enablePersistence;
+
+	protected DatabaseClass() {
 		initialize();
-		loadDatabase();
+		if (enablePersistence)
+			loadDatabase();
 	}
-	
+
 	private void initialize() {
 		graphs = new ConcurrentHashMap<>();
+		enablePersistence = false;
 		persistenceFile = System.getProperty("catalina.base") + "/webapps/verify/json/" + "database.json";
 	}
 
 	private void loadDatabase() {
 		ObjectMapper mapper = new ObjectMapper();
-		
+
 		List<Graph> parsedGraphs = null;
 		try {
 			File databaseFile = new File(persistenceFile);
-			parsedGraphs = mapper.readValue(databaseFile, TypeFactory.defaultInstance().constructCollectionType(List.class, Graph.class));
+			parsedGraphs = mapper.readValue(databaseFile,
+											TypeFactory.defaultInstance().constructCollectionType(	List.class,
+																									Graph.class));
 		}
 		catch (JsonParseException e) {
-			System.out.println("No database to load");
+			System.out.println("Database not loaded due to a JsonParseException: " + e.getMessage());
 			return;
 		}
 		catch (JsonMappingException e) {
-			System.out.println("No database to load");
+			System.out.println("Database not loaded due to a JsonMappingException: " + e.getMessage());
 			return;
 		}
 		catch (IOException e) {
-			System.out.println("No database to load");
+			System.out.println("Database not loaded due to an IOException: " + e.getMessage());
 			return;
 		}
-		
+
 		System.out.println("Loading database...");
-		
-		
-		for (Graph graph : parsedGraphs){
-			
+
+		for (Graph graph : parsedGraphs) {
+
+			try {
+				GraphService.validateGraph(graph);
+			}
+			catch (Exception e) {
+				System.out.println("Invalid database file: at least one graph is invalid!");
+				return;
+			}
+
 			graph.setId(getNumberOfGraphs() + 1);
-			
-			for (Map.Entry<Long, Node> nodeEntry : graph.getNodes().entrySet()){
+
+			for (Map.Entry<Long, Node> nodeEntry : graph.getNodes().entrySet()) {
 				nodeEntry.getValue().setId(nodeEntry.getKey());
-				
-				for (Map.Entry<Long, Neighbour> neighbourEntry : nodeEntry.getValue().getNeighbours().entrySet()){
+
+				for (Map.Entry<Long, Neighbour> neighbourEntry : nodeEntry.getValue().getNeighbours().entrySet()) {
 					neighbourEntry.getValue().setId(neighbourEntry.getKey());
 				}
 			}
-			
+
 			graphs.put(graph.getId(), graph);
 		}
-		
+
 		System.out.println("Database loaded!");
-		System.out.println(graphs.size() + " added");
+		System.out.println(graphs.size() + " graphs added");
 	}
 
 	public static DatabaseClass getInstance() {
 		return instance;
 	}
-	
+
 	public ConcurrentHashMap<Long, Graph> getGraphs() {
 		return graphs;
 	}
@@ -102,7 +114,9 @@ public class DatabaseClass {
 		return nodes.size();
 	}
 
-	public void persistDatabase() {
+	public static void persistDatabase() {
+		if (!enablePersistence)
+			return;
 		ObjectMapper mapper = new ObjectMapper();
 
 		try {
