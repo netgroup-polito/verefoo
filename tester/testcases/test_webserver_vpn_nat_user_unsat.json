@@ -1,0 +1,82 @@
+{
+	"id": 5,
+	"name": "nat_vpn_test_case_serv_to_user",
+	"description": "This test case contains a graph with client, nat, vpn and server. webserver -> client",
+	"policy_url_parameters": "?type=reachability&source=webserver&destination=user1",
+	"result": "UNSAT",
+	"graph": {
+	   "nodes":[
+	      {
+	         "name":"user1",
+	         "functional_type":"endhost",
+	         "neighbours":[
+	            {
+	               "name":"nat"
+	            }
+	         ],
+	        "configuration": 
+	            [
+					{
+						"body": "cartoon",
+						"protocol": "HTTP_REQUEST",
+						"destination": "webserver"
+					}
+	            ]
+	      },
+	      {
+	         "name":"nat",
+	         "functional_type":"nat",
+	         "neighbours":[
+	            {
+	               "name":"user1"
+	            },
+	            {
+	               "name":"vpnaccess"
+	            }
+	         ],
+	         "configuration":[
+	            "user1"
+	         ]
+	      },
+	      {
+	         "name":"vpnaccess",
+	         "functional_type":"vpnaccess",
+	         "neighbours":[
+	         	{
+	               "name":"nat"
+	            },
+	            {
+	               "name":"vpnexit"
+	            }
+	         ],
+	         "configuration":[
+	            {"vpnexit": "vpnexit"}
+	         ]
+	      },
+	      {
+	         "name":"vpnexit",
+	         "functional_type":"vpnexit",
+	         "neighbours":[
+	            {
+	               "name":"vpnaccess"
+	            },
+	            {
+	               "name":"webserver"
+	            }
+	         ],
+	         "configuration":[
+	            {"vpnaccess": "vpnaccess"}
+	         ]
+	      },
+	      {
+	         "name":"webserver",
+	         "functional_type":"webserver",
+	         "neighbours":[
+	         	{
+	         		"name": "vpnexit"
+	         	}
+	         ]
+	      }
+	   ]
+	}
+}

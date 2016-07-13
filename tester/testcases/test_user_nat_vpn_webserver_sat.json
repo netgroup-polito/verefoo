@@ -1,9 +1,9 @@
 {
-	"id": 1,
-	"name": "simple_test_case",
-	"description": "This test case contains a graph with client, firewall and server",
+	"id": 3,
+	"name": "nat_vpn_test_case",
+	"description": "This test case contains a graph with client, nat, vpn and server",
 	"policy_url_parameters": "?type=reachability&source=user1&destination=webserver",
-	"result": "UNSAT",
+	"result": "SAT",
 	"graph": {
 	   "nodes":[
 	      {
@@ -17,7 +17,7 @@
 	        "configuration": 
 	            [
 					{
-						"body": "sex",
+						"body": "cartoon",
 						"protocol": "HTTP_REQUEST",
 						"destination": "webserver"
 					}
@@ -28,7 +28,10 @@
 	         "functional_type":"nat",
 	         "neighbours":[
 	            {
-	               "name":"dpi"
+	               "name":"user1"
+	            },
+	            {
+	               "name":"vpnaccess"
 	            }
 	         ],
 	         "configuration":[
@@ -36,22 +39,42 @@
 	         ]
 	      },
 	      {
-	         "name":"dpi",
-	         "functional_type":"dpi",
+	         "name":"vpnaccess",
+	         "functional_type":"vpnaccess",
 	         "neighbours":[
+	         	{
+	               "name":"nat"
+	            },
+	            {
+	               "name":"vpnexit"
+	            }
+	         ],
+	         "configuration":[
+	            {"vpnexit": "vpnexit"}
+	         ]
+	      },
+	      {
+	         "name":"vpnexit",
+	         "functional_type":"vpnexit",
+	         "neighbours":[
+	            {
+	               "name":"vpnaccess"
+	            },
 	            {
 	               "name":"webserver"
 	            }
 	         ],
 	         "configuration":[
-	           "sex", "droga"
+	            {"vpnaccess": "vpnaccess"}
 	         ]
 	      },
 	      {
 	         "name":"webserver",
 	         "functional_type":"webserver",
 	         "neighbours":[
-	
+	         	{
+	         		"name": "vpnexit"
+	         	}
 	         ]
 	      }
 	   ]

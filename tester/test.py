@@ -98,15 +98,21 @@ for i in os.listdir(TEST_CASES_DIR):
                             eprint("\t[ERROR] Expected result was " + data["result"] + " but VeriGraph returned " + policy.json()["result"])
                             print("\t--- Test failed ---")
                     else:
-                        print("\tVeriGraph returned an unexpected response -> " + policy.status_code, policy.reason)
+                        print("\tVeriGraph returned an unexpected response -> " + str(policy.status_code), policy.reason)
+                        print("\t--- Test failed ---")
+                print()
             except ValueError:
                 print("Malformed json!\nSkipping "+i+" file")
+                print("\t--- Test failed ---")
             except ValidationError:
                 print("Invalid json (see Schema file)!\nSkipping "+i+" file")
+                print("\t--- Test failed ---")
             except ConnectionError:
                 print("Connection refused!")
+                print("\t--- Test failed ---")
             except HTTPError:
                 print("HTTP error!")
+                print("\t--- Test failed ---")
 
 # Final output
 print("\nTest run = "+str(run))
