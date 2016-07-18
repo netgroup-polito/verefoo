@@ -9,3 +9,12 @@ HINT - to install a package you can raise the following command (Bash on Linux o
 	python -m pip install requests
 	
 Tested on PYTHON 3.4.3
+
+To add a new test, just put a new .json file inside the testcases folder. The corresponding JSON schema is in the testcase_schema.json file and some examples are already available. Each json file should specify:
+- id, an integer for the testcase;
+- name, the name for the testcase;
+- description, an optional description;
+- policy_url_parameters, the parameters to be appended after the verification URL (including the '?' character);
+- result, the expected verification result;
+- graph, the graph to be tested (the same object that you usually POST to VeriGraph to create a new graph).
+The test.py script will test each .json file contained into the testcases folder and will provide a complete output.

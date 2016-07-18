@@ -49,7 +49,7 @@
 	      },
 	      {
 	         "name":"webserver",
-	         "functional_type":"endpoint",
+	         "functional_type":"webserver",
 	         "neighbours":[
 	
 	         ]
