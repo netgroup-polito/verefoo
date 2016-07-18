@@ -41,7 +41,7 @@ public class Test{
     	 Test p = new Test();
          p.resetZ3();
          Test_1 model = new Test_1(p.ctx);
-         IsolationResult ret =model.check.checkIsolationProperty(model.client, model.webserver);
+         IsolationResult ret =model.check.checkIsolationProperty(model.webserver, model.firewall);
          if (ret.result == Status.UNSATISFIABLE){
              System.out.println("UNSAT");
 //             return -1;

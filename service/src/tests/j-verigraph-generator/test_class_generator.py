@@ -33,11 +33,6 @@ from routing_generator import *
 import logging
 from pip._vendor.pkg_resources import null_ns_handler
 
-
-#global variables
-debug = True
-#end of global variables
-
     
 #generates a custom test file
 def generate_test_file(chain, number, configuration, output_file="test_class"):
@@ -58,7 +53,7 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
     for node in chain["nodes"]:       
         chn[node["name"]] = {}
 
-    #set chn values ---> chn(name, (field, value))
+    #set chn values: chn[name][key] = value
     for node in chain["nodes"]:
         for key, value in node.items():
             try:
@@ -69,85 +64,68 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                 logging.debug("Field " + str(key) + " not found for node " + str(node["name"]))
                 logging.debug("Cotinuing...")
                 continue
-    #debug print of the chain        
-    
+            
+    #debug print of chn        
     logging.debug(pformat((chn)))
-        
-#OLD ROUTING FROM FILE    
-#     #set route values ---> route(name, [list of addresses])
-#     for node in routing["routing_table"]:
-#         for key, value in node.items():
-#             try: 
-#                 route[key] = value
-#             except KeyError, e:
-#                 print "No routing table found for node " + str(key)
-#                 print "Continuing..."
-#                 continue
-#     #debug print of the routing tables
-#     if debug == True:
-#         pprint(route)
 
     routing = generate_routing_from_chain(chain)
     
     for node_name, node_rt in routing["routing_table"].items():
-        route[node_name] = node_rt  
-    logging.debug(pformat((route)))
+        route[node_name] = node_rt
         
-    #pprint(configuration["nodes"])
+    #debug print of route  
+    logging.debug(pformat((route)))
     
-    #save all the IPs in a list
-    ips = []
-    for node_name in chn.keys():
-        ips.append(chn[node_name]["address"])
-    
-    #set config values ---> config(functional_type, (field, value))
+    #set config: config[node_name][key] = value
     for node in configuration["nodes"]:
         for key, value in node.items():
             #id field is redundant
             if key != "id":
                 try:
                     if key == "configuration":
-                        #initialize with empty config
+                        #init config[node_name][key] with an empty array
                         config[node["id"]][key] = []
-                        #make sure configuration refers to a node belonging to the current chain, otherwise skip configuraion field
                         
                         for value_item in value:
+                            change_key = "key" in convert_configuration_property_to_ip[chn[node["id"]]["functional_type"]]
+                            change_value = "value" in convert_configuration_property_to_ip[chn[node["id"]]["functional_type"]]
+                            if (change_key==False and change_value==False):
+                                config[node["id"]][key].append(value_item)
+                                continue
+                            # config[node_name][configuration] is a dictionary
                             if isinstance(value_item, dict):
                                 for config_item_key, config_item_value in value_item.items():
-                                    #key is a node and value is a node
-                                    if config_item_key in chn.keys() and config_item_value in chn.keys():
-                                        if chn[node["id"]]["functional_type"] == "webclient" or chn[node["id"]]["functional_type"] == "mailclient" or chn[node["id"]]["functional_type"] == "vpnaccess" or chn[node["id"]]["functional_type"] == "vpnexit":
-                                            value_item[str(config_item_key)] = "ip_" + str(config_item_value)
-                                            config[node["id"]][key].append(value_item)
-                                        elif chn[node["id"]]["functional_type"] == "endhost":
-                                            config[node["id"]][key].append(value_item)
-                                        else:
-                                            value_item["ip_" + str(config_item_key)] = "ip_" + str(config_item_value)
-                                            del value_item[config_item_key]
-                                            config[node["id"]][key].append(value_item)
-                                    else:
-                                        #key is not a node or value is not a node
-                                        if (chn[node["id"]]["functional_type"] == "webclient" or chn[node["id"]]["functional_type"] == "mailclient") and config_item_value in chn.keys():
-                                            value_item[str(config_item_key)] = "ip_" + str(config_item_value)
-                                        else:
-                                            value_item[str(config_item_key)] = str(config_item_value)    
+                                    new_key = config_item_key
+                                    changed_key = False
+                                    changed_value = False
+                                    if change_key and config_item_key in chn.keys():
+                                        changed_key = True
+                                        new_key = "ip_" + str(config_item_key)
+                                        value_item[new_key] = str(config_item_value)
+                                        del value_item[config_item_key]
+                                    if change_value and config_item_value in chn.keys():
+                                        changed_value = True
+                                        new_value = "ip_" + str(config_item_value)
+                                        value_item[new_key] = new_value
+                                    if(change_key==changed_key) and (change_value==changed_value):
                                         config[node["id"]][key].append(value_item)
                             else:
-                                #if value_item in ips:
-                                if value_item in chn.keys():
-                                    #config[node["id"]][key].append(value_item)
-                                    config[node["id"]][key].append("ip_" + str(value_item))
-                                elif chn[node["id"]]["functional_type"] == "dpi":
-                                    config[node["id"]][key].append("String.valueOf(\"" + str(value_item) + "\").hashCode()")
+                                if change_value:
+                                    if value_item in chn.keys():
+                                        new_value = "ip_" + str(value_item)
+                                        config[node["id"]][key].append(new_value)
+                                else:
+                                    config[node["id"]][key].append(str(value_item))
                     else:
                         config[node["id"]][key] = value
                 except KeyError, e:
                     #node not found in current chain 
-                    logging.debug("Field " + key + " not found for node " + str(node["id"]))
+                    logging.debug("Field '" + key + "' not found for node '" + str(node["id"]) + "'")
                     logging.debug(key + " probably doesn't belong to the current chain, thus it will be skipped")
                     #sys.exit(1)
                     continue
                 
+    # debug print of config            
     logging.debug(pformat((config)))
         
     #prepare a few more helpful data structures
@@ -166,25 +144,10 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
     for node, field in chn.items():
         nodes_types.append(field["functional_type"])
         nodes_addresses.append(field["address"])
-        #nodes_ip_mappings.append(node + ", ctx." + field["address"])
         nodes_ip_mappings.append(field["address"])        
-    
-                
-#     #add routing table entries to rt vector
-#     for node, rt in route.items():
-#         for entry in rt:
-#             for dest, next_hop in entry.items():
-#                 #row = "ctx." + dest + ", " + next_hop
-#                 row = dest + ", " + next_hop
-#                 try:
-#                     nodes_rt[node].append(row)
-#                 except KeyError, e:
-#                     #node not found, notify and exit
-#                     print "Node " + node + " not found!"
-#                     sys.exit(1)
+
     for node, rt in route.items():
         for dest, next_hop in rt.items():
-            #row = "ctx." + dest + ", " + next_hop
             row = "nctx.am.get(\"" + dest + "\"), " + next_hop
             try:
                 nodes_rt[node].append(row)
@@ -233,33 +196,21 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
         c.indent()
         
         c.write("NetContext nctx = new NetContext (ctx,new String[]")
-        #write a list of nodes like the following:
-        #
-        #{'a', 'b', 'c'}
         c.write_list(nodes_names, wrapper="\"")
         c.append(", new String[]")
-        #write a list of ip addresses like the following:
-        #
-        #['ip_a', 'ip_b', 'ip_c']
         c.write_list(nodes_addresses, wrapper="\"")
         c.append(");\n")
 
         c.writeln("Network net = new Network (ctx,new Object[]{nctx});")
 
         for i in range(0, len(nodes_names)):
-            #write a line like <node_name> = components.<node_class>(ctx.<node_name>, net, ctx):
-            #
-            #a = components.EndHost(ctx.a, net, ctx)
-            #server = components.PolitoWebServer(ctx.server, net, ctx)
             c.write(str(nodes_names[i]) + " = new " + devices_to_classes[str(nodes_types[i])] + "(ctx, new Object[]{nctx.nm.get(\"" + nodes_names[i] + "\"), net, nctx")
             if devices_initialization[nodes_types[i]] != [] :
                 for param in devices_initialization[nodes_types[i]]:
                     print "configuring node " + nodes_names[i]
-                    pprint(config[nodes_names[i]])
                     for config_param in config[nodes_names[i]]["configuration"]:
                         if param in config_param:
                             c.append(", nctx.am.get(\"" + config_param[param] + "\")")
-                    #c.append(", nctx.am.get(\"" + config[nodes_names[i]]["configuration"][0][param] + "\")")
             c.append("});\n")
         
         c.writeln("ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>> adm = new ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>>();")
@@ -271,11 +222,8 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
         #SET ADDRESS MAPPINGS
         c.writeln("net.setAddressMappings(adm);")
 
-        #CONFIGURE ROUTING TABLE HERE
+        #CONFIGURE ROUTING TABLE
         for i in range(0, len(nodes_names)):
-            #write a line like:
-            #
-            #net.RoutingTable(<node_name>, [(ctx.<destination_address1>, <next_hop1>]), (ctx.<destination_address2>, <next_hop2>]))
             c.writeln("ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt_" + nodes_names[i] + " = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();")
             for row in nodes_rt[nodes_names[i]]:
                 c.writeln("rt_" + nodes_names[i] + ".add(new Tuple<DatatypeExpr,NetworkObject>(" + row + "));")
@@ -284,9 +232,6 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
         
         #ATTACH DEVICES
         c.write("net.attach(")
-        #write a line like net.Attach(<node1_name>, <node2_name>):
-        #
-        #net.Attach(a, server, politoCache, fw)
         c.write_list(nodes_names, delimiter = False, wrapper="")
         c.append(");\n")
 
@@ -319,7 +264,7 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                     for config_element in config[nodes_names[i]]["configuration"]:
                         if isinstance(config_element,dict):
                             for key, value in config_element.items():
-                                if key in ips and value in ips:
+                                if key in nodes_addresses and value in nodes_addresses:
                                     c.writeln("acl" + str(i) + ".add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(\"" + key + "\"),nctx.am.get(\"" + value + "\")));")
                     c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(acl" + str(i) + ");")
                 elif nodes_types[i] == "antispam":
@@ -327,6 +272,8 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                     c.write_list(formatted_list_from_list_of_maps(config[nodes_names[i]]["configuration"]))
                     c.append(");\n")
                 elif nodes_types[i] == "dpi":
+                    for index in range(0, len(config[nodes_names[i]]["configuration"])):
+                        config[nodes_names[i]]["configuration"][index] = "String.valueOf(\"" + str(config[nodes_names[i]]["configuration"][index]) + "\").hashCode()"
                     c.write(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(new int[]")
                     c.write_list(formatted_list_from_list_of_maps(config[nodes_names[i]]["configuration"]), wrapper="")
                     c.append(");\n")
@@ -352,20 +299,21 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                     c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(nctx.am.get(\"" + nodes_addresses[i] + "\"), nctx.am.get(\"" + config[nodes_names[i]]["configuration"][0]["vpnexit"] + "\"));")
                 elif nodes_types[i] == "vpnexit":
                     c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "(nctx.am.get(\"" + config[nodes_names[i]]["configuration"][0]["vpnaccess"] + "\"), nctx.am.get(\"" + nodes_addresses[i] + "\"));")
+            
+            # config is empty but configure device anyway        
             elif nodes_types[i] == "fieldmodifier":
                 c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "();")
 
         c.writeln("check = new Checker(ctx,nctx,net);")
+        
         c.dedent()
         c.writeln("}")
+        
         c.dedent()
         c.writeln("}")
 
         #write c object to file    
         print >>f, c.end()
-
-        #rename class to upper case
-        #os.rename(dirname + "/" + basename + "_" + str(number) + ".java", dirname + "/" + basename + "_" + str(number) + ".java")
 
         logging.debug("wrote test file " + os.path.abspath(dirname + "/" + basename + "_" + str(number)) + ".java" + " successfully!")
 
@@ -374,12 +322,14 @@ def main(argv):
     #exit if any command line argument is missing
     if len(argv) < 6:
         print 'test_class_generator.py -c <chain_file> -f <conf_file> -o <output_name>'
-        sys.exit(2)
-     #initialize json file names   
+        sys.exit(1)
+    
+    #initialize json file names   
     chains_file = ''
     configuration_file = ''
     output_file = ''
-    #parse command line arguments and exit if there is an error
+    
+    #parse command line arguments and exit in case of any error
     try:
         opts, args = getopt.getopt(argv,"hc:f:r:o:",["help","chain=","config=","route=","ofile="])
     except getopt.GetoptError as err:
@@ -406,20 +356,12 @@ def main(argv):
     #parse configuration file
     configuration = convert_unicode_to_ascii(parse_json_file(configuration_file))
     
-    #OLD ROUTING FROM FILE
-    #parse routing file
-    #routing = convert_unicode_to_ascii(parse_json_file(routing_file))
-    
-    
-    #debug prints with pprint
-    
     logging.debug(pformat((chains)))
     logging.debug(pformat((configuration)))
     
     #custom formatted prints
     print_chains(chains)
     print_configuration(configuration)
-    #print_routing_table(routing)
 
     #counter for the number of chains
     number_of_chains = 0

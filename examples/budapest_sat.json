@@ -1,56 +1,78 @@
 {
-    "nodes": [
-        {
-            "name": "user1",
-            "functional_type": "endpoint",
+	"nodes": [
+		{
+			"name": "user1",
+			"functional_type": "endpoint",
 			"neighbours": [
 				{
 					"name": "nat"
 				}
-            ]
-        },
-        {
-            "name": "nat",
-            "functional_type": "nat",
+			]
+		},
+		{
+			"name": "nat",
+			"functional_type": "nat",
+			"neighbours": [
+				{
+					"name": "firewall"
+				},
+				{
+					"name": "user1"
+				}
+			],
+			"configuration": [
+				"user1",
+				"user2"
+			]
+		},
+		{
+			"name": "firewall",
+			"functional_type": "firewall",
+			"neighbours": [
+				{
+					"name": "webserver"
+				},
+				{
+					"name": "nat"
+				},
+				{
+					"name": "dpi"
+				}
+			]
+		},
+		{
+			"name": "webserver",
+			"functional_type": "endpoint",
 			"neighbours": [
 				{
 					"name": "firewall"
 				}
-			],
-			"configuration":["user1","user2"]
-        },
-        {
-            "name": "firewall",
-            "functional_type": "firewall",
-			"neighbours": [
-				{
-					"name": "webserver"
-				}
 			]
-        },
-        {
-            "name": "webserver",
-            "functional_type": "endpoint",
-            "neighbours": []
-        },
-        {
-            "name": "user2",
-            "functional_type": "endpoint",
+		},
+		{
+			"name": "user2",
+			"functional_type": "endpoint",
 			"neighbours": [
 				{
 					"name": "dpi"
 				}
 			]
-        },
-        {
-            "name": "dpi",
-            "functional_type": "nat",
+		},
+		{
+			"name": "dpi",
+			"functional_type": "nat",
 			"neighbours": [
 				{
 					"name": "firewall"
+				},
+				{
+					"name": "user2"
 				}
 			],
-			"configuration":["user1","user2"]
-        }
-    ]
+			"configuration": [
+				"user1",
+				"user2"
+			]
+		}
+	]
 }

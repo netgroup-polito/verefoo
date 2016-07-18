@@ -32,7 +32,6 @@ public class Graph {
 
 	@ApiModelProperty(required = false, hidden = true)
 	@XmlTransient
-	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private Set<Link>		links	= new HashSet<Link>();
 
 	public Graph() {

@@ -68,21 +68,21 @@ devices_initialization = {  "webclient" : ["webserver"],
                             "fieldmodifier":[]                        
                           }
 
-devices_configuration_methods = {   "webclient" : "list",
-                                    "webserver" : "list",
-                                    "cache" : "list",
-                                    "nat" : "list",
-                                    "firewall" : "maps",
-                                    "mailclient" : "list",
-                                    "mailserver" : "list",
-                                    "antispam" : "list",
-                                    "endpoint": "list" ,
-                                    "dpi":"list",
-                                    "endhost":"list",
-                                    "vpnaccess":"list",
-                                    "vpnexit":"list",
-                                    "fieldmodifier":"list"
-                                 }
+convert_configuration_property_to_ip = {    "webclient" : ["value"],
+                                            "webserver" : [],
+                                            "cache" : ["value"],
+                                            "nat" : ["value"],
+                                            "firewall" : ["key", "value"],
+                                            "mailclient" : ["value"],
+                                            "mailserver" : [],
+                                            "antispam" : [],
+                                            "endpoint": [],
+                                            "dpi": [],
+                                            "endhost": [],
+                                            "vpnaccess": ["value"],
+                                            "vpnexit": ["value"],
+                                            "fieldmodifier": []
+                                        }
 
 devices_configuration_fields = {    "webclient" : "",
                                     "webserver" : "",

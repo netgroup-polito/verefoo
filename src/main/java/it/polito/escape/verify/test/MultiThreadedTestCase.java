@@ -21,85 +21,110 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.polito.escape.verify.client.VerifyClient;
+import it.polito.escape.verify.client.VerifyClientException;
+import it.polito.escape.verify.model.Configuration;
 import it.polito.escape.verify.model.Graph;
+import it.polito.escape.verify.model.Node;
 
 public class MultiThreadedTestCase {
 
-	private void testUpdateGraphStatus(final int threadCount) throws InterruptedException, ExecutionException, JsonParseException, JsonMappingException, IOException {
+	private void testUpdateGraphStatus(final int threadCount) throws InterruptedException, ExecutionException, JsonParseException, JsonMappingException, IOException, VerifyClientException {
 		final VerifyClient verifyClient = new VerifyClient("http://localhost:8080/verify/api");
+		
 		Response retrieveGraphResponse = verifyClient.retrieveGraph(1);
 		String responseString = retrieveGraphResponse.readEntity(String.class);
 		System.out.println(responseString);
+		
 		Graph graph = new ObjectMapper().readValue(responseString, Graph.class);
-		UpdateGraphTask task = new UpdateGraphTask(verifyClient, 1, graph);
-		List<MultiThreadedTestCase.UpdateGraphTask> tasks = Collections.nCopies(threadCount, task);
+		
+		UpdateGraph task = new UpdateGraph(verifyClient, 1, graph);
+		
+		List<MultiThreadedTestCase.UpdateGraph> tasks = Collections.nCopies(threadCount, task);
 		ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-		List<Future<Integer>> futures = executorService.invokeAll(tasks);
+		
+		List<Future<Response>> futures = executorService.invokeAll(tasks);
 		List<Integer> resultList = new ArrayList<Integer>(futures.size());
+		
 		// Check for exceptions
-		for (Future<Integer> future : futures) {
+		for (Future<Response> future : futures) {
 			// Throws an exception if an exception was thrown by the task.
-			resultList.add(future.get());
+			resultList.add(future.get().getStatus());
 		}
-		// Validate the IDs
+		// Validate the dimensions
 		Assert.assertEquals(threadCount, futures.size());
+		
 		List<Integer> expectedList = new ArrayList<Integer>(threadCount);
 		for (int i = 1; i <= threadCount; i++) {
 			expectedList.add(200);
 		}
-		Collections.sort(resultList);
+		// Validate expected results
 		Assert.assertEquals(expectedList, resultList);
 	}
 	
-	private void testUpdateGraph(final int threadCount) throws InterruptedException, ExecutionException, JsonParseException, JsonMappingException, IOException {
+	private void testUpdateGraph(final int threadCount) throws InterruptedException, ExecutionException, JsonParseException, JsonMappingException, IOException, VerifyClientException {
 		final VerifyClient verifyClient = new VerifyClient("http://localhost:8080/verify/api");
-		Response retrieveGraphResponse = verifyClient.retrieveGraph(1);
+		
+		Response retrieveGraphResponse = verifyClient.retrieveGraph(2L);
 		String responseString = retrieveGraphResponse.readEntity(String.class);
 		System.out.println(responseString);
+		
 		Graph graph = new ObjectMapper().readValue(responseString, Graph.class);
-		graph.getNodes().get(1L).setFunctional_type("firewall");
+		
+		Node nodeToEdit = graph.getNodes().get(1L);
+		nodeToEdit.setFunctional_type("endpoint");
+		nodeToEdit.setConfiguration(new Configuration(nodeToEdit.getName(), "", new ObjectMapper().createArrayNode()));
+		
 		String graphAsString = new ObjectMapper().writeValueAsString(graph);
-		UpdateGraph task = new UpdateGraph(verifyClient, 1, graph);
+		System.out.println(graphAsString);
+		
+		UpdateGraph task = new UpdateGraph(verifyClient, 2, graph);
+		
 		List<MultiThreadedTestCase.UpdateGraph> tasks = Collections.nCopies(threadCount, task);
 		ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-		List<Future<String>> futures = executorService.invokeAll(tasks);
+		
+		List<Future<Response>> futures = executorService.invokeAll(tasks);
 		List<String> resultList = new ArrayList<String>(futures.size());
+		
 		// Check for exceptions
-		for (Future<String> future : futures) {
+		for (Future<Response> future : futures) {
 			// Throws an exception if an exception was thrown by the task.
-			resultList.add(future.get());
+			resultList.add(future.get().readEntity(String.class));
 		}
-		// Validate the IDs
+		// Validate dimensions
 		Assert.assertEquals(threadCount, futures.size());
+		
 		List<String> expectedList = new ArrayList<String>(threadCount);
 		for (int i = 1; i <= threadCount; i++) {
 			expectedList.add(graphAsString);
 		}
-
+		// Validate expected results
 		Assert.assertEquals(expectedList, resultList);
 	}
 	
 	private void testCreateGraphStatus(final int threadCount, Graph graph) throws InterruptedException, ExecutionException, JsonParseException, JsonMappingException, IOException {
 		final VerifyClient verifyClient = new VerifyClient("http://localhost:8080/verify/api");
 
-		CreateGraphTask task = new CreateGraphTask(verifyClient, graph);
+		CreateGraph task = new CreateGraph(verifyClient, graph);
 		
-		List<MultiThreadedTestCase.CreateGraphTask> tasks = Collections.nCopies(threadCount, task);
+		List<MultiThreadedTestCase.CreateGraph> tasks = Collections.nCopies(threadCount, task);
 		ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-		List<Future<Integer>> futures = executorService.invokeAll(tasks);
+		
+		List<Future<Response>> futures = executorService.invokeAll(tasks);
 		List<Integer> resultList = new ArrayList<Integer>(futures.size());
+		
 		// Check for exceptions
-		for (Future<Integer> future : futures) {
+		for (Future<Response> future : futures) {
 			// Throws an exception if an exception was thrown by the task.
-			resultList.add(future.get());
+			resultList.add(future.get().getStatus());
 		}
 		// Validate the IDs
 		Assert.assertEquals(threadCount, futures.size());
+		
 		List<Integer> expectedList = new ArrayList<Integer>(threadCount);
 		for (int i = 1; i <= threadCount; i++) {
 			expectedList.add(201);
 		}
-		Collections.sort(resultList);
+		// Validate expected results
 		Assert.assertEquals(expectedList, resultList);
 	}
 	
@@ -110,12 +135,12 @@ public class MultiThreadedTestCase {
 	}
 
 	@Test
-	public void updateGraphStatusCheck() throws InterruptedException, ExecutionException, JsonParseException, JsonMappingException, IOException {
+	public void updateGraphStatusCheck() throws InterruptedException, ExecutionException, JsonParseException, JsonMappingException, IOException, VerifyClientException {
 		testUpdateGraphStatus(64);
 	}
 	
 	@Test
-	public void updateGraphResponseCheck() throws InterruptedException, ExecutionException, JsonParseException, JsonMappingException, IOException {
+	public void updateGraphResponseCheck() throws InterruptedException, ExecutionException, JsonParseException, JsonMappingException, IOException, VerifyClientException {
 		testUpdateGraph(16);
 	}
 	
@@ -124,29 +149,8 @@ public class MultiThreadedTestCase {
 		Graph graph = new Graph();
 		testCreateGraphStatus(8, graph);
 	}
-
-	class UpdateGraphTask implements Callable<Integer> {
-
-		private VerifyClient	verifyClient;
-
-		private int				graphId;
-
-		private Graph			graph;
-
-		public UpdateGraphTask(VerifyClient verifyClient, int graphId, Graph graph) {
-			this.graphId = graphId;
-			this.graph = graph;
-			this.verifyClient = verifyClient;
-		}
-
-		@Override
-		public Integer call() throws Exception {
-			Thread.sleep(randInt(0,2000));
-			return this.verifyClient.updateGraph(this.graphId, this.graph).getStatus();
-		}
-	}
 	
-	class UpdateGraph implements Callable<String> {
+	class UpdateGraph implements Callable<Response> {
 
 		private VerifyClient	verifyClient;
 
@@ -161,29 +165,28 @@ public class MultiThreadedTestCase {
 		}
 
 		@Override
-		public String call() throws Exception {
+		public Response call() throws Exception {
 			Thread.sleep(randInt(0,2000));
 			Response updateGraphResponse = this.verifyClient.updateGraph(this.graphId, this.graph);
-			String updatedGraph = updateGraphResponse.readEntity(String.class);
-			return updatedGraph;
+			return updateGraphResponse;
 		}
 	}
 	
-	class CreateGraphTask implements Callable<Integer> {
+	class CreateGraph implements Callable<Response> {
 
 		private VerifyClient	verifyClient;
 
 		private Graph			graph;
 
-		public CreateGraphTask(VerifyClient verifyClient, Graph graph) {
+		public CreateGraph(VerifyClient verifyClient, Graph graph) {
 			this.graph = graph;
 			this.verifyClient = verifyClient;
 		}
 
 		@Override
-		public Integer call() throws Exception {
+		public Response call() throws Exception {
 			Thread.sleep(randInt(0,2000));
-			return this.verifyClient.createGraph(this.graph).getStatus();
+			return this.verifyClient.createGraph(this.graph);
 		}
 		
 	}
