@@ -162,7 +162,7 @@ public class Tester {
 
 	public static void main(String[] args)	throws JsonParseException, JsonMappingException, IOException,
 											VerifyClientException, Exception {
-		String folderName = System.getProperty("user.dir") + "/tester/testcase";
+		String folderName = System.getProperty("user.dir") + "/tester/testcases";
 		File folder = new File(folderName);
 		if (!folder.exists()) {
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
