@@ -105,22 +105,22 @@ e.g.
 
 2. regenerate `mcnet.jar` selecting the packages `mcnet.components` and `mcnet.netobjs` and exporting the generated JAR to `/verify/service/build` (overwrite the existing file)
 
-3. under `/verify/src/main/webapp/json/` create a file `<type>.json`. This file represents a JSON schema (see [here](http://json-schema.org/ the official documentation)). For compatibility with the other functions it is mandatory to support an array as the root of the configuration, but feel free to specify all the other constraints as needed. A sample of `<type>.json` to describe an empty configuration could be the following:
+3. under `/verify/src/main/webapp/json/` create a file `<type>.json`. This file represents a JSON schema \(see [here](http://json-schema.org/) the official documentation\). For compatibility with the other functions it is mandatory to support an array as the root of the configuration, but feel free to specify all the other constraints as needed. A sample of `<type>.json` to describe an empty configuration could be the following:
 
-```json
-{
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Type",
-    "description": "This is a generic type",
-    "type": "array",
-    "items": {
-        "type": "object"
-    },
-    "minItems": 0,
-    "maxItems": 0,
-    "uniqueItems": true
-}
-```
+  ```json
+  {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "title": "Type",
+      "description": "This is a generic type",
+      "type": "array",
+      "items": {
+          "type": "object"
+      },
+      "minItems": 0,
+      "maxItems": 0,
+      "uniqueItems": true
+  }
+  ```
 
 4. in the package `it.polito.escape.verify.validation` (i.e. under `src/main/java/it/polito/escape/verify/validation`) create a new class file named `<Type>Validator.java` (please pay attention to the naming convention here: `<Type>` is the function type used in the previous step capitalized, followed by the suffix `Validator`) which implements `ValidationInterface`. This class represents a custom validator for the newly introduced type and allows for more complex constraints, which is not possible to express through a JSON schema file. The validate method that has to be implemented is given the following objects:
   - `Graph graph` represents the nffg that the object node belongs to;
