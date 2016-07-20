@@ -127,6 +127,7 @@ e.g.
   - `Node node` represents the node that the object configuration belongs to;
   - `Configuration configuration` represents the parsed configuration. It is sufficient to call the method `getConfiguration` on the `configuration` object to get a `JsonNode` (Jackson's class) and iterate over the various fields.
 In case a configuration is not valid please throw a new `ValidationException` passing a descriptive failure message.
+Adding a custom validator is not strictly necessary whenever a JSON schema is thought to be sufficient. Note though that, other than the mandatory validation against a schema, whenever a custom validator is not found a default validation is triggered, i.e. the value of every JSON property must refer to the name of an existing node in the working graph/nffg. If this is not the desired behavior it is suggested to write a custom validator with looser constraints.
 
 5. customize the class generator and add the support for the newly introduced type:
   - open the file `/verify/service/src/tests/j-verigraph-generator/config.py` and edit the following dictionaries:
