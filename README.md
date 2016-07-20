@@ -98,3 +98,51 @@ e.g.
     - add the required JARS (`mcnet.jar`, `com.microsoft.z3.jar` and `qjutils.jar` from [here](https://github.com/netgroup-polito/verigraph/tree/master/service/build)) under `User Entries`
     - Hit `Apply` and `Ok`
 - Run the server
+
+**How to add you own function `<type>`**
+
+1. under the the `mcnet.netobjs` package (i.e. under `/verify/service/src/mcnet/netobjs`) create a new class `<Type>.java`, where `<type>` is the desired function name (i.e. `<type>` will be added to the supported node functional types) which extends `NetworkObject` and implement the desired logic
+
+2. regenerate `mcnet.jar` selecting the packages `mcnet.components` and `mcnet.netobjs` and exporting the generated JAR to `/verify/service/build` (overwrite the existing file)
+
+3. under `/verify/src/main/webapp/json/` create a file `<type>.json`. This file represents a JSON schema (see [here](http://json-schema.org/ the official documentation)). For compatibility with the other functions it is mandatory to support an array as the root of the configuration, but feel free to specify all the other constraints as needed. A sample of `<type>.json` to describe an empty configuration could be the following:
+
+```json
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Type",
+    "description": "This is a generic type",
+    "type": "array",
+    "items": {
+        "type": "object"
+    },
+    "minItems": 0,
+    "maxItems": 0,
+    "uniqueItems": true
+}
+```
+
+4. in the package `it.polito.escape.verify.validation` (i.e. under `src/main/java/it/polito/escape/verify/validation`) create a new class file named `<Type>Validator.java` (please pay attention to the naming convention here: `<Type>` is the function type used in the previous step capitalized, followed by the suffix `Validator`) which implements `ValidationInterface`. This class represents a custom validator for the newly introduced type and allows for more complex constraints, which is not possible to express through a JSON schema file. The validate method that has to be implemented is given the following objects:
+  - `Graph graph` represents the nffg that the object node belongs to;
+  - `Node node` represents the node that the object configuration belongs to;
+  - `Configuration configuration` represents the parsed configuration. It is sufficient to call the method `getConfiguration` on the `configuration` object to get a `JsonNode` (Jackson's class) and iterate over the various fields.
+In case a configuration is not valid please throw a new `ValidationException` passing a descriptive failure message.
+
+5. customize the class generator and add the support for the newly introduced type:
+  - open the file `/verify/service/src/tests/j-verigraph-generator/config.py` and edit the following dictionaries:
+    - `devices_to_classes` --> add the following entry: `"<type>" : "<Type>"`
+    if you followed these instructions carefully the name of the class implementing the function `<type>` should be `<Type>.java` under the package `mcnet.netobjs`.
+    - `devices_to_configuration_methods` --> add the following entry: `"<type>" : "configurationMethod"`
+    if `<type>` is a middlebox it should have a configuration method contained in the implementation `<Type>.java` under the package `mcnet.netobjs`.
+    - `devices_initialization`: add the following entry: `"<type>" : ["param1", "param2"]`
+    if `<type>` requires any parameter when it gets instanciated please enter them in the form of a list. Make sure that these parameters refer to existing keys contained in the configuration schema file (see step 3). For instance the type `webclient` requires the name of a webserver it wants to communicate with. This parameter is passed in the configuration of a weblient by setting a property `webserver` to the name of the desired webserver. The value of this property gets extracted and used by the test generator automatically.
+    - `convert_configuration_property_to_ip` --> add the following entry: `"<type>" : ["key", "value"]`
+    Note that both `key` and `value` are optional and it is critical to set them only if needed. Since the Z3 provider used for testing works with IP addresses in this dictionary you have to indicate whether it is needed an automatic convertion from names to IP addresses: 
+      - in case the keyword `key` is used every key of the JSON configuration parsed will be prepended with the string `ip_`;
+      - in case the keyword `value` is used every value of the JSON configuration parsed will be prepended with the string `ip_`;
+      - in case the list does not contain neither `key` nor `value` the original configuration won't be touched.
+  - open the file `/verify/service/src/tests/j-verigraph-generator/test_class_generator.py` and under the "switch" case in the form of a series of ifs used to configure middle-boxes that starts at line #239 add a branch like the following with the logic to generate the Java code for <type> --> 
+  `elif nodes_types[i] == "<type>":`
+  You can take inspiration from the other branches to see how to serialize Java code. Note that this addition to the "switch" statement is not needed if `<type>` is not a middlebox or it does not need to be configured.
+
+6. Restart the web service.
