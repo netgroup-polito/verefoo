@@ -264,10 +264,11 @@ public class VerifyClient {
 		}
 	}
 	
-	public Verification getIsolation(long graphId, String source, String destination) throws VerifyClientException, ProcessingException{
+	public Verification getIsolation(long graphId, String source, String destination, String middlebox) throws VerifyClientException, ProcessingException{
 		Response response = isolationTarget.resolveTemplate("graphId", graphId)
 				.queryParam("source", source)
 				.queryParam("destination", destination)
+				.queryParam("middlebox", middlebox)
 				.queryParam("type", "isolation")
 				.request()
 				.get();
@@ -286,10 +287,11 @@ public class VerifyClient {
 		}
 	}
 	
-	public Verification getTraversal(long graphId, String source, String destination) throws VerifyClientException, ProcessingException{
+	public Verification getTraversal(long graphId, String source, String destination, String middlebox) throws VerifyClientException, ProcessingException{
 		Response response = traversalTarget.resolveTemplate("graphId", graphId)
 				.queryParam("source", source)
 				.queryParam("destination", destination)
+				.queryParam("middlebox", middlebox)
 				.queryParam("type", "traversal")
 				.request()
 				.get();

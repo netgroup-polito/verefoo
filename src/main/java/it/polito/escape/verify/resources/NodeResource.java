@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import it.polito.escape.verify.exception.BadRequestException;
+import it.polito.escape.verify.exception.ForbiddenException;
 import it.polito.escape.verify.model.Configuration;
 import it.polito.escape.verify.model.ErrorMessage;
 import it.polito.escape.verify.model.Graph;
@@ -114,6 +115,12 @@ public class NodeResource {
     		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
     		@ApiParam(value = "Node configuration", required = true) Configuration nodeConfiguration,
     		@Context UriInfo uriInfo){
+    	if (graphId <= 0) {
+			throw new ForbiddenException("Illegal graph id: " + graphId);
+		}
+		if (nodeId <= 0) {
+			throw new ForbiddenException("Illegal node id: " + nodeId);
+		}
     	Graph graph = new GraphService().getGraph(graphId);
     	if (graph == null){
     		throw new BadRequestException("Graph with id " + graphId + " not found");
