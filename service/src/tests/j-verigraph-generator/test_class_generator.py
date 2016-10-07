@@ -181,8 +181,25 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
         c.writeln("import mcnet.netobjs.PacketModel;")
         
         #import components
-        for i in range(0, len(nodes_names)):
-            c.writeln("import mcnet.netobjs." + devices_to_classes[str(nodes_types[i])] + ";")
+        #for i in range(0, len(nodes_names)):
+        #    c.writeln("import mcnet.netobjs." + devices_to_classes[str(nodes_types[i])] + ";")
+        
+        for key, value in devices_to_classes.items():
+            c.writeln("import mcnet.netobjs." + value + ";")
+#         c.writeln("import mcnet.netobjs.PolitoWebClient;")
+#         c.writeln("import mcnet.netobjs.PolitoWebServer;")
+#         c.writeln("import mcnet.netobjs.PolitoCache;")
+#         c.writeln("import mcnet.netobjs.PolitoNat;")
+#         c.writeln("import mcnet.netobjs.AclFirewall;")
+#         c.writeln("import mcnet.netobjs.PolitoMailClient;")
+#         c.writeln("import mcnet.netobjs.PolitoMailServer;")
+#         c.writeln("import mcnet.netobjs.PolitoAntispam;")
+#         c.writeln("import mcnet.netobjs.EndHost;")
+#         c.writeln("import mcnet.netobjs.PolitoIDS;")
+#         c.writeln("import mcnet.netobjs.PolitoEndHost;")
+#         c.writeln("import mcnet.netobjs.PolitoVpnAccess;")
+#         c.writeln("import mcnet.netobjs.PolitoVpnExit;")
+#         c.writeln("import mcnet.netobjs.PolitoFieldModifier;")
         
         c.writeln("public class " + basename + "_" + str(number) + "{")
         
@@ -191,18 +208,10 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
         # declare components
         for i in range(0, len(nodes_names)):
             c.writeln("public " + devices_to_classes[str(nodes_types[i])] + " " + str(nodes_names[i]) + ";")
-
-        c.writeln("public " + basename + "_" + str(number) + "(Context ctx){")
+            
+        # method setDevices
+        c.writeln("private void setDevices(Context ctx, NetContext nctx, Network net){")
         c.indent()
-        
-        c.write("NetContext nctx = new NetContext (ctx,new String[]")
-        c.write_list(nodes_names, wrapper="\"")
-        c.append(", new String[]")
-        c.write_list(nodes_addresses, wrapper="\"")
-        c.append(");\n")
-
-        c.writeln("Network net = new Network (ctx,new Object[]{nctx});")
-
         for i in range(0, len(nodes_names)):
             c.write(str(nodes_names[i]) + " = new " + devices_to_classes[str(nodes_types[i])] + "(ctx, new Object[]{nctx.nm.get(\"" + nodes_names[i] + "\"), net, nctx")
             if devices_initialization[nodes_types[i]] != [] :
@@ -212,31 +221,35 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
                         if param in config_param:
                             c.append(", nctx.am.get(\"" + config_param[param] + "\")")
             c.append("});\n")
+        c.dedent()
+        c.writeln("}")
+        # end method setDevices
         
-        c.writeln("ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>> adm = new ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>>();")
+        # method doMappings
+        c.writeln("private void doMappings(NetContext nctx, ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>> adm){")
+        c.indent()
         for i in range(0, len(nodes_names)):
             c.writeln("ArrayList<DatatypeExpr> al" + str(i) + " = new ArrayList<DatatypeExpr>();")
             c.writeln("al" + str(i) + ".add(nctx.am.get(\"" + nodes_ip_mappings[i] + "\"));")
             c.writeln("adm.add(new Tuple<>((NetworkObject)" + nodes_names[i] + ", al" + str(i) + "));")
-
-        #SET ADDRESS MAPPINGS
-        c.writeln("net.setAddressMappings(adm);")
-
-        #CONFIGURE ROUTING TABLE
+        c.dedent()
+        c.writeln("}")
+        # end method doMappings
+        
+        # for each node methods setRouting and configureDevice
         for i in range(0, len(nodes_names)):
-            c.writeln("ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt_" + nodes_names[i] + " = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();")
+            # method setRouting
+            c.writeln("private void setRouting" + nodes_names[i] + "(NetContext nctx, Network net, ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt_" + nodes_names[i] + "){")
+            c.indent()
             for row in nodes_rt[nodes_names[i]]:
                 c.writeln("rt_" + nodes_names[i] + ".add(new Tuple<DatatypeExpr,NetworkObject>(" + row + "));")
             c.writeln("net.routingTable(" + nodes_names[i] + ", rt_" + nodes_names[i] + ");")
-
-        
-        #ATTACH DEVICES
-        c.write("net.attach(")
-        c.write_list(nodes_names, delimiter = False, wrapper="")
-        c.append(");\n")
-
-        #CONFIGURE MIDDLE-BOXES
-        for i in range(0, len(nodes_names)):
+            c.dedent()
+            c.writeln("}")
+            # end method setRouting
+            # method configureDevice
+            c.writeln("private void configureDevice" + nodes_names[i] + "(NetContext nctx) {")
+            c.indent()
             #configure middle-box only if its configuration is not empty
             if config[nodes_names[i]]["configuration"] != [] :
                 if nodes_types[i] == "cache":
@@ -303,6 +316,45 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
             # config is empty but configure device anyway        
             elif nodes_types[i] == "fieldmodifier":
                 c.writeln(nodes_names[i] + "." + devices_to_configuration_methods[nodes_types[i]] + "();")
+            c.dedent()
+            c.writeln("}")
+            # end method configureDevice
+            
+        
+
+        c.writeln("public " + basename + "_" + str(number) + "(Context ctx){")
+        c.indent()
+        
+        c.write("NetContext nctx = new NetContext (ctx,new String[]")
+        c.write_list(nodes_names, wrapper="\"")
+        c.append(", new String[]")
+        c.write_list(nodes_addresses, wrapper="\"")
+        c.append(");\n")
+
+        c.writeln("Network net = new Network (ctx,new Object[]{nctx});")
+        
+        # call method setDevices
+        c.writeln("setDevices(ctx, nctx, net);")
+
+        #SET ADDRESS MAPPINGS
+        c.writeln("ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>> adm = new ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>>();")
+        # call doMappings
+        c.writeln("net.setAddressMappings(adm);")
+        c.writeln("net.setAddressMappings(adm);")
+
+        #CONFIGURE ROUTING TABLE
+        for i in range(0, len(nodes_names)):
+            c.writeln("ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt_" + nodes_names[i] + " = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>(); ")
+            c.writeln("setRouting" + nodes_names[i] + "(nctx, net, rt_" + nodes_names[i] + ");")
+                  
+        #ATTACH DEVICES
+        c.write("net.attach(")
+        c.write_list(nodes_names, delimiter = False, wrapper="")
+        c.append(");\n")
+
+        #CONFIGURE MIDDLE-BOXES
+        for i in range(0, len(nodes_names)):
+            c.writeln("configureDevice" + nodes_names[i] + "(nctx);")
 
         c.writeln("check = new Checker(ctx,nctx,net);")
         
