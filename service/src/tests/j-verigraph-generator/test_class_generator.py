@@ -186,20 +186,6 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
         
         for key, value in devices_to_classes.items():
             c.writeln("import mcnet.netobjs." + value + ";")
-#         c.writeln("import mcnet.netobjs.PolitoWebClient;")
-#         c.writeln("import mcnet.netobjs.PolitoWebServer;")
-#         c.writeln("import mcnet.netobjs.PolitoCache;")
-#         c.writeln("import mcnet.netobjs.PolitoNat;")
-#         c.writeln("import mcnet.netobjs.AclFirewall;")
-#         c.writeln("import mcnet.netobjs.PolitoMailClient;")
-#         c.writeln("import mcnet.netobjs.PolitoMailServer;")
-#         c.writeln("import mcnet.netobjs.PolitoAntispam;")
-#         c.writeln("import mcnet.netobjs.EndHost;")
-#         c.writeln("import mcnet.netobjs.PolitoIDS;")
-#         c.writeln("import mcnet.netobjs.PolitoEndHost;")
-#         c.writeln("import mcnet.netobjs.PolitoVpnAccess;")
-#         c.writeln("import mcnet.netobjs.PolitoVpnExit;")
-#         c.writeln("import mcnet.netobjs.PolitoFieldModifier;")
         
         c.writeln("public class " + basename + "_" + str(number) + "{")
         
@@ -339,7 +325,7 @@ def generate_test_file(chain, number, configuration, output_file="test_class"):
         #SET ADDRESS MAPPINGS
         c.writeln("ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>> adm = new ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>>();")
         # call doMappings
-        c.writeln("net.setAddressMappings(adm);")
+        c.writeln("doMappings(nctx, adm);")
         c.writeln("net.setAddressMappings(adm);")
 
         #CONFIGURE ROUTING TABLE

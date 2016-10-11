@@ -43,6 +43,9 @@ public class GraphCustomDeserializer extends JsonDeserializer<Graph>{
 		
 		JsonNode nodesJson = root.get("nodes");
 		
+		if(nodesJson == null)
+			throw new BadRequestException("Invalid graph");
+		
 		List<Node> nodeList = null;
 		try {
 			nodeList = new ObjectMapper().readValue(nodesJson.toString(), TypeFactory.defaultInstance().constructCollectionType(List.class, Node.class));

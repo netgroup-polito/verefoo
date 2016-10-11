@@ -294,7 +294,8 @@ public class PolitoNat extends NetworkObject{
     	IntExpr t_1 = ctx.mkIntConst("t_1");
     	IntExpr t_2 = ctx.mkIntConst("t_2");
     	
-    	private_addr_func = ctx.mkFuncDecl("private_addr_func", nctx.address, ctx.mkBoolSort());
+//    	private_addr_func = ctx.mkFuncDecl("private_addr_func", nctx.address, ctx.mkBoolSort());
+    	private_addr_func = ctx.mkFuncDecl(nat + "_nat_func", nctx.address, ctx.mkBoolSort());
 
     	//Constraint1
 //    	"send(nat, x, p_0, t_0) && !private_addr_func(p_0.dest) -> 

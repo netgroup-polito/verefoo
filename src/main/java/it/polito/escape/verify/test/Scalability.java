@@ -46,6 +46,69 @@ public class Scalability {
 		reachabilityTest(s,900);                                                                                                                                                                           
 		reachabilityTest(s,950);
 		reachabilityTest(s,1000);
+		
+//		reachabilityTest(s,500);
+//		reachabilityTest(s,1000);
+//		reachabilityTest(s,1500);
+//		reachabilityTest(s,2000);
+//		reachabilityTest(s,2500);
+//		reachabilityTest(s,3000);
+//		reachabilityTest(s,3500);
+//		reachabilityTest(s,4000);
+//		reachabilityTest(s,4500);
+//		reachabilityTest(s,5000);
+//		reachabilityTest(s,5500);
+//		reachabilityTest(s,6000);
+//		reachabilityTest(s,6500);
+//		reachabilityTest(s,7000);
+//		reachabilityTest(s,7500);
+//		reachabilityTest(s,8000);
+//		reachabilityTest(s,8500);
+//		reachabilityTest(s,9000);
+//		reachabilityTest(s,9500);
+//		reachabilityTest(s,10000);
+		
+//		isolationTest(s,500);
+//		isolationTest(s,1000);
+//		isolationTest(s,1500);
+//		isolationTest(s,2000);
+//		isolationTest(s,2500);
+//		isolationTest(s,3000);
+//		isolationTest(s,3500);
+//		isolationTest(s,4000);
+//		isolationTest(s,4500);
+//		isolationTest(s,5000);
+//		isolationTest(s,5500);
+//		isolationTest(s,6000);
+//		isolationTest(s,6500);
+//		isolationTest(s,7000);
+//		isolationTest(s,7500);
+//		isolationTest(s,8000);
+//		isolationTest(s,8500);
+//		isolationTest(s,9000);
+//		isolationTest(s,9500);
+//		isolationTest(s,10000);
+		
+//		traversalTest(s,500);
+//		traversalTest(s,1000);
+//		traversalTest(s,1500);
+//		traversalTest(s,2000);
+//		traversalTest(s,2500);
+//		traversalTest(s,3000);
+//		traversalTest(s,3500);
+//		traversalTest(s,4000);
+//		traversalTest(s,4500);
+//		traversalTest(s,5000);
+//		traversalTest(s,5500);
+//		traversalTest(s,6000);
+//		traversalTest(s,6500);
+//		traversalTest(s,7000);
+//		traversalTest(s,7500);
+//		traversalTest(s,8000);
+//		traversalTest(s,8500);
+//		traversalTest(s,9000);
+//		traversalTest(s,9500);
+//		traversalTest(s,10000);
 /*		
 		isolationTest(s,50);                                                                                                                                                                            
 		isolationTest(s,100);                                                                                                                                                                           
@@ -91,37 +154,38 @@ public class Scalability {
 	}
 
 	private static void reachabilityTest(Scalability s, int n) throws VerifyClientException {
-		System.out.printf("Reachability test with " + n + " NATs: ");
+		System.out.printf("Reachability test with N=" + n + ": ");
 		printTimestamp();
 		Graph graph = generateNatScenario(n);
 		Graph createdGraph = s.client.createGraph(graph).readEntity(Graph.class);
 		Verification result = s.client.getReachability(createdGraph.getId(), "client", "server");
 		System.out.println("Test returned " + result.getResult());
-		System.out.printf("Finished reachability test with " + n + " NATs: ");
+		System.out.printf("Finished reachability test with N=" + n + ": ");
 		printTimestamp();
 		System.out.println();
 	}
 	
 	private static void isolationTest(Scalability s, int n) throws VerifyClientException {
-		System.out.printf("Isolation test with " + n + " NATs: ");
+		System.out.printf("Isolation test with N=" + n + ": ");
 		printTimestamp();
 		Graph graph = generateNatScenario(n);
 		Graph createdGraph = s.client.createGraph(graph).readEntity(Graph.class);
-		Verification result = s.client.getIsolation(createdGraph.getId(), "client", "server", "nat1");
+		Verification result = s.client.getIsolation(createdGraph.getId(), "client", "server", "firewall");
 		System.out.println("Test returned " + result.getResult());
-		System.out.printf("Finished isolation test with " + n + " NATs: ");
+		System.out.printf("Finished isolation test with N=" + n + ": ");
 		printTimestamp();
 		System.out.println();
 	}
 	
 	private static void traversalTest(Scalability s, int n) throws VerifyClientException {
-		System.out.printf("Traversal test with " + n + " NATs: ");
+		System.out.printf("Traversal test with N=" + n + ": ");
 		printTimestamp();
 		Graph graph = generateNatScenario(n);
 		Graph createdGraph = s.client.createGraph(graph).readEntity(Graph.class);
-		Verification result = s.client.getIsolation(createdGraph.getId(), "client", "server", "nat1");
+		Verification result = s.client.getTraversal(createdGraph.getId(), "client", "server", "firewall");
 		System.out.println("Test returned " + result.getResult());
-		System.out.printf("Finished traversal test with " + n + " NATs: ");
+//		System.out.println("Result explanation: " + result.getComment());
+		System.out.printf("Finished traversal test with N=" + n + ": ");
 		printTimestamp();
 		System.out.println();
 	}
@@ -165,6 +229,9 @@ public class Scalability {
 			if(nat.getId() != 1){
 				natNeighbours.put(1L, new Neighbour(1L, "nat" + i));
 				configArray.add("client");
+				for (int j=1; j <= i; j++){
+					configArray.add("nat" + j);
+				}
 			}
 			//first nat: set only client as neighbour and natted node
 			else{
@@ -275,6 +342,83 @@ public class Scalability {
 		
 		Map<Long, Neighbour> serverNeighbours = new HashMap<Long, Neighbour>();
 		serverNeighbours.put(1L, new Neighbour(1L, "firewall" + (n)));
+		server.setNeighbours(serverNeighbours );
+		
+		//add server to list
+		nodes.add(server);
+		
+		//create graph
+		Graph g = new Graph();
+		Map<Long, Node> graphNodes = new HashMap<Long, Node>();
+		long index = 1L;
+		for (Node node : nodes){
+			graphNodes.put(index, node);
+			index++;
+		}
+		g.setNodes(graphNodes);
+		
+		return g;
+	}
+	
+	private static Graph generateScenario(int n) {
+		List<Node> nodes = new ArrayList<Node>();
+		
+		Node firewall = new Node();
+		firewall.setName("firewall");
+		firewall.setFunctional_type("firewall");
+		ArrayNode firewallConfigArray = new ObjectMapper().createArrayNode();
+		Map<Long, Neighbour> firewallNeighbours = new HashMap<Long, Neighbour>();
+		
+		for (int i=0; i < n; i++){
+			if(i!=0){
+				JsonNode firewallEntry = new ObjectMapper().createObjectNode();
+				((ObjectNode) firewallEntry).put("server", "client" + (i+1));
+				firewallConfigArray.add(firewallEntry);
+			}
+			firewallNeighbours.put(new Long(i+1), new Neighbour(new Long(i+1), "client" + (i+1)));
+		}
+		
+		firewallNeighbours.put(new Long(n+1), new Neighbour(new Long(n+1), "server"));
+		
+		firewall.setConfiguration(new Configuration(firewall.getName(),"", firewallConfigArray));
+		
+		
+		firewall.setNeighbours(firewallNeighbours );
+		//add client to list
+		nodes.add(firewall);
+		
+		for(int i=0; i< n;i++){
+			Node client = new Node();
+			client.setId(i+1);
+			client.setName("client" + (i+1));
+			client.setFunctional_type("endhost");
+			ArrayNode clientConfigArray = new ObjectMapper().createArrayNode();
+			JsonNode clientConfig = new ObjectMapper().createObjectNode();
+			((ObjectNode)clientConfig).put("url", "www.facebook.com");
+			((ObjectNode)clientConfig).put("body", "word");
+			((ObjectNode)clientConfig).put("destination","server");
+			((ObjectNode)clientConfig).put("protocol", "HTTP_REQUEST");
+			clientConfigArray.add(clientConfig);
+			
+			Map<Long, Neighbour> clientNeighbours = new HashMap<Long, Neighbour>();
+			
+			clientNeighbours.put(1L, new Neighbour(1L, "firewall"));
+									
+			client.setNeighbours(clientNeighbours);
+			client.setConfiguration(new Configuration(client.getName(),"", clientConfigArray));
+			
+			//add client to list
+			nodes.add(client);
+		}
+		
+		Node server = new Node();
+		server.setName("server");
+		server.setFunctional_type("webserver");
+		ArrayNode serverConfigArray = new ObjectMapper().createArrayNode();
+		server.setConfiguration(new Configuration(server.getName(),"", serverConfigArray));
+		
+		Map<Long, Neighbour> serverNeighbours = new HashMap<Long, Neighbour>();
+		serverNeighbours.put(1L, new Neighbour(1L, "firewall"));
 		server.setNeighbours(serverNeighbours );
 		
 		//add server to list
