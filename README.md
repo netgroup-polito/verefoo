@@ -41,9 +41,13 @@ set CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\shared\qjutils.jar;%CATALINA_HOME%\sha
   e.g.  
   `tar zxvf jdk-7u<version>-linux-x64.tar.gz`  
 - delete the `.tar.gz` file if you want to save disk space
-- install and configure Apache Tomcat 8 with the following commands:  
-  `wget http://it.apache.contactlab.it/tomcat/tomcat-8/v8.0.32/bin/apache-tomcat-8.0.32.tar.gz`  
-  `tar xvf apache-tomcat-8.0.32.tar.gz`  
+- install and configure Apache Tomcat 8 with the following commands:
+  - go to [this URL](http://it.apache.contactlab.it/tomcat/tomcat-8/) and see what the latest available version is
+  - download the archive (substitute every occurrence of '8.0.32' in the following command with the latest available version):  
+  `wget http://it.apache.contactlab.it/tomcat/tomcat-8/v8.0.32/bin/apache-tomcat-8.0.32.tar.gz`
+  - extract downloaded archive:    
+  `tar xvf apache-tomcat-8.0.32.tar.gz`
+  - edit configuration:    
   `nano ./apache-tomcat-8.0.32/conf/tomcat-users.xml`  
   - under the `tomcat-users` tag place the following content
   ```xml

@@ -26,6 +26,8 @@ public class Scalability {
 	public static void main(String[] args) throws VerifyClientException {
 		Scalability s = new Scalability();
 		
+		reachabilityTest(s, 10);
+		
 		reachabilityTest(s,50);                                                                                                                                                                            
 		reachabilityTest(s,100);                                                                                                                                                                           
 		reachabilityTest(s,150);                                                                                                                                                                           
