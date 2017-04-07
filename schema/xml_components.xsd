@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:simpleType name="functionalTypes">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ACLFIREWALL"/>
+			<xsd:enumeration value="ENDHOST"/>
+			<xsd:enumeration value="ENDPOINT"/>
+			<xsd:enumeration value="ANTISPAM"/>
+			<xsd:enumeration value="CACHE"/>
+			<xsd:enumeration value="DPI"/>
+			<xsd:enumeration value="MAILCLIENT"/>
+			<xsd:enumeration value="MAILSERVER"/>
+			<xsd:enumeration value="NAT"/>
+			<xsd:enumeration value="VPNACCESS"/>
+			<xsd:enumeration value="VPNEXIT"/>
+			<xsd:enumeration value="WEBCLIENT"/>
+			<xsd:enumeration value="WEBSERVER"/>
+			<xsd:enumeration value="FIELDMODIFIER"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="policyTypes">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="reachability"/>
+			<xsd:enumeration value="traversal"/>
+			<xsd:enumeration value="isolation"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="graphs">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="graph" maxOccurs="unbounded" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		<xsd:unique name="uniqueGraph">
+		   	<xsd:selector xpath="graph" /> 
+		   	<xsd:field xpath="@id" /> 	
+		</xsd:unique>
+	</xsd:element>
+	<xsd:element name="graph">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="node" maxOccurs="unbounded"></xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:long" use="optional"/>
+		</xsd:complexType>
+		<xsd:unique name="uniqueNodeId">
+			<xsd:selector xpath="node"/>
+			<xsd:field xpath="@id"/>
+		</xsd:unique>
+		<xsd:key name="keyNode">
+			<xsd:selector xpath="node"/>
+			<xsd:field xpath="@name"/>
+		</xsd:key>
+		<xsd:keyref name="keyRefNodeSrc" refer="keyNode">
+			<xsd:selector xpath="node/neighbour"/>
+			<xsd:field xpath="@name"/>
+		</xsd:keyref>
+	</xsd:element>
+	<xsd:element name="node">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="neighbour" maxOccurs="unbounded" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:long" use="optional"/>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
+			<xsd:attribute name="functional_type" type="functionalTypes" use="required"/>
+		</xsd:complexType>
+		<xsd:unique name="uniqueNeighbourId">
+			<xsd:selector xpath="neighbour"/>
+			<xsd:field xpath="@id"/>
+		</xsd:unique>
+	</xsd:element>
+	<xsd:element name="neighbour">
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:long" use="optional"/>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="paths">
+ 		<xsd:complexType>
+ 			<xsd:choice>
+ 				<xsd:element name="message" type="xsd:string"/>
+ 				<xsd:element name="path" type="xsd:string" maxOccurs="unbounded"/>
+ 			</xsd:choice>
+ 			<xsd:attribute name="source" type="xsd:string" use="required"/>
+ 			<xsd:attribute name="destination" type="xsd:string" use="required"/>
+ 			<xsd:attribute name="direction" type="xsd:string" use="required"/>
+ 		</xsd:complexType>
+ 	</xsd:element>
+ 	<xsd:element name="reachability">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="result" type="xsd:boolean"/>
+			</xsd:sequence>
+			<xsd:attribute name="source" type="xsd:string" use="required"/>
+ 			<xsd:attribute name="destination" type="xsd:string" use="required"/>
+ 			<xsd:attribute name="direction" type="xsd:string" use="required"/>
+		</xsd:complexType> 	
+ 	</xsd:element>
+  	<xsd:element name="policy">
+ 		<xsd:complexType>
+ 			<xsd:sequence>
+				<xsd:element name="result" type="xsd:boolean"/>
+			</xsd:sequence>
+			<xsd:attribute name="source" type="xsd:string" use="required"/>
+			<xsd:attribute name="middlebox" type="xsd:string" use="optional"/>
+ 			<xsd:attribute name="destination" type="xsd:string" use="required"/>
+ 			<xsd:attribute name="type" type="policyTypes" use="required"/>
+ 		</xsd:complexType>
+ 	</xsd:element>
+</xsd:schema>

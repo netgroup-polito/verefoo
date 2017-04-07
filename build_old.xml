@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Verigraph" default="package-service" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant" >
+	<description>
+			Script for Verigraph
+	</description>
+
+	
+	<property name="root.location" location="." />
+	
+	<!-- The location to be used for class files -->
+	<property name="src.dir" location="${root.location}/src" />
+	<property name="path.prefix" value="it/polito" />
+	<property name="build.dir" location="${root.location}/build" />
+	<!-- The location for source files -->
+	<property name="src.dir" location="${lab3.location}/src" />
+	<!-- The location for solutions -->
+	<property name="lib.dir" location="${root.location}/lib" />
+	<property name="schemadir" location="${root.location}/schema"/>
+	<property name="schemafile" value="xml_components.xsd"/>
+	<property name="target" value="1.8" />
+	<property name="source" value="1.8" />	
+	
+	<property name="gen-tomcat-service.dir" location="${root.location}/target"/>
+	<property name="resources.dir" location="${root.location}/webapp"/>
+	<property name="gen-war.dir" location="${root.location}/war" />
+	
+	<path id="maven-ant-tasks.classpath" path="lib/maven-ant-tasks-2.1.3.jar" />
+	<typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+           uri="antlib:org.apache.maven.artifact.ant"
+           classpathref="maven-ant-tasks.classpath" />
+	<property file="build.properties"/>
+
+
+
+	
+	<import file="tomcat-build.xml"/>
+	
+	<path id="classpath">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>		
+	</path>
+	
+	<path id="build.classpath">
+    <fileset refid="mvn-dependencies" />
+</path>
+	
+	<!-- Load pom.xml for dependencies -->
+	<artifact:pom id="pomfile" file="pom.xml" />
+	<artifact:dependencies filesetId="mvn-dependencies" pomRefId="pomfile" />
+	
+
+	<target name="init">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${gen-tomcat-service.dir}"/>		
+	</target>
+
+	
+	
+	
+	
+
+	<!-- The target for compiling the Verigraph application -->
+	<target name="build-service" depends="init">
+		<echo>Building verigraph (if needed)...</echo>
+		<javac 
+			destdir="${build.dir}"
+			debug="${debug}"
+			debuglevel="${debuglevel}"
+			source="${source}"
+			target="${target}"
+			includeantruntime="false">
+				<src path="${src.dir}" />
+				<include name="${path.prefix}/**/*.java"/> 
+				<classpath>
+					<path refid="build.classpath" />
+				</classpath>
+				
+		</javac>
+		<echo>Done.</echo>
+	</target>
+
+
+	
+	<target name="package-service" depends="build-service">
+	
+		<!-- copy web module resource files to temporary destination folder -->
+    	<copy toDir="${gen-tomcat-service.dir}" overwrite="true">
+        	<fileset dir="${resources.dir}">
+			</fileset>
+      	</copy>
+		<!-- copy class files to WEB-INF/classes directory -->
+    	<copy toDir="${gen-tomcat-service.dir}/WEB-INF/classes" overwrite="true">
+        	<fileset dir="${build.dir}"/>
+      	</copy>
+		<!-- copy lib files to WEB-INF/lib directory -->
+    	<copy toDir="${gen-tomcat-service.dir}/WEB-INF/lib" overwrite="true">
+        	<fileset dir="${lib.dir}">
+        		<include name="*.jar"/>        		
+			</fileset>
+      	</copy> 
+		<!-- make war archive -->
+		<jar destfile="${gen-war.dir}/${serviceName}.war" basedir="${gen-tomcat-service.dir}"/>
+	</target>
+	
+	<!-- target for cleaning -->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${gen-tomcat-service.dir}"/>
+	</target>
+
+	
+</project>

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="verify">
+    <wb-module deploy-name="verigraph">
+        <wb-resource deploy-path="/" source-path="/webapp"/>
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/service/generated/gen-src"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/service/src"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
-        <wb-resource deploy-path="/" source-path="/src/main/webapp"/>
-        <property name="context-root" value="verify"/>
-        <property name="java-output-path" value="/verify/target/classes"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/test"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        
+        <property name="java-output-path" value="/verigraph/target/classes"/>
+        <property name="context-root" value="verigraph"/>
     </wb-module>
 </project-modules>
