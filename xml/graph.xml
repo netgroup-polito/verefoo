@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<graph xmlns="http://www.example.org/verigraph/" id="2">
-    <node id="2" name="pippo" functional_type="ENDPOINT"/>
-</graph>

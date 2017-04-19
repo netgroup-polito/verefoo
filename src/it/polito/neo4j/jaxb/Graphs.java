@@ -1,8 +1,8 @@
 //
-// Questo file ï¿½ stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
+// Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
-// Qualsiasi modifica a questo file andrï¿½ persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2017.03.01 alle 04:27:21 PM CET 
+// Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
+// Generato il: 2017.04.13 alle 07:43:11 PM CEST 
 //
 
 

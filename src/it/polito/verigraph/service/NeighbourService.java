@@ -1,11 +1,17 @@
 package it.polito.verigraph.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBException;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import it.polito.neo4j.manager.Neo4jDBManager;
-import it.polito.verigraph.database.DatabaseClass;
 import it.polito.verigraph.exception.BadRequestException;
 import it.polito.verigraph.exception.DataNotFoundException;
 import it.polito.verigraph.exception.ForbiddenException;
@@ -16,46 +22,32 @@ import it.polito.verigraph.model.Node;
 public class NeighbourService {
 
 	private Neo4jDBManager manager=new Neo4jDBManager();
-	private Map<Long, Graph> graphs = DatabaseClass.getInstance().getGraphs();
 
-	public List<Neighbour> getAllNeighbours(long graphId, long nodeId) {
-		if (graphId <= 0) {
+
+	public List<Neighbour> getAllNeighbours(long graphId, long nodeId) throws JsonProcessingException {
+		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
-		if (nodeId <= 0) {
+		if (nodeId < 0) {
 			throw new ForbiddenException("Illegal node id: " + nodeId);
 		}
-		Graph graph = graphs.get(graphId);
-		if (graph == null)
-			throw new DataNotFoundException("Graph with id " + graphId + " not found");
-		Map<Long, Node> nodes = graph.getNodes();
-		Node node = nodes.get(nodeId);
-		if (node == null)
-			throw new DataNotFoundException("Node with id " + nodeId + " not found in graph with id " + graphId);
-		Map<Long, Neighbour> neighbours = node.getNeighbours();
+		
+		Map<Long, Neighbour> neighbours = manager.getNeighbours(graphId, nodeId);
 		return new ArrayList<Neighbour>(neighbours.values());
 	}
 
-	public Neighbour getNeighbour(long graphId, long nodeId, long neighbourId) {
-		if (graphId <= 0) {
+	public Neighbour getNeighbour(long graphId, long nodeId, long neighbourId) throws JsonProcessingException {
+		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
-		if (nodeId <= 0) {
+		if (nodeId < 0) {
 			throw new ForbiddenException("Illegal node id: " + nodeId);
 		}
-		if (neighbourId <= 0) {
+		if (neighbourId < 0) {
 			throw new ForbiddenException("Illegal neighbour id: " + neighbourId);
 		}
-		Graph graph = graphs.get(graphId);
-		if (graph == null)
-			throw new DataNotFoundException("Graph with id " + graphId + " not found");
-		Map<Long, Node> nodes = graph.getNodes();
-		Node node = nodes.get(nodeId);
-		if (node == null) {
-			throw new DataNotFoundException("Node with id " + nodeId + " not found in graph with id " + graphId);
-		}
-		Map<Long, Neighbour> neighbours = node.getNeighbours();
-		Neighbour neighbour = neighbours.get(neighbourId);
+		
+		Neighbour neighbour=manager.getNeighbour(graphId, nodeId, neighbourId);
 		if (neighbour == null) {
 			throw new DataNotFoundException("Neighbour with id "	+ neighbourId + " not found for node with id " + nodeId
 											+ " in graph with id " + graphId);
@@ -63,97 +55,65 @@ public class NeighbourService {
 		return neighbour;
 	}
 
-	public Neighbour addNeighbour(long graphId, long nodeId, Neighbour neighbour) {
-		if (graphId <= 0) {
+	public Neighbour addNeighbour(long graphId, long nodeId, Neighbour neighbour) throws JsonParseException, JsonMappingException, JAXBException, IOException {
+		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
-		if (nodeId <= 0) {
+		if (nodeId < 0) {
 			throw new ForbiddenException("Illegal node id: " + nodeId);
 		}
-		Graph graph = graphs.get(graphId);
-		if (graph == null)
-			throw new DataNotFoundException("Graph with id " + graphId + " not found");
-		Map<Long, Node> nodes = graph.getNodes();
-		Node node = nodes.get(nodeId);
-		if (node == null) {
-			throw new DataNotFoundException("Node with id " + nodeId + " not found in graph with id " + graphId);
-		}
-		Map<Long, Neighbour> neighbours = node.getNeighbours();
-
-		validateNeighbour(graph, node, neighbour);
-		Neighbour out;
 		
-		synchronized (this) {
-			neighbour.setId(neighbours.size() + 1);
-			neighbours.put(neighbour.getId(), neighbour);
-			DatabaseClass.persistDatabase();
-			out=neighbour;
-			//return neighbour;
-		}
-		manager.addNeighbours(graphId, nodeId, neighbour);
+		
+		Graph graph = manager.getGraph(graphId);
+	
+		Node node=manager.getNodeById(nodeId, graphId);
+		
+		validateNeighbour(graph, node, neighbour);
+				
+	
+		Neighbour out=manager.addNeighbours(graphId, nodeId, neighbour);
+		validateNeighbour(graph, node, neighbour);
 		return out;
 	}
 
-	public Neighbour updateNeighbour(long graphId, long nodeId, Neighbour neighbour) {
-		if (graphId <= 0) {
+	public Neighbour updateNeighbour(long graphId, long nodeId, Neighbour neighbour) throws JAXBException, IOException {
+		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
-		if (nodeId <= 0) {
+		if (nodeId < 0) {
 			throw new ForbiddenException("Illegal node id: " + nodeId);
 		}
-		if (neighbour.getId() <= 0) {
+		if (neighbour.getId() < 0) {
 			throw new ForbiddenException("Illegal neighbour id: " + nodeId);
 		}
-		Graph graph = graphs.get(graphId);
-		if (graph == null)
-			throw new DataNotFoundException("Graph with id " + graphId + " not found");
-		Map<Long, Node> nodes = graph.getNodes();
-		Node node = nodes.get(nodeId);
+		Graph graph=manager.getGraph(graphId);
+		Node node=manager.getNodeById(nodeId, graphId);
 		if (node == null) {
 			throw new DataNotFoundException("Node with id " + nodeId + " not found in graph with id " + graphId);
 		}
-		Map<Long, Neighbour> neighbours = node.getNeighbours();
-		Neighbour currentNeighbour = neighbours.get(neighbour.getId());
-		if (currentNeighbour == null) {
-			throw new DataNotFoundException("Neighbour with id "	+ neighbour.getId() + " not found for node with id "
-											+ nodeId + " in graph with id " + graphId);
-		}
-
+		
 		validateNeighbour(graph, node, neighbour);
-		manager.updateNeighbour(graphId, nodeId, neighbour);
-		synchronized (this) {
-			neighbours.put(neighbour.getId(), neighbour);
-			DatabaseClass.persistDatabase();
-			return neighbour;
-		}
+		Neighbour n=manager.updateNeighbour(graphId, nodeId, neighbour);
+	
+		return n;
 	}
 
 	public Neighbour removeNeighbour(long graphId, long nodeId, long neighbourId) {
-		if (graphId <= 0) {
+		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
-		if (nodeId <= 0) {
+		if (nodeId < 0) {
 			throw new ForbiddenException("Illegal node id: " + nodeId);
 		}
-		if (neighbourId <= 0) {
+		if (neighbourId < 0) {
 			throw new ForbiddenException("Illegal neighbour id: " + nodeId);
-		}
-		Graph graph = graphs.get(graphId);
-		if (graph == null)
-			throw new DataNotFoundException("Graph with id " + graphId + " not found");
-		Map<Long, Node> nodes = graph.getNodes();
-		Node node = nodes.get(nodeId);
-		if (node == null) {
-			throw new DataNotFoundException("Node with id " + nodeId + " not found in graph with id " + graphId);
-		}
-		Map<Long, Neighbour> neighbours = node.getNeighbours();
-		manager.deleteNeighbour(graphId, nodeId, neighbourId);
-		synchronized(this){
-			return neighbours.remove(neighbourId);
-		}
+		}		
+		
+		Neighbour n=manager.deleteNeighbour(graphId, nodeId, neighbourId);
+		return n;
 	}
 
-	public static void validateNeighbour(Graph graph, Node node, Neighbour neighbour) {
+	public static void validateNeighbour(Graph graph, Node node, Neighbour neighbour) throws JsonProcessingException {
 		if (graph == null)
 			throw new BadRequestException("Neighbour validation failed: cannot validate null graph");
 		if (node == null)
@@ -166,7 +126,9 @@ public class NeighbourService {
 		if (neighbour.getName().equals(""))
 			throw new BadRequestException("Neighbour validation failed: neighbour 'name' field cannot be an empty string");
 
-		Node nodeFound = graph.searchNodeByName(neighbour.getName());
+		//Node nodeFound = graph.searchNodeByName(neighbour.getName());
+		
+		Node nodeFound=graph.searchNodeByName(neighbour.getName());
 		if ((nodeFound == null) || (nodeFound.getName().equals(node.getName())))
 			throw new BadRequestException("Neighbour validation failed: '"	+ neighbour.getName()
 											+ "' is not a valid name for a neighbour of node '" + node.getName() + "'");

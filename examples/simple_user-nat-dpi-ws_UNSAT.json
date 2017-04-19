@@ -1,7 +1,7 @@
 {
    "nodes":[
       {
-         "name":"user1",
+         "name":"user2",
          "functional_type":"endhost",
          "neighbours":[
             {

@@ -1,5 +1,6 @@
 package it.polito.verigraph.resources;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -17,12 +18,18 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.JAXBException;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import it.polito.neo4j.exceptions.MyNotFoundException;
+import it.polito.neo4j.manager.Neo4jDBManager;
 import it.polito.verigraph.exception.BadRequestException;
 import it.polito.verigraph.exception.ForbiddenException;
 import it.polito.verigraph.model.Configuration;
@@ -39,6 +46,7 @@ import it.polito.verigraph.service.NodeService;
 public class NodeResource {
 	
 	NodeService nodeService = new NodeService();
+
 	
     
     @GET
@@ -52,7 +60,7 @@ public class NodeResource {
     						@ApiResponse(code = 404, message = "Graph not found", response = ErrorMessage.class),
     						@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
     						@ApiResponse(code = 200, message = "All the nodes have been returned in the message body", response = Node.class, responseContainer = "List") })
-    public List<Node> getNodes(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId){
+    public List<Node> getNodes(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId) throws JsonParseException, JsonMappingException, JAXBException, IOException, MyNotFoundException{
     	return nodeService.getAllNodes(graphId);
     }
     
@@ -70,7 +78,7 @@ public class NodeResource {
     public Response addNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
     		@ApiParam(value = "New node object", required = true) Node node,
-    		@Context UriInfo uriInfo) {
+    		@Context UriInfo uriInfo) throws JsonParseException, JsonMappingException, JAXBException, IOException {
         Node newNode = nodeService.addNode(graphId, node);
         String newId = String.valueOf(newNode.getId());
         URI uri = uriInfo.getAbsolutePathBuilder().path(newId).build();
@@ -93,7 +101,7 @@ public class NodeResource {
     public Node getNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
     		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
-    		@Context UriInfo uriInfo){
+    		@Context UriInfo uriInfo) throws JsonParseException, JsonMappingException, JAXBException, IOException, MyNotFoundException{
     	Node node = nodeService.getNode(graphId, nodeId);
     	node.addLink(getUriForSelf(uriInfo, graphId, node), "self");
     	node.addLink(getUriForNeighbours(uriInfo, graphId, node), "neighbours");
@@ -109,44 +117,16 @@ public class NodeResource {
     @ApiResponses(value = { @ApiResponse(code = 403, message = "Invalid graph and/or node id", response = ErrorMessage.class),
     						@ApiResponse(code = 404, message = "Graph and/or node not found", response = ErrorMessage.class),
     						@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
-    						@ApiResponse(code = 200, message = "Configuration updated for the requested node")})
-    public void addNodeConfiguration(
+    						@ApiResponse(code = 200, message = "Configuration updated for the requested node", response=Configuration.class)})
+    public Configuration addNodeConfiguration(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
     		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
     		@ApiParam(value = "Node configuration", required = true) Configuration nodeConfiguration,
-    		@Context UriInfo uriInfo){
-    	if (graphId <= 0) {
-			throw new ForbiddenException("Illegal graph id: " + graphId);
-		}
-		if (nodeId <= 0) {
-			throw new ForbiddenException("Illegal node id: " + nodeId);
-		}
-    	Graph graph = new GraphService().getGraph(graphId);
-    	if (graph == null){
-    		throw new BadRequestException("Graph with id " + graphId + " not found");
-    	}
-    	Node node = nodeService.getNode(graphId, nodeId);
-    	if (node == null){
-    		throw new BadRequestException("Node with id " + nodeId + " not found in graph with id " + graphId);
-    	}
-    	Node nodeCopy = new Node();
-    	nodeCopy.setId(node.getId());
-    	nodeCopy.setName(node.getName());
-    	nodeCopy.setFunctional_type(node.getFunctional_type());
-    	Map<Long,Neighbour> nodes = new HashMap<Long,Neighbour>();
-    	nodes.putAll(node.getNeighbours());
-    	nodeCopy.setNeighbours(nodes);
-    	nodeConfiguration.setId(nodeCopy.getName());
-    	nodeCopy.setConfiguration(nodeConfiguration);
+    		@Context UriInfo uriInfo) throws JsonParseException, JsonMappingException, JAXBException, IOException, MyNotFoundException{
     	
-    	Graph graphCopy = new Graph();
-		graphCopy.setId(graph.getId());
-		graphCopy.setNodes(new HashMap<Long, Node>(graph.getNodes()));
-		graphCopy.getNodes().remove(node.getId());
-		
-		NodeService.validateNode(graphCopy, nodeCopy);
-		
-    	graph.getNodes().put(nodeId, nodeCopy);
+    	Configuration conf=nodeService.addNodeConfiguration(graphId, nodeId, nodeConfiguration);
+    	return conf;
+    	
     }
     
 
@@ -165,7 +145,7 @@ public class NodeResource {
     public Node updateNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
     		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
-    		@ApiParam(value = "Updated node object", required = true) Node node){
+    		@ApiParam(value = "Updated node object", required = true) Node node) throws JAXBException, IOException{
     	node.setId(nodeId);
     	return nodeService.updateNode(graphId, node);
     }
@@ -181,7 +161,7 @@ public class NodeResource {
     						@ApiResponse(code = 204, message = "Node successfully deleted")})
     public void deleteNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
-    		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId){
+    		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId) throws JsonParseException, JsonMappingException, JAXBException, IOException{
     	nodeService.removeNode(graphId, nodeId);
     }
     

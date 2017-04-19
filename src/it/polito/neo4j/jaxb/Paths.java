@@ -1,8 +1,8 @@
 //
-// Questo file ï¿½ stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
+// Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
-// Qualsiasi modifica a questo file andrï¿½ persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2017.03.01 alle 04:27:21 PM CET 
+// Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
+// Generato il: 2017.04.13 alle 07:43:11 PM CEST 
 //
 
 
@@ -58,7 +58,7 @@ public class Paths {
     protected String direction;
 
     /**
-     * Recupera il valore della proprietï¿½ message.
+     * Recupera il valore della proprietà message.
      * 
      * @return
      *     possible object is
@@ -70,7 +70,7 @@ public class Paths {
     }
 
     /**
-     * Imposta il valore della proprietï¿½ message.
+     * Imposta il valore della proprietà message.
      * 
      * @param value
      *     allowed object is
@@ -111,7 +111,7 @@ public class Paths {
     }
 
     /**
-     * Recupera il valore della proprietï¿½ source.
+     * Recupera il valore della proprietà source.
      * 
      * @return
      *     possible object is
@@ -123,7 +123,7 @@ public class Paths {
     }
 
     /**
-     * Imposta il valore della proprietï¿½ source.
+     * Imposta il valore della proprietà source.
      * 
      * @param value
      *     allowed object is
@@ -135,7 +135,7 @@ public class Paths {
     }
 
     /**
-     * Recupera il valore della proprietï¿½ destination.
+     * Recupera il valore della proprietà destination.
      * 
      * @return
      *     possible object is
@@ -147,7 +147,7 @@ public class Paths {
     }
 
     /**
-     * Imposta il valore della proprietï¿½ destination.
+     * Imposta il valore della proprietà destination.
      * 
      * @param value
      *     allowed object is
@@ -159,7 +159,7 @@ public class Paths {
     }
 
     /**
-     * Recupera il valore della proprietï¿½ direction.
+     * Recupera il valore della proprietà direction.
      * 
      * @return
      *     possible object is
@@ -171,7 +171,7 @@ public class Paths {
     }
 
     /**
-     * Imposta il valore della proprietï¿½ direction.
+     * Imposta il valore della proprietà direction.
      * 
      * @param value
      *     allowed object is

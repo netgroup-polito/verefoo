@@ -8,13 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.InternalServerErrorException;
+import javax.xml.bind.JAXBException;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.main.JsonSchema;
 
+import it.polito.neo4j.exceptions.MyNotFoundException;
 import it.polito.neo4j.manager.Neo4jDBManager;
-import it.polito.verigraph.database.DatabaseClass;
 import it.polito.verigraph.exception.BadRequestException;
 import it.polito.verigraph.exception.DataNotFoundException;
 import it.polito.verigraph.exception.ForbiddenException;
@@ -26,140 +30,96 @@ import it.polito.verigraph.model.Node;
 public class NodeService {
 
 	private Neo4jDBManager manager=new Neo4jDBManager();
-	private Map<Long, Graph> graphs = DatabaseClass.getInstance().getGraphs();
+
 
 	public NodeService() {
 
 	}
 
-	public List<Node> getAllNodes(long graphId) {
-		if (graphId <= 0) {
+	public List<Node> getAllNodes(long graphId) throws JsonParseException, JsonMappingException, JAXBException, IOException, MyNotFoundException {
+		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
-		Graph graph = graphs.get(graphId);
-		if (graph == null)
-			throw new DataNotFoundException("Graph with id " + graphId + " not found");
-		Map<Long, Node> nodes = graph.getNodes();
+		
+		/*il controllo sull'esistenza del grafo viene fatto all'interno della getNodes
+		
+		 */	
+	
+		Map<Long, Node> nodes =manager.getNodes(graphId);
 		return new ArrayList<Node>(nodes.values());
 	}
 
-	public Node getNode(long graphId, long nodeId) {
-		if (graphId <= 0) {
+	public Node getNode(long graphId, long nodeId) throws JsonParseException, JsonMappingException, JAXBException, IOException, MyNotFoundException {
+		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
-		if (nodeId <= 0) {
+		if (nodeId < 0) {
 			throw new ForbiddenException("Illegal node id: " + nodeId);
 		}
-		Graph graph = graphs.get(graphId);
-		if (graph == null)
-			throw new DataNotFoundException("Graph with id " + graphId + " not found");
-		Map<Long, Node> nodes = graph.getNodes();
-		Node node = nodes.get(nodeId);
+				
+		Node node=manager.getNodeById(nodeId, graphId);
 		if (node == null) {
 			throw new DataNotFoundException("Node with id " + nodeId + " not found in graph with id " + graphId);
 		}
 		return node;
 	}
 
-	public Node updateNode(long graphId, Node node) {
-		if (graphId <= 0) {
+	public Node updateNode(long graphId, Node node) throws JAXBException, IOException {
+		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
-		if (node.getId() <= 0) {
+		if (node.getId() < 0) {
 			throw new ForbiddenException("Illegal node id: " + node.getId());
 		}
-		Graph graph = graphs.get(graphId);
-		if (graph == null)
-			throw new DataNotFoundException("Graph with id " + graphId + " not found");
-		Map<Long, Node> nodes = graph.getNodes();
-		Node localNode = nodes.get(node.getId());
-		if (localNode == null) {
-			throw new DataNotFoundException("Node with id " + node.getId() + " not found in graph with id " + graphId);
-		}
+		
+		Graph graph=manager.getGraph(graphId);
+		validateNode(graph, node);
 
-		Graph graphCopy = new Graph();
-		graphCopy.setId(graph.getId());
-		graphCopy.setNodes(new HashMap<Long, Node>(graph.getNodes()));
-		graphCopy.getNodes().remove(node.getId());
-
-		// int numberOfNeighbours = 0;
-		// for(Neighbour neighbour : node.getNeighbours().values()){
-		// neighbour.setId(++numberOfNeighbours);
-		// }
-
-		for (Map.Entry<Long, Neighbour> neighbourEntry : node.getNeighbours().entrySet()) {
-			neighbourEntry.getValue().setId(neighbourEntry.getKey());
-		}
-
-		validateNode(graphCopy, node);
-
-		manager.updateNode(graphId, node, node.getId());
-		synchronized (this) {
-			nodes.put(node.getId(), node);
-			DatabaseClass.persistDatabase();
-			return node;
-		}
+		Node n=manager.updateNode(graphId, node, node.getId());
+		validateNode(graph, n);
+		
+		return n;
 	}
 
-	public Node removeNode(long graphId, long nodeId) {
-		if (graphId <= 0) {
+	public Node removeNode(long graphId, long nodeId) throws JsonParseException, JsonMappingException, JAXBException, IOException {
+		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
-		if (nodeId <= 0) {
+		if (nodeId < 0) {
 			throw new ForbiddenException("Illegal node id: " + nodeId);
 		}
-		Graph graph = graphs.get(graphId);
+		
+		Graph graph=manager.getGraph(graphId);
 		if (graph == null)
 			throw new DataNotFoundException("Graph with id " + graphId + " not found");
-		Map<Long, Node> nodes = graph.getNodes();
+	
 		
-		manager.deleteNode(graphId, nodeId);
-
-		synchronized (this) {
-			return nodes.remove(nodeId);
-		}
+		Node n=manager.deleteNode(graphId, nodeId);
+	
+		return n;
+		
 	}
 
-	public Node addNode(long graphId, Node node) {
-		if (graphId <= 0) {
+	public Node addNode(long graphId, Node node) throws JsonParseException, JsonMappingException, JAXBException, IOException {
+		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
-		Graph graph = graphs.get(graphId);
-		if (graph == null)
-			throw new DataNotFoundException("Graph with id " + graphId + " not found");
-		Map<Long, Node> nodes = graph.getNodes();
-
-		validateNode(graph, node);
 		
+		Graph graph=manager.getGraph(graphId);
 		
-		synchronized (this) {
-			node.setId(DatabaseClass.getInstance().getGraphNumberOfNodes(graphId) + 1);
-		}
+		validateNode(graph, node);		
 
-		// int numberOfNeighbours = 0;
-
-		for (Map.Entry<Long, Neighbour> neighbourEntry : node.getNeighbours().entrySet()) {
-			neighbourEntry.getValue().setId(neighbourEntry.getKey());
-		}
-
-		// for (Neighbour neighbour : node.getNeighbours().values()) {
-		// neighbour.setId(++numberOfNeighbours);
-		// }
-
-		manager.addNode(graphId, node);
-
-		synchronized (this) {
-			nodes.put(node.getId(), node);
-			DatabaseClass.persistDatabase();
-			return node;
-		}
+		Node n=manager.addNode(graphId, node);
+		validateNode(graph, n);
+		
+		return n;
 	}
 
-	public Node searchByName(long graphId, String nodeName) {
-		if (graphId <= 0) {
+	public Node searchByName(long graphId, String nodeName) throws JsonParseException, JsonMappingException, JAXBException, IOException {
+		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
-		Graph graph = graphs.get(graphId);
+		Graph graph = manager.getGraph(graphId);
 		if (graph == null)
 			throw new DataNotFoundException("Graph with id " + graphId + " not found");
 		Map<Long, Node> nodes = graph.getNodes();
@@ -171,7 +131,7 @@ public class NodeService {
 		return null;
 	}
 
-	public static void validateNode(Graph graph, Node node) {
+	public static void validateNode(Graph graph, Node node) throws JsonProcessingException {
 		if (graph == null)
 			throw new BadRequestException("Node validation failed: cannot validate null graph");
 		if (node == null)
@@ -187,7 +147,7 @@ public class NodeService {
 		if (node.getFunctional_type().equals(""))
 			throw new BadRequestException("Node validation failed: node 'functional_type' field cannot be an empty string");
 
-		Node nodeFound = graph.searchNodeByName(node.getName());
+		Node nodeFound =graph.searchNodeByName(node.getName());
 		if ((nodeFound != null) && (nodeFound.equals(node) == false))
 			throw new BadRequestException("Node validation failed: graph already has a node named '"	+ node.getName()
 											+ "'");
@@ -246,5 +206,25 @@ public class NodeService {
 
 		}
 
+	}
+
+	public Configuration addNodeConfiguration(long graphId, long nodeId, Configuration nodeConfiguration) throws IOException {
+		if (graphId < 0) {
+			throw new ForbiddenException("Illegal graph id: " + graphId);
+		}
+		if (nodeId < 0) {
+			throw new ForbiddenException("Illegal node id: " + nodeId);
+		}
+		
+		
+		Node node=manager.getNodeById(nodeId, graphId);
+		System.out.println("Nodo esistente");
+		validateNodeConfigurationAgainstSchemaFile(node, nodeConfiguration.getConfiguration());		
+
+		Configuration newConf=manager.updateConfiguration(nodeId, graphId, nodeConfiguration, node);
+		
+		return newConf;
+    	
+    
 	}
 }

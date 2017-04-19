@@ -30,6 +30,8 @@ import javax.xml.bind.JAXBException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import it.polito.neo4j.exceptions.MyInvalidDirectionException;
@@ -404,8 +406,8 @@ public class VerificationService {
 
 		try {
 			Class<?> userClass = new DynamicClassLoader(folder).load("tests." + filenameNoExtension);
-			Object context = ReflectUtil.newInstance(userClass);
-			Object result = ReflectUtil.invoke("run", context);
+			java.lang.Object context = ReflectUtil.newInstance(userClass);
+			java.lang.Object result = ReflectUtil.invoke("run", context);
 			return (int) result;
 		}
 		catch (Exception e) {
@@ -471,8 +473,8 @@ public class VerificationService {
 		}
 	}
 
-	public Verification verify(long graphId, VerificationBean verificationBean) throws MyInvalidDirectionException {
-		if (graphId <= 0) {
+	public Verification verify(long graphId, VerificationBean verificationBean) throws MyInvalidDirectionException, JsonParseException, JsonMappingException, JAXBException, IOException {
+		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
 		GraphService graphService = new GraphService();
@@ -492,9 +494,10 @@ public class VerificationService {
 		if (type == null || type.equals("")) {
 			throw new BadRequestException("Please specify the 'type' parameter in your request");
 		}
-
-		Node sourceNode = graph.searchNodeByName(verificationBean.getSource());
-		Node destinationNode = graph.searchNodeByName(verificationBean.getDestination());
+		Node sourceNode= manager.getNodeByName(graphId, verificationBean.getSource());
+		Node destinationNode=manager.getNodeByName(graphId, verificationBean.getDestination());
+		//Node sourceNode = graph.searchNodeByName(verificationBean.getSource());
+	//	Node destinationNode = graph.searchNodeByName(verificationBean.getDestination());
 
 		if (sourceNode == null) {
 			throw new BadRequestException("The 'source' parameter '" + source + "' is not valid, please insert the name of an existing node");

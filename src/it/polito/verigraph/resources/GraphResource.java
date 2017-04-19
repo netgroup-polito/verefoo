@@ -1,5 +1,6 @@
 package it.polito.verigraph.resources;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -18,12 +19,17 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBException;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import it.polito.neo4j.exceptions.MyInvalidDirectionException;
+import it.polito.neo4j.exceptions.MyNotFoundException;
 import it.polito.verigraph.model.ErrorMessage;
 import it.polito.verigraph.model.Graph;
 import it.polito.verigraph.model.Verification;
@@ -50,7 +56,7 @@ public class GraphResource {
 											response = Graph.class,
 											responseContainer = "List"),
 	                        @ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class)})
-	public List<Graph> getGraphs() {
+	public List<Graph> getGraphs() throws JsonProcessingException, MyNotFoundException {
 		return graphService.getAllGraphs();
 	}
 
@@ -63,7 +69,7 @@ public class GraphResource {
 							@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
 							@ApiResponse(code = 201, message = "Graph successfully created", response = Graph.class) })
 	public Response addGraph(	@ApiParam(value = "New graph object", required = true) Graph graph,
-								@Context UriInfo uriInfo) throws JAXBException {
+								@Context UriInfo uriInfo) throws JAXBException, JsonParseException, JsonMappingException, IOException {
 		Graph newGraph = graphService.addGraph(graph);
 		String newId = String.valueOf(newGraph.getId());
 		URI uri = uriInfo.getAbsolutePathBuilder().path(newId).build();
@@ -83,7 +89,7 @@ public class GraphResource {
 											message = "The requested graph has been returned in the message body",
 											response = Graph.class) })
 	public Graph getGraph(	@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
-							@Context UriInfo uriInfo) {
+							@Context UriInfo uriInfo) throws JsonParseException, JsonMappingException, JAXBException, IOException {
 		Graph graph = graphService.getGraph(graphId);
 		graph.addLink(getUriForSelf(uriInfo, graph), "self");
 		graph.addLink(getUriForNodes(uriInfo, graph), "nodes");
@@ -99,7 +105,7 @@ public class GraphResource {
 							@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
 							@ApiResponse(code = 200, message = "Graph edited successfully", response = Graph.class) })
 	public Graph updateGraph(	@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long id,
-								@ApiParam(value = "Updated graph object", required = true) Graph graph) throws JAXBException {
+								@ApiParam(value = "Updated graph object", required = true) Graph graph) throws JAXBException, JsonParseException, JsonMappingException, IOException {
 		graph.setId(id);
 		return graphService.updateGraph(graph);
 	}
@@ -128,7 +134,7 @@ public class GraphResource {
 							@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),})
 	public Verification verifyGraph(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
 									@ApiParam(	value = "'source' and 'destination' must refer to names of existing nodes in the same graph, 'type' refers to the required verification between the two (e.g. 'reachability')",
-												required = true) @BeanParam VerificationBean verificationBean) throws MyInvalidDirectionException {
+												required = true) @BeanParam VerificationBean verificationBean) throws MyInvalidDirectionException, JsonParseException, JsonMappingException, JAXBException, IOException {
 		
 		return verificationService.verify(graphId, verificationBean);
 	}

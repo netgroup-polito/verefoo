@@ -17,11 +17,11 @@ import it.polito.neo4j.exceptions.MyNotFoundException;
 public interface Neo4jDBInteraction {
 	public enum NodeType implements Label
 	{
-		Nffg, Node, AclFirewall, EndHost, EndPoint, Antispam, Cache, DPI, Mailclient, Mailserver, NAT, VPNAccess, VPNExit, Webclient, Webserver;
+		Nffg, Node, Firewall, EndHost, EndPoint, Antispam, Cache, DPI, Mailclient, Mailserver, NAT, VPNAccess, VPNExit, Webclient, Webserver, Configuration, Fieldmodifier;
 	}
 	public enum RelationType implements RelationshipType
 	{
-		PathRelationship, InfoRelationship, OwnerRelationship;
+		PathRelationship, OwnerRelationship, ConfigurationRelantionship, ElementRelationship;
 	}
 		
 	public void createGraphs(Graphs graphs) throws MyNotFoundException;
@@ -44,6 +44,5 @@ public interface Neo4jDBInteraction {
 	public Graph updateGraph(Graph graph, long graphId) throws MyNotFoundException, MyInvalidObjectException, DuplicateNodeException;
 	public it.polito.neo4j.jaxb.Node updateNeighbour(Neighbour neighbour, long graphId, long nodeId, long neighbourId) throws MyNotFoundException, MyInvalidObjectException;
 
-	public Reachability checkReachability(long graphId, String srcName, String dstName, String direction) throws MyNotFoundException;
 	public Paths findAllPathsBetweenTwoNodes(long graphId, String srcName, String dstName, String direction) throws MyNotFoundException;
 }

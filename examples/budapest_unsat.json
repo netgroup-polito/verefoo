@@ -41,7 +41,10 @@
 			],
 			"configuration": [
 				{
-					"webserver": "nat"
+					"webserver": "nat"					
+				},
+				{
+				"webserver":"dpi"
 				}
 			]
 		},

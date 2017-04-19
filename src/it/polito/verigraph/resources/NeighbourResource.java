@@ -1,5 +1,6 @@
 package it.polito.verigraph.resources;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -15,6 +16,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.JAXBException;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -45,7 +51,7 @@ public class NeighbourResource {
 							@ApiResponse(code = 200, message = "All the neighbours have been returned in the message body", response=Neighbour.class, responseContainer="List")})
 	public List<Neighbour> getAllNeighbours(
 			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
-			@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId){
+			@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId) throws JsonProcessingException{
 		return neighboursService.getAllNeighbours(graphId, nodeId);
 	}
 	
@@ -64,7 +70,7 @@ public class NeighbourResource {
 			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
 			@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId, 
 			@ApiParam(value = "New neighbour object. Neighbour name must refer to the name of an existing node of the same graph", required = true) Neighbour neighbour,
-			@Context UriInfo uriInfo){
+			@Context UriInfo uriInfo) throws JsonParseException, JsonMappingException, JAXBException, IOException{
 		Neighbour newNeighbour = neighboursService.addNeighbour(graphId, nodeId, neighbour);
 		String newId = String.valueOf(newNeighbour.getId());
         URI uri = uriInfo.getAbsolutePathBuilder().path(newId).build();
@@ -89,7 +95,7 @@ public class NeighbourResource {
 			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
 			@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
 			@ApiParam(value = "Neighbour id", required = true) @PathParam("neighbourId") long neighbourId,
-			@ApiParam(value = "Updated neighbour object. Neighbour name must refer to the name of an existing node of the same graph", required = true) Neighbour neighbour){
+			@ApiParam(value = "Updated neighbour object. Neighbour name must refer to the name of an existing node of the same graph", required = true) Neighbour neighbour) throws JAXBException, IOException{
 		neighbour.setId(neighbourId);
 		return neighboursService.updateNeighbour(graphId, nodeId, neighbour);
 	}
@@ -126,7 +132,7 @@ public class NeighbourResource {
 	public Neighbour getNeighbour(
 			@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
 			@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
-			@ApiParam(value = "Neighbour id", required = true) @PathParam("neighbourId") long neighbourId){
+			@ApiParam(value = "Neighbour id", required = true) @PathParam("neighbourId") long neighbourId) throws JsonProcessingException{
 		return neighboursService.getNeighbour(graphId, nodeId, neighbourId);
 	}
 }
