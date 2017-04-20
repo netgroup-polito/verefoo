@@ -71,8 +71,8 @@ public class VerificationService {
 	//public Paths getPaths(Graph graph, Node sourceNode, Node destinationNode) throws MyInvalidDirectionException {
 	private Paths getPaths(Graph graph, Node sourceNode, Node destinationNode) throws MyInvalidDirectionException {
 
-		String source = sourceNode.getName() + "_" + sourceNode.getId();
-		String destination = destinationNode.getName() + "_" + destinationNode.getId();
+		String source = sourceNode.getName();
+		String destination = destinationNode.getName();
 		
 		Paths paths;
 		paths=manager.getPath(graph.getId(), source, destination, "outgoing");
