@@ -69,7 +69,7 @@ public class PolitoVpnExit extends NetworkObject {
 	    solver.add(constraints.toArray(constr));
 	}
 	
-	public void vpnAccessModel(DatatypeExpr vpnAccessIp, DatatypeExpr vpnExitIp) {
+	public void vpnExitModel(DatatypeExpr vpnAccessIp, DatatypeExpr vpnExitIp) {
 		Expr x = ctx.mkConst("vpn_x", nctx.node);
 		Expr y = ctx.mkConst("vpn_y", nctx.node);
         

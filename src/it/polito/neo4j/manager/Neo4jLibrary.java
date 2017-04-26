@@ -84,8 +84,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		
 	private Neo4jLibrary()
 	{
-		String neo4jDeploymentFolder =  System.getProperty("catalina.home") + "/webapps/verigraph";
-		//String neo4jDeploymentFolder =  "C:/Users/Cristina/Documents";		
+		//String neo4jDeploymentFolder =  System.getProperty("catalina.home") + "/webapps/verigraph";
+		String neo4jDeploymentFolder =  "C:/Users/Cristina/Documents";		
 		Properties p = new Properties();
 		FileReader r;
 		try {
@@ -138,20 +138,25 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		try
 		{	
 			Node nffgRoot = graphDB.createNode(NodeType.Nffg);
-						
+			//nffgRoot.setProperty("name", "graph");
+			//nffgRoot.setProperty("id", graph.getId());
+			
 			nffgRoot.setProperty("id", nffgRoot.getId());
 			graph.setId(nffgRoot.getId());
 			
+			//System.out.println("graph modificato:" + nffgRoot.getProperty("id").toString());
+			//System.out.println("nffg " + nffgRoot.getId());
 			
+					
 			
 			for(it.polito.neo4j.jaxb.Node nodo : graph.getNode()){
 				Node newNode = createNode(nffgRoot, nodo, graph);
-			
+			//	System.out.println("nodo_id: " + newNode.getId());
 				nodo.setId(newNode.getId());
 				it.polito.neo4j.jaxb.Configuration c=nodo.getConfiguration();
 				Node newConf=createConfiguration(newNode, c);
 				c.setId(newConf.getId());
-				
+				//System.out.println("configuration_id: " + c.getId());
 			}
 			
 			//modifica l'id a tutti i neighbour inserendo l'id della relazione
@@ -163,7 +168,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				for(Neighbour neig : nodo.getNeighbour()){
 					Neighbour n = neighs.get(neig.getName());					
 					neig.setId(n.getId());
-				
+					//System.out.println("neighbour_id " +neig.getId() );
 				}
 				
 				
@@ -478,7 +483,9 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		if(srcNode==null){
 			throw new DataNotFoundException("Source node (in neighbour node) not found");
 		}
-	
+		//Node srcNode = graphDB.getNodeById(nodo.getId());
+		//Node srcNode=findNodeByNameAndId(nodo,graph);
+		//Node srcNode=findNodeByNameOfSpecificGraph(nodo.getName(), graph.getId());
 				
 		Map<String,Neighbour> neighbours = new HashMap<>();
 
@@ -514,9 +521,12 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		
 			for(Relationship rel : node.getRelationships(RelationType.OwnerRelationship)){
 				Node[] nodi = rel.getNodes();
-			
+				//System.out.println("nome relazione: " + nodi[0].getProperty("name"));
+				//System.out.println("nome relazione: " + nodi[1].getProperty("name"));
+				//System.out.println("nodi:" + nodi[0].getId() + "\ngraphID:" + graphId);
 				if(nodi[0].getId() == graphId || nodi[1].getId() == graphId){
-				
+					//System.out.println("rel:" + rel.getId());
+					//re.getId non è detto che sia uguale al graphId
 					if((long)rel.getProperty("id") == graphId)
 						return node;
 						
@@ -1566,9 +1576,13 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			findGraph(graphId);		
 			Node src = findNodeByNameOfSpecificGraph(srcName, graphId);
 			Node dst = findNodeByNameOfSpecificGraph(dstName, graphId);
-			if(src == null || dst == null){
+			if(src == null ){
 				tx.failure();
-				throw new MyNotFoundException("Source node and/or destination node are not exist");
+				throw new DataNotFoundException("Source node not exists");
+			}else
+				if(dst == null){
+					tx.failure();
+					throw new DataNotFoundException("Destination node not exists");
 			}
 			PathFinder<Path> finder = GraphAlgoFactory.allSimplePaths(PathExpanders.forTypeAndDirection(RelationType.PathRelationship, Direction.valueOf(direction.toUpperCase())), MAX_DEPTH);
 			//PathFinder<Path> finder = GraphAlgoFactory.allPaths(PathExpanders.forTypeAndDirection(RelationType.PathRelationship, Direction.valueOf(direction.toUpperCase())), MAX_DEPTH);

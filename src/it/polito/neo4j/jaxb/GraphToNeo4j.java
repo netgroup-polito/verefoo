@@ -756,7 +756,7 @@ case "WEBSERVER":{
 	if(!nodes.toString().equals(empty)){
 		ObjectMapper mapper=new ObjectMapper();		
 		java.util.Map<String, String> map=new LinkedHashMap();	
-		if(nodes.toString().equals("[]")){
+		if(nodes.toString().equals(empty)){
 			break;
 		}else{
 			String input;

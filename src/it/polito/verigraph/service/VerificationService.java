@@ -1,38 +1,24 @@
 package it.polito.verigraph.service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.util.Date;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.tools.Diagnostic;
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
-import javax.ws.rs.ProcessingException;
-import javax.xml.bind.JAXBException;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import javax.xml.bind.JAXBException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.microsoft.z3.Context;
+import com.microsoft.z3.Z3Exception;
 
 import it.polito.neo4j.exceptions.MyInvalidDirectionException;
 import it.polito.neo4j.jaxb.*;
@@ -41,28 +27,19 @@ import it.polito.neo4j.manager.Neo4jDBManager;
 import it.polito.verigraph.exception.BadRequestException;
 import it.polito.verigraph.exception.DataNotFoundException;
 import it.polito.verigraph.exception.ForbiddenException;
-import it.polito.verigraph.exception.InternalServerErrorException;
-import it.polito.verigraph.model.Configuration;
-import it.polito.verigraph.model.Entry;
 import it.polito.verigraph.model.Graph;
-import it.polito.verigraph.model.Neighbour;
+
 import it.polito.verigraph.model.Node;
 import it.polito.verigraph.model.Test;
 import it.polito.verigraph.model.Verification;
 import it.polito.verigraph.resources.beans.VerificationBean;
-import qj.util.ReflectUtil;
-import qj.util.lang.DynamicClassLoader;
+import it.polito.verigraph.solver.GeneratorSolver;
+import it.polito.verigraph.solver.Scenario;
 
-public class VerificationService {
-
-	private static final String	generatorFolder		= System.getProperty("catalina.base")
-														+ "/webapps/verigraph/WEB-INF/classes/tests/j-verigraph-generator";
-
-	private String				testClassGenerator	= generatorFolder + "/test_class_generator.py";
-
-	private String				testGenerator		= generatorFolder + "/test_generator.py";
+public class VerificationService {	
 	
 	private Neo4jDBManager manager=new Neo4jDBManager();
+	Context ctx;
 	
 	public VerificationService() {
 
@@ -106,370 +83,11 @@ public class VerificationService {
 		return newPath;
 	}
 
-	static private Map<String, Long> toMap(List<String> lst) {
-		return lst.stream().collect(Collectors.groupingBy(s -> s, Collectors.counting()));
-	}
 
-	
 	private void printListsOfStrings(String message, List<List<String>> lists) {
 		System.out.println(message);
 		for (List<String> element : lists) {
 			System.out.println(element);
-		}
-	}
-
-	private static File createTempDir(String prefix) throws IOException {
-		String tmpDirStr = System.getProperty("java.io.tmpdir");
-		if (tmpDirStr == null) {
-			throw new IOException("System property 'java.io.tmpdir' does not specify a tmp dir");
-		}
-
-		File tmpDir = new File(tmpDirStr);
-		if (!tmpDir.exists()) {
-			boolean created = tmpDir.mkdirs();
-			if (!created) {
-				throw new IOException("Unable to create tmp dir " + tmpDir);
-			}
-		}
-
-		File resultDir = null;
-		int suffix = (int) System.currentTimeMillis();
-		int failureCount = 0;
-		do {
-			resultDir = new File(tmpDir, prefix + suffix % 10000);
-			suffix++;
-			failureCount++;
-		} while (resultDir.exists() && failureCount < 50);
-
-		if (resultDir.exists()) {
-			throw new IOException(failureCount
-									+ " attempts to generate a non-existent directory name failed, giving up");
-		}
-		boolean created = resultDir.mkdir();
-		if (!created) {
-			throw new IOException("Failed to create tmp directory");
-		}
-
-		return resultDir;
-	}
-
-	@SuppressWarnings("unchecked")
-	private void generateChainsFile(Graph graph, List<List<String>> sanitizedPaths, String chainsFile) {
-		JSONObject root = new JSONObject();
-		JSONArray chains = new JSONArray();
-
-		int chainCounter = 0;
-
-		for (List<String> path : sanitizedPaths) {
-			Iterator<String> pathsIterator = path.iterator();
-			JSONObject chain = new JSONObject();
-			chain.put("id", ++chainCounter);
-			//chain.put("flowspace", "tcp=80");
-			JSONArray nodes = new JSONArray();
-			while (pathsIterator.hasNext()) {
-				String nodeName = (String) pathsIterator.next();
-				Node currentNode = graph.searchNodeByName(nodeName);
-				if (currentNode == null) {
-					throw new InternalServerErrorException("Unable to generate 'chains.json' for neo4jmanager: node "
-															+ nodeName + " not found");
-				}
-				JSONObject node = new JSONObject();
-				node.put("name", currentNode.getName());
-				// if(currentNode.getFunctional_type().equals("firewall"))
-				// node.put("address", "ip_nat");
-				// else
-				node.put("address", "ip_" + currentNode.getName());
-				node.put("functional_type", currentNode.getFunctional_type());
-				nodes.add(node);
-				chain.put("nodes", nodes);
-			}
-			chains.add(chain);
-		}
-		root.put("chains", chains);
-
-		try (FileWriter file = new FileWriter(chainsFile)) {
-			file.write(root.toJSONString());
-			System.out.println("Successfully created 'chains.json' with the following content:");
-			System.out.println(root);
-		}
-		catch (IOException e) {
-			throw new InternalServerErrorException("Error saving 'chains.json' for neo4jmanager");
-		}
-
-	}
-
-	@SuppressWarnings("unchecked")
-	private void generateConfigFile(Graph graph, String configFile) {
-		JSONObject root = new JSONObject();
-		JSONArray nodes = new JSONArray();
-
-		for (Node n : graph.getNodes().values()) {
-			JSONObject node = new JSONObject();
-			// JSONArray configuration = new JSONArray();
-			Configuration nodeConfig = n.getConfiguration();
-			JsonNode configuration = nodeConfig.getConfiguration();
-
-			node.put("configuration", configuration);
-			node.put("id", nodeConfig.getId());
-			node.put("description", nodeConfig.getDescription());
-
-			nodes.add(node);
-
-		}
-		root.put("nodes", nodes);
-
-		try (FileWriter file = new FileWriter(configFile)) {
-			file.write(root.toJSONString());
-			System.out.println("Successfully created 'config.json' with the following content:");
-			System.out.println(root);
-		}
-		catch (IOException e) {
-			throw new InternalServerErrorException("Error saving 'config.json' for neo4jmanager");
-		}
-
-	}
-
-	private void printCommand(String[] cmd) {
-		for (String c : cmd) {
-			System.out.printf(c + " ");
-		}
-		System.out.println("");
-	}
-
-	private String platfromIndependentPath(String path) {
-		path = path.replaceAll("/", Matcher.quoteReplacement(Character.toString(File.separatorChar)));
-		return path;
-	}
-
-	private void generateTestScenarios(String chainsFile, String configFile, String scenarioFile) {
-
-		String[] cmd = {	"python", platfromIndependentPath(testClassGenerator), "-c",
-							platfromIndependentPath(chainsFile), "-f", platfromIndependentPath(configFile), "-o",
-							platfromIndependentPath(scenarioFile) };
-		printCommand(cmd);
-
-		ProcessBuilder pb = new ProcessBuilder(cmd);
-		pb.redirectErrorStream(true);
-		Process process;
-		try {
-			process = pb.start();
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String line;
-			while ((line = reader.readLine()) != null)
-				System.out.println("test_class_generator.py: " + line);
-			process.waitFor();
-			if (process.exitValue() != 0) {
-				throw new InternalServerErrorException("Unable to generate test scenario file for the verification request: test_class_generator returned "
-														+ process.exitValue());
-			}
-		}
-		catch (IOException e) {
-			throw new InternalServerErrorException("Error generating tests for Z3: unable to execute generator");
-		}
-		catch (InterruptedException e) {
-			throw new InternalServerErrorException("Error generating tests for Z3: generator got interrupted during execution");
-		}
-
-	}
-
-	private void generateTests(	int scenariosCounter, String scenariosBasename, String source, String destination,
-								String testsBasename) {
-
-		List<String> scenarios = new ArrayList<String>();
-		List<String> tests = new ArrayList<String>();
-		for (int i = 0; i < scenariosCounter; i++) {
-			scenarios.add(scenariosBasename + "_" + (i + 1) + ".java");
-			tests.add(testsBasename + "_" + (i + 1) + ".java");
-		}
-
-		for (int i = 0; i < scenariosCounter; i++) {
-			String[] cmd = {	"python", platfromIndependentPath(testGenerator), "-i",
-								platfromIndependentPath(scenarios.get(i)), "-o", platfromIndependentPath(tests.get(i)),
-								"-s", source, "-d", destination };
-			printCommand(cmd);
-
-			ProcessBuilder pb = new ProcessBuilder(cmd);
-			pb.redirectErrorStream(true);
-			Process process;
-			try {
-				process = pb.start();
-
-				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-				String line;
-				while ((line = reader.readLine()) != null)
-					System.out.println("test_generator.py: " + line);
-				process.waitFor();
-				if (process.exitValue() != 0) {
-					throw new InternalServerErrorException("Unable to generate test file for the verification request: test_generator returned "
-															+ process.exitValue());
-				}
-			}
-			catch (IOException e) {
-				throw new InternalServerErrorException("Error generating tests for Z3: unable to execute generator");
-			}
-			catch (InterruptedException e) {
-				throw new InternalServerErrorException("Error generating tests for Z3: generator got interrupted during execution");
-			}
-
-		}
-
-	}
-
-	private void prepareForCompilationAndExecution(	int scenariosCounter, String scenarioBasename, String testBasename,
-													List<File> sourceFiles, List<File> classFiles) {
-		for (int i = 0; i < scenariosCounter; i++) {
-			String scenario = scenarioBasename + "_" + (i + 1) + ".java";
-			sourceFiles.add(new File(scenario));
-			System.out.println("Scenario file " + scenario + " added to compilation");
-
-			String testSource = testBasename + "_" + (i + 1) + ".java";
-			String testClass = testBasename + "_" + (i + 1);
-
-			sourceFiles.add(new File(testSource));
-			System.out.println("Test file " + testSource + " added to compilation");
-			classFiles.add(new File(testClass));
-			System.out.println("Test file " + testClass + " added to execution");
-		}
-	}
-
-	private void compileFiles(List<File> files, String folder) {
-
-		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		if (compiler == null) {
-			throw new InternalServerErrorException("Error getting the Java compiler: JDK >= 1.8 required");
-		}
-		StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
-
-		try {
-			// fileManager.setLocation(StandardLocation.CLASS_OUTPUT,
-			// Arrays.asList(new File(projectFolder)));
-
-			// String z3 = "/usr/lib/com.microsoft.z3.jar";
-			// List<String> optionList = new ArrayList<String>();
-			// optionList.add("-classpath");
-			// optionList.add(System.getProperty("java.class.path") + ":" + z3);
-			List<String> optionList = new ArrayList<String>();
-			optionList.add("-d");
-			optionList.add(folder);
-			DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-
-			boolean success = compiler
-										.getTask(	null,
-													fileManager,
-													diagnostics,
-													optionList,
-													null,
-													fileManager.getJavaFileObjectsFromFiles(files))
-										.call();
-			if (!success) {
-				Locale myLocale = Locale.getDefault();
-				StringBuilder msg = new StringBuilder();
-				msg.append("Error compiling Z3 test files: ");
-				for (Diagnostic<? extends JavaFileObject> err : diagnostics.getDiagnostics()) {
-					msg.append('\n');
-					msg.append(err.getKind());
-					msg.append(": ");
-					if (err.getSource() != null) {
-						msg.append(err.getSource().getName());
-					}
-					msg.append(':');
-					msg.append(err.getLineNumber());
-					msg.append(": ");
-					msg.append(err.getMessage(myLocale));
-				}
-				throw new InternalServerErrorException(msg.toString());
-			}
-			fileManager.close();
-
-		}
-		catch (IOException e) {
-			throw new InternalServerErrorException("Unable to set the location of the Z3 test files to be compiled");
-		}
-
-	}
-
-	private int runIt(File filename, String folder) {
-		int endIndex = filename.getName().lastIndexOf(".");
-		String filenameNoExtension;
-		if (endIndex == -1) {
-			filenameNoExtension = filename.getName();
-		}
-		else {
-			filenameNoExtension = filename.getName().substring(0, endIndex);
-			if (!filenameNoExtension.matches("\\w+")) {
-				filenameNoExtension = filename.getName();
-			}
-		}
-
-		System.out.println("Filename is: " + filenameNoExtension);
-
-		try {
-			Class<?> userClass = new DynamicClassLoader(folder).load("tests." + filenameNoExtension);
-			java.lang.Object context = ReflectUtil.newInstance(userClass);
-			java.lang.Object result = ReflectUtil.invoke("run", context);
-			return (int) result;
-		}
-		catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			throw new InternalServerErrorException("Error executing Z3 tests: "	+ e.getMessage()
-													+ ". There are errors in the Z3 model.");
-		}
-	}
-
-	private List<Test> runFiles(String folder, List<List<String>> paths, Graph graph, List<File> files) {
-		List<Test> tests = new ArrayList<Test>();
-		for (int i = 0; i < files.size(); i++) {
-			System.out.println("Running test file \"" + files.get(i).getAbsolutePath() + "\"");
-			int result = runIt(files.get(i), folder);
-			System.out.println("Execution returned: " + result);
-
-			List<Node> path = new ArrayList<Node>();
-			for (String nodeString : paths.get(i)) {
-				Node node = graph.searchNodeByName(nodeString);
-				path.add(node);
-			}
-			Test t = new Test(path, result);
-			tests.add(t);
-		}
-
-		return tests;
-	}
-	
-	@SuppressWarnings("unused")
-	private static boolean deleteDir(File dir) {
-		if (dir.isDirectory()) {
-			String[] children = dir.list();
-			for (int i = 0; i < children.length; i++) {
-				boolean success = deleteDir(new File(dir, children[i]));
-				if (!success) {
-					return false;
-				}
-			}
-		}
-
-		return dir.delete();
-
-	}
-
-	@SuppressWarnings("unused")
-	private void deleteFilesWithPrefix(String directory, String prefix, String extension) {
-		final File scenarioFolder = new File(directory);
-		final File[] scenarioFiles = scenarioFolder.listFiles(new FilenameFilter() {
-
-			@Override
-			public boolean accept(final File dir, final String name) {
-				return name.matches(prefix + ".*\\." + extension);
-			}
-		});
-		for (final File file : scenarioFiles) {
-			if (!file.delete()) {
-				System.err.println("Can't remove " + file.getAbsolutePath());
-			}
-			else {
-				System.out.println("Removed file " + file.getAbsolutePath());
-			}
 		}
 	}
 
@@ -494,10 +112,10 @@ public class VerificationService {
 		if (type == null || type.equals("")) {
 			throw new BadRequestException("Please specify the 'type' parameter in your request");
 		}
-		Node sourceNode= manager.getNodeByName(graphId, verificationBean.getSource());
-		Node destinationNode=manager.getNodeByName(graphId, verificationBean.getDestination());
-		//Node sourceNode = graph.searchNodeByName(verificationBean.getSource());
-	//	Node destinationNode = graph.searchNodeByName(verificationBean.getDestination());
+		//Node sourceNode= manager.getNodeByName(graphId, verificationBean.getSource());
+		//Node destinationNode=manager.getNodeByName(graphId, verificationBean.getDestination());
+		Node sourceNode = graph.searchNodeByName(verificationBean.getSource());
+		Node destinationNode = graph.searchNodeByName(verificationBean.getDestination());
 
 		if (sourceNode == null) {
 			throw new BadRequestException("The 'source' parameter '" + source + "' is not valid, please insert the name of an existing node");
@@ -557,7 +175,12 @@ public class VerificationService {
 	}
 
 	private Verification isolationVerification(Graph graph, Node sourceNode, Node destinationNode, Node middleboxNode) throws MyInvalidDirectionException {
-
+		Long time_isolation=(long) 0;
+		Calendar cal_isolation = Calendar.getInstance();
+		Date start_time_isolation = cal_isolation.getTime();
+		
+		
+		
 		Paths paths = getPaths(graph, sourceNode, destinationNode);
 		if (paths.getPath().size() == 0) {
 			return new Verification("UNSAT",
@@ -566,6 +189,7 @@ public class VerificationService {
 		}
 
 		List<List<String>> sanitizedPaths = sanitizePaths(paths);
+		List<Test> tests = extractTestsFromPaths(graph, sanitizedPaths, "UNKNWON");
 
 		printListsOfStrings("sanitizedPaths", sanitizedPaths);
 
@@ -575,8 +199,7 @@ public class VerificationService {
 												+ destinationNode.getName() + "'");
 		}
 
-		List<Test> tests = extractTestsFromPaths(graph, sanitizedPaths, "UNKNWON");
-
+		
 		extractPathsWithMiddlebox(sanitizedPaths, middleboxNode.getName());
 
 		if (sanitizedPaths.isEmpty()) {
@@ -588,49 +211,21 @@ public class VerificationService {
 		}
 
 		printListsOfStrings("Paths with middlebox '" + middleboxNode.getName() + "'", sanitizedPaths);
+		
+		Map<Integer, GeneratorSolver> scenarios=createScenarios(sanitizedPaths, graph);	
+		
+		tests = run(graph, scenarios, sourceNode.getName(), destinationNode.getName());		
+		
 
-		File tempDir = null;
-
-		try {
-			tempDir = createTempDir("isolation");
-		}
-		catch (IOException e) {
-			throw new InternalServerErrorException("Unable to perform verification: " + e.getMessage());
-		}
-
-		String chainsFile = tempDir.getAbsolutePath() + "/chains.json";
-		generateChainsFile(graph, sanitizedPaths, chainsFile);
-
-		String configFile = tempDir.getAbsolutePath() + "/config.json";
-		generateConfigFile(graph, configFile);
-
-		String isolationScenariosBasename = tempDir.getAbsolutePath() + "/IsolationScenario";
-		generateTestScenarios(chainsFile, configFile, isolationScenariosBasename);
-
-		String isolationTestsBasename = tempDir.getAbsolutePath() + "/IsolationTest";
-		generateTests(	sanitizedPaths.size(),
-						isolationScenariosBasename,
-						sourceNode.getName(),
-						middleboxNode.getName(),
-						isolationTestsBasename);
-
-		List<File> sourceFiles = new ArrayList<File>();
-		List<File> classFiles = new ArrayList<File>();
-		prepareForCompilationAndExecution(	sanitizedPaths.size(),
-											isolationScenariosBasename,
-											isolationTestsBasename,
-											sourceFiles,
-											classFiles);
-
-		compileFiles(sourceFiles, tempDir.getAbsolutePath());
-
-		tests = runFiles(tempDir.getAbsolutePath(), sanitizedPaths, graph, classFiles);
-
-		return evaluateIsolationResults(tests,
-										sourceNode.getName(),
+		Verification isolation=evaluateIsolationResults(tests, sourceNode.getName(),
 										destinationNode.getName(),
 										middleboxNode.getName());
-
+		
+		Calendar cal_isolation_stop = Calendar.getInstance();
+		time_isolation = time_isolation +(cal_isolation_stop.getTime().getTime() - start_time_isolation.getTime());
+		System.out.println("Time to check reachability policy: " + time_isolation);
+		
+		return isolation;
 	}
 
 	private List<Test> extractTestsFromPaths(Graph graph, List<List<String>> paths, String result) {
@@ -732,7 +327,11 @@ public class VerificationService {
 	}
 
 	private Verification traversalVerification(Graph graph, Node sourceNode, Node destinationNode, Node middleboxNode) throws MyInvalidDirectionException {
-
+		Long time_traversal=(long) 0;
+		Calendar cal_traversal = Calendar.getInstance();
+		Date start_time_traversal = cal_traversal.getTime();
+		
+		
 		Paths paths = getPaths(graph, sourceNode, destinationNode);
 		if (paths.getPath().size() == 0) {
 			return new Verification("UNSAT",
@@ -769,42 +368,11 @@ public class VerificationService {
 
 		printListsOfStrings("Paths with middlebox '" + middleboxNode.getName() + "'", pathsWithMiddlebox);
 
-		File tempDir = null;
+		
 
-		try {
-			tempDir = createTempDir("traversal");
-		}
-		catch (IOException e) {
-			throw new InternalServerErrorException("Unable to perform verification: " + e.getMessage());
-		}
-
-		String chainsFile = tempDir.getAbsolutePath() + "/chains.json";
-		generateChainsFile(graph, pathsWithMiddlebox, chainsFile);
-
-		String configFile = tempDir.getAbsolutePath() + "/config.json";
-		generateConfigFile(graph, configFile);
-
-		String traversalScenariosBasename = tempDir.getAbsolutePath() + "/TraversalScenario";
-		generateTestScenarios(chainsFile, configFile, traversalScenariosBasename);
-
-		String traversalTestsBasename = tempDir.getAbsolutePath() + "/TraversalTest";
-		generateTests(	pathsWithMiddlebox.size(),
-						traversalScenariosBasename,
-						sourceNode.getName(),
-						destinationNode.getName(),
-						traversalTestsBasename);
-
-		List<File> sourceFiles = new ArrayList<File>();
-		List<File> classFiles = new ArrayList<File>();
-		prepareForCompilationAndExecution(	pathsWithMiddlebox.size(),
-											traversalScenariosBasename,
-											traversalTestsBasename,
-											sourceFiles,
-											classFiles);
-
-		compileFiles(sourceFiles, tempDir.getAbsolutePath());
-
-		tests = runFiles(tempDir.getAbsolutePath(), pathsWithMiddlebox, graph, classFiles);
+		Map<Integer, GeneratorSolver> scenarios=createScenarios(pathsWithMiddlebox, graph);	
+		
+		tests = run(graph, scenarios, sourceNode.getName(), destinationNode.getName());	
 
 		for (Test t : tests) {
 			if (t.getResult().equals("UNSAT")) {
@@ -839,48 +407,21 @@ public class VerificationService {
 											+ middleboxNode.getName() + "'");
 		}
 
-		tempDir = null;
+		
+		Map<Integer, GeneratorSolver> scenarios2=createScenarios( pathsBetweenSourceAndDestination, graph);	
+		
+		tests = run(graph, scenarios2, sourceNode.getName(), destinationNode.getName());
+		
 
-		try {
-			tempDir = createTempDir("traversal");
-		}
-		catch (IOException e) {
-			throw new InternalServerErrorException("Unable to perform verification: " + e.getMessage());
-		}
-
-		chainsFile = tempDir.getAbsolutePath() + "/chains.json";
-		generateChainsFile(graph, pathsBetweenSourceAndDestination, chainsFile);
-
-		configFile = tempDir.getAbsolutePath() + "/config.json";
-		generateConfigFile(graph, configFile);
-
-		traversalScenariosBasename = tempDir.getAbsolutePath() + "/TraversalScenario";
-		generateTestScenarios(chainsFile, configFile, traversalScenariosBasename);
-
-		traversalTestsBasename = tempDir.getAbsolutePath() + "/TraversalTest";
-		generateTests(	pathsBetweenSourceAndDestination.size(),
-						traversalScenariosBasename,
-						sourceNode.getName(),
-						destinationNode.getName(),
-						traversalTestsBasename);
-
-		sourceFiles = new ArrayList<File>();
-		classFiles = new ArrayList<File>();
-		prepareForCompilationAndExecution(	pathsBetweenSourceAndDestination.size(),
-											traversalScenariosBasename,
-											traversalTestsBasename,
-											sourceFiles,
-											classFiles);
-
-		compileFiles(sourceFiles, tempDir.getAbsolutePath());
-
-		tests = runFiles(tempDir.getAbsolutePath(), pathsBetweenSourceAndDestination, graph, classFiles);
-
-		return evaluateTraversalResults(tests,
+		Verification traversal= evaluateTraversalResults(tests,
 										sourceNode.getName(),
 										destinationNode.getName(),
 										middleboxNode.getName());
 
+		Calendar cal_traversal_stop = Calendar.getInstance();
+		time_traversal = time_traversal +(cal_traversal_stop.getTime().getTime() - start_time_traversal.getTime());
+		System.out.println("Time to check traversal policy: " + time_traversal);
+		return traversal;
 	}
 
 	private Verification evaluateTraversalResults(	List<Test> tests, String source, String destination,
@@ -920,6 +461,10 @@ public class VerificationService {
 	}
 
 	private Verification reachabilityVerification(Graph graph, Node sourceNode, Node destinationNode) throws MyInvalidDirectionException {
+		Long time_reachability=(long) 0;
+		Calendar cal_reachability = Calendar.getInstance();
+		Date start_time_reachability = cal_reachability.getTime();
+		
 		Paths paths = getPaths(graph, sourceNode, destinationNode);
 
 		if (paths.getPath().size() == 0) {
@@ -937,45 +482,74 @@ public class VerificationService {
 									"There are no available paths between '"	+ sourceNode.getName() + "' and '"
 												+ destinationNode.getName() + "'");
 		}
-
-		File tempDir = null;
-
-		try {
-			tempDir = createTempDir("reachability");
+		
+		Map<Integer, GeneratorSolver> scenarios=createScenarios(sanitizedPaths, graph);	
+		
+		List<Test> tests = run(graph, scenarios, sourceNode.getName(), destinationNode.getName());		
+		
+		Verification reachability= evaluateReachabilityResult(tests, sourceNode.getName(), destinationNode.getName());
+		
+		Calendar cal_reachability_stop = Calendar.getInstance();
+		time_reachability = time_reachability +(cal_reachability_stop.getTime().getTime() - start_time_reachability.getTime());
+		System.out.println("Time to check reachability policy: " + time_reachability);
+		
+		return reachability;
+	}
+	
+	
+	
+	private List<Test> run(Graph graph, Map<Integer, GeneratorSolver> scenarios, String src, String dst) {
+		List<Test> tests = new ArrayList<Test>();
+		String result=new String();
+		
+		//estimation time
+		Long time=(long) 0;
+		Calendar cal = Calendar.getInstance();
+		Date start_time = cal.getTime();
+		
+		
+		for(Map.Entry<Integer, GeneratorSolver> t : scenarios.entrySet()){
+			for(Map.Entry<Integer, GeneratorSolver> i : scenarios.entrySet()){
+				result=i.getValue().run(src, dst);
+				
+			}		
+		
+			List<Node> path = new ArrayList<Node>();
+			for (String nodeString : t.getValue().getPaths()) {
+				Node node = graph.searchNodeByName(nodeString);
+				path.add(node);
+			}
+			Test test = new Test(path, result);
+			tests.add(test);
 		}
-		catch (IOException e) {
-			throw new InternalServerErrorException("Unable to perform verification: " + e.getMessage());
+
+		Calendar cal2 = Calendar.getInstance();
+		time = time +(cal2.getTime().getTime() - start_time.getTime());
+		System.out.println("time occur to run: " + time);
+		
+		
+		return tests;
+	}
+
+	private Map<Integer, GeneratorSolver> createScenarios(List<List<String>> sanitizedPaths, Graph graph) {
+		int index=0;
+		Map<Integer, GeneratorSolver> scenarios=new HashMap<Integer, GeneratorSolver>();
+		for(List<String> s : sanitizedPaths){
+			Scenario tmp=new Scenario(graph, s);
+			tmp.createScenario();
+			resetZ3();
+			GeneratorSolver gs=new GeneratorSolver(tmp, s, ctx);
+			gs.genSolver();
+			scenarios.put(index++, gs);
 		}
-
-		String chainsFile = tempDir.getAbsolutePath() + "/chains.json";
-		generateChainsFile(graph, sanitizedPaths, chainsFile);
-
-		String configFile = tempDir.getAbsolutePath() + "/config.json";
-		generateConfigFile(graph, configFile);
-
-		String reachabilityScenariosBasename = tempDir.getAbsolutePath() + "/ReachabilityScenario";
-		generateTestScenarios(chainsFile, configFile, reachabilityScenariosBasename);
-
-		String reachabilityTestsBasename = tempDir.getAbsolutePath() + "/ReachabilityTest";
-		generateTests(	sanitizedPaths.size(),
-						reachabilityScenariosBasename,
-						sourceNode.getName(),
-						destinationNode.getName(),
-						reachabilityTestsBasename);
-
-		List<File> sourceFiles = new ArrayList<File>();
-		List<File> classFiles = new ArrayList<File>();
-		prepareForCompilationAndExecution(	sanitizedPaths.size(),
-											reachabilityScenariosBasename,
-											reachabilityTestsBasename,
-											sourceFiles,
-											classFiles);
-
-		compileFiles(sourceFiles, tempDir.getAbsolutePath());
-
-		List<Test> tests = runFiles(tempDir.getAbsolutePath(), sanitizedPaths, graph, classFiles);
-
-		return evaluateReachabilityResult(tests, sourceNode.getName(), destinationNode.getName());
+		return scenarios;
+	}
+	
+	public void resetZ3() throws Z3Exception{
+	    HashMap<String, String> cfg = new HashMap<String, String>();
+	    cfg.put("model", "true");	   
+	    ctx = new Context(cfg);
+	   
 	}
 
 	private Verification evaluateReachabilityResult(List<Test> tests, String source, String destination) {

@@ -274,7 +274,7 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 		it.polito.neo4j.jaxb.Paths paths=(new ObjectFactory()).createPaths();
 		try{
 			if(source == null || destination == null || direction == null)
-				throw new MyNotFoundException("Missing query parameters");
+				throw new DataNotFoundException("Missing query parameters");
 			service.checkValidDirection(direction);
 			paths =  lib.findAllPathsBetweenTwoNodes(graphId, source, destination,direction);
 		}
