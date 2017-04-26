@@ -214,7 +214,9 @@ public class VerificationService {
 		Map<Integer, GeneratorSolver> scenarios=createScenarios(sanitizedPaths, graph);	
 		
 		tests = run(graph, scenarios, sourceNode.getName(), destinationNode.getName());		
-		
+		for(Test tt : tests){
+			System.out.println("risultato: "+tt.getResult());
+		}
 
 		Verification isolation=evaluateIsolationResults(tests, sourceNode.getName(),
 										destinationNode.getName(),
@@ -251,7 +253,7 @@ public class VerificationService {
 				isSat = true;
 			}
 			else if (t.getResult().equals("UNKNOWN")) {
-				v.setResult("UNKNWON");
+				v.setResult("UNKNOWN");
 				v.setComment("Isolation property with source '"	+ source + "', destination '" + destination
 								+ "' and middlebox '" + middlebox + "' is UNKNOWN because although '" + source
 								+ "' cannot reach '" + middlebox + "' in any path from '" + source + "' to '"
@@ -264,20 +266,22 @@ public class VerificationService {
 			}
 		}
 		if (isSat) {
-			v.setResult("UNSAT");
-			v.setComment("Isolation property with source '"	+ source + "', destination '" + destination
-							+ "' and middlebox '" + middlebox + "' is UNSATISFIED because reachability between '"
-							+ source + "' and '" + middlebox + "' is SATISFIED in at least one path between '" + source
-							+ "' and '" + destination + "' which traverses middlebox '" + middlebox
-							+ "' (see below all the paths that have been checked)");
-		}
-		else if (unsatCounter == tests.size()) {
 			v.setResult("SAT");
 			v.setComment("Isolation property with source '"	+ source + "', destination '" + destination
 							+ "' and middlebox '" + middlebox + "' is SATISFIED because reachability between '" + source
 							+ "' and '" + middlebox + "' is UNSATISFIED in all paths between '" + source + "' and '"
 							+ destination + "' which traverse middlebox '" + middlebox
 							+ "' (see below all the paths that have been checked)");
+			
+		}
+		else if (unsatCounter == tests.size()) {
+			v.setResult("UNSAT");
+			v.setComment("Isolation property with source '"	+ source + "', destination '" + destination
+							+ "' and middlebox '" + middlebox + "' is UNSATISFIED because reachability between '"
+							+ source + "' and '" + middlebox + "' is SATISFIED in at least one path between '" + source
+							+ "' and '" + destination + "' which traverses middlebox '" + middlebox
+							+ "' (see below all the paths that have been checked)");
+			
 		}
 		return v;
 
@@ -485,6 +489,10 @@ public class VerificationService {
 		Map<Integer, GeneratorSolver> scenarios=createScenarios(sanitizedPaths, graph);	
 		
 		List<Test> tests = run(graph, scenarios, sourceNode.getName(), destinationNode.getName());		
+		for(Test tt : tests){
+			System.out.println("risultato: "+tt.getResult()+".");
+		}
+
 		
 		Verification reachability= evaluateReachabilityResult(tests, sourceNode.getName(), destinationNode.getName());
 		
@@ -508,11 +516,9 @@ public class VerificationService {
 		
 		
 		for(Map.Entry<Integer, GeneratorSolver> t : scenarios.entrySet()){
-			for(Map.Entry<Integer, GeneratorSolver> i : scenarios.entrySet()){
-				result=i.getValue().run(src, dst);
-				System.out.println("RESULT run: " + result);
-				
-					
+			
+				result=t.getValue().run(src, dst);
+				System.out.println("RESULT run: " + result);				
 		
 			List<Node> path = new ArrayList<Node>();
 			for (String nodeString : t.getValue().getPaths()) {
@@ -522,7 +528,7 @@ public class VerificationService {
 			Test test = new Test(path, result);
 			tests.add(test);
 		}
-		}
+		
 		Calendar cal2 = Calendar.getInstance();
 		time = time +(cal2.getTime().getTime() - start_time.getTime());
 		System.out.println("time occur to run: " + time);
@@ -549,31 +555,37 @@ public class VerificationService {
 		Verification v = new Verification();
 		boolean sat = false;
 		int unsat = 0;
-		for (Test t : tests) {
-			v.getTests().add(t);
-
-			if (t.getResult().equals("SAT")) {
+		for (Test t : tests) {			
+			
+			if (t.getResult().equals("SAT")) {				
 				sat = true;
 			}
+			
 			else if (t.getResult().equals("UNKNOWN")) {
 				v.setResult("UNKNWON");
 				v.setComment("Reachability from '"	+ source + "' to '" + destination
 								+ "' is unknown. See all the checked paths below");
+				System.out.println("v.setComment: "+ v.getComment());
 			}
 			else if (t.getResult().equals("UNSAT")) {
 				unsat++;
 			}
+			v.getTests().add(t);
 		}
-		if (sat) {
+		if (sat==true) {
 			v.setResult("SAT");
 			v.setComment("There is at least one path '"	+ source + "' can use to reach '" + destination
 							+ "'. See all the available paths below");
+			System.out.println("v.setComment: "+ v.getComment());
 		}
 		else if (unsat == tests.size()) {
 			v.setResult("UNSAT");
 			v.setComment("There isn't any path '"	+ source + "' can use to reach '" + destination
 							+ "'. See all the checked paths below");
+			System.out.println("v.setComment: "+ v.getComment());
 		}
+		System.out.println("v.comment: "+ v.getComment());
+		System.out.println("v.result: "+ v.getResult());
 		return v;
 	}
 

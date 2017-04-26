@@ -76,7 +76,7 @@ public class GeneratorSolver{
 		if (result.result == Status.UNSATISFIABLE){
 	     	   res="UNSAT"; // Nodes a and b are isolated
 	    	}else if(result.result == Status.SATISFIABLE){
-	     		res= "SAT ";
+	     		res= "SAT";
 	    	}else if(result.result == Status.UNKNOWN){
 	    		res= "UNKNOWN";
 	    	}
