@@ -56,10 +56,10 @@ public class GeneratorSolver{
 			return null;
 	}
 	
-	public GeneratorSolver(Scenario tmp, List<String> s, Context ctx) {
+	public GeneratorSolver(Scenario tmp, List<String> s) {
 		this.scenario=tmp;
 		this.path=s;
-		this.ctx=ctx;
+		
 	}
 
 	public void resetZ3() throws Z3Exception{
@@ -72,6 +72,7 @@ public class GeneratorSolver{
 		IsolationResult result;
 		result=check.checkIsolationProperty((NetworkObject)mo.get(src), (NetworkObject)mo.get(dst));
 		String res=new String();
+		System.out.println("RISULTATO RUN: " +result.result );
 		if (result.result == Status.UNSATISFIABLE){
 	     	   res="UNSAT"; // Nodes a and b are isolated
 	    	}else if(result.result == Status.SATISFIABLE){
@@ -83,22 +84,40 @@ public class GeneratorSolver{
 	}
 	
 	public void genSolver() {
+		resetZ3();
+		List<String> names=new ArrayList<String>();
+		List<String> addresses=new ArrayList<String>();
+		for(Map.Entry<String, Map<String, String>> a : scenario.chn.entrySet()){
+			String name=a.getKey();
+			Map<String, String> nodo=a.getValue();
+			String address=nodo.get("address");
+			names.add(name);
+			addresses.add(address);
+		}
+		//String name_nctx=listToArguments(scenario.nodes_names);
+		//String type_nctx=listToArguments(scenario.nodes_addresses);
 		
-		String name_nctx=listToArguments(scenario.nodes_names);
-		String type_nctx=listToArguments(scenario.nodes_types);
+		//String name_nctx=listToArguments(names);
+		//String type_nctx=listToArguments(addresses);
+		
+		String[] name_nctx=listToStringArguments(names);
+		String[] type_nctx=listToStringArguments(addresses);
 		
 		
-		NetContext nctx = new NetContext (ctx,new String[]{name_nctx},
-				new String[]{type_nctx});
-
-
-		Network net = new Network (ctx,new Object[]{nctx});
+		//System.out.println("name_nctx: " + name_nctx);
+		
+		nctx = new NetContext (ctx, name_nctx, type_nctx);
+		
+		
+		net = new Network (ctx,new Object[]{nctx});
 		
 		//creazione classi mcnet.objects: Map<nome_nodo, obj creato>		
 		for(int i=0; i<scenario.nodes_names.size(); i++){
-			if(scenario.nodes_names.get(i)!=null){			
+			if(scenario.nodes_names.get(i)!=null){	
+				
 				//mo.put(scenario.nodes_names.get(i),setDevice(scenario.nodes_names.get(i), ctx, nctx, net));
-				setDevice(scenario.nodes_names.get(i), ctx, nctx, net, mo);
+				//setDevice(scenario.nodes_names.get(i), ctx, nctx, net, mo);
+				setDevice(scenario.nodes_names.get(i));
 			}
 		}
 		
@@ -119,10 +138,11 @@ public class GeneratorSolver{
 		
 	}
 
-	private void setDevice(String name, Context ctx, NetContext nctx, Network net, Map<String, Object> mo) {
+	private void setDevice(String name) {
+//	private void setDevice(String name, Context ctx, NetContext nctx, Network net, Map<String, Object> mo) {
 		Map<String, String> value=scenario.chn.get(name);	
-		String type=value.get("functional_type");
-		if(type.compareTo("endhost")==0){
+		String type=value.get("functional_type");		
+		if(type.compareTo("endhost")==0){			
 			PolitoEndHost endhost=new PolitoEndHost(ctx, new Object[]{nctx.nm.get(name), net, nctx});
 			mo.put(name, endhost);
 		}else if(type.compareTo("cache")==0){
@@ -246,11 +266,10 @@ public class GeneratorSolver{
 			}else if(model instanceof PolitoNat){
 				List<String> list_tmp=scenario.config_array.get(name);
 				List<String> list=trimIp(list_tmp);
-				if(list!=null){
-					PolitoNat nat=(PolitoNat)cd.getValue();	
+				if(list!=null){					
 					 ArrayList<DatatypeExpr> ia = new ArrayList<DatatypeExpr>();
-					 for(String s : list){
-						 ia.add(nctx.am.get(s));
+					 for(String s : list){						
+						 ia.add(nctx.am.get("ip_"+s));
 					 }
 					 
 					((PolitoNat)cd.getValue()).natModel(nctx.am.get(address));
@@ -396,6 +415,15 @@ public class GeneratorSolver{
 		for(int i=0; i<arg.size(); i++){
 			if(arg.get(i)!=null)
 				o[i]= nctx.nm.get(arg.get(i));
+		}
+		return o;
+	}
+	
+	private String[] listToStringArguments(List<String> arg){
+		String[] o= new String[arg.size()];
+		for(int i=0; i<arg.size(); i++){
+			if(arg.get(i)!=null)
+				o[i]= arg.get(i);
 		}
 		return o;
 	}

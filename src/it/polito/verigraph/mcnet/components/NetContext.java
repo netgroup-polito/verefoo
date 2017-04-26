@@ -24,6 +24,7 @@ package it.polito.verigraph.mcnet.components;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Constructor;
@@ -83,8 +84,13 @@ public class NetContext extends Core{
 		    am = new HashMap<String,DatatypeExpr>(); // list of addresses, callable by address name
 		    pf= new HashMap<String,FuncDecl>() ;
 	        
+		    
 		    mkTypes((String[])args[0],(String[])args[1]);
 	        
+		    if(nm.get("user1")!=null)
+				System.out.println("Non è nulllll");
+			else
+				System.out.println("E' NULL IN NETCTX");
 	   		constraints = new ArrayList<BoolExpr>();
 	        policies = new ArrayList<Core>();
 	        
@@ -117,6 +123,7 @@ public class NetContext extends Core{
 	    		DatatypeExpr fd  = (DatatypeExpr)node.getConst(i);
 	    		//System.out.println( (DatatypeExpr)node.getConst(i));
 	    		DumbNode dn =new DumbNode(ctx,new Object[]{fd});
+	    		
 	    		nm.put(fd.toString(),dn);
 	    	}
 	    
@@ -130,6 +137,8 @@ public class NetContext extends Core{
 	    	for(int i=0;i<address.getConsts().length;i++){
 	    		DatatypeExpr fd  = (DatatypeExpr)address.getConst(i);
 	    		//System.out.println( (DatatypeExpr)address.getConst(i));
+	    	
+	    		
 	    		am.put(fd.toString(),fd);
 	    	}
 	    

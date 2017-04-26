@@ -17,8 +17,8 @@ import javax.xml.bind.JAXBException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.microsoft.z3.Context;
-import com.microsoft.z3.Z3Exception;
+import com.microsoft.z3.*;
+
 
 import it.polito.neo4j.exceptions.MyInvalidDirectionException;
 import it.polito.neo4j.jaxb.*;
@@ -39,7 +39,6 @@ import it.polito.verigraph.solver.Scenario;
 public class VerificationService {	
 	
 	private Neo4jDBManager manager=new Neo4jDBManager();
-	Context ctx;
 	
 	public VerificationService() {
 
@@ -76,7 +75,7 @@ public class VerificationService {
 		Matcher m = Pattern.compile("\\(([^)]+)\\)").matcher(path);
 		while (m.find()) {
 			String node = m.group(1);
-			System.out.println("node:" + node);
+			//System.out.println("node:" + node);
 			newPath.add(node);
 			
 		}
@@ -191,7 +190,7 @@ public class VerificationService {
 		List<List<String>> sanitizedPaths = sanitizePaths(paths);
 		List<Test> tests = extractTestsFromPaths(graph, sanitizedPaths, "UNKNWON");
 
-		printListsOfStrings("sanitizedPaths", sanitizedPaths);
+	//	printListsOfStrings("sanitizedPaths", sanitizedPaths);
 
 		if (sanitizedPaths.isEmpty()) {
 			return new Verification("UNSAT",
@@ -200,17 +199,17 @@ public class VerificationService {
 		}
 
 		
-		extractPathsWithMiddlebox(sanitizedPaths, middleboxNode.getName());
+		extractPathsWithoutMiddlebox(sanitizedPaths, middleboxNode.getName());
 
 		if (sanitizedPaths.isEmpty()) {
 			return new Verification("UNSAT",
 									tests,
 									"There are no available paths between '"	+ sourceNode.getName() + "' and '"
-											+ destinationNode.getName() + "' which traverse middlebox '"
+											+ destinationNode.getName() + "' which no traverse middlebox '"
 											+ middleboxNode.getName() + "'. See below all the available paths.");
 		}
 
-		printListsOfStrings("Paths with middlebox '" + middleboxNode.getName() + "'", sanitizedPaths);
+	//	printListsOfStrings("Paths with middlebox '" + middleboxNode.getName() + "'", sanitizedPaths);
 		
 		Map<Integer, GeneratorSolver> scenarios=createScenarios(sanitizedPaths, graph);	
 		
@@ -341,7 +340,7 @@ public class VerificationService {
 
 		List<List<String>> pathsBetweenSourceAndDestination = sanitizePaths(paths);
 
-		printListsOfStrings("Paths", pathsBetweenSourceAndDestination);
+	//	printListsOfStrings("Paths", pathsBetweenSourceAndDestination);
 
 		if (pathsBetweenSourceAndDestination.isEmpty()) {
 			return new Verification("UNSAT",
@@ -366,7 +365,7 @@ public class VerificationService {
 											+ middleboxNode.getName() + "'. See below all the available paths");
 		}
 
-		printListsOfStrings("Paths with middlebox '" + middleboxNode.getName() + "'", pathsWithMiddlebox);
+	//	printListsOfStrings("Paths with middlebox '" + middleboxNode.getName() + "'", pathsWithMiddlebox);
 
 		
 
@@ -475,7 +474,7 @@ public class VerificationService {
 
 		List<List<String>> sanitizedPaths = sanitizePaths(paths);
 		
-		printListsOfStrings("Paths", sanitizedPaths);
+		//printListsOfStrings("Paths", sanitizedPaths);
 
 		if (sanitizedPaths.isEmpty()) {
 			return new Verification("UNSAT",
@@ -500,7 +499,7 @@ public class VerificationService {
 	
 	private List<Test> run(Graph graph, Map<Integer, GeneratorSolver> scenarios, String src, String dst) {
 		List<Test> tests = new ArrayList<Test>();
-		String result=new String();
+		String result;
 		
 		//estimation time
 		Long time=(long) 0;
@@ -511,8 +510,9 @@ public class VerificationService {
 		for(Map.Entry<Integer, GeneratorSolver> t : scenarios.entrySet()){
 			for(Map.Entry<Integer, GeneratorSolver> i : scenarios.entrySet()){
 				result=i.getValue().run(src, dst);
+				System.out.println("RESULT run: " + result);
 				
-			}		
+					
 		
 			List<Node> path = new ArrayList<Node>();
 			for (String nodeString : t.getValue().getPaths()) {
@@ -522,7 +522,7 @@ public class VerificationService {
 			Test test = new Test(path, result);
 			tests.add(test);
 		}
-
+		}
 		Calendar cal2 = Calendar.getInstance();
 		time = time +(cal2.getTime().getTime() - start_time.getTime());
 		System.out.println("time occur to run: " + time);
@@ -536,22 +536,15 @@ public class VerificationService {
 		Map<Integer, GeneratorSolver> scenarios=new HashMap<Integer, GeneratorSolver>();
 		for(List<String> s : sanitizedPaths){
 			Scenario tmp=new Scenario(graph, s);
-			tmp.createScenario();
-			resetZ3();
-			GeneratorSolver gs=new GeneratorSolver(tmp, s, ctx);
+			tmp.createScenario();			
+			GeneratorSolver gs=new GeneratorSolver(tmp, s);
 			gs.genSolver();
 			scenarios.put(index++, gs);
 		}
 		return scenarios;
 	}
 	
-	public void resetZ3() throws Z3Exception{
-	    HashMap<String, String> cfg = new HashMap<String, String>();
-	    cfg.put("model", "true");	   
-	    ctx = new Context(cfg);
-	   
-	}
-
+	
 	private Verification evaluateReachabilityResult(List<Test> tests, String source, String destination) {
 		Verification v = new Verification();
 		boolean sat = false;
