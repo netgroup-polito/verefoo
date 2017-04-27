@@ -79,7 +79,6 @@ public class GraphToNeo4j {
 			it.polito.neo4j.jaxb.Configuration configuration=(new ObjectFactory()).createConfiguration();
 			JsonNode json=c.getValue().getConfiguration().getConfiguration();
 			setConfiguration(configuration, c.getValue(), json);
-			
 			node.setConfiguration(configuration);
 			nodes.add(node);
 	}
@@ -796,6 +795,7 @@ case "WEBSERVER":{
 		System.out.println("webserver empty");
 		}
 	configuration.setWebserver(webserver);
+	System.out.println("WEBSERVER: " + configuration.getWebserver().getObject());
 	break;
 	}
 }

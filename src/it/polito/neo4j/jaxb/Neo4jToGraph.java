@@ -85,7 +85,7 @@ public class Neo4jToGraph {
 	}
 	
 	private static Configuration setConfiguration(it.polito.neo4j.jaxb.Configuration configuration, Configuration conf) throws JsonProcessingException {
-		// TODO Auto-generated method stub
+		
 		conf.setId(configuration.getId().toString());
 		if(configuration.getDescription()!=null)
 			conf.setDescription(configuration.getDescription());

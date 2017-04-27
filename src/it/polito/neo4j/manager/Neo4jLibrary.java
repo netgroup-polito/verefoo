@@ -916,16 +916,18 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 						Iterable<Relationship> confs= conf.getRelationships(RelationType.ElementRelationship);
 						Iterator<Relationship> confsIt = confs.iterator();
 						Fieldmodifier field=new Fieldmodifier();
-						it.polito.neo4j.jaxb.Object list=new it.polito.neo4j.jaxb.Object();
+						it.polito.neo4j.jaxb.Object list;
 						while(confsIt.hasNext()){
+							list=new it.polito.neo4j.jaxb.Object();
 							Relationship relConf = confsIt.next();
 							Node element = relConf.getStartNode();
 							if(element.hasLabel(NodeType.Fieldmodifier)){
 								list.setDestination(element.getProperty("destination").toString());
 								list.setSource(element.getProperty("source").toString());								
-							}							
+							}		
+							field.setObject(list);
 						}
-						field.setObject(list);
+						
 						c.setFieldmodifier(field);
 						break;
 					}
@@ -950,16 +952,18 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 						Iterable<Relationship> confs= conf.getRelationships(RelationType.ElementRelationship);
 						Iterator<Relationship> confsIt = confs.iterator();
 						Mailserver mailserver=new Mailserver();
-						it.polito.neo4j.jaxb.Object list=new it.polito.neo4j.jaxb.Object();
+						it.polito.neo4j.jaxb.Object list;
 						while(confsIt.hasNext()){
+							list=new it.polito.neo4j.jaxb.Object();
 							Relationship relConf = confsIt.next();
 							Node element = relConf.getStartNode();
 							if(element.hasLabel(NodeType.Mailserver)){
 								list.setDestination(element.getProperty("destination").toString());
 								list.setSource(element.getProperty("source").toString());								
-							}							
+							}	
+							mailserver.setObject(list);
 						}
-						mailserver.setObject(list);
+												
 						c.setMailserver(mailserver);
 						break;
 					}
@@ -1039,17 +1043,20 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 						Iterable<Relationship> confs= conf.getRelationships(RelationType.ElementRelationship);
 						Iterator<Relationship> confsIt = confs.iterator();
 						Webserver webserver=new Webserver();
-						it.polito.neo4j.jaxb.Object list=new it.polito.neo4j.jaxb.Object();
+						it.polito.neo4j.jaxb.Object list;
 						while(confsIt.hasNext()){
+							list=new it.polito.neo4j.jaxb.Object();
 							Relationship relConf = confsIt.next();
 							Node element = relConf.getStartNode();
 							if(element.hasLabel(NodeType.Webserver)){
 								list.setDestination(element.getProperty("destination").toString());
 								list.setSource(element.getProperty("source").toString());								
-							}							
+							}		
+							webserver.setObject(list);
 						}
-						webserver.setObject(list);
+												
 						c.setWebserver(webserver);
+						
 						break;
 					}
 					
