@@ -138,7 +138,7 @@ public class NetContext extends Core{
 	    		DatatypeExpr fd  = (DatatypeExpr)address.getConst(i);
 	    		//System.out.println( (DatatypeExpr)address.getConst(i));
 	    	
-	    		
+	    		System.out.println("fd.toSttrin(): " + fd.toString() + " fd: " + fd);
 	    		am.put(fd.toString(),fd);
 	    	}
 	    

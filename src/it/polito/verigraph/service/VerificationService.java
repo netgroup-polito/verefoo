@@ -489,11 +489,7 @@ public class VerificationService {
 		Map<Integer, GeneratorSolver> scenarios=createScenarios(sanitizedPaths, graph);	
 		
 		List<Test> tests = run(graph, scenarios, sourceNode.getName(), destinationNode.getName());		
-		for(Test tt : tests){
-			System.out.println("risultato: "+tt.getResult()+".");
-		}
-
-		
+			
 		Verification reachability= evaluateReachabilityResult(tests, sourceNode.getName(), destinationNode.getName());
 		
 		Calendar cal_reachability_stop = Calendar.getInstance();
@@ -572,7 +568,7 @@ public class VerificationService {
 			}
 			v.getTests().add(t);
 		}
-		if (sat==true) {
+		if (sat) {
 			v.setResult("SAT");
 			v.setComment("There is at least one path '"	+ source + "' can use to reach '" + destination
 							+ "'. See all the available paths below");

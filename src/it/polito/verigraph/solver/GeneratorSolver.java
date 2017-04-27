@@ -85,7 +85,7 @@ public class GeneratorSolver{
 	
 	public void genSolver() {
 		resetZ3();
-		List<String> names=new ArrayList<String>();
+		/*List<String> names=new ArrayList<String>();
 		List<String> addresses=new ArrayList<String>();
 		for(Map.Entry<String, Map<String, String>> a : scenario.chn.entrySet()){
 			String name=a.getKey();
@@ -93,20 +93,21 @@ public class GeneratorSolver{
 			String address=nodo.get("address");
 			names.add(name);
 			addresses.add(address);
-		}
+		}*/
+		
 		//String name_nctx=listToArguments(scenario.nodes_names);
 		//String type_nctx=listToArguments(scenario.nodes_addresses);
 		
 		//String name_nctx=listToArguments(names);
 		//String type_nctx=listToArguments(addresses);
 		
-		String[] name_nctx=listToStringArguments(names);
-		String[] type_nctx=listToStringArguments(addresses);
+		String[] name_nctx=listToStringArguments(scenario.nodes_names);
+		String[] address_nctx=listToStringArguments(scenario.nodes_addresses);
 		
 		
-		//System.out.println("name_nctx: " + name_nctx);
 		
-		nctx = new NetContext (ctx, name_nctx, type_nctx);
+		
+		nctx = new NetContext (ctx, name_nctx, address_nctx);
 		
 		
 		net = new Network (ctx,new Object[]{nctx});
@@ -132,6 +133,7 @@ public class GeneratorSolver{
 		
 		//configureDevice
 		configureDevice(mo);
+		
 		
 		check = new Checker(ctx,nctx,net);
 		
@@ -197,10 +199,12 @@ public class GeneratorSolver{
 			Object model=cd.getValue();
 			if(model instanceof PolitoEndHost){
 				Map<String, String> packet=scenario.config_obj.get(name);
-				if(packet!=null){					
+				if(packet!=null){		
+					System.out.println("body_endhost:   " + packet.get("body"));
 					PacketModel pModel = new PacketModel();
 					if(packet.get("body")!=null){
 						pModel.setBody(String.valueOf(packet.get("body")).hashCode());
+						System.out.println("body_endhost:   " + pModel.getBody());
 					}
 					if(packet.get("destination")!=null){
 						  pModel.setIp_dest(nctx.am.get(packet.get("destination")));
@@ -264,14 +268,13 @@ public class GeneratorSolver{
 				mo.put(name, mailserver);
 				
 			}else if(model instanceof PolitoNat){
-				List<String> list_tmp=scenario.config_array.get(name);
-				List<String> list=trimIp(list_tmp);
+				List<String> list=scenario.config_array.get(name);				
 				if(list!=null){					
 					 ArrayList<DatatypeExpr> ia = new ArrayList<DatatypeExpr>();
 					 for(String s : list){						
-						 ia.add(nctx.am.get("ip_"+s));
+						 ia.add(nctx.am.get(s));
 					 }
-					 
+					 System.out.println("ia size" + ia.size());
 					((PolitoNat)cd.getValue()).natModel(nctx.am.get(address));
 					((PolitoNat)cd.getValue()).setInternalAddress(ia);
 					}				
@@ -299,12 +302,16 @@ public class GeneratorSolver{
 				break;
 				
 			}else if(model instanceof PolitoIDS){
-				List<String> list_tmp=scenario.config_array.get(name);
-				List<String> list=trimIp(list_tmp);
+				List<String> list=scenario.config_array.get(name);				
 				if(list!=null){
+					System.out.println("dpi_da settare:   " + list);
 					PolitoIDS dpi=(PolitoIDS)cd.getValue();					
-					int[] blackList=listToIntArguments(list);					
-					((PolitoIDS)cd.getValue()).installIDS(blackList);						
+					int[] blackList=listToIntArguments(list);
+					for(int a : blackList){
+						System.out.println("blacklist_dpi: " + a);
+					}
+					((PolitoIDS)cd.getValue()).installIDS(blackList);	
+					
 					}		
 				
 				
@@ -424,6 +431,8 @@ public class GeneratorSolver{
 		for(int i=0; i<arg.size(); i++){
 			if(arg.get(i)!=null)
 				o[i]= arg.get(i);
+			System.out.println("name_nctx: " + o[i]);
+			
 		}
 		return o;
 	}
@@ -432,7 +441,8 @@ private int[] listToIntArguments(List<String> arg) {
 	int[] o= new int[arg.size()];
 	for(int i=0; i<arg.size(); i++){
 		if(arg.get(i)!=null)
-			o[i]= String.valueOf(arg).hashCode();
+			o[i]= String.valueOf(arg.get(i)).hashCode();
+			System.out.println("hashcode:   " + o[i]);
 	}
 	return o;
 	}
