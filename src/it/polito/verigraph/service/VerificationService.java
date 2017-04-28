@@ -478,7 +478,7 @@ public class VerificationService {
 
 		List<List<String>> sanitizedPaths = sanitizePaths(paths);
 		
-		//printListsOfStrings("Paths", sanitizedPaths);
+		printListsOfStrings("Paths", sanitizedPaths);
 
 		if (sanitizedPaths.isEmpty()) {
 			return new Verification("UNSAT",

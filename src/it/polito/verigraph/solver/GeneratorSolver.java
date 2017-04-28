@@ -17,6 +17,7 @@ import com.microsoft.z3.Sort;
 import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
 
+import it.polito.verigraph.exception.DataNotFoundException;
 import it.polito.verigraph.mcnet.components.Checker;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verigraph.mcnet.components.NetContext;
@@ -85,21 +86,7 @@ public class GeneratorSolver{
 	
 	public void genSolver() {
 		resetZ3();
-		/*List<String> names=new ArrayList<String>();
-		List<String> addresses=new ArrayList<String>();
-		for(Map.Entry<String, Map<String, String>> a : scenario.chn.entrySet()){
-			String name=a.getKey();
-			Map<String, String> nodo=a.getValue();
-			String address=nodo.get("address");
-			names.add(name);
-			addresses.add(address);
-		}*/
 		
-		//String name_nctx=listToArguments(scenario.nodes_names);
-		//String type_nctx=listToArguments(scenario.nodes_addresses);
-		
-		//String name_nctx=listToArguments(names);
-		//String type_nctx=listToArguments(addresses);
 		
 		String[] name_nctx=listToStringArguments(scenario.nodes_names);
 		String[] address_nctx=listToStringArguments(scenario.nodes_addresses);
@@ -114,13 +101,12 @@ public class GeneratorSolver{
 		
 		//creazione classi mcnet.objects: Map<nome_nodo, obj creato>		
 		for(int i=0; i<scenario.nodes_names.size(); i++){
-			if(scenario.nodes_names.get(i)!=null){	
-				
-				//mo.put(scenario.nodes_names.get(i),setDevice(scenario.nodes_names.get(i), ctx, nctx, net));
-				//setDevice(scenario.nodes_names.get(i), ctx, nctx, net, mo);
+			if(scenario.nodes_names.get(i)!=null){				
+			
 				setDevice(scenario.nodes_names.get(i));
 			}
 		}
+		
 		
 		//setMapping
 		ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>> adm = new ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>>();
@@ -131,8 +117,24 @@ public class GeneratorSolver{
 		Map<String, List<Tuple<DatatypeExpr,NetworkObject>>> ro=new HashMap<String,List<Tuple<DatatypeExpr,NetworkObject>>>();
 		doRouting(ro, mo);
 		
+		for(Map.Entry<String, Object> xx : mo.entrySet()){
+			System.out.println("nome device in mo: " + xx.getKey());
+			Object oo=xx.getValue();
+			if(oo instanceof PolitoEndHost){
+				System.out.println("nome device in mo: " + xx.getKey() + " è un endhost");
+			}else if(oo instanceof PolitoNat){
+				System.out.println("nome device in mo: " + xx.getKey() + " è un nat");
+			}else if(oo instanceof AclFirewall){
+				System.out.println("nome device in mo: " + xx.getKey() + " è un firewall");
+			}else if(oo instanceof EndHost){
+				System.out.println("nome device in mo: " + xx.getKey() + " è un endpoint");
+			}
+		}
+		
+		
+		
 		//configureDevice
-		configureDevice(mo);
+		configureDevice();
 		
 		
 		check = new Checker(ctx,nctx,net);
@@ -141,9 +143,8 @@ public class GeneratorSolver{
 	}
 
 	private void setDevice(String name) {
-//	private void setDevice(String name, Context ctx, NetContext nctx, Network net, Map<String, Object> mo) {
 		Map<String, String> value=scenario.chn.get(name);	
-		String type=value.get("functional_type");		
+		String type=value.get("functional_type");	
 		if(type.compareTo("endhost")==0){			
 			PolitoEndHost endhost=new PolitoEndHost(ctx, new Object[]{nctx.nm.get(name), net, nctx});
 			mo.put(name, endhost);
@@ -157,7 +158,8 @@ public class GeneratorSolver{
 			PolitoFieldModifier fieldmodifier=new PolitoFieldModifier(ctx, new Object[]{nctx.nm.get(name), net, nctx});
 			mo.put(name, fieldmodifier);
 		}else if(type.compareTo("mailclient")==0){
-			PolitoMailClient mailclient=new PolitoMailClient(ctx, new Object[]{nctx.nm.get(name), net, nctx});
+			String conf=(scenario.config_obj.get(name)).get("mailserver");
+			PolitoMailClient mailclient=new PolitoMailClient(ctx, new Object[]{nctx.nm.get(name), net, nctx, nctx.am.get(conf)});
 			mo.put(name, mailclient);
 		}else if(type.compareTo("mailserver")==0){
 			PolitoMailServer mailserver=new PolitoMailServer(ctx, new Object[]{nctx.nm.get(name), net, nctx});
@@ -175,7 +177,8 @@ public class GeneratorSolver{
 			PolitoWebServer webserver=new PolitoWebServer(ctx, new Object[]{nctx.nm.get(name), net, nctx});
 			mo.put(name, webserver);
 		}else if(type.compareTo("webclient")==0){
-			PolitoWebClient webclient=new PolitoWebClient(ctx, new Object[]{nctx.nm.get(name), net, nctx});
+			String conf=(scenario.config_obj.get(name)).get("webserver");
+			PolitoWebClient webclient=new PolitoWebClient(ctx, new Object[]{nctx.nm.get(name), net, nctx, nctx.am.get(conf)});
 			mo.put(name, webclient);
 		}else if(type.compareTo("dpi")==0){
 			PolitoIDS dpi=new PolitoIDS(ctx, new Object[]{nctx.nm.get(name), net, nctx});
@@ -191,20 +194,23 @@ public class GeneratorSolver{
 		
 	}
 
-	private void configureDevice(Map<String, Object> mo) {
+	private void configureDevice() {	
 		for(Map.Entry<String,Object> cd : mo.entrySet()){
 			String name=cd.getKey();
+		
 			//String type=(scenario.chn.get(name)).get("functional_type");
 			String address=(scenario.chn.get(name)).get("address");
 			Object model=cd.getValue();
+			
 			if(model instanceof PolitoEndHost){
+				
 				Map<String, String> packet=scenario.config_obj.get(name);
-				if(packet!=null){		
-					System.out.println("body_endhost:   " + packet.get("body"));
+				if(packet!=null){	
+				
 					PacketModel pModel = new PacketModel();
 					if(packet.get("body")!=null){
-						pModel.setBody(String.valueOf(packet.get("body")).hashCode());
-						System.out.println("body_endhost:   " + pModel.getBody());
+						pModel.setBody(String.valueOf(packet.get("body")).hashCode());	
+						System.out.println("body_hashCode: " + pModel.getBody());
 					}
 					if(packet.get("destination")!=null){
 						  pModel.setIp_dest(nctx.am.get(packet.get("destination")));
@@ -236,16 +242,30 @@ public class GeneratorSolver{
 			   
 					((PolitoEndHost)cd.getValue()).installEndHost(pModel);
 				}
+				else{
+					System.out.println("endhost vuoto");
+				
+					
+				}
 				
 			}else if(model instanceof PolitoCache){
 				
 				List<String> list_tmp=scenario.config_array.get(name);
+				for(int i=0; i<list_tmp.size(); i++){
+					if(!scenario.nodes_addresses.contains(list_tmp.get(i)))
+						list_tmp.remove(i);
+				}
 				List<String> list=trimIp(list_tmp);
-				if(list!=null){
+				if(list!=null){					
 					PolitoCache cache=(PolitoCache)cd.getValue();					
 					NetworkObject [] array_no=listToNetworkArguments(list);					
 					((PolitoCache)cd.getValue()).installCache(array_no);						
-					}		
+					}	
+				else{
+					System.out.println("cache vuoto");
+					
+					
+				}
 				
 			}else if(model instanceof PolitoAntispam){
 				List<String> list_tmp=scenario.config_array.get(name);
@@ -254,36 +274,53 @@ public class GeneratorSolver{
 					PolitoAntispam antispam=(PolitoAntispam)cd.getValue();					
 					int[] blackList=listToIntArguments(list);
 					((PolitoAntispam)cd.getValue()).installAntispam(blackList);
-					}
-				
+					
+				}
+				else{
+					System.out.println("antispam vuoto");
+					
+					
+				}
 			}else if(model instanceof PolitoFieldModifier){
 				((PolitoFieldModifier)cd.getValue()).installFieldModifier();
 				
 			}else if(model instanceof PolitoMailClient){
-				PolitoMailClient mailclient=new PolitoMailClient(ctx, new Object[]{nctx.nm.get(name), net, nctx});
-				mo.put(name, mailclient);
+				//regole inserire nella initi
+				continue;
 				
 			}else if(model instanceof PolitoMailServer){
-				PolitoMailServer mailserver=new PolitoMailServer(ctx, new Object[]{nctx.nm.get(name), net, nctx});
-				mo.put(name, mailserver);
+				//regole inserire nella initi
+				continue;
 				
 			}else if(model instanceof PolitoNat){
 				List<String> list=scenario.config_array.get(name);				
-				if(list!=null){					
+				if(list!=null){		
+					
 					 ArrayList<DatatypeExpr> ia = new ArrayList<DatatypeExpr>();
-					 for(String s : list){						
-						 ia.add(nctx.am.get(s));
+					 for(String s : list){	
+						System.out.println("host da inserire nel nat: " + s);
+						 if(scenario.nodes_addresses.contains(s))
+							 ia.add(nctx.am.get(s));
 					 }
-					 System.out.println("ia size" + ia.size());
+				
 					((PolitoNat)cd.getValue()).natModel(nctx.am.get(address));
 					((PolitoNat)cd.getValue()).setInternalAddress(ia);
-					}				
+				}	
+				else{
+					System.out.println("nat vuoto");
+				
+				}
 				
 			}else if(model instanceof PolitoVpnAccess){
 				Map<String, String> vpnexit=scenario.config_obj.get(name);
 				if(vpnexit!=null){
 					for(Map.Entry<String, String> a : vpnexit.entrySet())
 					((PolitoVpnAccess)cd.getValue()).vpnAccessModel(nctx.am.get(address), nctx.am.get(a.getValue()));
+				}
+				else{
+					System.out.println("vpnaccess vuoto");
+				
+					
 				}
 				
 			}else if(model instanceof PolitoVpnExit){
@@ -292,44 +329,68 @@ public class GeneratorSolver{
 					for(Map.Entry<String, String> a : vpnaccess.entrySet())
 					((PolitoVpnExit)cd.getValue()).vpnExitModel(nctx.am.get(address), nctx.am.get(a.getValue()));
 				}
+				else{
+					System.out.println("vpnexit vuoto");
+				
+					
+				}
 				
 			}else if(model instanceof PolitoWebServer){
 				//le regole vengono inserite nella init()
-				break;
+				continue;
 				
 			}else if(model instanceof PolitoWebClient){
 				//le regole vengono inserite nella init()
-				break;
+				continue;
 				
 			}else if(model instanceof PolitoIDS){
 				List<String> list=scenario.config_array.get(name);				
 				if(list!=null){
-					System.out.println("dpi_da settare:   " + list);
+				
 					PolitoIDS dpi=(PolitoIDS)cd.getValue();					
 					int[] blackList=listToIntArguments(list);
-					for(int a : blackList){
-						System.out.println("blacklist_dpi: " + a);
-					}
+					
 					((PolitoIDS)cd.getValue()).installIDS(blackList);	
 					
-					}		
+					}	
+				else{
+					System.out.println("dpi vuoto");
+				
+					
+				}
 				
 				
 			}else if(model instanceof EndHost){
 				//le regole vengono inserite nella init()
-				break;
+				continue;
 				
 			}else if(model instanceof AclFirewall){
+				System.out.println("Firewall configuration");
 				Map<String, String> acls=scenario.config_obj.get(name);
-				if(acls!=null){					
-				    ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
-					for(Map.Entry<String, String> a : acls.entrySet()){
-						 acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(a.getKey()),nctx.am.get(a.getValue())));
-					 }
+				 ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+				
+				 if(acls!=null){
+				   	for(Map.Entry<String, String> a : acls.entrySet()){
+						String dest=a.getKey();
+						String src=a.getValue();
+					
+						if(scenario.nodes_addresses.contains("ip_"+dest) && scenario.nodes_addresses.contains("ip_"+src))
+							acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_"+dest),nctx.am.get("ip_"+src)));
+					
+							
+					}
 					((AclFirewall)cd.getValue()).addAcls(acl);
 					
 				}
+				else{
+					
+					 ((AclFirewall)cd.getValue()).addAcls(acl);
+				
+					
+				}
 			}
+			else
+				System.out.println("NEssuna configurazione effettuata");
 			
 		}		
 		
@@ -353,6 +414,7 @@ public class GeneratorSolver{
 
 	private void doRouting(Map<String, List<Tuple<DatatypeExpr, NetworkObject>>> ro, Map<String, Object> mo) {
 		for(String nodes : scenario.nodes_names){
+		
 			Object obj=mo.get(nodes);
 			if(obj!=null){
 				
@@ -360,7 +422,7 @@ public class GeneratorSolver{
 				Map<String, String> route=scenario.routing.get(nodes);
 				for(Map.Entry<String,String> r : route.entrySet()){
 					String dest=r.getKey();
-					NetworkObject next_hop=(NetworkObject)mo.get(r.getValue());
+					NetworkObject next_hop=(NetworkObject)mo.get(r.getValue());					
 					rt.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get(dest), next_hop));
 				}
 				net.routingTable((NetworkObject)obj, rt);
@@ -373,10 +435,6 @@ public class GeneratorSolver{
 		
 	}
 
-	private void setRouting(ArrayList<Tuple<DatatypeExpr, NetworkObject>> rt) {
-		
-		
-	}
 
 	private void doMappings(ArrayList<Tuple<NetworkObject, ArrayList<DatatypeExpr>>> adm, Map<String, Object> mo) {
 		for(Map.Entry<String, Object> obj : mo.entrySet()){	
@@ -392,13 +450,7 @@ public class GeneratorSolver{
 		
 	}
 
-	private ModelObject setDevice(String name, Context ctx, NetContext nctx, Network net) {
-		Map<String, String> value=scenario.chn.get(name);	
-		ModelObject mo=new ModelObject(ctx, new Object[] {nctx, name, value.get("functional_type").toString()});		
-		return mo;	
-	}
 
-	
 
 	
 	//function Arguments:
@@ -431,8 +483,7 @@ public class GeneratorSolver{
 		for(int i=0; i<arg.size(); i++){
 			if(arg.get(i)!=null)
 				o[i]= arg.get(i);
-			System.out.println("name_nctx: " + o[i]);
-			
+		
 		}
 		return o;
 	}
@@ -442,7 +493,7 @@ private int[] listToIntArguments(List<String> arg) {
 	for(int i=0; i<arg.size(); i++){
 		if(arg.get(i)!=null)
 			o[i]= String.valueOf(arg.get(i)).hashCode();
-			System.out.println("hashcode:   " + o[i]);
+			
 	}
 	return o;
 	}

@@ -276,7 +276,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			String destination=c.getEndhost().getDestination();
 			String body=c.getEndhost().getBody();
 			String email_from=c.getEndhost().getEmailFrom();
-			String protocol=c.getEndhost().getProtocol().toString();
+			ProtocolTypes protocol=c.getEndhost().getProtocol();
 			String options=c.getEndhost().getOptions();
 			String url=c.getEndhost().getUrl();
 			BigInteger sequence=c.getEndhost().getSequence();
@@ -302,9 +302,10 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				e_from.setProperty("id", newConf.getId());
 				e_from.setProperty("name", "email_from");
 			}
-			if(protocol!=null){
+			if(protocol!=null){	
+				String protocollo=c.getEndhost().getProtocol().value();
 				Node proto=graphDB.createNode(NodeType.EndHost);
-				proto.setProperty("protocol", protocol);
+				proto.setProperty("protocol", protocollo);
 				Relationship p=proto.createRelationshipTo(newConf,  RelationType.ElementRelationship);
 				p.setProperty("id", newConf.getId());
 				p.setProperty("name", "protocol");
@@ -901,7 +902,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 						endhost.setOptions(options);
 						endhost.setSequence(sequence);
 						endhost.setUrl(url);
-						endhost.setProtocol(ProtocolTypes.fromValue(protocol));
+						if(!protocol.isEmpty())
+							endhost.setProtocol(ProtocolTypes.fromValue(protocol));
 						c.setEndhost(endhost);
 						break;
 					}

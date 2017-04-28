@@ -25,10 +25,7 @@ public class Scenario {
 	Map<String, Map<String, String>> config_obj=new HashMap<String, Map<String, String>>();
 	Map<String,List<String>> config_array=new HashMap<String, List<String>>();
 	
-	/* nodes_names e nodes_addresses contengono tutti i nodi e gli indirizzi coinvolti nello scenario, 
-	 * compresi quelli non contenuti nel path, ma presenti nelle configuraioni di qualche nodo dello scenario
-	 * (esempio: il nat potrebbe contenere nelle configurazioni elementi che restano al di fuori dell'attuale path)
-	 */
+	
 	List<String> nodes_names=new ArrayList<String>();
 	List<String> nodes_types=new ArrayList<String>();
 	List<String> nodes_addresses=new ArrayList<String>();
@@ -58,8 +55,8 @@ public class Scenario {
 
 		//per ogni nodo si crea una mappa da isnerire in chn
 		for(int i=0; i<nodes.size(); i++){
-
-			String name=nodes.get(i).getName().toLowerCase();
+			
+			String name=nodes.get(i).getName();
 			nodes_names.add(name);
 			
 			String type=nodes.get(i).getFunctional_type().toLowerCase();
@@ -79,26 +76,31 @@ public class Scenario {
 
 			//fill routing
 			Map<String, String> route=new HashMap<String, String>();			
-
-			for(int k=i-1; k<0; k--){
-				if(k>=0){
-					String ip_dest="ip_"+nodes.get(k).getName().toLowerCase();
-					String next_hop=nodes.get(i-1).getName().toLowerCase();
-					route.put(ip_dest, next_hop); 
+			
+			
+				for(int k=i-1; ; k--){		
+					if(k==-1)
+						break;
+					else{
+						String ip_dest="ip_"+nodes.get(k).getName();
+						String next_hop=nodes.get(i-1).getName();
+						route.put(ip_dest, next_hop); 
+					}
+					
 				}
-			}
+			
 			for(int j=i+1; j<nodes.size(); j++){
-				String ip_dest="ip_"+nodes.get(j).getName().toLowerCase();
-				String next_hop=nodes.get(i+1).getName().toLowerCase();
+				String ip_dest="ip_"+nodes.get(j).getName();
+				String next_hop=nodes.get(i+1).getName();
 				route.put(ip_dest, next_hop);
 			}
 			routing.put(name, route);
+			
+			
 		
 
 		//fill configuration
 		setConfiguration(name, type, configuration, config_obj, config_array);
-		
-		
 					
 		}
 		
@@ -132,14 +134,8 @@ public class Scenario {
 					for(String string : list){
 						//map_tmp.putAll(mapper.readValue(string, LinkedHashMap.class));		
 						map.putAll(mapper.readValue(string, LinkedHashMap.class));
-						checkConfiguration(map);
-					}
-					
-					/*if(map_tmp!=null){
-						for(Map.Entry<String, String> m : map_tmp.entrySet()){
-							map.put("ip_"+m.getKey(), "ip_"+m.getValue());
-						}
-					}*/
+						
+					}					
 
 				}catch(JsonGenerationException e) {
 
@@ -182,7 +178,7 @@ public class Scenario {
 				try {
 
 					source = mapper.readValue(configuration.toString(), ArrayList.class);
-					checkConfiguration(source);
+					
 
 				} catch (JsonGenerationException e) {
 
@@ -217,7 +213,7 @@ public class Scenario {
 					List<String> list_tmp=new ArrayList<String>();
 					list_tmp = mapper.readValue(configuration.toString(), ArrayList.class);
 					if(list_tmp!=null){
-						checkConfiguration(list_tmp);
+					
 						for(String s : list_tmp){
 							resource.add("ip_"+s);
 						}
@@ -298,10 +294,7 @@ public class Scenario {
 					String ip=map.get("destination");
 					if(ip!=null){						
 						map.put("destination", "ip_"+ip);					
-						if(!path.contains(ip)){							
-							nodes_addresses.add("ip_"+ip);
-						}
-							
+						
 					}
 
 				}catch(JsonGenerationException e) {
@@ -412,7 +405,8 @@ public class Scenario {
 				if(ip!=null){
 					map.put("mailserver", "ip_"+ip);
 						if(!path.contains(ip)){
-							nodes_addresses.add("ip_"+ip);
+							if(!nodes_addresses.contains("ip_"+ip))
+								nodes_addresses.add("ip_"+ip);
 						}
 				}	
 			}catch(JsonGenerationException e) {
@@ -489,7 +483,6 @@ public class Scenario {
 
 					list = mapper.readValue(configuration.toString(), ArrayList.class);
 					if(!list.isEmpty()){
-						checkConfiguration(list);
 						for(String s : list){
 							source.add("ip_"+s);
 						}
@@ -545,8 +538,9 @@ public class Scenario {
 				String ip=map.get("vpnexit");
 				if(ip!=null){
 					map.put("vpnexit", "ip_"+ip);
-					if(!path.contains(ip)){					
-						nodes_addresses.add("ip_"+ip);
+					if(!path.contains(ip)){
+						if(!nodes_addresses.contains("ip_"+ip))
+							nodes_addresses.add("ip_"+ip);
 					}
 				}
 			}catch(JsonGenerationException e) {
@@ -591,8 +585,9 @@ public class Scenario {
 				String ip=map.get("vpnaccess");
 				if(ip!=null){
 					map.put("vpnaccess", "ip_"+ip);	
-					if(!path.contains(ip)){					
-						nodes_addresses.add("ip_"+ip);
+					if(!path.contains(ip)){	
+						if(!nodes_addresses.contains("ip_"+ip))
+							nodes_addresses.add("ip_"+ip);
 					}
 				}
 			}catch(JsonGenerationException e) {
@@ -697,29 +692,34 @@ public class Scenario {
 	}
 
 	private void checkConfiguration(List<String> source) {
-		for(String a : source){
-			if(!path.contains(a)){				
-				nodes_addresses.add("ip_"+a);
+		for(int i=0; i<source.size(); i++){
+			if(!path.contains(source.get(i))){	
+				if(!nodes_addresses.contains("ip_"+source.get(i)))
+					nodes_addresses.add("ip_"+source.get(i));
+						
 			}			
 		}
 		
 	}
 
 	private void checkConfiguration(Map<String, String> map) {
+		Map<String, String> m=new HashMap<String, String>();
 		for(Map.Entry<String, String> a : map.entrySet()){
 			if(a.getKey()!=null){				
 			
-				if(!path.contains(a.getKey())){				
-					nodes_addresses.add("ip_"+a.getKey());
+				if(!path.contains(a.getKey())){	
+					if(!nodes_addresses.contains("ip_"+a.getKey()))
+						nodes_addresses.add("ip_"+a.getKey());
 				}
 			}
 			if(a.getValue()!=null){
-				if(!path.contains(a.getValue())){				
-					nodes_addresses.add("ip_"+a.getValue());
+				if(!path.contains(a.getValue())){	
+					if(!nodes_addresses.contains("ip_"+a.getValue()))
+						nodes_addresses.add("ip_"+a.getValue());
 				}
 			}
 		}
-		
+	
 	}
 
 		

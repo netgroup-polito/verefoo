@@ -85,12 +85,8 @@ public class NetContext extends Core{
 		    pf= new HashMap<String,FuncDecl>() ;
 	        
 		    
-		    mkTypes((String[])args[0],(String[])args[1]);
-	        
-		    if(nm.get("user1")!=null)
-				System.out.println("Non è nulllll");
-			else
-				System.out.println("E' NULL IN NETCTX");
+		    mkTypes((String[])args[0],(String[])args[1]);       
+		    
 	   		constraints = new ArrayList<BoolExpr>();
 	        policies = new ArrayList<Core>();
 	        
@@ -136,9 +132,8 @@ public class NetContext extends Core{
 	    	address = ctx.mkEnumSort("Address", new_addr);
 	    	for(int i=0;i<address.getConsts().length;i++){
 	    		DatatypeExpr fd  = (DatatypeExpr)address.getConst(i);
-	    		//System.out.println( (DatatypeExpr)address.getConst(i));
+	    		//System.out.println( (DatatypeExpr)address.getConst(i));	    	
 	    	
-	    		System.out.println("fd.toSttrin(): " + fd.toString() + " fd: " + fd);
 	    		am.put(fd.toString(),fd);
 	    	}
 	    

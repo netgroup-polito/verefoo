@@ -1,7 +1,7 @@
 //
-// Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
+// Questo file ï¿½ stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
-// Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
+// Qualsiasi modifica a questo file andrï¿½ persa durante la ricompilazione dello schema di origine. 
 // Generato il: 2017.04.13 alle 07:43:11 PM CEST 
 //
 
@@ -48,7 +48,7 @@ public class Endhost {
     protected String body;
     @XmlAttribute(name = "sequence")
     protected BigInteger sequence;
-    @XmlAttribute(name = "protocol", required = true)
+    @XmlAttribute(name = "protocol")
     protected ProtocolTypes protocol;
     @XmlAttribute(name = "email_from")
     protected String emailFrom;
@@ -56,11 +56,11 @@ public class Endhost {
     protected String url;
     @XmlAttribute(name = "options")
     protected String options;
-    @XmlAttribute(name = "destination", required = true)
+    @XmlAttribute(name = "destination")
     protected String destination;
 
     /**
-     * Recupera il valore della proprietà body.
+     * Recupera il valore della proprietï¿½ body.
      * 
      * @return
      *     possible object is
@@ -72,7 +72,7 @@ public class Endhost {
     }
 
     /**
-     * Imposta il valore della proprietà body.
+     * Imposta il valore della proprietï¿½ body.
      * 
      * @param value
      *     allowed object is
@@ -84,7 +84,7 @@ public class Endhost {
     }
 
     /**
-     * Recupera il valore della proprietà sequence.
+     * Recupera il valore della proprietï¿½ sequence.
      * 
      * @return
      *     possible object is
@@ -96,7 +96,7 @@ public class Endhost {
     }
 
     /**
-     * Imposta il valore della proprietà sequence.
+     * Imposta il valore della proprietï¿½ sequence.
      * 
      * @param value
      *     allowed object is
@@ -108,7 +108,7 @@ public class Endhost {
     }
 
     /**
-     * Recupera il valore della proprietà protocol.
+     * Recupera il valore della proprietï¿½ protocol.
      * 
      * @return
      *     possible object is
@@ -120,7 +120,7 @@ public class Endhost {
     }
 
     /**
-     * Imposta il valore della proprietà protocol.
+     * Imposta il valore della proprietï¿½ protocol.
      * 
      * @param value
      *     allowed object is
@@ -132,7 +132,7 @@ public class Endhost {
     }
 
     /**
-     * Recupera il valore della proprietà emailFrom.
+     * Recupera il valore della proprietï¿½ emailFrom.
      * 
      * @return
      *     possible object is
@@ -144,7 +144,7 @@ public class Endhost {
     }
 
     /**
-     * Imposta il valore della proprietà emailFrom.
+     * Imposta il valore della proprietï¿½ emailFrom.
      * 
      * @param value
      *     allowed object is
@@ -156,7 +156,7 @@ public class Endhost {
     }
 
     /**
-     * Recupera il valore della proprietà url.
+     * Recupera il valore della proprietï¿½ url.
      * 
      * @return
      *     possible object is
@@ -168,7 +168,7 @@ public class Endhost {
     }
 
     /**
-     * Imposta il valore della proprietà url.
+     * Imposta il valore della proprietï¿½ url.
      * 
      * @param value
      *     allowed object is
@@ -180,7 +180,7 @@ public class Endhost {
     }
 
     /**
-     * Recupera il valore della proprietà options.
+     * Recupera il valore della proprietï¿½ options.
      * 
      * @return
      *     possible object is
@@ -192,7 +192,7 @@ public class Endhost {
     }
 
     /**
-     * Imposta il valore della proprietà options.
+     * Imposta il valore della proprietï¿½ options.
      * 
      * @param value
      *     allowed object is
@@ -204,7 +204,7 @@ public class Endhost {
     }
 
     /**
-     * Recupera il valore della proprietà destination.
+     * Recupera il valore della proprietï¿½ destination.
      * 
      * @return
      *     possible object is
@@ -216,7 +216,7 @@ public class Endhost {
     }
 
     /**
-     * Imposta il valore della proprietà destination.
+     * Imposta il valore della proprietï¿½ destination.
      * 
      * @param value
      *     allowed object is
