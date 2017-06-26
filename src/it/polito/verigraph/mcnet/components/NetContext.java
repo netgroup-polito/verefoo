@@ -90,7 +90,8 @@ public class NetContext extends Core{
 	   		constraints = new ArrayList<BoolExpr>();
 	        policies = new ArrayList<Core>();
 	        
-	        baseCondition();			
+	        baseCondition();
+	        //System.out.println("netcn: " + constraints);
 		}
 			
 	    /**

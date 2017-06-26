@@ -57,8 +57,7 @@ public class GraphToNeo4j {
 		graph=(new ObjectFactory()).createGraph();
 		graph.setId(gr.getId());		
 		
-		List<it.polito.neo4j.jaxb.Node> nodes=new ArrayList<it.polito.neo4j.jaxb.Node>();
-		//System.out.println("numero nodi:" + gr.getNodes().size());
+		List<it.polito.neo4j.jaxb.Node> nodes=new ArrayList<it.polito.neo4j.jaxb.Node>();		
 		for(Map.Entry<Long, it.polito.verigraph.model.Node> c : gr.getNodes().entrySet()){
 			it.polito.neo4j.jaxb.Node node=(new ObjectFactory()).createNode();
 			node.setId(c.getValue().getId());
@@ -75,7 +74,7 @@ public class GraphToNeo4j {
 		}
 			node.getNeighbour().addAll(neighbours);
 			
-			/* setConfiguration */			
+			/* setConfigurations */			
 			it.polito.neo4j.jaxb.Configuration configuration=(new ObjectFactory()).createConfiguration();
 			JsonNode json=c.getValue().getConfiguration().getConfiguration();
 			setConfiguration(configuration, c.getValue(), json);
@@ -102,8 +101,6 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 	//JsonNode nodes=node.getConfiguration().getConfiguration();	
 	String empty="[]";
 	
-	
-	
 	switch(node.getFunctional_type().toUpperCase()){
 	case "FIREWALL":{
 		configuration.setName(node.getFunctional_type().toLowerCase());
@@ -128,13 +125,15 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 						
 			try{
 				for(String string : list){
-					map.putAll(mapper.readValue(string, LinkedHashMap.class));	
-					for(java.util.Map.Entry<String, String> m : map.entrySet()){
-						Elements e=new Elements();				
-						e.setDestination(m.getKey());
-						e.setSource(m.getValue());	
-						elements_list.add(e);
-					}
+					//System.out.println("stampa list: " + string);
+					map.putAll(mapper.readValue(string, LinkedHashMap.class));
+					//System.out.println("mappe: "+map);					
+				}
+				for(java.util.Map.Entry<String, String> m : map.entrySet()){
+					Elements e=new Elements();				
+					e.setDestination(m.getKey());
+					e.setSource(m.getValue());	
+					elements_list.add(e);
 				}
 			
 		
@@ -156,7 +155,7 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 			
 		}
 			else{
-				System.out.println("elements_list empty");
+				System.out.println("elements_list of Firewall " +node.getName()+" empty");
 				
 			}
 		firewall.getElements().addAll(elements_list);
@@ -182,7 +181,7 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 			        list = mapper.readValue(nodes.toString(), ArrayList.class);
 			      
 			        for(String s : list){
-			    		System.out.println("antispam: " + s);
+			    		//System.out.println("antispam: " + s);
 			    		source.add(s);
 			        }
 			      
@@ -202,7 +201,7 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 			
 		}
 		else{			
-			System.out.println("antispam empty");
+			System.out.println("Antispam " +node.getName()+" empty");
 		}
 		antispam.getSource().addAll(source);
 		configuration.setAntispam(antispam);
@@ -242,7 +241,7 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 			
 		}
 		else{
-			System.out.println("cache vuota");			
+			System.out.println("Cache " +node.getName()+" empty");			
 		}
 		cache.getResource().addAll(resource);
 		configuration.setCache(cache);
@@ -283,7 +282,7 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 			
 			}
 		else{
-			System.out.println("dpi empty");
+			System.out.println("Dpi " +node.getName()+"  empty");
 		}
 		dpi.getNotAllowed().addAll(notAllowed);
 		configuration.setDpi(dpi);
@@ -356,7 +355,7 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 			
 		}
 		else{
-			System.out.println("endhost empty");
+			System.out.println("Endhost " +node.getName()+" empty");
 		}
 		configuration.setEndhost(endhost);
 		break;
@@ -368,67 +367,9 @@ case "ENDPOINT":{
 	break;
 }
 case "FIELDMODIFIER":{
-	/* Avendo come unico elemento un object nello schema, 
-	 * vengono prelevate le coppie di elementi "a":"b" e inseriti in un Object nel fiedlmodifier
-	  */
-	configuration.setName(node.getFunctional_type());
-	Fieldmodifier fieldmodifier=new  Fieldmodifier();
-	/* Nel caso in cui si vogliano aggiungere nuovi object, basta sostituire l'object con una List<Object> e modificare il maxOccurs di xml_components*/
-	it.polito.neo4j.jaxb.Object obj=new it.polito.neo4j.jaxb.Object();
 	
-	if(!nodes.toString().equals(empty)){
-		ObjectMapper mapper=new ObjectMapper();	
-		java.util.Map<String, String> map=new LinkedHashMap();	
-		if(nodes.toString().isEmpty()){
-			break;
-		}else{
-			String input;
-			Matcher matcher = Pattern.compile("\\[([^\\]]*)\\]").matcher(nodes.toString());
-			if(matcher.find()){
-				input=matcher.group(1);
-			}else
-				input=nodes.toString();
-			
-			Pattern pattern=Pattern.compile("\\{([^\\}]*)\\}");
-			List<String> list = new ArrayList<String>();
-			Matcher match= pattern.matcher(input);
-			while (match.find()) {
-			    list.add(match.group());
-			}	
-						
-			try{
-				for(String string : list){
-					map.putAll(mapper.readValue(string, LinkedHashMap.class));	
-					if(map!=null || !map.isEmpty()){
-						for(java.util.Map.Entry<String, String> m : map.entrySet()){
-						obj.setSource(m.getKey());
-						obj.setDestination(m.getValue());
-						/*nel caso di più object qui andrebbe inserito l'object in una lista*/
-						fieldmodifier.setObject(obj);
-						}
-					}
-			}
-			
-			}catch(JsonGenerationException e) {
-		
-		        e.printStackTrace();
-		
-		    } catch (JsonMappingException e) {
-		
-		        e.printStackTrace();
-		        
-		
-		    } catch (IOException e) {
-		
-		        e.printStackTrace();
-		
-		    }
-		}	
-			
-	}
-	else{
-		System.out.println("fieldmodifier empty");
-	}
+	configuration.setName(node.getFunctional_type());
+	Fieldmodifier fieldmodifier=new  Fieldmodifier();	
 	configuration.setFieldmodifier(fieldmodifier);
 	break;
 	}
@@ -439,8 +380,7 @@ case "MAILCLIENT":{
 	
 	ObjectMapper mapper=new ObjectMapper();
 	System.out.println("nodes: " + nodes.toString());
-	java.util.Map<String, String> map=new LinkedHashMap();
-	System.out.println("mailclient");
+	java.util.Map<String, String> map=new LinkedHashMap();	
 	String input;
 	Matcher matcher = Pattern.compile("\\[([^\\]]*)\\]").matcher(nodes.toString());
 	if(matcher.find()){
@@ -459,14 +399,15 @@ case "MAILCLIENT":{
 		for(String string : list){
 			map.putAll(mapper.readValue(string, LinkedHashMap.class));	
 			if(map!=null || !map.isEmpty()){
-				for(java.util.Map.Entry<String, String> m : map.entrySet()){
-					System.out.println("for_mailclient");
-					System.out.println("chiave: " + m.getKey() + "value " + m.getValue());
+				for(java.util.Map.Entry<String, String> m : map.entrySet()){				
 					switch(m.getKey()){
 					case "mailserver":{
 						mailclient.setMailserver(m.getValue());
 						break;
 					}
+					default:
+						System.out.println("\"mailserver\" object is required");
+						break;
 					}
 				}
 			}
@@ -488,63 +429,9 @@ case "MAILCLIENT":{
 	break;
 }
 case "MAILSERVER":{
-	/*stessa situazione di fieldmodifier
-	 * 
-	 */
+	
 	configuration.setName(node.getFunctional_type().toLowerCase());
 	Mailserver mailserver=new Mailserver();
-	
-	/* Nel caso in cui si vogliano aggiungere nuovi object, basta sostituire l'object con una List<Object> e modificare il maxOccurs di xml_components*/
-	it.polito.neo4j.jaxb.Object obj=new it.polito.neo4j.jaxb.Object();
-	
-	if(!nodes.toString().equals(empty)){
-		ObjectMapper mapper=new ObjectMapper();	
-		java.util.Map<String, String> map=new LinkedHashMap();		
-		String input;
-		Matcher matcher = Pattern.compile("\\[([^\\]]*)\\]").matcher(nodes.toString());
-		if(matcher.find()){
-			input=matcher.group(1);
-		}else
-			input=nodes.toString();
-		
-		Pattern pattern=Pattern.compile("\\{([^\\}]*)\\}");
-		List<String> list = new ArrayList<String>();
-		Matcher match= pattern.matcher(input);
-		while (match.find()) {
-		    list.add(match.group());
-		}	
-					
-		try{
-			for(String string : list){
-				/*1 solo object presente*/
-				map.putAll(mapper.readValue(string, LinkedHashMap.class));	
-				if(map!=null)
-					for(java.util.Map.Entry<String, String> m : map.entrySet()){												
-						obj.setSource(m.getKey());
-						obj.setDestination(m.getValue());
-						/*nel caso di più object qui andrebbe inserito l'object in una lista*/
-						mailserver.setObject(obj);
-					}
-			}
-		}catch(JsonGenerationException e) {
-	
-	        e.printStackTrace();
-	
-	    } catch (JsonMappingException e) {
-	
-	        e.printStackTrace();
-	
-	    } catch (IOException e) {
-	
-	        e.printStackTrace();
-	
-	    }
-	
-		
-	}
-	else{
-		System.out.println("mailserver empty");
-	}
 	configuration.setMailserver(mailserver);
 	break;
 }
@@ -582,7 +469,7 @@ case "NAT":{
 		
 	}
 	else{
-		System.out.println("nat empty");
+		System.out.println("Nat " +node.getName()+" empty");
 	}
 	nat.getSource().addAll(source);
 	configuration.setNat(nat);
@@ -618,8 +505,11 @@ case "VPNACCESS":{
 					
 					case "vpnexit":{
 					vpnaccess.setVpnexit(m.getValue());
-					}
 					break;
+					}
+					default:
+						System.out.println("\"vpnexit\" is required");
+						break;
 					}
 				}
 			}
@@ -671,6 +561,10 @@ case "VPNEXIT":{
 						vpnexit.setVpnaccess(m.getValue());
 						break;
 					}
+					default:{
+						System.out.println("\"vpnaccess\" is required");
+						break;
+					}
 					}
 				}
 			}
@@ -697,9 +591,7 @@ case "WEBCLIENT":{
 	
 	
 	ObjectMapper mapper=new ObjectMapper();
-	System.out.println("nodes: " + nodes.toString());
 	java.util.Map<String, String> map=new LinkedHashMap();
-	System.out.println("webclient");
 	String input;	
 	Matcher matcher = Pattern.compile("\\[([^\\]]*)\\]").matcher(nodes.toString());
 	if(matcher.find()){
@@ -715,16 +607,18 @@ case "WEBCLIENT":{
 	}	
 				
 	try{
-		for(String string : list){
-			/*solo 1 stringa presente */
+		for(String string : list){		
 			map.putAll(mapper.readValue(string, LinkedHashMap.class));	
 			if(map!=null || !map.isEmpty()){
-				for(java.util.Map.Entry<String, String> m : map.entrySet()){
-					System.out.println("for_webclient");
-					System.out.println("chiave: " + m.getKey() + "value " + m.getValue());
+				for(java.util.Map.Entry<String, String> m : map.entrySet()){					
 					switch(m.getKey()){
 					case "webserver":{
 						webclient.setNameWebServer(m.getValue());
+						break;
+					}
+					default:{
+						System.out.println("\"webserver\" object is required");
+						break;
 					}
 					}
 				}
@@ -749,53 +643,7 @@ case "WEBCLIENT":{
 case "WEBSERVER":{
 	configuration.setName(node.getFunctional_type().toLowerCase());
 	Webserver webserver=new Webserver();
-	/* Nel caso in cui si vogliano aggiungere nuovi object, basta sostituire l'object con una List<Object> e modificare il maxOccurs di xml_components*/
-	it.polito.neo4j.jaxb.Object obj=new it.polito.neo4j.jaxb.Object();
-	
-	if(!nodes.toString().equals(empty)){
-		ObjectMapper mapper=new ObjectMapper();		
-		java.util.Map<String, String> map=new LinkedHashMap();	
-		if(nodes.toString().equals(empty)){
-			break;
-		}else{
-			String input;
-			Matcher matcher = Pattern.compile("\\[([^\\]]*)\\]").matcher(nodes.toString());
-			if(matcher.find()){
-				input=matcher.group(1);
-			}else
-				input=nodes.toString();
-			
-			try{
-			/*readValue legge solo 1 valore di 1 object*/
-			map=mapper.readValue(input, java.util.LinkedHashMap.class);
-			if(!map.isEmpty() || map!=null){
-				for(java.util.Map.Entry<String, String> m : map.entrySet()){				
-					obj.setSource(m.getKey());
-					obj.setDestination(m.getValue());
-					/*nel caso di più object qui andrebbe inserito l'object in una lista*/
-					webserver.setObject(obj);
-				}
-			}
-			}catch(JsonGenerationException e) {
-		
-		        e.printStackTrace();
-		
-		    } catch (JsonMappingException e) {
-		
-		        e.printStackTrace();
-		
-		    } catch (IOException e) {
-		
-		        e.printStackTrace();
-		
-		    }
-		}	
-		}
-	else{
-		System.out.println("webserver empty");
-		}
 	configuration.setWebserver(webserver);
-	System.out.println("WEBSERVER: " + configuration.getWebserver().getObject());
 	break;
 	}
 }

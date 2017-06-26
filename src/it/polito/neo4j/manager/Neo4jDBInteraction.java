@@ -11,6 +11,7 @@ import it.polito.neo4j.jaxb.Neighbour;
 import it.polito.neo4j.jaxb.Paths;
 import it.polito.neo4j.jaxb.Reachability;
 import it.polito.neo4j.exceptions.DuplicateNodeException;
+import it.polito.neo4j.exceptions.MyInvalidIdException;
 import it.polito.neo4j.exceptions.MyInvalidObjectException;
 import it.polito.neo4j.exceptions.MyNotFoundException;
 
@@ -24,9 +25,9 @@ public interface Neo4jDBInteraction {
 		PathRelationship, OwnerRelationship, ConfigurationRelantionship, ElementRelationship;
 	}
 		
-	public void createGraphs(Graphs graphs) throws MyNotFoundException;
-	public Graph createGraph(Graph graph) throws MyNotFoundException;
-	public it.polito.neo4j.jaxb.Node createNode(it.polito.neo4j.jaxb.Node node, long graphId) throws MyNotFoundException, DuplicateNodeException;
+	public void createGraphs(Graphs graphs) throws MyNotFoundException, MyInvalidIdException;
+	public Graph createGraph(Graph graph) throws MyNotFoundException, MyInvalidIdException;
+	public it.polito.neo4j.jaxb.Node createNode(it.polito.neo4j.jaxb.Node node, long graphId) throws MyNotFoundException, DuplicateNodeException, MyInvalidIdException;
 	public Neighbour createNeighbour(Neighbour neighbour, long graphId, long nodeId) throws MyNotFoundException;
 	
 	public Graphs getGraphs();
@@ -40,8 +41,8 @@ public interface Neo4jDBInteraction {
 	public void deleteNode(long graphId, long nodeId) throws MyNotFoundException;
 	public void deleteNeighbour(long graphId, long nodeId, long neighbourId) throws MyNotFoundException;
 	
-	public it.polito.neo4j.jaxb.Node updateNode(it.polito.neo4j.jaxb.Node node, long graphId, long nodeId) throws MyNotFoundException, MyInvalidObjectException;
-	public Graph updateGraph(Graph graph, long graphId) throws MyNotFoundException, MyInvalidObjectException, DuplicateNodeException;
+	public it.polito.neo4j.jaxb.Node updateNode(it.polito.neo4j.jaxb.Node node, long graphId, long nodeId) throws MyNotFoundException, MyInvalidObjectException, MyInvalidIdException;
+	public Graph updateGraph(Graph graph, long graphId) throws MyNotFoundException, MyInvalidObjectException, DuplicateNodeException, MyInvalidIdException;
 	public it.polito.neo4j.jaxb.Node updateNeighbour(Neighbour neighbour, long graphId, long nodeId, long neighbourId) throws MyNotFoundException, MyInvalidObjectException;
 
 	public Paths findAllPathsBetweenTwoNodes(long graphId, String srcName, String dstName, String direction) throws MyNotFoundException;

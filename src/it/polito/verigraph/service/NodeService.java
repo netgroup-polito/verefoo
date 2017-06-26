@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.main.JsonSchema;
 
+import it.polito.neo4j.exceptions.MyInvalidIdException;
 import it.polito.neo4j.exceptions.MyNotFoundException;
 import it.polito.neo4j.manager.Neo4jDBManager;
 import it.polito.verigraph.exception.BadRequestException;
@@ -64,7 +65,7 @@ public class NodeService {
 		return node;
 	}
 
-	public Node updateNode(long graphId, Node node) throws JAXBException, IOException {
+	public Node updateNode(long graphId, Node node) throws JAXBException, IOException, MyInvalidIdException {
 		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
@@ -100,7 +101,7 @@ public class NodeService {
 		
 	}
 
-	public Node addNode(long graphId, Node node) throws JsonParseException, JsonMappingException, JAXBException, IOException {
+	public Node addNode(long graphId, Node node) throws JsonParseException, JsonMappingException, JAXBException, IOException, MyInvalidIdException {
 		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}
@@ -208,7 +209,7 @@ public class NodeService {
 
 	}
 
-	public Configuration addNodeConfiguration(long graphId, long nodeId, Configuration nodeConfiguration) throws IOException {
+	public Configuration addNodeConfiguration(long graphId, long nodeId, Configuration nodeConfiguration) throws IOException, MyInvalidIdException {
 		if (graphId < 0) {
 			throw new ForbiddenException("Illegal graph id: " + graphId);
 		}

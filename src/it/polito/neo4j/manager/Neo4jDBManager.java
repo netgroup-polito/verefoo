@@ -25,7 +25,6 @@ import it.polito.neo4j.jaxb.GraphToNeo4j;
 import it.polito.neo4j.jaxb.Neo4jToGraph;
 import it.polito.neo4j.jaxb.ObjectFactory;
 import it.polito.neo4j.jaxb.Paths;
-import it.polito.neo4j.service.Service;
 import it.polito.neo4j.exceptions.MyInvalidDirectionException;
 import it.polito.neo4j.exceptions.MyInvalidIdException;
 import it.polito.verigraph.exception.DataNotFoundException;
@@ -37,11 +36,10 @@ import it.polito.verigraph.model.Node;
 public class Neo4jDBManager {
 	
 	public static Neo4jLibrary lib = Neo4jLibrary.getNeo4jLibrary();
-	static Service service = new Service();
 	//static ObjectFactory obFactory = new ObjectFactory();
 
 	
-	public it.polito.verigraph.model.Graph updateGraph(it.polito.verigraph.model.Graph graph) throws JAXBException, JsonParseException, JsonMappingException, IOException{
+	public it.polito.verigraph.model.Graph updateGraph(it.polito.verigraph.model.Graph graph) throws JAXBException, JsonParseException, JsonMappingException, IOException, MyInvalidIdException{
 	
 			
 		    it.polito.neo4j.jaxb.Graph graph_xml=GraphToNeo4j.generateObject(graph);
@@ -56,16 +54,16 @@ public class Neo4jDBManager {
 				
 			}
 			catch(MyNotFoundException e1){
-				System.out.println("error update 1");
+				//System.out.println("error update 1");
 				throw new NotFoundException();
 			}
 			
 			catch(DuplicateNodeException e3){
-				System.out.println("error update 2");
+				//System.out.println("error update 2");
 				throw new BadRequestException(e3.getMessage());
 			}
 			catch(MyInvalidObjectException e4){
-				System.out.println("error update 3");
+				//System.out.println("error update 3");
 				throw new BadRequestException(e4.getMessage());
 			}
 	}
@@ -81,7 +79,7 @@ public class Neo4jDBManager {
 	}
 
 	
-	public it.polito.verigraph.model.Graph addGraph(it.polito.verigraph.model.Graph graph) throws JAXBException, JsonParseException, JsonMappingException, IOException {
+	public it.polito.verigraph.model.Graph addGraph(it.polito.verigraph.model.Graph graph) throws JAXBException, JsonParseException, JsonMappingException, IOException, MyInvalidIdException {
 			
 				it.polito.neo4j.jaxb.Graph graph_xml=GraphToNeo4j.generateObject(graph);
 				it.polito.neo4j.jaxb.Graph graphReturned;
@@ -202,7 +200,7 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 		
 	}
 
-	public it.polito.verigraph.model.Node addNode(long graphId, it.polito.verigraph.model.Node node) throws IOException {
+	public it.polito.verigraph.model.Node addNode(long graphId, it.polito.verigraph.model.Node node) throws IOException, MyInvalidIdException {
 		// TODO Auto-generated method stub
 		it.polito.neo4j.jaxb.Node node_xml=GraphToNeo4j.NodeToNeo4j(node);
 		it.polito.neo4j.jaxb.Node nodeReturned;
@@ -229,7 +227,7 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 		return node_v;
 	}
 
-	public Node updateNode(long graphId, Node node, long id) throws IOException {
+	public Node updateNode(long graphId, Node node, long id) throws IOException, MyInvalidIdException {
 		// TODO Auto-generated method stub
 		it.polito.neo4j.jaxb.Node node_xml=GraphToNeo4j.NodeToNeo4j(node);
 		it.polito.neo4j.jaxb.Node nodeReturned;
@@ -274,8 +272,7 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 		it.polito.neo4j.jaxb.Paths paths=(new ObjectFactory()).createPaths();
 		try{
 			if(source == null || destination == null || direction == null)
-				throw new DataNotFoundException("Missing query parameters");
-			service.checkValidDirection(direction);
+				throw new DataNotFoundException("Missing query parameters");			
 			paths =  lib.findAllPathsBetweenTwoNodes(graphId, source, destination,direction);
 		}
 		catch(MyNotFoundException e1){
@@ -384,7 +381,7 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 		}
 	}
 
-	public Configuration updateConfiguration(long nodeId, long graphId, Configuration nodeConfiguration, Node node) throws JsonParseException, JsonMappingException, IOException {
+	public Configuration updateConfiguration(long nodeId, long graphId, Configuration nodeConfiguration, Node node) throws JsonParseException, JsonMappingException, IOException, MyInvalidIdException {
 			
 		try{
 			

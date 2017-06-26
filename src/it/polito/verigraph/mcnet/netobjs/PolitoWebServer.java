@@ -64,6 +64,7 @@ public class PolitoWebServer extends NetworkObject{
 	        net = (Network)args[0][1];
 	        nctx = (NetContext)args[0][2];
 	        webServerRules();
+	      
 	    }
 		
 		@Override
@@ -122,7 +123,9 @@ public class PolitoWebServer extends NetworkObject{
                             		ctx.mkEq(nctx.pf.get("proto").apply(p_1), ctx.mkInt(nctx.HTTP_REQUEST)),
                             		ctx.mkEq(nctx.pf.get("dest").apply(p_0), nctx.pf.get("src").apply(p_1)),
                             		ctx.mkEq(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_1))),
-                            1,null,null,null,null)),1,null,null,null,null));    	        	            	        
+                            1,null,null,null,null)),1,null,null,null,null));   
+	    	
+	    	//System.out.println(constraints);
 	    }
 }	
 	

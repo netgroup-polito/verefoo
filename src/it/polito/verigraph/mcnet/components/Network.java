@@ -48,7 +48,7 @@ public class Network extends Core{
 	Context ctx;
 	NetContext nctx;
 	List<BoolExpr> constraints; 
-	List<NetworkObject> elements; 
+	public List<NetworkObject> elements; 
 	
 
 	
@@ -71,7 +71,7 @@ public class Network extends Core{
 	 */
 	public void attach (NetworkObject ... elements){
 	      for(NetworkObject el : elements)  
-		  this.elements.add(el);
+		  this.elements.add(el);	     
 	}
 	  
 	@Override

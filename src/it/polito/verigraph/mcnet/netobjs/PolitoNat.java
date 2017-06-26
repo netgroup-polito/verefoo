@@ -364,6 +364,7 @@ public class PolitoNat extends NetworkObject{
     												ctx.mkEq(nctx.pf.get("src").apply(p_1),nctx.pf.get("dest").apply(p_2)),
     												ctx.mkEq(nctx.pf.get("src").apply(p_0),nctx.pf.get("dest").apply(p_2)),	
     												ctx.mkEq(nctx.pf.get("src").apply(p_2),nctx.pf.get("dest").apply(p_0))),1,null,null,null,null)),1,null,null,null,null))),1,null,null,null,null));
+    //	System.out.println("nat: " + constraints);
     }	
     
     public void setInternalAddress(ArrayList<DatatypeExpr> internalAddress){

@@ -59,9 +59,7 @@ public class VerificationService {
 
 	private List<List<String>> sanitizePaths(Paths paths) {
 		List<List<String>> sanitizedPaths = new ArrayList<List<String>>();
-		for (String path : paths.getPath()) {
-			System.out.println("Original path: " + path);
-			//List<String> newPath = sanitizePath(path);
+		for (String path : paths.getPath()) {			
 			List<String> newPath = extractPath(path);
 			sanitizedPaths.add(newPath);
 		}
@@ -74,8 +72,7 @@ public class VerificationService {
 		// find all nodes, i.e. all names between parentheses
 		Matcher m = Pattern.compile("\\(([^)]+)\\)").matcher(path);
 		while (m.find()) {
-			String node = m.group(1);
-			//System.out.println("node:" + node);
+			String node = m.group(1);			
 			newPath.add(node);
 			
 		}
@@ -111,8 +108,7 @@ public class VerificationService {
 		if (type == null || type.equals("")) {
 			throw new BadRequestException("Please specify the 'type' parameter in your request");
 		}
-		//Node sourceNode= manager.getNodeByName(graphId, verificationBean.getSource());
-		//Node destinationNode=manager.getNodeByName(graphId, verificationBean.getDestination());
+		
 		Node sourceNode = graph.searchNodeByName(verificationBean.getSource());
 		Node destinationNode = graph.searchNodeByName(verificationBean.getDestination());
 
@@ -489,7 +485,11 @@ public class VerificationService {
 		Map<Integer, GeneratorSolver> scenarios=createScenarios(sanitizedPaths, graph);	
 		
 		List<Test> tests = run(graph, scenarios, sourceNode.getName(), destinationNode.getName());		
-			
+		
+		Calendar cal_reachability_after_run = Calendar.getInstance();
+		time_reachability = time_reachability +(cal_reachability_after_run.getTime().getTime() - start_time_reachability.getTime());
+		System.out.println("Time reachability after run: " + time_reachability);
+		
 		Verification reachability= evaluateReachabilityResult(tests, sourceNode.getName(), destinationNode.getName());
 		
 		Calendar cal_reachability_stop = Calendar.getInstance();
@@ -506,15 +506,14 @@ public class VerificationService {
 		String result;
 		
 		//estimation time
-		Long time=(long) 0;
-		Calendar cal = Calendar.getInstance();
-		Date start_time = cal.getTime();
+		//Long time=(long) 0;
+		//Calendar cal = Calendar.getInstance();
+		//Date start_time = cal.getTime();
 		
 		
 		for(Map.Entry<Integer, GeneratorSolver> t : scenarios.entrySet()){
 			
-				result=t.getValue().run(src, dst);
-				System.out.println("RESULT run: " + result);				
+				result=t.getValue().run(src, dst);							
 		
 			List<Node> path = new ArrayList<Node>();
 			for (String nodeString : t.getValue().getPaths()) {
@@ -525,9 +524,9 @@ public class VerificationService {
 			tests.add(test);
 		}
 		
-		Calendar cal2 = Calendar.getInstance();
-		time = time +(cal2.getTime().getTime() - start_time.getTime());
-		System.out.println("time occur to run: " + time);
+		//Calendar cal2 = Calendar.getInstance();
+		//time = time +(cal2.getTime().getTime() - start_time.getTime());
+		//System.out.println("Time occur to run: " + time);
 		
 		
 		return tests;
@@ -561,7 +560,7 @@ public class VerificationService {
 				v.setResult("UNKNWON");
 				v.setComment("Reachability from '"	+ source + "' to '" + destination
 								+ "' is unknown. See all the checked paths below");
-				System.out.println("v.setComment: "+ v.getComment());
+				//System.out.println("v.setComment: "+ v.getComment());
 			}
 			else if (t.getResult().equals("UNSAT")) {
 				unsat++;
@@ -572,17 +571,84 @@ public class VerificationService {
 			v.setResult("SAT");
 			v.setComment("There is at least one path '"	+ source + "' can use to reach '" + destination
 							+ "'. See all the available paths below");
-			System.out.println("v.setComment: "+ v.getComment());
+			//System.out.println("v.setComment: "+ v.getComment());
 		}
 		else if (unsat == tests.size()) {
 			v.setResult("UNSAT");
 			v.setComment("There isn't any path '"	+ source + "' can use to reach '" + destination
 							+ "'. See all the checked paths below");
-			System.out.println("v.setComment: "+ v.getComment());
+			//System.out.println("v.setComment: "+ v.getComment());
 		}
-		System.out.println("v.comment: "+ v.getComment());
-		System.out.println("v.result: "+ v.getResult());
+		//System.out.println("v.comment: "+ v.getComment());
+		//System.out.println("v.result: "+ v.getResult());
 		return v;
+	}
+
+	public List<List<Node>> getPaths(long graphId, String source, String destination) throws JsonParseException, JsonMappingException, JAXBException, IOException, MyInvalidDirectionException {
+		if (graphId < 0) {
+			throw new ForbiddenException("Illegal graph id: " + graphId);
+		}
+		GraphService graphService = new GraphService();
+		Graph graph = graphService.getGraph(graphId);
+		if (graph == null) {
+			throw new DataNotFoundException("Graph with id " + graphId + " not found");
+		}
+		
+		
+		if (source == null || source.equals("")) {
+			throw new BadRequestException("Please specify the 'source' parameter in your request");
+		}
+		if (destination == null || destination.equals("")) {
+			throw new BadRequestException("Please specify the 'destination' parameter in your request");
+		}		
+	
+		Node sourceNode = graph.searchNodeByName(source);
+		Node destinationNode = graph.searchNodeByName(destination);
+
+		if (sourceNode == null) {
+			throw new BadRequestException("The 'source' parameter '" + source + "' is not valid, please insert the name of an existing node");
+		}
+		if (destinationNode == null) {
+			throw new BadRequestException("The 'destination' parameter '" + destination + "' is not valid, please insert the name of an existing node");
+		}
+		
+		Paths all_paths = getPaths(graph, sourceNode, destinationNode);
+
+		if (all_paths.getPath().size() == 0) {
+			System.out.println("No path available");
+			return null;
+		}
+
+		List<List<String>> sanitizedPaths = sanitizePaths(all_paths);
+		
+		printListsOfStrings("Paths", sanitizedPaths);
+		
+		if (sanitizedPaths.isEmpty()) {
+			return null;
+		}
+		
+		List<List<Node>> paths=new ArrayList<List<Node>>();
+		List<Node> p= new ArrayList<Node>();
+		
+		for(int i=0; i<sanitizedPaths.size(); i++){
+			List<String> name=sanitizedPaths.get(i);
+			for(int j=0; j<name.size(); j++){
+				Node n=graph.searchNodeByName(name.get(j));
+				if(n!=null)
+					p.add(j, n);
+			}
+			if(!p.isEmpty())
+			paths.add(i, p);
+				
+		}
+		
+		if(!paths.isEmpty())
+			return paths;
+		else
+			return null;
+		
+		
+		
 	}
 
 }

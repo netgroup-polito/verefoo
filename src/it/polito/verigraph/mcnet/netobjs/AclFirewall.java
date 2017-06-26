@@ -69,6 +69,7 @@ public class AclFirewall extends NetworkObject{
 	    nctx = (NetContext)args[0][2];
 	    net.saneSend(this);
 		firewallSendRules();
+		//System.out.println("frewall: " + constraints);
 	}
 	
 	/**

@@ -3,6 +3,7 @@ package it.polito.verigraph.resources;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
@@ -13,6 +14,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -29,9 +31,11 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import it.polito.neo4j.exceptions.MyInvalidDirectionException;
+import it.polito.neo4j.exceptions.MyInvalidIdException;
 import it.polito.neo4j.exceptions.MyNotFoundException;
 import it.polito.verigraph.model.ErrorMessage;
 import it.polito.verigraph.model.Graph;
+import it.polito.verigraph.model.Node;
 import it.polito.verigraph.model.Verification;
 import it.polito.verigraph.resources.beans.VerificationBean;
 import it.polito.verigraph.service.GraphService;
@@ -69,7 +73,7 @@ public class GraphResource {
 							@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
 							@ApiResponse(code = 201, message = "Graph successfully created", response = Graph.class) })
 	public Response addGraph(	@ApiParam(value = "New graph object", required = true) Graph graph,
-								@Context UriInfo uriInfo) throws JAXBException, JsonParseException, JsonMappingException, IOException {
+								@Context UriInfo uriInfo) throws JAXBException, JsonParseException, JsonMappingException, IOException, MyInvalidIdException {
 		Graph newGraph = graphService.addGraph(graph);
 		String newId = String.valueOf(newGraph.getId());
 		URI uri = uriInfo.getAbsolutePathBuilder().path(newId).build();
@@ -105,7 +109,7 @@ public class GraphResource {
 							@ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),
 							@ApiResponse(code = 200, message = "Graph edited successfully", response = Graph.class) })
 	public Graph updateGraph(	@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long id,
-								@ApiParam(value = "Updated graph object", required = true) Graph graph) throws JAXBException, JsonParseException, JsonMappingException, IOException {
+								@ApiParam(value = "Updated graph object", required = true) Graph graph) throws JAXBException, JsonParseException, JsonMappingException, IOException, MyInvalidIdException {
 		graph.setId(id);
 		return graphService.updateGraph(graph);
 	}
@@ -146,6 +150,26 @@ public class GraphResource {
 							.build()
 							.toString();
 		return uri;
+	}
+	
+	@GET
+	@Path("/{graphId}/paths")
+	@ApiOperation(	httpMethod = "GET",	value = "Retrieve all paths between two nodes")
+	@ApiResponses(value = {	@ApiResponse(	code = 403,
+	message = "Invalid graph id or invalid configuration for source and/or destination node",
+	response = ErrorMessage.class),
+	@ApiResponse(	code = 404,
+	message = "Graph not found or source node not found or destination node not found or configuration for source and/or destination node not available",
+	response = ErrorMessage.class),
+    @ApiResponse(code = 500, message = "Internal server error", response = ErrorMessage.class),})	
+	
+	public List<List<Node>> getPaths(@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
+									@ApiParam(	value = "'source' must refer to name of existing nodes in the same graph",
+												required = true) @QueryParam("source") String srcName,
+									@ApiParam(	value = "'destination' must refer to name of existing nodes in the same graph",
+									required = true)@QueryParam("destination") String dstName) throws MyInvalidDirectionException, JsonParseException, JsonMappingException, JAXBException, IOException {
+		
+		return verificationService.getPaths(graphId, srcName, dstName);
 	}
 
 	private String getUriForNodes(UriInfo uriInfo, Graph graph) {

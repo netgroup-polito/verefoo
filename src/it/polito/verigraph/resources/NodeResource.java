@@ -28,6 +28,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import it.polito.neo4j.exceptions.MyInvalidIdException;
 import it.polito.neo4j.exceptions.MyNotFoundException;
 import it.polito.neo4j.manager.Neo4jDBManager;
 import it.polito.verigraph.exception.BadRequestException;
@@ -78,7 +79,7 @@ public class NodeResource {
     public Response addNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
     		@ApiParam(value = "New node object", required = true) Node node,
-    		@Context UriInfo uriInfo) throws JsonParseException, JsonMappingException, JAXBException, IOException {
+    		@Context UriInfo uriInfo) throws JsonParseException, JsonMappingException, JAXBException, IOException, MyInvalidIdException {
         Node newNode = nodeService.addNode(graphId, node);
         String newId = String.valueOf(newNode.getId());
         URI uri = uriInfo.getAbsolutePathBuilder().path(newId).build();
@@ -122,7 +123,7 @@ public class NodeResource {
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
     		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
     		@ApiParam(value = "Node configuration", required = true) Configuration nodeConfiguration,
-    		@Context UriInfo uriInfo) throws JsonParseException, JsonMappingException, JAXBException, IOException, MyNotFoundException{
+    		@Context UriInfo uriInfo) throws JsonParseException, JsonMappingException, JAXBException, IOException, MyNotFoundException, MyInvalidIdException{
     	
     	Configuration conf=nodeService.addNodeConfiguration(graphId, nodeId, nodeConfiguration);
     	return conf;
@@ -145,7 +146,7 @@ public class NodeResource {
     public Node updateNode(
     		@ApiParam(value = "Graph id", required = true) @PathParam("graphId") long graphId,
     		@ApiParam(value = "Node id", required = true) @PathParam("nodeId") long nodeId,
-    		@ApiParam(value = "Updated node object", required = true) Node node) throws JAXBException, IOException{
+    		@ApiParam(value = "Updated node object", required = true) Node node) throws JAXBException, IOException, MyInvalidIdException{
     	node.setId(nodeId);
     	return nodeService.updateNode(graphId, node);
     }

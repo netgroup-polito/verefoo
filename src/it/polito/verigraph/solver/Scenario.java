@@ -14,23 +14,27 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import it.polito.verigraph.exception.DataNotFoundException;
 import it.polito.verigraph.model.Graph;
 import it.polito.verigraph.model.Node;
 
 public class Scenario {
 	Graph graph;
 	List<String> path=new ArrayList<String>();
+	
 	Map<String, Map<String, String>> chn=new HashMap<String, Map<String, String>>();
 	Map<String, Map<String, String>> routing=new HashMap<String, Map<String, String>>();
+	
+	//configurations node:
 	Map<String, Map<String, String>> config_obj=new HashMap<String, Map<String, String>>();
 	Map<String,List<String>> config_array=new HashMap<String, List<String>>();
 	
-	
+	//utility for netcontext:
 	List<String> nodes_names=new ArrayList<String>();
 	List<String> nodes_types=new ArrayList<String>();
 	List<String> nodes_addresses=new ArrayList<String>();
-	List<String> nodes_ip_mappings=new ArrayList<String>();
-	Map<String, Map<String, String>> nodes_rt=new HashMap<String, Map<String, String>>();
+
 	
 	public Scenario(Graph graph, List<String> s) {
 
@@ -46,7 +50,7 @@ public class Scenario {
 		for(String s : path){
 			Node n=graph.searchNodeByName(s);
 			if(n==null){
-				System.out.println("Nodo presente nel path (sanitizesPath) non presente nel grafo");
+				System.out.println("The node "+n.getName()+" is not present in the graph");
 			}
 			else{
 				nodes.add(n);
@@ -63,7 +67,6 @@ public class Scenario {
 			nodes_types.add(type);
 			
 			nodes_addresses.add("ip_"+name);
-			nodes_ip_mappings.add("ip_"+name);
 			
 			
 			JsonNode configuration=nodes.get(i).getConfiguration().getConfiguration();
@@ -103,7 +106,15 @@ public class Scenario {
 		setConfiguration(name, type, configuration, config_obj, config_array);
 					
 		}
-		
+		/*for(Map.Entry<String, Map<String, String>> a : routing.entrySet()){
+			String name_=a.getKey();
+			Map<String, String> b= a.getValue();
+			System.out.println("routing " + name_);
+			for(Map.Entry<String, String> d : b.entrySet()){
+				System.out.println("ip_dest: " + d.getKey());
+				System.out.println("next_hop: "+ d.getValue());
+			}
+		}*/
 }
 
 	@SuppressWarnings("unchecked")
@@ -131,11 +142,13 @@ public class Scenario {
 				}	
 
 				try{
-					for(String string : list){
-						//map_tmp.putAll(mapper.readValue(string, LinkedHashMap.class));		
+					for(String string : list){								
 						map.putAll(mapper.readValue(string, LinkedHashMap.class));
 						
-					}					
+					}
+					//checkConfiguration(map);
+					
+					
 
 				}catch(JsonGenerationException e) {
 
@@ -178,7 +191,7 @@ public class Scenario {
 				try {
 
 					source = mapper.readValue(configuration.toString(), ArrayList.class);
-					
+					//checkConfiguration(source);
 
 				} catch (JsonGenerationException e) {
 
@@ -213,7 +226,7 @@ public class Scenario {
 					List<String> list_tmp=new ArrayList<String>();
 					list_tmp = mapper.readValue(configuration.toString(), ArrayList.class);
 					if(list_tmp!=null){
-					
+					//	checkConfiguration(list_tmp);
 						for(String s : list_tmp){
 							resource.add("ip_"+s);
 						}
@@ -294,7 +307,11 @@ public class Scenario {
 					String ip=map.get("destination");
 					if(ip!=null){						
 						map.put("destination", "ip_"+ip);					
-						
+						/*if(!path.contains(ip)){	
+							if(!nodes_addresses.contains("ip_"+ip))
+								nodes_addresses.add("ip_"+ip);
+						}
+							*/
 					}
 
 				}catch(JsonGenerationException e) {
@@ -483,6 +500,7 @@ public class Scenario {
 
 					list = mapper.readValue(configuration.toString(), ArrayList.class);
 					if(!list.isEmpty()){
+					//	checkConfiguration(list);
 						for(String s : list){
 							source.add("ip_"+s);
 						}
@@ -687,6 +705,9 @@ public class Scenario {
 			}
 			config_obj.put(name, map);
 			break;
+		}
+		default:{
+			throw new DataNotFoundException("The type "+type+ " is not valid");
 		}
 		}
 	}

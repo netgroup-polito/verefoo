@@ -35,8 +35,7 @@ public class Neo4jToGraph {
 			for(it.polito.neo4j.jaxb.Neighbour neigh : list){
 				it.polito.verigraph.model.Neighbour ngraph=new it.polito.verigraph.model.Neighbour();
 				ngraph.setId(neigh.getId());
-				ngraph.setName(neigh.getName());
-				//System.out.println("nodo: " + node.getName() + " neigh: " + ngraph.getName());
+				ngraph.setName(neigh.getName());			
 				neighbours.put(ngraph.getId(), ngraph);
 				
 			}
@@ -220,16 +219,6 @@ public class Neo4jToGraph {
 			ObjectMapper mapper=new ObjectMapper();
 			JsonNode root=mapper.createObjectNode();
 			ArrayNode child=mapper.createArrayNode();	
-			
-			if(configuration.getFieldmodifier().getObject()!=null){
-				System.out.println("fieldmodifier not empty");
-				it.polito.neo4j.jaxb.Object o = configuration.getFieldmodifier().getObject();
-				JsonNode element=mapper.createObjectNode();
-				((ObjectNode)element).put(o.getSource(), o.getDestination());
-				child.add(element);
-			}
-			//((ObjectNode)root).set("configuration", child);
-			//conf.setConfiguration(root);
 			conf.setConfiguration(child);
 			break;
 		}
@@ -258,15 +247,6 @@ public class Neo4jToGraph {
 			ObjectMapper mapper=new ObjectMapper();
 			JsonNode root=mapper.createObjectNode();
 			ArrayNode child=mapper.createArrayNode();	
-			
-			if(configuration.getMailserver().getObject()!=null){
-				it.polito.neo4j.jaxb.Object o = configuration.getMailserver().getObject();
-				JsonNode element=mapper.createObjectNode();
-				((ObjectNode)element).put(o.getSource(), o.getDestination());
-				child.add(element);
-			}	
-			//((ObjectNode)root).set("configuration", child);
-			//conf.setConfiguration(root);
 			conf.setConfiguration(child);
 			break;
 		}
@@ -352,15 +332,6 @@ public class Neo4jToGraph {
 			ObjectMapper mapper=new ObjectMapper();
 			JsonNode root=mapper.createObjectNode();
 			ArrayNode child=mapper.createArrayNode();	
-			
-			if(configuration.getWebserver().getObject()!=null){
-				it.polito.neo4j.jaxb.Object o = configuration.getWebserver().getObject();
-				JsonNode element=mapper.createObjectNode();
-				((ObjectNode)element).put(o.getSource(), o.getDestination());
-				child.add(element);
-			}	
-			//((ObjectNode)root).set("configuration", child);
-			//conf.setConfiguration(root);
 			conf.setConfiguration(child);
 			break;
 		}

@@ -65,6 +65,7 @@ import it.polito.neo4j.jaxb.Webserver;
 import it.polito.neo4j.manager.Neo4jDBInteraction.NodeType;
 import it.polito.verigraph.exception.DataNotFoundException;
 import it.polito.neo4j.exceptions.DuplicateNodeException;
+import it.polito.neo4j.exceptions.MyInvalidIdException;
 import it.polito.neo4j.exceptions.MyInvalidObjectException;
 import it.polito.neo4j.exceptions.MyNotFoundException;
 
@@ -84,12 +85,12 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		
 	private Neo4jLibrary()
 	{
-		//String neo4jDeploymentFolder =  System.getProperty("catalina.home") + "/webapps/verigraph";
+		//String neo4jDeploymentFolder =  System.getProperty("catalina.home") + "/db/verigraph";
 		String neo4jDeploymentFolder =  "C:/Users/Cristina/Documents";		
 		Properties p = new Properties();
 		FileReader r;
 		try {
-			r = new FileReader(new File("C:/Users/Cristina/git/verigraph/server.properties"));
+			r = new FileReader(new File(System.getProperty("user.dir")+File.separator+"server.properties"));
 			p.load(r);
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
@@ -99,7 +100,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		}
 	    String pathDB = (String) p.get("graphDBPath");
 		dbFactory = new GraphDatabaseFactory();
-		graphDB = dbFactory.newEmbeddedDatabase(new File(neo4jDeploymentFolder+"/"+pathDB));		
+		graphDB = dbFactory.newEmbeddedDatabase(new File(neo4jDeploymentFolder+File.separator+pathDB));		
 		registerShutdownHook(graphDB);
 		obFactory = new ObjectFactory();
 	}
@@ -123,7 +124,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 	    });
 	}
 
-	public void createGraphs(Graphs graphs) throws MyNotFoundException
+	public void createGraphs(Graphs graphs) throws MyNotFoundException, MyInvalidIdException
 	{
 		for (Graph graph : graphs.getGraph())
 		{
@@ -132,35 +133,25 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 	}
 
 	
-	public Graph createGraph(Graph graph) throws MyNotFoundException{
+	public Graph createGraph(Graph graph) throws MyNotFoundException, MyInvalidIdException{
 		Transaction tx = graphDB.beginTx();
 
 		try
 		{	
-			Node nffgRoot = graphDB.createNode(NodeType.Nffg);
-			//nffgRoot.setProperty("name", "graph");
-			//nffgRoot.setProperty("id", graph.getId());
-			
+			Node nffgRoot = graphDB.createNode(NodeType.Nffg);			
 			nffgRoot.setProperty("id", nffgRoot.getId());
-			graph.setId(nffgRoot.getId());
-			
-			//System.out.println("graph modificato:" + nffgRoot.getProperty("id").toString());
-			//System.out.println("nffg " + nffgRoot.getId());
-			
-					
+			graph.setId(nffgRoot.getId());				
 			
 			for(it.polito.neo4j.jaxb.Node nodo : graph.getNode()){
-				Node newNode = createNode(nffgRoot, nodo, graph);
-			//	System.out.println("nodo_id: " + newNode.getId());
+				Node newNode = createNode(nffgRoot, nodo, graph);			
 				nodo.setId(newNode.getId());
 				it.polito.neo4j.jaxb.Configuration c=nodo.getConfiguration();
 				Node newConf=createConfiguration(newNode, c);
 				c.setId(newConf.getId());
-				//System.out.println("configuration_id: " + c.getId());
+				
 			}
 			
-			//modifica l'id a tutti i neighbour inserendo l'id della relazione
-			
+			//modifica l'id a tutti i neighbour inserendo l'id della relazione			
 			
 			for(it.polito.neo4j.jaxb.Node nodo : graph.getNode()){
 				Map<String, Neighbour> neighs = addNeighbours(nodo, graph);
@@ -168,7 +159,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				for(Neighbour neig : nodo.getNeighbour()){
 					Neighbour n = neighs.get(neig.getName());					
 					neig.setId(n.getId());
-					//System.out.println("neighbour_id " +neig.getId() );
+					
 				}
 				
 				
@@ -176,17 +167,17 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			
 			
 			tx.success();
-		//	System.out.println("tx success");
+		
 		}
 		finally
 		{
 			tx.close();
-			//System.out.println("tx close");
+			
 		}
 		return graph;
 	}
 
-	private Node createConfiguration(Node newNode, Configuration c) {
+	private Node createConfiguration(Node newNode, Configuration c) throws MyInvalidIdException {
 		// TODO Auto-generated method stub
 				
 		Node newConf=graphDB.createNode(NodeType.Configuration);		
@@ -204,7 +195,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		
 	}
 
-	private void setConfiguration(Node newConf, String type, it.polito.neo4j.jaxb.Configuration c) {
+	private void setConfiguration(Node newConf, String type, it.polito.neo4j.jaxb.Configuration c) throws MyInvalidIdException {
 		// TODO Auto-generated method stub
 		switch(type){
 		
@@ -221,7 +212,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				}		
 									
 			}else{
-				System.out.println("configuration empty");
+				System.out.println("Configuration firewall empty");
 			}
 			break;
 		}
@@ -238,7 +229,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				}		
 			
 			}else{
-				System.out.println("configuration empty");
+				System.out.println("Configuration Antispam empty");
 			}
 				break;
 				
@@ -268,7 +259,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				dpi.setProperty("id", newConf.getId());
 			}		
 			}else{
-				System.out.println("configuration empty");
+				System.out.println("Configuration Dpi empty");
 			}
 			break;
 		}
@@ -335,24 +326,11 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			break;
 		}
 	case "ENDPOINT":{
-		System.out.println("newConf: " + newConf.getProperty("name"));
-		
+		//System.out.println("newConf: " + newConf.getProperty("name"));		
 		break;
 	}
 	case "FIELDMODIFIER":{
-		/* Avendo come unico elemento un object nello schema, 
-		 * vengono prelevate le coppie di elementi "a":"b" e inseriti in un Object nel fiedlmodifier
-		 */
-		it.polito.neo4j.jaxb.Object list=c.getFieldmodifier().getObject();
-		if(list!=null){
-			Node newElem=graphDB.createNode(NodeType.Fieldmodifier);
-			newElem.setProperty("source", list.getSource());
-			newElem.setProperty("destination", list.getDestination());			
-			Relationship field=newElem.createRelationshipTo(newConf, RelationType.ElementRelationship);
-			field.setProperty("id", newConf.getId());				
-		}else{
-			System.out.println("configuration empty");
-		}
+		//System.out.println("newConf: " + newConf.getProperty("name"));		
 		break;
 		
 		}
@@ -365,26 +343,13 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			Relationship mailclient=newElem.createRelationshipTo(newConf, RelationType.ElementRelationship);
 			mailclient.setProperty("id", newConf.getId());
 		}else{
-			System.out.println("configuration empty");
+			System.out.println("Configuration Mailclient empty");
 		}
 		
 		break;
 	}
 	case "MAILSERVER":{
-		/*stessa situazione di fieldmodifier
-		 * 
-		 */
-		it.polito.neo4j.jaxb.Object list=c.getMailserver().getObject();
-		if(list!=null){
-			Node newElem=graphDB.createNode(NodeType.Mailserver);
-			newElem.setProperty("source", list.getSource());
-			newElem.setProperty("destination", list.getDestination());			
-			Relationship mailserver=newElem.createRelationshipTo(newConf, RelationType.ElementRelationship);
-			mailserver.setProperty("id", newConf.getId());				
-		}else{
-			System.out.println("configuration empty");
-		}
-		
+		System.out.println("newConf: " + newConf.getProperty("name"));		
 		break;
 	}
 	case "NAT":{
@@ -398,7 +363,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			nat.setProperty("id", newConf.getId());
 		}		
 		}else{
-			System.out.println("configuration empty");
+			System.out.println("Configuration Nat empty");
 		}
 		break;
 		}
@@ -412,7 +377,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			Relationship vpnaccess=newElem.createRelationshipTo(newConf, RelationType.ElementRelationship);
 			vpnaccess.setProperty("id", newConf.getId());
 		}else{
-			System.out.println("configuration empty");
+			System.out.println("Configuration Vpnaccess empty");
 		}
 		
 		break;
@@ -425,7 +390,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			Relationship vpnexit=newElem.createRelationshipTo(newConf, RelationType.ElementRelationship);
 			vpnexit.setProperty("id", newConf.getId());
 		}else{
-			System.out.println("configuration empty");
+			System.out.println("Configuration Vpnexit empty");
 		}
 		
 		break;
@@ -438,25 +403,18 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			Relationship webclient=newElem.createRelationshipTo(newConf, RelationType.ElementRelationship);
 			webclient.setProperty("id", newConf.getId());
 		}else{
-			System.out.println("configuration empty");
+			System.out.println("Configuration Webclient empty");
 		}
 		
 		break;
 	}
 	case "WEBSERVER":{
-		it.polito.neo4j.jaxb.Object list=c.getWebserver().getObject();
-		if(list!=null){
-			Node newElem=graphDB.createNode(NodeType.Webserver);
-			newElem.setProperty("source", list.getSource());
-			newElem.setProperty("destination", list.getDestination());			
-			Relationship webserver=newElem.createRelationshipTo(newConf, RelationType.ElementRelationship);
-			webserver.setProperty("id", newConf.getId());				
-		}else{
-			System.out.println("configuration empty");
-		}
-		
+		//System.out.println("newConf: " + newConf.getProperty("name"));				
 		break;
 		}
+	default:{
+		throw new MyInvalidIdException("Element node "+type+" not valid");
+	}
 }
 		
 	}
@@ -555,7 +513,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		return null;
 	}
 
-	public it.polito.neo4j.jaxb.Node createNode(it.polito.neo4j.jaxb.Node node, long graphId) throws MyNotFoundException, DuplicateNodeException{
+	public it.polito.neo4j.jaxb.Node createNode(it.polito.neo4j.jaxb.Node node, long graphId) throws MyNotFoundException, DuplicateNodeException, MyInvalidIdException{
 		Node graph;
 		Transaction tx = graphDB.beginTx();
 		//System.out.println("nodo da creare: " + node.getName() + " id nodo: " + node.getId());
@@ -915,21 +873,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 					}
 					
 					case "FIELDMODIFIER":{
-						Iterable<Relationship> confs= conf.getRelationships(RelationType.ElementRelationship);
-						Iterator<Relationship> confsIt = confs.iterator();
-						Fieldmodifier field=new Fieldmodifier();
-						it.polito.neo4j.jaxb.Object list;
-						while(confsIt.hasNext()){
-							list=new it.polito.neo4j.jaxb.Object();
-							Relationship relConf = confsIt.next();
-							Node element = relConf.getStartNode();
-							if(element.hasLabel(NodeType.Fieldmodifier)){
-								list.setDestination(element.getProperty("destination").toString());
-								list.setSource(element.getProperty("source").toString());								
-							}		
-							field.setObject(list);
-						}
 						
+						Fieldmodifier field=new Fieldmodifier();
 						c.setFieldmodifier(field);
 						break;
 					}
@@ -951,21 +896,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 					}
 					
 					case "MAILSERVER":{
-						Iterable<Relationship> confs= conf.getRelationships(RelationType.ElementRelationship);
-						Iterator<Relationship> confsIt = confs.iterator();
+						
 						Mailserver mailserver=new Mailserver();
-						it.polito.neo4j.jaxb.Object list;
-						while(confsIt.hasNext()){
-							list=new it.polito.neo4j.jaxb.Object();
-							Relationship relConf = confsIt.next();
-							Node element = relConf.getStartNode();
-							if(element.hasLabel(NodeType.Mailserver)){
-								list.setDestination(element.getProperty("destination").toString());
-								list.setSource(element.getProperty("source").toString());								
-							}	
-							mailserver.setObject(list);
-						}
-												
 						c.setMailserver(mailserver);
 						break;
 					}
@@ -1042,23 +974,9 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 					}
 					
 					case "WEBSERVER":{
-						Iterable<Relationship> confs= conf.getRelationships(RelationType.ElementRelationship);
-						Iterator<Relationship> confsIt = confs.iterator();
-						Webserver webserver=new Webserver();
-						it.polito.neo4j.jaxb.Object list;
-						while(confsIt.hasNext()){
-							list=new it.polito.neo4j.jaxb.Object();
-							Relationship relConf = confsIt.next();
-							Node element = relConf.getStartNode();
-							if(element.hasLabel(NodeType.Webserver)){
-								list.setDestination(element.getProperty("destination").toString());
-								list.setSource(element.getProperty("source").toString());								
-							}		
-							webserver.setObject(list);
-						}
-												
-						c.setWebserver(webserver);
 						
+						Webserver webserver=new Webserver();
+						c.setWebserver(webserver);
 						break;
 					}
 					
@@ -1345,7 +1263,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		}
 	}
 
-	public it.polito.neo4j.jaxb.Node updateNode(it.polito.neo4j.jaxb.Node node, long graphId, long nodeId) throws MyInvalidObjectException,MyNotFoundException{
+	public it.polito.neo4j.jaxb.Node updateNode(it.polito.neo4j.jaxb.Node node, long graphId, long nodeId) throws MyInvalidObjectException,MyNotFoundException, MyInvalidIdException{
 		Node nodo;
 		Transaction tx = graphDB.beginTx();
 		it.polito.neo4j.jaxb.Node returnedNode;
@@ -1436,7 +1354,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 	
 	
 
-	public Graph updateGraph(Graph graph, long graphId) throws MyNotFoundException,DuplicateNodeException,MyInvalidObjectException{
+	public Graph updateGraph(Graph graph, long graphId) throws MyNotFoundException,DuplicateNodeException,MyInvalidObjectException, MyInvalidIdException{
 		Transaction tx = graphDB.beginTx();
 		//it.polito.neo4j.jaxb.Node newNode;
 		Node nodo;
@@ -1587,18 +1505,17 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			Node dst = findNodeByNameOfSpecificGraph(dstName, graphId);
 			if(src == null ){
 				tx.failure();
-				throw new DataNotFoundException("Source node not exists");
+				throw new DataNotFoundException("Source node "+src+" not exists");
 			}else
 				if(dst == null){
 					tx.failure();
-					throw new DataNotFoundException("Destination node not exists");
+					throw new DataNotFoundException("Destination node "+dst+" not exists");
 			}
 			PathFinder<Path> finder = GraphAlgoFactory.allSimplePaths(PathExpanders.forTypeAndDirection(RelationType.PathRelationship, Direction.valueOf(direction.toUpperCase())), MAX_DEPTH);
-			//PathFinder<Path> finder = GraphAlgoFactory.allPaths(PathExpanders.forTypeAndDirection(RelationType.PathRelationship, Direction.valueOf(direction.toUpperCase())), MAX_DEPTH);
-
+		
 		    for (Path p : finder.findAllPaths(src, dst))
 		    {
-		    	//System.out.println("path iterator" + Paths.simplePathToString(p, "name"));
+		    	
 		    	pathPrinted.add(Paths.simplePathToString(p, "name"));
 		    }
 		}
@@ -1624,8 +1541,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		try{
 			findGraph(graphId);
 		
-			nodo = findNodeByNameOfSpecificGraph(name, graphId);
-		//	System.out.println("getnode ha trovato il nodo:"+nodeId+" del grafo:"+graphId+"");
+			nodo = findNodeByNameOfSpecificGraph(name, graphId);	
 			tx.success();
 			if(nodo!=null)
 				return retrieveNode(nodo);
@@ -1648,8 +1564,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		try{
 			findGraph(graphId);
 		
-			nodo = findNodeByIdAndSpecificGraph(nodeId, graphId);
-		//	System.out.println("getnode ha trovato il nodo:"+nodeId+" del grafo:"+graphId+"");
+			nodo = findNodeByIdAndSpecificGraph(nodeId, graphId);		
 			tx.success();
 			if(nodo==null){
 				return null;
@@ -1686,7 +1601,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		
 	}
 
-	public it.polito.neo4j.jaxb.Configuration updateConfiguration(long nodeId, long graphId, it.polito.neo4j.jaxb.Configuration nodeConfiguration) throws MyNotFoundException {
+	public it.polito.neo4j.jaxb.Configuration updateConfiguration(long nodeId, long graphId, it.polito.neo4j.jaxb.Configuration nodeConfiguration) throws MyNotFoundException, MyInvalidIdException {
 		Node nodo;
 		Transaction tx = graphDB.beginTx();
 		it.polito.neo4j.jaxb.Configuration returnedConf;

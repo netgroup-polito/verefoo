@@ -107,6 +107,8 @@ public class PolitoEndHost extends NetworkObject {
                 		(BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.pf.get("dest").apply(p_0))),1,null,null,null,null));
 		
 		System.out.println("Done.");
+		//System.out.println("endhost: " + constraints);
+		
 		return;
 	}
 

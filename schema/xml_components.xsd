@@ -135,11 +135,11 @@
  		<xsd:complexType> 			
 			<xsd:attribute name="body" type="xsd:string"/>
 			<xsd:attribute name="sequence" type="xsd:integer"/>
-			<xsd:attribute name="protocol" type="protocolTypes" use="required"/>
+			<xsd:attribute name="protocol" type="protocolTypes"/>
 			<xsd:attribute name="email_from" type="xsd:string"/>
 			<xsd:attribute name="url" type="xsd:string"/>
 			<xsd:attribute name="options" type="xsd:string"/>
-			<xsd:attribute name="destination" type="xsd:string" use="required"/>					
+			<xsd:attribute name="destination" type="xsd:string"/>					
  		</xsd:complexType>
  	</xsd:element>
  	<xsd:element name="endpoint"> 
@@ -178,11 +178,11 @@
  		</xsd:complexType>
  	</xsd:element>
  	<xsd:element name="mailserver">
- 		<xsd:complexType> 
- 			<xsd:sequence minOccurs="0" maxOccurs="0">
- 				<xsd:element name="object" type="xsd:anySimpleType"/>
- 			</xsd:sequence>							
- 		</xsd:complexType>
+ 		<xsd:complexType>
+ 		<xsd:sequence>
+ 			<xsd:element name="name" type="xsd:string" nillable="true"/>
+ 		</xsd:sequence>
+ 	</xsd:complexType>
  	</xsd:element>
  	<xsd:element name="nat">
  		<xsd:complexType>  
@@ -207,17 +207,17 @@
  		</xsd:complexType>
  	</xsd:element>
  	<xsd:element name="webserver">
- 		<xsd:complexType> 
- 			<xsd:sequence minOccurs="0" maxOccurs="0">
- 				<xsd:element name="object" type="xsd:anySimpleType"/>
- 			</xsd:sequence>							
- 		</xsd:complexType>
+ 		<xsd:complexType>
+ 		<xsd:sequence>
+ 			<xsd:element name="name" type="xsd:string" nillable="true"/>
+ 		</xsd:sequence>
+ 	</xsd:complexType>
  	</xsd:element>
  	<xsd:element name="fieldmodifier">
- 		<xsd:complexType> 
- 			<xsd:sequence minOccurs="0" maxOccurs="0">
- 				<xsd:element name="object" type="xsd:anySimpleType"/>
- 			</xsd:sequence>							
- 		</xsd:complexType>
+ 		<xsd:complexType>
+ 		<xsd:sequence>
+ 			<xsd:element name="name" type="xsd:string" nillable="true"/>
+ 		</xsd:sequence>
+ 	</xsd:complexType>
  	</xsd:element>
 </xsd:schema>

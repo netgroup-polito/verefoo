@@ -147,6 +147,8 @@ public class PolitoIDS extends NetworkObject {
                 								  		ctx.mkNot((BoolExpr)nctx.nodeHasAddr.apply(politoIDS,nctx.pf.get("src").apply(p_0)))),
                 						  1,
                 						  null,null,null,null));
+        
+    //    System.out.println("ids: " + constraints);
 		
 	}
 
