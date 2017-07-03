@@ -125,9 +125,9 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 						
 			try{
 				for(String string : list){
-					//System.out.println("stampa list: " + string);
+					//System.out.println("print list: " + string);
 					map.putAll(mapper.readValue(string, LinkedHashMap.class));
-					//System.out.println("mappe: "+map);					
+					//System.out.println("maps: "+map);					
 				}
 				for(java.util.Map.Entry<String, String> m : map.entrySet()){
 					Elements e=new Elements();				
@@ -552,7 +552,7 @@ case "VPNEXIT":{
 				
 	try{
 		for(String string : list){
-			/* solo 1 stringa presente */
+			/* there is only 1 string */
 			map.putAll(mapper.readValue(string, LinkedHashMap.class));	
 			if(map!=null || !map.isEmpty()){
 				for(java.util.Map.Entry<String, String> m : map.entrySet()){

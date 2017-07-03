@@ -73,14 +73,14 @@ public class Polito_CacheNatFwTest{
     	int k=0;
     	long t=0;
     	
-    	for(;k<100;k++){
+    	//for(;k<100;k++){
 			p.resetZ3();
 			PolitoCacheNatFwTest model = new PolitoCacheNatFwTest(p.ctx);
 		
 			Calendar cal = Calendar.getInstance();
 		    Date start_time = cal.getTime();
 			     
-			IsolationResult ret =model.check.checkIsolationProperty(model.hostA,model.hostB );
+			IsolationResult ret =model.check.checkIsolationProperty(model.hostA,model.hostC );
 		
 			Calendar cal2 = Calendar.getInstance();
 			t = t+(cal2.getTime().getTime() - start_time.getTime()); 
@@ -97,12 +97,12 @@ public class Polito_CacheNatFwTest{
 //	    	    System.out.println( "Last recv_time -> " +ret.last_recv_time);
 			}
     	
-    	}
+    	//}
     	System.out.println("Mean execution time hostA-> hostB: "+(float)(t/1000)/k);
     	
     	
     	k=0;t=0;
-    	for(;k<100;k++){
+    	/*for(;k<100;k++){
 			p.resetZ3();
 			PolitoCacheNatFwTest model = new  PolitoCacheNatFwTest(p.ctx);
 		
@@ -125,9 +125,9 @@ public class Polito_CacheNatFwTest{
 //	    	    System.out.println( "Last recv_time -> " +ret.last_recv_time);
 			}
     	
-    	}
-    	System.out.println("Mean execution time hostB-> hostA: "+(float)(t/1000)/k);
-    }
+    	*/}
+    	//System.out.println("Mean execution time hostB-> hostA: "+(float)(t/1000)/k);
+    //}
 
     
 }

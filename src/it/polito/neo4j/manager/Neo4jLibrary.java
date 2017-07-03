@@ -151,7 +151,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				
 			}
 			
-			//modifica l'id a tutti i neighbour inserendo l'id della relazione			
+			//modify  the neighbours id insertingthe relationsihp ip			
 			
 			for(it.polito.neo4j.jaxb.Node nodo : graph.getNode()){
 				Map<String, Neighbour> neighs = addNeighbours(nodo, graph);
@@ -178,8 +178,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 	}
 
 	private Node createConfiguration(Node newNode, Configuration c) throws MyInvalidIdException {
-		// TODO Auto-generated method stub
-				
+						
 		Node newConf=graphDB.createNode(NodeType.Configuration);		
 		newConf.setProperty("name", c.getName());
 		newConf.setProperty("id", newConf.getId());
@@ -196,7 +195,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 	}
 
 	private void setConfiguration(Node newConf, String type, it.polito.neo4j.jaxb.Configuration c) throws MyInvalidIdException {
-		// TODO Auto-generated method stub
+		
 		switch(type){
 		
 		case "FIREWALL":{
@@ -427,17 +426,14 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		newNode.setProperty("id", newNode.getId());
 		Relationship r=newNode.createRelationshipTo(nffgRoot, RelationType.OwnerRelationship);
 		r.setProperty("id", graph.getId());
-	//	System.out.println("IdRelOwner:" + r.getProperty("id"));
-		//System.out.println("IdNuovoNodo:" + newNode.getProperty("id"));
+	  //System.out.println("IdRelOwner:" + r.getProperty("id"));
+		//System.out.println("IdNewNode:" + newNode.getProperty("id"));
 		
 		return newNode;
 	}
 
 	private Map<String,Neighbour> addNeighbours(it.polito.neo4j.jaxb.Node nodo, Graph graph) throws MyNotFoundException{
 		
-		/* ci possono essere più nodi con lo stesso nome o con stesso id che si riferiscono a grafi diversi
-		 * bisogna fare una doppia ricerca (nel caso in cui non vengano utilizzati gli id di neo4j
-		 */
 		Node srcNode = graphDB.findNode(NodeType.Node, "id", nodo.getId());	
 		if(srcNode==null){
 			throw new DataNotFoundException("Source node (in neighbour node) not found");
@@ -469,7 +465,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 	}
 
 	private Node findNodeByIdAndSpecificGraph(long nodoId, long graphId) throws MyNotFoundException {
-		// TODO Auto-generated method stub
+		
 		//ResourceIterator<Node> nodes=graphDB.findNodes(NodeType.Node, "id", nodoId);
 		Node node=graphDB.findNode(NodeType.Node, "id", nodoId);
 		Node n;
@@ -479,13 +475,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		else{
 		
 			for(Relationship rel : node.getRelationships(RelationType.OwnerRelationship)){
-				Node[] nodi = rel.getNodes();
-				//System.out.println("nome relazione: " + nodi[0].getProperty("name"));
-				//System.out.println("nome relazione: " + nodi[1].getProperty("name"));
-				//System.out.println("nodi:" + nodi[0].getId() + "\ngraphID:" + graphId);
-				if(nodi[0].getId() == graphId || nodi[1].getId() == graphId){
-					//System.out.println("rel:" + rel.getId());
-					//re.getId non è detto che sia uguale al graphId
+				Node[] nodi = rel.getNodes();				
+				if(nodi[0].getId() == graphId || nodi[1].getId() == graphId){					
 					if((long)rel.getProperty("id") == graphId)
 						return node;
 						
@@ -500,8 +491,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		
 		ResourceIterator<Node> nodes = graphDB.findNodes(NodeType.Node, "name", nodeName);
 		while (nodes.hasNext()){
-			Node n = nodes.next();
-			//System.out.println("nome nodo" + n.getProperty("name"));
+			Node n = nodes.next();			
 			for(Relationship rel : n.getRelationships(RelationType.OwnerRelationship)){
 				Node[] nodi = rel.getNodes();				
 				if((nodi[0].getId() == graphId || nodi[1].getId()== graphId)){
@@ -516,17 +506,15 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 	public it.polito.neo4j.jaxb.Node createNode(it.polito.neo4j.jaxb.Node node, long graphId) throws MyNotFoundException, DuplicateNodeException, MyInvalidIdException{
 		Node graph;
 		Transaction tx = graphDB.beginTx();
-		//System.out.println("nodo da creare: " + node.getName() + " id nodo: " + node.getId());
+	
 		
 		try{
-			graph = findGraph(graphId);
-	//		System.out.println("grafo trovato id: " + (long)graph.getProperty("id"));
+			graph = findGraph(graphId);	
 			Graph myGraph = getGraph(graphId);
 			if(DuplicateNode(node,myGraph))
 				throw new DuplicateNodeException("This node is already present");
 			Node newNode = createNode(graph,node,myGraph);
-			node.setId(newNode.getId());
-			//System.out.println("newnode:" + newNode.getId());
+			node.setId(newNode.getId());			
 			it.polito.neo4j.jaxb.Configuration c=node.getConfiguration();
 			Node newConf=createConfiguration(newNode, c);
 			c.setId(newConf.getId());
@@ -656,7 +644,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 	}
 	
 	/*
-	 * Nel caso in cui non si utilizzino gli id di neo4j:
+	 * In case of ids neoj are used:
 	 * private Node findNode(long nodoId, long graphId) throws MyNotFoundException{
 		Node n;
 
@@ -1085,7 +1073,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			nodo = findNodeByNameOfSpecificGraph(nodeName, graphId);
 			if(nodo==null)
 				return null;
-		//	System.out.println("getnode ha trovato il nodo:"+nodeId+" del grafo:"+graphId+"");
+		
 			else{
 				tx.success();			
 				return retrieveNode(nodo);
@@ -1107,8 +1095,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		try{
 			findGraph(graphId);
 			//nodo = findNode(nodeId, graphId);
-			nodo = findNode(nodeId);
-		//	System.out.println("getnode ha trovato il nodo:"+nodeId+" del grafo:"+graphId+"");
+			nodo = findNode(nodeId);		
 			tx.success();
 			return retrieveNode(nodo);
 		}
@@ -1380,7 +1367,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				//System.out.println("configuration_id: " + c.getId());
 			}
 			
-			//modifica l'id a tutti i neighbour inserendo l'id della relazione
+			//modify neighbours ids inserting ids relationship
 			
 			
 			for(it.polito.neo4j.jaxb.Node tmpnodo : graph.getNode()){
@@ -1489,7 +1476,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		if(dst == null)
 			throw new MyNotFoundException("There is no Node whose name is '" + neigh.getName() + "'");
 		Relationship relationship = nodo.createRelationshipTo(dst, RelationType.PathRelationship);
-		//la relazione deve avere sempre id uguale all'id del neighbour dst
+		
 		//relationship.setProperty("id", neighbourId);
 		relationship.setProperty("id", neigh.getId());
 		

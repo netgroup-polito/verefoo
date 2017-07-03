@@ -70,7 +70,7 @@ public class Polito_CacheFwTest {
 		p.resetZ3();
 		PolitoCacheFwTest model = new PolitoCacheFwTest(p.ctx);
 		IsolationResult ret = model.check.checkIsolationProperty(model.a, model.server);
-		p.printVector(ret.assertions);
+		//p.printVector(ret.assertions);
 		if (ret.result == Status.UNSATISFIABLE) {
 			System.out.println("UNSAT");
 		}

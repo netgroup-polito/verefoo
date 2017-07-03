@@ -116,7 +116,7 @@ public class PolitoVpnTest {
 		    
 		    /* VPN gateways config */
 		    politoVpnAccess.vpnAccessModel(nctx.am.get("ip_vpnaccess"), nctx.am.get("ip_vpnexit"));
-		    politoVpnExit.vpnAccessModel(nctx.am.get("ip_vpnaccess"), nctx.am.get("ip_vpnexit"));
+		    politoVpnExit.vpnExitModel(nctx.am.get("ip_vpnaccess"), nctx.am.get("ip_vpnexit"));
 		    
 		    System.out.println(net.EndHosts());
 		    check = new Checker(ctx,nctx,net);

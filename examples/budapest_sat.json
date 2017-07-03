@@ -24,6 +24,29 @@
 				"user1"
 			]
 		},
+		{
+			"name": "firewall",
+			"functional_type": "firewall",
+			"neighbours": [
+				{
+					"name": "webserver"
+				},
+				{
+					"name": "nat"
+				},
+				{
+					"name": "dpi"
+				}
+			],
+			"configuration": [
+				{
+					"webserver": "nat"					
+				},
+				{
+				"webserver":"dpi"
+				}
+			]
+		},
 		
 		{
 			"name": "webserver",

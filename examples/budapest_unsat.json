@@ -67,20 +67,16 @@
 			]
 		},
 		{
-			"name": "dpi",
-			"functional_type": "nat",
-			"neighbours": [
-				{
-					"name": "firewall"
-				},
-				{
-					"name": "user2"
-				}
-			],
-			"configuration": [
-				"user1",
-				"user2"
-			]
-		}
+         "name":"dpi",
+         "functional_type":"dpi",
+         "neighbours":[
+            {
+               "name":"webserver"
+            }
+         ],
+         "configuration":[
+           "droga"
+         ]
+      }
 	]
 }

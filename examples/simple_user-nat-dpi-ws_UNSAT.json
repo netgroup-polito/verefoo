@@ -1,7 +1,7 @@
 {
    "nodes":[
       {
-         "name":"user2",
+         "name":"user1",
          "functional_type":"endhost",
          "neighbours":[
             {
@@ -38,9 +38,32 @@
             }
          ],
          "configuration":[
-           "sex", "droga"
+           "droga"
          ]
       },
+      {
+			"name": "firewall",
+			"functional_type": "firewall",
+			"neighbours": [
+				{
+					"name": "webserver"
+				},
+				{
+					"name": "nat"
+				},
+				{
+					"name": "dpi"
+				}
+			],
+			"configuration": [
+				{
+					"webserver": "nat"					
+				},
+				{
+				"webserver":"dpi"
+				}
+			]
+		},
       {
          "name":"webserver",
          "functional_type":"endpoint",

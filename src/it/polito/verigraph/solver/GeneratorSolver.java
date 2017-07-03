@@ -110,7 +110,7 @@ public class GeneratorSolver{
 		
 		net = new Network (ctx,new Object[]{nctx});
 		
-		//classes creation mcnet.objects: Map<nome_nodo, obj created>		
+		//classes creation mcnet.objects: Map<name_node, obj created>		
 		for(int i=0; i<scenario.nodes_names.size(); i++){
 			if(scenario.nodes_names.get(i)!=null){	
 				
@@ -132,20 +132,20 @@ public class GeneratorSolver{
 		doRouting(ro, mo);
 		
 	/*	for(Map.Entry<String, Object> xx : mo.entrySet()){
-			//System.out.println("nome device in mo: " + xx.getKey());
+			//System.out.println("device name in mo: " + xx.getKey());
 			Object oo=xx.getValue();
 			if(oo instanceof PolitoEndHost){
-				System.out.println("nome device in mo: " + xx.getKey() + " è un endhost");
+				System.out.println("nome device in mo: " + xx.getKey() + " it's an endhost");
 			}else if(oo instanceof PolitoNat){
-				System.out.println("nome device in mo: " + xx.getKey() + " è un nat");
+				System.out.println("nome device in mo: " + xx.getKey() + " it's a nat");
 			}else if(oo instanceof AclFirewall){
-				System.out.println("nome device in mo: " + xx.getKey() + " è un firewall");
+				System.out.println("nome device in mo: " + xx.getKey() + " it's a firewall");
 			}else if(oo instanceof EndHost){
-				System.out.println("nome device in mo: " + xx.getKey() + " è un endpoint");
+				System.out.println("nome device in mo: " + xx.getKey() + " it's an endpoint");
 			}else if(oo instanceof PolitoIDS){
-				System.out.println("nome device in mo: " + xx.getKey() + " è un dpi");
+				System.out.println("nome device in mo: " + xx.getKey() + " it's a dpi");
 			}else if(oo instanceof PolitoWebServer){
-				System.out.println("nome device in mo: " + xx.getKey() + " è un dpi");
+				System.out.println("nome device in mo: " + xx.getKey() + " it's a ws");
 			}
 		}
 		*/
@@ -268,7 +268,7 @@ public class GeneratorSolver{
 				}
 				else{
 					System.out.println("endhost empty");
-					//throw new DataNotFoundException("configuration endhost empty");		
+							
 					
 				}
 				
@@ -287,7 +287,7 @@ public class GeneratorSolver{
 					}	
 				else{
 					System.out.println("Cache empty");
-					//throw new DataNotFoundException("configuration cache empty");		
+						
 					
 				}
 				
@@ -302,18 +302,18 @@ public class GeneratorSolver{
 				}
 				else{
 					System.out.println("Antispam empty");
-					//throw new DataNotFoundException("configuration antispam empty");		
+					
 					
 				}
 			}else if(model instanceof PolitoFieldModifier){
 				((PolitoFieldModifier)cd.getValue()).installFieldModifier();
 				
 			}else if(model instanceof PolitoMailClient){
-				//regole inserire nella init
+				//the rules are inserted in the init method
 				continue;
 				
 			}else if(model instanceof PolitoMailServer){
-				//regole inserire nella init
+				//the rules are inserted in the init method
 				continue;
 				
 			}else if(model instanceof PolitoNat){
@@ -331,15 +331,12 @@ public class GeneratorSolver{
 							 ia.add(nctx.am.get(s));
 							 System.out.println("aggiunto: " + s);
 						 }
-					 }
-					// System.out.println("elementi inseriti nella ia del nat: " + ia.size());
-					// System.out.println("address NAT: " + address);
+					 }					
 					((PolitoNat)cd.getValue()).natModel(nctx.am.get(address));
 					((PolitoNat)cd.getValue()).setInternalAddress(ia);
 				}	
 				else{
-					System.out.println("nat empty");
-				//	throw new DataNotFoundException("configuration nat empty");			
+					System.out.println("nat empty");						
 					
 				}
 				
@@ -364,40 +361,38 @@ public class GeneratorSolver{
 				}
 				else{
 					System.out.println("Vpnexit empty");
-					//throw new DataNotFoundException("configuration vpnexit empty");
+					
 					
 					
 				}
 				
 			}else if(model instanceof PolitoWebServer){
-				//le regole vengono inserite nella init()
+				//the rules are inserted in the init method
 				continue;
 				
 			}else if(model instanceof PolitoWebClient){
-				//le regole vengono inserite nella init()
+				//the rules are inserted in the init method
 				continue;
 				
 			}else if(model instanceof PolitoIDS){
 				List<String> list=scenario.config_array.get(name);				
-				if(!list.isEmpty()){
-					//System.out.println("dpi_da settare:   " + list);
+				if(!list.isEmpty()){					
 					PolitoIDS dpi=(PolitoIDS)cd.getValue();					
 					int[] blackList=listToIntArguments(list);
-					for(int a : blackList){
+					/*for(int a : blackList){
 						//System.out.println("blacklist_dpi: " + a);
-					}
+					}*/
 					((PolitoIDS)cd.getValue()).installIDS(blackList);	
 					
 					}	
 				else{
-					System.out.println("Dpi empty");
-				//	throw new DataNotFoundException("configuration dpi empty");		
+					System.out.println("Dpi empty");				
 					
 				}
 				
 				
 			}else if(model instanceof EndHost){
-				//le regole vengono inserite nella init()
+				//the rules are inserted in the init method
 				continue;
 				
 			}else if(model instanceof AclFirewall){
@@ -424,7 +419,7 @@ public class GeneratorSolver{
 					
 					 //((AclFirewall)cd.getValue()).addAcls(acl);
 					System.out.println("ACLS empty");
-					//throw new DataNotFoundException("configuration firewall empty");
+					
 					
 					
 				}
@@ -463,9 +458,9 @@ public class GeneratorSolver{
 				for(Map.Entry<String,String> r : route.entrySet()){
 					String dest=r.getKey();
 					NetworkObject next_hop=(NetworkObject)mo.get(r.getValue());
-					System.out.println("string nodes in doROuting: " + nodes);
-					System.out.println("dest " + nodes + ": " + dest);
-					System.out.println("next_hop " + nodes + ": " + next_hop);
+					//System.out.println("string nodes in doROuting: " + nodes);
+					//System.out.println("dest " + nodes + ": " + dest);
+					//System.out.println("next_hop " + nodes + ": " + next_hop);
 					rt.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get(dest), next_hop));
 				}
 				net.routingTable((NetworkObject)obj, rt);

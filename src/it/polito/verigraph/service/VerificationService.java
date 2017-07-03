@@ -44,7 +44,7 @@ public class VerificationService {
 
 	}
 
-	//public Paths getPaths(Graph graph, Node sourceNode, Node destinationNode) throws MyInvalidDirectionException {
+	
 	private Paths getPaths(Graph graph, Node sourceNode, Node destinationNode) throws MyInvalidDirectionException {
 
 		String source = sourceNode.getName();
@@ -66,8 +66,7 @@ public class VerificationService {
 		return sanitizedPaths;
 	}
 
-	private List<String> extractPath(String path) {
-		// TODO Auto-generated method stub
+	private List<String> extractPath(String path) {		
 		List<String> newPath = new ArrayList<String>();
 		// find all nodes, i.e. all names between parentheses
 		Matcher m = Pattern.compile("\\(([^)]+)\\)").matcher(path);

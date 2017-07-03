@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Nat",
+    "description": "Polito Nat",
+    "type": "array",
+    "items": {
+        "type": "string"
+    },
+    "minItems": 0,
+    "uniqueItems": true
+}

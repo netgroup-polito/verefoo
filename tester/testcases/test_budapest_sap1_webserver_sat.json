@@ -17,7 +17,7 @@
             ],
             "configuration":[  
                {  
-                  "ip_sap1":"webserver1"
+                  "sap1":"webserver1"
                }
             ],
             "name":"fw",

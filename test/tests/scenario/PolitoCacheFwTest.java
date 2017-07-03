@@ -108,6 +108,7 @@ public class PolitoCacheFwTest {
 
 		ArrayList<Tuple<DatatypeExpr, DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr, DatatypeExpr>>();
 		acl.add(new Tuple<DatatypeExpr, DatatypeExpr>(nctx.am.get("ip_server"), nctx.am.get("ip_a")));
+		//acl.add(new Tuple<DatatypeExpr, DatatypeExpr>(nctx.am.get("ip_server2"), nctx.am.get("ip_a")));
 
 		fw.addAcls(acl);
 

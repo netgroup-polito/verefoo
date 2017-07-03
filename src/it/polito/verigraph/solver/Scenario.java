@@ -46,7 +46,7 @@ public class Scenario {
 	public void createScenario() {
 		List<Node> nodes=new ArrayList<Node>();
 
-		//creazione lista di nodi
+		//nodes list creation
 		for(String s : path){
 			Node n=graph.searchNodeByName(s);
 			if(n==null){
@@ -57,7 +57,7 @@ public class Scenario {
 			}
 		}
 
-		//per ogni nodo si crea una mappa da isnerire in chn
+		//for each node a map is created in order to insert the map in chn
 		for(int i=0; i<nodes.size(); i++){
 			
 			String name=nodes.get(i).getName();
@@ -463,7 +463,7 @@ public class Scenario {
 
 				try{
 					for(String string : list){
-						/*1 solo object presente*/
+						/*only one object*/
 						map.putAll(mapper.readValue(string, LinkedHashMap.class));	
 						
 					}
@@ -597,7 +597,7 @@ public class Scenario {
 
 			try{
 				for(String string : list){
-					/* solo 1 stringa presente */
+					/*only 1 string */
 					map_tmp.putAll(mapper.readValue(string, LinkedHashMap.class));					
 				}
 				String ip=map.get("vpnaccess");
@@ -645,7 +645,7 @@ public class Scenario {
 
 			try{
 				for(String string : list){
-					/*solo 1 stringa presente */
+					/*only 1 string */
 					map.putAll(mapper.readValue(string, LinkedHashMap.class));						
 				}
 				
@@ -682,7 +682,7 @@ public class Scenario {
 						input=configuration.toString();
 
 					try{
-						/*readValue legge solo 1 valore di 1 object*/
+						/*readValue reads only 1 value of 1 object*/
 						map=mapper.readValue(input, java.util.LinkedHashMap.class);
 						
 					}catch(JsonGenerationException e) {

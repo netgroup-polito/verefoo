@@ -67,7 +67,7 @@ public class PolitoCacheNatFwTest {
 		
 		hostA = new PolitoWebClient(ctx, new Object[]{nctx.nm.get("hostA"), net, nctx,nctx.am.get("ip_hostB")});
 		hostB = new PolitoWebServer(ctx, new Object[]{nctx.nm.get("hostB"), net, nctx});
-		hostC = new PolitoWebServer(ctx, new Object[]{nctx.nm.get("hostC"), net, nctx});
+	//	hostC = new PolitoWebServer(ctx, new Object[]{nctx.nm.get("hostC"), net, nctx});
 		politoCache = new PolitoCache(ctx, new Object[]{nctx.nm.get("politoCache"), net, nctx});
 		politoNat = new PolitoNat(ctx, new Object[]{nctx.nm.get("politoNat"), net, nctx});
 		politoFw = new AclFirewall(ctx, new Object[]{nctx.nm.get("politoFw"), net, nctx});
@@ -82,14 +82,14 @@ public class PolitoCacheNatFwTest {
 		
 		al1.add(nctx.am.get("ip_hostA"));
 		al2.add(nctx.am.get("ip_hostB"));
-		al3.add(nctx.am.get("ip_hostC"));
+	//	al3.add(nctx.am.get("ip_hostC"));
 		al4.add(nctx.am.get("ip_politoCache"));
 		al5.add(nctx.am.get("ip_politoNat"));
 		al6.add(nctx.am.get("ip_politoFw"));
 		
 	    adm.add(new Tuple<>(hostA, al1));
 	    adm.add(new Tuple<>(hostB, al2));
-	    adm.add(new Tuple<>(hostC, al3));
+	 //   adm.add(new Tuple<>(hostC, al3));
 	    adm.add(new Tuple<>(politoCache, al4));
 	    adm.add(new Tuple<>(politoNat, al5));
 	    adm.add(new Tuple<>(politoFw,al6));
@@ -98,43 +98,43 @@ public class PolitoCacheNatFwTest {
 	    
 	    ArrayList<Tuple<DatatypeExpr,NetworkObject>> rtA = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
 	    rtA.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostB"), politoCache));
-	    rtA.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostC"), politoCache));
+	 //   rtA.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostC"), politoCache));
 	    rtA.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoCache"), politoCache));
 	    rtA.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoNat"), politoCache));
 	    rtA.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoFw"), politoCache));
 	    
 	    ArrayList<Tuple<DatatypeExpr,NetworkObject>> rtB = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
 	    rtB.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostA"), politoFw));
-	    rtB.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostC"), politoFw));
+	  //  rtB.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostC"), politoFw));
 	    rtB.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoCache"), politoFw));
 	    rtB.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoNat"), politoFw));
 	    rtB.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoFw"), politoFw));
 	    
-	    ArrayList<Tuple<DatatypeExpr,NetworkObject>> rtC = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
+	/*    ArrayList<Tuple<DatatypeExpr,NetworkObject>> rtC = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
 	    rtC.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostB"), politoCache));
 	    rtC.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostA"), politoCache));
 	    rtC.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoCache"), politoCache));
 	    rtC.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoNat"), politoCache));
 	    rtC.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoFw"), politoCache));
-	    
+	 */   
 	    ArrayList<Tuple<DatatypeExpr,NetworkObject>> rtCache = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
 	    rtCache.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostA"), hostA));
 	    rtCache.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostB"), politoNat));
-	    rtCache.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostC"), hostC));
+	   // rtCache.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostC"), hostC));
 	    rtCache.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoNat"), politoNat));
 	    rtCache.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoFw"), politoNat));
 	    
 	    ArrayList<Tuple<DatatypeExpr,NetworkObject>> rtNat = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
 	    rtNat.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostA"), politoCache));
 	    rtNat.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostB"), politoFw));
-	    rtNat.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostC"), politoCache));
+	   // rtNat.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostC"), politoCache));
 	    rtNat.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoCache"), politoCache));
 	    rtNat.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoFw"), politoFw));
 	    
 	    ArrayList<Tuple<DatatypeExpr,NetworkObject>> rtFw = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
 	    rtFw.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostB"), hostB));
 	    rtFw.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostA"), politoNat));
-	    rtFw.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostC"), politoNat));
+	  //  rtFw.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_hostC"), politoNat));
 	    rtFw.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoNat"), politoNat));
 	    rtFw.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_politoCache"), politoNat));
 	    
@@ -143,15 +143,17 @@ public class PolitoCacheNatFwTest {
 	    net.routingTable(politoNat, rtNat);
 	    net.routingTable(politoCache, rtCache);
 	    net.routingTable(hostA, rtA);
-	    net.routingTable(hostC, rtC);
+	   // net.routingTable(hostC, rtC);
 	    net.routingTable(hostB, rtB);
 	    
 	    //Attaching nodes to network
-	    net.attach(hostA, hostB, hostC, politoCache, politoNat, politoFw);
+	  //  net.attach(hostA, hostB, hostC, politoCache, politoNat, politoFw);
+	    net.attach(hostA, hostB, politoCache, politoNat, politoFw);
 
 	    ArrayList<DatatypeExpr> ia = new ArrayList<DatatypeExpr>();
 	    ia.add(nctx.am.get("ip_hostA"));
 	    ia.add(nctx.am.get("ip_hostC"));
+	    ia.add(nctx.am.get("ip_host"));
 	    ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
 	    acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_politoNat"),nctx.am.get("ip_hostB")));
 	    

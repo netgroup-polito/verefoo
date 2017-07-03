@@ -35,7 +35,7 @@ import subprocess
 # Constants (change them, if appropriate)
 VERIGRAPH_PORT = "8080"
 TEST_CASES_DIR = "testcases"
-BASE_URL = "http://localhost:"+VERIGRAPH_PORT+"/verify/api/graphs/"
+BASE_URL = "http://localhost:"+VERIGRAPH_PORT+"/verigraph/api/graphs/"
 SCHEMA_FILE = "testcase_schema.json"
 
 # Variables

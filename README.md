@@ -1,19 +1,12 @@
 How to deploy **VeriGraph** on Apache Tomcat:
 
 **Windows**
-- install `jdk1.8.X_YY` [here](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-- set ambient variable `JAVA_HOME` to where you installed the jdk (e.g. `C:\Program Files\Java\jdk1.8.X_YY`)
-- install Apache Tomcat 8 [here](https://tomcat.apache.org/download-80.cgi)
-- set ambient variable `CATALINA_HOME` to the directory where you installed Apache (e.g. `C:\Program Files\Java\apache-tomcat-8.0.30`)
-- create `shared` folder under `%CATALINA_HOME%`
-- add previously created folder to the Windows `Path` system variable (i.e. append the following string at the end: `;%CATALINA_HOME%\shared`)
-- download `mcnet.jar`, `com.microsoft.z3.jar` and `qjutils.jar` from [here](https://github.com/netgroup-polito/verigraph/tree/master/service/build) and copy them to `%CATALINA_HOME%\shared` 
-- create custom file setenv.bat under `%CATALINA_HOME%\bin` with the following content:
-```bat
-set CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\shared\qjutils.jar;%CATALINA_HOME%\shared\mcnet.jar;%CATALINA_HOME%\shared\com.microsoft.z3.jar;.;%CATALINA_HOME%\webapps\verify\WEB-INF\classes\tests
-```
-- download `neo4jmanager.war` and `verify.war` from [here](https://github.com/netgroup-polito/verigraph/tree/master/service/build/windows)
-- copy downloaded WARs into `%CATALINA_HOME%\webapps`
+- install jdk1.8.X YY(http://www.oracle.comntechnetwork/java/javase/downloads/jdk8-downloads-2133151.html);
+- set JAVA HOME environment variable to where you installed the jdk (e.g. C:\Program Files\Java\jdk1.8.X YY);
+- install Apache Tomcat 8 (https://tomcat.apache.org/download-80.cgi);
+- set CATALINA HOME ambient variable to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30);
+- download verigraph.war from https://github.com/netgroup-polito/verigraph/tree/neo4j-integration/war;
+- copy downloaded WARs into %CATALINA HOME%\webapps;
 - (optional) configure Tomcat Manager:
   - open the file `%CATALINA_HOME%\conf\tomcat-users.xml`
   - under the `tomcat-users` tag place the following content:
@@ -69,21 +62,9 @@ e.g.
 `export JRE_HOME=/home/mininet/jdk1.8.0_92/jre`  
 `export JDK_HOME='/path/to/jdk/folder'`  
 e.g.  
-`export JDK_HOME=/home/mininet/jdk1.8.0_92`  
-`export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CATALINA_HOME/shared`  
-`export JAVA_OPTS="-Djava.library.path=$CATALINA_HOME/shared"`  
+`export JDK_HOME=/home/mininet/jdk1.8.0_92`
 - `exec bash`
-- download `mcnet.jar`, `com.microsoft.z3.jar` and `qjutils.jar` from [here](https://github.com/netgroup-polito/verigraph/tree/master/service/build/linux) and copy them to `$CATALINA_HOME/shared`
-- customize Tomcat classpath  
-  `nano $CATALINA_HOME/bin/setenv.sh`
-  - paste the following content and save file:
-  ```bash
-  #!/bin/sh
-  export CLASSPATH=$CLASSPATH:$CATALINA_HOME/shared/qjutils.jar:$CATALINA_HOME/shared/mcnet.jar:$CATALINA_HOME/shared/com.microsoft.z3.jar:.:$CATALINA_HOME/webapps/verify/WEB-INF/classes/tests
-  ```
-  - save and close the file (`CTRL+O`, `CTRL+X`)
-  `sudo chmod +x $CATALINA_HOME/bin/setenv.sh`
-- download `neo4jmanager.war` and `verify.war` from [here](https://github.com/netgroup-polito/verigraph/tree/master/dist)
+- download `verigraph.war` from https://github.com/netgroup-polito/verigraph/tree/neo4j-integration/war
 - paste the downloaded WARs into `$CATALINA_HOME/webapps`
 - launch Tomcat 8 with the startup script `$CATALINA_HOME/bin/startup.sh`
 - open a browser and navigate to [this link](http://localhost:8080/manager) and login using `tomcat/tomcat` as username/password
@@ -105,11 +86,11 @@ e.g.
 
 **How to add you own function `<type>`**
 
-1. under the the `mcnet.netobjs` package (i.e. under `/verify/service/src/mcnet/netobjs`) create a new class `<Type>.java`, where `<type>` is the desired function name (i.e. `<type>` will be added to the supported node functional types) which extends `NetworkObject` and implement the desired logic
+1. under the the `mcnet.netobjs` package (i.e. under `/verigraph/src/mcnet/netobjs`) create a new class `<Type>.java`, where `<type>` is the desired function name (i.e. `<type>` will be added to the supported node functional types) which extends `NetworkObject` and implement the desired logic
 
-2. regenerate `mcnet.jar` selecting the packages `mcnet.components` and `mcnet.netobjs` and exporting the generated JAR to `/verify/service/build` (overwrite the existing file)
+2. regenerate `mcnet.jar` selecting the packages `mcnet.components` and `mcnet.netobjs` and exporting the generated JAR to `/verigraph/lib` (overwrite the existing file)
 
-3. under `/verify/src/main/webapp/json/` create a file `<type>.json`. This file represents a JSON schema \(see [here](http://json-schema.org/) the official documentation\). For compatibility with the other functions it is mandatory to support an array as the root of the configuration, but feel free to specify all the other constraints as needed. A sample of `<type>.json` to describe an empty configuration could be the following:
+3. under `/verigraph/json/` create a file `<type>.json`. This file represents a JSON schema \(see [here](http://json-schema.org/) the official documentation\). For compatibility with the other functions it is mandatory to support an array as the root of the configuration, but feel free to specify all the other constraints as needed. A sample of `<type>.json` to describe an empty configuration could be the following:
 
   ```json
   {
@@ -126,28 +107,56 @@ e.g.
   }
   ```
 
-4. in the package `it.polito.escape.verify.validation` (i.e. under `src/main/java/it/polito/escape/verify/validation`) create a new class file named `<Type>Validator.java` (please pay attention to the naming convention here: `<Type>` is the function type used in the previous step capitalized, followed by the suffix `Validator`) which implements `ValidationInterface`. This class represents a custom validator for the newly introduced type and allows for more complex constraints, which is not possible to express through a JSON schema file. The validate method that has to be implemented is given the following objects:
+4. in the package `it.polito.verigraph.validation` (i.e. under `src/it/polito/verigraph/validation`) create a new class file named `<Type>Validator.java` (please pay attention to the naming convention here: `<Type>` is the function type used in the previous step capitalized, followed by the suffix `Validator`) which implements `ValidationInterface`. This class represents a custom validator for the newly introduced type and allows for more complex constraints, which is not possible to express through a JSON schema file. The validate method that has to be implemented is given the following objects:
   - `Graph graph` represents the nffg that the object node belongs to;
   - `Node node` represents the node that the object configuration belongs to;
   - `Configuration configuration` represents the parsed configuration. It is sufficient to call the method `getConfiguration` on the `configuration` object to get a `JsonNode` (Jackson's class) and iterate over the various fields.
 In case a configuration is not valid please throw a new `ValidationException` passing a descriptive failure message.
 Adding a custom validator is not strictly necessary whenever a JSON schema is thought to be sufficient. Note though that, other than the mandatory validation against a schema, whenever a custom validator is not found a default validation is triggered, i.e. the value of every JSON property must refer to the name of an existing node in the working graph/nffg. If this is not the desired behavior it is suggested to write a custom validator with looser constraints.
 
-5. customize the class generator and add the support for the newly introduced type:
-  - open the file `/verify/service/src/tests/j-verigraph-generator/config.py` and edit the following dictionaries:
-    - `devices_to_classes` --> add the following entry: `"<type>" : "<Type>"`
-    if you followed these instructions carefully the name of the class implementing the function `<type>` should be `<Type>.java` under the package `mcnet.netobjs`.
-    - `devices_to_configuration_methods` --> add the following entry: `"<type>" : "configurationMethod"`
-    if `<type>` is a middlebox it should have a configuration method contained in the implementation `<Type>.java` under the package `mcnet.netobjs`.
-    - `devices_initialization`: add the following entry: `"<type>" : ["param1", "param2"]`
-    if `<type>` requires any parameter when it gets instanciated please enter them in the form of a list. Make sure that these parameters refer to existing keys contained in the configuration schema file (see step 3). For instance the type `webclient` requires the name of a webserver it wants to communicate with. This parameter is passed in the configuration of a weblient by setting a property `webserver` to the name of the desired webserver. The value of this property gets extracted and used by the test generator automatically.
-    - `convert_configuration_property_to_ip` --> add the following entry: `"<type>" : ["key", "value"]`
-    Note that both `key` and `value` are optional and it is critical to set them only if needed. Since the Z3 provider used for testing works with IP addresses in this dictionary you have to indicate whether it is needed an automatic convertion from names to IP addresses: 
-      - in case the keyword `key` is used every key of the JSON configuration parsed will be prepended with the string `ip_`;
-      - in case the keyword `value` is used every value of the JSON configuration parsed will be prepended with the string `ip_`;
-      - in case the list does not contain neither `key` nor `value` the original configuration won't be touched.
-  - open the file `/verify/service/src/tests/j-verigraph-generator/test_class_generator.py` and under the "switch" case in the form of a series of ifs used to configure middle-boxes that starts at line #239 add a branch like the following with the logic to generate the Java code for <type> --> 
-  `elif nodes_types[i] == "<type>":`
-  You can take inspiration from the other branches to see how to serialize Java code. Note that this addition to the "switch" statement is not needed if `<type>` is not a middlebox or it does not need to be configured.
+5. edit the xml_component schema file in order to add the new element in the neo4j database;
 
-6. Restart the web service.
+6. Right-click->Generate->JAXB Classes on xml component in order to regenerate the classes in it.polito.neo4j.jaxb package;
+
+7. Insert the serialization logic for the new element type configuration in set-Cofiguration() method in GraphToNeo4j class of the it.polito.neo4j.jaxb package;
+
+8. Insert the deserialization logic for the new element type configuration in setCofiguration() method in Neo4jToGraph class of the it.polito.neo4j.jaxb package;
+
+9. Insert the new element in the switch case of setConfiguration() method of Scenario class in it.polito.verigraph.solver package in order to add the configurations element to the Scenario. This method retrieves the
+configuration values of the element in order to make the configureDevices() in GenSolver class. The configurations have to be stored into the config array or config obj data structures. The former is used in the case
+of a list of values as element configuration (e.g. a dpi has a list of not allowed word); the latter, in the case of a pair of values, represents a single configuration value (e.g. a firewall has a pair hdestination, sourcei
+as configuration);
+
+10. Insert the creation of the new element in an else if of setDevice() of GenSolver class and put into mo data structure the name of the new element and the element itself (e.g. mo.put(host1, endhost));
+
+11. Insert the condition for the installation of the new object created in it.polito.verigraph.mcnet.netobj using the data structure where you put the configurations of the element (config array or config obj);
+
+12. Restart the web service.
+
+
+** Ant script **
+
+1. Edit the location of the server.location property to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30);
+
+Verigraph target:
+
+- package_service: it generates the war file;
+
+- start-tomcat : it starts the Apache Tomcat;
+
+- deployWS: it deploys the verigraph.war file contained in verigraph/war folder;
+
+- startWS: it starts the webservice;
+
+- stopWS: it stops the webservice;
+
+- undeployWS: it undeploys the webservice from Apache Tomcat;
+
+- stop-tomcat: it stops Apache Tomcat.
+
+
+***Troubleshooting***
+
+- The neo4j embedded version must be greater or equal to 3.1.3 as specified in pom.xml file. The previous versions could not work correctly with Apache Tomcat because of a bug;
+
+- The location of the database can be edited by the neo4jDeploymentFolder field of Neo4jLibrary class in it.polito.neo4j.manager.

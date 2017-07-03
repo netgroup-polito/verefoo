@@ -139,8 +139,7 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 }
 
 	public it.polito.verigraph.model.Neighbour addNeighbours(long graphId, long nodeId, it.polito.verigraph.model.Neighbour neighbour) throws JsonProcessingException {
-		// TODO Auto-generated method stub
-		
+			
 		it.polito.neo4j.jaxb.Neighbour neighbour_xml=GraphToNeo4j.NeighbourToNeo4j(neighbour);
 		it.polito.neo4j.jaxb.Neighbour neighReturned;
 		it.polito.verigraph.model.Neighbour n;
@@ -156,7 +155,7 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 	}
 
 	public Neighbour deleteNeighbour(long graphId, long nodeId, long neighbourId) {
-		// TODO Auto-generated method stub
+		
 		try{
 			it.polito.neo4j.jaxb.Neighbour n=lib.getNeighbour(graphId, nodeId, neighbourId);
 			if(n==null){
@@ -170,8 +169,7 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 		catch(MyNotFoundException e1){
 			e1.printStackTrace();
 			throw new NotFoundException();
-		}catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
+		}catch (JsonProcessingException e) {			
 			throw new NotFoundException("jsonprocessing node");
 		}
 		
@@ -181,7 +179,6 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 	}
 
 	public Neighbour updateNeighbour(long graphId, long nodeId, it.polito.verigraph.model.Neighbour neighbour) throws JsonProcessingException {
-		// TODO Auto-generated method stub
 		it.polito.neo4j.jaxb.Neighbour neighbour_xml=GraphToNeo4j.NeighbourToNeo4j(neighbour);
 		it.polito.neo4j.jaxb.Node nodeReturned;
 		Neighbour r;
@@ -192,8 +189,7 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 		}		
 		catch(MyNotFoundException e2){
 			throw new NotFoundException();
-		} catch (MyInvalidObjectException e) {
-			// TODO Auto-generated catch block
+		} catch (MyInvalidObjectException e) {			
 			e.printStackTrace();
 		}
 		return null;
@@ -201,7 +197,6 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 	}
 
 	public it.polito.verigraph.model.Node addNode(long graphId, it.polito.verigraph.model.Node node) throws IOException, MyInvalidIdException {
-		// TODO Auto-generated method stub
 		it.polito.neo4j.jaxb.Node node_xml=GraphToNeo4j.NodeToNeo4j(node);
 		it.polito.neo4j.jaxb.Node nodeReturned;
 		it.polito.verigraph.model.Node node_v=new it.polito.verigraph.model.Node();
@@ -228,7 +223,6 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 	}
 
 	public Node updateNode(long graphId, Node node, long id) throws IOException, MyInvalidIdException {
-		// TODO Auto-generated method stub
 		it.polito.neo4j.jaxb.Node node_xml=GraphToNeo4j.NodeToNeo4j(node);
 		it.polito.neo4j.jaxb.Node nodeReturned;
 		Node node_v;
@@ -250,8 +244,7 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 	}
 
 	public Node deleteNode(long graphId, long nodeId) {
-		// TODO Auto-generated method stub
-		
+				
 		try{
 			it.polito.neo4j.jaxb.Node n=lib.getNodeById(nodeId, graphId);
 			lib.deleteNode(graphId, nodeId);
@@ -259,8 +252,7 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 		}
 		catch(MyNotFoundException e1){
 			throw new NotFoundException("graph or node not found");
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
+		} catch (JsonProcessingException e) {		
 			throw new NotFoundException("jsonprocessing node");
 		}
 	}
@@ -268,7 +260,6 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 	
 
 	public Paths getPath(long graphId, String source, String destination, String direction) throws MyInvalidDirectionException {
-		// TODO Auto-generated method stub
 		it.polito.neo4j.jaxb.Paths paths=(new ObjectFactory()).createPaths();
 		try{
 			if(source == null || destination == null || direction == null)
