@@ -1,4 +1,4 @@
-package it.polito.neo4j.jaxb;
+package it.polito.neo4j.translator;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import it.polito.neo4j.jaxb.Elements;
 import it.polito.verigraph.model.Configuration;
 import it.polito.verigraph.model.Node;
 

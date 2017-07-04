@@ -1,4 +1,4 @@
-package it.polito.neo4j.jaxb;
+package it.polito.neo4j.translator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,10 +46,29 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.JSONWrappedObject;
 
+import it.polito.neo4j.jaxb.Antispam;
+import it.polito.neo4j.jaxb.Cache;
+import it.polito.neo4j.jaxb.Dpi;
+import it.polito.neo4j.jaxb.Elements;
+import it.polito.neo4j.jaxb.Endhost;
+import it.polito.neo4j.jaxb.Endpoint;
+import it.polito.neo4j.jaxb.Fieldmodifier;
+import it.polito.neo4j.jaxb.Firewall;
+import it.polito.neo4j.jaxb.FunctionalTypes;
 import it.polito.neo4j.jaxb.Graph;
 import it.polito.neo4j.jaxb.Node;
+import it.polito.neo4j.jaxb.ObjectFactory;
+import it.polito.neo4j.jaxb.ProtocolTypes;
+import it.polito.neo4j.jaxb.Vpnaccess;
+import it.polito.neo4j.jaxb.Vpnexit;
+import it.polito.neo4j.jaxb.Webclient;
+import it.polito.neo4j.jaxb.Webserver;
 import it.polito.verigraph.model.Configuration;
 import it.polito.neo4j.jaxb.Graphs;
+import it.polito.neo4j.jaxb.Mailclient;
+import it.polito.neo4j.jaxb.Mailserver;
+import it.polito.neo4j.jaxb.Nat;
+import it.polito.neo4j.jaxb.Neighbour;
 
 public class GraphToNeo4j {	
 	public static it.polito.neo4j.jaxb.Graph generateObject(it.polito.verigraph.model.Graph gr) throws JsonParseException, JsonMappingException, IOException {

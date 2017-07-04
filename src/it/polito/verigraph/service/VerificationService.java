@@ -21,9 +21,9 @@ import com.microsoft.z3.*;
 
 
 import it.polito.neo4j.exceptions.MyInvalidDirectionException;
-import it.polito.neo4j.jaxb.*;
+import it.polito.neo4j.jaxb.Paths;
 import it.polito.neo4j.manager.Neo4jDBManager;
-
+import it.polito.neo4j.translator.*;
 import it.polito.verigraph.exception.BadRequestException;
 import it.polito.verigraph.exception.DataNotFoundException;
 import it.polito.verigraph.exception.ForbiddenException;

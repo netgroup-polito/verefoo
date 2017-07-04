@@ -9,7 +9,6 @@ import it.polito.neo4j.jaxb.Graph;
 import it.polito.neo4j.jaxb.Graphs;
 import it.polito.neo4j.jaxb.Neighbour;
 import it.polito.neo4j.jaxb.Paths;
-import it.polito.neo4j.jaxb.Reachability;
 import it.polito.neo4j.exceptions.DuplicateNodeException;
 import it.polito.neo4j.exceptions.MyInvalidIdException;
 import it.polito.neo4j.exceptions.MyInvalidObjectException;

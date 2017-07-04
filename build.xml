@@ -13,6 +13,7 @@
 
 	<!-- The location to be used for class files -->
 	<property name="src.dir" location="${root.location}/src" />
+	<property name="gen.dir" location="${root.location}/gen-src"/>
 	<property name="path.prefix" value="it/polito" />
 	<property name="build.dir" location="${root.location}/build" />	
 	<!-- The location for solutions -->
@@ -21,8 +22,6 @@
 	<property name="schemafile" value="xml_components.xsd"/>
 	<property name="target" value="1.8" />
 	<property name="source" value="1.8" />		
-	<property name="schemafile" value="xml_components.xsd"/>
-	
 	
 	<property name="gen-tomcat-service.dir" location="${root.location}/target"/>
 	<property name="resources.dir" location="${root.location}/webapp"/>
@@ -59,17 +58,18 @@
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${gen-tomcat-service.dir}"/>	
 		<mkdir dir="${gen-war.dir}"/>
+		<mkdir dir="${gen.dir}"/>
 	</target>
 
 	<target name="-chk-bindings">
 			<uptodate property="generate-bindings.notRequired" targetfile="${src.dir}/.flagfile">
-				<srcfiles dir="${schemadir}" includes="${schemaForBinding}"/>
+				<srcfiles dir="${schemadir}" includes="${schemafile}"/>
 			</uptodate>
 		</target>
 		
-		<target name="generate-bindings" unless="generate-bindings.notRequired" depends="init,-chk-bindings" description="Create the value classes">
+		<target name="generate-bindings" unless="generate-bindings.notRequired" depends="init" description="Create the value classes">
 			<exec executable="xjc" failonerror="true" output="xjc_log.txt">
-				<arg line="-d ${src.dir} -p it.polito.neo4j.jaxb ${schemadir}/${schemaForBinding}"/>
+				<arg line="-d ${gen.dir} -p it.polito.neo4j.jaxb ${schemadir}/${schemafile}"/>
 			</exec>
 			<touch file="${src.dir}/.flagfile"/>
 		</target>
@@ -86,6 +86,7 @@
 			target="${target}"
 			includeantruntime="false">
 				<src path="${src.dir}" />
+				<src path="${gen.dir}" />
 				<include name="${path.prefix}/**/*.java"/> 
 				
 				
@@ -150,6 +151,7 @@
 	<!-- target for cleaning -->
 	<target name="clean">
 		<delete dir="${build.dir}" />
+		<delete dir="${gen.dir}" />
 		<delete dir="${gen-tomcat-service.dir}"/>
 	</target>
 

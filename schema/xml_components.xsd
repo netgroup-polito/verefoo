@@ -148,8 +148,7 @@
  			<xsd:element name="name" type="xsd:string" nillable="true"/>
  		</xsd:sequence>
  	</xsd:complexType>
- 	
- 			
+ 	 			
  	</xsd:element>
  	<xsd:element name="antispam">
  		<xsd:complexType> 

@@ -6,4 +6,4 @@
 //
 
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://www.example.org/verigraph/", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package it.polito.neo4j.jaxb;
+package it.polito.neo4j.translator;

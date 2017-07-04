@@ -57,7 +57,6 @@ import it.polito.neo4j.jaxb.Nat;
 import it.polito.neo4j.jaxb.Neighbour;
 import it.polito.neo4j.jaxb.ObjectFactory;
 import it.polito.neo4j.jaxb.ProtocolTypes;
-import it.polito.neo4j.jaxb.Reachability;
 import it.polito.neo4j.jaxb.Vpnaccess;
 import it.polito.neo4j.jaxb.Vpnexit;
 import it.polito.neo4j.jaxb.Webclient;
