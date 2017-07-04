@@ -1,0 +1,42 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Endhost",
+    "description": "Polito Endhost",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "body": {
+                "description": "HTTP body",
+                "type": "string"
+            },
+            "sequence": {
+                "description": "Sequence number",
+                "type": "integer"
+            },
+            "protocol": {
+                "description": "Protocol",
+                "type": "string",
+                "enum": ["HTTP_REQUEST", "HTTP_RESPONSE", "POP3_REQUEST", "POP3_RESPONSE"]
+            },
+            "email_from": {
+                "description": "E-mail sender",
+                "type": "string"
+            },
+            "url": {
+                "description": "URL",
+                "type": "string"
+            },
+            "options": {
+                "description": "Options",
+                "type": "string"
+            },
+            "destination": {
+                "description": "Destination node",
+                "type": "string"
+            }
+        },
+        "additionalProperties": false
+    },
+    "maxItems": 1
+}

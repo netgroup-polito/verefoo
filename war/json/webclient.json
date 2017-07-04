@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Web client",
+    "description": "Polito Web Client",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "webserver": {
+                "description": "Web server name",
+                "type": "string"
+            }
+        },
+        "additionalProperties": false,
+        "required": [
+            "webserver"
+        ]
+    },
+    "minItems": 1,
+    "maxItems": 1,
+    "uniqueItems": true
+}

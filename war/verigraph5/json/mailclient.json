@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Mail Client",
+    "description": "Polito Mail Client",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "mailserver": {
+                "description": "Mail server name",
+                "type": "string"
+            }
+        },
+        "additionalProperties": false,
+        "required": [
+            "mailserver"
+        ]
+    },
+    "minItems": 1,
+    "maxItems": 1,
+    "uniqueItems": true
+}

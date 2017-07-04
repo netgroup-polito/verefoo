@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Web Server",
+    "description": "Polito Web Server",
+    "type": "array",
+    "items": {
+        "type": "object"
+    },
+    "minItems": 0,
+    "maxItems": 0,
+    "uniqueItems": true
+}
