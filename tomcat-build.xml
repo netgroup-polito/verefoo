@@ -5,9 +5,9 @@
 		Script for Controlling Tomcat (to be imported in main build)
 	</description>
 	
-	<property name="tomcatUsername" value="tomcat" />
-	<property name="tomcatPassword" value="tomcat" />
-	<property name="server.location" location="C:/Users/Cristina/apache-tomcat-8.0.42" />
+	<property name="tomcatUsername" value="root" />
+	<property name="tomcatPassword" value="root" />
+	<property name="server.location" location="C:\Users\Serena\workspace_DP2\apache-tomcat-8.0.38" />
 	<property name="tomcatPort" value="8080" />
 	<property name="tomcatUrl" value="http://localhost:${tomcatPort}/manager/text" />
 	

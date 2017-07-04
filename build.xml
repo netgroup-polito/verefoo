@@ -97,8 +97,7 @@
 	<macrodef name="war-exploded">	    
 	    <sequential>
 	    			<copy toDir="${gen-tomcat-service.dir}" overwrite="true">
-	    	        	<fileset dir="${resources.dir}">
-	    				</fileset>
+	    	        	<fileset dir="${resources.dir}"/>
 	    	      	</copy>
 	    			<copy toDir="${gen-tomcat-service.dir}" overwrite="true">
 	    	        	<fileset dir=".">
@@ -120,6 +119,17 @@
 	    				</fileset>
 	    	      	</copy> 
 			    	<delete dir="${gen-tomcat-service.dir}/maven-lib"/>
+	    	
+	    			<!-- Make the jar that includes only the classes needed for verigraph models --> 
+	    			<jar destfile="${gen-tomcat-service.dir}/WEB-INF/lib/mcnet.jar">
+	    				<fileset dir="${build.dir}">
+	    					<include name="it/polito/verigraph/mcnet/**/*.class"/>
+	    				</fileset>
+	    			</jar>
+			    	<!-- Copy the z3 library --> 
+			    	<copy toDir="${gen-tomcat-service.dir}/WEB-INF/lib" overwrite="true" flatten="true">
+	    	    		<file name="${lib.dir}/com.microsoft.z3.jar" />
+	    	      	</copy> 
 	    	
 	    </sequential>
 	</macrodef>          
