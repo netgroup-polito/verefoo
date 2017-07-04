@@ -59,6 +59,18 @@
 		<mkdir dir="${gen-tomcat-service.dir}"/>	
 		<mkdir dir="${gen-war.dir}"/>
 		<mkdir dir="${gen.dir}"/>
+		<mkdir dir="${lib.dir}"/>
+		<get dest="${lib.dir}">
+		    <url url="https://github.com/Z3Prover/z3/releases/download/z3-4.5.0/z3-4.5.0-x86-win.zip"/> 
+		    <url url="http://central.maven.org/maven2/org/apache/maven/maven-ant-tasks/2.1.3/maven-ant-tasks-2.1.3.jar"/>
+		</get>
+		<unzip src="${lib.dir}/z3-4.5.0-x86-win.zip" dest="${lib.dir}" overwrite="true">
+		    <patternset>
+		        <include name="**/**/com.microsoft.z3.jar"/>
+		    </patternset>
+			 <mapper type="flatten"/>
+	    </unzip>
+		<delete file="${lib.dir}/z3-4.5.0-x86-win.zip"/>
 	</target>
 
 	<target name="-chk-bindings">
