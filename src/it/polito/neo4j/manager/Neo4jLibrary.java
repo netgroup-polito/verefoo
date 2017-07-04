@@ -85,12 +85,10 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		
 	private Neo4jLibrary()
 	{
-		String neo4jDeploymentFolder =  System.getProperty("catalina.home") + "/db/verigraph";
-		//String neo4jDeploymentFolder =  "C:/Users/Cristina/Documents";		
+		String neo4jDeploymentFolder =  System.getProperty("catalina.home") + "/neo4j";
 		Properties p = new Properties();
 		FileReader r;
 		try {
-//			r = new FileReader(new File(System.getProperty("user.dir")+File.separator+"server.properties"));
 			r = new FileReader(new File(System.getProperty("catalina.home")+File.separator+"/webapps/verigraph/server.properties"));
 			p.load(r);
 		} catch (FileNotFoundException e1) {
