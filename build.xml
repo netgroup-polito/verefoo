@@ -96,8 +96,13 @@
 
 	<macrodef name="war-exploded">	    
 	    <sequential>
-	    	<copy toDir="${gen-tomcat-service.dir}" overwrite="true">
+	    			<copy toDir="${gen-tomcat-service.dir}" overwrite="true">
 	    	        	<fileset dir="${resources.dir}">
+	    				</fileset>
+	    	      	</copy>
+	    			<copy toDir="${gen-tomcat-service.dir}" overwrite="true">
+	    	        	<fileset dir=".">
+	    	        		<include name="server.properties"/>
 	    				</fileset>
 	    	      	</copy>
 	    			<!-- copy class files to WEB-INF/classes directory -->
@@ -105,15 +110,23 @@
 	    	        	<fileset dir="${build.dir}"/>
 	    	      	</copy>
 	    			<!-- copy lib files to WEB-INF/lib directory -->
-	    	    	<copy toDir="${gen-tomcat-service.dir}/WEB-INF/lib" overwrite="true">
+	    	    	<copy toDir="${gen-tomcat-service.dir}/maven-lib" overwrite="true">
 	    	    		<fileset refid="runtime.fileset">	    	        		     		
 	    				</fileset>
 	    	      	</copy> 
+	    			<copy toDir="${gen-tomcat-service.dir}/WEB-INF/lib" overwrite="true" flatten="true">
+	    	    		<fileset dir="${gen-tomcat-service.dir}/maven-lib">	 
+	    	    			<include name="**/**/*.jar"/>
+	    				</fileset>
+	    	      	</copy> 
+			    	<delete dir="${gen-tomcat-service.dir}/maven-lib"/>
+	    	
 	    </sequential>
 	</macrodef>          
 	 
 	<target name="war-exploded" depends="build-service">
-	    <war-exploded/>        
+	    <war-exploded/>  
+		
 	</target>
 	 
 	<target name="war" depends="war-exploded">       
