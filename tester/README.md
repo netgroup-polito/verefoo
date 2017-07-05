@@ -26,4 +26,4 @@ The result.csv contains the verificatin results in the following way (column):
 5: result (FAIL in case of test failed)
 6: the execution time for each execution of the verification
 
-It is possible to do several verification for each request in the policy_url_paramters. The default value is 1, but it can be modified by edit the tests_number variable in test.py file 
+It is possible to do several verification for each request in the policy_url_paramters. The default value is 1, but it can be modified by edit the the arg value of run-test ant task in build.xml
