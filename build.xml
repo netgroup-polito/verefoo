@@ -7,8 +7,6 @@
 	
 	<property name="root.location" location="." />
 	
-	
-	
 
 
 	<!-- The location to be used for class files -->
@@ -18,14 +16,17 @@
 	<property name="build.dir" location="${root.location}/build" />	
 	<!-- The location for solutions -->
 	<property name="lib.dir" location="${root.location}/lib" />
-	<property name="schemadir" location="${root.location}/schema"/>
+	<property name="schemadir" location="${root.location}/schema"/>	
 	<property name="schemafile" value="xml_components.xsd"/>
+	<property name="testfile" value="test.py"/>
 	<property name="target" value="1.8" />
 	<property name="source" value="1.8" />		
 	
 	<property name="gen-tomcat-service.dir" location="${root.location}/target"/>
 	<property name="resources.dir" location="${root.location}/webapp"/>
 	<property name="gen-war.dir" location="${root.location}/war" />
+	<property name="jsonschemafolder.dir" location="${root.location}/jsonschema"/>
+	<property name="test.dir" location="${root.location}/tester"/>
 
 	
 	<import file="tomcat-build.xml"/>
@@ -87,7 +88,7 @@
 		</target>
 	
 	<!-- The target for compiling the Verigraph application -->
-	<target name="build-service" depends="init, generate-bindings, mvn-init">
+	<target name="build-service" depends="init, mvn-init">
 		<echo>Building verigraph (if needed)...</echo>
 		<javac 
 			classpathref="compile.classpath"
@@ -121,6 +122,10 @@
 	    	    	<copy toDir="${gen-tomcat-service.dir}/WEB-INF/classes" overwrite="true">
 	    	        	<fileset dir="${build.dir}"/>
 	    	      	</copy>
+	    			<!-- copy jsonschema folder to WEB-INF/classes directory -->
+	    		    	    	<copy toDir="${gen-tomcat-service.dir}/jsonschema" overwrite="true">
+	    		    	        	<fileset dir="${jsonschemafolder.dir}"/>
+	    		    	      	</copy>
 	    			<!-- copy lib files to WEB-INF/lib directory -->
 	    	    	<copy toDir="${gen-tomcat-service.dir}/maven-lib" overwrite="true">
 	    	    		<fileset refid="runtime.fileset">	    	        		     		
@@ -152,11 +157,19 @@
 		
 	</target>
 	 
-	<target name="war" depends="war-exploded">       
+	<target name="generate-war" depends="war-exploded">       
 	    <war destfile="${gen-war.dir}/${serviceName}.war" basedir="${gen-tomcat-service.dir}"/>
 	</target>
 		
+	<!-- launch test python test -->
 	
+	<target name="run-test">
+	  <exec dir="${test.dir}" executable="python">
+	    <arg value="${testfile}"/>
+	  	<arg value="-iteration"/>
+	  	<arg value="1"/> <!-- iteration number -->
+	  </exec>
+	</target>
 	
 
 	
