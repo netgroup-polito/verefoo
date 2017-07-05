@@ -14,14 +14,15 @@
 			"functional_type": "nat",
 			"neighbours": [
 				{
-					"name": "webserver"
+					"name": "firewall"
 				},
 				{
 					"name": "user1"
 				}
 			],
 			"configuration": [
-				"user1"
+				"user1",
+				"user2"
 			]
 		},
 		{
@@ -37,26 +38,41 @@
 				{
 					"name": "dpi"
 				}
-			],
-			"configuration": [
-				{
-					"webserver": "nat"					
-				},
-				{
-				"webserver":"dpi"
-				}
 			]
 		},
-		
 		{
 			"name": "webserver",
 			"functional_type": "endpoint",
 			"neighbours": [
 				{
-					"name": "nat"
+					"name": "firewall"
 				}
 			]
+		},
+		{
+			"name": "user2",
+			"functional_type": "endpoint",
+			"neighbours": [
+				{
+					"name": "dpi"
+				}
+			]
+		},
+		{
+			"name": "dpi",
+			"functional_type": "nat",
+			"neighbours": [
+				{
+					"name": "firewall"
+				},
+				{
+					"name": "user2"
+				}
+			],
+			"configuration": [
+				"user1",
+				"user2"
+			]
 		}
-		
 	]
 }

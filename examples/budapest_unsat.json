@@ -41,10 +41,7 @@
 			],
 			"configuration": [
 				{
-					"webserver": "nat"					
-				},
-				{
-				"webserver":"dpi"
+					"webserver": "nat"
 				}
 			]
 		},
@@ -67,16 +64,20 @@
 			]
 		},
 		{
-         "name":"dpi",
-         "functional_type":"dpi",
-         "neighbours":[
-            {
-               "name":"webserver"
-            }
-         ],
-         "configuration":[
-           "droga"
-         ]
-      }
+			"name": "dpi",
+			"functional_type": "nat",
+			"neighbours": [
+				{
+					"name": "firewall"
+				},
+				{
+					"name": "user2"
+				}
+			],
+			"configuration": [
+				"user1",
+				"user2"
+			]
+		}
 	]
 }

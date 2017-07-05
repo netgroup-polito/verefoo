@@ -38,32 +38,9 @@
             }
          ],
          "configuration":[
-           "droga"
+           "sex", "droga"
          ]
       },
-      {
-			"name": "firewall",
-			"functional_type": "firewall",
-			"neighbours": [
-				{
-					"name": "webserver"
-				},
-				{
-					"name": "nat"
-				},
-				{
-					"name": "dpi"
-				}
-			],
-			"configuration": [
-				{
-					"webserver": "nat"					
-				},
-				{
-				"webserver":"dpi"
-				}
-			]
-		},
       {
          "name":"webserver",
          "functional_type":"endpoint",
