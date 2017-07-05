@@ -2,8 +2,12 @@
    "id":7,
    "name":"budapest_test_case_unsat",
    "description":"This test case verifies budapest scenario, chain sap1->webserver1 with fw blocking",
-   "policy_url_parameters":"?type=reachability&source=sap1&destination=webserver1",
-   "result":"UNSAT",
+   "policy_url_parameters":[
+   "?type=reachability&source=sap1&destination=webserver1"
+   ],
+   "result":[
+   "UNSAT"
+   ],
    "graph":{  
       "nodes":[  
          {  

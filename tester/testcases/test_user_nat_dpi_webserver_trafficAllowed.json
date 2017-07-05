@@ -2,8 +2,12 @@
 	"id": 2,
 	"name": "simple_test_case",
 	"description": "This test case contains a graph with client, firewall and server",
-	"policy_url_parameters": "?type=reachability&source=user1&destination=webserver",
-	"result": "SAT",
+	"policy_url_parameters":[
+	"?type=reachability&source=user1&destination=webserver"
+	],
+	"result":[ 
+	"SAT"
+	],
 	"graph": {
 	   "nodes":[
 	      {

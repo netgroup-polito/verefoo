@@ -14,7 +14,16 @@ To add a new test, just put a new .json file inside the testcases folder. The co
 - id, an integer for the testcase;
 - name, the name for the testcase;
 - description, an optional description;
-- policy_url_parameters, the parameters to be appended after the verification URL (including the '?' character);
-- result, the expected verification result;
+- policy_url_parameters, the parameters to be appended after the verification URL (including the '?' character), it is an array. 
+- result, the expected verification results, it is an array;
 - graph, the graph to be tested (the same object that you usually POST to VeriGraph to create a new graph).
 The test.py script will test each .json file contained into the testcases folder and will provide a complete output.
+The result.csv contains the verificatin results in the following way (column):
+1: source_node
+2: destination_node
+3: graph_id
+4: testcase_id
+5: result (FAIL in case of test failed)
+6: the execution time for each execution of the verification
+
+It is possible to do several verification for each request in the policy_url_paramters. The default value is 1, but it can be modified by edit the tests_number variable in test.py file 
