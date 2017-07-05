@@ -176,7 +176,7 @@ public class NodeService {
 	public static void validateNodeConfigurationAgainstSchemaFile(Node node, JsonNode configurationJson) {
 		String schemaFileName = node.getFunctional_type() + ".json";
 
-		File schemaFile = new File(System.getProperty("catalina.base") + "/webapps/verigraph/json/" + schemaFileName);
+		File schemaFile = new File(System.getProperty("catalina.base") + "/webapps/verigraph/jsonschema/" + schemaFileName);
 
 		if (!schemaFile.exists()) {
 			throw new ForbiddenException("Functional type '"	+ node.getFunctional_type()
@@ -218,8 +218,7 @@ public class NodeService {
 		}
 		
 		
-		Node node=manager.getNodeById(nodeId, graphId);
-		System.out.println("Nodo esistente");
+		Node node=manager.getNodeById(nodeId, graphId);		
 		validateNodeConfigurationAgainstSchemaFile(node, nodeConfiguration.getConfiguration());		
 
 		Configuration newConf=manager.updateConfiguration(nodeId, graphId, nodeConfiguration, node);

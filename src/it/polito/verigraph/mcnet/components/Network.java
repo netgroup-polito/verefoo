@@ -320,7 +320,7 @@ public class Network extends Core{
 		   List<String> att_nos = new ArrayList<String>();
 		   for(NetworkObject el :elements){
 			   if(el.isEndHost){
-				   System.out.println("el: "+el);
+				   //System.out.println("el: "+el);
 			   		att_nos.add(el.getZ3Node().toString());
 		   		}
 		   	}

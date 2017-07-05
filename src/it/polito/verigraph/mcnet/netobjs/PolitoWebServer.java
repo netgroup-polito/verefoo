@@ -125,7 +125,7 @@ public class PolitoWebServer extends NetworkObject{
                             		ctx.mkEq(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_1))),
                             1,null,null,null,null)),1,null,null,null,null));   
 	    	
-	    	//System.out.println(constraints);
+	    	
 	    }
 }	
 	

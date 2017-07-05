@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,6 +64,7 @@ import it.polito.neo4j.jaxb.Webclient;
 import it.polito.neo4j.jaxb.Webserver;
 import it.polito.neo4j.manager.Neo4jDBInteraction.NodeType;
 import it.polito.verigraph.exception.DataNotFoundException;
+import it.polito.verigraph.service.VerigraphLogger;
 import it.polito.neo4j.exceptions.DuplicateNodeException;
 import it.polito.neo4j.exceptions.MyInvalidIdException;
 import it.polito.neo4j.exceptions.MyInvalidObjectException;
@@ -77,10 +79,12 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 	private static final RelationshipType ElementRelationship = null;
 
 
+
 	private GraphDatabaseFactory dbFactory;
 	private GraphDatabaseService graphDB;
 	private ObjectFactory obFactory;
 	private static Neo4jLibrary neo4jLib = new Neo4jLibrary();
+	public static VerigraphLogger vlogger = VerigraphLogger.getVerigraphlogger();
 		
 	private Neo4jLibrary()
 	{
@@ -104,7 +108,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 	}
 
 //	singleton class
-	public static Neo4jLibrary getNeo4jLibrary(){
+	public static Neo4jLibrary getNeo4jLibrary(){		
 		return neo4jLib;
 	}
 
@@ -149,7 +153,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				
 			}
 			
-			//modify  the neighbours id insertingthe relationsihp ip			
+			//modify  the neighbours id inserting the relationship 			
 			
 			for(it.polito.neo4j.jaxb.Node nodo : graph.getNode()){
 				Map<String, Neighbour> neighs = addNeighbours(nodo, graph);
@@ -209,7 +213,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				}		
 									
 			}else{
-				System.out.println("Configuration firewall empty");
+				vlogger.logger.info("Configuration firewall empty");
+				
 			}
 			break;
 		}
@@ -226,7 +231,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				}		
 			
 			}else{
-				System.out.println("Configuration Antispam empty");
+				vlogger.logger.info("Configuration Antispam empty");
+				
 			}
 				break;
 				
@@ -241,7 +247,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				cache.setProperty("id", newConf.getId());
 			}		
 			}else{
-				System.out.println("configuration empty");
+				vlogger.logger.info("Configuration Cache empty");
+				
 			}
 			break;
 			
@@ -256,7 +263,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				dpi.setProperty("id", newConf.getId());
 			}		
 			}else{
-				System.out.println("Configuration Dpi empty");
+				vlogger.logger.info("Configuration Dpi empty");
+				
 			}
 			break;
 		}
@@ -323,11 +331,13 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			break;
 		}
 	case "ENDPOINT":{
-		//System.out.println("newConf: " + newConf.getProperty("name"));		
+		vlogger.logger.info("It is an ENDPOINT");
+				
 		break;
 	}
 	case "FIELDMODIFIER":{
-		//System.out.println("newConf: " + newConf.getProperty("name"));		
+		vlogger.logger.info("It is a FIELMODIFIER");
+			
 		break;
 		
 		}
@@ -340,17 +350,19 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			Relationship mailclient=newElem.createRelationshipTo(newConf, RelationType.ElementRelationship);
 			mailclient.setProperty("id", newConf.getId());
 		}else{
-			System.out.println("Configuration Mailclient empty");
+			vlogger.logger.info("Configuration Mailclient empty");
+			
 		}
 		
 		break;
 	}
 	case "MAILSERVER":{
-		System.out.println("newConf: " + newConf.getProperty("name"));		
+		vlogger.logger.info("It is a MAILSERVER");
+				
 		break;
 	}
 	case "NAT":{
-		//System.out.println("newConf: " + newConf.getProperty("name"));
+		
 		List<String> list=c.getNat().getSource();
 		if(!list.isEmpty()){
 		for(String s : list){
@@ -360,7 +372,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			nat.setProperty("id", newConf.getId());
 		}		
 		}else{
-			System.out.println("Configuration Nat empty");
+			vlogger.logger.info("Configuration Nat empty");
+			
 		}
 		break;
 		}
@@ -374,7 +387,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			Relationship vpnaccess=newElem.createRelationshipTo(newConf, RelationType.ElementRelationship);
 			vpnaccess.setProperty("id", newConf.getId());
 		}else{
-			System.out.println("Configuration Vpnaccess empty");
+			vlogger.logger.info("Configuration Vpnaccess empty");
+			
 		}
 		
 		break;
@@ -387,7 +401,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			Relationship vpnexit=newElem.createRelationshipTo(newConf, RelationType.ElementRelationship);
 			vpnexit.setProperty("id", newConf.getId());
 		}else{
-			System.out.println("Configuration Vpnexit empty");
+			vlogger.logger.info("Configuration Vpnexit empty");
+			
 		}
 		
 		break;
@@ -400,13 +415,14 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			Relationship webclient=newElem.createRelationshipTo(newConf, RelationType.ElementRelationship);
 			webclient.setProperty("id", newConf.getId());
 		}else{
-			System.out.println("Configuration Webclient empty");
+			vlogger.logger.info("Configuration Webclient empty");
+			
 		}
 		
 		break;
 	}
 	case "WEBSERVER":{
-		//System.out.println("newConf: " + newConf.getProperty("name"));				
+		vlogger.logger.info("It's a webserver");					
 		break;
 		}
 	default:{
@@ -423,9 +439,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		nodo.setId(newNode.getId());
 		newNode.setProperty("id", newNode.getId());
 		Relationship r=newNode.createRelationshipTo(nffgRoot, RelationType.OwnerRelationship);
-		r.setProperty("id", graph.getId());
-	  //System.out.println("IdRelOwner:" + r.getProperty("id"));
-		//System.out.println("IdNewNode:" + newNode.getProperty("id"));
+		r.setProperty("id", graph.getId());	  
 		
 		return newNode;
 	}
@@ -436,9 +450,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		if(srcNode==null){
 			throw new DataNotFoundException("Source node (in neighbour node) not found");
 		}
-		//Node srcNode = graphDB.getNodeById(nodo.getId());
-		//Node srcNode=findNodeByNameAndId(nodo,graph);
-		//Node srcNode=findNodeByNameOfSpecificGraph(nodo.getName(), graph.getId());
+		
 				
 		Map<String,Neighbour> neighbours = new HashMap<>();
 
@@ -451,11 +463,11 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		
 			Relationship rel = srcNode.createRelationshipTo(dstNode,RelationType.PathRelationship);
 			
-			//rel.setProperty("id", rel.getId());
+			
 			neighbour.setId(dstNode.getId());
 			
 			
-		//	System.out.println("neighbourId: " + neighbour.getId());
+		
 			rel.setProperty("id", neighbour.getId());
 			neighbours.put((String)dstNode.getProperty("name"),neighbour);
 		}
@@ -464,10 +476,10 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 
 	private Node findNodeByIdAndSpecificGraph(long nodoId, long graphId) throws MyNotFoundException {
 		
-		//ResourceIterator<Node> nodes=graphDB.findNodes(NodeType.Node, "id", nodoId);
+		
 		Node node=graphDB.findNode(NodeType.Node, "id", nodoId);
 		Node n;
-		//Node node=graphDB.getNodeById(nodoId);
+		
 		if(node == null)			
 				throw new DataNotFoundException("There is no Node whose Id is '" + nodoId + "'");
 		else{
@@ -609,9 +621,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		Node graph;
 
 		try{
-			graph=graphDB.findNode(NodeType.Nffg, "id", graphId);
-			//graph = graphDB.getNodeById(graphId);
-			//if(graph == null || !graph.hasLabel(NodeType.Nffg))
+			graph=graphDB.findNode(NodeType.Nffg, "id", graphId);			
 			if(graph==null){
 				throw new DataNotFoundException("There is no Graph whose Id is '" + graphId + "'");
 		
@@ -628,9 +638,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		Node node;
 
 		try{
-			node=graphDB.findNode(NodeType.Node, "id", nodeId);
-		//	node = graphDB.getNodeById(nodeId);
-			//if(node == null || !node.hasLabel(NodeType.Node))
+			node=graphDB.findNode(NodeType.Node, "id", nodeId);		
 			if(node==null)
 				throw new DataNotFoundException("There is no Node whose Id is '" + nodeId + "'");
 		}
@@ -641,36 +649,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		return node;
 	}
 	
-	/*
-	 * In case of ids neoj are used:
-	 * private Node findNode(long nodoId, long graphId) throws MyNotFoundException{
-		Node n;
-
-		try{
-			ResourceIterator<Node> nodes=graphDB.findNodes(NodeType.Node, "id", nodoId);
-			while (nodes.hasNext()){
-				n = nodes.next();			
-					
-						for(Relationship rel : n.getRelationships(RelationType.OwnerRelationship)){
-							Node[] nodi = rel.getNodes();						
-							if(nodi[0].getId() == graphId || nodi[1].getId() == graphId){
-								if((long)rel.getProperty("id") == graphId)
-									return n;
-							}
-							
-						}		
-					
-				}
-			System.out.println("no node found");
-			return null;
-		}
-		catch(NotFoundException e){
-			throw new MyNotFoundException("There is no Node whose Id is '" + nodoId + "'");
-		}		
-		
-	}
-	*/
-
+	
 	private void addNeighbour(it.polito.neo4j.jaxb.Node src, Node dst, long neighbourId){
 		Neighbour vicino = obFactory.createNeighbour();
 		vicino.setId(neighbourId);
@@ -679,9 +658,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 	}
 
 	private it.polito.neo4j.jaxb.Node retrieveNode(Node nodo){
-		it.polito.neo4j.jaxb.Node n = obFactory.createNode();
+		it.polito.neo4j.jaxb.Node n = obFactory.createNode();		
 		
-		//n.setId((long)nodo.getProperty("id"));
 		n.setId(nodo.getId());
 		n.setName( nodo.getProperty("name").toString());
 		n.setFunctionalType(it.polito.neo4j.jaxb.FunctionalTypes.valueOf((String) nodo.getProperty("functionalType")));
@@ -975,7 +953,8 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			}
 					
 		}else{
-			System.out.println("NO configuration");
+			vlogger.logger.info("Not valid functional type");
+			
 		}
 	return c;
 	}
@@ -1044,8 +1023,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		Transaction tx = graphDB.beginTx();
 
 		try{
-			findGraph(graphId);
-			//nodo = findNode(nodeId, graphId);
+			findGraph(graphId);			
 			nodo = findNode(nodeId);
 			if(nodo==null){
 				tx.failure();
@@ -1066,8 +1044,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		Transaction tx = graphDB.beginTx();
 
 		try{
-			findGraph(graphId);
-			//nodo = findNode(nodeId, graphId);
+			findGraph(graphId);			
 			nodo = findNodeByNameOfSpecificGraph(nodeName, graphId);
 			if(nodo==null)
 				return null;
@@ -1091,8 +1068,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		Transaction tx = graphDB.beginTx();
 
 		try{
-			findGraph(graphId);
-			//nodo = findNode(nodeId, graphId);
+			findGraph(graphId);			
 			nodo = findNode(nodeId);		
 			tx.success();
 			return retrieveNode(nodo);
@@ -1137,8 +1113,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		Transaction tx = graphDB.beginTx();
 
 		try{
-			findGraph(graphId);
-			//nodosrc = findNode(nodeId, graphId);
+			findGraph(graphId);			
 			nodosrc=findNode(nodeId);
 			nododst = findNodeByNameOfSpecificGraph(neighbour.getName(), graphId);
 			if(nododst == null){
@@ -1212,7 +1187,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 
 		try{
 			node=graphDB.findNode(NodeType.Node, "id",nodeId);
-			//node = graphDB.getNodeById(nodeId);			
+						
 		}
 		catch(NotFoundException e){
 			throw new MyNotFoundException("There is no Node whose Id is '" + nodeId + "'");
@@ -1227,8 +1202,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		boolean trovato=false;
 
 		try{
-			findGraph(graphId);
-			//nodo = findNode(nodeId, graphId);
+			findGraph(graphId);			
 			nodo = findNode(nodeId);
 			for(Relationship rel : nodo.getRelationships(Direction.OUTGOING, RelationType.PathRelationship)){
 				if((long)rel.getProperty("id") == neighbourId){
@@ -1327,9 +1301,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			return neigh;
 		}
 		catch(NotFoundException e){
-			Relationship  rel = nodo.createRelationshipTo(dst, RelationType.PathRelationship);
-			//rel.setProperty("id", rel.getId());
-			//neigh.setId(rel.getId());			
+			Relationship  rel = nodo.createRelationshipTo(dst, RelationType.PathRelationship);					
 			rel.setProperty("id", neigh.getId());
 		}
 
@@ -1340,8 +1312,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 	
 
 	public Graph updateGraph(Graph graph, long graphId) throws MyNotFoundException,DuplicateNodeException,MyInvalidObjectException, MyInvalidIdException{
-		Transaction tx = graphDB.beginTx();
-		//it.polito.neo4j.jaxb.Node newNode;
+		Transaction tx = graphDB.beginTx();		
 		Node nodo;
 		Node graph_old;
 
@@ -1356,13 +1327,12 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			}
 			
 			for(it.polito.neo4j.jaxb.Node tmpnodo : graph.getNode()){
-				Node newNode = createNode(graph_old, tmpnodo, graph);
-			//	System.out.println("nodo_id: " + newNode.getId());
+				Node newNode = createNode(graph_old, tmpnodo, graph);			
 				tmpnodo.setId(newNode.getId());
 				it.polito.neo4j.jaxb.Configuration c=tmpnodo.getConfiguration();
 				Node newConf=createConfiguration(newNode, c);
 				c.setId(newConf.getId());
-				//System.out.println("configuration_id: " + c.getId());
+				
 			}
 			
 			//modify neighbours ids inserting ids relationship
@@ -1374,7 +1344,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 				for(Neighbour neig : tmpnodo.getNeighbour()){
 					Neighbour n = neighs.get(neig.getName());					
 					neig.setId(n.getId());
-					//System.out.println("neighbour_id " +neig.getId() );
+					
 				}
 				
 				
@@ -1421,15 +1391,14 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		return false;
 	}
 
-	//public void updateNeighbour(Neighbour neighbour, long graphId, long nodeId, long neighbourId) throws MyInvalidObjectException,MyNotFoundException{
+	
 	public it.polito.neo4j.jaxb.Node updateNeighbour(Neighbour neighbour, long graphId, long nodeId, long neighbourId) throws MyInvalidObjectException,MyNotFoundException{
 		Node nodo;
 		Transaction tx = graphDB.beginTx();
 		it.polito.neo4j.jaxb.Node returnedNode;
 
 		try{
-			findGraph(graphId);
-			//nodo = findNode(nodeId, graphId);
+			findGraph(graphId);			
 			nodo = findNode(nodeId);
 			if(validNeighbour(neighbour,getGraph(graphId),getNode(graphId, nodeId)) ==  false)
 				throw new MyInvalidObjectException("Invalid neighbour");
@@ -1475,7 +1444,6 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			throw new MyNotFoundException("There is no Node whose name is '" + neigh.getName() + "'");
 		Relationship relationship = nodo.createRelationshipTo(dst, RelationType.PathRelationship);
 		
-		//relationship.setProperty("id", neighbourId);
 		relationship.setProperty("id", neigh.getId());
 		
 	}

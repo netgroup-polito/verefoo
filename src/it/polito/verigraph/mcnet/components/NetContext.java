@@ -91,7 +91,7 @@ public class NetContext extends Core{
 	        policies = new ArrayList<Core>();
 	        
 	        baseCondition();
-	        //System.out.println("netcn: " + constraints);
+	       
 		}
 			
 	    /**
@@ -117,8 +117,7 @@ public class NetContext extends Core{
 	        node = ctx.mkEnumSort("Node", nodes);	    
 	       
 	        for(int i=0;i<node.getConsts().length;i++){
-	    		DatatypeExpr fd  = (DatatypeExpr)node.getConst(i);
-	    		//System.out.println( (DatatypeExpr)node.getConst(i));
+	    		DatatypeExpr fd  = (DatatypeExpr)node.getConst(i);	    		
 	    		DumbNode dn =new DumbNode(ctx,new Object[]{fd});
 	    		
 	    		nm.put(fd.toString(),dn);
@@ -133,7 +132,7 @@ public class NetContext extends Core{
 	    	address = ctx.mkEnumSort("Address", new_addr);
 	    	for(int i=0;i<address.getConsts().length;i++){
 	    		DatatypeExpr fd  = (DatatypeExpr)address.getConst(i);
-	    		//System.out.println( (DatatypeExpr)address.getConst(i));	    	
+	    			    	
 	    	
 	    		am.put(fd.toString(),fd);
 	    	}
@@ -173,11 +172,11 @@ public class NetContext extends Core{
 	         */
 	        
 	        nodeHasAddr = ctx.mkFuncDecl("nodeHasAddr", new Sort[]{node, address},ctx.mkBoolSort());
-	        //System.out.println("nodeHasAddr: "+ nodeHasAddr);  
+	        
 	      
 	        // addrToNode: address -> node
 	        addrToNode = ctx.mkFuncDecl("addrToNode", address, node);
-	        //System.out.println("addrToNode: "+ addrToNode);
+	        
 	        
 	        // Send and receive both have the form:
 	        // source-> destination -> packet-> int-> bool
@@ -332,7 +331,7 @@ public class NetContext extends Core{
 							    ctx.mkEq(this.pf.get("options").apply(p_1), this.pf.get("options").apply(p_0)))),1,null,null,null,null)
 	        		);
 	        
-	        //System.out.println(constraints);
+	       
 	    }
 
 	    /**

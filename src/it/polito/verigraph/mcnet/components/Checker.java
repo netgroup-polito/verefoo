@@ -179,7 +179,7 @@ public class Checker {
 	    						ctx.mkEq(nctx.dest_port.apply(p_2), nctx.src_port.apply(p)),
 	    						ctx.mkEq(nctx.pf.get("dest").apply(p_2), nctx.pf.get("src").apply(p)),
 	    						ctx.mkLt(t_2,t_0)),1,null,null,null,null)));
-	    System.out.println((ctx.mkNot(ctx.mkExists(new Expr[]{p_2,n_2,t_2},
+	    //System.out.println((ctx.mkNot(ctx.mkExists(new Expr[]{p_2,n_2,t_2},
 				ctx.mkAnd(
 						(BoolExpr)nctx.send.apply(dest.getZ3Node(), n_2, p_2, t_2),
 						ctx.mkEq(nctx.pf.get("src").apply(p_2), nctx.pf.get("dest").apply(p)),

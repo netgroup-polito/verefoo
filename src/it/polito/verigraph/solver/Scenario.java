@@ -18,10 +18,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.polito.verigraph.exception.DataNotFoundException;
 import it.polito.verigraph.model.Graph;
 import it.polito.verigraph.model.Node;
+import it.polito.verigraph.service.VerigraphLogger;
 
 public class Scenario {
 	Graph graph;
 	List<String> path=new ArrayList<String>();
+	public static VerigraphLogger vlogger = VerigraphLogger.getVerigraphlogger();
 	
 	Map<String, Map<String, String>> chn=new HashMap<String, Map<String, String>>();
 	Map<String, Map<String, String>> routing=new HashMap<String, Map<String, String>>();
@@ -50,7 +52,8 @@ public class Scenario {
 		for(String s : path){
 			Node n=graph.searchNodeByName(s);
 			if(n==null){
-				System.out.println("The node "+n.getName()+" is not present in the graph");
+				vlogger.logger.info("The node "+n.getName()+" is not present in the graph");
+			//	System.out.println("The node "+n.getName()+" is not present in the graph");
 			}
 			else{
 				nodes.add(n);
@@ -105,16 +108,7 @@ public class Scenario {
 		//fill configuration
 		setConfiguration(name, type, configuration, config_obj, config_array);
 					
-		}
-		/*for(Map.Entry<String, Map<String, String>> a : routing.entrySet()){
-			String name_=a.getKey();
-			Map<String, String> b= a.getValue();
-			System.out.println("routing " + name_);
-			for(Map.Entry<String, String> d : b.entrySet()){
-				System.out.println("ip_dest: " + d.getKey());
-				System.out.println("next_hop: "+ d.getValue());
-			}
-		}*/
+		}	
 }
 
 	@SuppressWarnings("unchecked")
@@ -146,9 +140,7 @@ public class Scenario {
 						map.putAll(mapper.readValue(string, LinkedHashMap.class));
 						
 					}
-					//checkConfiguration(map);
-					
-					
+				
 
 				}catch(JsonGenerationException e) {
 
@@ -168,7 +160,7 @@ public class Scenario {
 
 			}
 			else{
-				System.out.println("firewall empty");
+				vlogger.logger.info("Firewall "+name+" empty");			
 
 			}
 			
@@ -191,7 +183,7 @@ public class Scenario {
 				try {
 
 					source = mapper.readValue(configuration.toString(), ArrayList.class);
-					//checkConfiguration(source);
+					
 
 				} catch (JsonGenerationException e) {
 
@@ -208,8 +200,9 @@ public class Scenario {
 				}
 
 			}
-			else{			
-				System.out.println("antispam empty");
+			else{		
+				vlogger.logger.info("Antispam "+name+" empty");
+				
 			}
 			config_array.put(name, source);
 			break;
@@ -225,8 +218,7 @@ public class Scenario {
 				try {
 					List<String> list_tmp=new ArrayList<String>();
 					list_tmp = mapper.readValue(configuration.toString(), ArrayList.class);
-					if(list_tmp!=null){
-					//	checkConfiguration(list_tmp);
+					if(list_tmp!=null){					
 						for(String s : list_tmp){
 							resource.add("ip_"+s);
 						}
@@ -249,7 +241,8 @@ public class Scenario {
 
 			}
 			else{
-				System.out.println("cache vuota");			
+				vlogger.logger.info("Cache "+name+ " empty");
+					
 			}
 			config_array.put(name, resource);
 			break;
@@ -283,7 +276,7 @@ public class Scenario {
 
 			}
 			else{
-				System.out.println("dpi empty");
+				vlogger.logger.info("Dpi "+name+ " empty");
 			}
 			config_array.put(name, notAllowed);
 			break;
@@ -306,12 +299,8 @@ public class Scenario {
 					map=mapper.readValue(input, java.util.LinkedHashMap.class);
 					String ip=map.get("destination");
 					if(ip!=null){						
-						map.put("destination", "ip_"+ip);					
-						/*if(!path.contains(ip)){	
-							if(!nodes_addresses.contains("ip_"+ip))
-								nodes_addresses.add("ip_"+ip);
-						}
-							*/
+						map.put("destination", "ip_"+ip);				
+						
 					}
 
 				}catch(JsonGenerationException e) {
@@ -331,7 +320,7 @@ public class Scenario {
 
 			}
 			else{
-				System.out.println("endhost empty");
+				vlogger.logger.info("Endhost "+name+ " empty");
 			}
 			config_obj.put(name, map);
 			break;
@@ -387,7 +376,7 @@ public class Scenario {
 
 			}
 			else{
-				System.out.println("fieldmodifier empty");
+				vlogger.logger.info("Fieldmodifier "+name+ " empty");
 			}
 			config_obj.put(name, map);
 			break;
@@ -484,7 +473,7 @@ public class Scenario {
 
 			}
 			else{
-				System.out.println("mailserver empty");
+				vlogger.logger.info("Mailserver "+name+ " empty");
 			}
 		config_obj.put(name, map);
 			break;
@@ -499,8 +488,7 @@ public class Scenario {
 				try {
 
 					list = mapper.readValue(configuration.toString(), ArrayList.class);
-					if(!list.isEmpty()){
-					//	checkConfiguration(list);
+					if(!list.isEmpty()){					
 						for(String s : list){
 							source.add("ip_"+s);
 						}
@@ -524,7 +512,7 @@ public class Scenario {
 
 			}
 			else{
-				System.out.println("nat empty");
+				vlogger.logger.info("Nat "+name+ " empty");
 			}
 		config_array.put(name, source);
 			break;
@@ -701,7 +689,7 @@ public class Scenario {
 				}	
 			}
 			else{
-				System.out.println("webserver empty");
+				vlogger.logger.info("Webserver "+name+ " empty");
 			}
 			config_obj.put(name, map);
 			break;

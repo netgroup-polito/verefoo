@@ -24,7 +24,6 @@ public class Neo4jToGraph {
 		
 		it.polito.verigraph.model.Graph graph=new it.polito.verigraph.model.Graph();
 		graph.setId(g.getId());
-	//	System.out.println("graph.setId :" + graph.getId());
 		Map<Long, it.polito.verigraph.model.Node> nodes=new HashMap<Long, it.polito.verigraph.model.Node>();
 		for(it.polito.neo4j.jaxb.Node n : g.getNode()){
 			it.polito.verigraph.model.Node node=new it.polito.verigraph.model.Node();

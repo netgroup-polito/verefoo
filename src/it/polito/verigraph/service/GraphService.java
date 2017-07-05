@@ -18,8 +18,9 @@ import it.polito.verigraph.model.Node;
 
 public class GraphService {
 	
-	
 	private Neo4jDBManager manager= new Neo4jDBManager();
+	public static VerigraphLogger vlogger = VerigraphLogger.getVerigraphlogger();
+	
 
 	public GraphService() {
 		
@@ -39,7 +40,7 @@ public class GraphService {
 			throw new ForbiddenException("Illegal graph id: " + id);
 		}
 		Graph localGraph=manager.getGraph(id);
-		validateGraph(localGraph);
+		validateGraph(localGraph);		
 		return localGraph;
 	}
 
@@ -53,7 +54,8 @@ public class GraphService {
 		
 		Graph localGraph=new Graph();
 		localGraph=manager.updateGraph(graph);
-		System.out.println("update graph ok");
+		vlogger.logger.info("Graph updated");
+		
 		
 		
 		validateGraph(localGraph);

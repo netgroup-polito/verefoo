@@ -64,6 +64,7 @@ import it.polito.neo4j.jaxb.Vpnexit;
 import it.polito.neo4j.jaxb.Webclient;
 import it.polito.neo4j.jaxb.Webserver;
 import it.polito.verigraph.model.Configuration;
+import it.polito.verigraph.service.VerigraphLogger;
 import it.polito.neo4j.jaxb.Graphs;
 import it.polito.neo4j.jaxb.Mailclient;
 import it.polito.neo4j.jaxb.Mailserver;
@@ -71,6 +72,7 @@ import it.polito.neo4j.jaxb.Nat;
 import it.polito.neo4j.jaxb.Neighbour;
 
 public class GraphToNeo4j {	
+	public static VerigraphLogger vlogger = VerigraphLogger.getVerigraphlogger();
 	public static it.polito.neo4j.jaxb.Graph generateObject(it.polito.verigraph.model.Graph gr) throws JsonParseException, JsonMappingException, IOException {
 		it.polito.neo4j.jaxb.Graph graph;
 		graph=(new ObjectFactory()).createGraph();
@@ -117,7 +119,7 @@ public class GraphToNeo4j {
 @SuppressWarnings("unchecked")
 private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configuration, it.polito.verigraph.model.Node node, JsonNode nodes) throws JsonParseException, JsonMappingException, IOException {
 		// TODO Auto-generated method stub
-	//JsonNode nodes=node.getConfiguration().getConfiguration();	
+
 	String empty="[]";
 	
 	switch(node.getFunctional_type().toUpperCase()){
@@ -143,10 +145,8 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 			}	
 						
 			try{
-				for(String string : list){
-					//System.out.println("print list: " + string);
-					map.putAll(mapper.readValue(string, LinkedHashMap.class));
-					//System.out.println("maps: "+map);					
+				for(String string : list){					
+					map.putAll(mapper.readValue(string, LinkedHashMap.class));									
 				}
 				for(java.util.Map.Entry<String, String> m : map.entrySet()){
 					Elements e=new Elements();				
@@ -174,7 +174,7 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 			
 		}
 			else{
-				System.out.println("elements_list of Firewall " +node.getName()+" empty");
+				vlogger.logger.info("elements_list of Firewall " +node.getName()+" empty");				
 				
 			}
 		firewall.getElements().addAll(elements_list);
@@ -199,8 +199,7 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 	
 			        list = mapper.readValue(nodes.toString(), ArrayList.class);
 			      
-			        for(String s : list){
-			    		//System.out.println("antispam: " + s);
+			        for(String s : list){			    		
 			    		source.add(s);
 			        }
 			      
@@ -219,16 +218,16 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 			    }
 			
 		}
-		else{			
-			System.out.println("Antispam " +node.getName()+" empty");
+		else{		
+			vlogger.logger.info("Antispam " +node.getName()+" empty");
+			
 		}
 		antispam.getSource().addAll(source);
 		configuration.setAntispam(antispam);
 		break;
 	}
 	case "CACHE":{
-		configuration.setName(node.getFunctional_type().toLowerCase());
-		System.out.println("nodes: " + nodes.toString());
+		configuration.setName(node.getFunctional_type().toLowerCase());		
 		Cache cache=new Cache();
 		List<String> resource=new ArrayList<String>();
 		
@@ -260,7 +259,8 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 			
 		}
 		else{
-			System.out.println("Cache " +node.getName()+" empty");			
+			vlogger.logger.info("Cache " +node.getName()+" empty");
+						
 		}
 		cache.getResource().addAll(resource);
 		configuration.setCache(cache);
@@ -301,7 +301,8 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 			
 			}
 		else{
-			System.out.println("Dpi " +node.getName()+"  empty");
+			vlogger.logger.info("Dpi " +node.getName()+"  empty");
+			
 		}
 		dpi.getNotAllowed().addAll(notAllowed);
 		configuration.setDpi(dpi);
@@ -374,7 +375,8 @@ private static void setConfiguration(it.polito.neo4j.jaxb.Configuration configur
 			
 		}
 		else{
-			System.out.println("Endhost " +node.getName()+" empty");
+			vlogger.logger.info("Endhost " +node.getName()+" empty");
+			
 		}
 		configuration.setEndhost(endhost);
 		break;
@@ -397,8 +399,7 @@ case "MAILCLIENT":{
 	configuration.setName(node.getFunctional_type().toLowerCase());
 	Mailclient mailclient=new Mailclient();
 	
-	ObjectMapper mapper=new ObjectMapper();
-	System.out.println("nodes: " + nodes.toString());
+	ObjectMapper mapper=new ObjectMapper();	
 	java.util.Map<String, String> map=new LinkedHashMap();	
 	String input;
 	Matcher matcher = Pattern.compile("\\[([^\\]]*)\\]").matcher(nodes.toString());
@@ -425,7 +426,7 @@ case "MAILCLIENT":{
 						break;
 					}
 					default:
-						System.out.println("\"mailserver\" object is required");
+						vlogger.logger.info("\"mailserver\" object is required");					
 						break;
 					}
 				}
@@ -488,7 +489,8 @@ case "NAT":{
 		
 	}
 	else{
-		System.out.println("Nat " +node.getName()+" empty");
+		vlogger.logger.info("Nat " +node.getName()+" empty");
+		
 	}
 	nat.getSource().addAll(source);
 	configuration.setNat(nat);
@@ -527,7 +529,7 @@ case "VPNACCESS":{
 					break;
 					}
 					default:
-						System.out.println("\"vpnexit\" is required");
+						vlogger.logger.info("\"vpnexit\" is required");						
 						break;
 					}
 				}
@@ -581,7 +583,7 @@ case "VPNEXIT":{
 						break;
 					}
 					default:{
-						System.out.println("\"vpnaccess\" is required");
+						vlogger.logger.info("\"vpnaccess\" is required");						
 						break;
 					}
 					}
@@ -636,7 +638,7 @@ case "WEBCLIENT":{
 						break;
 					}
 					default:{
-						System.out.println("\"webserver\" object is required");
+						vlogger.logger.info("\"webserver\" object is required");						
 						break;
 					}
 					}

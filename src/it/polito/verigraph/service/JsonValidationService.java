@@ -18,6 +18,7 @@ public class JsonValidationService {
 	private Graph	graph	= new Graph();
 
 	private Node	node	= new Node();
+	public static VerigraphLogger vlogger = VerigraphLogger.getVerigraphlogger();
 
 	public JsonValidationService() {
 
@@ -40,7 +41,8 @@ public class JsonValidationService {
 		if (node.isTextual()) {
 			boolean isValid = validateFieldAgainstNodeNames(node.asText());
 			if (!isValid) {
-				System.out.println(node.asText() + " is not a valid string!");
+				vlogger.logger.info(node.asText() + " is not a valid string!");
+				//System.out.println(node.asText() + " is not a valid string!");
 				throw new BadRequestException("String '"	+ node.asText()
 												+ "' is not valid for the configuration of node '" + this.node.getName()
 												+ "'");
@@ -70,8 +72,10 @@ public class JsonValidationService {
 			validator = Class.forName("it.polito.verigraph.validation." + className);
 		}
 		catch (ClassNotFoundException e) {
-			System.out.println(className	+ " not found, configuration properties of node '" + node.getName()
+			vlogger.logger.info(className	+ " not found, configuration properties of node '" + node.getName()
 								+ "' will be validated against node names");
+			//System.out.println(className	+ " not found, configuration properties of node '" + node.getName()
+							//	+ "' will be validated against node names");
 			return false;
 		}
 

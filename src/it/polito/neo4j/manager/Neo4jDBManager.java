@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
@@ -32,11 +33,14 @@ import it.polito.verigraph.model.Configuration;
 import it.polito.verigraph.model.Graph;
 import it.polito.verigraph.model.Neighbour;
 import it.polito.verigraph.model.Node;
+import it.polito.verigraph.service.VerigraphLogger;
 
 public class Neo4jDBManager {
 	
 	public static Neo4jLibrary lib = Neo4jLibrary.getNeo4jLibrary();
 	//static ObjectFactory obFactory = new ObjectFactory();
+
+	public static VerigraphLogger vlogger = VerigraphLogger.getVerigraphlogger();
 
 	
 	public it.polito.verigraph.model.Graph updateGraph(it.polito.verigraph.model.Graph graph) throws JAXBException, JsonParseException, JsonMappingException, IOException, MyInvalidIdException{
@@ -54,16 +58,16 @@ public class Neo4jDBManager {
 				
 			}
 			catch(MyNotFoundException e1){
-				//System.out.println("error update 1");
+				vlogger.logger.info("error update 1");						
 				throw new NotFoundException();
 			}
 			
-			catch(DuplicateNodeException e3){
-				//System.out.println("error update 2");
+			catch(DuplicateNodeException e3){				
+				vlogger.logger.info("error update 2");
 				throw new BadRequestException(e3.getMessage());
 			}
-			catch(MyInvalidObjectException e4){
-				//System.out.println("error update 3");
+			catch(MyInvalidObjectException e4){				
+				vlogger.logger.info("error update 3");
 				throw new BadRequestException(e4.getMessage());
 			}
 	}
@@ -202,11 +206,7 @@ public List<it.polito.verigraph.model.Graph> getGraphs() throws JsonProcessingEx
 		it.polito.verigraph.model.Node node_v=new it.polito.verigraph.model.Node();
 		try
 		{
-			for(it.polito.neo4j.jaxb.Neighbour n :node_xml.getNeighbour()){
-				System.out.println("vicini: " + n.getName());
-				
-			}
-			
+					
 			nodeReturned = lib.createNode(node_xml, graphId);
 			node_v=Neo4jToGraph.NodeToVerigraph(nodeReturned);
 		}

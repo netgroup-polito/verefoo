@@ -72,7 +72,7 @@ public class PolitoEndHost extends NetworkObject {
 	 * Fields that can be configured -> "dest","body","seq","proto","emailFrom","url","options"
 	 */
 	public void installEndHost (PacketModel packet){
-		System.out.println("Installing PolitoEndHost...");
+		//System.out.println("Installing PolitoEndHost...");
 		Expr n_0 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_n_0", nctx.node);
     	Expr p_0 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_p_0", nctx.packet);
     	IntExpr t_0 = ctx.mkIntConst("PolitoEndHost_"+politoEndHost+"_t_0");
@@ -106,8 +106,8 @@ public class PolitoEndHost extends NetworkObject {
                 ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0,politoEndHost, p_0, t_0), 
                 		(BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.pf.get("dest").apply(p_0))),1,null,null,null,null));
 		
-		System.out.println("Done.");
-		//System.out.println("endhost: " + constraints);
+		//System.out.println("Done.");
+	
 		
 		return;
 	}

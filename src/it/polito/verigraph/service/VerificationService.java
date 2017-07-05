@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ import com.microsoft.z3.*;
 import it.polito.neo4j.exceptions.MyInvalidDirectionException;
 import it.polito.neo4j.jaxb.Paths;
 import it.polito.neo4j.manager.Neo4jDBManager;
+import it.polito.neo4j.manager.Neo4jLibrary;
 import it.polito.neo4j.translator.*;
 import it.polito.verigraph.exception.BadRequestException;
 import it.polito.verigraph.exception.DataNotFoundException;
@@ -39,6 +41,9 @@ import it.polito.verigraph.solver.Scenario;
 public class VerificationService {	
 	
 	private Neo4jDBManager manager=new Neo4jDBManager();
+	//private final static Logger LOGGER = Logger.getLogger(VerigraphLogger.class.getName());
+	public static VerigraphLogger vlogger = VerigraphLogger.getVerigraphlogger();
+	
 	
 	public VerificationService() {
 
@@ -80,9 +85,14 @@ public class VerificationService {
 
 
 	private void printListsOfStrings(String message, List<List<String>> lists) {
-		System.out.println(message);
+		vlogger.logger.info(message);	
 		for (List<String> element : lists) {
-			System.out.println(element);
+			StringBuilder paths= new StringBuilder();
+			for(String s : element){
+				paths.append(s+" ");				
+			}
+			vlogger.logger.info(paths.toString());
+			//System.out.println(element);
 		}
 	}
 
@@ -209,9 +219,7 @@ public class VerificationService {
 		Map<Integer, GeneratorSolver> scenarios=createScenarios(sanitizedPaths, graph);	
 		
 		tests = run(graph, scenarios, sourceNode.getName(), destinationNode.getName());		
-		for(Test tt : tests){
-			System.out.println("risultato: "+tt.getResult());
-		}
+		
 
 		Verification isolation=evaluateIsolationResults(tests, sourceNode.getName(),
 										destinationNode.getName(),
@@ -219,7 +227,8 @@ public class VerificationService {
 		
 		Calendar cal_isolation_stop = Calendar.getInstance();
 		time_isolation = time_isolation +(cal_isolation_stop.getTime().getTime() - start_time_isolation.getTime());
-		System.out.println("Time to check reachability policy: " + time_isolation);
+		vlogger.logger.info("Time to check reachability policy: " + time_isolation);
+		//System.out.println("Time to check reachability policy: " + time_isolation);
 		
 		return isolation;
 	}
@@ -418,7 +427,8 @@ public class VerificationService {
 
 		Calendar cal_traversal_stop = Calendar.getInstance();
 		time_traversal = time_traversal +(cal_traversal_stop.getTime().getTime() - start_time_traversal.getTime());
-		System.out.println("Time to check traversal policy: " + time_traversal);
+		vlogger.logger.info("Time to check traversal policy: " + time_traversal);
+		//System.out.println("Time to check traversal policy: " + time_traversal);
 		return traversal;
 	}
 
@@ -487,13 +497,15 @@ public class VerificationService {
 		
 		Calendar cal_reachability_after_run = Calendar.getInstance();
 		time_reachability = time_reachability +(cal_reachability_after_run.getTime().getTime() - start_time_reachability.getTime());
-		System.out.println("Time reachability after run: " + time_reachability);
+		vlogger.logger.info("Time reachability after run: " + time_reachability);
+		//System.out.println("Time reachability after run: " + time_reachability);
 		
 		Verification reachability= evaluateReachabilityResult(tests, sourceNode.getName(), destinationNode.getName());
 		
 		Calendar cal_reachability_stop = Calendar.getInstance();
 		time_reachability = time_reachability +(cal_reachability_stop.getTime().getTime() - start_time_reachability.getTime());
-		System.out.println("Time to check reachability policy: " + time_reachability);
+		vlogger.logger.info("Time to check reachability policy: " + time_reachability);
+		//System.out.println("Time to check reachability policy: " + time_reachability);
 		
 		return reachability;
 	}
@@ -559,7 +571,7 @@ public class VerificationService {
 				v.setResult("UNKNWON");
 				v.setComment("Reachability from '"	+ source + "' to '" + destination
 								+ "' is unknown. See all the checked paths below");
-				//System.out.println("v.setComment: "+ v.getComment());
+				
 			}
 			else if (t.getResult().equals("UNSAT")) {
 				unsat++;
@@ -570,16 +582,15 @@ public class VerificationService {
 			v.setResult("SAT");
 			v.setComment("There is at least one path '"	+ source + "' can use to reach '" + destination
 							+ "'. See all the available paths below");
-			//System.out.println("v.setComment: "+ v.getComment());
+			
 		}
 		else if (unsat == tests.size()) {
 			v.setResult("UNSAT");
 			v.setComment("There isn't any path '"	+ source + "' can use to reach '" + destination
 							+ "'. See all the checked paths below");
-			//System.out.println("v.setComment: "+ v.getComment());
+			
 		}
-		//System.out.println("v.comment: "+ v.getComment());
-		//System.out.println("v.result: "+ v.getResult());
+		
 		return v;
 	}
 
@@ -614,7 +625,8 @@ public class VerificationService {
 		Paths all_paths = getPaths(graph, sourceNode, destinationNode);
 
 		if (all_paths.getPath().size() == 0) {
-			System.out.println("No path available");
+			vlogger.logger.info("No path available");
+			//System.out.println("No path available");
 			return null;
 		}
 
