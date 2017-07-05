@@ -88,7 +88,7 @@
 		</target>
 	
 	<!-- The target for compiling the Verigraph application -->
-	<target name="build-service" depends="init, mvn-init">
+	<target name="build-service" depends="init, generate-bindings, mvn-init">
 		<echo>Building verigraph (if needed)...</echo>
 		<javac 
 			classpathref="compile.classpath"
