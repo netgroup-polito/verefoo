@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Vpn Access",
+    "description": "Polito Vpn Access",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "vpnexit": {
+                "description": "Vpn Exit",
+                "type": "string"
+            }
+        },
+        "additionalProperties": false,
+        "required": [
+            "vpnexit"
+        ]
+    },
+    "minItems": 1,
+    "maxItems": 1,
+    "uniqueItems": true
+}
