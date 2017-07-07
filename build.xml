@@ -28,6 +28,9 @@
 	<property name="jsonschemafolder.dir" location="${root.location}/jsonschema"/>
 	<property name="test.dir" location="${root.location}/tester"/>
 
+	<path id="z3.classpath">
+		<pathelement location="${lib.dir}/com.microsoft.z3.jar"/>
+	</path>
 	
 	<import file="tomcat-build.xml"/>
 
@@ -91,13 +94,16 @@
 	<target name="build-service" depends="init, generate-bindings, mvn-init">
 		<echo>Building verigraph (if needed)...</echo>
 		<javac 
-			classpathref="compile.classpath"
 			destdir="${build.dir}"
 			debug="${debug}"
 			debuglevel="${debuglevel}"
 			source="${source}"
 			target="${target}"
 			includeantruntime="false">
+				<classpath>
+					<path ref="compile.classpath"/>
+					<path ref="z3.classpath"/>
+				</classpath>
 				<src path="${src.dir}" />
 				<src path="${gen.dir}" />
 				<include name="${path.prefix}/**/*.java"/> 
