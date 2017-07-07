@@ -1,9 +1,0 @@
-{
-    "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Endpoint",
-    "description": "Polito Endpoint",
-    "type": "array",
-    "minItems": 0,
-    "maxItems":0,
-    "uniqueItems": true
-}
