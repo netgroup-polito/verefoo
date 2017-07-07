@@ -101,8 +101,8 @@
 			target="${target}"
 			includeantruntime="false">
 				<classpath>
-					<path ref="compile.classpath"/>
-					<path ref="z3.classpath"/>
+					<path id="compile.classpath"/>
+					<path id="z3.classpath"/>
 				</classpath>
 				<src path="${src.dir}" />
 				<src path="${gen.dir}" />
