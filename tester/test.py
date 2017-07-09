@@ -65,8 +65,9 @@ try:
 except ValueError:
     eprint("Invalid json schema (check your "+SCHEMA_FILE+")!\nExiting.")
     exit(-1)
-with open('result.csv', 'wb') as file:
+with open('result.csv', 'w') as file:
     writer=csv.writer(file, delimiter=',', quoting=csv.QUOTE_MINIMAL, lineterminator='\n')
+    writer.writerow(['SRC','DST','GRAPH_ID','TEST_ID','RESULT','TIMES (ms)'])
     # Iterate over .json files contained in the TEST_CASES_DIR
     for i in os.listdir(TEST_CASES_DIR):
         if i.endswith(".json"): 
