@@ -13,14 +13,38 @@ How to deploy **VeriGraph** on Apache Tomcat:
   <role rolename="role1"/>
   <user username="tomcat" password="tomcat" roles="tomcat,manager-gui"/>
   <user username="both" password="tomcat" roles="tomcat,role1"/>
-  <user username="role1" password="tomcat" roles="role1"/>  
-  ```  
-- clone or download Verigraph at https://github.com/netgroup-polito/verigraph.git;
+  <user username="role1" password="tomcat" roles="role1"/>    ```  
+
 - edit the "to_be_defined" fields in tomcat-build.xml;
 - execute the generate-war ant task in order to generate the .war;
 - launch Tomcat 8 with the startup script `%CATALINA_HOME%\bin\startup.bat`;
 - (optional) if you previously configured Tomcat Manager you can open a browser and navigate to [this link](http://localhost:8080/manager) and login using `tomcat/tomcat` as username/password;
 - (optional) you can deploy/undeploy/redeploy the downloaded WARs through the web interface.
+
+
+**Ant script**
+
+Edit the "to_be_defined" fields of the tomcat-build.xml. Set server.location property to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30);
+
+Verigraph target:
+
+- generate-war: it generates the war file;
+
+- generate-binding: it generates the JAXB classes from xml_components schema;
+
+- run-test: tt runs the tests in tester folder. It is possible to choose the iterations number for each verification request by launching the test with "-Diteration=n run-test" where n is the number of iterations you want;
+
+- start-tomcat : it starts the Apache Tomcat;
+
+- deployWS: it deploys the verigraph.war file contained in verigraph/war folder;
+
+- startWS: it starts the webservice;
+
+- stopWS: it stops the webservice;
+
+- undeployWS: it undeploys the webservice from Apache Tomcat;
+
+- stop-tomcat: it stops Apache Tomcat.
 
 
 **Unix**
@@ -66,7 +90,6 @@ e.g.
 e.g.  
 `export JDK_HOME=/home/mininet/jdk1.8.0_92`
 - `exec bash`
-- clone or download Verigraph at https://github.com/netgroup-polito/verigraph.git;
 - edit the "to_be_defined" fields in tomcat-build.xml;
 - execute the generate-war ant task in order to generate the .war;
 - launch Tomcat 8 with the startup script `$CATALINA_HOME/bin/startup.sh`
@@ -134,31 +157,6 @@ as configuration);
 11. Restart the web service.
 
 
-**Ant script**
-
-Edit the "to_be_defined" fields of the tomcat-build.xml. Set server.location property to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30);
-
-Verigraph target:
-
-- generate-war: it generates the war file;
-
-- generate-binding: it generates the JAXB classes from xml_components schema;
-
-- run-test: t runs the tests in tester folder; 
-
-- start-tomcat : it starts the Apache Tomcat;
-
-- deployWS: it deploys the verigraph.war file contained in verigraph/war folder;
-
-- startWS: it starts the webservice;
-
-- stopWS: it stops the webservice;
-
-- undeployWS: it undeploys the webservice from Apache Tomcat;
-
-- stop-tomcat: it stops Apache Tomcat.
-
-
 **Troubleshooting**
 
 - The neo4j embedded version must be greater or equal to 3.1.3 as specified in pom.xml file. The previous versions could not work correctly with Apache Tomcat because of a bug;
@@ -166,3 +164,35 @@ Verigraph target:
 - The location of the database can be edited by the neo4jDeploymentFolder field of Neo4jLibrary class in it.polito.neo4j.manager;
 
 - The ant task "init" downloads the com.mirosoft.z3 library, if you want to change the version of the library, modify the url in the task with the right version. Note that the versions earlier than 4.5 cannot work properly.
+
+
+In order to run the automatic testing script test.py, you need the following dependencies installed on your python distribution:
+- "requests" python package -> http://docs.python-requests.org/en/master/
+- "jsonschema" python package -> https://pypi.python.org/pypi/jsonschema
+
+IMPORTANT - If you have multiple versions of Python installed on your machine, check carefully that the version you are actually using when running the script, has the required packages installed. Requested version is Python 3+
+
+HINT - to install a package you can raise the following command (Bash on Linux or DOS shell on Windows):
+	python -m pip install jsonschema
+	python -m pip install requests
+	
+Tested on PYTHON 3.4.3
+
+To add a new test, just put a new .json file inside the testcases folder. The corresponding JSON schema is in the testcase_schema.json file and some examples are already available. Each json file should specify:
+- id, an integer for the testcase;
+- name, the name for the testcase;
+- description, an optional description;
+- policy_url_parameters, the parameters to be appended after the verification URL (including the '?' character), it is an array. 
+- result, the expected verification results, it is an array;
+- graph, the graph to be tested (the same object that you usually POST to VeriGraph to create a new graph).
+
+The test.py script will test each .json file contained into the testcases folder and will provide a complete output.
+The result.csv contains the verificatin results in the following way (column):
+-source_node;
+-destination_node;
+-graph_id;
+-testcase_id;
+-result (FAIL in case of test failed);
+-the execution time for each execution of the verification.
+
+It is possible to do several verification for each request in the policy_url_paramters. You have to launch the ant run-test with "-Diteration=n run-test" or by commandline with "testpy -iteration n" where n is the iterations number you want.
