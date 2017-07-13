@@ -5,9 +5,9 @@
 		Script for Controlling Tomcat (to be imported in main build)
 	</description>
 	
-	<property name="tomcatUsername" value="root" />
-	<property name="tomcatPassword" value="root" />
-	<property name="server.location" location="C:\Users\Serena\workspace_DP2\apache-tomcat-8.0.38" />
+	<property name="tomcatUsername" value="to_be_defined" />
+	<property name="tomcatPassword" value="to_be_defined" />
+	<property name="server.location" location="to_be_defined" />
 	<property name="tomcatPort" value="8080" />
 	<property name="tomcatUrl" value="http://localhost:${tomcatPort}/manager/text" />
 	
@@ -17,10 +17,7 @@
 	<property name="serviceName" value="verigraph" />
 	<property name="rootDirectoryWS" value="verigraph"/>
 	
-    <target name="package-service">         
-    </target>
-
-
+   
 	<path id="tomcat.class.path">
 		<fileset dir="${server.location}/lib">
 			<include name="**/*.jar" />
@@ -59,7 +56,7 @@
 	
 
 	<!-- WEBSERVICE LIFECICLE MANAGEMENT-->
-	<target name="deployWS" depends="package-service" description="Deploy service to tomcat">
+	<target name="deployWS" description="Deploy service to tomcat">
 		<echo>Deploying to tomcat...</echo>
 		<deploy url="${tomcatUrl}" username="${tomcatUsername}"
 				password="${tomcatPassword}" path="/${serviceName}"
