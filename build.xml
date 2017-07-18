@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Verigraph" default="package-service" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+<project name="Verigraph" default="generate-war" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 	<description>
 			Script for Verigraph
 	</description>
@@ -12,6 +12,7 @@
 	<!-- The location to be used for class files -->
 	<property name="src.dir" location="${root.location}/src" />
 	<property name="gen.dir" location="${root.location}/gen-src"/>
+	<property name="war.dir" location="${root.location}/war"/>
 	<property name="path.prefix" value="it/polito" />
 	<property name="build.dir" location="${root.location}/build" />	
 	<!-- The location for solutions -->
@@ -79,17 +80,17 @@
 	</target>
 
 	<target name="-chk-bindings">
-			<uptodate property="generate-bindings.notRequired" targetfile="${src.dir}/.flagfile">
-				<srcfiles dir="${schemadir}" includes="${schemafile}"/>
-			</uptodate>
-		</target>
+		<uptodate property="generate-bindings.notRequired" targetfile="${src.dir}/.flagfile">
+			<srcfiles dir="${schemadir}" includes="${schemafile}"/>
+		</uptodate>
+	</target>
 		
-		<target name="generate-bindings" unless="generate-bindings.notRequired" depends="init" description="Create the value classes">
-			<exec executable="xjc" failonerror="true" output="xjc_log.txt">
-				<arg line="-d ${gen.dir} -p it.polito.neo4j.jaxb ${schemadir}/${schemafile}"/>
-			</exec>
-			<touch file="${src.dir}/.flagfile"/>
-		</target>
+	<target name="generate-bindings" unless="generate-bindings.notRequired" depends="init" description="Create the value classes">
+		<exec executable="xjc" failonerror="true">
+			<arg line="-d ${gen.dir} -p it.polito.neo4j.jaxb ${schemadir}/${schemafile}"/>
+		</exec>
+		<touch file="${src.dir}/.flagfile"/>
+	</target>
 	
 	<!-- The target for compiling the Verigraph application -->
 	<target name="build-service" depends="init, generate-bindings, mvn-init">
@@ -107,9 +108,7 @@
 				</classpath>
 				<src path="${src.dir}" />
 				<src path="${gen.dir}" />
-				<include name="${path.prefix}/**/*.java"/> 
-				
-				
+				<include name="${path.prefix}/**/*.java"/> 	
 		</javac>
 		<echo>Done.</echo>
 	</target>
@@ -185,6 +184,8 @@
 		<delete dir="${build.dir}" />
 		<delete dir="${gen.dir}" />
 		<delete dir="${gen-tomcat-service.dir}"/>
+		<delete dir="${war.dir}"/>
+		<delete dir="${lib.dir}"/>
 	</target>
 
 	
