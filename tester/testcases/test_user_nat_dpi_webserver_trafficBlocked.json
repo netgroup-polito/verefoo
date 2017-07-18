@@ -5,7 +5,7 @@
 	"policy_url_parameters": [
 	"?type=reachability&source=user1&destination=webserver"
 	],
-	"result": [
+	"results": [
 	"UNSAT"
 	],
 	"graph": {

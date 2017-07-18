@@ -15,8 +15,21 @@ To add a new test, just put a new .json file inside the testcases folder. The co
 - name, the name for the testcase;
 - description, an optional description;
 - policy_url_parameters, the parameters to be appended after the verification URL (including the '?' character), it is an array. 
-- result, the expected verification results, it is an array;
-- graph, the graph to be tested (the same object that you usually POST to VeriGraph to create a new graph).
+- results, the expected verification results, it is an array;
+
+In case of multiple policy_url_parameters and results:
+ ```
+   "policy_url_parameters":[
+   "?type=reachability&source=sap1&destination=webserver1",
+   "?type=reachability&source=sap3&destination=webserver1" 
+   ],
+   "results":[
+   "SAT",
+   "SAT"
+   ],
+   ```
+   
+   
 The test.py script will test each .json file contained into the testcases folder and will provide a complete output.
 The result.csv contains the verificatin results in the following way (column):
 1: source_node

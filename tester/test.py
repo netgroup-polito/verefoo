@@ -91,7 +91,7 @@ with open('result.csv', 'w') as file:
                     print("\tTEST DESCRIPTION: "+data["description"])
                     
                     requested=data["policy_url_parameters"]
-                    results=data["result"]
+                    results=data["results"]
                     
                     if(len(requested)==len(results)):
                         
@@ -124,7 +124,7 @@ with open('result.csv', 'w') as file:
                                         print("\tVerification result is " + policy.json()["result"])                                        
                                       
                                         # Check the result with the expected one
-                                        if policy.json()["result"] == data["result"][i]:
+                                        if policy.json()["result"] == data["results"][i]:
                                             # SUCCESS
                                             print("\t+++ Test passed +++")
                                             if n==0:
