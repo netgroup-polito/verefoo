@@ -13,9 +13,9 @@
 	<property name="src.dir" location="${root.location}/src" />
 	<property name="gen.dir" location="${root.location}/gen-src"/>
 	<property name="war.dir" location="${root.location}/war"/>
+	<property name="grpc.dir" value="${src.dir}/it/polito/verigraph/grpc" />
 	<property name="path.prefix" value="it/polito" />
 	<property name="build.dir" location="${root.location}/build" />	
-	<!-- The location for solutions -->
 	<property name="lib.dir" location="${root.location}/lib" />
 	<property name="schemadir" location="${root.location}/schema"/>	
 	<property name="schemafile" value="xml_components.xsd"/>
@@ -33,6 +33,7 @@
 	<path id="z3.classpath">
 		<pathelement location="${lib.dir}/com.microsoft.z3.jar"/>
 	</path>
+	
 	
 	<import file="tomcat-build.xml"/>
 
@@ -57,6 +58,10 @@
 	        <pom refid="maven.project"/>
 	        <localRepository refid="local.repository"/>
 	    </artifact:dependencies>
+		 <artifact:dependencies pathId="build.classpath" filesetId="build.fileset" >
+			        <pom refid="maven.project"/>
+			        <localRepository refid="local.repository"/>
+			    </artifact:dependencies>
 	</target>
 	
 
@@ -108,7 +113,9 @@
 				</classpath>
 				<src path="${src.dir}" />
 				<src path="${gen.dir}" />
+				<src path="${basedir}/gen-protobuf" />
 				<include name="${path.prefix}/**/*.java"/> 	
+				<exclude name="main/proto/"/>
 		</javac>
 		<echo>Done.</echo>
 	</target>
@@ -126,12 +133,15 @@
 	    	      	</copy>
 	    			<!-- copy class files to WEB-INF/classes directory -->
 	    	    	<copy toDir="${gen-tomcat-service.dir}/WEB-INF/classes" overwrite="true">
-	    	        	<fileset dir="${build.dir}"/>
+	    	        	<fileset dir="${build.dir}">
+	    	        		<exclude name="verigraph.proto"/>
+	    	        		<exclude name="src/main/proto"/>
+	    	        	</fileset>
 	    	      	</copy>
 	    			<!-- copy jsonschema folder to WEB-INF/classes directory -->
-	    		    	    	<copy toDir="${gen-tomcat-service.dir}/jsonschema" overwrite="true">
-	    		    	        	<fileset dir="${jsonschemafolder.dir}"/>
-	    		    	      	</copy>
+	    	    	<copy toDir="${gen-tomcat-service.dir}/jsonschema" overwrite="true">
+	    	        	<fileset dir="${jsonschemafolder.dir}"/>
+	    	      	</copy>
 	    			<!-- copy lib files to WEB-INF/lib directory -->
 	    	    	<copy toDir="${gen-tomcat-service.dir}/maven-lib" overwrite="true">
 	    	    		<fileset refid="runtime.fileset">	    	        		     		
@@ -164,7 +174,12 @@
 	</target>
 	 
 	<target name="generate-war" depends="war-exploded">       
-	    <war destfile="${gen-war.dir}/${serviceName}.war" basedir="${gen-tomcat-service.dir}"/>
+	    <war destfile="${gen-war.dir}/${serviceName}.war" basedir="${gen-tomcat-service.dir}">
+	    	<exclude name="protoc-dependencies/"/>
+	    	<exclude name="protoc-plugins/"/>
+	    	<exclude name="classes/"/>
+	    	<exclude/>
+	    	</war>
 	</target>
 		
 	<!-- launch test python test -->

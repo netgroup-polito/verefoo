@@ -88,23 +88,31 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 		
 	private Neo4jLibrary()
 	{
-		String neo4jDeploymentFolder =  System.getProperty("catalina.home") + "/neo4j";
-		Properties p = new Properties();
-		FileReader r;
 		try {
-			r = new FileReader(new File(System.getProperty("catalina.home")+File.separator+"/webapps/verigraph/server.properties"));
+			FileReader r;
+			Properties p = new Properties();
+			String neo4j_path = System.getProperty("catalina.home");
+			
+			if(neo4j_path != null){
+				r = new FileReader(new File(neo4j_path+File.separator+"/webapps/verigraph/server.properties"));
+			}else{
+				neo4j_path=System.getProperty("user.dir");
+				r= new FileReader(new File(neo4j_path+File.separator+"/server.properties"));
+			}
+			
 			p.load(r);
+			String pathDB = (String) p.get("graphDBPath");
+		    dbFactory = new GraphDatabaseFactory();
+		    graphDB = dbFactory.newEmbeddedDatabase(new File(neo4j_path + "/neo4j"+File.separator+pathDB));		
+		    registerShutdownHook(graphDB);
+		    obFactory = new ObjectFactory();
+		
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-	    String pathDB = (String) p.get("graphDBPath");
-		dbFactory = new GraphDatabaseFactory();
-		graphDB = dbFactory.newEmbeddedDatabase(new File(neo4jDeploymentFolder+File.separator+pathDB));		
-		registerShutdownHook(graphDB);
-		obFactory = new ObjectFactory();
 	}
 
 //	singleton class

@@ -42,7 +42,11 @@ public class VerigraphLogger {
        // logger.setUseParentHandlers(false);
         logger.setLevel(Level.INFO);
         try {
-			fileTxt = new FileHandler(System.getProperty("catalina.home")+"/logs/verigraph_log.txt");
+        	String path = System.getProperty("catalina.home");
+        	if(path != null)
+        		fileTxt = new FileHandler(path+"/logs/verigraph_log.txt");
+        	else fileTxt= new FileHandler("verigraph_log.txt");
+        	
 		} catch (SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -179,6 +179,9 @@ public class NodeService {
 		File schemaFile = new File(System.getProperty("catalina.base") + "/webapps/verigraph/jsonschema/" + schemaFileName);
 
 		if (!schemaFile.exists()) {
+			//if no REST client, try gRPC application
+			schemaFile = new File("jsonschema/" + schemaFileName);
+
 			throw new ForbiddenException("Functional type '"	+ node.getFunctional_type()
 											+ "' is not supported! Please edit 'functional_type' field of node '"
 											+ node.getName() + "'");
