@@ -17,14 +17,14 @@ How to deploy **VeriGraph** on Apache Tomcat:
 
 - edit the "to_be_defined" fields in tomcat-build.xml;
 - execute the generate-war ant task in order to generate the .war;
-- launch Tomcat 8 with the startup script `%CATALINA_HOME%\bin\startup.bat`;
+- launch Tomcat 8 with the startup script `%CATALINA_HOME%\bin\startup.bat` or by the start-tomcat task ant;
 - (optional) if you previously configured Tomcat Manager you can open a browser and navigate to [this link](http://localhost:8080/manager) and login using `tomcat/tomcat` as username/password;
 - (optional) you can deploy/undeploy/redeploy the downloaded WARs through the web interface.
 
 
 **Ant script**
 
-Edit the "to_be_defined" fields of the tomcat-build.xml. Set server.location property to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30);
+Edit the "to_be_defined" fields of the tomcat-build.xml. (e.g. name="tomcatUsername" value="tomcat" and name="tomcatPassword" value="tomcat" the values set in 'tomcat-users'). Set server.location property to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30);
 
 Verigraph target:
 
@@ -32,13 +32,13 @@ Verigraph target:
 
 - generate-binding: it generates the JAXB classes from xml_components schema;
 
-- run-test: tt runs the tests in tester folder. It is possible to choose the iterations number for each verification request by launching the test with "-Diteration=n run-test" where n is the number of iterations you want;
-
 - start-tomcat : it starts the Apache Tomcat;
 
 - deployWS: it deploys the verigraph.war file contained in verigraph/war folder;
 
 - startWS: it starts the webservice;
+
+- run-test: it runs the tests in tester folder. It is possible to choose the iterations number for each verification request by launching the test with "-Diteration=n run-test" where n is the number of iterations you want;
 
 - stopWS: it stops the webservice;
 
@@ -90,9 +90,9 @@ e.g.
 e.g.  
 `export JDK_HOME=/home/mininet/jdk1.8.0_92`
 - `exec bash`
-- edit the "to_be_defined" fields in tomcat-build.xml;
+- edit the "to_be_defined" fields in tomcat-build.xml (e.g. name="tomcatUsername" value="tomcat" and name="tomcatPassword" value="tomcat" the values set in 'tomcat-users'). Set server.location property to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30)
 - execute the generate-war ant task in order to generate the .war;
-- launch Tomcat 8 with the startup script `$CATALINA_HOME/bin/startup.sh`
+- launch Tomcat 8 with the startup script `$CATALINA_HOME/bin/startup.sh` or with start-tomcat ant tast
 - open a browser and navigate to [this link](http://localhost:8080/manager) and login using `tomcat/tomcat` as username/password
 - you can deploy/undeploy/redeploy the downloaded WARs through the web interface
 
@@ -106,14 +106,14 @@ e.g.
     - double-click on the newly created server in the `Servers` tab
     - make sure under `Server Locations` `Use Tomcat installation` is selected  
 - Run the server
-- edit the "to_be_defined" fields in tomcat-build.xml;
+- edit the "to_be_defined" fields in tomcat-build.xml (e.g. name="tomcatUsername" value="tomcat" and name="tomcatPassword" value="tomcat" the values set in 'tomcat-users'). Set server.location property to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30);
 - execute the generate-war ant task in order to generate the .war;
 
 **How to add you own function `<type>`**
 
 1. under the the `it.polito.verigraph.mcnet.netobjs` package create a new class `<Type>.java`, where `<type>` is the desired function name (i.e. `<type>` will be added to the supported node functional types) which extends `NetworkObject` and implement the desired logic
 
-2. under `/verigraph/json/` create a file `<type>.json`. This file represents a JSON schema \(see [here](http://json-schema.org/) the official documentation\). For compatibility with the other functions it is mandatory to support an array as the root of the configuration, but feel free to specify all the other constraints as needed. A sample of `<type>.json` to describe an empty configuration could be the following:
+2. under `/verigraph/jsonschema/` create a file `<type>.json`. This file represents a JSON schema \(see [here](http://json-schema.org/) the official documentation\). For compatibility with the other functions it is mandatory to support an array as the root of the configuration, but feel free to specify all the other constraints as needed. A sample of `<type>.json` to describe an empty configuration could be the following:
 
   ```json
   {
@@ -183,11 +183,24 @@ To add a new test, just put a new .json file inside the testcases folder. The co
 - name, the name for the testcase;
 - description, an optional description;
 - policy_url_parameters, the parameters to be appended after the verification URL (including the '?' character), it is an array. 
-- result, the expected verification results, it is an array;
+- results, the expected verification results, it is an array;
 - graph, the graph to be tested (the same object that you usually POST to VeriGraph to create a new graph).
 
+In case of multiple policy_url_parameters and results:
+ ```
+   "policy_url_parameters":[
+   "?type=reachability&source=sap1&destination=webserver1",
+   "?type=reachability&source=sap3&destination=webserver1" 
+   ],
+   "results":[
+   "SAT",
+   "SAT"
+   ],
+   ```
+
 The test.py script will test each .json file contained into the testcases folder and will provide a complete output.
-The result.csv contains the verificatin results in the following way (column):
+The result.csv contains the verification results in the following way (column):
+
 -source_node;
 -destination_node;
 -graph_id;
@@ -196,3 +209,4 @@ The result.csv contains the verificatin results in the following way (column):
 -the execution time for each execution of the verification.
 
 It is possible to do several verification for each request in the policy_url_paramters. You have to launch the ant run-test with "-Diteration=n run-test" or by commandline with "testpy -iteration n" where n is the iterations number you want.
+
