@@ -1,11 +1,14 @@
 {  
    "id":6,
    "name":"budapest_test_case_sat",
-   "description":"This test case verifies budapest scenario, chain sap1->webserver1",
+   "description":"This test case verifies budapest scenario, chain sap1->webserver1",   
    "policy_url_parameters":[
-   "?type=reachability&source=sap1&destination=webserver1"
+   "?type=reachability&source=sap1&destination=webserver1",
+   "?type=reachability&source=sap3&destination=webserver1" 
    ],
-   "result":["SAT"
+   "results":[
+   "SAT",
+   "SAT"
    ],
    "graph": {  
       "nodes":[  
