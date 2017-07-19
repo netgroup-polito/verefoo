@@ -137,7 +137,7 @@ public class GrpcTest {
 	@Test
 	public void test3Node() throws Exception {
 		NodeGrpc ufoundedGraph = NodeGrpc.newBuilder()
-				.setErrorMessage("Node with id 1 not found in graph with id 1").build();
+				.setErrorMessage("There is no Graph whose Id is '1'").build();
 
 		// graph not found in the server
 		NodeGrpc node = client.getNode(1, 1);//id not present
@@ -224,7 +224,7 @@ public class GrpcTest {
 	@Test
 	public void test5Neighbours() throws Exception {
 		NeighbourGrpc ufoundedNeighbour = NeighbourGrpc.newBuilder()
-				.setErrorMessage("Neighbour with id 1 not found for node with id 1 in graph with id 1").build();;
+				.setErrorMessage("There is no Graph whose Id is '1'").build();;
 
 		// Neighbour not found in the server
 		NeighbourGrpc neighbour = client.getNeighbour(1, 1, 1);//id not present

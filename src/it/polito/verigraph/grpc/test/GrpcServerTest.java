@@ -31,9 +31,11 @@ import com.google.protobuf.Descriptors.FieldDescriptor;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Unit tests for {@link Service}.
@@ -71,7 +73,7 @@ public class GrpcServerTest {
 			count++;
 			stub.deleteGraph(RequestID.newBuilder().setIdGraph(iter.next().getId()).build());
 		}
-		System.out.println("Number of graphs deleted = "+count);
+		//System.out.println("Number of graphs deleted = "+count);
 		
 	}
 	
@@ -135,23 +137,28 @@ public class GrpcServerTest {
 		g4 = GraphGrpc.newBuilder(g4).setId(g4_id).build();
 		// run
 		Iterator<GraphGrpc> graphs = stub.getGraphs(request);
-
+		
+		while(graphs.hasNext()){
+			graphs.next();
+		}
+		
 		if(graphs.hasNext()){
-		assertEquals(graphs.next(), g1);
-		assertEquals(graphs.next(), g2);
-		assertEquals(graphs.next(), g3);
-		assertEquals(graphs.next(), g4);
-		
-		
-		//deleteGraph
-		RequestID req = RequestID.newBuilder().setIdGraph(g1.getId()).build();
-		stub.deleteGraph(req);
-		// run
-		graphs = stub.getGraphs(request);
-
-		assertEquals(graphs.next(), g2);
-		assertEquals(graphs.next(), g3);
-		assertEquals(graphs.next(), g4);
+			graphs.next();
+			assertEquals(graphs.next(), g1);
+			assertEquals(graphs.next(), g2);
+			assertEquals(graphs.next(), g3);
+			assertEquals(graphs.next(), g4);
+			
+			
+			//deleteGraph
+			RequestID req = RequestID.newBuilder().setIdGraph(g1.getId()).build();
+			stub.deleteGraph(req);
+			// run
+			graphs = stub.getGraphs(request);
+	
+			assertEquals(graphs.next(), g2);
+			assertEquals(graphs.next(), g3);
+			assertEquals(graphs.next(), g4);
 		}
 	}
 	
@@ -183,7 +190,7 @@ public class GrpcServerTest {
 		long node_id = response.getNode().getId();
 		//addedNode = response.getNode();
 		
-		request = RequestID.newBuilder().setIdGraph(g2_id).setIdNode(node_id).build() ;	
+		request = RequestID.newBuilder().setIdGraph(g2_id).setIdNode(addedNode.getId()).build() ;	
 		node = stub.getNode(request);
 
 		assertEquals(addedNode.getId(), node.getId());
@@ -212,112 +219,184 @@ public class GrpcServerTest {
 		assertEquals(status.getSuccess(),true);
 	}
 
-//	@Test
-//	public void test4Nodes() throws Exception {
-//		// setup
-//		RequestID request = RequestID.newBuilder().setIdGraph(2).build();
-//		NodeGrpc n1 = NodeGrpc.newBuilder(Client.createNodeGrpc("Node5", "endhost", null, null))
-//				.setIdGraph(2).build(); 
-//		NodeGrpc n2 =  NodeGrpc.newBuilder(Client.createNodeGrpc("Node3", "endhost", null, null))
-//				.setIdGraph(2).build(); 
-//		NodeGrpc n3 =  NodeGrpc.newBuilder(Client.createNodeGrpc("Node4", "endhost", null, null))
-//				.setIdGraph(2).build();
-//		NodeGrpc n4 =  NodeGrpc.newBuilder(Client.createNodeGrpc("client", "endhost", null, null))
-//				.setIdGraph(2).build(); 
-//		
-//		VerigraphGrpc.VerigraphBlockingStub stub = VerigraphGrpc.newBlockingStub(inProcessChannel);
-//
-//		stub.createNode(n1);
-//		stub.createNode(n2);
-//		stub.createNode(n3);
-//		stub.createNode(n4);
-//		n1 = NodeGrpc.newBuilder(n1).setId(2).setIdGraph(0).build();
-//		n2 = NodeGrpc.newBuilder(n2).setId(3).setIdGraph(0).build();
-//		n3 = NodeGrpc.newBuilder(n3).setId(4).setIdGraph(0).build();		
-//		n4 = NodeGrpc.newBuilder(n4).setId(5).setIdGraph(0).build();
-//		// run
-//		Iterator<NodeGrpc> nodes = stub.getNodes(request);
-//
-//		//nodes.next();
-//		assertEquals(nodes.next(), n1);
-//		assertEquals(nodes.next(), n2);
-//		assertEquals(nodes.next(), n3);
-//		assertEquals(nodes.next(), n4);
-//		
-//		//deleteNode
-//		RequestID req = RequestID.newBuilder().setIdGraph(2).setIdNode(1).build();
-//		stub.deleteNode(req);
-//		// run
-//		nodes = stub.getNodes(request);
-//
-//		assertEquals(nodes.next(), n1);
-//		assertEquals(nodes.next(), n2);
-//		assertEquals(nodes.next(), n3);
-//		assertEquals(nodes.next(), n4);
-//	}
-//	
-//	@Test
-//	public void test5Neighbours() throws Exception {
-//		RequestID request = RequestID.newBuilder().setIdGraph(2).setIdNode(2).setIdNeighbour(1).build() ;//id not present
-//		NeighbourGrpc ufoundedNeighbour = NeighbourGrpc.newBuilder()
-//						.setErrorMessage("Neighbour with id 1 not found for node with id 2 in graph with id 2").build();;
-//		VerigraphGrpc.VerigraphBlockingStub stub = VerigraphGrpc.newBlockingStub(inProcessChannel);
-//
-//		// Neighbour not found in the server
-//		NeighbourGrpc neighbour = stub.getNeighbour(request);
-//		
-//		assertEquals(ufoundedNeighbour, neighbour);
-//
-//		// getNeighbour, but first add it
-//		NeighbourGrpc addedNeighbour = NeighbourGrpc.newBuilder().setIdGraph(2).setIdNode(2)
-//										.setName("client").build();
-//		NewNeighbour response = stub.createNeighbour(addedNeighbour);
-//		addedNeighbour = response.getNeighbour();
-//		request = RequestID.newBuilder().setIdGraph(2).setIdNode(2)
-//						.setIdNeighbour(addedNeighbour.getId()).build();	
-//		neighbour = stub.getNeighbour(request);
-//
-//		assertEquals(addedNeighbour.getId(), neighbour.getId());
-//
-//		//updateNeighbour
-//		NeighbourGrpc updatedNeighbour = Client.createNeighbourGrpc("Node4");
-//		NeighbourGrpc nu = NeighbourGrpc.newBuilder(updatedNeighbour)
-//				.setId(response.getNeighbour().getId()).setIdGraph(2).setIdNode(2).build();
+	@Test
+	public void test4Nodes() throws Exception {
+		System.out.println("[DEBUG] test4Graphs starts");
+		deleteGraphs();
+		
+		VerigraphGrpc.VerigraphBlockingStub stub = VerigraphGrpc.newBlockingStub(inProcessChannel);
+		
+		GraphGrpc g2 = GraphGrpc.newBuilder().build(); 
+		NewGraph g2_new = stub.createGraph(g2);
+		long g2_id = g2_new.getGraph().getId();
+		
+		// setup
+		RequestID request = RequestID.newBuilder().setIdGraph(g2_id).build();
+		NodeGrpc n1 = NodeGrpc.newBuilder(Client.createNodeGrpc("Node5", "endhost", null, null))
+				.setIdGraph(g2_id).build(); 
+		NodeGrpc n2 =  NodeGrpc.newBuilder(Client.createNodeGrpc("Node3", "endhost", null, null))
+				.setIdGraph(g2_id).build(); 
+		NodeGrpc n3 =  NodeGrpc.newBuilder(Client.createNodeGrpc("Node4", "endhost", null, null))
+				.setIdGraph(g2_id).build();
+		NodeGrpc n4 =  NodeGrpc.newBuilder(Client.createNodeGrpc("client", "endhost", null, null))
+				.setIdGraph(g2_id).build(); 
+		
+		NewNode nn1= stub.createNode(n1);
+		NewNode nn2= stub.createNode(n2);
+		NewNode nn3= stub.createNode(n3);
+		NewNode nn4= stub.createNode(n4);
+		
+		n1 = NodeGrpc.newBuilder(n1).setId(nn1.getNode().getId()).setIdGraph(g2_id).build();
+		n2 = NodeGrpc.newBuilder(n2).setId(nn2.getNode().getId()).setIdGraph(g2_id).build();
+		n3 = NodeGrpc.newBuilder(n3).setId(nn3.getNode().getId()).setIdGraph(g2_id).build();		
+		n4 = NodeGrpc.newBuilder(n4).setId(nn4.getNode().getId()).setIdGraph(g2_id).build();
+		
+		// run
+		Iterator<NodeGrpc> nodes = stub.getNodes(request);
+		
+		while(nodes.hasNext()){
+			nodes.next();
+//			System.out.println("[DEBUG - TEST4] graph loaded: " + nodes.next());
+		}
+
+		if(nodes.hasNext()){
+		assertEquals(nodes.next(), n1);
+		assertEquals(nodes.next(), n2);
+		assertEquals(nodes.next(), n3);
+		assertEquals(nodes.next(), n4);
+		}
+		
+		//deleteNode
+		RequestID req = RequestID.newBuilder().setIdGraph(g2_id).setIdNode(n1.getId()).build();
+		stub.deleteNode(req);
+		// run
+		nodes = stub.getNodes(request);
+		
+		while(nodes.hasNext()){
+			nodes.next();
+//			System.out.println("[DEBUG - TEST4] graph loaded: " + nodes.next());
+		}
+
+		if(nodes.hasNext()){
+		//assertEquals(nodes.next(), n1);
+		assertEquals(nodes.next(), n2);
+		assertEquals(nodes.next(), n3);
+		assertEquals(nodes.next(), n4);
+		}
+	}
+	
+	@Test
+	public void test5Neighbours() throws Exception {
+		System.out.println("[DEBUG] test5Graphs starts");
+		deleteGraphs();
+		
+		VerigraphGrpc.VerigraphBlockingStub stub = VerigraphGrpc.newBlockingStub(inProcessChannel);
+		
+		GraphGrpc g2 = GraphGrpc.newBuilder().build(); 
+		NewGraph g2_new = stub.createGraph(g2);
+		long g2_id = g2_new.getGraph().getId();
+		
+		NodeGrpc n1 = NodeGrpc.newBuilder().setName("Node1").setIdGraph(g2_id).setFunctionalType(FunctionalType.endhost).build();
+		NewNode new_n1 = stub.createNode(n1);
+		long n1_id = new_n1.getNode().getId();
+		
+		NodeGrpc n2 = NodeGrpc.newBuilder().setName("client").setIdGraph(g2_id).setFunctionalType(FunctionalType.endhost).build();
+		NewNode new_n2 = stub.createNode(n2);
+		long n2_id = new_n2.getNode().getId();
+		
+		RequestID request = RequestID.newBuilder().setIdGraph(g2_id).setIdNode(n1_id).setIdNeighbour(1).build() ;//id not present
+		NeighbourGrpc ufoundedNeighbour = NeighbourGrpc.newBuilder()
+						.setErrorMessage("Neighbour with id 1 not found for node with id "+n1_id+" in graph with id "+g2_id).build();;
+
+		// Neighbour not found in the server
+		NeighbourGrpc neighbour = stub.getNeighbour(request);
+		
+		assertEquals(ufoundedNeighbour, neighbour);
+
+		// getNeighbour, but first add it
+		NeighbourGrpc addedNeighbour = NeighbourGrpc.newBuilder().setIdGraph(g2_id).setIdNode(n1_id).setName("client").build();
+		NewNeighbour response = stub.createNeighbour(addedNeighbour);
+		addedNeighbour = response.getNeighbour();
+		request = RequestID.newBuilder().setIdGraph(g2_id).setIdNode(n1_id)
+						.setIdNeighbour(addedNeighbour.getId()).build();	
+		neighbour = stub.getNeighbour(request);
+
+		assertEquals(addedNeighbour.getId(), neighbour.getId());
+		
+		NodeGrpc updatedNode = NodeGrpc.newBuilder().setName("Node4").setIdGraph(g2_id).setId(n2_id)
+				.setFunctionalType(FunctionalType.endhost).build();
+		
+		//updateNeighbour
+		NewNode response_node = stub.updateNode(updatedNode);
+		assertEquals(response_node.getSuccess(),true);
+		
+//		NeighbourGrpc nu = NeighbourGrpc.newBuilder().setName("Node4")
+//				.setId(addedNeighbour.getId()).setIdGraph(g2_id).setIdNode(n1_id).build();
 //		response = stub.updateNeighbour(nu);
-//
-//		assertEquals(response.getSuccess(),true);
-//		assertEquals(response.getNeighbour().getName(),"Node4");
-//	}
-//
-//	@Test
-//	public void test6Neighbours() throws Exception {
-//		// setup
-//		RequestID request = RequestID.newBuilder().setIdGraph(2).setIdNode(2).build();
-//		NeighbourGrpc n1 = NeighbourGrpc.newBuilder().setIdGraph(2).setIdNode(2)
-//							.setName("Node3").build(); 
-//		NeighbourGrpc n2 = NeighbourGrpc.newBuilder().setIdGraph(2).setIdNode(2)
-//							.setName("client").build(); 
-//		
-//		VerigraphGrpc.VerigraphBlockingStub stub = VerigraphGrpc.newBlockingStub(inProcessChannel);
-//
-//		stub.createNeighbour(n1);
-//		stub.createNeighbour(n2);
-//		n1 = NeighbourGrpc.newBuilder(n1).setId(2).setIdGraph(0).setIdNode(0).build();		
-//		n2 = NeighbourGrpc.newBuilder(n2).setId(3).setIdGraph(0).setIdNode(0).build();
-//		// run
-//		Iterator<NeighbourGrpc> neighbours = stub.getNeighbours(request);
-//
-//		neighbours.next();
-//		assertEquals(neighbours.next(), n1);
-//		assertEquals(neighbours.next(), n2);
-//		
-//		//deleteNeighbour
-//		RequestID req = RequestID.newBuilder().setIdGraph(2).setIdNode(2).setIdNeighbour(1).build();
-//		stub.deleteNeighbour(req);
-//		// run
-//		neighbours = stub.getNeighbours(request);
-//
-//		assertEquals(neighbours.next(), n1);
-//		assertEquals(neighbours.next(), n2);
-//	}
+//		System.out.println(response);
+
+		request = RequestID.newBuilder().setIdGraph(g2_id).setIdNode(n1_id)
+				.setIdNeighbour(addedNeighbour.getId()).build();	
+		neighbour = stub.getNeighbour(request);
+		assertEquals(neighbour.getName(),"Node4");
+	}
+
+	@Test
+	public void test6Neighbours() throws Exception {
+		System.out.println("[DEBUG] test6Graphs starts");
+		deleteGraphs();
+		
+		VerigraphGrpc.VerigraphBlockingStub stub = VerigraphGrpc.newBlockingStub(inProcessChannel);
+		// setup
+		GraphGrpc g2 = GraphGrpc.newBuilder().build(); 
+		NewGraph g2_new = stub.createGraph(g2);
+		long g2_id = g2_new.getGraph().getId();
+		
+		NodeGrpc node1 = NodeGrpc.newBuilder().setName("Node1").setFunctionalType(FunctionalType.endhost).build();
+		NewNode new_n1 = stub.createNode(node1);
+		long n1_id = new_n1.getNode().getId();
+		
+		
+		
+		NeighbourGrpc n1 = NeighbourGrpc.newBuilder().setIdGraph(g2_id).setIdNode(n1_id)
+							.setName("Node3").build(); 
+		NeighbourGrpc n2 = NeighbourGrpc.newBuilder().setIdGraph(g2_id).setIdNode(n1_id)
+							.setName("client").build(); 
+		
+
+		stub.createNeighbour(n1);
+		stub.createNeighbour(n2);
+		n1 = NeighbourGrpc.newBuilder(n1).setId(2).setIdGraph(g2_id).setIdNode(n1_id).build();		
+		n2 = NeighbourGrpc.newBuilder(n2).setId(3).setIdGraph(g2_id).setIdNode(n1_id).build();
+		// run
+		RequestID request = RequestID.newBuilder().setIdGraph(g2_id).setIdNode(n1_id).build();
+		Iterator<NeighbourGrpc> neighbours = stub.getNeighbours(request);
+		
+		while(neighbours.hasNext()){
+			neighbours.next();
+		}
+
+		if(neighbours.hasNext()){
+			assertEquals(neighbours.next(), n1);
+			assertEquals(neighbours.next(), n2);
+		}
+		
+		//deleteNeighbour
+		RequestID req = RequestID.newBuilder().setIdGraph(g2_id).setIdNode(n1_id).setIdNeighbour(n1.getId()).build();
+		stub.deleteNeighbour(req);
+		// run
+		neighbours = stub.getNeighbours(request);
+
+		while(neighbours.hasNext()){
+			neighbours.next();
+		}
+		
+		if(neighbours.hasNext()){
+		assertEquals(neighbours.next(), n1);
+		assertEquals(neighbours.next(), n2);
+		}
+	}
+	
+
+	
 }

@@ -60,7 +60,7 @@ public class Service {
 	  }
 	  
 	  public void start() throws IOException {
-		  FileHandler fileTxt = new FileHandler("grpc_server_log.txt", true);
+		  FileHandler fileTxt = new FileHandler("grpc_server_log.txt");
 		  SimpleFormatter formatterTxt = new SimpleFormatter();
 		  fileTxt.setFormatter(formatterTxt);
 	      logger.addHandler(fileTxt);
