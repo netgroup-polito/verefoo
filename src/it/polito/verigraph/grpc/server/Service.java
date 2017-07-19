@@ -3,8 +3,10 @@ package it.polito.verigraph.grpc.server;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -58,6 +60,10 @@ public class Service {
 	  }
 	  
 	  public void start() throws IOException {
+		  FileHandler fileTxt = new FileHandler("grpc_server_log.txt", true);
+		  SimpleFormatter formatterTxt = new SimpleFormatter();
+		  fileTxt.setFormatter(formatterTxt);
+	      logger.addHandler(fileTxt);
 		  server.start();
 		  logger.info("Server started, listening on "+ port);
 		  Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -94,7 +100,7 @@ public class Service {
 		  }
 	  }
 
-	  /**Here start method of my impementation*/
+	  /**Here start method of my implementation*/
 	  private class VerigraphImpl extends VerigraphGrpc.VerigraphImplBase{
 
 		  /** Here start methods of GraphResource*/
@@ -122,10 +128,13 @@ public class Service {
 				  response.setSuccess(true).setGraph(GrpcUtils.obtainGraph(newGraph));
 			  }catch(BadRequestException ex){
 				  response.setSuccess(false).setErrorMessage(ex.getMessage());
+				  logger.log(Level.WARNING, ex.getClass().toString());
 				  logger.log(Level.WARNING, ex.getMessage());
+				  
 			  }	
 			  catch(Exception ex){
 				  response.setSuccess(false).setErrorMessage(internalError);
+				  logger.log(Level.WARNING, ex.getClass().toString());
 				  logger.log(Level.WARNING, ex.getMessage());
 			  }			
 			  responseObserver.onNext(response.build());

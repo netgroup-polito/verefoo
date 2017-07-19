@@ -180,11 +180,13 @@ public class NodeService {
 
 		if (!schemaFile.exists()) {
 			//if no REST client, try gRPC application
-			schemaFile = new File("jsonschema/" + schemaFileName);
-
+			schemaFile = new File(System.getProperty("user.dir") + "/jsonschema/" + schemaFileName);
+			
+			if (!schemaFile.exists()) {
 			throw new ForbiddenException("Functional type '"	+ node.getFunctional_type()
 											+ "' is not supported! Please edit 'functional_type' field of node '"
 											+ node.getName() + "'");
+			}
 		}
 
 		JsonSchema schemaNode = null;

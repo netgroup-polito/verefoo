@@ -95,6 +95,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			
 			if(neo4j_path != null){
 				r = new FileReader(new File(neo4j_path+File.separator+"/webapps/verigraph/server.properties"));
+				
 			}else{
 				neo4j_path=System.getProperty("user.dir");
 				r= new FileReader(new File(neo4j_path+File.separator+"/server.properties"));
@@ -104,6 +105,7 @@ public class Neo4jLibrary implements Neo4jDBInteraction
 			String pathDB = (String) p.get("graphDBPath");
 		    dbFactory = new GraphDatabaseFactory();
 		    graphDB = dbFactory.newEmbeddedDatabase(new File(neo4j_path + "/neo4j"+File.separator+pathDB));		
+		    VerigraphLogger.logger.info("Database location is "+ neo4j_path + "/neo4j"+File.separator+pathDB);
 		    registerShutdownHook(graphDB);
 		    obFactory = new ObjectFactory();
 		

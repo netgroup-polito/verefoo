@@ -52,17 +52,17 @@ public class Client {
 			graphs = blockingStub.getGraphs(request);
 			while (graphs.hasNext()) {	
 				GraphGrpc graph = graphs.next();
-				System.out.println("Graph id : "+graph.getId());			
+				System.out.println("[getGraphs] Graph id : "+graph.getId());			
 				if(graph.getErrorMessage().equals("")){
-					System.out.println("Node id : "+graph.getId());
+					System.out.println("[getGraphs] Node id : "+graph.getId());
 					graphsRecveived.add(graph);
 				}else{
-					System.out.println("Error : " + graph.getErrorMessage());
+					System.out.println("[getGraphs] Error : " + graph.getErrorMessage());
 					return graphsRecveived;
 				}
 			}
 		} catch (StatusRuntimeException ex) {
-			System.err.println("RPC failed: " + ex.getStatus());
+			System.err.println("[getGraphs] RPC failed: " + ex.getStatus());
 		}
 		return graphsRecveived;
 	}
@@ -73,12 +73,12 @@ public class Client {
 		try {
 			response = blockingStub.createGraph(gr);
 			if(response.getSuccess()){
-				System.out.println("Successful operation ");
+				System.out.println("[createGraph Successful operation ");
 			}else{
-				System.out.println("Unsuccessful operation: " + response.getErrorMessage());
+				System.out.println("[createGraph] Unsuccessful operation: " + response.getErrorMessage());
 			}
 		} catch (StatusRuntimeException e) {
-			System.err.println("RPC failed: " + e.getStatus());
+			System.err.println("[createGraph] RPC failed: " + e.getStatus());
 			return NewGraph.newBuilder().setSuccess(false).build();
 		}
 		return response;
@@ -92,13 +92,13 @@ public class Client {
 		try {
 			response = blockingStub.deleteGraph(id);
 			if(response.getSuccess()){
-				System.out.println("Successful operation ");
+				System.out.println("[deleteGraph] Successful operation ");
 				return true;
 			}else{
-				System.out.println("Unsuccessful operation: " + response.getErrorMessage());
+				System.out.println("[deleteGraph] Unsuccessful operation: " + response.getErrorMessage());
 			}
 		} catch (StatusRuntimeException e) {
-			System.err.println("RPC failed: " + e.getStatus());
+			System.err.println("[deleteGraph] RPC failed: " + e.getStatus());
 		}
 		return false;
 	}
@@ -111,12 +111,12 @@ public class Client {
 		try {
 			response = blockingStub.updateGraph(gr);
 			if(response.getSuccess()){
-				System.out.println("Successful operation ");
+				System.out.println("[updateGraph] Successful operation ");
 			}else{
-				System.out.println("Unsuccessful operation: " + response.getErrorMessage());				
+				System.out.println("[updateGraph] Unsuccessful operation: " + response.getErrorMessage());				
 			}
 		} catch (StatusRuntimeException e) {
-			System.err.println("RPC failed: " + e.getStatus());
+			System.err.println("[updateGraph] RPC failed: " + e.getStatus());
 			return NewGraph.newBuilder().setSuccess(false).build();
 		}
 		return response;
@@ -129,11 +129,11 @@ public class Client {
 		try {
 			GraphGrpc graph = blockingStub.getGraph(request);
 			if(!graph.getErrorMessage().equals("")){
-				System.out.println("Error in operation: " + graph.getErrorMessage());	
+				System.out.println("[getGraph] Error in operation: " + graph.getErrorMessage());	
 			}
 			return graph;
 		} catch (StatusRuntimeException ex) {
-			System.err.println("RPC failed: " + ex.getStatus());
+			System.err.println("[getGraph] RPC failed: " + ex.getStatus());
 			return null;
 		}
 	}
@@ -145,10 +145,10 @@ public class Client {
 		try {
 			response = blockingStub.verifyPolicy(policy);
 			if(!response.getErrorMessage().equals("")){
-				System.out.println("Error in operation: " + response.getErrorMessage());	
+				System.out.println("[verify] Error in operation: " + response.getErrorMessage());	
 			}
-			System.out.println("Result : "+response.getResult());
-			System.out.println("Comment : "+response.getComment());
+			System.out.println("[verify] Result : "+response.getResult());
+			System.out.println("[verify] Comment : "+response.getComment());
 			//uncomment if you want to print the paths
 			/*for(TestGrpc test:response.getTestList()){
 				System.out.println("Test : "+test.getResult()+". Traversed nodes:");
@@ -159,7 +159,7 @@ public class Client {
 			}*/
 			return response;
 		} catch (StatusRuntimeException e) {
-			System.err.println("RPC failed: " + e.getStatus());
+			System.err.println("[verify] RPC failed: " + e.getStatus());
 			return null;
 		}
 	}
@@ -176,15 +176,15 @@ public class Client {
 			while (nodes.hasNext()) {	
 				NodeGrpc node = nodes.next();
 				if(node.getErrorMessage().equals("")){
-					System.out.println("Node id : "+node.getId());
+					System.out.println("[getNodes] Node id : "+node.getId());
 					nodesReceived.add(node);
 				}else{
-					System.out.println("Error : " + node.getErrorMessage());
+					System.out.println("[getNodes] Error : " + node.getErrorMessage());
 					return nodesReceived;
 				}	
 			}
 		} catch (StatusRuntimeException ex) {
-			System.err.println("RPC failed: " + ex.getStatus());
+			System.err.println("[getNodes] RPC failed: " + ex.getStatus());
 		}
 		return nodesReceived;
 	}
@@ -197,12 +197,12 @@ public class Client {
 			NodeGrpc n = NodeGrpc.newBuilder(node).setIdGraph(idGraph).build();
 			response = blockingStub.createNode(n);
 			if(response.getSuccess()){
-				System.out.println("Successful operation ");				
+				System.out.println("[createNode] Successful operation ");				
 			}else{
-				System.out.println("Unsuccessful operation: " + response.getErrorMessage());
+				System.out.println("[createNode] Unsuccessful operation: " + response.getErrorMessage());
 			}
 		} catch (StatusRuntimeException e) {
-			System.err.println("RPC failed: " + e.getStatus());
+			System.err.println("[createNode] RPC failed: " + e.getStatus());
 			return NewNode.newBuilder().setSuccess(false).build();
 		}
 		return response;
@@ -216,13 +216,13 @@ public class Client {
 		try {
 			response = blockingStub.deleteNode(id);
 			if(response.getSuccess()){
-				System.out.println("Successful operation ");
+				System.out.println("[deleteNode] Successful operation ");
 				return true;
 			}else{
-				System.out.println("Unsuccessful operation: " + response.getErrorMessage());
+				System.out.println("[deleteNode] Unsuccessful operation: " + response.getErrorMessage());
 			}
 		} catch (StatusRuntimeException e) {
-			System.err.println("RPC failed: " + e.getStatus());
+			System.err.println("[deleteNode] RPC failed: " + e.getStatus());
 		}
 		return false;
 	}
@@ -235,12 +235,12 @@ public class Client {
 		try {
 			response = blockingStub.updateNode(nu);
 			if(response.getSuccess()){
-				System.out.println("Successful operation ");
+				System.out.println("[updateNode] Successful operation ");
 			}else{
-				System.out.println("Unsuccessful operation: " + response.getErrorMessage());
+				System.out.println("[updateNode] Unsuccessful operation: " + response.getErrorMessage());
 			}
 		} catch (StatusRuntimeException e) {
-			System.err.println("RPC failed: " + e.getStatus());
+			System.err.println("[updateNode] RPC failed: " + e.getStatus());
 			return NewNode.newBuilder().setSuccess(false).build();
 		}
 		return response;
@@ -253,11 +253,11 @@ public class Client {
 		try {
 			NodeGrpc node = blockingStub.getNode(request);	
 			if(!node.getErrorMessage().equals("")){
-				System.out.println("Error in operation: " + node.getErrorMessage());	
+				System.out.println("[getNode] Error in operation: " + node.getErrorMessage());	
 			}
 			return 	node;	
 		} catch (StatusRuntimeException ex) {
-			System.err.println("RPC failed: " + ex.getStatus());
+			System.err.println("[getNode] RPC failed: " + ex.getStatus());
 			return null;
 		}
 	}
@@ -271,13 +271,13 @@ public class Client {
 			
 			Status response = blockingStub.configureNode(request);
 			if(response.getSuccess()){
-				System.out.println("Successful operation ");
+				System.out.println("[configureNode] Successful operation ");
 				return true;
 			}else{
-				System.out.println("Unsuccessful operation: " + response.getErrorMessage());
+				System.out.println("[configureNode] Unsuccessful operation: " + response.getErrorMessage());
 			}
 		} catch (StatusRuntimeException e) {
-			System.err.println("RPC failed: " + e.getStatus());	
+			System.err.println("[configureNode] RPC failed: " + e.getStatus());	
 		}
 		return false;
 	}
@@ -295,15 +295,15 @@ public class Client {
 			while (neighbours.hasNext()) {
 				NeighbourGrpc neighbour = neighbours.next();					
 				if(neighbour.getErrorMessage().equals("")){
-					System.out.println("Neighbour id : "+neighbour.getId());
+					System.out.println("[getNeighbours] Neighbour id : "+neighbour.getId());
 					neighboursReceived.add(neighbour);
 				}else{
-					System.out.println("Error : " + neighbour.getErrorMessage());
+					System.out.println("[getNeighbours] Error : " + neighbour.getErrorMessage());
 					return neighboursReceived;
 				}
 			}
 		} catch (StatusRuntimeException ex) {
-			System.err.println("RPC failed: " + ex.getStatus());
+			System.err.println("[getNeighbours] RPC failed: " + ex.getStatus());
 		}
 		return neighboursReceived;
 	}
@@ -317,12 +317,12 @@ public class Client {
 					.setIdNode(idNode).build();
 			response = blockingStub.createNeighbour(n);
 			if(response.getSuccess()){
-				System.out.println("Successful operation ");
+				System.out.println("[createNeighbour] Successful operation ");
 			}else{
-				System.out.println("Unsuccessful operation: " + response.getErrorMessage());
+				System.out.println("[createNeighbour] Unsuccessful operation: " + response.getErrorMessage());
 			}
 		} catch (StatusRuntimeException e) {
-			System.err.println("RPC failed: " + e.getStatus());
+			System.err.println("[createNeighbour] RPC failed: " + e.getStatus());
 			return NewNeighbour.newBuilder().setSuccess(false).build();
 		}
 		return response;
@@ -336,13 +336,13 @@ public class Client {
 		try {
 			response = blockingStub.deleteNeighbour(id);
 			if(response.getSuccess()){
-				System.out.println("Successful operation ");
+				System.out.println("[deleteNeighbour] Successful operation ");
 				return true;
 			}else{
-				System.out.println("Unsuccesful operation: " + response.getErrorMessage());
+				System.out.println("[deleteNeighbour] Unsuccesful operation: " + response.getErrorMessage());
 			}
 		} catch (StatusRuntimeException e) {
-			System.err.println("RPC failed: " + e.getStatus());
+			System.err.println("[deleteNeighbour] RPC failed: " + e.getStatus());
 		}
 		return false;
 	}
@@ -356,12 +356,12 @@ public class Client {
 		try {
 			response = blockingStub.updateNeighbour(nu);
 			if(response.getSuccess()){
-				System.out.println("Successful operation ");
+				System.out.println("[updateNeighbour] Successful operation ");
 			}else{
-				System.out.println("Unsuccessful operation: " + response.getErrorMessage());
+				System.out.println("[updateNeighbour] Unsuccessful operation: " + response.getErrorMessage());
 			}
 		} catch (StatusRuntimeException e) {
-			System.err.println("RPC failed: " + e.getStatus());
+			System.err.println("[updateNeighbour] RPC failed: " + e.getStatus());
 			return NewNeighbour.newBuilder().setSuccess(false).build();
 		}
 		return response;
@@ -374,11 +374,11 @@ public class Client {
 		try {
 			NeighbourGrpc neighbour = blockingStub.getNeighbour(request);	
 			if(!neighbour.getErrorMessage().equals("")){
-				System.out.println("Error in operation: " + neighbour.getErrorMessage());	
+				System.out.println("[getNeighbour] Error in operation: " + neighbour.getErrorMessage());	
 			}
 			return neighbour;
 		} catch (StatusRuntimeException ex) {
-			System.err.println("RPC failed: " + ex.getStatus());
+			System.err.println("[getNeighbour] RPC failed: " + ex.getStatus());
 			return null;
 		}
 	}
@@ -411,7 +411,20 @@ public class Client {
 				System.out.println("Created graph with id :"+ createdGraph.getGraph().getId());
 			}
 			
-			client.getGraphs();
+			for(GraphGrpc g : client.getGraphs()){
+				long graph_id = g.getId();
+				System.out.println("graph id: "+graph_id);
+				for (NodeGrpc n: g.getNodeList()){
+					long node_id = n.getId();
+					System.out.println("node id: "+node_id);
+					NodeGrpc nodenew = createNodeGrpc("Newnode","endhost",null,null);
+//					NewNode node = client.updateNode(graph_id, node_id, nodenew);
+//					System.out.println("Client updates node: "+node.getSuccess());
+					System.out.println("end");
+				}
+			}
+			
+			
 		} catch(Exception ex){
 			System.out.println("Error: " + ex.getMessage());
 			ex.printStackTrace();
