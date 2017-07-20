@@ -5,10 +5,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.junit.After;
 import org.junit.Before;
@@ -19,12 +22,15 @@ import org.junit.runners.JUnit4;
 import org.junit.runners.MethodSorters;
 
 import it.polito.verigraph.grpc.ConfigurationGrpc;
+import it.polito.verigraph.grpc.GetRequest;
 import it.polito.verigraph.grpc.GraphGrpc;
 import it.polito.verigraph.grpc.NeighbourGrpc;
 import it.polito.verigraph.grpc.NewGraph;
 import it.polito.verigraph.grpc.NewNeighbour;
 import it.polito.verigraph.grpc.NewNode;
 import it.polito.verigraph.grpc.NodeGrpc;
+import it.polito.verigraph.grpc.RequestID;
+import it.polito.verigraph.grpc.VerigraphGrpc;
 import it.polito.verigraph.grpc.client.Client;
 import it.polito.verigraph.grpc.server.Service;
 
@@ -33,7 +39,7 @@ import it.polito.verigraph.grpc.server.Service;
 public class GrpcTest {
 	private Service server;
 	private Client client;
-
+	
 	@Before
 	public void setUpBeforeClass() throws Exception {
 		client = new Client("localhost" , 50051);
@@ -53,9 +59,18 @@ public class GrpcTest {
 		assertNotNull("NULL "+meaning, ts);
 		assertEquals("Wrong "+meaning, rs, ts);		
 	}
+	
+	
+	public void deleteGraphs() {
+		for(GraphGrpc graph : client.getGraphs()){
+			client.deleteGraph(graph.getId());
+		}
+		
+	}
 
 	@Test
 	public final void test1Load() throws Exception{
+		deleteGraphs();
 		String funcType1 = "vpnaccess";
 		String funcType2 = "vpnexit";
 
@@ -100,7 +115,8 @@ public class GrpcTest {
 	}
 
 	@Test
-	public final void test2LoadWithError() throws Exception{		
+	public final void test2LoadWithError() throws Exception{
+		deleteGraphs();
 		// try to load a graph with node without functionalType
 		NodeGrpc node = null;
 		try{
@@ -114,28 +130,35 @@ public class GrpcTest {
 			nodes.add(node);
 		
 		GraphGrpc graph = Client.createGraphGrpc(nodes);
-		graph = client.createGraph(graph).getGraph();
+		GraphGrpc g = client.createGraph(graph).getGraph();
 		
-		assertEquals(graph.getId(), 2);
+		GraphGrpc get_graph= client.getGraph(g.getId());
+		assertEquals(g.getErrorMessage(), get_graph.getErrorMessage());
 		
 		//getGraphs
-		Iterator<GraphGrpc> graphs = client.getGraphs().iterator();
-
-		assertEquals(graphs.next().getId(), 1);
-		assertEquals(graphs.next(), graph);
+		List<GraphGrpc> graph_list = client.getGraphs();
+		TreeSet<GraphGrpc> pts = new TreeSet<GraphGrpc>(new GraphGrpcComparator());
+		pts.addAll(graph_list);
+		Iterator<GraphGrpc> graphs = pts.iterator();
+		
+		//assertEquals(graphs.next().getId(), g.getId());
+		if(graphs.hasNext())
+			assertEquals(graphs.next(), g);
 		
 		//deleteGraph
-		boolean resp= client.deleteGraph(graph.getId());
+		boolean resp= client.deleteGraph(g.getId());
 		assertEquals(resp, true);
 		
 		List<GraphGrpc> listGraphs = client.getGraphs();
 
-		assertEquals(listGraphs.size(), 1);
-		assertEquals(listGraphs.get(0).getId(), 1);
+		assertEquals(listGraphs.size(), 0);
+//		assertEquals(listGraphs.get(0).getId(), 1);
 	}
 	
 	@Test
 	public void test3Node() throws Exception {
+		deleteGraphs();
+		
 		NodeGrpc ufoundedGraph = NodeGrpc.newBuilder()
 				.setErrorMessage("There is no Graph whose Id is '1'").build();
 
@@ -143,18 +166,20 @@ public class GrpcTest {
 		NodeGrpc node = client.getNode(1, 1);//id not present
 
 		assertEquals(ufoundedGraph, node);
-
+		
 		// graph found in the server, but first add it
 		NodeGrpc addedNode = Client.createNodeGrpc("Node4", "firewall", null, null);
-		NewNode response = client.createNode(addedNode, 1);
+		GraphGrpc addedgraph = Client.createGraphGrpc(null);
+		NewGraph response_graph = client.createGraph(addedgraph);
+		NewNode response = client.createNode(addedNode, response_graph.getGraph().getId());
 		addedNode = response.getNode();	
-		node = client.getNode(1, 1);
+		node = client.getNode(response_graph.getGraph().getId(), addedNode.getId());
 
 		assertEquals(addedNode.getId(), node.getId());
 
 		//updateNode
 		NodeGrpc updatedNode = Client.createNodeGrpc("Node9", "endhost", null, null);
-		response = client.updateNode(1, addedNode.getId(), updatedNode);
+		response = client.updateNode(response_graph.getGraph().getId(), addedNode.getId(), updatedNode);
 
 		assertEquals(response.getSuccess(),true);
 		
@@ -167,7 +192,7 @@ public class GrpcTest {
 		params.put("protocol", "HTTP_REQUEST");
 		ConfigurationGrpc configuration = Client.createConfigurationGrpc(params, null, null, null);
 		
-		boolean status = client.configureNode(1, 1, configuration);
+		boolean status = client.configureNode(response_graph.getGraph().getId(), addedNode.getId(), configuration);
 		
 		assertEquals(status,true);
 	}
@@ -204,21 +229,30 @@ public class GrpcTest {
 		n4 = NodeGrpc.newBuilder(n4).setId(nw4.getNode().getId()).build();
 		
 		// getNodes
-		Iterator<NodeGrpc> nodes = client.getNodes(graph.getId()).iterator();
-
-		assertEquals(nodes.next().getName(), n1.getName());
-		assertEquals(nodes.next().getName(), n2.getName());
-		assertEquals(nodes.next().getName(), n3.getName());
-		assertEquals(nodes.next().getName(), n4.getName());
+		List<NodeGrpc> node_list = client.getNodes(graph.getId());
+		TreeSet<NodeGrpc> pts = new TreeSet<NodeGrpc>(new NodeGrpcComparator());
+		pts.addAll(node_list);
+		Iterator<NodeGrpc> nodes = pts.iterator();
+		//sorted by name
+		if(nodes.hasNext()){
+			assertEquals(nodes.next().getName(), n3.getName());
+			assertEquals(nodes.next().getName(), n4.getName());
+			assertEquals(nodes.next().getName(), n1.getName());
+			assertEquals(nodes.next().getName(), n2.getName());
+		}
 		
+	
 		//deleteNode
-		client.deleteNode(graph.getId(), 1);
+		client.deleteNode(graph.getId(), n1.getId());
 		// run
-		nodes = client.getNodes(graph.getId()).iterator();
-
-		assertEquals(nodes.next().getName(), n2.getName());
+		node_list = client.getNodes(graph.getId());
+		pts = new TreeSet<NodeGrpc>(new NodeGrpcComparator());
+		pts.addAll(node_list);
+		nodes = pts.iterator();
+		
 		assertEquals(nodes.next().getName(), n3.getName());
 		assertEquals(nodes.next().getName(), n4.getName());
+		assertEquals(nodes.next().getName(), n2.getName());
 	}
 	
 	@Test
@@ -282,7 +316,7 @@ public class GrpcTest {
 		//updateNeighbour
 		NeighbourGrpc updatedNeighbour = Client.createNeighbourGrpc("Node10");
 		
-		response = client.updateNeighbour(graph.getId(), 1, addedNeighbour.getId(),updatedNeighbour);
+		response = client.updateNeighbour(graph.getId(), nw1.getNode().getId(), addedNeighbour.getId(),updatedNeighbour);
 
 		assertEquals(response.getSuccess(),true);
 		assertEquals(response.getNeighbour().getName(),"Node10");
@@ -323,19 +357,61 @@ public class GrpcTest {
 		nn2 = NeighbourGrpc.newBuilder(nn2).setId(2).build();
 		nn3 = NeighbourGrpc.newBuilder(nn3).setId(3).build();	
 		// run
-		Iterator<NeighbourGrpc> neighbours = client.getNeighbours(graph.getId(), nw1.getNode().getId()).iterator();
+		List<NeighbourGrpc> node_list = client.getNeighbours(graph.getId(), nw1.getNode().getId());
+		TreeSet<NeighbourGrpc> pts = new TreeSet<NeighbourGrpc>(new NeighbourGrpcComparator());
+		pts.addAll(node_list);
+		Iterator<NeighbourGrpc> neighbours = pts.iterator();
+		
+		while(neighbours.hasNext()){
+			neighbours.next();
+		}
 
-		assertEquals(neighbours.next(), nn1);
-		assertEquals(neighbours.next(), nn2);
-		assertEquals(neighbours.next(), nn3);
+		if(neighbours.hasNext()){
+			assertEquals(neighbours.next(), addedNeighbour1.getNeighbour());
+			assertEquals(neighbours.next(), addedNeighbour2.getNeighbour());
+			assertEquals(neighbours.next(), addedNeighbour3.getNeighbour());
+		}
 		
 		//deleteNeighbour
-		boolean succ = client.deleteNeighbour(graph.getId(), nw1.getNode().getId(), 1);
+		boolean succ = client.deleteNeighbour(graph.getId(), nw1.getNode().getId(), addedNeighbour1.getNeighbour().getId());
 		assertEquals(succ, true);
 		// run
-		neighbours = client.getNeighbours(graph.getId(), nw1.getNode().getId()).iterator();
+		node_list = client.getNeighbours(graph.getId(), nw1.getNode().getId());
+		pts = new TreeSet<NeighbourGrpc>(new NeighbourGrpcComparator());
+		pts.addAll(node_list);
+		neighbours = pts.iterator();
 
-		assertEquals(neighbours.next(), nn2);
-		assertEquals(neighbours.next(), nn3);
+		while(neighbours.hasNext()){
+			neighbours.next();
+		}
+
+		
+		if(neighbours.hasNext()){
+			assertEquals(neighbours.next(), addedNeighbour2.getNeighbour());
+			assertEquals(neighbours.next(), addedNeighbour3.getNeighbour());
+		}
 	}
+}
+
+
+class NodeGrpcComparator implements Comparator<NodeGrpc> {
+    public int compare(NodeGrpc n0, NodeGrpc n1) {
+    	return n0.getName().compareTo(n1.getName());
+    }
+}
+
+class NeighbourGrpcComparator implements Comparator<NeighbourGrpc> {
+    public int compare(NeighbourGrpc n0, NeighbourGrpc n1) {
+    	return n0.getName().compareTo(n1.getName());
+    }
+}
+
+class GraphGrpcComparator implements Comparator<GraphGrpc> {
+    public int compare(GraphGrpc n0, GraphGrpc n1) {
+    	if(n0.getId() == n1.getId())
+    		return 0;
+    	else if (n0.getId() > n1.getId())
+    		return 1;
+    	else return -1;
+    }
 }

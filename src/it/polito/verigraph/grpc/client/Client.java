@@ -73,7 +73,7 @@ public class Client {
 		try {
 			response = blockingStub.createGraph(gr);
 			if(response.getSuccess()){
-				System.out.println("[createGraph Successful operation ");
+				System.out.println("[createGraph] Successful operation ");
 			}else{
 				System.out.println("[createGraph] Unsuccessful operation: " + response.getErrorMessage());
 			}

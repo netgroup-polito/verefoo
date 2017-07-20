@@ -160,7 +160,7 @@
 		<fail if="test_failed" status="${exit.code1}" message="*** First set of Junit tests: Some Tests FAILED ***"/>
 		<echo>*** First set of Junit tests: All Tests PASSED  ***</echo>
 		
-		<!--echo>Running Second set of Junit tests...</echo>		
+		<echo>Running Second set of Junit tests...</echo>		
 		<junit printsummary="yes" dir="." fork="yes" haltonfailure="no" showoutput="no" filtertrace="true" timeout="120000">
 			<jvmarg value="-Djava.awt.headless=true" />
 			<formatter type="brief" usefile="false"/>
@@ -172,7 +172,7 @@
 		<fail if="test_failed" status="${exit.code2}" message="*** Second set of Junit tests: Some Tests FAILED ***"/>
 		<echo>*** Second set of Junit tests: All Tests PASSED  ***</echo>
 		
-		<echo>Running Third set of Junit tests...</echo>		
+		<!--echo>Running Third set of Junit tests...</echo>		
 		<junit printsummary="yes" dir="." fork="yes" haltonfailure="no" showoutput="no" filtertrace="true" timeout="120000">
 			<jvmarg value="-Djava.awt.headless=true" />
 			<formatter type="brief" usefile="false"/>

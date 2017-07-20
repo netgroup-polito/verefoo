@@ -68,9 +68,7 @@ public class GrpcServerTest {
 	public void deleteGraphs() {
 		VerigraphGrpc.VerigraphBlockingStub stub = VerigraphGrpc.newBlockingStub(inProcessChannel);
 		Iterator<GraphGrpc> iter = stub.getGraphs(GetRequest.newBuilder().build());
-		int count =0;
 		while(iter.hasNext()){
-			count++;
 			stub.deleteGraph(RequestID.newBuilder().setIdGraph(iter.next().getId()).build());
 		}
 		//System.out.println("Number of graphs deleted = "+count);
