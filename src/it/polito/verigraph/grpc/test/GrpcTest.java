@@ -70,6 +70,7 @@ public class GrpcTest {
 
 	@Test
 	public final void test1Load() throws Exception{
+		System.out.println("[DEBUG] test1Load starts");
 		deleteGraphs();
 		String funcType1 = "vpnaccess";
 		String funcType2 = "vpnexit";
@@ -116,6 +117,7 @@ public class GrpcTest {
 
 	@Test
 	public final void test2LoadWithError() throws Exception{
+		System.out.println("[DEBUG] test2Load starts");
 		deleteGraphs();
 		// try to load a graph with node without functionalType
 		NodeGrpc node = null;
@@ -157,6 +159,7 @@ public class GrpcTest {
 	
 	@Test
 	public void test3Node() throws Exception {
+		System.out.println("[DEBUG] test3Load starts");
 		deleteGraphs();
 		
 		NodeGrpc ufoundedGraph = NodeGrpc.newBuilder()
@@ -199,6 +202,7 @@ public class GrpcTest {
 
 	@Test
 	public void test4Nodes() throws Exception {		
+		System.out.println("[DEBUG] test4Load starts");
 		// setup
 		GraphGrpc graph = Client.createGraphGrpc(null);
 		//createGraph
@@ -257,6 +261,7 @@ public class GrpcTest {
 	
 	@Test
 	public void test5Neighbours() throws Exception {
+		System.out.println("[DEBUG] test5Load starts");
 		NeighbourGrpc ufoundedNeighbour = NeighbourGrpc.newBuilder()
 				.setErrorMessage("There is no Graph whose Id is '1'").build();;
 
@@ -324,6 +329,7 @@ public class GrpcTest {
 
 	@Test
 	public void test6Neighbours() throws Exception {
+		System.out.println("[DEBUG] test6Load starts");
 		// setup
 		GraphGrpc graph = Client.createGraphGrpc(null);
 		//createGraph

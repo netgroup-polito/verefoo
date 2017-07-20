@@ -182,7 +182,7 @@
 			</classpath>
 		</junit>
 		<fail if="test_failed" status="${exit.code3}" message="*** Third set of Junit tests: Some Tests FAILED ***"/>
-		<echo>*** Third set of Junit tests: All Tests PASSED  ***</echo>
+		<echo>*** Third set of Junit tests: All Tests PASSED  ***</echo-->
 		
 		<echo>Running Fourth set of Junit tests...</echo>		
 		<junit printsummary="yes" dir="." fork="yes" haltonfailure="no" showoutput="no" filtertrace="true" timeout="120000">
@@ -191,12 +191,12 @@
 			<test haltonfailure="no" failureproperty="test_failed" name="${test4.class}"/>
 			<classpath>
 				<path refid="test.classpath" />
-				<fileset dir="${other_lib.dir}">
+				<fileset dir="${lib.dir}">
 					<include name="*.jar" />
 				</fileset>
 			</classpath>
 		</junit>
-		<fail if="test_failed" status="${exit.code4}" message="*** Fourth set of Junit tests: Some Tests FAILED ***"/-->
+		<fail if="test_failed" status="${exit.code4}" message="*** Fourth set of Junit tests: Some Tests FAILED ***"/>
 		<echo>*** Fourth set of Junit tests: All Tests PASSED  ***</echo>
 		<echo>***************************************************</echo>
 		<echo>*************** All Tests PASSED  *****************</echo>

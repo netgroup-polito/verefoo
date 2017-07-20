@@ -6,6 +6,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.ws.rs.client.Client;
@@ -40,12 +41,12 @@ public class Tester {
 	private VerifyClient	verifyClient;
 
 	public Tester(String target, File schema, File folder)	throws JsonParseException, JsonMappingException, IOException,
-															Exception {
+	Exception {
 		init(target, schema, folder);
 	}
 
 	private void init(String target, File schema, File folder)	throws JsonParseException, JsonMappingException,
-																IOException, Exception {
+	IOException, Exception {
 		this.target = target;
 		this.verifyClient = new VerifyClient(this.target);
 		this.schema = schema;
@@ -75,7 +76,7 @@ public class Tester {
 	}
 
 	public List<TestCase> getTestCases(List<File> files)	throws JsonParseException, JsonMappingException, IOException,
-															Exception {
+	Exception {
 		List<TestCase> testCases = new ArrayList<TestCase>();
 
 		for (File file : files) {
@@ -95,20 +96,28 @@ public class Tester {
 	private void runTestCases() throws VerifyClientException, TestExecutionException {
 		int counter = 0;
 		for (TestCase tc : this.testCases) {
-			String result = runTestCase(tc);
-			if (!result.equals(tc.getResult()))
-				throw new TestExecutionException("Error running test given in file '"	+ this.testFiles.get(counter).getName()
-									+ "'. Test returned '" + result + "' instead of '" + tc.getResult() + "'.");
-			else
-				System.out.println("Test given in file '"	+ this.testFiles.get(counter).getName() + "' returned '"
-									+ result + "' as expected");
+			List<String> results = runTestCase(tc);
+			Iterator<String> iter = tc.getResults().iterator();
+			for(String result : results){
+				if (iter.hasNext()){
+					if( !result.equals(iter.next()))
+						throw new TestExecutionException("Error running test given in file '"	+ this.testFiles.get(counter).getName()
+								+ "'. Test returned '" + result + "' instead of '" + tc.getResults() + "'.");
+					else
+						System.out.println("Test given in file '"	+ this.testFiles.get(counter).getName() + "' returned '"
+								+ result + "' as expected");
+					} else throw new TestExecutionException("Error running test given in file '"	+ this.testFiles.get(counter).getName()
+						+ "'. Test returned '" + result + "' instead of '" + tc.getResults() + "'.");
+			}
 			counter++;
 		}
 		System.out.println("All tests PASSED");
 	}
-	
-	private String runTestCase(TestCase tc) throws VerifyClientException, TestExecutionException{
+
+	private List<String> runTestCase(TestCase tc) throws VerifyClientException, TestExecutionException{
 		Client client = ClientBuilder.newClient();
+
+		List<String> results = new ArrayList<String>();
 
 		Graph graph = tc.getGraph();
 		Response response = null;
@@ -122,12 +131,14 @@ public class Tester {
 			throw new TestExecutionException("HTTP request failed");
 		}
 		Graph createdGraph = response.readEntity(Graph.class);
-		String urlParams = tc.getPolicyUrlParameters();
-		WebTarget target = client.target(this.target + "/graphs/" + createdGraph.getId() + "/policy" + urlParams);
+		for (String urlParams : tc.getPolicyUrlParameters()){
+			WebTarget target = client.target(this.target + "/graphs/" + createdGraph.getId() + "/policy" + urlParams);
 
-		response = target.request().get();
-		Verification verification = response.readEntity(Verification.class);
-		return verification.getResult();
+			response = target.request().get();
+			Verification verification = response.readEntity(Verification.class);
+			results.add(verification.getResult());
+		}
+		return results;
 	}
 
 	public void validateTestFile(File testFile) throws Exception {
@@ -155,44 +166,44 @@ public class Tester {
 		}
 		catch (ProcessingException e) {
 			throw new Exception("There were errors in the validation of file '"	+ testFile.getAbsolutePath()
-								+ "' against the json schema '" + schema.getAbsolutePath() + "': " + e.getMessage());
+			+ "' against the json schema '" + schema.getAbsolutePath() + "': " + e.getMessage());
 
 		}
 	}
 
 	public static void main(String[] args)	throws JsonParseException, JsonMappingException, IOException,
-											VerifyClientException, Exception {
+	VerifyClientException, Exception {
 		String folderName = System.getProperty("user.dir") + "/tester/testcases";
 		File folder = new File(folderName);
 		if (!folder.exists()) {
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		    String s;
-		    do{
-		    	System.out.println("Please enter the testcases folder path: ");
-		    	s = in.readLine();
-		    	if (isValidpath(s)){
-		    		folder = new File(s);
-		    		break;
-		    	}
-		    }while (s != null && s.length() != 0);
-		    if(s == null)
-		    	System.exit(0);
+			String s;
+			do{
+				System.out.println("Please enter the testcases folder path: ");
+				s = in.readLine();
+				if (isValidpath(s)){
+					folder = new File(s);
+					break;
+				}
+			}while (s != null && s.length() != 0);
+			if(s == null)
+				System.exit(0);
 		}
 		String schemaName = System.getProperty("user.dir") + "/tester/testcase_schema.json";
 		File schema = new File(schemaName);
 		if (!schema.exists()) {
 			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		    String s;
-		    do{
-		    	System.out.println("Please enter the full path of 'testcase_schema.json': ");
-		    	s = in.readLine();
-		    	if (isValidpath(s)){
-		    		folder = new File(s);
-		    		break;
-		    	}
-		    }while (s != null && s.length() != 0);
-		    if(s == null)
-		    	System.exit(0);
+			String s;
+			do{
+				System.out.println("Please enter the full path of 'testcase_schema.json': ");
+				s = in.readLine();
+				if (isValidpath(s)){
+					folder = new File(s);
+					break;
+				}
+			}while (s != null && s.length() != 0);
+			if(s == null)
+				System.exit(0);
 		}
 
 		Tester tester = new Tester("http://localhost:8080/verigraph/api", schema, folder);

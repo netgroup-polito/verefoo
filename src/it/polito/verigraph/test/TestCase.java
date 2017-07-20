@@ -1,6 +1,8 @@
 package it.polito.verigraph.test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -26,10 +28,10 @@ public class TestCase {
 	private String				description;
 
 	@JsonProperty("policy_url_parameters")
-	private String				policyUrlParameters;
+	private ArrayList<String> policyUrlParameters;
 
-	@JsonProperty("result")
-	private String				result;
+	@JsonProperty("results")
+	private ArrayList<String> results;
 
 	@JsonProperty("graph")
 	private Graph				graph;
@@ -99,7 +101,7 @@ public class TestCase {
 	 * @return The policyUrlParameters
 	 */
 	@JsonProperty("policy_url_parameters")
-	public String getPolicyUrlParameters() {
+	public List<String> getPolicyUrlParameters() {
 		return policyUrlParameters;
 	}
 
@@ -109,17 +111,20 @@ public class TestCase {
 	 *            The policy_url_parameters
 	 */
 	@JsonProperty("policy_url_parameters")
-	public void setPolicyUrlParameters(String policyUrlParameters) {
-		this.policyUrlParameters = policyUrlParameters;
+	public void setPolicyUrlParameters(List<String> policyUrlParameters) {
+		if (this.policyUrlParameters == null)
+			this.policyUrlParameters = new ArrayList<String>();
+		
+		this.policyUrlParameters.addAll(policyUrlParameters);
 	}
 
 	/**
 	 * 
 	 * @return The result
 	 */
-	@JsonProperty("result")
-	public String getResult() {
-		return result;
+	@JsonProperty("results")
+	public List<String> getResults() {
+		return results;
 	}
 
 	/**
@@ -127,9 +132,11 @@ public class TestCase {
 	 * @param result
 	 *            The result
 	 */
-	@JsonProperty("result")
-	public void setResult(String result) {
-		this.result = result;
+	@JsonProperty("results")
+	public void setResults(List<String> results) {
+		if (this.results == null)
+			this.results = new ArrayList<String>();
+		this.results.addAll(results);
 	}
 
 	/**

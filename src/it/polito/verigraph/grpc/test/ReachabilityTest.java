@@ -3,6 +3,7 @@ package it.polito.verigraph.grpc.test;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -100,19 +101,25 @@ public class ReachabilityTest {
 	
 	@Test
 	public final void wrongReachability() {
+		System.out.println("[DEBUG] wrongReachability starts");
 		System.out.println("DEBUG: starting testWrongReachability");
 		
 		VerificationGrpc nullVer = VerificationGrpc.newBuilder()
-							.setErrorMessage("Graph with id 52 not found").build();
+							.setErrorMessage("There is no Graph whose Id is '52'").build();
 		//verification on uncreated graph
+		if(client.getGraph(52) != null){
+			client.deleteGraph(52);
+		}
 		Policy policyToVerify = Client.createPolicy("Node1", "Node4", "reachability", null, 52);			
 		VerificationGrpc ver = client.verify(policyToVerify);			
 		assertEquals(ver, nullVer);
 		
 		//verification on uncreated nodes
+		GraphGrpc graph = GraphGrpc.newBuilder().build();
+		graph = client.createGraph(graph).getGraph();
 		nullVer = VerificationGrpc.newBuilder()
 				.setErrorMessage("The \'source\' parameter \'Node5\' is not valid, please insert the name of an existing node").build();
-		policyToVerify = Client.createPolicy("Node5", "Node4", "reachability", null, 1);			
+		policyToVerify = Client.createPolicy("Node5", "Node4", "reachability", null, graph.getId());			
 		ver = client.verify(policyToVerify);			
 		assertEquals(ver, nullVer);
 		
@@ -120,7 +127,7 @@ public class ReachabilityTest {
 		nullVer = VerificationGrpc.newBuilder()
 				.setErrorMessage("The \'source\' parameter \'Node1\' is not valid, please insert the name of an existing node").build();
 		
-		policyToVerify = Client.createPolicy("Node1", "Node10", "reachability", null, 1);			
+		policyToVerify = Client.createPolicy("Node1", "Node10", "reachability", null, graph.getId());			
 		ver = client.verify(policyToVerify);			
 		assertEquals(ver, nullVer);
 		
@@ -167,23 +174,36 @@ public class ReachabilityTest {
 
 	@Test
 	public void runTestCases() throws VerifyClientException, TestExecutionException {
+		System.out.println("[DEBUG] runTestCases starts");
 		int counter = 0;
-		for (TestCase tc : this.testCases) {
-			String result = runTestCase(tc);
-			if (!result.equals(tc.getResult()))
-				throw new TestExecutionException("Error running test given in file '"	+ this.testFiles.get(counter).getName()
-									+ "'. Test returned '" + result + "' instead of '" + tc.getResult() + "'.");
-			else
-				System.out.println("Test given in file '"	+ this.testFiles.get(counter).getName() + "' returned '"
-									+ result + "' as expected");
+		for (TestCase tc : this.testCases) {	
+			List<String> results = runTestCase(tc);
+			Iterator<String> iter = tc.getResults().iterator();
+			
+			if(results.isEmpty()){
+				throw new TestExecutionException("Error running test given in file '"	+ this.testFiles.get(counter).getName()+ "'.");
+			}
+				
+			for(String result : results){
+				if (iter.hasNext()){
+					if( !result.equals(iter.next()))
+					throw new TestExecutionException("Error running test given in file '"	+ this.testFiles.get(counter).getName()
+										+ "'. Test returned '" + result + "' instead of '" + tc.getResults() + "'.");
+				else
+					System.out.println("Test given in file '"	+ this.testFiles.get(counter).getName() + "' returned '"
+										+ result + "' as expected");
+				} else throw new TestExecutionException("Error running test given in file '"	+ this.testFiles.get(counter).getName()
+						+ "'. Test returned '" + result + "' instead of '" + tc.getResults() + "'.");
+			}
 			counter++;
 			
 		}
 		System.out.println("All tests PASSED");
 	}
 	
-	private String runTestCase(TestCase tc) throws VerifyClientException, TestExecutionException{
+	private List<String> runTestCase(TestCase tc) throws VerifyClientException, TestExecutionException{
 		GraphGrpc graph = GrpcUtils.obtainGraph(tc.getGraph());
+		ArrayList<String> results = new ArrayList<String>();
 		
 		NewGraph newGraph = this.client.createGraph(graph);
 		if(newGraph.getSuccess() == false)
@@ -193,15 +213,17 @@ public class ReachabilityTest {
 		GraphGrpc addedgraph = client.getGraph(createdGraph.getId());
 		System.out.println(addedgraph);
 		
-		final Map<String, String> map = GrpcUtils.getParamGivenString(tc.getPolicyUrlParameters());
-		
-		Policy policy = Client.createPolicy(map.get("source"), 
-											map.get("destination"),
-											map.get("type"),
-											map.get("middlebox"), 
-											createdGraph.getId());
-		VerificationGrpc verification = this.client.verify(policy);
-		return verification.getResult();
+		for(String url : tc.getPolicyUrlParameters()){
+			final Map<String, String> map = GrpcUtils.getParamGivenString(url);
+			Policy policy = Client.createPolicy(map.get("source"), 
+					map.get("destination"),
+					map.get("type"),
+					map.get("middlebox"), 
+					createdGraph.getId());
+			VerificationGrpc verification = this.client.verify(policy);
+			results.add(verification.getResult());
+		}
+		return results;
 	}
 
 	public void validateTestFile(File testFile) throws Exception {
@@ -240,4 +262,5 @@ public class ReachabilityTest {
 		File file = new File(s);
 		return file.exists();
 	}
+	
 }
