@@ -25,54 +25,54 @@ import it.polito.verigraph.model.Node;
  */
 public class GraphCustomDeserializer extends JsonDeserializer<Graph>{
 
-	/* (non-Javadoc)
-	 * @see com.fasterxml.jackson.databind.JsonDeserializer#deserialize(com.fasterxml.jackson.core.JsonParser, com.fasterxml.jackson.databind.DeserializationContext)
-	 */
-	@Override
-	public Graph deserialize(JsonParser jp, DeserializationContext context){
-		JsonNode root = null;
-		try {
-			root = jp.getCodec().readTree(jp);
-		}
-		catch (JsonProcessingException e) {
-			throw new InternalServerErrorException("Error parsing a graph: " + e.getMessage());
-		}
-		catch (IOException e) {
-			throw new InternalServerErrorException("I/O error parsing a graph: " + e.getMessage());
-		} 
-		
-		JsonNode nodesJson = root.get("nodes");
-		
-		if(nodesJson == null)
-			throw new BadRequestException("Invalid graph");
-		
-		List<Node> nodeList = null;
-		try {
-			nodeList = new ObjectMapper().readValue(nodesJson.toString(), TypeFactory.defaultInstance().constructCollectionType(List.class, Node.class));
-		}
-		catch (JsonParseException e) {
-			throw new BadRequestException("Invalid content for a graph: " + e.getMessage());
-		}
-		catch (JsonMappingException e) {
-			throw new BadRequestException("Invalid input json structure for a graph: " + e.getMessage());
-		}
-		catch (IOException e) {
-			throw new InternalServerErrorException("I/O error parsing a graph: " + e.getMessage());
-		}
+    /* (non-Javadoc)
+     * @see com.fasterxml.jackson.databind.JsonDeserializer#deserialize(com.fasterxml.jackson.core.JsonParser, com.fasterxml.jackson.databind.DeserializationContext)
+     */
+    @Override
+    public Graph deserialize(JsonParser jp, DeserializationContext context){
+        JsonNode root = null;
+        try {
+            root = jp.getCodec().readTree(jp);
+        }
+        catch (JsonProcessingException e) {
+            throw new InternalServerErrorException("Error parsing a graph: " + e.getMessage());
+        }
+        catch (IOException e) {
+            throw new InternalServerErrorException("I/O error parsing a graph: " + e.getMessage());
+        }
 
-		Graph graph = new Graph();
-		if(root.get("id") != null){
-			long graphId = root.get("id").asLong();
-			graph.setId(graphId);
-		}
-		Map<Long, Node> nodes = graph.getNodes();
-		
-		long numberOfNodes = 0;
-		for (Node node : nodeList){
-			nodes.put(++numberOfNodes, node);
-		}
-		return graph;
+        JsonNode nodesJson = root.get("nodes");
 
-	}
+        if(nodesJson == null)
+            throw new BadRequestException("Invalid graph");
+
+        List<Node> nodeList = null;
+        try {
+            nodeList = new ObjectMapper().readValue(nodesJson.toString(), TypeFactory.defaultInstance().constructCollectionType(List.class, Node.class));
+        }
+        catch (JsonParseException e) {
+            throw new BadRequestException("Invalid content for a graph: " + e.getMessage());
+        }
+        catch (JsonMappingException e) {
+            throw new BadRequestException("Invalid input json structure for a graph: " + e.getMessage());
+        }
+        catch (IOException e) {
+            throw new InternalServerErrorException("I/O error parsing a graph: " + e.getMessage());
+        }
+
+        Graph graph = new Graph();
+        if(root.get("id") != null){
+            long graphId = root.get("id").asLong();
+            graph.setId(graphId);
+        }
+        Map<Long, Node> nodes = graph.getNodes();
+
+        long numberOfNodes = 0;
+        for (Node node : nodeList){
+            nodes.put(++numberOfNodes, node);
+        }
+        return graph;
+
+    }
 
 }

@@ -22,62 +22,60 @@ import it.polito.verigraph.model.Node;
 
 public class NodeCustomDeserializer extends JsonDeserializer<Node> {
 
-	@Override
-	public Node deserialize(JsonParser jp, DeserializationContext context) {
+    @Override
+    public Node deserialize(JsonParser jp, DeserializationContext context) {
 
-		try {
-			JsonNode root = jp.getCodec().readTree(jp);
-			JsonNode neighboursJson = root.get("neighbours");
-			JsonNode configurationJson = root.get("configuration");
+        try {
+            JsonNode root = jp.getCodec().readTree(jp);
+            JsonNode neighboursJson = root.get("neighbours");
+            JsonNode configurationJson = root.get("configuration");
+            String nodeName = root.get("name").asText();
+            String functionalType = root.get("functional_type").asText();
+            Node node = new Node();
 
-			String nodeName = root.get("name").asText();
-			String functionalType = root.get("functional_type").asText();
+            if(root.get("id") != null){
+                long nodeId = root.get("id").asLong();
+                node.setId(nodeId);
+            }
+            node.setName(nodeName);
+            node.setFunctional_type(functionalType);
 
-			Node node = new Node();
-			if(root.get("id") != null){
-				long nodeId = root.get("id").asLong();
-				node.setId(nodeId);
-			}
-			node.setName(nodeName);
-			node.setFunctional_type(functionalType);
+            if (configurationJson == null)
+                node.setConfiguration(new Configuration(node.getName(), "", new ObjectMapper().createArrayNode()));
+            else {
+                Configuration conf = node.getConfiguration();
+                conf.setId(node.getName());
+                conf.setDescription("");
+                conf.setConfiguration(configurationJson);
+            }
 
-			if (configurationJson == null)
-				node.setConfiguration(new Configuration(node.getName(), "", new ObjectMapper().createArrayNode()));
-			else {
-				Configuration conf = node.getConfiguration();
-				conf.setId(node.getName());
-				conf.setDescription("");
-				conf.setConfiguration(configurationJson);
-			}
+            try {
+                List<Neighbour> neighbourList = new ObjectMapper().readValue( neighboursJson.toString(),
+                        TypeFactory.defaultInstance()
+                        .constructCollectionType(List.class,
+                                Neighbour.class));
+                Map<Long, Neighbour> neighbours = node.getNeighbours();
+                long numberOfNeighbours = 0;
+                for (Neighbour neighbour : neighbourList) {
+                    neighbours.put(++numberOfNeighbours, neighbour);
+                }
 
-			try {
-				List<Neighbour> neighbourList = new ObjectMapper().readValue(	neighboursJson.toString(),
-																				TypeFactory	.defaultInstance()
-																							.constructCollectionType(	List.class,
-																														Neighbour.class));
-				Map<Long, Neighbour> neighbours = node.getNeighbours();
+                return node;
+            }
+            catch (JsonParseException e) {
+                throw new BadRequestException("Invalid content for a node: " + e.getMessage());
+            }
+            catch (JsonMappingException e) {
+                throw new BadRequestException("Invalid input json structure for a node: " + e.getMessage());
+            }
+        }
+        catch (JsonProcessingException e) {
+            throw new InternalServerErrorException("Error parsing a node: " + e.getMessage());
+        }
+        catch (IOException e) {
+            throw new InternalServerErrorException("I/O error parsing a node: " + e.getMessage());
+        }
 
-				long numberOfNeighbours = 0;
-				for (Neighbour neighbour : neighbourList) {
-					neighbours.put(++numberOfNeighbours, neighbour);
-				}
-
-				return node;
-			}
-			catch (JsonParseException e) {
-				throw new BadRequestException("Invalid content for a node: " + e.getMessage());
-			}
-			catch (JsonMappingException e) {
-				throw new BadRequestException("Invalid input json structure for a node: " + e.getMessage());
-			}
-		}
-		catch (JsonProcessingException e) {
-			throw new InternalServerErrorException("Error parsing a node: " + e.getMessage());
-		}
-		catch (IOException e) {
-			throw new InternalServerErrorException("I/O error parsing a node: " + e.getMessage());
-		}
-
-	}
+    }
 
 }

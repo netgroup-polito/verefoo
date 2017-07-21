@@ -10,12 +10,12 @@ import it.polito.verigraph.model.ErrorMessage;
 @Provider
 public class BadRequestExceptionMapper implements ExceptionMapper<BadRequestException> {
 
-	@Override
-	public Response toResponse(BadRequestException exception) {
-		ErrorMessage errorMessage = new ErrorMessage(	exception.getMessage(),
-														400,
-														"http://localhost:8080/verigraph/api-docs/");
-		return Response.status(Status.BAD_REQUEST).entity(errorMessage).build();
-	}
+    @Override
+    public Response toResponse(BadRequestException exception) {
+        ErrorMessage errorMessage = new ErrorMessage( exception.getMessage(),
+                400,
+                "http://localhost:8080/verigraph/api-docs/");
+        return Response.status(Status.BAD_REQUEST).entity(errorMessage).build();
+    }
 
 }
