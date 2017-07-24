@@ -2,59 +2,58 @@ package it.polito.verigraph.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "Policy verification")
 public class Verification {
 
-	@ApiModelProperty(example = "SAT | UNSAT | UNKNOWN")
-	private String		result;
-	private String comment;
-	private List<Test>	tests	= new ArrayList<Test>();
+    @ApiModelProperty(example = "SAT | UNSAT | UNKNOWN")
+    private String result;
+    private String comment;
+    private List<Test> tests= new ArrayList<Test>();
 
-	public Verification() {
+    public Verification() {
 
-	}
+    }
 
-	public Verification(String result) {
-		this.result = result;
-	}
-	
-	public Verification(String result, List<Test> tests, String comment){
-		this.result = result;
-		this.tests = tests;
-		this.comment = comment;
-	}
-	
-	public Verification(String result, String comment){
-		this.result = result;
-		this.comment = comment;
-	}
+    public Verification(String result) {
+        this.result = result;
+    }
 
-	public String getResult() {
-		return result;
-	}
+    public Verification(String result, List<Test> tests, String comment){
+        this.result = result;
+        this.tests = tests;
+        this.comment = comment;
+    }
 
-	public void setResult(String result) {
-		this.result = result;
-	}
+    public Verification(String result, String comment){
+        this.result = result;
+        this.comment = comment;
+    }
 
-	public List<Test> getTests() {
-		return tests;
-	}
+    public String getResult() {
+        return result;
+    }
 
-	public void setTests(List<Test> tests) {
-		this.tests = tests;
-	}
-	
-	public String getComment() {
-		return comment;
-	}
-	
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-	
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public List<Test> getTests() {
+        return tests;
+    }
+
+    public void setTests(List<Test> tests) {
+        this.tests = tests;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
 }

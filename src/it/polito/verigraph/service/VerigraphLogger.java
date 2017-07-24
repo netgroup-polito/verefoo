@@ -11,15 +11,12 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 public class VerigraphLogger {
-	 static private FileHandler fileTxt;
-	 static private SimpleFormatter formatterTxt;
-	 private static VerigraphLogger verigraphlogger= new VerigraphLogger();
-	public static Logger logger; 
-    
+    static private FileHandler fileTxt;
+    static private SimpleFormatter formatterTxt;
+    private static VerigraphLogger verigraphlogger= new VerigraphLogger();
+    public static Logger logger;
 
     private VerigraphLogger() {
-
-       
 
         // suppress the logging output to the console
         /*Logger rootLogger = Logger.getLogger("");
@@ -27,44 +24,40 @@ public class VerigraphLogger {
         if (handlers[0] instanceof ConsoleHandler) {
             rootLogger.removeHandler(handlers[0]);
         }*/
-       
-    	/*Logger globalLogger = Logger.getLogger("");
+
+        /*Logger globalLogger = Logger.getLogger("");
         Handler[] handlers = globalLogger.getHandlers();
         for(Handler handler : handlers) {
             globalLogger.removeHandler(handler);
         }*/
-    	
-    	LogManager.getLogManager().reset();
-        
 
+        LogManager.getLogManager().reset();
         // get the global logger to configure it
         logger = Logger.getLogger(VerigraphLogger.class.getName());
-       // logger.setUseParentHandlers(false);
+        // logger.setUseParentHandlers(false);
         logger.setLevel(Level.INFO);
         try {
-        	if(System.getProperty("catalina.home") != null)
-        		fileTxt = new FileHandler(System.getProperty("catalina.home")+"/logs/verigraph_log.txt");
-        	else fileTxt= new FileHandler("verigraph_log.txt");
-        	
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
+            if(System.getProperty("catalina.home") != null)
+                fileTxt = new FileHandler(System.getProperty("catalina.home")+"/logs/verigraph_log.txt");
+            else fileTxt= new FileHandler("verigraph_log.txt");
+
+        } catch (SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         // create a TXT formatter
         formatterTxt = new SimpleFormatter();
         fileTxt.setFormatter(formatterTxt);
         logger.addHandler(fileTxt);
 
-     
     }
-    
-    public static VerigraphLogger getVerigraphlogger(){    	
-    	return verigraphlogger;
+
+    public static VerigraphLogger getVerigraphlogger(){
+        return verigraphlogger;
     }
-   
+
 }

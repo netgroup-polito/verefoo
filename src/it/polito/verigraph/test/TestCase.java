@@ -18,154 +18,153 @@ import it.polito.verigraph.model.Graph;
 @JsonPropertyOrder({ "id", "name", "description", "policy_url_parameters", "result", "graph" })
 public class TestCase {
 
-	@JsonProperty("id")
-	private Integer				id;
+    @JsonProperty("id")
+    private Integer id;
 
-	@JsonProperty("name")
-	private String				name;
+    @JsonProperty("name")
+    private String name;
 
-	@JsonProperty("description")
-	private String				description;
+    @JsonProperty("description")
+    private String description;
 
-	@JsonProperty("policy_url_parameters")
-	private ArrayList<String> policyUrlParameters;
+    @JsonProperty("policy_url_parameters")
+    private ArrayList<String> policyUrlParameters;
 
-	@JsonProperty("results")
-	private ArrayList<String> results;
+    @JsonProperty("results")
+    private ArrayList<String> results;
 
-	@JsonProperty("graph")
-	private Graph				graph;
+    @JsonProperty("graph")
+    private Graph graph;
 
-	@JsonIgnore
-	private Map<String, Object>	additionalProperties	= new HashMap<String, Object>();
+    @JsonIgnore
+    private Map<String, Object>additionalProperties= new HashMap<String, Object>();
 
-	/**
-	 * 
-	 * @return The id
-	 */
-	@JsonProperty("id")
-	public Integer getId() {
-		return id;
-	}
+    /**
+     *
+     * @return The id
+     */
+    @JsonProperty("id")
+    public Integer getId() {
+        return id;
+    }
 
-	/**
-	 * 
-	 * @param id
-	 *            The id
-	 */
-	@JsonProperty("id")
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    /**
+     *
+     * @param id
+     *            The id
+     */
+    @JsonProperty("id")
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	/**
-	 * 
-	 * @return The name
-	 */
-	@JsonProperty("name")
-	public String getName() {
-		return name;
-	}
+    /**
+     *
+     * @return The name
+     */
+    @JsonProperty("name")
+    public String getName() {
+        return name;
+    }
 
-	/**
-	 * 
-	 * @param name
-	 *            The name
-	 */
-	@JsonProperty("name")
-	public void setName(String name) {
-		this.name = name;
-	}
+    /**
+     *
+     * @param name
+     *            The name
+     */
+    @JsonProperty("name")
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	/**
-	 * 
-	 * @return The description
-	 */
-	@JsonProperty("description")
-	public String getDescription() {
-		return description;
-	}
+    /**
+     *
+     * @return The description
+     */
+    @JsonProperty("description")
+    public String getDescription() {
+        return description;
+    }
 
-	/**
-	 * 
-	 * @param description
-	 *            The description
-	 */
-	@JsonProperty("description")
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    /**
+     *
+     * @param description
+     *            The description
+     */
+    @JsonProperty("description")
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	/**
-	 * 
-	 * @return The policyUrlParameters
-	 */
-	@JsonProperty("policy_url_parameters")
-	public List<String> getPolicyUrlParameters() {
-		return policyUrlParameters;
-	}
+    /**
+     *
+     * @return The policyUrlParameters
+     */
+    @JsonProperty("policy_url_parameters")
+    public List<String> getPolicyUrlParameters() {
+        return policyUrlParameters;
+    }
 
-	/**
-	 * 
-	 * @param policyUrlParameters
-	 *            The policy_url_parameters
-	 */
-	@JsonProperty("policy_url_parameters")
-	public void setPolicyUrlParameters(List<String> policyUrlParameters) {
-		if (this.policyUrlParameters == null)
-			this.policyUrlParameters = new ArrayList<String>();
-		
-		this.policyUrlParameters.addAll(policyUrlParameters);
-	}
+    /**
+     *
+     * @param policyUrlParameters
+     *            The policy_url_parameters
+     */
+    @JsonProperty("policy_url_parameters")
+    public void setPolicyUrlParameters(List<String> policyUrlParameters) {
+        if (this.policyUrlParameters == null)
+            this.policyUrlParameters = new ArrayList<String>();
 
-	/**
-	 * 
-	 * @return The result
-	 */
-	@JsonProperty("results")
-	public List<String> getResults() {
-		return results;
-	}
+        this.policyUrlParameters.addAll(policyUrlParameters);
+    }
 
-	/**
-	 * 
-	 * @param result
-	 *            The result
-	 */
-	@JsonProperty("results")
-	public void setResults(List<String> results) {
-		if (this.results == null)
-			this.results = new ArrayList<String>();
-		this.results.addAll(results);
-	}
+    /**
+     *
+     * @return The result
+     */
+    @JsonProperty("results")
+    public List<String> getResults() {
+        return results;
+    }
 
-	/**
-	 * 
-	 * @return The graph
-	 */
-	@JsonProperty("graph")
-	public Graph getGraph() {
-		return graph;
-	}
+    /**
+     *
+     * @param result
+     *            The result
+     */
+    @JsonProperty("results")
+    public void setResults(List<String> results) {
+        if (this.results == null)
+            this.results = new ArrayList<String>();
+        this.results.addAll(results);
+    }
 
-	/**
-	 * 
-	 * @param graph
-	 *            The graph
-	 */
-	@JsonProperty("graph")
-	public void setGraph(Graph graph) {
-		this.graph = graph;
-	}
+    /**
+     *
+     * @return The graph
+     */
+    @JsonProperty("graph")
+    public Graph getGraph() {
+        return graph;
+    }
 
-	@JsonAnyGetter
-	public Map<String, Object> getAdditionalProperties() {
-		return this.additionalProperties;
-	}
+    /**
+     *
+     * @param graph
+     *            The graph
+     */
+    @JsonProperty("graph")
+    public void setGraph(Graph graph) {
+        this.graph = graph;
+    }
 
-	@JsonAnySetter
-	public void setAdditionalProperty(String name, Object value) {
-		this.additionalProperties.put(name, value);
-	}
+    @JsonAnyGetter
+    public Map<String, Object> getAdditionalProperties() {
+        return this.additionalProperties;
+    }
 
+    @JsonAnySetter
+    public void setAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+    }
 }

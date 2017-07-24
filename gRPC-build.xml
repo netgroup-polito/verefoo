@@ -148,7 +148,7 @@
 	<!-- Target runFuncTest.real	-->
 	<target name="runFuncTest.real" depends="gRPC-build">
 		
-		<echo>Running First set of Junit tests...</echo>		
+		<!--echo>Running First set of Junit tests...</echo>		
 		<junit printsummary="yes" dir="." fork="yes" haltonfailure="no" showoutput="no" filtertrace="true" timeout="120000">
 			<jvmarg value="-Djava.awt.headless=true" />
 			<formatter type="brief" usefile="false"/>
@@ -170,9 +170,9 @@
 			</classpath>
 		</junit>
 		<fail if="test_failed" status="${exit.code2}" message="*** Second set of Junit tests: Some Tests FAILED ***"/>
-		<echo>*** Second set of Junit tests: All Tests PASSED  ***</echo>
+		<echo>*** Second set of Junit tests: All Tests PASSED  ***</echo-->
 		
-		<!--echo>Running Third set of Junit tests...</echo>		
+		<echo>Running Third set of Junit tests...</echo>		
 		<junit printsummary="yes" dir="." fork="yes" haltonfailure="no" showoutput="no" filtertrace="true" timeout="120000">
 			<jvmarg value="-Djava.awt.headless=true" />
 			<formatter type="brief" usefile="false"/>
@@ -182,9 +182,9 @@
 			</classpath>
 		</junit>
 		<fail if="test_failed" status="${exit.code3}" message="*** Third set of Junit tests: Some Tests FAILED ***"/>
-		<echo>*** Third set of Junit tests: All Tests PASSED  ***</echo-->
+		<echo>*** Third set of Junit tests: All Tests PASSED  ***</echo>
 		
-		<echo>Running Fourth set of Junit tests...</echo>		
+		<!--echo>Running Fourth set of Junit tests...</echo>		
 		<junit printsummary="yes" dir="." fork="yes" haltonfailure="no" showoutput="no" filtertrace="true" timeout="120000">
 			<jvmarg value="-Djava.awt.headless=true" />
 			<formatter type="brief" usefile="false"/>
@@ -196,7 +196,7 @@
 				</fileset>
 			</classpath>
 		</junit>
-		<fail if="test_failed" status="${exit.code4}" message="*** Fourth set of Junit tests: Some Tests FAILED ***"/>
+		<fail if="test_failed" status="${exit.code4}" message="*** Fourth set of Junit tests: Some Tests FAILED ***"/-->
 		<echo>*** Fourth set of Junit tests: All Tests PASSED  ***</echo>
 		<echo>***************************************************</echo>
 		<echo>*************** All Tests PASSED  *****************</echo>

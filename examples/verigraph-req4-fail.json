@@ -1,76 +1,76 @@
-{  
-   "nodes":[  
-      {  
-         "neighbours":[  
-            {  
+{
+   "nodes":[
+      {
+         "neighbours":[
+            {
                "name":"webserver1"
             },
-            {  
+            {
                "name":"nat"
             }
          ],
-         "configuration":[  
-            {  
+         "configuration":[
+            {
                "ip_host1":"webserver1"
             }
          ],
          "name":"fw",
          "functional_type":"firewall"
       },
-      {  
-         "neighbours":[  
-            {  
+      {
+         "neighbours":[
+            {
                "name":"host3"
             },
-            {  
+            {
                "name":"fw"
             }
          ],
          "name":"webserver1",
          "functional_type":"webserver"
       },
-      {  
-         "neighbours":[  
-            {  
+      {
+         "neighbours":[
+            {
                "name":"host1"
             },
-            {  
+            {
                "name":"dpi"
             },
-            {  
+            {
                "name":"fw"
             }
          ],
-         "configuration":[  
+         "configuration":[
             "host1",
             "host2"
          ],
          "name":"nat",
          "functional_type":"nat"
       },
-      {  
-         "neighbours":[  
-            {  
+      {
+         "neighbours":[
+            {
                "name":"host2"
             },
-            {  
+            {
                "name":"nat"
             }
          ],
-         "configuration":[  
+         "configuration":[
             "sex"
          ],
          "name":"dpi",
          "functional_type":"dpi"
       },
-      {  
-         "neighbours":[  
-            {  
+      {
+         "neighbours":[
+            {
                "name":"dpi"
             }
          ],
-         "configuration":[  
-            {  
+         "configuration":[
+            {
                "url":"www.facebook.com",
                "body":"sex",
                "destination":"webserver1",
@@ -80,14 +80,14 @@
          "name":"host2",
          "functional_type":"endhost"
       },
-      {  
-         "neighbours":[  
-            {  
+      {
+         "neighbours":[
+            {
                "name":"nat"
             }
          ],
-         "configuration":[  
-            {  
+         "configuration":[
+            {
                "url":"www.facebook.com",
                "body":"drug",
                "destination":"webserver1",
@@ -97,14 +97,14 @@
          "name":"host1",
          "functional_type":"endhost"
       },
-      {  
-         "neighbours":[  
-            {  
+      {
+         "neighbours":[
+            {
                "name":"webserver1"
             }
          ],
-         "configuration":[  
-            {  
+         "configuration":[
+            {
                "url":"www.facebook.com",
                "body":"cats",
                "destination":"webserver1",

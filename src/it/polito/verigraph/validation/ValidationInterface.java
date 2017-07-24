@@ -6,7 +6,7 @@ import it.polito.verigraph.model.Node;
 import it.polito.verigraph.validation.exception.ValidationException;
 
 public interface ValidationInterface {
-	
-	void validate(Graph graph, Node node, Configuration configuration) throws ValidationException;
+
+    void validate(Graph graph, Node node, Configuration configuration) throws ValidationException;
 
 }

@@ -8,13 +8,13 @@
                "name":"nat"
             }
          ],
-        "configuration": 
+        "configuration":
             [
-				{
-					"body": "sex",
-					"protocol": "HTTP_REQUEST",
-					"destination": "webserver"
-				}
+                {
+                    "body": "sex",
+                    "protocol": "HTTP_REQUEST",
+                    "destination": "webserver"
+                }
             ]
       },
       {
