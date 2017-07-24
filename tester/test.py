@@ -3,19 +3,19 @@
 #  Copyright 2016 Politecnico di Torino
 #  Authors:
 #  Project Supervisor and Contact: Riccardo Sisto (riccardo.sisto@polito.it)
-#  
+#
 #  This file is part of Verigraph.
-#  
+#
 #  Verigraph is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU Affero General Public License as
 #  published by the Free Software Foundation, either version 3 of
 #  the License, or (at your option) any later version.
-#  
+#
 #  Verigraph is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU Affero General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU Affero General Public
 #  License along with Verigraph.  If not, see
 #  <http://www.gnu.org/licenses/>.
@@ -55,7 +55,7 @@ def eprint(toPrint):
     sys.stdout.flush()
     print(toPrint, file=sys.stderr)
     sys.stderr.flush()
-    
+
 # Print PYTHON ver
 print("PYTHON " + sys.version)
 
@@ -70,38 +70,38 @@ with open('result.csv', 'w') as file:
     writer.writerow(['SRC','DST','GRAPH_ID','TEST_ID','RESULT','TIMES (ms)'])
     # Iterate over .json files contained in the TEST_CASES_DIR
     for i in os.listdir(TEST_CASES_DIR):
-        if i.endswith(".json"): 
+        if i.endswith(".json"):
             with open(TEST_CASES_DIR+os.path.sep+i) as data_file:
                 try:
                     # Load json file (raise exception if malformed)
                     data = json.load(data_file)
-                    
+
                     # Validate input json against schema (raise exception if invalid)
                     validate(data, schema)
-                    
-                  
+
+
                     parser = argparse.ArgumentParser(description='iteration number')
                     parser.add_argument('-iteration')
                     args = vars(parser.parse_args())
                     tests_number=args['iteration'][0]
-                    
+
                     print("Test case ID: "+str(data["id"]))
                     print("\tFILE NAME: "+i)
                     print("\tTEST NAME: "+data["name"])
                     print("\tTEST DESCRIPTION: "+data["description"])
-                    
+
                     requested=data["policy_url_parameters"]
                     results=data["results"]
-                    
+
                     if(len(requested)==len(results)):
-                        
+
                         run += 1
                         # POST the graph
                         r = requests.post(BASE_URL, json=data["graph"])
                         if r.status_code == 201:
                             graph_id = r.json()["id"]
                             print("\tCreated Graph has ID " + str(graph_id) + " on VeriGraph")
-                            
+
                             for i in range(len(requested)):
                                 print("request #: "+str(i))
                                 output=[]
@@ -111,25 +111,25 @@ with open('result.csv', 'w') as file:
                                 temp=re.split(r'[&=]', temp)
                                 output.append(temp[3])
                                 output.append(temp[5])
-                                
+
                                 #range(0, n)) where n is the number of tests to execute for every request (1 is the default)
-                                for n in range(0, int(tests_number)):                           
-                                    start_time=datetime.datetime.now()                      
+                                for n in range(0, int(tests_number)):
+                                    start_time=datetime.datetime.now()
                                     # GET the policy verification result
                                     policy = requests.get(BASE_URL+str(graph_id)+"/policy"+data["policy_url_parameters"][i])
                                     total_time.append(int((datetime.datetime.now()-start_time).total_seconds() * 1000))
-                            
+
                                     # Check the response
                                     if policy.status_code == 200:
-                                        print("\tVerification result is " + policy.json()["result"])                                        
-                                      
+                                        print("\tVerification result is " + policy.json()["result"])
+
                                         # Check the result with the expected one
                                         if policy.json()["result"] == data["results"][i]:
                                             # SUCCESS
                                             print("\t+++ Test passed +++")
                                             if n==0:
                                                 result.append(policy.json()["result"])
-                                            
+
                                         else:
                                             # FAIL
                                             #eprint("\t[ERROR] Expected result was " + data["result"][i] + " but VeriGraph returned " + policy.json()["result"])
@@ -146,7 +146,7 @@ with open('result.csv', 'w') as file:
                                     output.append(result[0])
                                     for j in range(len(total_time)):
                                         output.append(total_time[j])
-                                    writer.writerow(output) 
+                                    writer.writerow(output)
                                 else:
                                     output.append("Error")
                                     output.append("Policy code="+str(policy.status_code))
