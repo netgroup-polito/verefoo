@@ -1,24 +1,11 @@
-/*
- * Copyright 2016 Politecnico di Torino
- * Authors:
- * Project Supervisor and Contact: Riccardo Sisto (riccardo.sisto@polito.it)
+/*******************************************************************************
+ * Copyright (c) 2017 Politecnico di Torino and others.
  *
- * This file is part of Verigraph.
- *
- * Verigraph is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of
- * the License, or (at your option) any later version.
- *
- * Verigraph is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public
- * License along with Verigraph.  If not, see
- * <http://www.gnu.org/licenses/>.
- */
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License, Version 2.0
+ * which accompanies this distribution, and is available at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *******************************************************************************/
 package it.polito.verigraph.mcnet.components;
 
 import com.microsoft.z3.BoolExpr;
@@ -28,7 +15,6 @@ import com.microsoft.z3.Model;
 import com.microsoft.z3.Status;
 
 import it.polito.verigraph.mcnet.components.NetContext;
-
 
 /**Data structure for the response to a check request for data isolation property
  *
@@ -52,4 +38,3 @@ public class DataIsolationResult {
         this.assertions = assertions;
     }
 }
-
