@@ -1,0 +1,101 @@
+VeriGraph models the network as a set of network nodes that send and receive packets. Each packet has a static structure, which is:
+\begin{figure}[h]
+	{\footnotesize
+		\begin{subequations}
+			\begin{align}
+				\begin{split}
+					Packet = \{& src, dst, origin, origin\_body, body,\\
+					&   seq, proto, emailFrom, url, options\}
+				\end{split}
+			\end{align}
+		\end{subequations}}
+	\end{figure}
+\begin{itemize}
+	\item \textit{src} and \textit{dst} are the source and destination addresses of the current packet;
+	\item \textit{origin} represents the network node that has originally created the packet;
+	\item \textit{origin\_body} takes trace of the original content body of the packet, while \textit{body} is the current body (that could be modified traversing the chain);
+	\item \textit{seq} is the sequence number of this packet;
+	\item \textit{proto} represents the protocol type and it can assume as values: \textit{HTTP\_REQUEST, HTTP\_RESPONSE, POP3\_REQUEST, POP3\_RESPONSE, SMTP\_REQUEST, SMTP\_RESPONSE}. This set of values must be extended when the VNF catalog is enriched with new functions that use other protocols (e.g., DNS server, VPN gateways and other);
+	\item \textit{emailFrom} states for the email address that has sent a POP3 or SMTP message and it is modelled as an integer;
+	\item\textit{url} states for the web content of a HTTP message and it is modelled as an integer;
+	\item \textit{options} are the options values for the current packet.
+\end{itemize}
+ When there is not explicit constraints imposed on which values a packet filed can assume, Z3 is allowed to assign any values to those fields. This is because Z3 looks for those values that satisfy all the conditions imposed by the formulas to verify. For instance, let us consider that VeriGraph has to check if a web server is reachable from a web client. Both network nodes are modelled so that they can send and receive only HTTP messages (i.e., \textit{$p.proto == HTTP\_RESPONSE \vee p.proto == HTTP\_REQUEST$}) and no conditions are imposed on other fields. Hence Z3 can assign any value to, for instance, the \textit{url} field, because this is not directly involved into the formulas for verifying the web server and client connection.
+
+VeriGraph library provides also a set of functions for retrieving some useful information. All of these functions are uninterpreted functions supported by Z3, which means that they do not have any a priori interpretation, like usual programming language. Uninterpreted functions allow any interpretation that is consistent with the constraints over the function. Some functions supported by VeriGraph are:
+\begin{itemize}
+	\item \textit{Bool nodeHasAddress(node, address)}, which checks if \textit{address} is an address associated to \textit{node};
+	\item \textit{Node addrToNode(address)}, which returns the node associated to the passed \textit{address};
+	\item \textit{Int sport(packet)} and \textit{Int dport(packet)} return respectively the source and destination ports of \textit{packet}.
+\end{itemize} 
+
+ The main functions that model operational behaviours in a network, provided by VeriGraph, are:
+\begin{itemize}
+	\item \textit{Bool send(node\_src, node\_dst, packet, time\_t)}: the \textit{send} function returns a boolean and represents the sending action performed by a source node (\textit{node\_src}) towards a destination node (\textit{node\_dst}) of a packet (\textit{packet}) at certain time (\textit{time\_t});
+	\item \textit{Bool recv(node\_src, node\_dst, packet, time\_t)}:  this function returns a boolean and models a destination node (\textit{node\_dst}) that has received  a packet (\textit{packet}) at time \textit{time\_t} from a source node (\textit{node\_src}). 
+\end{itemize} 
+Hence the \textit{send} and \textit{recv} functions (as well the other previously defined) are the means to impose conditions for describing how network and VNFs operate. In particular, VeriGraph has already a set of conditions imposed on those two functions in order to model the fundamentals principals of a correct forwarding behaviour. The formulas of such conditions are:
+\begin{figure}[h]
+	{\footnotesize
+		\begin{subequations}
+			\begin{align}
+				\begin{split}
+					\label{send-formulas}
+					(send(n_{0}, n_{1}, p_{0}, t_{0})) \implies (& n_{0} \neq n_{1} \wedge p_{0}.src \neq p_{0}.dst \wedge \\
+					& sport(p_{0}) \geq 0 \wedge sport(p_{0}) < MAX\_PORT \wedge \\
+					& dport(p_{0}) \geq 0 \wedge dport(p_{0}) < MAX\_PORT \wedge \\
+					& t_{0} > 0 ), \quad \forall n_{0}, p_{0}, t_{0} \\
+				\end{split}
+			\end{align}
+		\end{subequations}}
+\end{figure} 
+\begin{figure}[h]
+		{\footnotesize
+			\begin{subequations}
+				\begin{align}
+					\begin{split}
+						\label{recv-formulas}
+ 					    (recv(n_{0}, n_{1}, p_{0}, t_{0})) \implies (& n_{0} \neq n_{1} \wedge p_{0}.src \neq p_{0}.dst \wedge \\
+ 					    & sport(p_{0}) \geq 0 \wedge sport(p_{0}) < MAX\_PORT \wedge \\
+ 					    & dport(p_{0}) \geq 0 \wedge dport(p_{0}) < MAX\_PORT \wedge \\
+ 					    &\exists (t_{1}) | (send(n_{0}, n_{1}, p_{0}, t_{1}) \wedge t_{1} < t_{0} \wedge \\
+ 					    & t_{1} > 0 \wedge t_{0} > 0 ), \quad \forall n_{0}, p_{0}, t_{0} \\
+					\end{split}
+				\end{align}
+				\label{formula1}
+			\end{subequations}}
+\end{figure} \\
+Formula~\ref{send-formulas} states that the source and destination nodes (\textit{$n_0$} and \textit{$n_1$}) must be different, as well source and destination addresses in the packet (\textit{$p_0.src$} and \textit{$p_0.dst$}). The source and destination ports must also be defined in a valid range of values and the sending time must be a positive value. In Formula~\ref{recv-formulas}, we can find the conditions for receiving a packet (similar to the formula for sending), but we have to consider an additional constrain: if a packet is received by a node (\textit{$n_1$}), this implies that this packet was previously sent to that node.   
+
+Finally, it is possible that source and destination nodes may be no directly connected, but they can exchange traffic through a set of functions. These functions process and potentially can modify received packets before forwarding them toward the final destination (e.g., NATs modify IP addresses). 
+
+In order to verify the correctness of reachability properties in presence of such functions, we have to assume that the original sent packet could be different from the received one. Hence VeriGraph ca verify the reachability between the \textit{$src$} and \textit{$dest$} nodes in presence of a set of middleboxes thanks to the following formula:
+\begin{figure}[h]
+	{\footnotesize
+		\begin{subequations}
+			\begin{align}
+				\begin{split}
+				\exists (n_{0}, n_{1}, p_{0}, p_{1}, t_{0}, t_{1}) \; |&  \; (send(src, n_{1}, p_{1}, t_{1}) \wedge nodeHasAddr(src, p_{1}.src) \wedge \\
+				& p_{1}.origin == src  \wedge nodeHasAddr(dest, p_{1}.dst) \wedge   \\
+				&  recv(n_{0}, dest, p_{0}, t_{0}) \wedge nodeHasAddr(dest, p_{0}.dst) \\
+				& \wedge p_{1}.origin == p_{0}.origin )
+				\end{split}
+			\end{align}
+			\label{formula}
+		\end{subequations}}
+\end{figure}
+\\
+Here we are modelling the case of a source node (\textit{$src$}) that is sending a packet (\textit{$p_{1}$}) to a destination node \textit{$dst$} (\textit{$send(src, n_{1}, p_{1}, t_{1}) \wedge nodeHasAddr(dest, p_{1}.dst)$}), of which we want to check the reachability between each other. The sent packet is delivered to the first chain node (\textit{$n_{1}$}) that connect source and destination nodes and must also have the address of the \textit{$src$} node as source address (\textit{$nodeHasAddr(src, p_{1}.src)$}). As we have already explained, the destination node may receive a different packet from the one sent, because VNFs could modify the sent packet in its trip towards the destination. Thus we have to impose that the destination node receives a new packet (\textit{$p_{0}$}) from the last chain node (\textit{$n_{0}$}): the received packet  must have the address of the \textit{$dest$} node as destination, but it must have anyway the same origin of the sent packet (\textit{$p_{1}.origin == p_{0}.origin $}).
+
+Please note that Formula~\ref{formula} can be substituted by a simplified version thanks to the condition expressed in formula~\ref{formula1}; the simpler formula is the following: 
+\begin{figure}[h]
+	{\footnotesize
+		\begin{subequations}
+			\begin{align}
+				\begin{split}
+					\exists (n_{0}, p_{0}, t_{0}) \; |&  \; (recv(n_{0}, dest, p_{0}, t_{0}) \wedge nodeHasAddr(dest, p_{0}.dst) \wedge \\
+					& p_{0}.origin == src )
+				\end{split}
+			\end{align}
+		\end{subequations}}
+\end{figure}
