@@ -1,13 +1,14 @@
 How to deploy **VeriGraph** on Apache Tomcat:
 
 **Windows**
+
 - install jdk1.8.X YY(http://www.oracle.comntechnetwork/java/javase/downloads/jdk8-downloads-2133151.html);
 - set JAVA HOME environment variable to where you installed the jdk (e.g. C:\Program Files\Java\jdk1.8.X YY);
 - install Apache Tomcat 8 (https://tomcat.apache.org/download-80.cgi);
 - set CATALINA HOME ambient variable to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30);
 - (optional) configure Tomcat Manager:
   - open the file `%CATALINA_HOME%\conf\tomcat-users.xml`
-  - under the `tomcat-users` tag place the following content:
+  - under the `tomcat-users` tag place, initialize an user with roles "tomcat, manager-gui, manager-script". An example is the following content:
   ```xml
   <role rolename="tomcat"/>
   <role rolename="role1"/>
@@ -15,16 +16,16 @@ How to deploy **VeriGraph** on Apache Tomcat:
   <user username="both" password="tomcat" roles="tomcat,role1"/>
   <user username="role1" password="tomcat" roles="role1"/>    ```  
 
-- edit the "to_be_defined" fields in tomcat-build.xml;
+- edit the "to\_be_defined" fields in tomcat-build.xml with the before defined credentials;
 - execute the generate-war ant task in order to generate the .war;
 - launch Tomcat 8 with the startup script `%CATALINA_HOME%\bin\startup.bat` or by the start-tomcat task ant;
-- (optional) if you previously configured Tomcat Manager you can open a browser and navigate to [this link](http://localhost:8080/manager) and login using `tomcat/tomcat` as username/password;
+- (optional) if you previously configured Tomcat Manager you can open a browser and navigate to [this link](http://localhost:8080/manager) and login using the proper username and password (e.g., `tomcat/tomcat` in the previous example);
 - (optional) you can deploy/undeploy/redeploy the downloaded WARs through the web interface.
 
 
 **Ant script**
 
-Edit the "to_be_defined" fields of the tomcat-build.xml. (e.g. name="tomcatUsername" value="tomcat" and name="tomcatPassword" value="tomcat" the values set in 'tomcat-users'). Set server.location property to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30);
+Edit the "to\_be_defined" fields of the tomcat-build.xml. with the username and password previously configured in Tomcat(e.g. `name="tomcatUsername" value="tomcat"` and `name="tomcatPassword" value="tomcat"` the values set in 'tomcat-users'). Set `server.location` property to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30);
 
 Verigraph target:
 
@@ -48,6 +49,7 @@ Verigraph target:
 
 
 **Unix**
+
 - install `jdk1.8.X_YY` from the command line:
   - go to [this link](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) to check the appropriate version for you OS and architecture
   - copy the desired version to the clipboard (e.g. `http://download.oracle.com/otn-pub/java/jdk/7u79-b15/jdk-7u79-linux-x64.tar.gz`)
@@ -68,7 +70,7 @@ Verigraph target:
   `tar xvf apache-tomcat-8.0.32.tar.gz`
   - edit configuration:    
   `nano ./apache-tomcat-8.0.32/conf/tomcat-users.xml`  
-  - under the `tomcat-users` tag place the following content
+  - under the `tomcat-users` tag place, initialize an user with roles "tomcat, manager-gui, manager-script". An example is the following content:
   ```xml
   <role rolename="tomcat"/>
   <role rolename="role1"/>
@@ -90,13 +92,14 @@ e.g.
 e.g.  
 `export JDK_HOME=/home/mininet/jdk1.8.0_92`
 - `exec bash`
-- edit the "to_be_defined" fields in tomcat-build.xml (e.g. name="tomcatUsername" value="tomcat" and name="tomcatPassword" value="tomcat" the values set in 'tomcat-users'). Set server.location property to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30)
+- edit the "to\_be_defined" fields of the tomcat-build.xml. with the username and password previously configured in Tomcat(e.g. `name="tomcatUsername" value="tomcat"` and `name="tomcatPassword" value="tomcat"` the values set in 'tomcat-users'). Set `server.location` property to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30);
 - execute the generate-war ant task in order to generate the .war;
 - launch Tomcat 8 with the startup script `$CATALINA_HOME/bin/startup.sh` or with start-tomcat ant tast
 - open a browser and navigate to [this link](http://localhost:8080/manager) and login using `tomcat/tomcat` as username/password
 - you can deploy/undeploy/redeploy the downloaded WARs through the web interface
 
 **Eclipse**
+
 - clone project onto your hard drive with this command: `git clone git@github.com:netgroup-polito/verigraph.git`
 - Download Apache Tomcat 8 (see instructions above for Windows and Unix)
 - Download JDK (see instructions above for Windows and Unix)
@@ -106,7 +109,7 @@ e.g.
     - double-click on the newly created server in the `Servers` tab
     - make sure under `Server Locations` `Use Tomcat installation` is selected  
 - Run the server
-- edit the "to_be_defined" fields in tomcat-build.xml (e.g. name="tomcatUsername" value="tomcat" and name="tomcatPassword" value="tomcat" the values set in 'tomcat-users'). Set server.location property to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30);
+- edit the "to\_be_defined" fields of the tomcat-build.xml. with the username and password previously configured in Tomcat(e.g. `name="tomcatUsername" value="tomcat"` and `name="tomcatPassword" value="tomcat"` the values set in 'tomcat-users'). Set `server.location` property to the directory where you installed Apache (e.g. C:\Program Files\Java\apache-tomcat-8.0.30);
 - execute the generate-war ant task in order to generate the .war;
 
 **How to add you own function `<type>`**

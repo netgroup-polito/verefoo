@@ -1,0 +1,1 @@
+The XML Schema files in this folder are used by VeriGraph to automatically generate Java XML Bindings (JAXB)
