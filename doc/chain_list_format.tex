@@ -1,0 +1,26 @@
+Example of JSON file for representing VNF chains, received by VeriGraph as input:
+\begin{lstlisting}[language=json,firstnumber=1]
+{ "chains": [ {
+    "id": "1",
+    "flowspace": "tcp=80",
+    "nodes": [
+             { "name": "node1", "functional_type": "web-client", "address":"ip_webClient" },
+             { "name": "node1", "functional_type": "web-cache", "address":"ip_webCache" },
+             { "name": "node2", "functional_type": "nat", "address":"ip_nat" },
+             { "name": "node1", "functional_type": "firewall", "address":"ip_firewall },
+             { "name": "node1", "functional_type": "web-server", "address":"ip_webServer" }
+             ]
+   },
+   { "id": "2",
+     "flowspace": "tcp=25",
+     "nodes": [
+              { "name": "node1", "functional_type": "mail-client", "address":"ip_mailClient" },
+              { "name": "node1", "functional_type": "anti-spam", "address":"ip_spam" },
+              { "name": "node2", "functional_type": "nat" , "address":"ip_nat"},
+              { "name": "node1", "functional_type": "firewall", "address":"ip_firewall" },
+              { "name": "node1", "functional_type": "mail-server", "address":"ip_mailServer" }
+              ]
+   }
+ ]
+}
+\end{lstlisting}

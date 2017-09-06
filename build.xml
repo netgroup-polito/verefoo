@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2017 Politecnico di Torino and others.
+
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Apache License, Version 2.0
+ which accompanies this distribution, and is available at
+ http://www.apache.org/licenses/LICENSE-2.0
+-->
+<project name="Verigraph" default="generate-war" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+  <description>
+      Script for Verigraph
+  </description>
+
+  <property name="root.location" location="." />
+  <!-- The location to be used for class files -->
+  <property name="src.dir" location="${root.location}/src" />
+  <property name="gen.dir" location="${root.location}/gen-src" />
+  <property name="war.dir" location="${root.location}/war" />
+  <property name="grpc.dir" value="${src.dir}/it/polito/verigraph/grpc" />
+  <property name="path.prefix" value="it/polito" />
+  <property name="build.dir" location="${root.location}/build" />
+  <property name="lib.dir" location="${root.location}/lib" />
+  <property name="schemadir" location="${root.location}/schema" />
+  <property name="schemafile" value="xml_components.xsd" />
+  <property name="testfile" value="test.py" />
+  <property name="target" value="1.8" />
+  <property name="source" value="1.8" />
+  <property name="gen-tomcat-service.dir" location="${root.location}/target" />
+  <property name="resources.dir" location="${root.location}/webapp" />
+  <property name="gen-war.dir" location="${root.location}/war" />
+  <property name="jsonschemafolder.dir" location="${root.location}/jsonschema" />
+  <property name="test.dir" location="${root.location}/tester" />
+  <property name="iteration" value="1" />
+
+  <path id="z3.classpath">
+    <pathelement location="${lib.dir}/com.microsoft.z3.jar" />
+  </path>
+
+
+  <import file="tomcat-build.xml" />
+
+  <target name="mvn-init" unless="compile.classpath" xmlns:artifact="urn:maven-artifact-ant">
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpath="lib/maven-ant-tasks-2.1.3.jar" />
+    <condition property="maven.repo.local" value="${maven.repo.local}" else="${user.home}/.m2/repository">
+      <isset property="maven.repo.local" />
+    </condition>
+    <echo>maven.repo.local=${maven.repo.local}</echo>
+    <artifact:localRepository id="local.repository" path="${maven.repo.local}" />
+    <artifact:pom file="pom.xml" id="maven.project" />
+    <artifact:dependencies pathId="compile.classpath" filesetId="compile.fileset" useScope="compile">
+      <pom refid="maven.project" />
+      <localRepository refid="local.repository" />
+    </artifact:dependencies>
+    <artifact:dependencies pathId="test.classpath" filesetId="test.fileset" useScope="test">
+      <pom refid="maven.project" />
+      <localRepository refid="local.repository" />
+    </artifact:dependencies>
+    <artifact:dependencies pathId="runtime.classpath" filesetId="runtime.fileset" useScope="runtime">
+      <pom refid="maven.project" />
+      <localRepository refid="local.repository" />
+    </artifact:dependencies>
+    <artifact:dependencies pathId="build.classpath" filesetId="build.fileset">
+      <pom refid="maven.project" />
+      <localRepository refid="local.repository" />
+    </artifact:dependencies>
+  </target>
+
+
+  <target name="init">
+    <mkdir dir="${build.dir}" />
+    <mkdir dir="${gen-tomcat-service.dir}" />
+    <mkdir dir="${gen-war.dir}" />
+    <mkdir dir="${gen.dir}" />
+    <mkdir dir="${lib.dir}" />
+    <get dest="${lib.dir}">
+      <url url="https://github.com/Z3Prover/z3/releases/download/z3-4.5.0/z3-4.5.0-x86-win.zip" />
+      <url url="http://central.maven.org/maven2/org/apache/maven/maven-ant-tasks/2.1.3/maven-ant-tasks-2.1.3.jar" />
+    </get>
+    <unzip src="${lib.dir}/z3-4.5.0-x86-win.zip" dest="${lib.dir}" overwrite="true">
+      <patternset>
+        <include name="**/**/com.microsoft.z3.jar" />
+      </patternset>
+      <mapper type="flatten" />
+    </unzip>
+    <delete file="${lib.dir}/z3-4.5.0-x86-win.zip" />
+  </target>
+
+	
+  <target name="-chk-bindings">
+    <uptodate property="generate-bindings.notRequired" targetfile="${src.dir}/.flagfile">
+      <srcfiles dir="${schemadir}" includes="${schemafile}" />
+    </uptodate>
+  </target>
+
+	
+  <target name="generate-bindings" unless="generate-bindings.notRequired" depends="init" description="Create the value classes">
+    <exec executable="xjc" failonerror="true">
+      <arg line="-d ${gen.dir} -p it.polito.neo4j.jaxb ${schemadir}/${schemafile}" />
+    </exec>
+    <touch file="${src.dir}/.flagfile" />
+  </target>
+
+  	
+  <!-- The target for compiling the Verigraph application -->
+  <target name="build-service" depends="init, generate-bindings, mvn-init">
+    <echo>Building verigraph (if needed)...</echo>
+    <javac destdir="${build.dir}" debug="${debug}" debuglevel="${debuglevel}" source="${source}" target="${target}" includeantruntime="false">
+      <classpath>
+        <path id="compile.classpath" />
+        <path id="z3.classpath" />
+      </classpath>
+      <src path="${src.dir}" />
+      <src path="${gen.dir}" />
+      <src path="${basedir}/gen-protobuf" />
+      <include name="${path.prefix}/**/*.java" />
+      <exclude name="main/proto/" />
+    </javac>
+    <echo>Done.</echo>
+  </target>
+
+
+  <macrodef name="war-exploded">
+    <sequential>
+      <copy toDir="${gen-tomcat-service.dir}" overwrite="true">
+        <fileset dir="${resources.dir}" />
+      </copy>
+      <copy toDir="${gen-tomcat-service.dir}" overwrite="true">
+        <fileset dir=".">
+          <include name="server.properties" />
+        </fileset>
+      </copy>
+      <!-- copy class files to WEB-INF/classes directory -->
+      <copy toDir="${gen-tomcat-service.dir}/WEB-INF/classes" overwrite="true">
+        <fileset dir="${build.dir}">
+          <exclude name="verigraph.proto" />
+          <exclude name="src/main/proto" />
+        </fileset>
+      </copy>
+      <!-- copy jsonschema folder to WEB-INF/classes directory -->
+      <copy toDir="${gen-tomcat-service.dir}/jsonschema" overwrite="true">
+        <fileset dir="${jsonschemafolder.dir}" />
+      </copy>
+      <!-- copy lib files to WEB-INF/lib directory -->
+      <copy toDir="${gen-tomcat-service.dir}/maven-lib" overwrite="true">
+        <fileset refid="runtime.fileset">
+        </fileset>
+      </copy>
+      <copy toDir="${gen-tomcat-service.dir}/WEB-INF/lib" overwrite="true" flatten="true">
+        <fileset dir="${gen-tomcat-service.dir}/maven-lib">
+          <include name="**/**/*.jar" />
+        </fileset>
+      </copy>
+      <delete dir="${gen-tomcat-service.dir}/maven-lib" />
+
+      <!-- Make the jar that includes only the classes needed for verigraph models -->
+      <jar destfile="${gen-tomcat-service.dir}/WEB-INF/lib/mcnet.jar">
+        <fileset dir="${build.dir}">
+          <include name="it/polito/verigraph/mcnet/**/*.class" />
+        </fileset>
+      </jar>
+      <!-- Copy the z3 library -->
+      <copy toDir="${gen-tomcat-service.dir}/WEB-INF/lib" overwrite="true" flatten="true">
+        <file name="${lib.dir}/com.microsoft.z3.jar" />
+      </copy>
+    </sequential>
+  </macrodef>
+
+	
+  <target name="war-exploded" depends="build-service">
+    <war-exploded />
+  </target>
+
+	
+  <target name="generate-war" depends="war-exploded">
+    <war destfile="${gen-war.dir}/${serviceName}.war" basedir="${gen-tomcat-service.dir}">
+      <exclude name="protoc-dependencies/" />
+      <exclude name="protoc-plugins/" />
+      <exclude name="classes/" />
+      <exclude />
+    </war>
+  </target>
+
+	
+  <!-- launch test python test -->
+  <target name="run-test">
+    <exec dir="${test.dir}" executable="python">
+      <arg value="${testfile}" />
+      <arg value="-iteration " />
+      <arg value="${iteration}" />
+    </exec>
+  </target>
+
+
+
+  <!-- target for cleaning -->
+  <target name="clean">
+    <delete dir="${build.dir}" />
+    <delete dir="${gen.dir}" />
+    <delete dir="${gen-tomcat-service.dir}" />
+    <delete dir="${war.dir}" />
+    <delete dir="${lib.dir}" />
+  </target>
+
+
+</project>

@@ -1,0 +1,11 @@
+#inputFileX {
+    display: block;
+    visibility: hidden;
+    width: 0;
+    height: 0;
+}
+
+/* TODO non trovo modo di spostare la select */
+#selectBootstrapNav{
+    margin-top: 8px;
+}

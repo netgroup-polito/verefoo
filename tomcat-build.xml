@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2017 Politecnico di Torino and others.
+
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Apache License, Version 2.0
+ which accompanies this distribution, and is available at
+ http://www.apache.org/licenses/LICENSE-2.0
+-->
+<project basedir="." name="tomcat-build">
+  <description>
+    Script for Controlling Tomcat (to be imported in main build)
+  </description>
+
+  <property name="tomcatUsername" value="to_be_defined" />
+  <property name="tomcatPassword" value="to_be_defined" />
+  <property name="server.location" location="to_be_defined" />
+  <property name="tomcatPort" value="8080" />
+  <property name="tomcatUrl" value="http://localhost:${tomcatPort}/manager/text" />
+  <property name="root.location" location="." />
+  <!--PROPERTIES AND TASKS TO BE OVERRIDDEN BY MAIN BUILD-->
+  <property name="serviceName" value="verigraph" />
+  <property name="rootDirectoryWS" value="verigraph"/>
+
+  <path id="tomcat.class.path">
+    <fileset dir="${server.location}/lib">
+      <include name="**/*.jar" />
+      <include name="**/*.zip" />
+    </fileset>
+    <pathelement location="${server.location}/bin/bootstrap.jar" />
+    <pathelement location="${server.location}/bin/tomcat-juli.jar" />
+  </path>
+
+  <!-- Configure the custom Ant tasks for the Manager application -->
+  <import file="${server.location}/bin/catalina-tasks.xml" />
+
+
+  <!-- TOMCAT LIFECICLE MANAGEMENT-->
+  <target name="start-tomcat" depends="check-tomcat-status" unless="tomcat.started">
+    <echo>Start Tomcat</echo>
+    <java classname="org.apache.catalina.startup.Bootstrap" fork="true"
+      classpathref="tomcat.class.path">
+      <jvmarg value="-Dcatalina.home=${server.location}/" />
+    </java>
+  </target>
+
+
+  <target name="stop-tomcat" depends="check-tomcat-status" if="tomcat.started">
+    <echo>Stop Tomcat</echo>
+    <java classname="org.apache.catalina.startup.Bootstrap" fork="true"
+      classpathref="tomcat.class.path">
+      <jvmarg value="-Dcatalina.home=${server.location}/" />
+      <arg line="stop" />
+    </java>
+  </target>
+
+
+  <target name="check-tomcat-status">
+    <condition property="tomcat.started">
+      <socket server="localhost" port="${tomcatPort}" />
+    </condition>
+  </target>
+
+
+  <!-- WEBSERVICE LIFECICLE MANAGEMENT-->
+  <target name="deployWS" description="Deploy service to tomcat">
+    <echo>Deploying to tomcat...</echo>
+    <deploy url="${tomcatUrl}" username="${tomcatUsername}"
+        password="${tomcatPassword}" path="/${serviceName}"
+        war="file:${root.location}/war/${serviceName}.war"
+      />
+  </target>
+
+
+  <target name="undeployWS" description="Undeploy to tomcat">
+    <echo>Undeploying...</echo>
+    <undeploy url="${tomcatUrl}" username="${tomcatUsername}"
+          password="${tomcatPassword}" path="/${serviceName}" failonerror="false"/>
+  </target>
+
+
+  <target name="startWS" description="Start service in tomcat">
+    <echo>Starting...</echo>
+    <start url="${tomcatUrl}" username="${tomcatUsername}" password="${tomcatPassword}"
+         path="/${serviceName}" />
+  </target>
+
+
+  <target name="stopWS" description="Stop service in tomcat">
+    <echo>Stopping...</echo>
+    <stop url="${tomcatUrl}" username="${tomcatUsername}" password="${tomcatPassword}"
+        path="/${serviceName}" />
+  </target>
+
+
+  <target name="reloadWS" description="Reload service in tomcat">
+    <echo>Reloading...</echo>
+    <reload url="${tomcatUrl}" username="${tomcatUsername}" password="${tomcatPassword}"
+          path="/${serviceName}" />
+  </target>
+
+
+  <target name="redeployWS" depends="undeployWS" description="Redeploy service in tomcat">
+    <antcall target="deployWS" />
+  </target>
+
+</project>

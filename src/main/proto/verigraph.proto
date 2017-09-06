@@ -1,0 +1,154 @@
+syntax = "proto3";
+
+package verigraph;
+
+option java_multiple_files = true;
+option java_package = "it.polito.verigraph.grpc";
+option java_outer_classname = "VerigraphProto";
+
+// The service definition.
+service Verigraph {
+  // Obtains a list of graphs
+  rpc GetGraphs (GetRequest) returns (stream GraphGrpc) {}
+  // Obtains a graph
+  rpc GetGraph (RequestID) returns (GraphGrpc) {}
+  // Obtains a list of Nodes
+  rpc GetNodes (RequestID) returns (stream NodeGrpc) {}
+  // Obtains a node
+  rpc GetNode (RequestID) returns (NodeGrpc) {}
+  // Obtains a list of Neighbours
+  rpc GetNeighbours (RequestID) returns (stream NeighbourGrpc) {}
+  // Obtains a Neighbour
+  rpc GetNeighbour (RequestID) returns (NeighbourGrpc) {}
+
+  // Creates a graph
+  rpc CreateGraph (GraphGrpc) returns (NewGraph) {}
+  // Delete a graph
+  rpc DeleteGraph (RequestID) returns (Status) {}
+  // Updates a graph
+  rpc UpdateGraph (GraphGrpc) returns (NewGraph) {}
+  // Verify a policy
+  rpc VerifyPolicy (Policy) returns (VerificationGrpc) {}
+
+  // Creates a Node
+  rpc CreateNode (NodeGrpc) returns (NewNode) {}
+  // Delete a Node
+  rpc DeleteNode (RequestID) returns (Status) {}
+  // Updates a Node
+  rpc UpdateNode (NodeGrpc) returns (NewNode) {}
+  // Configures a Node
+  rpc ConfigureNode (ConfigurationGrpc) returns (Status) {}
+
+  // Creates a neighbour
+  rpc CreateNeighbour (NeighbourGrpc) returns (NewNeighbour) {}
+  // Delete a neighbour
+  rpc DeleteNeighbour (RequestID) returns (Status) {}
+  // Updates a neighbour
+  rpc UpdateNeighbour (NeighbourGrpc) returns (NewNeighbour) {}
+}
+
+message GetRequest {
+}
+
+message RequestID {
+  int64 idGraph = 1;
+  int64 idNode = 2;
+  int64 idNeighbour = 3;
+}
+
+message Policy{
+int64 idGraph = 1;
+string source = 2;
+  string destination = 3;
+  enum PolicyType {
+   reachability = 0;
+   isolation = 1;
+   traversal = 2;
+}
+PolicyType type = 4;
+string middlebox = 5;
+}
+
+message ConfigurationGrpc{
+int64 idGraph = 1;
+int64 idNode = 2;
+string description = 3;
+string configuration = 4;
+string id = 5;
+}
+
+message NodeGrpc{
+int64 idGraph = 1;
+string name = 2;
+int64 id = 3;//long
+enum FunctionalType {
+antispam = 0;
+   cache = 1;
+   dpi = 2;
+   endhost = 3;
+   endpoint = 4;
+   fieldmodifier = 5;
+   firewall = 6;
+   mailclient = 7;
+   mailserver = 8;
+   nat = 9;
+   vpnaccess = 10;
+   vpnexit = 11;
+   webclient = 12;
+   webserver = 13;
+}
+FunctionalType functional_type = 4;
+repeated NeighbourGrpc neighbour = 5;
+ConfigurationGrpc configuration = 6;
+string errorMessage = 7;
+}
+
+message GraphGrpc{
+int64 id = 1;//long
+repeated NodeGrpc node = 2;
+string errorMessage = 3;
+}
+
+message NeighbourGrpc{
+int64 idGraph = 1;
+  int64 idNode = 2;
+string name = 3;
+  int64 id = 4;//long
+  string errorMessage = 5;
+}
+
+message NewGraph{
+bool success = 1;
+GraphGrpc graph = 2;
+string errorMessage = 3;
+}
+
+message NewNode{
+bool success = 1;
+NodeGrpc node = 2;
+string errorMessage = 3;
+}
+
+message NewNeighbour{
+bool success = 1;
+NeighbourGrpc neighbour = 2;
+string errorMessage = 3;
+}
+
+message TestGrpc {
+  repeated NodeGrpc node = 1;
+  string result = 2;
+}
+
+message VerificationGrpc{
+bool successOfOperation = 1;
+string result = 2;
+string comment = 3;
+repeated TestGrpc test = 4;
+string errorMessage = 5;
+}
+
+message Status{
+bool success = 1;
+string errorMessage = 2;
+}

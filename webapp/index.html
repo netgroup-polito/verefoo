@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>RESTful Client for Verigraph</title>
+
+    <!-- N E W    B O W E R    L I B R A R I E S -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/cytoscape/dist/cytoscape.js"></script>
+    <script src="bower_components/dagre/dist/dagre.js"></script>
+    <script src="bower_components/cytoscape-dagre/cytoscape-dagre.js"></script>
+    <script src="scripts/main-engine.js"></script>
+    <script src="bower_components/lodash/lodash.js"></script>
+    <script src="bower_components/sweetalert/dist/sweetalert-dev.js"></script>
+    <script src="bower_components/graphlib/dist/graphlib.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css">
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="bower_components/sweetalert/dist/sweetalert.css">
+
+    <!-- BOWER LIBRARY TO SAVE ON FILE -->
+    <script src="bower_components/file-saver/FileSaver.js"></script>
+
+
+    <!-- N O N - B O W E R    L I B R A R I E S -->
+    <script src="./fileOffline/html5shiv.js"></script>
+    <script src="./fileOffline/respond.min.js"></script>
+    <link href="css/sb-admin.css" rel="stylesheet">
+    <link rel="stylesheet" href="./stylesheets/2-col-portfolio.css">
+    <link rel="stylesheet" href="stylesheets/cytoscape-style.css">
+
+    <!--------- C U S T O M    L I B R A R I E S ----------->
+    <script src="scripts/various-utilities.js"></script>
+    <script src="scripts/NFFG-edit.js"></script>
+    <script src="scripts/main-data.js"></script>
+    <script src="scripts/server-communication-interface.js"></script>
+    <script src="scripts/alert-sweet-script.js"></script>
+    <script src="scripts/interation-server-client.js"></script>
+    <script src="scripts/local-disk-interface.js"></script>
+    <script src="scripts/convert-function.js"></script>
+    <script src="scripts/managing-graph-on-site.js"></script>
+    <script src="scripts/search-element-nffg.js"></script>
+    <link rel="stylesheet" href="stylesheets/custom.css">
+
+
+    <!-- Configure node libraries -->
+    <script src="scripts/modal-script-configurationGroupA.js"></script>
+    <script src="scripts/modal-script-configurationGroupB.js"></script>
+    <script src="scripts/modal-script-configurationGroupC.js"></script>
+    <script src="scripts/modal-script-configurationGroupD1.js"></script>
+    <script src="scripts/modal-script-configurationGroupD2.js"></script>
+    <script src="scripts/modal-script-configurationGroupD3.js"></script>
+    <script src="scripts/modal-script-configurationGroupD4.js"></script>
+    <script src="scripts/modal-script-configurationGroupE.js"></script>
+
+    <!-- To modify node -->
+    <script src="scripts/modify-node.js"></script>
+    <script src="scripts/active-disable-configure-modifiy-node-botton.js"></script>
+    <script src="scripts/modal-script-configurationGroupA-modify.js"></script>
+    <script src="scripts/modal-script-configurationGroupB-modify.js"></script>
+    <script src="scripts/modal-script-configurationGroupC-modify.js"></script>
+    <script src="scripts/modal-script-configurationGroupD1-modify.js"></script>
+    <script src="scripts/modal-script-configurationGroupD2-modify.js"></script>
+    <script src="scripts/modal-script-configurationGroupD3-modify.js"></script>
+    <script src="scripts/modal-script-configurationGroupD4-modify.js"></script>
+    <script src="scripts/modal-script-configurationGroupE-modify.js"></script>
+    <script src="scripts/cleanning-modal-swap-root-node-modify.js"></script>
+
+    <!-- For the modal -->
+    <script src="scripts/chose-modal.js"></script>
+    <script src="scripts/function-all-modal.js"></script>
+
+    <!-- Verify policies -->
+    <script src="scripts/verification-policies.js"></script>
+    <script src="scripts/print-verification-result.js"></script>
+
+
+    <!-- To warning before to close the browser or tab -->
+    <script src="scripts/warning-close-tab-browser.js"></script>
+
+
+    <!-- Active and disbale configure node checkbox  -->
+    <script src="scripts/active-disable-configure-node-botton.js"></script>
+
+    <!-- Print json information  -->
+    <script src="scripts/print-information.js"></script>
+
+
+    <!-- bootstrap-select -->
+    <script src="bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
+    <link rel="stylesheet" href="bower_components/bootstrap-select/dist/css/bootstrap-select.css">
+    <script src="bower_components/es6-promise/es6-promise.js"></script>
+    <script src="fileOffline/sweetalert.multi.js"></script>
+
+    <!-- modify json -->
+    <link href="./bower_components/jsoneditor/dist/jsoneditor.min.css" rel="stylesheet" type="text/css">
+    <script src="./bower_components/jsoneditor/dist/jsoneditor.min.js"></script>
+
+    <script src="scripts/modify-JSON.js"></script>
+
+
+   <!--Graph save or not saved -->
+    <script src="scripts/graph-saved-graph-not-save.js"></script>
+
+</head>
+<body>
+
+
+<div id="wrapper">
+
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html"><i id="thisX" class="fa fa-fw fa-dashboard"
+                                                         style="color:#ff6f6b;"></i> RESTful client for Verigraph</a>
+            <a id="serverOnline" class="navbar-brand" href="index.html"><i class="fa fa-fw fa-check"
+                                                                           style="color:#6aff6b;"></i> Server online</a>
+            <a id="serverOffline" class="navbar-brand" href="index.html"><i class="fa fa-fw fa-ban"
+                                                                            style="color:#ff6f6b;"></i> Server
+                offline</a>
+            <a class="navbar-brand" href="index.html"><i class="fa fa-fw fa-server"
+                                                         style="color:#0a8aff;"></i> Actual NFFG:<span
+                    id="actualNFFG"></span></a>
+            <!-- get example http://jsfiddle.net/hYY6X/ --> <!-- Problema class="selectpicker" -->
+            <!-- OLD
+            <div id="selectBootstrapNav" class="navbar-left">
+                <button class="dropdown btn btn-primary" id="nffgSelectorId" onchange="scheduleA.call(this, event)">
+                    New nffg
+                </button>
+            </div> -->
+            <ul class="nav navbar-right top-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle scrollable-menu" data-toggle="dropdown"><i
+                            class="fa fa-bell"></i>
+                        <span id="dropNFFGname">nffg name </span>
+                        <b class="caret scrollable-menu"></b></a>
+                    <ul id="optList" class="dropdown-menu alert-dropdown scrollable-menu">
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+
+        <i id="watingServerId" class="fa fa-refresh fa-spin fa-3x fa-fw" style="color: #ee0012"></i>
+
+        <script>
+
+            // Bootstrap select
+            $('#nffgSelectorId').selectpicker({
+                style: 'btn-primary',
+                width: 100,
+                size: 7
+            });
+            $("#watingServerId").hide();
+        </script>
+
+
+
+        <a id="graphSaved" class="navbar-brand" ><i class="fa fa fa-floppy-o"
+                                                                        style="color:#6aff6b;"></i>
+        Graph saved</a>
+
+        <a id="graphNotSaved" class="navbar-brand" ><i class="fa fa-exclamation-triangle"
+                                                                     style="color: #ee0012;"></i>
+            Graph not saved</a>
+
+
+
+        <!-- Top Menu Items -->
+        <ul class="nav navbar-right top-nav">
+
+
+            <li class="dropdown">
+                <a class="navbar-brand dropdown-toggle" data-toggle="modal" data-target=".infoModalUser"><i
+                        class="fa fa-fw fa-info-circle"
+                        style="color: #bbffbb"></i>
+                    Info</a>
+            </li>
+            <li>
+                <a class="navbar-brand" target="_blank" onclick="linkToSwagger()"
+                   data-toggle="tooltip"
+                   title="The page will be opened in a new tab"
+                   data-placement="bottom"><i class="fa fa-file-text" style="color: #8bb3ff;"></i> Server API doc</a>
+            </li>
+        </ul>
+        <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav side-nav" style="border-right: solid; border-width:thin; border-color: #000000;">
+                <div id="sidebarId" class="sidenav">
+                    <a href="javascript:void(0)" class="closebtn" id="openCloseX">&times;</a>
+
+                    <div class="modal-body row">
+                        <div class="col-md-12">
+                            <pre>
+                                <div class="json" style="color: #00b3ee">
+                                    </div>
+                            </pre>
+                        </div>
+
+                    </div>
+
+
+                </div>
+                <!-- LOAD NFFGcyto -->
+                <li>
+                    <a href="javascript:;" data-toggle="collapse" data-target="#loadNFFGd"><i
+                            class="fa fa-fw fa-download"
+                            style="color: #ffdb79"></i>
+                        Load NFFG <i class="fa fa-fw fa-caret-down"></i></a>
+                    <ul id="loadNFFGd" class="collapse">
+                        <li data-toggle="tooltip"
+                            title="It will download all the graphs available on the server"
+                            data-placement="right">
+                            <a id="func1" onclick="downloadNFFGsFromServer()"><i class="fa fa-cloud-download"
+                                                                                 style="color: #a4ffff;"></i> Download
+                                NFFG</a>
+                        </li>
+                        <li data-toggle="tooltip"
+                            title="Load a set of NFFG from a specified file"
+                            data-placement="right">
+                            <a id="loadFileX"><i class="fa fa-file"
+                                                 style="color: #caa7ff;"></i> Load
+                                NFFG from file</a>
+                            <input id="inputFileX" type="file" name="somename" size="chars">
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- SAVE NFFGcyto -->
+                <li>
+                    <a href="javascript:;" data-toggle="collapse" data-target="#saveNFFGd"><i class="fa fa-fw fa-save"
+                                                                                              style="color: #5b7cbf"></i>
+                        Save NFFG <i class="fa fa-fw fa-caret-down"></i></a>
+                    <ul id="saveNFFGd" class="collapse">
+                        <li data-toggle="tooltip"
+                            title="Force to save the NFFG on the server"
+                            data-placement="right">
+                            <a onclick="saveAsNewNffg()"><i class="fa fa-plus"
+                                                            style="color: greenyellow"></i>
+                                Save as new NFFG</a>
+                        </li>
+                        <li data-toggle="tooltip"
+                            title="Force to save the NFFG on the server"
+                            data-placement="right">
+                            <a onclick="updateGraph()"><i
+                                    class="fa fa-refresh"
+                                    style="color: #3b95ff"></i>
+                                Update the NFFG</a>
+                        </li>
+                        <li id="donwloadFileLi"
+                            data-toggle="tooltip"
+                            title="Download this NFFG as JSON file"
+                            data-placement="right">
+                            <!-- download="nffg.json" -->
+                            <a href="#" id="save"><i class="fa fa-save" style="color: #313fff"></i>
+                                Save on file</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- EDIT GRAPH-->
+                <li>
+                    <a href="javascript:;" data-toggle="collapse" data-target="#newNodeDropxxx"><i
+                            class="fa fa-fw  fa-gear"
+                            style="color: #ba6129"></i>
+                        Edit graph <i class="fa fa-fw fa-caret-down"></i></a>
+                    <ul id="newNodeDropxxx" class="collapse">
+                        <!-- ADD NEW NODE -->
+                        <li>
+                            <a href="javascript:;" data-toggle="collapse" data-target="#newNodeDrop"><i
+                                    class="fa fa-fw fa-plus-circle"
+                                    style="color: #8bb3ff"></i>
+                                Add new node <i class="fa fa-fw fa-caret-down"></i></a>
+                            <ul id="newNodeDrop" class="collapse">
+                                <li>
+                                    <input id="nodeID" type="text" class="form-control input-sm" placeholder="Node ID">
+                                </li>
+                                <select id="selectNewFunctionalType">
+                                    <!--The id of option is not used -->
+                                    <option id="o1" value="antispam">antispam</option>
+                                    <option id="o2" value="cache">cache</option>
+                                    <option id="o3" value="dpi">dpi</option>
+                                    <option id="o4" value="fieldmodifier">fieldmodifier</option>
+                                    <option id="o5" value="firewall">firewall</option>
+                                    <option id="o6" value="endhost">endhost</option>
+                                    <option id="o7" value="endpoint">endpoint</option>
+                                    <option id="o8" value="mailserver">mailserver</option>
+                                    <option id="o11" value="mailclient">mailclient</option>
+                                    <option id="o12" value="nat">nat</option>
+                                    <option id="o13" value="vpnaccess">vpnaccess</option>
+                                    <option id="o14" value="vpnexit">vpnexit</option>
+                                    <option id="o15" value="webclient">webclient</option>
+                                    <option id="o16" value="webserver">webserver</option>
+                                </select>
+                                <div style="color: #ffffff;">
+                                    <input id="idcheckboxconfigurenode" type="checkbox" name="configureNode"
+                                           value="yes"> Configure node
+                                </div>
+                                <li>
+                                    <a id="addNode"><span class="btn btn-primary btn-sm">Add node</span></a>
+                                    <!-- <a id="ConfigureAddNode"><span class="btn btn-warning btn-sm">Configure and add node</span></a>-->
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- ADD NEW EDGE -->
+                        <li>
+                            <a href="javascript:;" data-toggle="collapse" data-target="#newEdgeDrop"><i
+                                    class="fa fa-fw fa-link"
+                                    style="color: #8bb3ff"></i>
+                                Add new edge <i class="fa fa-fw fa-caret-down"></i></a>
+                            <ul id="newEdgeDrop" class="collapse">
+                                <li>
+                                    <input id="newEdgeSource" type="text" class="form-control input-sm"
+                                           placeholder="Soruce node">
+                                </li>
+                                <li>
+                                    <input id="newEdgeTarget" type="text" class="form-control input-sm"
+                                           placeholder="Target node">
+                                </li>
+                                <li>
+                                    <a id="addEdge"><span class="btn btn-primary btn-sm">Add edge</span></a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- MODIFY NODE -->
+                        <li>
+                            <a href="javascript:;" data-toggle="collapse" data-target="#newModifyNode"><i
+                                    class="fa fa-fw fa-eraser"
+                                    style="color: #ffd876"></i>
+                                Edit node <i class="fa fa-fw fa-caret-down"></i></a>
+                            <ul id="newModifyNode" class="collapse">
+                                <li>
+                                    <input id="idModifyNodeNameNode" type="text" class="form-control input-sm"
+                                           placeholder="Name node">
+                                </li>
+
+                                <select id="selectorConfigurationAction">
+                                    <!--The id of option is not used -->
+                                    <option id="sCA0" value="valueChangeNaneNode">Change name node</option>
+                                    <option id="sCA1" value="valueChangeConfiguration">Change configuration</option>
+                                    <option id="sCA2" value="valueChangeSettingConfiguraion">Change setting configuraion</option>
+                                    <option id="sCA3" value="valueDeleteSettingConfiguration">Delete setting configuration</option>
+                                </select>
+
+                                <div id="rootChangeConfigurationSelector">
+                                    <input id="idChangeNodeInput" type="text" class="form-control input-sm" placeholder="New name">
+                                </div>
+
+                                <li>
+                                    <a onclick=modifyNode()><span class="btn btn-warning btn-sm">Edit</span></a>
+                                </li>
+                            </ul>
+
+                        </li>
+                        <!-- REMOVE NODE -->
+                        <li>
+                            <a href="javascript:;" data-toggle="collapse" data-target="#removeNodeD"><i
+                                    class="fa fa-fw fa-minus-circle"
+                                    style="color: #ff6f6b"></i>
+                                Remove node <i class="fa fa-fw fa-caret-down"></i></a>
+                            <ul id="removeNodeD" class="collapse">
+                                <li>
+                                    <input id="nodeToRemove" type="text" class="form-control input-sm"
+                                           placeholder="Node ID to remove">
+                                </li>
+                                <li>
+                                    <a id="removeNode"><span class="btn btn-danger btn-sm">Remove node</span></a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- REMOVE EDGE -->
+                        <li>
+                            <a href="javascript:;" data-toggle="collapse" data-target="#removeEdgeD"><i
+                                    class="fa fa-fw fa-chain-broken"
+                                    style="color: #ff6f6b"></i>
+                                Remove edge <i class="fa fa-fw fa-caret-down"></i></a>
+                            <ul id="removeEdgeD" class="collapse">
+                                <li>
+                                    <input id="sourceToRemove" type="text" class="form-control input-sm"
+                                           placeholder="Soruce node to remove">
+                                </li>
+                                <li>
+                                    <input id="targetToRemove" type="text" class="form-control input-sm"
+                                           placeholder="Target node to remove">
+                                </li>
+                                <li>
+                                    <a id="removeEdge"><span class="btn btn-danger btn-sm">Remove edge</span></a>
+                                </li>
+                            </ul>
+
+                    </ul>
+                </li>
+
+
+                <!-- ADD NEW EMPTY GRAPH -->
+                <li data-toggle="tooltip"
+                    title="Add new graph both locally and on the server."
+                    data-placement="right">
+                    <a onclick="addNewGraph()"><i
+                            class=" fa fa-file" style="color: #a14277"></i> Create new graph</a>
+                </li>
+
+                <!-- VERIFY THE GRAPH -->
+                <li data-toggle="tooltip"
+                    title="Verify this NFFG. However, it will be not saved in any way."
+                    data-placement="right">
+                    <a onclick="verifyGraph()"><i
+                            class="fa fa-fw fa-search" style="color: #398948"></i> Verify the graph <i
+                            class="fa fa-fw fa-handshake-o"></i></a>
+                </li>
+
+                <!-- *************************************************************************************** -->
+
+                <!-- Verification -->
+                <li>
+                    <a href="javascript:;" data-toggle="collapse" data-target="#verifyPolicyDrop"><i
+                            class="glyphicon glyphicon-certificate"
+                            style="color: #13ba77"></i> Verification graph <i class="fa fa-fw fa-caret-down"></i></a>
+                    <ul id="verifyPolicyDrop" class="collapse">
+                        <!-- id Graph -->
+                        <div class="row">
+                            <div class="col-md-1"></div>
+                            <div class="col-md-10">
+
+                                <li data-toggle="tooltip"
+                                    title="Source node of the graph (required)"
+                                    data-placement="right">
+                                    <input id="verifyIdSourceNode" type="text" class="form-control input-sm"
+                                           placeholder="Sorce node (required)">
+                                </li>
+
+
+                                <li data-toggle="tooltip"
+                                    title="Destination node of the graph (required)"
+                                    data-placement="right">
+                                    <input id="verifyIdDestinationNode" type="text" class="form-control input-sm"
+                                           placeholder="Destination node (required)">
+                                </li>
+                                <div id="middleBoxRoot"></div>
+
+                                <li data-toggle="tooltip"
+                                    title="Select the type of the verification"
+                                    data-placement="right">
+                                    <!---
+                                    <input id="verifyTypeVerification" type="text" class="form-control input-sm"
+                                           placeholder="Type of verification (required)">
+                                    -->
+                                    <select id="verificationSelect">
+                                        <option value="reachability">Reachability</option>
+                                        <option value="isolation">Isolation</option>
+                                        <option value="traversal">traversal</option>
+                                    </select>
+
+                                </li>
+
+                                <li>
+                                    <a id="verificationStart"><span class="btn btn-primary btn-sm">Verification</span></a>
+                                </li>
+                                <div class="col-md-1"></div>
+                            </div>
+                        </div>
+
+                    </ul>
+                </li>
+
+
+
+                <li data-toggle="tooltip"
+                    title="View response of the verification policy"
+                    data-placement="right">
+                    <a id="openCloseVerificationPolicy"><i
+                            class="glyphicon glyphicon-eye-open" style="color: #00a73d"></i> View last verification</a>
+                </li>
+
+
+                <!-- *************************************************************************************** -->
+                <!-- REMOVE THE GRAPH -->
+                <li data-toggle="tooltip"
+                    title="Remove this graph both locally and on the server."
+                    data-placement="right">
+                    <a onclick="removeGraph()"><i
+                            class="fa fa-fw fa-trash" style="color: #a10200"></i> Remove the graph</a>
+                </li>
+
+                <!-- test button
+                <li>
+                    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#configurationGroupAmodal">Open Modal</button>
+                </li>
+                -->
+
+                <li data-toggle="tooltip"
+                    title="View all the information of the graph in json-format"
+                    data-placement="right">
+                    <a id="openClose"><i
+                            class="glyphicon glyphicon-eye-open" style="color: #a72800"></i> View json data graph</a>
+                </li>
+
+
+
+
+
+
+                <li data-toggle="tooltip"
+                    title="Edit JSON."
+                    data-placement="right">
+                    <a onclick="modifyJsonViewModal()"><i
+                            class="fa fa-pencil-square-o" style="color: #a19108"></i> Modify JSON</a>
+                </li>
+
+
+
+                <!--
+                <li class="active">
+                    <a href="index.html"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
+                </li>
+                <li>
+                    <a href="charts.html"><i class="fa fa-fw fa-bar-chart-o"></i> Charts</a>
+                </li>
+                <li>
+                    <a href="tables.html"><i class="fa fa-fw fa-table"></i> Tables</a>
+                </li>
+                <li>
+                    <a href="forms.html"><i class="fa fa-fw fa-edit"></i> Forms</a>
+                </li>
+                <li>
+                    <a href="bootstrap-elements.html"><i class="fa fa-fw fa-desktop"></i> Bootstrap Elements</a>
+                </li>
+                <li>
+                    <a href="bootstrap-grid.html"><i class="fa fa-fw fa-wrench"></i> Bootstrap Grid</a>
+                </li>
+                <li>
+                    <a href="blank-page.html"><i class="fa fa-fw fa-file"></i> Blank Page</a>
+                </li>
+                <li>
+                    <a href="index-rtl.html"><i class="fa fa-fw fa-dashboard"></i> RTL Dashboard</a>
+                </li>
+                -->
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </nav>
+
+    <div id="page-wrapper" style="background-color : #222">
+
+        <div class="container-fluid">
+
+
+            <div
+                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); z-index: 0; overflow: hidden; width: 100%; height: 100%;">
+                <div id="cy" class="" style=""></div>
+            </div>
+            <!-- /.row -->
+
+        </div>
+        <!-- /.container-fluid -->
+
+    </div>
+    <!-- /#page-wrapper -->
+
+</div>
+
+
+<!-- Modal  antispam , cache, nat and dpi modal configuration -->
+<div class="modal fade" id="configurationGroupAmodalA" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 align="center" class="modal-title">Configuration node</h2>
+            </div>
+
+            <!-- Modal end title  -->
+
+            <!--Body modal -->
+            <div class="modal-body">
+                <form id="formA" class="form-horizontal">
+
+                    <!-- old -->
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="input_fields_wrap_configurationGroupA" id="root00A">
+                                <div id="00A">Name of existing node: <input class="form-control" id="0A" type="text"
+                                                                            name="mytext[]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <div class="col-xs-4">
+                    <button type="button" class="btn btn-info add_field_button_configurationGroupA">Add More Fields
+                    </button>
+                </div>
+                <div class="col-xs-8">
+                    <button type="button" class="btn btn-primary" id="validateconfigurationGroupA" data-dismiss="modal">
+                        Validate
+                    </button>
+                    <button type="button" class="btn btn btn-danger" id="closeconfigurationGroupA" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--
+deprecated
+</div>
+-->
+
+<!-- Modal firewall configuration -->
+<div class="modal fade" id="configurationGroupBmodalB" role="dialog">
+    <div class="modal-dialog"> <!-- for a large moda modal-lg -->
+
+        <!-- Modal content-->
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 align="center" class="modal-title">Configuration node</h2>
+            </div>
+
+            <!-- Modal end title  -->
+
+            <!--Body modal -->
+            <div class="modal-body">
+                <form id="surveyFormB" class="form-horizontal">
+
+                    <!-- old -->
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="input_fields_wrap_configurationGroupB">
+                                <div id="00B">
+                                    Source existing node
+                                    <input class="form-control" id="0B" type="text" name="mytext[]"> <br>
+                                    Destination existing source
+                                    <input class="form-control" id="0BB" type="text" name="mytext[]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <div class="col-xs-4">
+                    <button type="button" class="btn btn-info add_field_button_configurationGroupB">Add More Fields
+                    </button>
+                </div>
+                <div class="col-xs-8">
+                    <button type="button" class="btn btn-primary" id="validateconfigurationGroupB" data-dismiss="modal">
+                        Validate
+                    </button>
+                    <button type="button" class="btn btn btn-danger" id="closeconfigurationGroupB" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Modal endhost configuration -->
+<div class="modal fade" id="configurationGroupBmodalC" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 align="center" class="modal-title">Configuration node</h2>
+            </div>
+
+            <!-- Modal end title  -->
+
+            <!--Body modal -->
+            <div class="modal-body">
+                <form id="surveyFormC" class="form-horizontal">
+
+            
+
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                        </div>
+                        <div class="col-xs-7">
+                            Active HTTP body field <input type="checkbox" id="0CC1CB" onclick="var input = document.getElementById('0CC1');
+                            if(this.checked)
+                            {
+                                input.disabled = false;
+
+                                input.focus();
+                            }
+                            else
+                                {
+                                    input.disabled=true;
+
+
+                                }"
+                        />
+                            <input class="form-control" id="0CC1" type="text" name="mytext[]" disabled>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                        </div>
+                        <div class="col-xs-7">
+                            Active sequence of number field <input type="checkbox" id="0CC2CB" onclick="var input = document.getElementById('0CC2');
+                            if(this.checked)
+                            {
+                                input.disabled = false;
+
+                                input.focus();
+                            }
+                            else
+                                {
+                                    input.disabled=true;
+
+
+                                }"
+                        />
+                            <input class="form-control" id="0CC2" type="text" name="mytext[]" disabled>
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                        </div>
+                        <div class="col-xs-7">
+                            Active protocol field <input type="checkbox" id="0CC3CB" onclick="var input = document.getElementById('0CC3');
+                            if(this.checked)
+                            {
+                                input.disabled = false;
+
+                                input.focus();
+                            }
+                            else
+                                {
+                                    input.disabled=true;
+
+                                }"
+                        />
+                            <div class="input_fields_wrap_configurationGroupC" disabled>
+                                <div id="0CC3Div">
+                                    Value of protocol:
+                                    <select id="0CC3" disabled>
+                                        <option value="HTTP_REQUEST">HTTP REQUEST</option>
+                                        <option value="HTTP_RESPONSE">HTTP RESPONSE</option>
+                                        <option value="POP3_REQUEST">POP3 REQUEST</option>
+                                        <option value="POP3_RESPONSE">POP3 RESPONSE</option>
+                                    </select>
+                            </div>
+                            <!--
+                             <input class="form-control" id="0CC3" type="text" name="mytext[]" disabled>
+                             -->
+                        </div>
+                    </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                        </div>
+                        <div class="col-xs-7">
+                            Active e-mail sender field <input type="checkbox" id="0CC4CB" onclick="var input = document.getElementById('0CC4');
+                            if(this.checked)
+                            {
+                                input.disabled = false;
+
+                                input.focus();
+                            }
+                            else
+                                {
+                                    input.disabled=true;
+
+
+                                }"
+                        />
+                            <input class="form-control" id="0CC4" type="text" name="mytext[]" disabled>
+                        </div>
+
+                    </div>
+
+
+
+
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                        </div>
+                        <div class="col-xs-7">
+                            Active URL field <input type="checkbox" id="0CC5CB" onclick="var input = document.getElementById('0CC5');
+                            if(this.checked)
+                            {
+                                input.disabled = false;
+
+                                input.focus();
+                            }
+                            else
+                                {
+                                    input.disabled=true;
+
+
+                                }"
+                        />
+                            <input class="form-control" id="0CC5" type="text" name="mytext[]" disabled>
+                        </div>
+
+                    </div>
+
+
+
+
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                        </div>
+                        <div class="col-xs-7">
+                            Active options field <input type="checkbox" id="0CC6CB" onclick="var input = document.getElementById('0CC6');
+                            if(this.checked)
+                            {
+                                input.disabled = false;
+
+                                input.focus();
+                            }
+                            else
+                                {
+                                    input.disabled=true;
+
+
+                                }"
+                        />
+                            <input class="form-control" id="0CC6" type="text" name="mytext[]" disabled>
+                        </div>
+
+                    </div>
+
+
+
+
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                        </div>
+                        <div class="col-xs-7">
+                            Active destination node field  <input type="checkbox" id="0CC7CB" onclick="var input = document.getElementById('0CC7');
+                            if(this.checked)
+                            {
+                                input.disabled = false;
+
+                                input.focus();
+                            }
+                            else
+                                {
+                                    input.disabled=true;
+
+                                }"
+                        />
+                            <input class="form-control" id="0CC7" type="text" name="mytext[]" disabled>
+                        </div>
+
+                    </div>
+
+
+
+
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <div class="col-xs-4">
+                    <!--
+                    <button type="button" class="btn btn-info add_field_button_configurationGroupC">Add More Fields</button>
+                    -->
+                </div>
+                <div class="col-xs-8">
+                    <button type="button" class="btn btn-primary" id="validateconfigurationGroupC" data-dismiss="modal">
+                        Validate
+                    </button>
+                    <button type="button" class="btn btn btn-danger" id="closeconfigurationGroupC" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal D group -->
+
+<!-- Modal  mailclient  modal D1 configuration -->
+<div class="modal fade" id="configurationGroupDmodalD1" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 align="center" class="modal-title">Configuration node</h2>
+            </div>
+
+            <!-- Modal end title  -->
+
+            <!--Body modal -->
+            <div class="modal-body">
+                <form id="formD1" class="form-horizontal">
+
+                    <!-- old -->
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                            <!--   <button class="add_field_button_configurationGroupD btn btn-default">Add More Fields</button> -->
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="input_fields_wrap_configurationGroupD1">
+                                <div id="00D1">Mail server name: <input class="form-control" id="0D1" type="text"
+                                                                        name="mytext[]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <div class="col-xs-4">
+                </div>
+                <div class="col-xs-8">
+                    <button type="button" class="btn btn-primary" id="validateconfigurationGroupD1"
+                            data-dismiss="modal">Validate
+                    </button>
+                    <button type="button" class="btn btn btn-danger" id="closeconfigurationGroupD1"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Modal   vpnaccess   modal D2 configuration -->
+<div class="modal fade" id="configurationGroupDmodalD2" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 align="center" class="modal-title">Configuration node</h2>
+            </div>
+
+            <!-- Modal end title  -->
+
+            <!--Body modal -->
+            <div class="modal-body">
+                <form id="formD2" class="form-horizontal">
+
+                    <!-- old -->
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                            <!--   <button class="add_field_button_configurationGroupD btn btn-default">Add More Fields</button> -->
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="input_fields_wrap_configurationGroupD2">
+                                <div id="00D2">Vpn Exit: <input class="form-control" id="0D2" type="text"
+                                                                name="mytext[]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <div class="col-xs-4">
+                </div>
+                <div class="col-xs-8">
+                    <button type="button" class="btn btn-primary" id="validateconfigurationGroupD2"
+                            data-dismiss="modal">Validate
+                    </button>
+                    <button type="button" class="btn btn btn-danger" id="closeconfigurationGroupD2"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Modal vpnexit  modal D3 configuration -->
+<div class="modal fade" id="configurationGroupDmodalD3" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 align="center" class="modal-title">Configuration node</h2>
+            </div>
+
+            <!-- Modal end title  -->
+
+            <!--Body modal -->
+            <div class="modal-body">
+                <form id="formD3" class="form-horizontal">
+
+                    <!-- old -->
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                            <!--   <button class="add_field_button_configurationGroupD btn btn-default">Add More Fields</button> -->
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="input_fields_wrap_configurationGroupD3">
+                                <div id="00D3">Vpn Access:<input class="form-control" id="0D3" type="text"
+                                                                 name="mytext[]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <div class="col-xs-4">
+                </div>
+                <div class="col-xs-8">
+                    <button type="button" class="btn btn-primary" id="validateconfigurationGroupD3"
+                            data-dismiss="modal">Validate
+                    </button>
+                    <button type="button" class="btn btn btn-danger" id="closeconfigurationGroupD3"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Modal webclient modal D4 configuration -->
+<div class="modal fade" id="configurationGroupDmodalD4" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 align="center" class="modal-title">Configuration node</h2>
+            </div>
+
+            <!-- Modal end title  -->
+
+            <!--Body modal -->
+            <div class="modal-body">
+                <form id="formD" class="form-horizontal">
+
+                    <!-- old -->
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                            <!--   <button class="add_field_button_configurationGroupD btn btn-default">Add More Fields</button> -->
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="input_fields_wrap_configurationGroupD4">
+                                <div id="00D4"> Web server name: <input class="form-control" id="0D4" type="text"
+                                                                       name="mytext[]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <div class="col-xs-4">
+                </div>
+                <div class="col-xs-8">
+                    <button type="button" class="btn btn-primary" id="validateconfigurationGroupD4"
+                            data-dismiss="modal">Validate
+                    </button>
+                    <button type="button" class="btn btn btn-danger" id="closeconfigurationGroupD4"
+                            data-dismiss="modal">Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal D group  end -->
+
+
+
+<!-- Modal  dpi modal E configuration -->
+<div class="modal fade" id="configurationGroupEmodalE" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 align="center" class="modal-title">Configuration node</h2>
+            </div>
+
+            <!-- Modal end title  -->
+
+            <!--Body modal -->
+            <div class="modal-body">
+                <form id="formE" class="form-horizontal">
+
+                    <!-- old -->
+                    <div class="form-group">
+                        <div class="col-xs-3">
+                        </div>
+                        <div class="col-xs-7">
+                            <div class="input_fields_wrap_configurationGroupE">
+                                <div id="00E">  List of forbidden words:  <input class="form-control" id="0E" type="text"
+                                                                            name="mytext[]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <div class="col-xs-4">
+                    <button type="button" class="btn btn-info add_field_button_configurationGroupE">Add More Fields
+                    </button>
+                </div>
+                <div class="col-xs-8">
+                    <button type="button" class="btn btn-primary" id="validateconfigurationGroupE" data-dismiss="modal">
+                        Validate
+                    </button>
+                    <button type="button" class="btn btn btn-danger" id="closeconfigurationGroupE" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Start info web-site-->
+<div class="modal fade infoModalUser" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content  col-md-12">
+            <br>
+            <h2 align="center">User guide</h2>
+            <hr>
+            <h4><i
+                    class="fa fa-fw fa-download"
+                    style="color: #ffdb79"></i>
+                Load NFFG</h4>
+            <ul>
+                <li>
+                    <i class="fa fa-cloud-download" style="color: #a4ffff;"></i> Download NFFG
+                    <p> By this, the entire set of NFFG present on the Verigraph server will be
+                        downloaded.</p>
+                </li>
+                <li>
+                    <i class="fa fa-file" style="color: #caa7ff;"></i> Load NFFG from file
+                    <p> Select a file from your local disk as source of NFFG. The file must contains a JSON
+                        object.</p>
+                </li>
+            </ul>
+            <hr>
+            <h4><i class="fa fa-fw fa-save"
+                   style="color: #5b7cbf"></i> Save NFFG</h4>
+            <ul>
+                <li>
+                    <i class="fa fa-plus" style="color: greenyellow"></i> Save as new NFFG
+                    <p> Force to save the actual NFFG on the server as new NFFG.</p>
+                </li>
+                <li>
+                    <i class="fa fa-refresh" style="color: #3b95ff"></i> Update the NFFG
+                    <p> Try to update the actual NFFG on the server. (If this graph has been downloaded from
+                        the server, the remote NFFG will be replaced by this. If this NFFG hasn't been
+                        downloaded from the server, it will be saved as new NFFG.)</p>
+                </li>
+                <li>
+                    <i class="fa fa-save" style="color: #313fff"></i> Save on file
+                    <p> Save the actual NFFG on a new local file.</p>
+                </li>
+            </ul>
+            <hr>
+            <h4>
+                <i class="fa fa-fw  fa-gear"
+                   style="color: #ba6129"></i> Edit graph </h4>
+            <ul>
+                <li>
+                    <i class="fa fa-fw fa-plus-circle" style="color: #8bb3ff"></i> Add new node
+                    <p>Add new node to the NFFG (it will be linked with other nodes by creating new edge).</p>
+                </li>
+                <li>
+                    <i class="fa fa-fw fa-link" style="color: #8bb3ff"></i> Add new edge
+                    <p></p>
+                </li>
+                <li>
+                    <i class="fa fa-fw fa-eraser" style="color: #ffd876"></i> Edit node
+                    <p>Change name, functional type and edit configuration of the node.</p>
+                </li>
+                <li>
+                    <i class="fa fa-fw fa-minus-circle" style="color: #ff6f6b"></i> Remove node
+                </li>
+                <li>
+                    <i class="fa fa-fw fa-chain-broken" style="color: #ff6f6b"></i> Remove edge
+                </li>
+            </ul>
+
+            <hr>
+
+            <h4>
+                <i class=" fa fa-file" style="color: #a14277"></i> Create new graph </h4>
+            <p>It simply request to create a new graph, requesting it to the server.</p>
+
+            <hr>
+            <h4><i class="fa fa-fw fa-search" style="color: #398948"></i> Verify the graph</h4>
+            <p>Your graph will be send to the server in order that will verify it. The graph has not been
+                stored in the server. You
+                will receive an advise if the graph is valid or no or there has been an error during the
+                operation.</p>
+
+            <hr>
+
+            <h4><i class="glyphicon glyphicon-certificate" style="color: #13ba77"></i> Verification graph </h4>
+            <p>Verification of the policy (reachability, isolation, traversal).</p>
+
+            <hr>
+
+            <h4><i class="glyphicon glyphicon-eye-open" style="color: #00a73d"></i> View last verification </h4>
+            <p>Show the JSON representation of the last verification.</p>
+
+            <hr>
+
+            <h4><i class="fa fa-fw fa-trash" style="color: #a10200"></i> Remove the graph </h4>
+            <p>Remove the selected graph.</p>
+
+            <hr>
+
+            <h4><i class="glyphicon glyphicon-eye-open" style="color: #a72800"></i> View json data graph </h4>
+            <p>Show the JSON representation of the selected graph.</p>
+
+            <hr>
+
+            <h4><i class="fa fa-pencil-square-o" style="color: #a19108"></i> Modify JSON </h4>
+            <p>Show the JSON representation, modify it by parsing JSON editor (it's not verified by Verigraph rules).</p>
+
+            <br>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Modal  result configuration -->
+<div class="modal fade" id="verificationIdModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 align="center" class="modal-title">Result verification</h2>
+            </div>
+
+            <!-- Modal end title  -->
+
+            <!--Body modal -->
+            <div class="modal-body">
+
+                <div id="sidebarIdx">
+
+                    <!--
+                    <a href="javascript:void(0)"  id="openCloseXxs">&times;</a>
+                    -->
+
+
+                    <div class="modal-body">
+                             <pre>
+                                <div class="jsonVerify" style="color: #00b3ee">
+
+                                </div>
+                             </pre>
+
+                    </div>
+
+                </div>
+
+
+
+
+            </div>
+            <div class="modal-footer">
+                <div class="col-xs-4">
+                    <!--
+                    <button type="button" class="btn btn-info add_field_button_configurationGroupA">Save on file
+                    </button>
+                    -->
+                </div>
+                <div class="col-xs-8">
+                    <!-- download="resultVerification.json" -->
+                    <a href="#" class="btn btn-primary"   id="saveVerificationPolicy">
+                        Save on file
+                    </a>
+                    <button type="button" class="btn btn btn-danger" id="verificationModalClose" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Modify json -->
+
+<!-- Modal  modification JSON -->
+<div class="modal fade" id="modifyJsonModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 align="center" class="modal-title"> Edit JSON </h2>
+            </div>
+
+
+            <style type="text/css">
+/*
+                #jsoneditor {
+                    width: 500px;
+                    height: 500px;
+                }
+*/
+
+            #jsoneditor
+            {
+                width: 100%;
+                height: 500px;
+            }
+
+                /*
+                p, li {
+                    width: 500px;
+                    font-size: 10.5pt;
+                }
+                   */
+
+                code {
+                    background: #f5f5f5;
+                }
+            </style>
+
+            <div id="fatherModifyJsonDOM">
+            <div id="jsoneditor"></div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="col-xs-4">
+                    <!--
+                    <button type="button" class="btn btn-info add_field_button_configurationGroupA">Save on file
+                    </button>
+                    -->
+                </div>
+                <div class="col-xs-8">
+                    <!-- download="resultVerification.json" -->
+                    <button type="button" class="btn btn btn-success" onclick="saveModifyJson()">
+                        Update
+                    </button>
+                    <button type="button" class="btn btn btn-danger" id="modifyJsonModalClose" data-dismiss="modal">
+                        Discard
+                    </button>
+                </div>
+            </div>
+
+            <script>
+            </script>
+
+        </div>
+    </div>
+</div>
+<!---- end  modification JSON-->
+
+
+<!--Modal modify node  -->
+<div class="modal fade" id="iDmodifyNodeModal" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 align="center" class="modal-title">Modification node</h2>
+            </div>
+
+            <!-- Modal end title  -->
+
+            <!--Body modal -->
+            <div class="modal-body">
+                <form id="rootModifyNodeModal" class="form-horizontal">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="col-xs-4">
+                </div>
+                <div class="col-xs-8">
+                    <button type="button" class="btn btn-primary" id="idValidateUpdateNode" data-dismiss="modal">
+                        Update
+                    </button>
+                    <button type="button" class="btn btn btn-danger" id="idDiscardUpdateNode" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+
+<!-- -->
+
+
+
+
+</body>
+<!--Style of the sidebar-->
+<style>
+    body {
+        font-family: "Lato", sans-serif;
+    }
+
+    .sidenav {
+        height: 100%;
+        width: 0%;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        right: 0;
+        background-color: #111;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+    }
+
+    .sidenav a {
+        padding: 8px 8px 8px 32px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #818181;
+        display: block;
+        transition: 0.3s
+    }
+
+    .sidenav a:hover, .offcanvas a:focus {
+        color: #f1f1f1;
+    }
+
+    .sidenav .closebtn {
+        position: absolute;
+        top: 0;
+        right: 25px;
+        font-size: 36px;
+        margin-left: 50px;
+    }
+
+    pre {
+        outline: 1px solid #ccc;
+        padding: 0px;
+        margin: 0px;
+    }
+
+    .string {
+        color: green;
+    }
+
+    .number {
+        color: darkorange;
+    }
+
+    .boolean {
+        color: blue;
+    }
+
+    .null {
+        color: magenta;
+    }
+
+    .key {
+        color: red;
+    }
+
+    .scrollable-menu {
+        height: auto;
+        max-height: 200px;
+        overflow-x: hidden;
+    }
+
+
+
+</style>
+<!--Finisch stype of the sidebar-->
+<script>
+    //idcheckboxconfigurenode 01  selectNewFunctionalType
+
+</script>
+</html>

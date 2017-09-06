@@ -1,59 +1,61 @@
 {
-	"id": 1,
-	"name": "simple_test_case",
-	"description": "This test case contains a graph with client, firewall and server",
-	"policy_url_parameters": "?type=reachability&source=user1&destination=webserver",
-	"result": "UNSAT",
-	"graph": {
-	   "nodes":[
-	      {
-	         "name":"user1",
-	         "functional_type":"endhost",
-	         "neighbours":[
-	            {
-	               "name":"nat"
-	            }
-	         ],
-	        "configuration": 
-	            [
-					{
-						"body": "sex",
-						"protocol": "HTTP_REQUEST",
-						"destination": "webserver"
-					}
-	            ]
-	      },
-	      {
-	         "name":"nat",
-	         "functional_type":"nat",
-	         "neighbours":[
-	            {
-	               "name":"dpi"
-	            }
-	         ],
-	         "configuration":[
-	            "user1"
-	         ]
-	      },
-	      {
-	         "name":"dpi",
-	         "functional_type":"dpi",
-	         "neighbours":[
-	            {
-	               "name":"webserver"
-	            }
-	         ],
-	         "configuration":[
-	           "sex", "droga"
-	         ]
-	      },
-	      {
-	         "name":"webserver",
-	         "functional_type":"webserver",
-	         "neighbours":[
-	
-	         ]
-	      }
-	   ]
-	}
+    "id": 1,
+    "name": "simple_test_case",
+    "description": "This test case contains a graph with client, firewall and server",
+    "policy_url_parameters": [
+        "?type=reachability&source=user1&destination=webserver"
+    ],
+    "results": [
+        "UNSAT"
+    ],
+    "graph": {
+        "nodes": [
+            {
+                "name": "user1",
+                "functional_type": "endhost",
+                "neighbours": [
+                    {
+                        "name": "nat"
+                    }
+                ],
+                "configuration": [
+                    {
+                        "body": "sex",
+                        "protocol": "HTTP_REQUEST",
+                        "destination": "webserver"
+                    }
+                ]
+            },
+            {
+                "name": "nat",
+                "functional_type": "nat",
+                "neighbours": [
+                    {
+                        "name": "dpi"
+                    }
+                ],
+                "configuration": [
+                    "user1"
+                ]
+            },
+            {
+                "name": "dpi",
+                "functional_type": "dpi",
+                "neighbours": [
+                    {
+                        "name": "webserver"
+                    }
+                ],
+                "configuration": [
+                    "sex",
+                    "droga"
+                ]
+            },
+            {
+                "name": "webserver",
+                "functional_type": "webserver",
+                "neighbours": []
+            }
+        ]
+    }
 }

@@ -18,16 +18,16 @@
         },
         "policy_url_parameters": {
             "description": "The set of parameters to be passed in GET request to the verification service",
-            "type": "string"
+            "type": "array"
         },
-        "result": {
+        "results": {
             "description": "The set of parameters to be passed in GET request to the verification service",
-            "type": "string"
+            "type": "array"
         },
         "graph": {
         	"description": "The graph to be tested",
         	"type": "object"
         }
     },
-    "required": ["id", "name", "policy_url_parameters", "result", "graph"]
+    "required": ["id", "name", "policy_url_parameters", "results", "graph"]
 }
