@@ -10,12 +10,11 @@ How to deploy **VeriGraph** on Apache Tomcat:
    YY(http://www.oracle.comntechnetwork/java/javase/downloads/jdk8-downloads-2133151.html);
 -  set JAVA HOME environment variable to where you installed the jdk
    (e.g.
-   C::raw-latex:`\Program `Files:raw-latex:`\Java`:raw-latex:`\jdk`1.8.X
-   YY);
+   `C:\Program Files\Java\jdk1.8.XYY`);
 -  install Apache Tomcat 8 (https://tomcat.apache.org/download-80.cgi);
 -  set CATALINA HOME ambient variable to the directory where you
    installed Apache (e.g.
-   C::raw-latex:`\Program `Files:raw-latex:`\Java`:raw-latex:`\apache`-tomcat-8.0.30);
+   `C:\Program Files\Java\apache-tomcat-8.0.30`);
 -  (optional) configure Tomcat Manager:
 -  open the file ``%CATALINA_HOME%\conf\tomcat-users.xml``
 -  under the ``tomcat-users`` tag place, initialize an user with roles
@@ -43,7 +42,7 @@ username and password previously configured in Tomcat(e.g.
 ``name="tomcatPassword" value="tomcat"`` the values set in
 'tomcat-users'). Set ``server.location`` property to the directory where
 you installed Apache (e.g.
-C::raw-latex:`\Program `Files:raw-latex:`\Java`:raw-latex:`\apache`-tomcat-8.0.30);
+`C:\Program Files\Java\apache-tomcat-8.0.30`);
 
 Verigraph target:
 
@@ -139,7 +138,7 @@ Verigraph target:
    Unix)
 -  Download JDK (see instructions above for Windows and Unix)
 -  Configure runtime environment in Eclipse with `the following
-   incstructions <http://crunchify.com/step-by-step-guide-to-setup-and-install-apache-tomcat-server-in-eclipse-development-environment-ide/>`__
+   instructions <http://crunchify.com/step-by-step-guide-to-setup-and-install-apache-tomcat-server-in-eclipse-development-environment-ide/>`__
 -  Add new Tomcat server on port ``8080``
 -  Configure Tomcat server:
 
@@ -154,7 +153,7 @@ Verigraph target:
    ``name="tomcatPassword" value="tomcat"`` the values set in
    'tomcat-users'). Set ``server.location`` property to the directory
    where you installed Apache (e.g.
-   C::raw-latex:`\Program `Files:raw-latex:`\Java`:raw-latex:`\apache`-tomcat-8.0.30);
+   `C:\Program Files\Java\apache-tomcat-8.0.30`);
 -  execute the generate-war ant task in order to generate the .war;
 
 **How to add you own function ``<type>``**
