@@ -184,10 +184,10 @@
 	
   <!-- launch test python test -->
   <target name="run-test">
+     <echo>Wait...</echo>
     <exec dir="${test.dir}" executable="python">
       <arg value="${testfile}" />
-      <arg value="-iteration " />
-      <arg value="${iteration}" />
+      <arg value="-iteration=${iteration}" />
     </exec>
   </target>
 
