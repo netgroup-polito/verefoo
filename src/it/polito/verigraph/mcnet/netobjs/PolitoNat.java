@@ -82,9 +82,9 @@ private_addresses.addAll(address);
         Expr p_1 = ctx.mkConst("p_1", nctx.packet);
         Expr p_2 = ctx.mkConst("p_2", nctx.packet);
 
-        IntExpr t_0 = ctx.mkIntConst("t_0");
+       /* IntExpr t_0 = ctx.mkIntConst("t_0");
         IntExpr t_1 = ctx.mkIntConst("t_1");
-        IntExpr t_2 = ctx.mkIntConst("t_2");
+        IntExpr t_2 = ctx.mkIntConst("t_2");*/
 
         //    private_addr_func = ctx.mkFuncDecl("private_addr_func", nctx.address, ctx.mkBoolSort());
         private_addr_func = ctx.mkFuncDecl(nat + "_nat_func", nctx.address, ctx.mkBoolSort());
@@ -97,16 +97,16 @@ private_addresses.addAll(address);
         //        private_addr_func(p1.src) &&
         //        p_1.origin == p_0.origin &&
         //        same for p_1.<dest,orig_body,body,seq,proto,emailFrom,url,options> == p_0.<...>) "
-        constraints.add( ctx.mkForall(new Expr[]{t_0, p_0, x},
+        constraints.add( ctx.mkForall(new Expr[]{ p_0, x},
                 ctx.mkImplies(
-                        ctx.mkAnd((BoolExpr)nctx.send.apply(nat, x, p_0, t_0),
+                        ctx.mkAnd((BoolExpr)nctx.send.apply(nat, x, p_0),
                                 ctx.mkNot((BoolExpr)private_addr_func.apply(nctx.pf.get("dest").apply(p_0)))),
                         ctx.mkAnd(
                                 ctx.mkEq(nctx.pf.get("src").apply(p_0),natIp),
-                                ctx.mkExists(new Expr[]{y, p_1, t_1},
+                                ctx.mkExists(new Expr[]{y, p_1},
                                         ctx.mkAnd(
-                                                (BoolExpr)nctx.recv.apply(y, nat, p_1, t_1),
-                                                ctx.mkLt(t_1 , t_0),
+                                                (BoolExpr)nctx.recv.apply(y, nat, p_1),
+                                               
                                                 (BoolExpr)private_addr_func.apply(nctx.pf.get("src").apply(p_1)),
                                                 ctx.mkEq(nctx.pf.get("origin").apply(p_1),nctx.pf.get("origin").apply(p_0)),
                                                 ctx.mkEq(nctx.pf.get("dest").apply(p_1),nctx.pf.get("dest").apply(p_0)),
@@ -127,16 +127,16 @@ private_addresses.addAll(address);
         //       p_1.dest == ip_politoNat &&
         //       p_1.origin == p_0.origin &&
         //       same for p_1.<src,orig_body,body,seq,proto,emailFrom,url,options> == p_0.<...>)
-        constraints.add( ctx.mkForall(new Expr[]{x, p_0, t_0},
+        constraints.add( ctx.mkForall(new Expr[]{x, p_0},
                 ctx.mkImplies(
-                        ctx.mkAnd((BoolExpr)nctx.send.apply(nat, x, p_0, t_0),
+                        ctx.mkAnd((BoolExpr)nctx.send.apply(nat, x, p_0),
                                 (BoolExpr)private_addr_func.apply(nctx.pf.get("dest").apply(p_0))),
                         ctx.mkAnd(
                                 ctx.mkNot((BoolExpr)private_addr_func.apply(nctx.pf.get("src").apply(p_0))),
-                                ctx.mkExists(new Expr[]{y, p_1, t_1},
+                                ctx.mkExists(new Expr[]{y, p_1},
                                         ctx.mkAnd(
-                                                ctx.mkLt(t_1 , t_0),
-                                                (BoolExpr)nctx.recv.apply(y, nat, p_1, t_1),
+                                                
+                                                (BoolExpr)nctx.recv.apply(y, nat, p_1),
                                                 ctx.mkNot((BoolExpr)private_addr_func.apply(nctx.pf.get("src").apply(p_1))),
                                                 ctx.mkEq(nctx.pf.get("dest").apply(p_1),natIp),
                                                 ctx.mkEq(nctx.pf.get("src").apply(p_1),nctx.pf.get("src").apply(p_0)),
@@ -148,10 +148,10 @@ private_addresses.addAll(address);
                                                 ctx.mkEq(nctx.pf.get("emailFrom").apply(p_1),nctx.pf.get("emailFrom").apply(p_0)),
                                                 ctx.mkEq(nctx.pf.get("url").apply(p_1),nctx.pf.get("url").apply(p_0)),
                                                 ctx.mkEq(nctx.pf.get("options").apply(p_1),nctx.pf.get("options").apply(p_0)),
-                                                ctx.mkExists(new Expr[]{z, p_2, t_2},
+                                                ctx.mkExists(new Expr[]{z, p_2},
                                                         ctx.mkAnd(
-                                                                ctx.mkLt(t_2 , t_1),
-                                                                (BoolExpr)nctx.recv.apply(z, nat, p_2, t_2),
+                                                                
+                                                                (BoolExpr)nctx.recv.apply(z, nat, p_2),
                                                                 (BoolExpr)private_addr_func.apply(nctx.pf.get("src").apply(p_2)),
                                                                 ctx.mkEq(nctx.pf.get("src").apply(p_1),nctx.pf.get("dest").apply(p_2)),
                                                                 ctx.mkEq(nctx.pf.get("src").apply(p_0),nctx.pf.get("dest").apply(p_2)),

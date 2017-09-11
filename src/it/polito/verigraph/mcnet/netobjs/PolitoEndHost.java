@@ -60,7 +60,7 @@ public class PolitoEndHost extends NetworkObject {
         //System.out.println("Installing PolitoEndHost...");
         Expr n_0 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_n_0", nctx.node);
         Expr p_0 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_p_0", nctx.packet);
-        IntExpr t_0 = ctx.mkIntConst("PolitoEndHost_"+politoEndHost+"_t_0");
+        //IntExpr t_0 = ctx.mkIntConst("PolitoEndHost_"+politoEndHost+"_t_0");
         BoolExpr predicatesOnPktFields = ctx.mkTrue();
 
         if(packet.getIp_dest() != null)
@@ -79,16 +79,16 @@ public class PolitoEndHost extends NetworkObject {
             predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("url").apply(p_0), ctx.mkInt(packet.getUrl())));
 
         //Constraint1 send(politoWebClient, n_0, p, t_0) -> p.origin == politoWebClient && p.orig_body == p.body && nodeHasAddr(politoWebClient,p.src)
-        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                ctx.mkImplies((BoolExpr)nctx.send.apply(politoEndHost, n_0, p_0, t_0),
+        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies((BoolExpr)nctx.send.apply(politoEndHost, n_0, p_0),
                         ctx.mkAnd(predicatesOnPktFields,
                                 ctx.mkEq(nctx.pf.get("orig_body").apply(p_0),nctx.pf.get("body").apply(p_0)),
                                 ctx.mkEq(nctx.pf.get("origin").apply(p_0),politoEndHost),
                                 (BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.pf.get("src").apply(p_0)))),1,null,null,null,null));
 
         //Constraint2 recv(n_0, politoWebClient, p, t_0) -> nodeHasAddr(politoWebClient,p.dest)
-        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0,politoEndHost, p_0, t_0),
+        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0,politoEndHost, p_0),
                         (BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.pf.get("dest").apply(p_0))),1,null,null,null,null));
 
         //System.out.println("Done.");

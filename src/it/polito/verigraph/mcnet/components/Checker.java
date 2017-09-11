@@ -76,10 +76,10 @@ public class Checker {
         IntExpr t_1 = ctx.mkIntConst("check_isolation_t1_"+src.getZ3Node()+"_"+dest.getZ3Node());
 
         //        Constraint1recv(n_0,destNode,p0,t_0)
-        this.solver.add((BoolExpr)nctx.recv.apply(n_0, dest.getZ3Node(), p0, t_0));
+        this.solver.add((BoolExpr)nctx.recv.apply(n_0, dest.getZ3Node(), p0));
 
         //        Constraint2send(srcNode,n_1,p1,t_1)
-        this.solver.add((BoolExpr)nctx.send.apply(src.getZ3Node(), n_1, p1, t_1));
+        this.solver.add((BoolExpr)nctx.send.apply(src.getZ3Node(), n_1, p1));
 
         //        Constraint3nodeHasAddr(srcNode,p1.srcAddr)
         this.solver.add((BoolExpr)nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));

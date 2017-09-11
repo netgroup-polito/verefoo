@@ -112,14 +112,15 @@ public class Network extends Core{
     public void saneSend(NetworkObject node){
         Expr n_0 = ctx.mkConst(node+"_saneSend_n_0", nctx.node);
         Expr p_0 = ctx.mkConst(node+"_saneSend_p_0", nctx.packet);
-        IntExpr t_0 = ctx.mkIntConst(node+"_saneSend_t_0");
+        //IntExpr t_0 = ctx.mkIntConst(node+"_saneSend_t_0");
         // Constant: node
         //Constraint send(node, n_0, p, t_0) -> !nodeHasAddr(node, p.dest)
+      //timeless
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                        ctx.mkImplies((BoolExpr)nctx.send.apply(node.getZ3Node(),n_0, p_0, t_0),
-                                ctx.mkNot((BoolExpr)nctx.nodeHasAddr.apply( node.getZ3Node(),
-                                        nctx.pf.get("dest").apply(p_0)))),1,null,null,null,null));
+                ctx.mkForall(new Expr[]{n_0, p_0},
+                    ctx.mkImplies((BoolExpr)nctx.send.apply(node.getZ3Node(),n_0, p_0),
+                    		ctx.mkNot((BoolExpr)nctx.nodeHasAddr.apply( node.getZ3Node(),
+                    				nctx.pf.get("dest").apply(p_0)))),1,null,null,null,null));
     }
 
     /**
@@ -131,13 +132,13 @@ public class Network extends Core{
         // SetGateway(self, node, gateway): All packets from node are sent through gateway
         Expr n_0 = ctx.mkConst(node+"_gateway_n_0", nctx.node);
         Expr p_0 = ctx.mkConst(node+"_gateway_p_0", nctx.packet);
-        IntExpr t_0 = ctx.mkIntConst(node+"_gateway_t_0");
+        //IntExpr t_0 = ctx.mkIntConst(node+"_gateway_t_0");
 
         //Constraint send(node, n_0, p_0, t_0) -> n_0 = gateway
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, p_0, t_0},
+                ctx.mkForall(new Expr[]{n_0, p_0},
                         ctx.mkImplies(
-                                (BoolExpr)nctx.send.apply(node.getZ3Node(), n_0, p_0, t_0),
+                                (BoolExpr)nctx.send.apply(node.getZ3Node(), n_0, p_0),
                                 ctx.mkEq(n_0,gateway.getZ3Node())),1,null,null,null,null));
 
         //        constraints.add(ctx.mkForall(new Expr[]{n_0, p_0, t_0},
@@ -163,7 +164,7 @@ public class Network extends Core{
         //Policy is of the form predicate -> node
         Expr p_0 = ctx.mkConst(node+"_composition_p_0", nctx.packet);
         Expr n_0 = ctx.mkConst(node+"_composition_n_0", nctx.node);
-        Expr t_0 = ctx.mkIntConst(node+"_composition_t_0");
+        //Expr t_0 = ctx.mkIntConst(node+"_composition_t_0");
 
         HashMap<String,ArrayList<BoolExpr>> collected = new HashMap<String,ArrayList<BoolExpr>>();
         HashMap<String,NetworkObject> node_dict = new HashMap<String,NetworkObject>();
@@ -188,8 +189,8 @@ public class Network extends Core{
             BoolExpr[] pred = new BoolExpr[entry.getValue().size()];
             predicates = ctx.mkOr(entry.getValue().toArray(pred));
 
-            constraints.add(ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                    ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.send.apply(node.getZ3Node(), n_0, p_0, t_0), predicates),
+            constraints.add(ctx.mkForall(new Expr[]{n_0, p_0},
+                    ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.send.apply(node.getZ3Node(), n_0, p_0), predicates),
                             ctx.mkEq(n_0, node_dict.get(entry.getKey()).getZ3Node())),1,null,null,null,null));
             /*System.out.println("cnstraints: " + (ctx.mkForall(new Expr[]{n_0, p_0, t_0},
                         ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.send.apply(node.getZ3Node(), n_0, p_0, t_0), predicates),
@@ -218,7 +219,7 @@ public class Network extends Core{
     public void compositionPolicyShunt (NetworkObject node,ArrayList<Tuple<DatatypeExpr,NetworkObject>> routing_table,NetworkObject shunt_node){
         Expr p_0 = ctx.mkConst(node+"_composition_p_0", nctx.packet);
         Expr n_0 = ctx.mkConst(node+"_composition_n_0", nctx.node);
-        Expr t_0 = ctx.mkIntConst(node+"_composition_t_0");
+        //Expr t_0 = ctx.mkIntConst(node+"_composition_t_0");
 
         HashMap<String,ArrayList<BoolExpr>> collected = new HashMap<String,ArrayList<BoolExpr>>();
         HashMap<String,NetworkObject> node_dict = new HashMap<String,NetworkObject>();
@@ -240,8 +241,8 @@ public class Network extends Core{
             BoolExpr[] pred = new BoolExpr[entry.getValue().size()];
             predicates = ctx.mkOr(entry.getValue().toArray(pred));
 
-            constraints.add(ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                    ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.send.apply(node.getZ3Node(), n_0, p_0, t_0), predicates),
+            constraints.add(ctx.mkForall(new Expr[]{n_0, p_0},
+                    ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.send.apply(node.getZ3Node(), n_0, p_0), predicates),
                             ctx.mkOr(ctx.mkEq(n_0, node_dict.get(entry.getKey()).getZ3Node()),ctx.mkEq(n_0, shunt_node.getZ3Node()))),1,null,null,null,null));
         }
 
@@ -280,7 +281,7 @@ public class Network extends Core{
 
         Expr n_0 = ctx.mkConst(node+"_isolation_n_0", nctx.node);
         Expr p_0 = ctx.mkConst(node+"_isolation_p_0", nctx.packet);
-        IntExpr t_0 = ctx.mkInt(node+"_isolation_t_0");
+        //IntExpr t_0 = ctx.mkInt(node+"_isolation_t_0");
 
         BoolExpr[] adj = new BoolExpr[adjacencies.size()];
         for(int y=0;y<adjacencies.size();y++){
@@ -289,11 +290,11 @@ public class Network extends Core{
         }
         BoolExpr clause = ctx.mkOr(adj);
 
-        constraints.add(ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                ctx.mkImplies((BoolExpr)nctx.send.apply(node.getZ3Node(), n_0, p_0, t_0),
+        constraints.add(ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies((BoolExpr)nctx.send.apply(node.getZ3Node(), n_0, p_0),
                         clause),1,null,null,null,null));
-        constraints.add(ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0, node.getZ3Node(), p_0, t_0),
+        constraints.add(ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0, node.getZ3Node(), p_0),
                         clause),1,null,null,null,null));
     }
 

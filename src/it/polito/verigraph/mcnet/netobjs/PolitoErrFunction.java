@@ -67,7 +67,7 @@ public class PolitoErrFunction extends NetworkObject{
     private void errFunctionRules (){
         Expr n_0 = ctx.mkConst("PolitoErrFunction_"+politoErrFunction+"_n_0", nctx.node);
         Expr p_0 = ctx.mkConst("PolitoErrFunction_"+politoErrFunction+"_p_0", nctx.packet);
-        IntExpr t_0 = ctx.mkIntConst("PolitoErrFunction_"+politoErrFunction+"_t_0");
+        //.IntExpr t_0 = ctx.mkIntConst("PolitoErrFunction_"+politoErrFunction+"_t_0");
 
         //     constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0},
         //     ctx.mkImplies((BoolExpr)nctx.send.apply(politoErrFunction, n_0, p_0, t_0),
@@ -83,8 +83,8 @@ public class PolitoErrFunction extends NetworkObject{
 
         //            Constraint1 We want the ErrFunction not to send out any packet
         //    send(politoErrFunction, n_0, p, t_0) -> 1 == 2
-        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                ctx.mkImplies((BoolExpr)nctx.send.apply(politoErrFunction, n_0, p_0, t_0),
+        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies((BoolExpr)nctx.send.apply(politoErrFunction, n_0, p_0),
                         ctx.mkEq(ctx.mkInt(1),ctx.mkInt(2))),1,null,null,null,null));
 
         //            constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0},

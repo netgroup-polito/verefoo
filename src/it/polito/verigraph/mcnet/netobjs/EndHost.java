@@ -61,32 +61,32 @@ public class EndHost extends NetworkObject{
 
     public void endHostRules (){
         Expr n_0 = ctx.mkConst("eh_"+node+"_n_0", nctx.node);
-        IntExpr t_0 = ctx.mkIntConst("eh_"+node+"_t_0");
+        //IntExpr t_0 = ctx.mkIntConst("eh_"+node+"_t_0");
         Expr p_0 = ctx.mkConst("eh_"+node+"_p_0", nctx.packet);
 
         //Constraint1send(node, n_0, p, t_0) -> nodeHasAddr(node,p.src)
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, p_0, t_0},
+                ctx.mkForall(new Expr[]{n_0, p_0},
                         ctx.mkImplies(
-                                (BoolExpr)nctx.send.apply(new Expr[]{ node, n_0, p_0, t_0}),
+                                (BoolExpr)nctx.send.apply(new Expr[]{ node, n_0, p_0}),
                                 (BoolExpr)nctx.nodeHasAddr.apply(new Expr[]{node, nctx.pf.get("src").apply(p_0)})),1,null,null,null,null));
         //Constraint2send(node, n_0, p, t_0) -> p.origin == node
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, p_0, t_0},
+                ctx.mkForall(new Expr[]{n_0, p_0},
                         ctx.mkImplies(
-                                (BoolExpr)nctx.send.apply(new Expr[]{ node, n_0, p_0, t_0}),
+                                (BoolExpr)nctx.send.apply(new Expr[]{ node, n_0, p_0}),
                                 ctx.mkEq(nctx.pf.get("origin").apply(p_0),node)),1,null,null,null,null));
         //Constraint3      send(node, n_0, p, t_0) -> p.orig_body == p.body
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, p_0, t_0},
+                ctx.mkForall(new Expr[]{n_0, p_0},
                         ctx.mkImplies(
-                                (BoolExpr)nctx.send.apply(new Expr[]{ node, n_0, p_0, t_0}),
+                                (BoolExpr)nctx.send.apply(new Expr[]{ node, n_0, p_0}),
                                 ctx.mkEq(nctx.pf.get("orig_body").apply(p_0),nctx.pf.get("body").apply(p_0))),1,null,null,null,null));
         //Constraint4recv(n_0, node, p, t_0) -> nodeHasAddr(node,p.dest)
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, p_0, t_0},
+                ctx.mkForall(new Expr[]{n_0, p_0},
                         ctx.mkImplies(
-                                (BoolExpr)nctx.recv.apply(new Expr[]{ n_0, node, p_0, t_0}),
+                                (BoolExpr)nctx.recv.apply(new Expr[]{ n_0, node, p_0}),
                                 (BoolExpr)nctx.nodeHasAddr.apply(new Expr[]{node, nctx.pf.get("dest").apply(p_0)})),1,null,null,null,null));
 
         //       Just a try: here we state that an endhost is not able to issue a HTTP response traffic

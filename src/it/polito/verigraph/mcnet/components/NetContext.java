@@ -173,11 +173,11 @@ public class NetContext extends Core{
 
 
         // send: node -> node -> packet-> int-> bool
-        send = ctx.mkFuncDecl("send", new Sort[]{ node, node, packet, ctx.mkIntSort()},ctx.mkBoolSort());
+        send = ctx.mkFuncDecl("send", new Sort[]{ node, node, packet},ctx.mkBoolSort());
 
 
         // recv: node -> node -> packet-> int-> bool
-        recv = ctx.mkFuncDecl("recv", new Sort[]{ node, node, packet, ctx.mkIntSort()},ctx.mkBoolSort());
+        recv = ctx.mkFuncDecl("recv", new Sort[]{ node, node, packet},ctx.mkBoolSort());
 
     }
 
@@ -191,116 +191,116 @@ public class NetContext extends Core{
         Expr n_2 = ctx.mkConst("ctx_base_n_2", node);
         Expr p_0 = ctx.mkConst("ctx_base_p_0", packet);
         Expr p_1 = ctx.mkConst("ctx_base_p_1", packet);
-        IntExpr t_0 = ctx.mkIntConst("ctx_base_t_0");
-        IntExpr t_1 = ctx.mkIntConst("ctx_base_t_1");
+        //IntExpr t_0 = ctx.mkIntConst("ctx_base_t_0");
+        //IntExpr t_1 = ctx.mkIntConst("ctx_base_t_1");
 
         // Constraint1 send(n_0, n_1, p_0, t_0) -> n_0 != n_1
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
-                        ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0, t_0),ctx.mkNot(ctx.mkEq( n_0, n_1))),1,null,null,null,null));
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
+                        ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0),ctx.mkNot(ctx.mkEq( n_0, n_1))),1,null,null,null,null));
 
         // Constraint2 recv(n_0, n_1, p_0, t_0) -> n_0 != n_1
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
-                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0, t_0),ctx.mkNot(ctx.mkEq( n_0, n_1))),1,null,null,null,null));
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
+                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),ctx.mkNot(ctx.mkEq( n_0, n_1))),1,null,null,null,null));
 
         // Constraint3 send(n_0, n_1, p_0, t_0) -> p_0.src != p_0.dest
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
-                        ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0, t_0),
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
+                        ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0),
                                 ctx.mkNot(ctx.mkEq(  pf.get("src").apply(p_0), pf.get("dest").apply(p_0)))),1,null,null,null,null));
 
         // Constraint4 recv(n_0, n_1, p_0, t_0) -> p_0.src != p_0.dest
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
-                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0, t_0),
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0 },
+                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0 ),
                                 ctx.mkNot(ctx.mkEq(pf.get("src").apply(p_0),pf.get("dest").apply(p_0)))),1,null,null,null,null));
 
-        // Constraint5 recv(n_0, n_1, p, t_0) -> send(n_0, n_1, p, t_1) && t_1 < t_0
+        // Constraint5 recv(n_0, n_1, p ) -> send(n_0, n_1, p, t_1) && t_1 < t_0
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
-                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0, t_0),
-                                ctx.mkExists(new Expr[]{t_1},
-                                        ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0, t_1),
-                                                ctx.mkLt(t_1, t_0)),1,null,null,null,null)),1,null,null,null,null));
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0 },
+                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0 ),
+                               
+                                        ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0)
+                                                )),1,null,null,null,null));
 
         // Constraint6 send(n_0, n_1, p, t_0) -> p.src_port > 0 && p.dest_port < MAX_PORT
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
-                        ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0, t_0),
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0 },
+                        ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0 ),
                                 ctx.mkAnd( ctx.mkGe((IntExpr)src_port.apply(p_0),(IntExpr)ctx.mkInt(0)),
                                         ctx.mkLt((IntExpr)src_port.apply(p_0),(IntExpr) ctx.mkInt(MAX_PORT)))),1,null,null,null,null));
 
         // Constraint7 recv(n_0, n_1, p, t_0) -> p.src_port > 0 && p.dest_port < MAX_PORT
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
-                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0, t_0),
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
+                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
                                 ctx.mkAnd( ctx.mkGe((IntExpr)dest_port.apply(p_0),(IntExpr)ctx.mkInt(0)),
                                         ctx.mkLt((IntExpr)dest_port.apply(p_0),(IntExpr) ctx.mkInt(MAX_PORT)))),1,null,null,null,null));
 
         // Constraint8 recv(n_0, n_1, p_0, t_0) -> t_0 > 0
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
-                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0, t_0),
-                                ctx.mkGt(t_0,ctx.mkInt(0))),1,null,null,null,null));
+        /*constraints.add(
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
+                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
+                                ctx.mkGt(t_0,ctx.mkInt(0))),1,null,null,null,null));*/
 
         // Constraint9 send(n_0, n_1, p_0, t_0) -> t_0 > 0
-        constraints.add(
+        /*constraints.add(
                 ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
                         ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0, t_0),
-                                ctx.mkGt(t_0,ctx.mkInt(0))),1,null,null,null,null));
+                                ctx.mkGt(t_0,ctx.mkInt(0))),1,null,null,null,null));*/
 
         // Extra constriants for supporting the VPN gateway
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
                         ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0, t_0),
+                                ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0),
                                         ctx.mkNot(ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.am.get("null")))),
                                 ctx.mkNot(ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.pf.get("inner_dest").apply(p_0)))),1,null,null,null,null));
 
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
                         ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0, t_0),
+                                ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0),
                                         ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.am.get("null"))),
                                 ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.pf.get("inner_dest").apply(p_0))),1,null,null,null,null));
 
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
                         ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0, t_0),
+                                ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0),
                                         ctx.mkEq(this.pf.get("inner_dest").apply(p_0), this.am.get("null"))),
                                 ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.pf.get("inner_dest").apply(p_0))),1,null,null,null,null));
 
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
                         ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)recv.apply(n_0, n_1, p_0, t_0),
+                                ctx.mkAnd((BoolExpr)recv.apply(n_0, n_1, p_0),
                                         ctx.mkNot(ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.am.get("null")))),
                                 ctx.mkNot(ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.pf.get("inner_dest").apply(p_0)))),1,null,null,null,null));
 
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
                         ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)recv.apply(n_0, n_1, p_0, t_0),
+                                ctx.mkAnd((BoolExpr)recv.apply(n_0, n_1, p_0),
                                         ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.am.get("null"))),
                                 ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.pf.get("inner_dest").apply(p_0))),1,null,null,null,null));
 
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
                         ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)recv.apply(n_0, n_1, p_0, t_0),
+                                ctx.mkAnd((BoolExpr)recv.apply(n_0, n_1, p_0),
                                         ctx.mkEq(this.pf.get("inner_dest").apply(p_0), this.am.get("null"))),
                                 ctx.mkEq(this.pf.get("inner_src").apply(p_0), this.pf.get("inner_dest").apply(p_0))),1,null,null,null,null));
 
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0, n_2, p_1, t_1},
+                ctx.mkForall(new Expr[]{n_0, n_1, p_0, n_2, p_1},
                         ctx.mkImplies(
                                 ctx.mkAnd(
-                                        ctx.mkLt(t_1, t_0),
-                                        (BoolExpr)send.apply(n_0, n_1, p_0, t_0),
+                                        
+                                        (BoolExpr)send.apply(n_0, n_1, p_0),
                                         (BoolExpr)this.pf.get("encrypted").apply(p_1),
-                                        (BoolExpr)recv.apply(n_2, n_0, p_1, t_1),
+                                        (BoolExpr)recv.apply(n_2, n_0, p_1),
                                         (BoolExpr)this.pf.get("encrypted").apply(p_0)),
                                 ctx.mkAnd(
                                         ctx.mkEq(this.pf.get("inner_src").apply(p_1), this.pf.get("inner_src").apply(p_0)),

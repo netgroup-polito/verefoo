@@ -61,15 +61,15 @@ public class PolitoFieldModifier extends NetworkObject {
         Expr p_0 = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_p_0", nctx.packet);
         Expr p_1 = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_p_1", nctx.packet);
 
-        IntExpr t_0 = ctx.mkIntConst("politoFieldModifier_"+politoFieldModifier+"_t_0");
+        /*IntExpr t_0 = ctx.mkIntConst("politoFieldModifier_"+politoFieldModifier+"_t_0");
         IntExpr t_1 = ctx.mkIntConst("politoFieldModifier_"+politoFieldModifier+"_t_1");
-
+*/
         constraints.add(
-                ctx.mkForall(new Expr[]{t_0, p_0, x},
-                        ctx.mkImplies((BoolExpr)nctx.send.apply(politoFieldModifier,x,p_0,t_0),
-                                ctx.mkExists(new Expr[]{y, p_1, t_1},
-                                        ctx.mkAnd(ctx.mkLt(t_1, t_0),
-                                                (BoolExpr)nctx.recv.apply(y, politoFieldModifier, p_1, t_1),
+                ctx.mkForall(new Expr[]{ p_0, x},
+                        ctx.mkImplies((BoolExpr)nctx.send.apply(politoFieldModifier,x,p_0),
+                                ctx.mkExists(new Expr[]{y, p_1},
+                                        ctx.mkAnd(
+                                                (BoolExpr)nctx.recv.apply(y, politoFieldModifier, p_1),
                                                 ctx.mkEq(nctx.pf.get("encrypted").apply(p_0), nctx.pf.get("encrypted").apply(p_1)),
                                                 ctx.mkEq(nctx.pf.get("src").apply(p_0), nctx.pf.get("src").apply(p_1)),
                                                 ctx.mkEq(nctx.pf.get("dest").apply(p_0), nctx.pf.get("dest").apply(p_1)),

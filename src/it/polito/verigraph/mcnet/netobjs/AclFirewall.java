@@ -86,21 +86,21 @@ public class AclFirewall extends NetworkObject{
         Expr p_0 = ctx.mkConst(fw+"_firewall_send_p_0", nctx.packet);
         Expr n_0 = ctx.mkConst(fw+"_firewall_send_n_0", nctx.node);
         Expr n_1 = ctx.mkConst(fw+"_firewall_send_n_1", nctx.node);
-        IntExpr t_0 = ctx.mkIntConst(fw+"_firewall_send_t_0");
-        IntExpr t_1 = ctx.mkIntConst(fw+"_firewall_send_t_1");
+        //IntExpr t_0 = ctx.mkIntConst(fw+"_firewall_send_t_0");
+        //IntExpr t_1 = ctx.mkIntConst(fw+"_firewall_send_t_1");
         acl_func = ctx.mkFuncDecl(fw+"_acl_func", new Sort[]{nctx.address, nctx.address},ctx.mkBoolSort());
 
         //Constraint1send(fw, n_0, p, t_0)  -> (exist n_1,t_1 : (recv(n_1, fw, p, t_1) &&
         //    t_1 < t_0 && !acl_func(p.src,p.dest))
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                        ctx.mkImplies(
-                                (BoolExpr)nctx.send.apply(new Expr[]{ fw, n_0, p_0, t_0}),
-                                ctx.mkExists(new Expr[]{t_1},
-                                        ctx.mkAnd(ctx.mkLt(t_1,t_0),
-                                                ctx.mkExists(new Expr[]{n_1},
-                                                        nctx.recv.apply(n_1, fw, p_0, t_1),1,null,null,null,null),
-                                                ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0)))),1,null,null,null,null)),1,null,null,null,null));
+            	ctx.mkForall(new Expr[]{n_0, p_0}, 
+    	            ctx.mkImplies(
+    	            	(BoolExpr)nctx.send.apply(new Expr[]{ fw, n_0, p_0}),
+    	            	
+    	            			ctx.mkAnd(
+    	            						ctx.mkExists(new Expr[]{n_1}, 
+    	            								nctx.recv.apply(n_1, fw, p_0),1,null,null,null,null), 
+    	            						ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0))))),1,null,null,null,null));
 
     }
 

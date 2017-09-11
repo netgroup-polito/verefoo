@@ -59,18 +59,18 @@ public class PolitoNF extends NetworkObject{
         Expr n_0 = ctx.mkConst("politoNF_"+politoNF+"_n_0", nctx.node);
         Expr n_1 = ctx.mkConst("politoNF_"+politoNF+"_n_1", nctx.node);
         Expr p_0 = ctx.mkConst("politoNF_"+politoNF+"_p_0", nctx.packet);
-        IntExpr t_0 = ctx.mkIntConst("politoNF_"+politoNF+"_t_0");
-        IntExpr t_1 = ctx.mkIntConst("politoNF_"+politoNF+"_t_1");
+        /*IntExpr t_0 = ctx.mkIntConst("politoNF_"+politoNF+"_t_0");
+        IntExpr t_1 = ctx.mkIntConst("politoNF_"+politoNF+"_t_1");*/
         Expr a_0 = ctx.mkConst(politoNF+"_politoNF_a_0", nctx.address);
         Expr a_1 = ctx.mkConst(politoNF+"_politoNF_a_1", nctx.address);
 
         FuncDecl myFunction = ctx.mkFuncDecl(politoNF+"_myFunction", new Sort[]{nctx.address,nctx.address}, ctx.mkBoolSort());
 
-        BoolExpr myConstraint = ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                ctx.mkImplies((BoolExpr)nctx.send.apply(politoNF, n_0, p_0, t_0),
-                        ctx.mkExists(new Expr[]{n_1, t_1},
-                                ctx.mkAnd((BoolExpr)nctx.recv.apply(n_1, politoNF, p_0, t_1),
-                                        ctx.mkLt(t_1 , t_0),
+        BoolExpr myConstraint = ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies((BoolExpr)nctx.send.apply(politoNF, n_0, p_0),
+                        ctx.mkExists(new Expr[]{n_1},
+                                ctx.mkAnd((BoolExpr)nctx.recv.apply(n_1, politoNF, p_0),
+                                        
                                         (BoolExpr)myFunction.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0))),1,null,null,null,null)),1,null,null,null,null);
 
         BoolExpr funcConstraint = ctx.mkOr(ctx.mkAnd(ctx.mkEq(a_0, ipA), ctx.mkEq(a_1, ipB)), ctx.mkAnd(ctx.mkEq(a_0,ipB), ctx.mkEq(a_1,ipA)));

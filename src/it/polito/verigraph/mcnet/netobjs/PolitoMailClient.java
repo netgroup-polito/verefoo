@@ -68,37 +68,37 @@ public class PolitoMailClient extends NetworkObject{
     private void mailClientRules (DatatypeExpr ipServer){
         Expr n_0 = ctx.mkConst("PolitoMailClient_"+politoMailClient+"_n_0", nctx.node);
         Expr p_0 = ctx.mkConst("PolitoMailClient_"+politoMailClient+"_p_0", nctx.packet);
-        IntExpr t_0 = ctx.mkIntConst("PolitoMailClient_"+politoMailClient+"_t_0");
+        //IntExpr t_0 = ctx.mkIntConst("PolitoMailClient_"+politoMailClient+"_t_0");
 
         //Constraint1 send(politoMailClient, n_0, p, t_0) -> nodeHasAddr(politoMailClient,p.src)
-        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                ctx.mkImplies((BoolExpr)nctx.send.apply(politoMailClient, n_0, p_0, t_0),
+        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies((BoolExpr)nctx.send.apply(politoMailClient, n_0, p_0),
                         (BoolExpr)nctx.nodeHasAddr.apply(politoMailClient,nctx.pf.get("src").apply(p_0))),1,null,null,null,null));
 
         //Constraint2 send(politoMailClient, n_0, p, t_0) -> p.origin == politoMailClient
-        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                ctx.mkImplies((BoolExpr)nctx.send.apply(politoMailClient, n_0, p_0, t_0),
+        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies((BoolExpr)nctx.send.apply(politoMailClient, n_0, p_0),
                         ctx.mkEq(nctx.pf.get("origin").apply(p_0),politoMailClient)),1,null,null,null,null));
 
         //Constraint3 send(politoMailClient, n_0, p, t_0) -> p.orig_body == p.body
-        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                ctx.mkImplies((BoolExpr)nctx.send.apply(politoMailClient, n_0, p_0, t_0),
+        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies((BoolExpr)nctx.send.apply(politoMailClient, n_0, p_0),
                         ctx.mkEq(nctx.pf.get("orig_body").apply(p_0),nctx.pf.get("body").apply(p_0))),1,null,null,null,null));
 
         //Constraint4 recv(n_0, politoMailClient, p, t_0) -> nodeHasAddr(politoMailClient,p.dest)
-        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0,politoMailClient, p_0, t_0),
+        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0,politoMailClient, p_0),
                         (BoolExpr)nctx.nodeHasAddr.apply(politoMailClient,nctx.pf.get("dest").apply(p_0))),1,null,null,null,null));
 
         //Constraint5 This client is only able to produce POP3 requests
         //send(politoMailClient, n_0, p, t_0) -> p.proto == POP3_REQ
-        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                ctx.mkImplies((BoolExpr)nctx.send.apply(politoMailClient, n_0, p_0, t_0),
+        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies((BoolExpr)nctx.send.apply(politoMailClient, n_0, p_0),
                         ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_REQUEST))),1,null,null,null,null));
 
         //Constraint6 send(politoMailClient, n_0, p, t_0) -> p.dest == ip_mailServer
-        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-                ctx.mkImplies((BoolExpr)nctx.send.apply(politoMailClient, n_0, p_0, t_0),
+        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies((BoolExpr)nctx.send.apply(politoMailClient, n_0, p_0),
                         ctx.mkEq(nctx.pf.get("dest").apply(p_0), ipServer)),1,null,null,null,null));
     }
 }

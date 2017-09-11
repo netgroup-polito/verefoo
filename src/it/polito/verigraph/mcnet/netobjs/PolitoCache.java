@@ -72,15 +72,15 @@ public class PolitoCache extends NetworkObject{
         Expr p_1 = ctx.mkConst("politoCache_"+politoCache+"_p_1", nctx.packet);
         Expr p_2 = ctx.mkConst("politoCache_"+politoCache+"_p_2", nctx.packet);
 
-        IntExpr t_0 = ctx.mkIntConst("politoCache_"+politoCache+"_t_0");
+        /*IntExpr t_0 = ctx.mkIntConst("politoCache_"+politoCache+"_t_0");
         IntExpr t_1 = ctx.mkIntConst("politoCache_"+politoCache+"_t_1");
-        IntExpr t_2 = ctx.mkIntConst("politoCache_"+politoCache+"_t_2");
+        IntExpr t_2 = ctx.mkIntConst("politoCache_"+politoCache+"_t_2");*/
 
         Expr a_0 = ctx.mkConst(politoCache+"politoCache_a_0", nctx.node);
         IntExpr u_0 = ctx.mkIntConst("politoCache_"+politoCache+"_u_0");
 
         FuncDecl isInternalNode = ctx.mkFuncDecl(politoCache+"_isInternalNode", nctx.node, ctx.mkBoolSort());
-        FuncDecl isInCache = ctx.mkFuncDecl(politoCache+"_isInCache", new Sort[]{ctx.mkIntSort(),ctx.mkIntSort()}, ctx.mkBoolSort());
+        FuncDecl isInCache = ctx.mkFuncDecl(politoCache+"_isInCache", new Sort[]{ctx.mkIntSort()}, ctx.mkBoolSort());
 
         assert(internalNodes.length!=0); //No internal nodes => Should never happen
 
@@ -118,15 +118,13 @@ public class PolitoCache extends NetworkObject{
         //        isInternalNode(n_1) && !isInternalNode(n_2) &&
         //        p_1.url == u_0 &&  p_2.url == u_0 )
         constraints.add(
-                ctx.mkForall(new Expr[]{u_0, t_0},
-                        ctx.mkImplies((BoolExpr)isInCache.apply(u_0, t_0),
-                                ctx.mkExists(new Expr[]{t_1,t_2,p_1,p_2,n_1, n_2},
+                ctx.mkForall(new Expr[]{u_0},
+                        ctx.mkImplies((BoolExpr)isInCache.apply(u_0),
+                                ctx.mkExists(new Expr[]{p_1,p_2,n_1, n_2},
                                         ctx.mkAnd(
-                                                ctx.mkLt(t_1, t_2),
-                                                ctx.mkLt(t_1, t_0),
-                                                ctx.mkLt(t_2, t_0),
-                                                (BoolExpr)nctx.recv.apply(n_1, politoCache, p_1, t_1),
-                                                (BoolExpr)nctx.recv.apply(n_2, politoCache, p_2, t_2),
+                                                
+                                                (BoolExpr)nctx.recv.apply(n_1, politoCache, p_1),
+                                                (BoolExpr)nctx.recv.apply(n_2, politoCache, p_2),
                                                 ctx.mkEq(nctx.pf.get("proto").apply(p_1), ctx.mkInt(nctx.HTTP_REQUEST)),
                                                 ctx.mkEq(nctx.pf.get("proto").apply(p_2), ctx.mkInt(nctx.HTTP_RESPONSE)),
                                                 (BoolExpr)isInternalNode.apply(n_1),
@@ -142,16 +140,16 @@ public class PolitoCache extends NetworkObject{
         //        (t_1 < t_0 && recv(n_1, politoCache, p, t_1) &&
         //         p.proto == HTTP_REQ &&  !isInCache(p.url,t_0))
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0,p_0, t_0},
+                ctx.mkForall(new Expr[]{n_0,p_0},
                         ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)nctx.send.apply(politoCache,n_0,p_0,t_0),ctx.mkNot((BoolExpr)isInternalNode.apply(n_0))),
-                                ctx.mkAnd(ctx.mkExists(new Expr[]{t_1, n_1},
+                                ctx.mkAnd((BoolExpr)nctx.send.apply(politoCache,n_0,p_0),ctx.mkNot((BoolExpr)isInternalNode.apply(n_0))),
+                                ctx.mkAnd(ctx.mkExists(new Expr[]{n_1},
                                         ctx.mkAnd(
-                                                ctx.mkLt(t_1, t_0),
+                                                
                                                 (BoolExpr)isInternalNode.apply(n_1),
-                                                (BoolExpr)nctx.recv.apply(n_1, politoCache, p_0, t_1)),1,null,null,null,null),
+                                                (BoolExpr)nctx.recv.apply(n_1, politoCache, p_0)),1,null,null,null,null),
                                         ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.HTTP_REQUEST)),
-                                        ctx.mkNot((BoolExpr)isInCache.apply(nctx.pf.get("url").apply(p_0), t_0)))),1,null,null,null,null));
+                                        ctx.mkNot((BoolExpr)isInCache.apply(nctx.pf.get("url").apply(p_0))))),1,null,null,null,null));
 
         //Constraint4 send(politoCache, n_0, p, t_0) && isInternalNode(n_0) ->
         //    (exist p_1,t_1 :
@@ -160,18 +158,18 @@ public class PolitoCache extends NetworkObject{
         //         p_1.url == p.url &&  p.src == p_1.dest && p.dest==p_1.src
         //         && isInCache(p.url,t_0))
         constraints.add(
-                ctx.mkForall(new Expr[]{n_0,p_0, t_0},
+                ctx.mkForall(new Expr[]{n_0,p_0},
                         ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)nctx.send.apply(politoCache,n_0,p_0,t_0),(BoolExpr)isInternalNode.apply(n_0)),
-                                ctx.mkAnd(ctx.mkExists(new Expr[]{p_1, t_1},
+                                ctx.mkAnd((BoolExpr)nctx.send.apply(politoCache,n_0,p_0),(BoolExpr)isInternalNode.apply(n_0)),
+                                ctx.mkAnd(ctx.mkExists(new Expr[]{p_1},
                                         ctx.mkAnd(
-                                                ctx.mkLt(t_1, t_0),
-                                                (BoolExpr)nctx.recv.apply(n_0, politoCache, p_1, t_1),
+                                                
+                                                (BoolExpr)nctx.recv.apply(n_0, politoCache, p_1),
                                                 ctx.mkEq(nctx.pf.get("proto").apply(p_1), ctx.mkInt(nctx.HTTP_REQUEST)),
                                                 ctx.mkEq(nctx.pf.get("url").apply(p_1), nctx.pf.get("url").apply(p_0))),1,null,null,null,null),
                                         ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.HTTP_RESPONSE)),
                                         ctx.mkEq(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_1)),
                                         ctx.mkEq(nctx.pf.get("dest").apply(p_0), nctx.pf.get("src").apply(p_1)),
-                                        (BoolExpr)isInCache.apply(nctx.pf.get("url").apply(p_0), t_0))),1,null,null,null,null));
+                                        (BoolExpr)isInCache.apply(nctx.pf.get("url").apply(p_0)))),1,null,null,null,null));
     }
 }
