@@ -87,18 +87,18 @@ public class Test3FieldModifiers {
         net.routingTable(fm1, rt3);
 
         ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt4 = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_a"),fm1));
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fm1"),fm1));
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fm3"),fm3));
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_b"),fm3));
+        rt4.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_a"),fm1));
+        rt4.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fm1"),fm1));
+        rt4.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fm3"),fm3));
+        rt4.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_b"),fm3));
 
         net.routingTable(fm2, rt4);
 
         ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt5 = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_a"),fm2));
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fm1"),fm2));
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fm2"),fm2));
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_b"),b));
+        rt5.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_a"),fm2));
+        rt5.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fm1"),fm2));
+        rt5.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fm2"),fm2));
+        rt5.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_b"),b));
 
         net.routingTable(fm3, rt5);
 

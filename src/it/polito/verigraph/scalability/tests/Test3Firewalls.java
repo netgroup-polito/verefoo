@@ -87,18 +87,18 @@ public class Test3Firewalls {
         net.routingTable(fw1, rt3);
 
         ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt4 = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_a"),fw1));
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fw1"),fw1));
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fw3"),fw3));
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_b"),fw3));
+        rt4.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_a"),fw1));
+        rt4.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fw1"),fw1));
+        rt4.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fw3"),fw3));
+        rt4.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_b"),fw3));
 
         net.routingTable(fw2, rt4);
 
         ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt5 = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_a"),fw2));
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fw1"),fw2));
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fw2"),fw2));
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_b"),b));
+        rt5.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_a"),fw2));
+        rt5.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fw1"),fw2));
+        rt5.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_fw2"),fw2));
+        rt5.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_b"),b));
 
         net.routingTable(fw3, rt5);
 
