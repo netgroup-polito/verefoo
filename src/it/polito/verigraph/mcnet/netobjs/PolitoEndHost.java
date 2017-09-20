@@ -45,6 +45,7 @@ public class PolitoEndHost extends NetworkObject {
         this.politoEndHost = this.z3Node = ((NetworkObject)args[0][0]).getZ3Node();
         this.net = (Network)args[0][1];
         this.nctx = (NetContext)args[0][2];
+        net.saneSend(this);
     }
 
     @Override

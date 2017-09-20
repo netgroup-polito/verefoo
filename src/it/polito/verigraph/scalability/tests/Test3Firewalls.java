@@ -106,7 +106,7 @@ public class Test3Firewalls {
 
         //Configuring middleboxes
         ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
-        acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_a"),nctx.am.get("ip_b")));
+        acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_a"),nctx.am.get("ip_fw1")));
         
         fw1.addAcls(acl);
         fw2.addAcls(acl);
@@ -146,10 +146,11 @@ public class Test3Firewalls {
         model.resetZ3();
         
         IsolationResult ret =model.check.checkIsolationProperty(model.a,model.b);
-        //model.printVector(ret.assertions);
+        model.printVector(ret.assertions);
         if (ret.result == Status.UNSATISFIABLE){
            System.out.println("UNSAT"); // Nodes a and b are isolated
         }else{
+            System.out.println("**************************************************");
             System.out.println("SAT ");
             System.out.println(ret.model);
 //            System.out.print( "Model -> ");model.printModel(ret.model);
