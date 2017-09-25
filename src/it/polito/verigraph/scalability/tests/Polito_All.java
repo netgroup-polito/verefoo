@@ -76,7 +76,8 @@ public class Polito_All{
     	//Test2Caches model = new Test2Caches();
     	//Test3Caches model = new Test3Caches();
     	//Test4Caches model = new Test4Caches();
-    	Test10Caches model = new Test10Caches();
+    	//Test10Caches model = new Test10Caches();
+    	Test20Caches model = new Test20Caches();
     	//Test3Firewalls model = new Test3Firewalls();
     	//Test3FieldModifiers model = new Test3FieldModifiers();
     	IsolationResult ret =model.check.checkIsolationProperty(model.a,model.b );
