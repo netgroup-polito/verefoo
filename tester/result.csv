@@ -1,0 +1,6 @@
+SRC,DST,GRAPH_ID,TEST_ID,RESULT,TIMES (ms)
+sap1,webserver1,2,6,SAT,4808
+sap3,webserver1,2,6,SAT,106
+sap1,webserver1,33,7,UNSAT,66
+user1,webserver,64,2,SAT,330
+user1,webserver,79,1,UNSAT,62
