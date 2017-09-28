@@ -12,17 +12,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.IntExpr;
+import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Z3Exception;
 import it.polito.verigraph.mcnet.components.Core;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 import it.polito.verigraph.mcnet.components.Tuple;
+import it.polito.verigraph.mcnet.components.Quattro;
 
 /**Model for a network, encompasses routing and wiring
  *
@@ -35,7 +39,7 @@ public class Network extends Core{
     List<BoolExpr> constraints;
     public List<NetworkObject> elements;
 
-
+	HashMap<BoolExpr, Tuple<Integer,String>> softConstraints;
 
     public Network(Context ctx,Object[]... args) {
         super(ctx, args);
@@ -60,10 +64,16 @@ public class Network extends Core{
     }
 
     @Override
-    protected void addConstraints(Solver solver) {
+    protected void addConstraints(Optimize solver) {
         try {
             BoolExpr[] constr = new BoolExpr[constraints.size()];
-            solver.add(constraints.toArray(constr));
+            solver.Add(constraints.toArray(constr));
+        	for (Entry<BoolExpr, Tuple<Integer,String>> entry : softConstraints.entrySet()) {
+				 //String key = entry.getKey();
+				Tuple<Integer, String> value = entry.getValue();
+				//System.out.println("======adding soft for "+entry.getKey()+"is "+entry.getValue()._1+ " string " + entry.getValue()._2 +"======");
+				nctx.handles.put("handle_"+entry.getValue()._2,solver.AssertSoft(entry.getKey(), entry.getValue()._1,entry.getValue()._2));
+			}
         } catch (Z3Exception e) {
             e.printStackTrace();
         }
@@ -158,6 +168,10 @@ public class Network extends Core{
     public void routingTable (NetworkObject node,ArrayList<Tuple<DatatypeExpr,NetworkObject>> routing_table){
         compositionPolicy(node,routing_table);
     }
+    public void routingTable2(NetworkObject node,
+			ArrayList<Quattro<DatatypeExpr, NetworkObject, Integer, BoolExpr>> routing_table) {
+		compositionPolicy2(node, routing_table);
+	}
 
     /**
      * Composition policies steer packets between middleboxes.
@@ -220,6 +234,49 @@ public class Network extends Core{
      * @param routing_table
      * @param shunt_node
      */
+    
+    public void compositionPolicy2(NetworkObject node,
+			ArrayList<Quattro<DatatypeExpr, NetworkObject, Integer, BoolExpr>> policy) {
+		// Policy is of the form predicate -> node
+		Expr p_0 = ctx.mkConst(node + "_composition_p_0", nctx.packet);
+		Expr n_0 = ctx.mkConst(node + "_composition_n_0", nctx.node);
+
+		HashMap<String, ArrayList<BoolExpr>> collected = new HashMap<String, ArrayList<BoolExpr>>();
+		HashMap<String, NetworkObject> node_dict = new HashMap<String, NetworkObject>();
+		HashMap<String, Integer> value = new HashMap<String, Integer>();
+		HashMap<String, BoolExpr> boolea = new HashMap<String, BoolExpr>();
+		BoolExpr predicates;
+		for (int y = 0; y < policy.size(); y++) {
+			Quattro<DatatypeExpr, NetworkObject, Integer,BoolExpr> tp = policy.get(y);
+			if (collected.containsKey("" + tp._2))
+				collected.get("" + tp._2).add(nctx.destAddrPredicate(p_0, tp._1));
+			else {
+				ArrayList<BoolExpr> alb = new ArrayList<BoolExpr>();
+				alb.add(nctx.destAddrPredicate(p_0, tp._1));
+				collected.put("" + tp._2, alb);
+			}
+			node_dict.put("" + tp._2, tp._2);
+			value.put("" + tp._2, tp._3);
+			boolea.put("" + tp._2, tp._4);
+		}
+
+		// Constraint foreach rtAddr,rtNode in rt( send(node, n_0, p_0, t_0) &&
+		// Or(foreach rtAddr in rt destAddrPredicate(p_0,rtAddr)) -> n_0 ==
+		// rtNode )
+		for (Map.Entry<String, ArrayList<BoolExpr>> entry : collected.entrySet()) {
+			BoolExpr[] pred = new BoolExpr[entry.getValue().size()];
+			predicates = ctx.mkOr(entry.getValue().toArray(pred));
+			//System.out.println("getting "+ boolea.get(entry.getKey())+" to ");
+			softConstraints.put(ctx.mkImplies(boolea.get(entry.getKey()), ctx.mkForall(new Expr[] { n_0, p_0 },
+					ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(node.getZ3Node(), n_0, p_0), predicates),
+							ctx.mkEq(n_0, node_dict.get(entry.getKey()).getZ3Node())),
+					1, null, null, null, null)), 
+					
+					//value.get(entry.getKey()));
+					new Tuple<Integer,String>(value.get(entry.getKey()),entry.getKey()));
+			
+		}
+	}
     public void compositionPolicyShunt (NetworkObject node,ArrayList<Tuple<DatatypeExpr,NetworkObject>> routing_table,NetworkObject shunt_node){
         Expr p_0 = ctx.mkConst(node+"_composition_p_0", nctx.packet);
         Expr n_0 = ctx.mkConst(node+"_composition_n_0", nctx.node);

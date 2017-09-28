@@ -17,6 +17,7 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
+import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Sort;
 
@@ -77,9 +78,9 @@ public class AclFirewall extends NetworkObject{
 	
 
 	@Override
-	protected void addConstraints(Solver solver) {
+	protected void addConstraints(Optimize solver) {
 			BoolExpr[] constr = new BoolExpr[constraints.size()];
-		    solver.add(constraints.toArray(constr));
+		    solver.Add(constraints.toArray(constr));
 		    aclConstraints(solver);
 	}
 
@@ -105,7 +106,7 @@ public class AclFirewall extends NetworkObject{
 
     }
 
-    private void aclConstraints(Solver solver){
+    private void aclConstraints(Optimize solver){
     	if (acls.size() == 0)
             return;
         Expr a_0 = ctx.mkConst(fw+"_firewall_acl_a_0", nctx.address);
@@ -116,7 +117,7 @@ public class AclFirewall extends NetworkObject{
         	acl_map[y] = ctx.mkOr(ctx.mkAnd(ctx.mkEq(a_0,tp._1),ctx.mkEq(a_1,tp._2)), ctx.mkAnd(ctx.mkEq(a_0,tp._2),ctx.mkEq(a_1,tp._1)));
         }
         //Constraint2		acl_func(a_0,a_1) == or(foreach ip1,ip2 in acl_map ((a_0 == ip1 && a_1 == ip2)||(a_0 == ip2 && a_1 == ip1)))
-        solver.add(ctx.mkForall(new Expr[]{a_0, a_1},
+        solver.Add(ctx.mkForall(new Expr[]{a_0, a_1},
         						ctx.mkEq( 
         								acl_func.apply(a_0, a_1),
         								ctx.mkOr(acl_map)),1,null,null,null,null));

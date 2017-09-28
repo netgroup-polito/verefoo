@@ -16,6 +16,7 @@ import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Model;
+import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 import it.polito.verigraph.mcnet.components.IsolationResult;
@@ -32,7 +33,7 @@ public class Checker {
     Context ctx;
     Network net;
     NetContext nctx;
-    Solver solver;
+    Optimize solver;
     ArrayList<BoolExpr> constraints;
     public BoolExpr [] assertions;
     public Status result;
@@ -43,7 +44,7 @@ public class Checker {
         this.ctx = context;
         this.net = network;
         this.nctx = nctx;
-        this.solver = ctx.mkSolver();
+        this.solver = ctx.mkOptimize();
         this.constraints = new ArrayList<BoolExpr>();
     }
 
@@ -51,7 +52,7 @@ public class Checker {
      *
      */
     public void clearState (){
-        this.solver.reset();
+        //this.solver.reset();
         this.constraints = new ArrayList<BoolExpr>();
     }
 
@@ -64,7 +65,7 @@ public class Checker {
     public IsolationResult checkIsolationProperty (NetworkObject src, NetworkObject dest){
         assert(net.elements.contains(src));
         assert(net.elements.contains(dest));
-        solver.push ();
+        solver.Push ();
         addConstraints();
 
 
@@ -76,20 +77,20 @@ public class Checker {
         IntExpr t_1 = ctx.mkIntConst("check_isolation_t1_"+src.getZ3Node()+"_"+dest.getZ3Node());
 
         //        Constraint1recv(n_0,destNode,p0,t_0)
-        this.solver.add((BoolExpr)nctx.recv.apply(n_0, dest.getZ3Node(), p0));
+        this.solver.Add((BoolExpr)nctx.recv.apply(n_0, dest.getZ3Node(), p0));
 
         //        Constraint2send(srcNode,n_1,p1,t_1)
-        this.solver.add((BoolExpr)nctx.send.apply(src.getZ3Node(), n_1, p1));
+        this.solver.Add((BoolExpr)nctx.send.apply(src.getZ3Node(), n_1, p1));
 
         //        Constraint3nodeHasAddr(srcNode,p1.srcAddr)
-        this.solver.add((BoolExpr)nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));
+        this.solver.Add((BoolExpr)nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));
 
 
         //        Constraint4p1.origin == srcNode
-        this.solver.add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
+        this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
 
         //        Constraint5nodeHasAddr(destNode,p1.destAddr)
-        this.solver.add((BoolExpr)nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
+        this.solver.Add((BoolExpr)nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
 
         //NON sembrano necessari
         //         this.solver.add(z3.Or(this.ctx.nodeHasAddr(src.getZ3Node(), this.ctx.packet.src(p0)),\
@@ -98,18 +99,21 @@ public class Checker {
         //this.solver.add(this.ctx.packet.dest(p1) == this.ctx.packet.dest(p0))
 
         //        Constraint6p1.origin ==  p0.origin
-        this.solver.add(ctx.mkEq(nctx.pf.get("origin").apply(p1),nctx.pf.get("origin").apply(p0)));
+        this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1),nctx.pf.get("origin").apply(p0)));
 
         //        Constraint7nodeHasAddr(destNode, p0.destAddr)
-        this.solver.add((BoolExpr)nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p0)));
+        this.solver.Add((BoolExpr)nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p0)));
 
-        result = this.solver.check();
+        result = this.solver.Check();
         model = null;
-        assertions = this.solver.getAssertions();
+        //assertions = this.solver.getAssertions();
+        //assertions = new BoolExpr [1] ;
+        assertions = null ;
+        
         if (result == Status.SATISFIABLE){
             model = this.solver.getModel();
         }
-        this.solver.pop();
+        this.solver.Pop();
         return new IsolationResult(ctx,result, p0, n_0, t_1, t_0, nctx, assertions, model);
     }
 
@@ -367,11 +371,12 @@ assert(net.elements.contains(src));
 
 
     public List<BoolExpr> getConstraints(){
-        Solver l = ctx.mkSolver();
+        Optimize l = ctx.mkOptimize();
         nctx.addConstraints(l);
         net.addConstraints(l);
         for (NetworkObject el : net.elements)
             el.addConstraints(l);
-        return Arrays.asList(l.getAssertions());
+        //return Arrays.asList(l.getAssertions());
+        return Arrays.asList();
     }
 }

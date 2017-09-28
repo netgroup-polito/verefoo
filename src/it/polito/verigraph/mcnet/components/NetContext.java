@@ -11,6 +11,8 @@ package it.polito.verigraph.mcnet.components;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Constructor;
 import com.microsoft.z3.Context;
@@ -20,8 +22,11 @@ import com.microsoft.z3.EnumSort;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
+import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Sort;
+import com.microsoft.z3.Optimize.Handle;
+
 import it.polito.verigraph.mcnet.netobjs.DumbNode;
 import it.polito.verigraph.mcnet.components.Core;
 import it.polito.verigraph.mcnet.components.NetworkObject;
@@ -51,6 +56,18 @@ public class NetContext extends Core{
     public final int POP3_REQUEST    = 3;
     public final int POP3_RESPONSE   = 4;
 
+    
+	public  BoolExpr y1;
+   	public  BoolExpr y2;
+   	
+   	public  BoolExpr x11;
+   	public  BoolExpr x12;
+   	public  BoolExpr x21;
+   	public  BoolExpr x22;
+   	public  BoolExpr x31;
+   	public  BoolExpr x32;
+   	
+	public  BoolExpr ture;
     /**
      * Context for all of the rest that follows. Every network needs one of these
      * @param ctx
@@ -75,9 +92,58 @@ public class NetContext extends Core{
         policies = new ArrayList<Core>();
 
         baseCondition();
+        setConditions();
 
     }
+    public HashMap<String,Handle> handles;
+    private void setConditions() {
+    	int capacity_x1 = 10;
+    	int capacity_x2 = 10;
+    	int capacity_x3 = 10;
+    	
+    	int capacity_y1 = 5;
+    	int capacity_y2 = 5;
+    	
+    	x11 = ctx.mkBoolConst("a11");
+		x12 = ctx.mkBoolConst("a12");
+		x21 = ctx.mkBoolConst("a21");
+		x22 = ctx.mkBoolConst("a22");
+		x31 = ctx.mkBoolConst("a31");
+		x32 = ctx.mkBoolConst("a32");
 
+		y1 = ctx.mkBoolConst("b1");
+		y2 = ctx.mkBoolConst("b2");
+		
+		handles = new HashMap<String,Handle>();
+		
+		Optimize mkOptimize = ctx.mkOptimize();
+		
+		ture = ctx.mkBoolConst("ture");
+		constraints.add(ctx.mkEq(ture, ctx.mkTrue()));
+		
+		
+		constraints.add(ctx.mkEq(ctx.mkXor(x11, x12), ctx.mkTrue()));
+		constraints.add(ctx.mkEq(ctx.mkXor(x21, x22), ctx.mkTrue()));
+		constraints.add(ctx.mkEq(ctx.mkXor(x31, x32), ctx.mkTrue()));
+		
+		constraints.add(ctx.mkOr(ctx.mkImplies(y1, x11),ctx.mkImplies(y1, x21),ctx.mkImplies(y1, x31)));
+		constraints.add(ctx.mkOr(ctx.mkImplies(y2, x12),ctx.mkImplies(y2, x22),ctx.mkImplies(y2, x32)));
+	
+		ArithExpr leftSide = ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), bool_to_int(x11)),ctx.mkMul(ctx.mkInt(capacity_x2), bool_to_int(x21)),ctx.mkMul(ctx.mkInt(capacity_x3), bool_to_int(x31)));
+		constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y1), bool_to_int(y1))));
+		
+		leftSide = ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), bool_to_int(x12)),ctx.mkMul(ctx.mkInt(capacity_x2), bool_to_int(x22)),ctx.mkMul(ctx.mkInt(capacity_x3), bool_to_int(x32)));
+		constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y2), bool_to_int(y2))));
+		
+	
+	}
+
+	private IntExpr bool_to_int(BoolExpr value) {
+		if(value.isTrue()){
+			return ctx.mkInt(1);
+		}
+		return ctx.mkInt(0);
+	}
     /**
      * A policy is a collection of shared algorithms or functions used by multiple components
      * (for instance compression or DPI policies etc).
@@ -88,9 +154,9 @@ public class NetContext extends Core{
     }
 
     @Override
-    protected void addConstraints(Solver solver) {
+    protected void addConstraints(Optimize solver) {
         BoolExpr[] constr = new BoolExpr[constraints.size()];
-        solver.add(constraints.toArray(constr));
+        solver.Add(constraints.toArray(constr));
         for (Core policy : policies){
             policy.addConstraints(solver);
         }

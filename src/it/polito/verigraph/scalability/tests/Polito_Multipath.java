@@ -30,15 +30,12 @@ import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
 
 import it.polito.verigraph.mcnet.components.IsolationResult;
-
-
-
 /**
  * 
  * @author Giacomo Costantini
  *
  */
-public class Polito_All{
+public class Polito_Multipath{
 
 	Context ctx;
 	
@@ -69,33 +66,29 @@ public class Polito_All{
 
     public static void main(String[] args) throws Z3Exception
     {
-    	Polito_All p = new Polito_All();
-    	//System.out.println(System.getProperty("sun.arch.data.model") );
-    	p.resetZ3();
+    	Polito_Multipath p = new Polito_Multipath();
+    	IsolationResult ret;
     	
-    	Test1Cache model = new Test1Cache();
-    	//Test2Caches model = new Test2Caches();
-    	//Test3Caches model = new Test3Caches();
-    	//Test4Caches model = new Test4Caches();
-    	//Test10Caches model = new Test10Caches();
-    	//Test20Caches model = new Test20Caches();
-    	//Test3Firewalls model = new Test3Firewalls();
-    	//Test3FieldModifiers model = new Test3FieldModifiers();
-    	IsolationResult ret =model.check.checkIsolationProperty(model.a,model.b );
+    	p.resetZ3(); 	
+    	PolitoMultipathTest model = new PolitoMultipathTest(p.ctx);
+    	
+    	
+//    	ret = model.check.CheckIsolationProperty(model.politoErrFunction, model.politoMailClient);
+//    	ret = model.check.CheckIsolationProperty(model.politoMailClient, model.politoMailServer);
+//    	ret = model.check.CheckIsolationProperty(model.politoMailServer, model.politoErrFunction);
+    	ret = model.check.checkIsolationProperty(model.b,model.a );
+    	
     	//p.printVector(ret.assertions);
     	if (ret.result == Status.UNSATISFIABLE){
      	   System.out.println("UNSAT"); // Nodes a and b are isolated
     	}else{
-     		System.out.println("SAT ");
-     		System.out.print( "Model -> "+ ret.model);
-     		//p.printVector(ret.assertions);
-     		//System.out.print( "Model -> "); p.printModel(ret.model);
+     		//System.out.println("SAT ");
+     		System.out.print( ""+ret.model); //p.printModel(ret.model);
 //    	    System.out.println( "Violating packet -> " +ret.violating_packet);
 //    	    System.out.println("Last hop -> " +ret.last_hop);
 //    	    System.out.println("Last send_time -> " +ret.last_send_time);
 //    	    System.out.println( "Last recv_time -> " +ret.last_recv_time);
- 
-    	}
+     	}
     }
 
     

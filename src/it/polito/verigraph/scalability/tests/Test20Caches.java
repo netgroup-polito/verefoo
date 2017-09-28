@@ -690,7 +690,7 @@ public class Test20Caches {
         
         ///////////////////////////////////////////////////////////////////
         net.attach(a, b, cache1, cache2, cache3, cache4, cache5, cache6, cache7, cache8, cache9, cache0,
-        		cache11, cache21, cache31, cache41, cache51, cache61, cache71, cache81, cache91, cache01);
+        		cache01, cache11, cache21, cache31, cache41, cache51, cache61, cache71, cache81, cache91);
 
         //Configuring middleboxes
         cache1.installCache(new NetworkObject[]{nctx.nm.get("a")});

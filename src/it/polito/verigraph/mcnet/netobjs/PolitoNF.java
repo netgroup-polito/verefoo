@@ -17,6 +17,7 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
+import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Sort;
 
@@ -87,9 +88,9 @@ public class PolitoNF extends NetworkObject{
     }
 
     @Override
-    protected void addConstraints(Solver solver) {
+    protected void addConstraints(Optimize solver) {
         BoolExpr[] constr = new BoolExpr[constraints.size()];
-        solver.add(constraints.toArray(constr));
+        solver.Add(constraints.toArray(constr));
     }
 
     @Override

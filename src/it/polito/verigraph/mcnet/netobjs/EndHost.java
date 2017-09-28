@@ -15,6 +15,7 @@ import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.IntExpr;
+import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
@@ -54,9 +55,9 @@ public class EndHost extends NetworkObject{
     }
 
     @Override
-    protected void addConstraints(Solver solver) {
+    protected void addConstraints(Optimize solver) {
         BoolExpr[] constr = new BoolExpr[constraints.size()];
-        solver.add(constraints.toArray(constr));
+        solver.Add(constraints.toArray(constr));
     }
 
     public void endHostRules (){

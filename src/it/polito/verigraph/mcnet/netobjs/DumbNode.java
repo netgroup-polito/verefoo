@@ -10,6 +10,7 @@ package it.polito.verigraph.mcnet.netobjs;
 
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
+import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 
@@ -24,7 +25,7 @@ public class DumbNode extends NetworkObject {
     }
 
     @Override
-    protected void addConstraints(Solver solver) {
+    protected void addConstraints(Optimize solver) {
         return;
     }
 

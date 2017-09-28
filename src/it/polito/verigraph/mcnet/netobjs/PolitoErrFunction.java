@@ -17,6 +17,7 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
+import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
 
 import it.polito.verigraph.mcnet.components.NetContext;
@@ -58,10 +59,10 @@ public class PolitoErrFunction extends NetworkObject{
     }
 
     @Override
-    protected void addConstraints(Solver solver) {
+    protected void addConstraints(Optimize solver) {
         //System.out.println("[ERR FUNC] Installing rules.");
         BoolExpr[] constr = new BoolExpr[constraints.size()];
-        solver.add(constraints.toArray(constr));
+        solver.Add(constraints.toArray(constr));
     }
 
     private void errFunctionRules (){

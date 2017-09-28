@@ -9,6 +9,7 @@
 package it.polito.verigraph.mcnet.components;
 
 import com.microsoft.z3.Context;
+import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
 
 /**Core component for everything that matters
@@ -39,5 +40,5 @@ public abstract class Core{
      * Add constraints to solver
      * @param solver
      */
-    abstract protected void addConstraints(Solver solver);
+    abstract protected void addConstraints(Optimize solver);
 }
