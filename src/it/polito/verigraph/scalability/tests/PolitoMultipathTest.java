@@ -116,8 +116,23 @@ public class PolitoMultipathTest {
 			rtClassifier.add(new Quattro<>(nctx.am.get("ip_b"), x1,classifier_y1,nctx.y1));
 			rtClassifier.add(new Quattro<>(nctx.am.get("ip_b"), x1,classifier_y2,nctx.y2));
 			
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x1"), x1,classifier_y1,nctx.y1));
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x1"), x1,classifier_y2,nctx.y2));
+			
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x2"), x1,classifier_y1,nctx.y1));
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x2"), x1,classifier_y2,nctx.y2));
+			
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x3"), x1,classifier_y1,nctx.y1));
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x3"), x1,classifier_y2,nctx.y2));
+			
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_a"), a,a_classifier,nctx.ture));
+			
 			ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtClient = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
 			rtClient.add(new Quattro<>(nctx.am.get("ip_b"), classifier,a_classifier, nctx.ture));
+			rtClient.add(new Quattro<>(nctx.am.get("ip_x1"), classifier,a_classifier, nctx.ture));
+			rtClient.add(new Quattro<>(nctx.am.get("ip_x2"), classifier,a_classifier, nctx.ture));
+			rtClient.add(new Quattro<>(nctx.am.get("ip_x3"), classifier,a_classifier, nctx.ture));
+			rtClient.add(new Quattro<>(nctx.am.get("ip_classifier"), classifier,a_classifier, nctx.ture));
 			
 			ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtX1 = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
 			rtX1.add(new Quattro<>(nctx.am.get("ip_b"), x2,0,ctx.mkAnd(nctx.x11,nctx.x21)));
@@ -125,15 +140,88 @@ public class PolitoMultipathTest {
 			rtX1.add(new Quattro<>(nctx.am.get("ip_b"), x2,y1_y2,ctx.mkAnd(nctx.x12,nctx.x21)));
 			rtX1.add(new Quattro<>(nctx.am.get("ip_b"), x2,0,ctx.mkAnd(nctx.x12,nctx.x22)));
 			
+			rtX1.add(new Quattro<>(nctx.am.get("ip_a"), classifier,classifier_y1,nctx.x11));
+			rtX1.add(new Quattro<>(nctx.am.get("ip_a"), classifier,classifier_y2,nctx.x12));
+			rtX1.add(new Quattro<>(nctx.am.get("ip_classifier"), classifier,classifier_y1,nctx.x11));
+			rtX1.add(new Quattro<>(nctx.am.get("ip_classifier"), classifier,classifier_y2,nctx.x12));
+			
+			rtX1.add(new Quattro<>(nctx.am.get("ip_x2"), x2,0,ctx.mkAnd(nctx.x11,nctx.x21)));
+			rtX1.add(new Quattro<>(nctx.am.get("ip_x2"), x2,y1_y2,ctx.mkAnd(nctx.x11,nctx.x22)));
+			rtX1.add(new Quattro<>(nctx.am.get("ip_x2"), x2,y1_y2,ctx.mkAnd(nctx.x12,nctx.x21)));
+			rtX1.add(new Quattro<>(nctx.am.get("ip_x2"), x2,0,ctx.mkAnd(nctx.x12,nctx.x22)));
+			
+			rtX1.add(new Quattro<>(nctx.am.get("ip_x3"), x2,0,ctx.mkAnd(nctx.x11,nctx.x21)));
+			rtX1.add(new Quattro<>(nctx.am.get("ip_x3"), x2,y1_y2,ctx.mkAnd(nctx.x11,nctx.x22)));
+			rtX1.add(new Quattro<>(nctx.am.get("ip_x3"), x2,y1_y2,ctx.mkAnd(nctx.x12,nctx.x21)));
+			rtX1.add(new Quattro<>(nctx.am.get("ip_x3"), x2,0,ctx.mkAnd(nctx.x12,nctx.x22)));
+			
+			
 			ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtX2 = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
 			rtX2.add(new Quattro<>(nctx.am.get("ip_b"), x3,0,ctx.mkAnd(nctx.x21,nctx.x31)));
 			rtX2.add(new Quattro<>(nctx.am.get("ip_b"), x3,y1_y2,ctx.mkAnd(nctx.x21,nctx.x32)));
 			rtX2.add(new Quattro<>(nctx.am.get("ip_b"), x3,y1_y2,ctx.mkAnd(nctx.x22,nctx.x31)));
 			rtX2.add(new Quattro<>(nctx.am.get("ip_b"), x3,0,ctx.mkAnd(nctx.x22,nctx.x32)));
 			
+			rtX2.add(new Quattro<>(nctx.am.get("ip_x3"), x3,0,ctx.mkAnd(nctx.x21,nctx.x31)));
+			rtX2.add(new Quattro<>(nctx.am.get("ip_x3"), x3,y1_y2,ctx.mkAnd(nctx.x21,nctx.x32)));
+			rtX2.add(new Quattro<>(nctx.am.get("ip_x3"), x3,y1_y2,ctx.mkAnd(nctx.x22,nctx.x31)));
+			rtX2.add(new Quattro<>(nctx.am.get("ip_x3"), x3,0,ctx.mkAnd(nctx.x22,nctx.x32)));
+			
+			rtX2.add(new Quattro<>(nctx.am.get("ip_a"), x1,0,ctx.mkAnd(nctx.x21,nctx.x11)));
+			rtX2.add(new Quattro<>(nctx.am.get("ip_a"), x1,y1_y2,ctx.mkAnd(nctx.x21,nctx.x12)));
+			rtX2.add(new Quattro<>(nctx.am.get("ip_a"), x1,y1_y2,ctx.mkAnd(nctx.x22,nctx.x11)));
+			rtX2.add(new Quattro<>(nctx.am.get("ip_a"), x1,0,ctx.mkAnd(nctx.x22,nctx.x12)));
+			
+			rtX2.add(new Quattro<>(nctx.am.get("ip_classifier"), x1,0,ctx.mkAnd(nctx.x21,nctx.x11)));
+			rtX2.add(new Quattro<>(nctx.am.get("ip_classifier"), x1,y1_y2,ctx.mkAnd(nctx.x21,nctx.x12)));
+			rtX2.add(new Quattro<>(nctx.am.get("ip_classifier"), x1,y1_y2,ctx.mkAnd(nctx.x22,nctx.x11)));
+			rtX2.add(new Quattro<>(nctx.am.get("ip_classifier"), x1,0,ctx.mkAnd(nctx.x22,nctx.x12)));
+			
+			rtX2.add(new Quattro<>(nctx.am.get("ip_x1"), x1,0,ctx.mkAnd(nctx.x21,nctx.x11)));
+			rtX2.add(new Quattro<>(nctx.am.get("ip_x1"), x1,y1_y2,ctx.mkAnd(nctx.x21,nctx.x12)));
+			rtX2.add(new Quattro<>(nctx.am.get("ip_x1"), x1,y1_y2,ctx.mkAnd(nctx.x22,nctx.x11)));
+			rtX2.add(new Quattro<>(nctx.am.get("ip_x1"), x1,0,ctx.mkAnd(nctx.x22,nctx.x12)));
+			
 			ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtX3 = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
 			rtX3.add(new Quattro<>(nctx.am.get("ip_b"), b,y1_b,nctx.x31));
 			rtX3.add(new Quattro<>(nctx.am.get("ip_b"), b,y2_b,nctx.x32));
+			
+			rtX3.add(new Quattro<>(nctx.am.get("ip_x2"), x2,y1_y2,ctx.mkAnd(nctx.x21,nctx.x32)));
+			rtX3.add(new Quattro<>(nctx.am.get("ip_x2"), x2,y1_y2,ctx.mkAnd(nctx.x22,nctx.x31)));
+			rtX3.add(new Quattro<>(nctx.am.get("ip_x2"), x2,0,ctx.mkAnd(nctx.x22,nctx.x32)));
+			rtX3.add(new Quattro<>(nctx.am.get("ip_x2"), x2,0,ctx.mkAnd(nctx.x21,nctx.x31)));
+			
+			rtX3.add(new Quattro<>(nctx.am.get("ip_x1"), x2,y1_y2,ctx.mkAnd(nctx.x21,nctx.x32)));
+			rtX3.add(new Quattro<>(nctx.am.get("ip_x1"), x2,y1_y2,ctx.mkAnd(nctx.x22,nctx.x31)));
+			rtX3.add(new Quattro<>(nctx.am.get("ip_x1"), x2,0,ctx.mkAnd(nctx.x22,nctx.x32)));
+			rtX3.add(new Quattro<>(nctx.am.get("ip_x1"), x2,0,ctx.mkAnd(nctx.x21,nctx.x31)));
+			
+			rtX3.add(new Quattro<>(nctx.am.get("ip_classifier"), x2,y1_y2,ctx.mkAnd(nctx.x21,nctx.x32)));
+			rtX3.add(new Quattro<>(nctx.am.get("ip_classifier"), x2,y1_y2,ctx.mkAnd(nctx.x22,nctx.x31)));
+			rtX3.add(new Quattro<>(nctx.am.get("ip_classifier"), x2,0,ctx.mkAnd(nctx.x22,nctx.x32)));
+			rtX3.add(new Quattro<>(nctx.am.get("ip_classifier"), x2,0,ctx.mkAnd(nctx.x21,nctx.x31)));
+			
+			rtX3.add(new Quattro<>(nctx.am.get("ip_a"), x2,y1_y2,ctx.mkAnd(nctx.x21,nctx.x32)));
+			rtX3.add(new Quattro<>(nctx.am.get("ip_a"), x2,y1_y2,ctx.mkAnd(nctx.x22,nctx.x31)));
+			rtX3.add(new Quattro<>(nctx.am.get("ip_a"), x2,0,ctx.mkAnd(nctx.x22,nctx.x32)));
+			rtX3.add(new Quattro<>(nctx.am.get("ip_a"), x2,0,ctx.mkAnd(nctx.x21,nctx.x31)));
+			
+			ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtb = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
+			rtb.add(new Quattro<>(nctx.am.get("ip_b"), x3,y1_b,nctx.x31));
+			rtb.add(new Quattro<>(nctx.am.get("ip_b"), x3,y2_b,nctx.x32));
+			
+			rtb.add(new Quattro<>(nctx.am.get("ip_x1"), x3,y1_b,nctx.x31));
+			rtb.add(new Quattro<>(nctx.am.get("ip_x1"), x3,y2_b,nctx.x32));
+			
+			rtb.add(new Quattro<>(nctx.am.get("ip_x2"), x3,y1_b,nctx.x31));
+			rtb.add(new Quattro<>(nctx.am.get("ip_x2"), x3,y2_b,nctx.x32));
+			
+			rtb.add(new Quattro<>(nctx.am.get("ip_x3"), x3,y1_b,nctx.x31));
+			rtb.add(new Quattro<>(nctx.am.get("ip_x3"), x3,y2_b,nctx.x32));
+			
+			rtb.add(new Quattro<>(nctx.am.get("ip_classifier"), x3,y1_b,nctx.x31));
+			rtb.add(new Quattro<>(nctx.am.get("ip_classifier"), x3,y2_b,nctx.x32));
+			
 
 	    	net.routingTable2(classifier, rtClassifier);
 	    	net.routingTable2(a, rtClient);
@@ -143,6 +231,11 @@ public class PolitoMultipathTest {
 	    	
 		    
 		    net.attach(a, b, classifier,x1,x2,x3);
+		    
+		  //Configuring middleboxes
+	        x1.installCache(new NetworkObject[]{nctx.nm.get("classifier")});
+	        x2.installCache(new NetworkObject[]{nctx.nm.get("x1")});
+	        x3.installCache(new NetworkObject[]{nctx.nm.get("x2")});
 		    
 		    //x1.installAntispam(new int[]{1});
 		    //x2.installAntispam(new int[]{1});

@@ -71,7 +71,7 @@ public class Network extends Core{
         	for (Entry<BoolExpr, Tuple<Integer,String>> entry : softConstraints.entrySet()) {
 				 //String key = entry.getKey();
 				Tuple<Integer, String> value = entry.getValue();
-				//System.out.println("======adding soft for "+entry.getKey()+"is "+entry.getValue()._1+ " string " + entry.getValue()._2 +"======");
+				System.out.println("======adding soft for "+entry.getKey()+"is "+entry.getValue()._1+ " string " + entry.getValue()._2 +"======");
 				nctx.handles.put("handle_"+entry.getValue()._2,solver.AssertSoft(entry.getKey(), entry.getValue()._1,entry.getValue()._2));
 			}
         } catch (Z3Exception e) {
@@ -243,8 +243,8 @@ public class Network extends Core{
 
 		HashMap<String, ArrayList<BoolExpr>> collected = new HashMap<String, ArrayList<BoolExpr>>();
 		HashMap<String, NetworkObject> node_dict = new HashMap<String, NetworkObject>();
-		HashMap<String, Integer> value = new HashMap<String, Integer>();
-		HashMap<String, BoolExpr> boolea = new HashMap<String, BoolExpr>();
+		HashMap<String, Integer> latency = new HashMap<String, Integer>();
+		HashMap<String, BoolExpr> depends = new HashMap<String, BoolExpr>();
 		BoolExpr predicates;
 		for (int y = 0; y < policy.size(); y++) {
 			Quattro<DatatypeExpr, NetworkObject, Integer,BoolExpr> tp = policy.get(y);
@@ -256,8 +256,8 @@ public class Network extends Core{
 				collected.put("" + tp._2, alb);
 			}
 			node_dict.put("" + tp._2, tp._2);
-			value.put("" + tp._2, tp._3);
-			boolea.put("" + tp._2, tp._4);
+			latency.put("" + tp._2, tp._3);
+			depends.put("" + tp._2, tp._4);
 		}
 
 		// Constraint foreach rtAddr,rtNode in rt( send(node, n_0, p_0, t_0) &&
@@ -266,14 +266,14 @@ public class Network extends Core{
 		for (Map.Entry<String, ArrayList<BoolExpr>> entry : collected.entrySet()) {
 			BoolExpr[] pred = new BoolExpr[entry.getValue().size()];
 			predicates = ctx.mkOr(entry.getValue().toArray(pred));
-			//System.out.println("getting "+ boolea.get(entry.getKey())+" to ");
-			softConstraints.put(ctx.mkImplies(boolea.get(entry.getKey()), ctx.mkForall(new Expr[] { n_0, p_0 },
+			System.out.println("getting "+ depends.get(entry.getKey())+" to " + entry.getKey());
+			softConstraints.put(ctx.mkImplies(depends.get(entry.getKey()), ctx.mkForall(new Expr[] { n_0, p_0 },
 					ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(node.getZ3Node(), n_0, p_0), predicates),
 							ctx.mkEq(n_0, node_dict.get(entry.getKey()).getZ3Node())),
 					1, null, null, null, null)), 
 					
 					//value.get(entry.getKey()));
-					new Tuple<Integer,String>(value.get(entry.getKey()),entry.getKey()));
+					new Tuple<Integer,String>(latency.get(entry.getKey()),entry.getKey()));
 			
 		}
 	}

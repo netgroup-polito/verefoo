@@ -76,7 +76,7 @@ public class Polito_Multipath{
 //    	ret = model.check.CheckIsolationProperty(model.politoErrFunction, model.politoMailClient);
 //    	ret = model.check.CheckIsolationProperty(model.politoMailClient, model.politoMailServer);
 //    	ret = model.check.CheckIsolationProperty(model.politoMailServer, model.politoErrFunction);
-    	ret = model.check.checkIsolationProperty(model.b,model.a );
+    	ret = model.check.checkIsolationProperty(model.a,model.b );
     	
     	//p.printVector(ret.assertions);
     	if (ret.result == Status.UNSATISFIABLE){
