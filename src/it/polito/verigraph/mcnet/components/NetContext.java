@@ -59,6 +59,8 @@ public class NetContext extends Core{
     
 	public  BoolExpr y1;
    	public  BoolExpr y2;
+   	public  BoolExpr y3;
+   	
    	
    	public  BoolExpr x11;
    	public  BoolExpr x12;
@@ -101,26 +103,24 @@ public class NetContext extends Core{
     	int capacity_x2 = 10;
     	int capacity_x3 = 10;
     	
-    	int capacity_y1 = 5;
-    	int capacity_y2 = 5;
+    	int capacity_y1 = 30;
+    	int capacity_y2 = 30;
     	
-    	x11 = ctx.mkBoolConst("a11");
-		x12 = ctx.mkBoolConst("a12");
-		x21 = ctx.mkBoolConst("a21");
-		x22 = ctx.mkBoolConst("a22");
-		x31 = ctx.mkBoolConst("a31");
-		x32 = ctx.mkBoolConst("a32");
+		x11 = ctx.mkBoolConst("x11");
+		x12 = ctx.mkBoolConst("x12");
+		x21 = ctx.mkBoolConst("x21");
+		x22 = ctx.mkBoolConst("x22");
+		x31 = ctx.mkBoolConst("x31");
+		x32 = ctx.mkBoolConst("x32");
 
-		y1 = ctx.mkBoolConst("b1");
-		y2 = ctx.mkBoolConst("b2");
-		
+		y1 = ctx.mkBoolConst("y1");
+		y2 = ctx.mkBoolConst("y2");
+
 		handles = new HashMap<String,Handle>();
-		
-		Optimize mkOptimize = ctx.mkOptimize();
-		
+
 		ture = ctx.mkBoolConst("ture");
 		constraints.add(ctx.mkEq(ture, ctx.mkTrue()));
-		
+		//constraints.add(ctx.mkEq(y2, ctx.mkTrue()));
 		
 		constraints.add(ctx.mkEq(ctx.mkXor(x11, x12), ctx.mkTrue()));
 		constraints.add(ctx.mkEq(ctx.mkXor(x21, x22), ctx.mkTrue()));
@@ -128,8 +128,13 @@ public class NetContext extends Core{
 		
 		constraints.add(ctx.mkOr(ctx.mkImplies(y1, x11),ctx.mkImplies(y1, x21),ctx.mkImplies(y1, x31)));
 		constraints.add(ctx.mkOr(ctx.mkImplies(y2, x12),ctx.mkImplies(y2, x22),ctx.mkImplies(y2, x32)));
+		
+		
 	
-		ArithExpr leftSide = ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), bool_to_int(x11)),ctx.mkMul(ctx.mkInt(capacity_x2), bool_to_int(x21)),ctx.mkMul(ctx.mkInt(capacity_x3), bool_to_int(x31)));
+		ArithExpr leftSide = 
+			ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), bool_to_int(x11)),
+					ctx.mkMul(ctx.mkInt(capacity_x2), bool_to_int(x21)),
+					ctx.mkMul(ctx.mkInt(capacity_x3), bool_to_int(x31)));
 		constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y1), bool_to_int(y1))));
 		
 		leftSide = ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), bool_to_int(x12)),ctx.mkMul(ctx.mkInt(capacity_x2), bool_to_int(x22)),ctx.mkMul(ctx.mkInt(capacity_x3), bool_to_int(x32)));
@@ -139,10 +144,16 @@ public class NetContext extends Core{
 	}
 
 	private IntExpr bool_to_int(BoolExpr value) {
-		if(value.isTrue()){
-			return ctx.mkInt(1);
-		}
-		return ctx.mkInt(0);
+		IntExpr integer = ctx.mkIntConst("integer_" + value);
+
+		// mkOptimize.Add(ctx.mkEq(integer, ctx.mkInt(0)));
+		// mkOptimize.Add(ctx.mkImplies(value, ctx.mkEq(integer,
+		// ctx.mkInt(1))));
+
+		constraints.add((ctx.mkImplies(value, ctx.mkEq(integer, ctx.mkInt(1)))));
+		constraints.add((ctx.mkImplies(ctx.mkNot(value), ctx.mkEq(integer, ctx.mkInt(0)))));
+
+		return integer;
 	}
     /**
      * A policy is a collection of shared algorithms or functions used by multiple components

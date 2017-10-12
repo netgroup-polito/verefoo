@@ -10,6 +10,7 @@ package it.polito.verigraph.mcnet.components;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -51,6 +52,7 @@ public class Network extends Core{
         this.nctx = (NetContext) args[0][0];
         constraints = new ArrayList<BoolExpr>();
         elements = new ArrayList<NetworkObject>();
+        softConstraints =new HashMap<>(); 
 
     }
 
@@ -71,9 +73,15 @@ public class Network extends Core{
         	for (Entry<BoolExpr, Tuple<Integer,String>> entry : softConstraints.entrySet()) {
 				 //String key = entry.getKey();
 				Tuple<Integer, String> value = entry.getValue();
-				System.out.println("======adding soft for "+entry.getKey()+"is "+entry.getValue()._1+ " string " + entry.getValue()._2 +"======");
-				nctx.handles.put("handle_"+entry.getValue()._2,solver.AssertSoft(entry.getKey(), entry.getValue()._1,entry.getValue()._2));
+				//System.out.println("======adding soft for "+ entry.getKey() +"\n is "+entry.getValue()._1+ " node is " + entry.getValue()._2 +" ====== ");
+				
+				nctx.handles.put("handle_"+entry.getValue()._2,solver.AssertSoft(ctx.mkNot(entry.getKey()), entry.getValue()._1,
+						//entry.getValue()._2));
+						"opt"));
+				
 			}
+        	solver.AssertSoft(ctx.mkNot(nctx.y1), 1, "num_servers");
+        	solver.AssertSoft(ctx.mkNot(nctx.y2), 1, "num_servers");
         } catch (Z3Exception e) {
             e.printStackTrace();
         }
@@ -243,21 +251,27 @@ public class Network extends Core{
 
 		HashMap<String, ArrayList<BoolExpr>> collected = new HashMap<String, ArrayList<BoolExpr>>();
 		HashMap<String, NetworkObject> node_dict = new HashMap<String, NetworkObject>();
-		HashMap<String, Integer> latency = new HashMap<String, Integer>();
-		HashMap<String, BoolExpr> depends = new HashMap<String, BoolExpr>();
+
+		HashMap<String, HashMap<String,Tuple< Integer, BoolExpr>>> latency= new HashMap<>();
+		
 		BoolExpr predicates;
 		for (int y = 0; y < policy.size(); y++) {
 			Quattro<DatatypeExpr, NetworkObject, Integer,BoolExpr> tp = policy.get(y);
-			if (collected.containsKey("" + tp._2))
-				collected.get("" + tp._2).add(nctx.destAddrPredicate(p_0, tp._1));
+			Tuple<Integer, BoolExpr> temp = new Tuple<>(tp._3,tp._4);
+			if (collected.containsKey("" + tp._2)){
+				if(!collected.get("" + tp._2).contains(nctx.destAddrPredicate(p_0,tp._1))) collected.get("" + tp._2).add(nctx.destAddrPredicate(p_0, tp._1));
+				  latency.get("" + tp._2).put(""+tp._3+"_"+tp._4,temp);
+			}
 			else {
+				HashMap<String,Tuple< Integer, BoolExpr>> lists= new HashMap<>();
 				ArrayList<BoolExpr> alb = new ArrayList<BoolExpr>();
-				alb.add(nctx.destAddrPredicate(p_0, tp._1));
+				if(!alb.contains(nctx.destAddrPredicate(p_0,tp._1))) alb.add(nctx.destAddrPredicate(p_0, tp._1));
 				collected.put("" + tp._2, alb);
+				lists.put(""+tp._3+"_"+tp._4,temp);
+				latency.put("" + tp._2, lists);
 			}
 			node_dict.put("" + tp._2, tp._2);
-			latency.put("" + tp._2, tp._3);
-			depends.put("" + tp._2, tp._4);
+
 		}
 
 		// Constraint foreach rtAddr,rtNode in rt( send(node, n_0, p_0, t_0) &&
@@ -265,15 +279,25 @@ public class Network extends Core{
 		// rtNode )
 		for (Map.Entry<String, ArrayList<BoolExpr>> entry : collected.entrySet()) {
 			BoolExpr[] pred = new BoolExpr[entry.getValue().size()];
+			HashMap<String, Tuple<Integer, BoolExpr>> sett = latency.get(entry.getKey());
+			//System.out.println("for "+entry.getKey()+" we have "+sett.size()+" for the node "+node);
 			predicates = ctx.mkOr(entry.getValue().toArray(pred));
-			System.out.println("getting "+ depends.get(entry.getKey())+" to " + entry.getKey());
-			softConstraints.put(ctx.mkImplies(depends.get(entry.getKey()), ctx.mkForall(new Expr[] { n_0, p_0 },
-					ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(node.getZ3Node(), n_0, p_0), predicates),
-							ctx.mkEq(n_0, node_dict.get(entry.getKey()).getZ3Node())),
-					1, null, null, null, null)), 
-					
-					//value.get(entry.getKey()));
-					new Tuple<Integer,String>(latency.get(entry.getKey()),entry.getKey()));
+			for(Entry<String, Tuple<Integer, BoolExpr>> temp: sett.entrySet()){
+				
+				
+				BoolExpr forTheKey = temp.getValue()._2;
+				Integer latency_val = temp.getValue()._1;
+				softConstraints.put(
+						ctx.mkImplies(forTheKey, 
+									   ctx.mkForall(new Expr[] { n_0, p_0 },
+											   	    ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(node.getZ3Node(), n_0, p_0), predicates),
+											   	    			  ctx.mkEq(n_0, node_dict.get(entry.getKey()).getZ3Node())),
+											   		1, null, null, null, null)), 
+						
+						//value.get(entry.getKey()));
+						new Tuple<Integer,String>(latency_val,node+"_"+entry.getKey()));
+				//System.out.println(forTheKey + " implies "+" node: "+node+" adresses: \n"+predicates+" has latency: "+latency_val);	
+			}
 			
 		}
 	}
@@ -290,7 +314,7 @@ public class Network extends Core{
             if(collected.containsKey(""+tp._2)) collected.get(""+tp._2).add(nctx.destAddrPredicate(p_0,tp._1));
             else{
                 ArrayList<BoolExpr> alb = new ArrayList<BoolExpr>();
-                alb.add(nctx.destAddrPredicate(p_0,tp._1));
+               alb.add(nctx.destAddrPredicate(p_0,tp._1));
                 collected.put(""+tp._2,alb);
             }
             node_dict.put(""+tp._2, tp._2);

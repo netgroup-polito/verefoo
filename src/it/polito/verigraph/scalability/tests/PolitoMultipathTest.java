@@ -64,8 +64,8 @@ public class PolitoMultipathTest {
 	public PolitoEndHost b;
 	public Classifier classifier;
 	
-	public int classifier_y1 = 10;
-	public int classifier_y2 = 20;
+	public int classifier_y1 = 100;
+	public int classifier_y2 = 5;
 	public int a_classifier = 10;
 	public int y1_y2= 30;
 	public int y1_b= 40;
@@ -113,17 +113,17 @@ public class PolitoMultipathTest {
 		
 		    
 			ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtClassifier = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
-			rtClassifier.add(new Quattro<>(nctx.am.get("ip_b"), x1,classifier_y1,nctx.y1));
-			rtClassifier.add(new Quattro<>(nctx.am.get("ip_b"), x1,classifier_y2,nctx.y2));
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_b"), x1,classifier_y1,nctx.x11));
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_b"), x1,classifier_y2,nctx.x12));
 			
-			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x1"), x1,classifier_y1,nctx.y1));
-			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x1"), x1,classifier_y2,nctx.y2));
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x1"), x1,classifier_y1,nctx.x11));
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x1"), x1,classifier_y2,nctx.x12));
 			
-			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x2"), x1,classifier_y1,nctx.y1));
-			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x2"), x1,classifier_y2,nctx.y2));
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x2"), x1,classifier_y1,nctx.x11));
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x2"), x1,classifier_y2,nctx.x12));
 			
-			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x3"), x1,classifier_y1,nctx.y1));
-			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x3"), x1,classifier_y2,nctx.y2));
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x3"), x1,classifier_y1,nctx.x11));
+			rtClassifier.add(new Quattro<>(nctx.am.get("ip_x3"), x1,classifier_y2,nctx.x12));
 			
 			rtClassifier.add(new Quattro<>(nctx.am.get("ip_a"), a,a_classifier,nctx.ture));
 			
@@ -140,11 +140,6 @@ public class PolitoMultipathTest {
 			rtX1.add(new Quattro<>(nctx.am.get("ip_b"), x2,y1_y2,ctx.mkAnd(nctx.x12,nctx.x21)));
 			rtX1.add(new Quattro<>(nctx.am.get("ip_b"), x2,0,ctx.mkAnd(nctx.x12,nctx.x22)));
 			
-			rtX1.add(new Quattro<>(nctx.am.get("ip_a"), classifier,classifier_y1,nctx.x11));
-			rtX1.add(new Quattro<>(nctx.am.get("ip_a"), classifier,classifier_y2,nctx.x12));
-			rtX1.add(new Quattro<>(nctx.am.get("ip_classifier"), classifier,classifier_y1,nctx.x11));
-			rtX1.add(new Quattro<>(nctx.am.get("ip_classifier"), classifier,classifier_y2,nctx.x12));
-			
 			rtX1.add(new Quattro<>(nctx.am.get("ip_x2"), x2,0,ctx.mkAnd(nctx.x11,nctx.x21)));
 			rtX1.add(new Quattro<>(nctx.am.get("ip_x2"), x2,y1_y2,ctx.mkAnd(nctx.x11,nctx.x22)));
 			rtX1.add(new Quattro<>(nctx.am.get("ip_x2"), x2,y1_y2,ctx.mkAnd(nctx.x12,nctx.x21)));
@@ -154,6 +149,11 @@ public class PolitoMultipathTest {
 			rtX1.add(new Quattro<>(nctx.am.get("ip_x3"), x2,y1_y2,ctx.mkAnd(nctx.x11,nctx.x22)));
 			rtX1.add(new Quattro<>(nctx.am.get("ip_x3"), x2,y1_y2,ctx.mkAnd(nctx.x12,nctx.x21)));
 			rtX1.add(new Quattro<>(nctx.am.get("ip_x3"), x2,0,ctx.mkAnd(nctx.x12,nctx.x22)));
+			
+			rtX1.add(new Quattro<>(nctx.am.get("ip_a"), classifier,classifier_y1,nctx.x11));
+			rtX1.add(new Quattro<>(nctx.am.get("ip_a"), classifier,classifier_y2,nctx.x12));
+			rtX1.add(new Quattro<>(nctx.am.get("ip_classifier"), classifier,classifier_y1,nctx.x11));
+			rtX1.add(new Quattro<>(nctx.am.get("ip_classifier"), classifier,classifier_y2,nctx.x12));
 			
 			
 			ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtX2 = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
@@ -228,6 +228,7 @@ public class PolitoMultipathTest {
 	    	net.routingTable2(x1, rtX1);
 	    	net.routingTable2(x2, rtX2);
 	    	net.routingTable2(x3, rtX3);
+	    	net.routingTable2(b, rtb);
 	    	
 		    
 		    net.attach(a, b, classifier,x1,x2,x3);
