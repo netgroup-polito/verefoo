@@ -73,7 +73,7 @@ public class Network extends Core{
         	for (Entry<BoolExpr, Tuple<Integer,String>> entry : softConstraints.entrySet()) {
 				 //String key = entry.getKey();
 				Tuple<Integer, String> value = entry.getValue();
-				//System.out.println("======adding soft for "+ entry.getKey() +"\n is "+entry.getValue()._1+ " node is " + entry.getValue()._2 +" ====== ");
+				System.out.println("======adding soft for "+ entry.getKey() +"\n is "+entry.getValue()._1+ " node is " + entry.getValue()._2 +" ====== ");
 				
 				nctx.handles.put("handle_"+entry.getValue()._2,solver.AssertSoft(ctx.mkNot(entry.getKey()), entry.getValue()._1,
 						//entry.getValue()._2));
@@ -296,7 +296,7 @@ public class Network extends Core{
 						
 						//value.get(entry.getKey()));
 						new Tuple<Integer,String>(latency_val,node+"_"+entry.getKey()));
-				//System.out.println(forTheKey + " implies "+" node: "+node+" adresses: \n"+predicates+" has latency: "+latency_val);	
+				System.out.println(forTheKey + " implies "+" node: "+node+" adresses: to the node "+node_dict.get(entry.getKey()).getZ3Node() +" \n"+predicates+" has latency: "+latency_val);	
 			}
 			
 		}

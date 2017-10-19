@@ -11,13 +11,17 @@ package it.polito.verigraph.mcnet.components;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Model;
 import com.microsoft.z3.Optimize;
+import com.microsoft.z3.Optimize.Handle;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 import it.polito.verigraph.mcnet.components.IsolationResult;
@@ -107,6 +111,12 @@ public class Checker {
 		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p0)));
 
 		result = this.solver.Check();
+		/*Handle handle;
+		for (Entry<String, Handle> entry : nctx.handles.entrySet()) {
+			handle=entry.getValue();
+			//System.out.println("+++++"+handle.getValue());
+		}*/
+		
 		model = null;
 		// assertions = this.solver.getAssertions();
 		// assertions = new BoolExpr [1] ;
@@ -128,14 +138,14 @@ public class Checker {
 			assert (net.elements.contains(pairs._1));
 			assert (net.elements.contains(pairs._2));
 
-			
-
 			Expr p0 = ctx.mkConst("check_isolation_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
 			Expr p1 = ctx.mkConst("check_isolation_p1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
 			Expr n_0 = ctx.mkConst("check_isolation_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
 			Expr n_1 = ctx.mkConst("check_isolation_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
-			//IntExpr t_0 = ctx.mkIntConst("check_isolation_t0_" + src.getZ3Node() + "_" + dest.getZ3Node());
-			//IntExpr t_1 = ctx.mkIntConst("check_isolation_t1_" + src.getZ3Node() + "_" + dest.getZ3Node());
+			// IntExpr t_0 = ctx.mkIntConst("check_isolation_t0_" +
+			// src.getZ3Node() + "_" + dest.getZ3Node());
+			// IntExpr t_1 = ctx.mkIntConst("check_isolation_t1_" +
+			// src.getZ3Node() + "_" + dest.getZ3Node());
 
 			// Constraint1recv(n_0,destNode,p0,t_0)
 			this.solver.Add((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0));

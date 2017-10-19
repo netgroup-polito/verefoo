@@ -78,6 +78,8 @@ public class Polito_Multipath{
 //    	ret = model.check.CheckIsolationProperty(model.politoMailServer, model.politoErrFunction);
     	ret = model.check.checkIsolationProperty(model.a,model.b );
     	
+    
+    	
     	//p.printVector(ret.assertions);
     	if (ret.result == Status.UNSATISFIABLE){
      	   System.out.println("UNSAT"); // Nodes a and b are isolated

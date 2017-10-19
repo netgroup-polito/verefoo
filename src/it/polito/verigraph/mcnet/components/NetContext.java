@@ -98,12 +98,16 @@ public class NetContext extends Core{
 
     }
     public HashMap<String,Handle> handles;
+    
+    
+    
+    
     private void setConditions() {
     	int capacity_x1 = 10;
     	int capacity_x2 = 10;
     	int capacity_x3 = 10;
     	
-    	int capacity_y1 = 30;
+    	int capacity_y1 = 10;
     	int capacity_y2 = 30;
     	
 		x11 = ctx.mkBoolConst("x11");

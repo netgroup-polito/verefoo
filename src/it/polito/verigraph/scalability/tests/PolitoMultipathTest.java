@@ -64,8 +64,8 @@ public class PolitoMultipathTest {
 	public PolitoEndHost b;
 	public Classifier classifier;
 	
-	public int classifier_y1 = 100;
-	public int classifier_y2 = 5;
+	public int classifier_y1 = 10;
+	public int classifier_y2 = 20;
 	public int a_classifier = 10;
 	public int y1_y2= 30;
 	public int y1_b= 40;
@@ -207,8 +207,8 @@ public class PolitoMultipathTest {
 			rtX3.add(new Quattro<>(nctx.am.get("ip_a"), x2,0,ctx.mkAnd(nctx.x21,nctx.x31)));
 			
 			ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtb = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
-			rtb.add(new Quattro<>(nctx.am.get("ip_b"), x3,y1_b,nctx.x31));
-			rtb.add(new Quattro<>(nctx.am.get("ip_b"), x3,y2_b,nctx.x32));
+			//rtb.add(new Quattro<>(nctx.am.get("ip_b"), x3,y1_b,nctx.x31));
+			//rtb.add(new Quattro<>(nctx.am.get("ip_b"), x3,y2_b,nctx.x32));
 			
 			rtb.add(new Quattro<>(nctx.am.get("ip_x1"), x3,y1_b,nctx.x31));
 			rtb.add(new Quattro<>(nctx.am.get("ip_x1"), x3,y2_b,nctx.x32));
