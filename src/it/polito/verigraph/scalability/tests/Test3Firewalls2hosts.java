@@ -125,10 +125,10 @@ public class Test3Firewalls2hosts {
         //Configuring middleboxes
         ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
         acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_a"),nctx.am.get("ip_b")));
-        acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_c"),nctx.am.get("ip_b")));
+        //acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_b"),nctx.am.get("ip_c")));
         
-        //fw1.addAcls(acl);
-        //fw2.addAcls(acl);
+        fw1.addAcls(acl);
+        fw2.addAcls(acl);
         fw3.addAcls(acl);
 
         check = new Checker(ctx,nctx,net);
@@ -166,14 +166,15 @@ public class Test3Firewalls2hosts {
         ArrayList<Tuple<NetworkObject, NetworkObject>> tuples = new  ArrayList<>();
         tuples.add(new Tuple<>(model.a,model.b));
         tuples.add(new Tuple<>(model.c,model.b));
-        IsolationResult ret =model.check.checkIsolationPropertMultiple(tuples);
+        //IsolationResult ret =model.check.checkIsolationPropertMultiple(tuples);
+        IsolationResult ret =model.check.checkIsolationProperty(model.c, model.b);
        //model.printVector(ret.assertions);
         if (ret.result == Status.UNSATISFIABLE){
            System.out.println("UNSAT"); // Nodes a and b are isolated
         }else{
             System.out.println("**************************************************");
             System.out.println("SAT ");
-            System.out.println(ret.model);
+            //System.out.println(ret.model);
 //            System.out.print( "Model -> ");model.printModel(ret.model);
 //          System.out.println( "Violating packet -> " +ret.violating_packet);
 //          System.out.println("Last hop -> " +ret.last_hop);

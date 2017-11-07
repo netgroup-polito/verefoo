@@ -47,10 +47,12 @@ public class PolitoEndHost extends NetworkObject {
         this.net = (Network)args[0][1];
         this.nctx = (NetContext)args[0][2];
         net.saneSend(this);
+        
     }
 
     @Override
     protected void addConstraints(Optimize solver) {
+    	installEndHost(null);
         BoolExpr[] constr = new BoolExpr[constraints.size()];
         solver.Add(constraints.toArray(constr));
     }
@@ -65,26 +67,30 @@ public class PolitoEndHost extends NetworkObject {
         //IntExpr t_0 = ctx.mkIntConst("PolitoEndHost_"+politoEndHost+"_t_0");
         BoolExpr predicatesOnPktFields = ctx.mkTrue();
 
-        if(packet.getIp_dest() != null)
-            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("dest").apply(p_0), packet.getIp_dest()));
-        if(packet.getBody() != null)
-            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("body").apply(p_0), ctx.mkInt(packet.getBody())));
-        if(packet.getEmailFrom() != null)
-            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("emailFrom").apply(p_0), ctx.mkInt(packet.getEmailFrom())));
-        if(packet.getOptions() != null)
-            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("options").apply(p_0), ctx.mkInt(packet.getOptions())));
-        if(packet.getProto() != null)
-            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(packet.getProto())));
-        if(packet.getSeq() != null)
-            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("seq").apply(p_0), ctx.mkInt(packet.getSeq())));
-        if(packet.getUrl() != null)
-            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("url").apply(p_0), ctx.mkInt(packet.getUrl())));
+       if (packet!=null){
+    	   if(packet.getIp_dest() != null)
+               predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("dest").apply(p_0), packet.getIp_dest()));
+           if(packet.getBody() != null)
+               predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("body").apply(p_0), ctx.mkInt(packet.getBody())));
+           if(packet.getEmailFrom() != null)
+               predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("emailFrom").apply(p_0), ctx.mkInt(packet.getEmailFrom())));
+           if(packet.getOptions() != null)
+               predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("options").apply(p_0), ctx.mkInt(packet.getOptions())));
+           if(packet.getProto() != null)
+               predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(packet.getProto())));
+           if(packet.getSeq() != null)
+               predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("seq").apply(p_0), ctx.mkInt(packet.getSeq())));
+           if(packet.getUrl() != null)
+               predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("url").apply(p_0), ctx.mkInt(packet.getUrl())));
 
-        //Constraint1 send(politoWebClient, n_0, p, t_0) -> p.origin == politoWebClient && p.orig_body == p.body && nodeHasAddr(politoWebClient,p.src)
+       }
+        //Constraint1 send(politoWebClient, n_0, p, t_0) -> 
+        //p.origin == politoWebClient && p.orig_body == p.body && nodeHasAddr(politoWebClient,p.src)
+       
+        //constraints.add((BoolExpr)nctx.send.apply(politoEndHost, n_0, p_0));
         constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
                 ctx.mkImplies((BoolExpr)nctx.send.apply(politoEndHost, n_0, p_0),
-                        ctx.mkAnd(predicatesOnPktFields,
-                                ctx.mkEq(nctx.pf.get("orig_body").apply(p_0),nctx.pf.get("body").apply(p_0)),
+                        ctx.mkAnd(
                                 ctx.mkEq(nctx.pf.get("origin").apply(p_0),politoEndHost),
                                 (BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.pf.get("src").apply(p_0)))),1,null,null,null,null));
 

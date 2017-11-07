@@ -45,6 +45,10 @@ public class Checker {
 	public Status result;
 	public Model model;
 
+	
+	public enum Prop {
+	    ISOLATION,REACHABILITY
+	}
 	public Checker(Context context, NetContext nctx, Network network) {
 		this.ctx = context;
 		this.net = network;
@@ -111,12 +115,12 @@ public class Checker {
 		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p0)));
 
 		result = this.solver.Check();
-		/*Handle handle;
-		for (Entry<String, Handle> entry : nctx.handles.entrySet()) {
-			handle=entry.getValue();
-			//System.out.println("+++++"+handle.getValue());
-		}*/
 		
+		Handle temp = null;
+		for (Entry<String, Handle> handle : nctx.handles.entrySet()) {
+			temp = handle.getValue();
+		}
+		System.out.println(temp.getValue());
 		model = null;
 		// assertions = this.solver.getAssertions();
 		// assertions = new BoolExpr [1] ;
@@ -128,67 +132,164 @@ public class Checker {
 		this.solver.Pop();
 		return new IsolationResult(ctx, result, p0, n_0, t_1, t_0, nctx, assertions, model);
 	}
-
-	public IsolationResult checkIsolationPropertMultiple(ArrayList<Tuple<NetworkObject, NetworkObject>> pair) {
+	
+	public IsolationResult checkRealIsolationProperty(NetworkObject src, NetworkObject dest) {
+		assert (net.elements.contains(src));
+		assert (net.elements.contains(dest));
 		solver.Push();
 		addConstraints();
-		for (Tuple<NetworkObject, NetworkObject> pairs : pair) {
-			NetworkObject src = pairs._1;
-			NetworkObject dest = pairs._2;
-			assert (net.elements.contains(pairs._1));
-			assert (net.elements.contains(pairs._2));
 
-			Expr p0 = ctx.mkConst("check_isolation_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
-			Expr p1 = ctx.mkConst("check_isolation_p1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
-			Expr n_0 = ctx.mkConst("check_isolation_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
-			Expr n_1 = ctx.mkConst("check_isolation_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
-			// IntExpr t_0 = ctx.mkIntConst("check_isolation_t0_" +
-			// src.getZ3Node() + "_" + dest.getZ3Node());
-			// IntExpr t_1 = ctx.mkIntConst("check_isolation_t1_" +
-			// src.getZ3Node() + "_" + dest.getZ3Node());
+		Expr p0 = ctx.mkConst("check_isolation_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
+		Expr p1 = ctx.mkConst("check_isolation_p1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
+		Expr n_0 = ctx.mkConst("check_isolation_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
+		Expr n_1 = ctx.mkConst("check_isolation_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
+		IntExpr t_0 = ctx.mkIntConst("check_isolation_t0_" + src.getZ3Node() + "_" + dest.getZ3Node());
+		IntExpr t_1 = ctx.mkIntConst("check_isolation_t1_" + src.getZ3Node() + "_" + dest.getZ3Node());
 
-			// Constraint1recv(n_0,destNode,p0,t_0)
-			this.solver.Add((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0));
+	
+		this.solver.Add(ctx.mkForall(new Expr[]{n_0, p0},
+				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0)),
+						ctx.mkAnd(ctx.mkNot(ctx.mkEq(src.getZ3Node(), nctx.pf.get("origin").apply(p0))))),1,null,null,null,null));
+								
+		// !(p1.origin == p0.origin)
+		//this.solver.Add(ctx.mkAnd(ctx.mkNot(ctx.mkEq(nctx.pf.get("origin").apply(p1), nctx.pf.get("origin").apply(p0)))));
+		// Constraint2 send(srcNode,n_1,p1,t_1)
+		this.solver.Add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1));
 
-			// Constraint2send(srcNode,n_1,p1,t_1)
-			this.solver.Add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1));
+		// Constraint3 nodeHasAddr(srcNode,p1.srcAddr)
+		//this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));
 
-			// Constraint3nodeHasAddr(srcNode,p1.srcAddr)
-			this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));
+		// Constraint4 p1.origin == srcNode
+		//this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
 
-			// Constraint4p1.origin == srcNode
-			this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
+		// Constraint5 nodeHasAddr(destNode,p1.destAddr)
+		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
 
-			// Constraint5nodeHasAddr(destNode,p1.destAddr)
-			this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
-
-			// NON sembrano necessari
-			// this.solver.add(z3.Or(this.ctx.nodeHasAddr(src.getZ3Node(),
-			// this.ctx.packet.src(p0)),\
-			// this.ctx.nodeHasAddr(n_0, this.ctx.packet.src(p0)),\
-			// this.ctx.nodeHasAddr(n_1, this.ctx.packet.src(p0))))
-			// this.solver.add(this.ctx.packet.dest(p1) ==
-			// this.ctx.packet.dest(p0))
-
-			// Constraint6p1.origin == p0.origin
-			this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), nctx.pf.get("origin").apply(p0)));
-
-			// Constraint7nodeHasAddr(destNode, p0.destAddr)
-			this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p0)));
-		}
+		// Constraint7nodeHasAddr(destNode, p0.destAddr)
+		//this.solver.Add(((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p0))));
 
 		result = this.solver.Check();
+		Handle temp = null;
+		for (Entry<String, Handle> handle : nctx.handles.entrySet()) {
+			temp = handle.getValue();
+		}
+		if (temp!=null)System.out.println(temp.getValue());
+		
 		model = null;
 		// assertions = this.solver.getAssertions();
 		// assertions = new BoolExpr [1] ;
 		assertions = null;
-
 		if (result == Status.SATISFIABLE) {
 			model = this.solver.getModel();
 		}
 		this.solver.Pop();
+		return new IsolationResult(ctx, result, p0, n_0, t_1, t_0, nctx, assertions, model);
+	}
+	
+	private void addIsolationProperty(NetworkObject src, NetworkObject dest) {
+		assert (net.elements.contains(src));
+		assert (net.elements.contains(dest));
+
+
+		Expr p0 = ctx.mkConst("check_isolation_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
+		Expr p1 = ctx.mkConst("check_isolation_p1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
+		Expr n_0 = ctx.mkConst("check_isolation_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
+		Expr n_1 = ctx.mkConst("check_isolation_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
+		IntExpr t_0 = ctx.mkIntConst("check_isolation_t0_" + src.getZ3Node() + "_" + dest.getZ3Node());
+		IntExpr t_1 = ctx.mkIntConst("check_isolation_t1_" + src.getZ3Node() + "_" + dest.getZ3Node());
+
+	
+		this.solver.Add(ctx.mkForall(new Expr[]{n_0, p0},
+				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0)),
+						ctx.mkAnd(ctx.mkNot(ctx.mkEq(src.getZ3Node(), nctx.pf.get("origin").apply(p0))))),1,null,null,null,null));
+								
+		// !(p1.origin == p0.origin)
+		//this.solver.Add(ctx.mkAnd(ctx.mkNot(ctx.mkEq(nctx.pf.get("origin").apply(p1), nctx.pf.get("origin").apply(p0)))));
+		// Constraint2 send(srcNode,n_1,p1,t_1)
+		this.solver.Add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1));
+
+		// Constraint3 nodeHasAddr(srcNode,p1.srcAddr)
+		//this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));
+
+		// Constraint4 p1.origin == srcNode
+		//this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
+
+		// Constraint5 nodeHasAddr(destNode,p1.destAddr)
+		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
+
+		// Constraint7nodeHasAddr(destNode, p0.destAddr)
+		//this.solver.Add(((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p0))));
+
+	}
+
+	public void propertyAdd(NetworkObject src, NetworkObject dest, Prop property) {
+		assert (net.elements.contains(src));
+		assert (net.elements.contains(dest));
+		
+		switch (property) {
+			case ISOLATION: 
+					addIsolationProperty(src, dest);
+					break;
+			case REACHABILITY: 
+				addReachabilityProperty(src, dest);
+				break;
+		}
+		
+		
+	}
+	private void addReachabilityProperty(NetworkObject src, NetworkObject dest) {
+		
+		Expr p0 = ctx.mkConst("check_reach_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
+		Expr p1 = ctx.mkConst("check_reach_p1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
+		Expr n_0 = ctx.mkConst("check_reach_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
+		Expr n_1 = ctx.mkConst("check_reach_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
+		IntExpr t_0 = ctx.mkIntConst("check_reach_t0_" + src.getZ3Node() + "_" + dest.getZ3Node());
+		IntExpr t_1 = ctx.mkIntConst("check_reach_t1_" + src.getZ3Node() + "_" + dest.getZ3Node());
+
+		// Constraint1recv(n_0,destNode,p0,t_0)
+		this.solver.Add((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0));
+
+		// Constraint2send(srcNode,n_1,p1,t_1)
+		this.solver.Add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1));
+
+		// Constraint3nodeHasAddr(srcNode,p1.srcAddr)
+		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));
+
+		// Constraint4p1.origin == srcNode
+		this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
+
+		// Constraint5nodeHasAddr(destNode,p1.destAddr)
+		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
+
+		// Constraint6p1.origin == p0.origin
+		this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), nctx.pf.get("origin").apply(p0)));
+
+		// Constraint7nodeHasAddr(destNode, p0.destAddr)
+		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p0)));
+		
+	}
+
+	public IsolationResult propertyCheck(){
+		solver.Push();
+		addConstraints();
+		
+		result = this.solver.Check();
+		
+		Handle temp = null;
+		for (Entry<String, Handle> handle : nctx.handles.entrySet()) {
+			temp = handle.getValue();
+		}
+		if (temp!=null)System.out.println(temp.getValue());
+		
+		model = null;
+		assertions = null;
+		if (result == Status.SATISFIABLE) {
+			model = this.solver.getModel();
+		}
+		solver.Pop();
 		return new IsolationResult(ctx, result, null, null, null, null, nctx, assertions, model);
 	}
+	
 
 	/*
 	 * public IsolationResult CheckIsolationFlowProperty (NetworkObject src,

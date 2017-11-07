@@ -2,15 +2,15 @@ package it.polito.verigraph.scalability.tests;
 
 /**
  * <p/>  Custom test  <p/>
- *  | A | <------> | CACHE |<------> | B |
+ *  | A | <------> | CACHE | <------> | CACHE |<------> | B |
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import org.neo4j.cypher.internal.compiler.v2_3.executionplan.checkForEagerLoadCsv;
+
+import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.FuncDecl;
@@ -23,27 +23,34 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
+import it.polito.verigraph.mcnet.components.Quattro;
 import it.polito.verigraph.mcnet.components.Tuple;
 import it.polito.verigraph.mcnet.netobjs.PolitoEndHost;
+import it.polito.verigraph.mcnet.netobjs.PolitoNat;
+import it.polito.verigraph.mcnet.netobjs.AclFirewall;
+import it.polito.verigraph.mcnet.netobjs.AclFirewallAuto;
 import it.polito.verigraph.mcnet.netobjs.PolitoCache;
 
-public class Test1Cache {
+public class TestFWNAT {
 
     public Checker check;
     public Context ctx;
     public PolitoEndHost a,b;
-    public PolitoCache cache1;
+    public AclFirewall fw1,fw2;
+    public PolitoNat nat;
 
-    public  Test1Cache(){
+    public  TestFWNAT(){
         ctx = new Context();
 
-        NetContext nctx = new NetContext (ctx,new String[]{"a", "b", "cache1"},
-                                                new String[]{"ip_a", "ip_b", "ip_cache1"});
+        NetContext nctx = new NetContext (ctx,new String[]{"a", "b", "nat","fw2","fw1"},
+                                                new String[]{"ip_a", "ip_b", "ip_nat", "ip_fw2", "ip_fw1"});
         Network net = new Network (ctx,new Object[]{nctx});
 
         a = new PolitoEndHost(ctx, new Object[]{nctx.nm.get("a"), net, nctx});
         b = new PolitoEndHost(ctx, new Object[]{nctx.nm.get("b"), net, nctx});
-        cache1 = new PolitoCache(ctx, new Object[]{nctx.nm.get("cache1"), net, nctx});
+        nat = new PolitoNat(ctx, new Object[]{nctx.nm.get("nat"), net, nctx});
+        fw1= new AclFirewall(ctx, new Object[]{nctx.nm.get("fw1"), net, nctx});
+        fw2= new AclFirewall(ctx, new Object[]{nctx.nm.get("fw2"), net, nctx});
 
         ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>> adm = new ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>>();
         ArrayList<DatatypeExpr> al1 = new ArrayList<DatatypeExpr>();
@@ -53,32 +60,50 @@ public class Test1Cache {
         ArrayList<DatatypeExpr> al5 = new ArrayList<DatatypeExpr>();
         al1.add(nctx.am.get("ip_a"));
         al2.add(nctx.am.get("ip_b"));
-        al3.add(nctx.am.get("ip_cache1"));
+        al3.add(nctx.am.get("ip_nat"));
+        al4.add(nctx.am.get("ip_fw2"));
+        al5.add(nctx.am.get("ip_fw1"));
         adm.add(new Tuple<>(a, al1));
         adm.add(new Tuple<>(b, al2));
-        adm.add(new Tuple<>(cache1, al3));
+        adm.add(new Tuple<>(nat, al3));
+        adm.add(new Tuple<>(fw2, al4));
+        adm.add(new Tuple<>(fw1, al5));
         net.setAddressMappings(adm);
 
-        ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt1 = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
-        rt1.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_cache1"), cache1));
-        rt1.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_b"), cache1));
-
-        net.routingTable(a, rt1);
-
-        ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt2 = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
-       
-        net.routingTable(b, rt2);
-
-        ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt3 = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
         
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_b"),b));
+        ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rta = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
+        rta.add(new Quattro<>(nctx.am.get("ip_b"), fw1,10,nctx.y1));
+        rta.add(new Quattro<>(nctx.am.get("ip_b"), nat,1,ctx.mkNot(nctx.y1)));
+        net.routingTable2(a, rta);
+        
+        ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtfw1 = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
+        rtfw1.add(new Quattro<>(nctx.am.get("ip_b"), nat,10,nctx.y1));
+        net.routingTable2(fw1, rtfw1);
 
-        net.routingTable(cache1, rt3);
+        ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtnat = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
+        rtnat.add(new Quattro<>(nctx.am.get("ip_b"), fw2,10,nctx.y2));
+        rtnat.add(new Quattro<>(nctx.am.get("ip_b"), b,1,ctx.mkNot(nctx.y2)));
+        net.routingTable2(nat, rtnat);
+        
+        ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtfw2 = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
+        rtfw2.add(new Quattro<>(nctx.am.get("ip_b"), b,7,nctx.y2));
+        net.routingTable2(fw2, rtfw2);       
 
-        net.attach(a, b, cache1);
-
-        //Configuring middleboxes
-        cache1.installCache(new NetworkObject[]{nctx.nm.get("a")});
+        net.attach(a, b, nat,fw2,fw1);
+        
+        ArrayList<DatatypeExpr> ia = new ArrayList<DatatypeExpr>();
+	    ia.add(nctx.am.get("ip_a"));
+	    ia.add(nctx.am.get("ip_fw1"));
+	    nat.natModel(nctx.am.get("ip_nat"));
+	    nat.setInternalAddress(ia);
+	    
+	    ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+        acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_nat"),nctx.am.get("ip_b")));
+        fw2.addAcls(acl);
+        
+        ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl2 = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+        acl2.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_fw1"),nctx.am.get("ip_a")));
+        fw1.addAcls(acl2);
         
         check = new Checker(ctx,nctx,net);
 }
@@ -107,34 +132,21 @@ public class Test1Cache {
         }
     }
 
-    private static  void parsing(String model) {
-		String[] lines =model.split("\\n");
-		Pattern pattern = Pattern.compile("\\(\\) Bool *true");
-		for (int i = 0; i < lines.length&&lines.length>1; i++) {
-			String compare = lines[i++]+lines[i];
-			Matcher matcher = pattern.matcher(compare);
-			if (matcher.find()) {
-			    System.out.println(compare);
-			} 
-		}
-	}
-    
+
     public static void main(String[] args) throws Z3Exception
     {
-        Test1Cache model = new Test1Cache();
+        TestFWNAT model = new TestFWNAT();
         model.resetZ3();
         
         IsolationResult ret =model.check.checkRealIsolationProperty(model.a,model.b);
-        
-        
         //IsolationResult ret =model.check.checkIsolationProperty(model.a,model.b);
+        //model.check.
         //model.printVector(ret.assertions);
         if (ret.result == Status.UNSATISFIABLE){
            System.out.println("UNSAT"); // Nodes a and b are isolated
         }else{
             System.out.println("SAT ");
             System.out.println(ret.model);
-           // parsing(ret.model+"");
 //            System.out.print( "Model -> ");model.printModel(ret.model);
 //          System.out.println( "Violating packet -> " +ret.violating_packet);
 //          System.out.println("Last hop -> " +ret.last_hop);

@@ -128,11 +128,17 @@ public class Test3Firewalls {
           //Configuring middleboxes
           ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
           acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_a"),nctx.am.get("ip_fw1")));
+          
+          ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl1 = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+          acl1.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_a"),nctx.am.get("ip_b")));
+          
+          ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl2 = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+          acl2.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_a"),nctx.am.get("ip_fw1")));
           //acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_c"),nctx.am.get("ip_b")));
           
-          fw1.addAcls(acl);
-          fw2.addAcls(acl);
-          fw3.addAcls(acl);
+         // fw1.addAcls(acl);
+          //fw2.addAcls(acl1);
+          //fw3.addAcls(acl2);
 
           check = new Checker(ctx,nctx,net);
 }
@@ -167,7 +173,7 @@ public class Test3Firewalls {
         Test3Firewalls model = new Test3Firewalls();
         model.resetZ3();
         
-        IsolationResult ret =model.check.checkIsolationProperty(model.a,model.b);
+        IsolationResult ret =model.check.checkRealIsolationProperty(model.a,model.b);
         //model.printVector(ret.assertions);
         if (ret.result == Status.UNSATISFIABLE){
            System.out.println("UNSAT"); // Nodes a and b are isolated

@@ -27,58 +27,45 @@ import it.polito.verigraph.mcnet.components.Tuple;
 import it.polito.verigraph.mcnet.netobjs.PolitoEndHost;
 import it.polito.verigraph.mcnet.netobjs.PolitoCache;
 
-public class Test1Cache {
+public class TestIsolation {
 
     public Checker check;
     public Context ctx;
     public PolitoEndHost a,b;
-    public PolitoCache cache1;
 
-    public  Test1Cache(){
+    public  TestIsolation(){
         ctx = new Context();
 
-        NetContext nctx = new NetContext (ctx,new String[]{"a", "b", "cache1"},
-                                                new String[]{"ip_a", "ip_b", "ip_cache1"});
+        NetContext nctx = new NetContext (ctx,new String[]{"a", "b"},
+                                                new String[]{"ip_a", "ip_b"});
         Network net = new Network (ctx,new Object[]{nctx});
 
         a = new PolitoEndHost(ctx, new Object[]{nctx.nm.get("a"), net, nctx});
         b = new PolitoEndHost(ctx, new Object[]{nctx.nm.get("b"), net, nctx});
-        cache1 = new PolitoCache(ctx, new Object[]{nctx.nm.get("cache1"), net, nctx});
 
         ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>> adm = new ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>>();
         ArrayList<DatatypeExpr> al1 = new ArrayList<DatatypeExpr>();
         ArrayList<DatatypeExpr> al2 = new ArrayList<DatatypeExpr>();
-        ArrayList<DatatypeExpr> al3 = new ArrayList<DatatypeExpr>();
-        ArrayList<DatatypeExpr> al4 = new ArrayList<DatatypeExpr>();
-        ArrayList<DatatypeExpr> al5 = new ArrayList<DatatypeExpr>();
         al1.add(nctx.am.get("ip_a"));
         al2.add(nctx.am.get("ip_b"));
-        al3.add(nctx.am.get("ip_cache1"));
         adm.add(new Tuple<>(a, al1));
         adm.add(new Tuple<>(b, al2));
-        adm.add(new Tuple<>(cache1, al3));
         net.setAddressMappings(adm);
 
         ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt1 = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
-        rt1.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_cache1"), cache1));
-        rt1.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_b"), cache1));
-
+        rt1.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_b"), b));
         net.routingTable(a, rt1);
 
         ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt2 = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
-       
+        rt2.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_a"), a));
         net.routingTable(b, rt2);
 
-        ArrayList<Tuple<DatatypeExpr,NetworkObject>> rt3 = new ArrayList<Tuple<DatatypeExpr,NetworkObject>>();
         
-        rt3.add(new Tuple<DatatypeExpr,NetworkObject>(nctx.am.get("ip_b"),b));
 
-        net.routingTable(cache1, rt3);
 
-        net.attach(a, b, cache1);
+        net.attach(a, b);
 
         //Configuring middleboxes
-        cache1.installCache(new NetworkObject[]{nctx.nm.get("a")});
         
         check = new Checker(ctx,nctx,net);
 }
@@ -121,7 +108,7 @@ public class Test1Cache {
     
     public static void main(String[] args) throws Z3Exception
     {
-        Test1Cache model = new Test1Cache();
+        TestIsolation model = new TestIsolation();
         model.resetZ3();
         
         IsolationResult ret =model.check.checkRealIsolationProperty(model.a,model.b);

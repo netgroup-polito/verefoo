@@ -84,8 +84,8 @@ public class Polito_Multipath{
     	if (ret.result == Status.UNSATISFIABLE){
      	   System.out.println("UNSAT"); // Nodes a and b are isolated
     	}else{
-     		//System.out.println("SAT ");
-     		System.out.print( ""+ret.model); //p.printModel(ret.model);
+     		System.out.println("SAT ");
+     		//System.out.print( ""+ret.model); //p.printModel(ret.model);
 //    	    System.out.println( "Violating packet -> " +ret.violating_packet);
 //    	    System.out.println("Last hop -> " +ret.last_hop);
 //    	    System.out.println("Last send_time -> " +ret.last_send_time);
