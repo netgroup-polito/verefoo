@@ -73,7 +73,7 @@ public class Polito_All{
     	//System.out.println(System.getProperty("sun.arch.data.model") );
     	p.resetZ3();
     	
-    	Test1Cache model = new Test1Cache();
+    	Test1OPT model = new Test1OPT();
     	//Test2Caches model = new Test2Caches();
     	//Test3Caches model = new Test3Caches();
     	//Test4Caches model = new Test4Caches();

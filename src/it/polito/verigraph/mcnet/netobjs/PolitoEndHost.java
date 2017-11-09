@@ -92,6 +92,9 @@ public class PolitoEndHost extends NetworkObject {
                 ctx.mkImplies((BoolExpr)nctx.send.apply(politoEndHost, n_0, p_0),
                         ctx.mkAnd(
                                 ctx.mkEq(nctx.pf.get("origin").apply(p_0),politoEndHost),
+                                (BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.pf.get("inner_src").apply(p_0)),
+                                //(BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.pf.get("inner_dest").apply(p_0)),
+                               // ctx.mkEq(nctx.pf.get("encrypted").apply(p_0),ctx.mkInt(1)),
                                 (BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.pf.get("src").apply(p_0)))),1,null,null,null,null));
 
         //Constraint2 recv(n_0, politoWebClient, p, t_0) -> nodeHasAddr(politoWebClient,p.dest)

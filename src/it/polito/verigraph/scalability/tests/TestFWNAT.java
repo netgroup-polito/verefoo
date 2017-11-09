@@ -18,7 +18,9 @@ import com.microsoft.z3.Model;
 import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
 
+import it.polito.verifoo.components.RoutingTable;
 import it.polito.verigraph.mcnet.components.Checker;
+import it.polito.verigraph.mcnet.components.Checker.Prop;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
@@ -36,7 +38,7 @@ public class TestFWNAT {
     public Checker check;
     public Context ctx;
     public PolitoEndHost a,b;
-    public AclFirewall fw1,fw2;
+    public AclFirewallAuto fw1,fw2;
     public PolitoNat nat;
 
     public  TestFWNAT(){
@@ -49,8 +51,8 @@ public class TestFWNAT {
         a = new PolitoEndHost(ctx, new Object[]{nctx.nm.get("a"), net, nctx});
         b = new PolitoEndHost(ctx, new Object[]{nctx.nm.get("b"), net, nctx});
         nat = new PolitoNat(ctx, new Object[]{nctx.nm.get("nat"), net, nctx});
-        fw1= new AclFirewall(ctx, new Object[]{nctx.nm.get("fw1"), net, nctx});
-        fw2= new AclFirewall(ctx, new Object[]{nctx.nm.get("fw2"), net, nctx});
+        fw1= new AclFirewallAuto(ctx, new Object[]{nctx.nm.get("fw1"), net, nctx});
+        fw2= new AclFirewallAuto(ctx, new Object[]{nctx.nm.get("fw2"), net, nctx});
 
         ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>> adm = new ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>>();
         ArrayList<DatatypeExpr> al1 = new ArrayList<DatatypeExpr>();
@@ -71,29 +73,29 @@ public class TestFWNAT {
         net.setAddressMappings(adm);
 
         
-        ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rta = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
-        rta.add(new Quattro<>(nctx.am.get("ip_b"), fw1,10,nctx.y1));
-        rta.add(new Quattro<>(nctx.am.get("ip_b"), nat,1,ctx.mkNot(nctx.y1)));
+        ArrayList<RoutingTable> rta = new ArrayList<RoutingTable>();
+        rta.add(new RoutingTable(nctx.am.get("ip_b"), fw1,10,nctx.y1));
+        rta.add(new RoutingTable(nctx.am.get("ip_b"), nat,1,ctx.mkNot(nctx.y1)));
         net.routingTable2(a, rta);
         
-        ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtfw1 = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
-        rtfw1.add(new Quattro<>(nctx.am.get("ip_b"), nat,10,nctx.y1));
+        ArrayList<RoutingTable> rtfw1 = new ArrayList<RoutingTable>();
+        rtfw1.add(new RoutingTable(nctx.am.get("ip_b"), nat,10,nctx.y1));
         net.routingTable2(fw1, rtfw1);
 
-        ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtnat = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
-        rtnat.add(new Quattro<>(nctx.am.get("ip_b"), fw2,10,nctx.y2));
-        rtnat.add(new Quattro<>(nctx.am.get("ip_b"), b,1,ctx.mkNot(nctx.y2)));
+        ArrayList<RoutingTable> rtnat = new ArrayList<RoutingTable>();
+        rtnat.add(new RoutingTable(nctx.am.get("ip_b"), fw2,10,nctx.y2));
+        rtnat.add(new RoutingTable(nctx.am.get("ip_b"), b,1,ctx.mkNot(nctx.y2)));
         net.routingTable2(nat, rtnat);
         
-        ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>> rtfw2 = new ArrayList<Quattro<DatatypeExpr,NetworkObject,Integer,BoolExpr>>();
-        rtfw2.add(new Quattro<>(nctx.am.get("ip_b"), b,7,nctx.y2));
+        ArrayList<RoutingTable> rtfw2 = new ArrayList<RoutingTable>();
+        rtfw2.add(new RoutingTable(nctx.am.get("ip_b"), b,7,nctx.y2));
         net.routingTable2(fw2, rtfw2);       
 
         net.attach(a, b, nat,fw2,fw1);
         
         ArrayList<DatatypeExpr> ia = new ArrayList<DatatypeExpr>();
 	    ia.add(nctx.am.get("ip_a"));
-	    ia.add(nctx.am.get("ip_fw1"));
+	   // ia.add(nctx.am.get("ip_fw1"));
 	    nat.natModel(nctx.am.get("ip_nat"));
 	    nat.setInternalAddress(ia);
 	    
@@ -138,10 +140,9 @@ public class TestFWNAT {
         TestFWNAT model = new TestFWNAT();
         model.resetZ3();
         
-        IsolationResult ret =model.check.checkRealIsolationProperty(model.a,model.b);
-        //IsolationResult ret =model.check.checkIsolationProperty(model.a,model.b);
-        //model.check.
-        //model.printVector(ret.assertions);
+        //IsolationResult ret =model.check.checkRealIsolationProperty(model.a,model.b);
+        model.check.propertyAdd(model.a, model.b, Prop.ISOLATION);
+        IsolationResult ret= model.check.propertyCheck();
         if (ret.result == Status.UNSATISFIABLE){
            System.out.println("UNSAT"); // Nodes a and b are isolated
         }else{

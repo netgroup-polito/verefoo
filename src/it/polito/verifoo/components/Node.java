@@ -40,11 +40,8 @@ import com.microsoft.z3.BoolExpr;
 @XmlType(name = "Node")
 public class Node {
 
-    @XmlAttribute(name = "name")
     protected String name;
-    @XmlAttribute(name = "functionType")
-    protected String functionType;
-    @XmlAttribute(name = "nffg")
+    protected VNFType functionType;
     protected String nffg;
     
     protected BoolExpr bool;
@@ -59,12 +56,22 @@ public class Node {
 		this.hosts = hosts;
 	}
 
-	public Node(String string, int i) {
+	public Node(String string, int i, VNFType vnf) {
 		this.setName(string);
 		this.setDisk(i);
+		this.setFunctionType(vnf);
 		hosts= new ArrayList<>();
 	}
 
+	public enum VNFType{
+		CACHE,
+		DPI,
+		FW,
+		NAT,
+		SPAM,
+		VPN;
+	}
+	
 	public BoolExpr getBool() {
 		return bool;
 	}
@@ -105,20 +112,20 @@ public class Node {
      *     {@link String }
      *     
      */
-    public String getFunctionType() {
+    public VNFType getFunctionType() {
         return functionType;
     }
 
     /**
      * Sets the value of the functionType property.
      * 
-     * @param value
+     * @param vnf
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setFunctionType(String value) {
-        this.functionType = value;
+    public void setFunctionType(VNFType vnf) {
+        this.functionType = vnf;
     }
 
     /**

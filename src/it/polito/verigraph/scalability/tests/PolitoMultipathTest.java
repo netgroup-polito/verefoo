@@ -223,12 +223,12 @@ public class PolitoMultipathTest {
 			rtb.add(new Quattro<>(nctx.am.get("ip_classifier"), x3,y2_b,nctx.x32));
 			*/
 
-	    	net.routingTable2(classifier, rtClassifier);
-	    	net.routingTable2(a, rtClient);
-	    	net.routingTable2(x1, rtX1);
-	    	net.routingTable2(x2, rtX2);
-	    	net.routingTable2(x3, rtX3);
-	    	net.routingTable2(b, rtb);
+	    	//net.routingTable2(classifier, rtClassifier);
+	    	//net.routingTable2(a, rtClient);
+	    	//net.routingTable2(x1, rtX1);
+	    	//net.routingTable2(x2, rtX2);
+	    	//net.routingTable2(x3, rtX3);
+	    	//net.routingTable2(b, rtb);
 	    	
 		    
 		    net.attach(a, b, classifier,x1,x2,x3);

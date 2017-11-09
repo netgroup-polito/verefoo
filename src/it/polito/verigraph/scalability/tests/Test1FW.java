@@ -131,8 +131,8 @@ public class Test1FW {
         Test1FW model = new Test1FW();
         model.resetZ3();
         
-        IsolationResult ret =model.check.checkRealIsolationProperty(model.a,model.b);
-        //IsolationResult ret =model.check.checkIsolationProperty(model.a,model.b);
+        //IsolationResult ret =model.check.checkRealIsolationProperty(model.a,model.b);
+        IsolationResult ret =model.check.checkIsolationProperty(model.a,model.b);
         //model.printVector(ret.assertions);
         if (ret.result == Status.UNSATISFIABLE){
            System.out.println("UNSAT"); // Nodes a and b are isolated

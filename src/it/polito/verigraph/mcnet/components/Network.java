@@ -24,6 +24,8 @@ import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Optimize.Handle;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Z3Exception;
+
+import it.polito.verifoo.components.RoutingTable;
 import it.polito.verigraph.mcnet.components.Core;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.NetworkObject;
@@ -185,8 +187,8 @@ public class Network extends Core {
 	}
 
 	public void routingTable2(NetworkObject node,
-			ArrayList<Quattro<DatatypeExpr, NetworkObject, Integer, BoolExpr>> routing_table) {
-		compositionPolicy2(node, routing_table);
+			ArrayList<RoutingTable> rta) {
+		compositionPolicy2(node, rta);
 	}
 
 	/**
@@ -258,7 +260,7 @@ public class Network extends Core {
 	 */
 
 	public void compositionPolicy2(NetworkObject node,
-			ArrayList<Quattro<DatatypeExpr, NetworkObject, Integer, BoolExpr>> policy) {
+			ArrayList<RoutingTable> rta) {
 		// Policy is of the form predicate -> node
 		Expr p_0 = ctx.mkConst(node + "_composition_p_0", nctx.packet);
 		Expr n_0 = ctx.mkConst(node + "_composition_n_0", nctx.node);
@@ -269,32 +271,34 @@ public class Network extends Core {
 		HashMap<String, HashMap<String, Tuple<Integer, BoolExpr>>> latency = new HashMap<>();
 
 		BoolExpr predicates;
-		for (int y = 0; y < policy.size(); y++) {
-			Quattro<DatatypeExpr, NetworkObject, Integer, BoolExpr> tp = policy.get(y);
-			Tuple<Integer, BoolExpr> temp = new Tuple<>(tp._3, tp._4);
-			if (collected.containsKey("" + tp._2)) {
-				if (!collected.get("" + tp._2).contains(nctx.destAddrPredicate(p_0, tp._1)))
-					collected.get("" + tp._2).add(nctx.destAddrPredicate(p_0, tp._1));
-				latency.get("" + tp._2).put("" + tp._3 + "_" + tp._4, temp);
+		for (int y = 0; y < rta.size(); y++) {
+			RoutingTable tp = rta.get(y);
+			Tuple<Integer, BoolExpr> temp = new Tuple<>(tp.latency, tp.condition);
+			if (collected.containsKey("" + tp.nextHop)) {
+				if (!collected.get("" + tp.nextHop).contains(nctx.destAddrPredicate(p_0, tp.ip)))
+					collected.get("" + tp.nextHop).add(nctx.destAddrPredicate(p_0, tp.ip));
+				latency.get("" + tp.nextHop).put("" + tp.latency + "_" + tp.condition, temp);
 			} else {
 				HashMap<String, Tuple<Integer, BoolExpr>> lists = new HashMap<>();
 				ArrayList<BoolExpr> alb = new ArrayList<BoolExpr>();
-				if (!alb.contains(nctx.destAddrPredicate(p_0, tp._1)))
-					alb.add(nctx.destAddrPredicate(p_0, tp._1));
-				collected.put("" + tp._2, alb);
+				if (!alb.contains(nctx.destAddrPredicate(p_0, tp.ip)))
+					alb.add(nctx.destAddrPredicate(p_0, tp.ip));
+				collected.put("" + tp.nextHop, alb);
 				// list contains [latency with boolean] to the actual tuple
 				// like 1_y1 with (1,y1)
-				lists.put("" + tp._3 + "_" + tp._4, temp);
+				lists.put("" + tp.latency + "_" + tp.condition, temp);
 				// latency contains element to be forwarded to with the lists
-				latency.put("" + tp._2, lists);
+				latency.put("" + tp.nextHop, lists);
 			}
-			node_dict.put("" + tp._2, tp._2);
+			node_dict.put("" + tp.nextHop, tp.nextHop);
 
 		}
 
 		// Constraint foreach rtAddr,rtNode in rt( send(node, n_0, p_0, t_0) &&
 		// Or(foreach rtAddr in rt destAddrPredicate(p_0,rtAddr)) -> n_0 ==
 		// rtNode )
+		
+		constraints.add(ctx.mkEq(nctx.y2, ctx.mkFalse()));
 		for (Map.Entry<String, ArrayList<BoolExpr>> entry : collected.entrySet()) {
 			BoolExpr[] pred = new BoolExpr[entry.getValue().size()];
 			HashMap<String, Tuple<Integer, BoolExpr>> sett = latency.get(entry.getKey());
@@ -303,6 +307,7 @@ public class Network extends Core {
 
 			for (Entry<String, Tuple<Integer, BoolExpr>> temp : sett.entrySet()) {
 
+				//constraints.add(ctx.mkEq(nctx.y1, ctx.mkFalse()));
 				BoolExpr forTheKey = temp.getValue()._2;
 				Integer latency_val = temp.getValue()._1;
 				BoolExpr mkImplies = ctx.mkImplies( forTheKey,
@@ -314,13 +319,13 @@ public class Network extends Core {
 						;
 				
 				
-				
-				softConstraints.put(mkImplies, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
+				constraints.add(mkImplies);
+				//softConstraints.put(mkImplies, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
 				// System.out.println("+++++++"+forTheKey + " implies "+" node:
 				// "+node+" adresses: to the node
 				// "+node_dict.get(entry.getKey()).getZ3Node() +"
 				// \n"+predicates+" has latency: "+latency_val);
-				System.out.println("\n SO for " + node + "\n" + mkImplies);
+				System.out.println("\n SO for " + node +"w="+latency_val + "\n" + mkImplies );
 
 			}
 

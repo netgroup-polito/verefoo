@@ -55,6 +55,7 @@ public class Checker {
 		this.nctx = nctx;
 		this.solver = ctx.mkOptimize();
 		this.constraints = new ArrayList<BoolExpr>();
+		this.constraintList =new ArrayList<BoolExpr>();
 	}
 
 	/**
@@ -93,10 +94,10 @@ public class Checker {
 		this.solver.Add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1));
 
 		// Constraint3nodeHasAddr(srcNode,p1.srcAddr)
-		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));
+		//this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));
 
 		// Constraint4p1.origin == srcNode
-		this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
+		//this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
 
 		// Constraint5nodeHasAddr(destNode,p1.destAddr)
 		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
@@ -120,7 +121,7 @@ public class Checker {
 		for (Entry<String, Handle> handle : nctx.handles.entrySet()) {
 			temp = handle.getValue();
 		}
-		System.out.println(temp.getValue());
+		if(temp!=null)System.out.println(temp.getValue());
 		model = null;
 		// assertions = this.solver.getAssertions();
 		// assertions = new BoolExpr [1] ;
@@ -136,7 +137,7 @@ public class Checker {
 	public IsolationResult checkRealIsolationProperty(NetworkObject src, NetworkObject dest) {
 		assert (net.elements.contains(src));
 		assert (net.elements.contains(dest));
-		solver.Push();
+		//solver.Push();
 		addConstraints();
 
 		Expr p0 = ctx.mkConst("check_isolation_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
@@ -182,43 +183,24 @@ public class Checker {
 		if (result == Status.SATISFIABLE) {
 			model = this.solver.getModel();
 		}
-		this.solver.Pop();
+		//this.solver.Pop();
 		return new IsolationResult(ctx, result, p0, n_0, t_1, t_0, nctx, assertions, model);
 	}
-	
+	private List<BoolExpr> constraintList;
 	private void addIsolationProperty(NetworkObject src, NetworkObject dest) {
-		assert (net.elements.contains(src));
-		assert (net.elements.contains(dest));
-
 
 		Expr p0 = ctx.mkConst("check_isolation_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
 		Expr p1 = ctx.mkConst("check_isolation_p1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
 		Expr n_0 = ctx.mkConst("check_isolation_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
 		Expr n_1 = ctx.mkConst("check_isolation_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
-		IntExpr t_0 = ctx.mkIntConst("check_isolation_t0_" + src.getZ3Node() + "_" + dest.getZ3Node());
-		IntExpr t_1 = ctx.mkIntConst("check_isolation_t1_" + src.getZ3Node() + "_" + dest.getZ3Node());
-
 	
-		this.solver.Add(ctx.mkForall(new Expr[]{n_0, p0},
+		
+		
+		constraintList.add(ctx.mkForall(new Expr[]{n_0, p0},
 				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0)),
 						ctx.mkAnd(ctx.mkNot(ctx.mkEq(src.getZ3Node(), nctx.pf.get("origin").apply(p0))))),1,null,null,null,null));
-								
-		// !(p1.origin == p0.origin)
-		//this.solver.Add(ctx.mkAnd(ctx.mkNot(ctx.mkEq(nctx.pf.get("origin").apply(p1), nctx.pf.get("origin").apply(p0)))));
-		// Constraint2 send(srcNode,n_1,p1,t_1)
-		this.solver.Add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1));
-
-		// Constraint3 nodeHasAddr(srcNode,p1.srcAddr)
-		//this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));
-
-		// Constraint4 p1.origin == srcNode
-		//this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
-
-		// Constraint5 nodeHasAddr(destNode,p1.destAddr)
-		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
-
-		// Constraint7nodeHasAddr(destNode, p0.destAddr)
-		//this.solver.Add(((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p0))));
+		constraintList.add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1));
+		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
 
 	}
 
@@ -231,8 +213,8 @@ public class Checker {
 					addIsolationProperty(src, dest);
 					break;
 			case REACHABILITY: 
-				addReachabilityProperty(src, dest);
-				break;
+					addReachabilityProperty(src, dest);
+					break;
 		}
 		
 		
@@ -247,25 +229,25 @@ public class Checker {
 		IntExpr t_1 = ctx.mkIntConst("check_reach_t1_" + src.getZ3Node() + "_" + dest.getZ3Node());
 
 		// Constraint1recv(n_0,destNode,p0,t_0)
-		this.solver.Add((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0));
+		constraintList.add((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0));
 
 		// Constraint2send(srcNode,n_1,p1,t_1)
-		this.solver.Add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1));
+		constraintList.add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1));
 
 		// Constraint3nodeHasAddr(srcNode,p1.srcAddr)
-		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));
+		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));
 
 		// Constraint4p1.origin == srcNode
-		this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
+		constraintList.add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
 
 		// Constraint5nodeHasAddr(destNode,p1.destAddr)
-		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
+		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
 
 		// Constraint6p1.origin == p0.origin
-		this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), nctx.pf.get("origin").apply(p0)));
+		constraintList.add(ctx.mkEq(nctx.pf.get("origin").apply(p1), nctx.pf.get("origin").apply(p0)));
 
 		// Constraint7nodeHasAddr(destNode, p0.destAddr)
-		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p0)));
+		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p0)));
 		
 	}
 
@@ -545,6 +527,9 @@ public class Checker {
 		net.addConstraints(solver);
 		for (NetworkObject el : net.elements)
 			el.addConstraints(solver);
+		for (BoolExpr boolExpr : constraintList) {
+			this.solver.Add(boolExpr);
+		}
 	}
 
 	public List<BoolExpr> getConstraints() {

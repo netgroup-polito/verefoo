@@ -34,6 +34,7 @@ import it.polito.verigraph.mcnet.netobjs.DumbNode;
 import it.polito.verifoo.components.Host;
 
 import it.polito.verifoo.components.Node;
+import it.polito.verigraph.mcnet.components.Checker.Prop;
 import it.polito.verigraph.mcnet.components.Core;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 
@@ -78,6 +79,17 @@ public class NetContext extends Core{
    	public  BoolExpr x22;
    	public  BoolExpr x31;
    	public  BoolExpr x32;
+
+   	public static final int a_fw1=2;
+   	public static final int c_fw1=2;
+   	public static final int a_nat=5;
+   	public static final int c_nat=5;
+   	public static final int fw1_nat=1;
+   	public static final int nat_fw2=2;
+   	public static final int fw2_b=1;
+   	public static final int nat_b=2;
+   	
+   	
    	
 	public  BoolExpr ture;
     /**
@@ -113,7 +125,7 @@ public class NetContext extends Core{
 		softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y1), "servers"));
 		softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y2), "servers"));
 		//setConditions();
-        //generate();
+        generate();
         
     }
     public HashMap<String,Handle> handles;
@@ -121,17 +133,18 @@ public class NetContext extends Core{
 		List<Host> hosts_new = new ArrayList<>(); 
 		List<Node> nodes_new = new ArrayList<>();
 		
-		hosts_new.add(new Host("yy1",30));
-		hosts_new.add(new Host("yy2",30));
+		hosts_new.add(new Host("yy1",10));
+		hosts_new.add(new Host("yy2",10));
+		hosts_new.add(new Host("yy3",10));
 	
-		nodes_new.add(new Node("xx1", 10));
-		nodes_new.add(new Node("xx2", 10));
-		nodes_new.add(new Node("xx3", 10));
-		generateAllocation(hosts_new, nodes_new);
+		nodes_new.add(new Node("xx1", 10,Node.VNFType.CACHE));
+		nodes_new.add(new Node("xx2", 10,Node.VNFType.NAT));
+		nodes_new.add(new Node("fw", 10,Node.VNFType.NAT));
+		generateAllocation(hosts_new, nodes_new, Prop.REACHABILITY);
 	}
 	
     
-    public void generateAllocation(List<Host> hosts2, List<Node> nodes2) {
+    public void generateAllocation(List<Host> hosts2, List<Node> nodes2, Prop property) {
     	this.hosts= hosts2;
     	this.nodes= nodes2;
     	

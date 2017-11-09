@@ -85,6 +85,7 @@ private_addresses.addAll(address);
         Expr p_1 = ctx.mkConst("p_1", nctx.packet);
         Expr p_2 = ctx.mkConst("p_2", nctx.packet);
         Expr p_3 = ctx.mkConst("p_3", nctx.packet);
+        Expr p_4 = ctx.mkConst("p_4", nctx.packet);
 
        /* IntExpr t_0 = ctx.mkIntConst("t_0");
         IntExpr t_1 = ctx.mkIntConst("t_1");
@@ -121,18 +122,42 @@ private_addresses.addAll(address);
                                                 ctx.mkEq(nctx.pf.get("proto").apply(p_1),nctx.pf.get("proto").apply(p_0)),
                                                 ctx.mkEq(nctx.pf.get("emailFrom").apply(p_1),nctx.pf.get("emailFrom").apply(p_0)),
                                                 ctx.mkEq(nctx.pf.get("url").apply(p_1),nctx.pf.get("url").apply(p_0)),
+                                                
+                                                ctx.mkEq(nctx.pf.get("inner_src").apply(p_1),nctx.pf.get("inner_src").apply(p_0)),
+           						               ctx.mkEq(nctx.pf.get("inner_dest").apply(p_1),nctx.pf.get("inner_dest").apply(p_0)),
+           						               ctx.mkEq(nctx.pf.get("encrypted").apply(p_1),nctx.pf.get("encrypted").apply(p_0)),
+                                                
                                                 ctx.mkEq(nctx.pf.get("options").apply(p_1),nctx.pf.get("options").apply(p_0))),1,null,null,null,null))),1,null,null,null,null));
 
-        
-        ctx.mkImplies( ctx.mkForall(new Expr[]{ p_3, a},
-        							ctx.mkAnd((BoolExpr)nctx.recv.apply(a, nat, p_3)
-        										, (BoolExpr)private_addr_func.apply(nctx.pf.get("src").apply(p_3))
-        															),1,null,null,null,null),
-        		 ctx.mkForall(new Expr[]{b},
-        				 ctx.mkAnd((BoolExpr)nctx.send.apply(nat, b, p_3)
-        				 ,ctx.mkNot((BoolExpr)private_addr_func.apply(nctx.pf.get("dest").apply(p_3)))
-        				 ,ctx.mkEq(nctx.pf.get("src").apply(p_3),natIp)
-        						 										),1,null,null,null,null));
+//        "src","dest","inner_src","inner_dest","origin","orig_body","body","seq","proto","emailFrom","url","options","encrypted"
+			BoolExpr expr = ctx.mkImplies( ctx.mkAnd((BoolExpr)nctx.recv.apply(a, nat, p_3)
+											,(BoolExpr)private_addr_func.apply(nctx.pf.get("src").apply(p_3))) ,       														
+					 ctx.mkExists(new Expr[]{b,p_4}, 
+							 ctx.mkAnd((BoolExpr)nctx.send.apply(nat, b, p_4)
+									 ,ctx.mkNot((BoolExpr)private_addr_func.apply(nctx.pf.get("dest").apply(p_4)))
+									 ,ctx.mkEq(nctx.pf.get("src").apply(p_4),natIp),
+									 ctx.mkEq(nctx.pf.get("origin").apply(p_3),nctx.pf.get("origin").apply(p_4)),
+						             ctx.mkEq(nctx.pf.get("dest").apply(p_3),nctx.pf.get("dest").apply(p_4)),
+						             ctx.mkEq(nctx.pf.get("orig_body").apply(p_3),nctx.pf.get("orig_body").apply(p_4)),
+						             ctx.mkEq(nctx.pf.get("body").apply(p_3),nctx.pf.get("body").apply(p_4)),
+						             ctx.mkEq(nctx.pf.get("seq").apply(p_3),nctx.pf.get("seq").apply(p_4)),
+						             ctx.mkEq(nctx.pf.get("proto").apply(p_3),nctx.pf.get("proto").apply(p_4)),
+						             ctx.mkEq(nctx.pf.get("emailFrom").apply(p_3),nctx.pf.get("emailFrom").apply(p_4)),
+						             ctx.mkEq(nctx.pf.get("url").apply(p_3),nctx.pf.get("url").apply(p_4)),
+						             ctx.mkEq(nctx.pf.get("inner_src").apply(p_3),nctx.pf.get("inner_src").apply(p_4)),
+						             ctx.mkEq(nctx.pf.get("inner_dest").apply(p_3),nctx.pf.get("inner_dest").apply(p_4)),
+						             ctx.mkEq(nctx.pf.get("url").apply(p_3),nctx.pf.get("url").apply(p_4)),
+						             ctx.mkEq(nctx.pf.get("encrypted").apply(p_3),nctx.pf.get("encrypted").apply(p_4)),
+						             ctx.mkEq(nctx.pf.get("options").apply(p_3),nctx.pf.get("options").apply(p_4)))
+							 
+							 
+							 ,1,null,null,null,null)
+					 
+					 
+					 
+					);
+			        				 constraints.add(ctx.mkForall(new Expr[]{a,p_3},	expr,1,null,null,null,null));	 
+        				 
         
         
      
@@ -167,14 +192,16 @@ private_addresses.addAll(address);
                                                 ctx.mkEq(nctx.pf.get("emailFrom").apply(p_1),nctx.pf.get("emailFrom").apply(p_0)),
                                                 ctx.mkEq(nctx.pf.get("url").apply(p_1),nctx.pf.get("url").apply(p_0)),
                                                 ctx.mkEq(nctx.pf.get("options").apply(p_1),nctx.pf.get("options").apply(p_0)),
+                                                ctx.mkEq(nctx.pf.get("inner_src").apply(p_1),nctx.pf.get("inner_src").apply(p_0)),
+            						               ctx.mkEq(nctx.pf.get("inner_dest").apply(p_1),nctx.pf.get("inner_dest").apply(p_0)),
+            						               ctx.mkEq(nctx.pf.get("encrypted").apply(p_1),nctx.pf.get("encrypted").apply(p_0)),
                                                 ctx.mkExists(new Expr[]{z, p_2},
                                                         ctx.mkAnd(
                                                                 
                                                                 (BoolExpr)nctx.recv.apply(z, nat, p_2),
                                                                 (BoolExpr)private_addr_func.apply(nctx.pf.get("src").apply(p_2)),
                                                                 ctx.mkEq(nctx.pf.get("src").apply(p_1),nctx.pf.get("dest").apply(p_2)),
-                                                                ctx.mkEq(nctx.pf.get("src").apply(p_0),nctx.pf.get("dest").apply(p_2)),
-                                                                ctx.mkEq(nctx.pf.get("src").apply(p_2),nctx.pf.get("dest").apply(p_0))),1,null,null,null,null)),1,null,null,null,null))),1,null,null,null,null));
+                                                                ctx.mkEq(nctx.pf.get("src").apply(p_0),nctx.pf.get("dest").apply(p_2))),1,null,null,null,null)),1,null,null,null,null))),1,null,null,null,null));
 
     }
 
@@ -184,8 +211,10 @@ private_addresses.addAll(address);
 
         for(DatatypeExpr n : internalAddress){
             constr.add(ctx.mkEq(n_0,n));
+            System.out.println("private "+ctx.mkEq(n_0,n));
         }
         BoolExpr[] constrs = new BoolExpr[constr.size()];
+        
         //Constraintprivate_addr_func(n_0) == or(n_0==n foreach internal address)
         constraints.add(ctx.mkForall(new Expr[]{n_0}, ctx.mkEq(private_addr_func.apply(n_0),ctx.mkOr(constr.toArray(constrs))),1,null,null,null,null));
     }
