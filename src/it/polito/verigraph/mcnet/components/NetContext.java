@@ -124,8 +124,8 @@ public class NetContext extends Core{
 		handles = new HashMap<String,Handle>();
 		softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y1), "servers"));
 		softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y2), "servers"));
-		//setConditions();
-        generate();
+		setConditions();
+        //generate();
         
     }
     public HashMap<String,Handle> handles;
@@ -135,11 +135,10 @@ public class NetContext extends Core{
 		
 		hosts_new.add(new Host("yy1",10));
 		hosts_new.add(new Host("yy2",10));
-		hosts_new.add(new Host("yy3",10));
 	
-		nodes_new.add(new Node("xx1", 10,Node.VNFType.CACHE));
-		nodes_new.add(new Node("xx2", 10,Node.VNFType.NAT));
-		nodes_new.add(new Node("fw", 10,Node.VNFType.NAT));
+		nodes_new.add(new Node("xx1", 5,Node.VNFType.FW));
+		nodes_new.add(new Node("xx2", 5,Node.VNFType.FW));
+		nodes_new.add(new Node("xx3", 5,Node.VNFType.FW));
 		generateAllocation(hosts_new, nodes_new, Prop.REACHABILITY);
 	}
 	

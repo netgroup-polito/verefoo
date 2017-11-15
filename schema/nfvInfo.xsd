@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="NFV">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element maxOccurs="1" minOccurs="1" ref="NF-FG"/>
+			<xs:element ref="Hosts"/>
+			<xs:element ref="Connections"/>
+			<xs:element ref="VNF-Catalog"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+    <xs:key name="hostKey">
+      <xs:selector xpath="Hosts/Host" />
+      <xs:field xpath="@name" />
+    </xs:key>
+    <xs:keyref name="HostNode" refer="hostKey">
+      <xs:selector xpath="NF-FG/Node" />
+      <xs:field xpath="@host" />
+    </xs:keyref>
+    <xs:keyref name="ConnectionSourceHost" refer="hostKey">
+      <xs:selector xpath="Connections/Connection" />
+      <xs:field xpath="@sourceHost" />
+    </xs:keyref>
+    <xs:keyref name="ConnectionDestHost" refer="hostKey">
+      <xs:selector xpath="Connections/Connection" />
+      <xs:field xpath="@destHost" />
+    </xs:keyref>
+    
+    
+	<xs:key name="F-typeKey">
+      <xs:selector xpath="VNF-Catalog/F-Type" />
+      <xs:field xpath="@FunctionalType" />
+    </xs:key>
+	<xs:keyref name="NodeF-Type" refer="F-typeKey">
+      <xs:selector xpath="NF-FG/Node/F-type" />
+      <xs:field xpath="@name" />
+    </xs:keyref>
+    
+    
+    <xs:key name="NF-FGname">
+      <xs:selector xpath="NF-FG" />
+      <xs:field xpath="@name" />
+    </xs:key>
+    <xs:keyref name="NF-FGNode" refer="NF-FGname">
+      <xs:selector xpath="NF-FG/Node" />
+      <xs:field xpath="@NF-FG" />
+    </xs:keyref>
+    <xs:keyref name="NF-FGLink" refer="NF-FGname">
+      <xs:selector xpath="NF-FG/Link" />
+      <xs:field xpath="@NF-FG" />
+    </xs:keyref>
+    
+    
+	
+	<xs:unique name="LinkName">
+      <xs:selector xpath="NF-FG/Link" />
+      <xs:field xpath="@NF-FG" />
+      <xs:field xpath="@name" />
+    </xs:unique>
+	
+	<xs:key name="NodeName">
+      <xs:selector xpath="NF-FG/Node" />
+      <xs:field xpath="@name" />
+    </xs:key>
+    <xs:keyref name="NodeHost" refer="NodeName">
+      <xs:selector xpath="Hosts/Host/NodeRef" />
+      <xs:field xpath="@node" />
+    </xs:keyref>
+    <xs:key name="NodeLink">
+      <xs:selector xpath="NF-FG/Node" />
+      <xs:field xpath="@NF-FG" />
+      <xs:field xpath="@name" />
+    </xs:key>
+    <xs:keyref name="LinkSourceNode" refer="NodeLink">
+      <xs:selector xpath="NF-FG/Link" />
+      <xs:field xpath="@NF-FG" />
+      <xs:field xpath="@sourceNode" />
+    </xs:keyref>
+    <xs:keyref name="LinkDestNode" refer="NodeLink">
+      <xs:selector xpath="NF-FG/Link" />
+      <xs:field xpath="@NF-FG" />
+      <xs:field xpath="@destNode" />
+    </xs:keyref>
+	
+</xs:element>
+<xs:element name="NF-FG">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="Node"/>
+			<xs:element maxOccurs="unbounded" minOccurs="0" ref="Link"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="Node">
+	<xs:complexType>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="host" type="xs:string" use="optional"/>
+		<xs:attribute name="NF-FG" type="xs:string" use="required"/>
+		<xs:attribute name="FunctionalType" type="F-name" use="required"/>
+	</xs:complexType>
+</xs:element>
+<xs:element name="Link">
+	<xs:complexType>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="sourceNode" type="xs:string" use="required"/>
+		<xs:attribute name="destNode" type="xs:string" use="required"/>
+		<xs:attribute name="reqLatency" type="positiveFloat"/>
+		<xs:attribute name="NF-FG" type="xs:string" use="required"/>
+	</xs:complexType>
+</xs:element>
+<xs:element name="Hosts">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" ref="Host"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+<xs:element name="Host">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="NodeRef" type="NodeRefType" maxOccurs="unbounded" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="diskStorage" type="positiveFloat" use="required"/>
+	</xs:complexType>
+</xs:element>
+<xs:element name="Connections">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" ref="Connection"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+<xs:element name="Connection">
+	<xs:complexType>
+		<xs:attribute name="sourceHost" type="xs:string" use="required"/>
+		<xs:attribute name="destHost" type="xs:string" use="required"/>
+		<xs:attribute name="avgLatency" type="positiveFloat"/>
+	</xs:complexType>
+</xs:element>
+<xs:element name="VNF-Catalog">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" ref="F-Type"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+<xs:element name="F-Type">
+	<xs:complexType>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="FunctionalType" type="F-name" use="required"/>
+		<xs:attribute name="reqDiskStorage" type="positiveFloat" use="required"/>
+	</xs:complexType>
+</xs:element>
+<xs:complexType name="NodeRefType">
+	<xs:attribute name="node" type="xs:string" use="required"/>
+</xs:complexType>
+<xs:simpleType name="F-name">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CACHE"/>
+      <xs:enumeration value="DPI"/>
+      <xs:enumeration value="FW"/>
+      <xs:enumeration value="MAIL_CLIENT"/>
+      <xs:enumeration value="MAIL_SERVER"/>
+      <xs:enumeration value="NAT"/> 
+      <xs:enumeration value="SPAM"/>
+      <xs:enumeration value="VPN"/>
+      <xs:enumeration value="WEB_CLIENT"/>
+      <xs:enumeration value="WEB_SERVER"/>
+ 	</xs:restriction>
+  </xs:simpleType>
+<xs:simpleType name="positiveFloat">
+    <xs:restriction base="xs:float">
+    	<xs:minExclusive value="0"/>
+ 	</xs:restriction>
+  </xs:simpleType>
+</xs:schema>

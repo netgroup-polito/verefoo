@@ -320,11 +320,7 @@ public class Network extends Core {
 				
 				
 				constraints.add(mkImplies);
-				//softConstraints.put(mkImplies, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
-				// System.out.println("+++++++"+forTheKey + " implies "+" node:
-				// "+node+" adresses: to the node
-				// "+node_dict.get(entry.getKey()).getZ3Node() +"
-				// \n"+predicates+" has latency: "+latency_val);
+				
 				System.out.println("\n SO for " + node +"w="+latency_val + "\n" + mkImplies );
 
 			}
