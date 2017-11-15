@@ -4,7 +4,7 @@
    :format: latex
 ..
 
-Let’s look at how to deploy **VeriGraph** on Apache Tomcat. If you’re only interested in creating gRPC API, you can skip this section and go `here <http://https://github.com/netgroup-polito/verigraph/blob/master/README_gRPC.md>`_
+Let’s look at how to deploy **VeriGraph** on Apache Tomcat. If you’re only interested in creating gRPC API, you can skip this section and go `here <https://github.com/netgroup-polito/verigraph/blob/master/README_gRPC.md>`_
 (though you might find it useful if Tomcat is not yet installed!).
 
 How to deploy **VeriGraph** on Apache Tomcat:
