@@ -89,6 +89,7 @@ public class NetContext extends Core{
    	public static final int fw2_b=1;
    	public static final int nat_b=2;
    	
+   	public int latencyAll;
    	
    	
 	public  BoolExpr ture;
@@ -125,15 +126,22 @@ public class NetContext extends Core{
 		softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y1), "servers"));
 		softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y2), "servers"));
 		setConditions();
+		latencyAll= 0;
         //generate();
         
     }
+    
+    public int addLatency(int latencyAll){
+    	this.latencyAll=this.latencyAll+latencyAll;
+    	return latencyAll;
+    }
+    
     public HashMap<String,Handle> handles;
     private void generate() {
 		List<Host> hosts_new = new ArrayList<>(); 
 		List<Node> nodes_new = new ArrayList<>();
 		
-		hosts_new.add(new Host("yy1",10));
+		hosts_new.add(new Host("yy1",5));
 		hosts_new.add(new Host("yy2",10));
 	
 		nodes_new.add(new Node("xx1", 5,Node.VNFType.FW));
@@ -189,8 +197,8 @@ public class NetContext extends Core{
     	int capacity_x2 = 10;
     	int capacity_x3 = 10;
     	
-    	int capacity_y1 = 30;
-    	int capacity_y2 = 40;
+    	int capacity_y1 = 20;
+    	int capacity_y2 = 20;
     	
 		x11 = ctx.mkBoolConst("x11");
 		x12 = ctx.mkBoolConst("x12");

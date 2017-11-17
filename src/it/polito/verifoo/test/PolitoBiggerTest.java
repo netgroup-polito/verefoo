@@ -54,7 +54,7 @@ import it.polito.verigraph.mcnet.netobjs.PolitoMailServer;
  *..........................|										<p/>
  *...................| ERR FUNCTION |								<p/>
  */
-public class PolitoMultipathTest {
+public class PolitoBiggerTest {
 	
 	public Checker check;
 	public AclFirewall x1;
@@ -70,7 +70,7 @@ public class PolitoMultipathTest {
 	public int y2_b= -100;
 	
 	
-	public	PolitoMultipathTest(Context ctx){
+	public	PolitoBiggerTest(Context ctx){
 	
 		
 			NetContext nctx = new NetContext (ctx,

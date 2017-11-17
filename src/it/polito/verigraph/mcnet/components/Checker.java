@@ -121,7 +121,8 @@ public class Checker {
 		for (Entry<String, Handle> handle : nctx.handles.entrySet()) {
 			temp = handle.getValue();
 		}
-		if(temp!=null)System.out.println(temp.getValue());
+		if(temp!=null) System.out.println(nctx.latencyAll-Integer.parseInt(temp.getValue()+""));
+		if(temp!=null) System.out.println("Weight of falsified constraints:"+temp.getValue());
 		model = null;
 		// assertions = this.solver.getAssertions();
 		// assertions = new BoolExpr [1] ;
