@@ -70,13 +70,20 @@ public class Polito_Multipath{
     	IsolationResult ret;
     	
     	p.resetZ3(); 	
-    	PolitoMultipathTest model = new PolitoMultipathTest(p.ctx);
+    	//PolitoMultipathTest model = new PolitoMultipathTest(p.ctx);
+//    	Polito3nodes3hosts model = new Polito3nodes3hosts(p.ctx);
+    	Polito5nodes7hosts model = new Polito5nodes7hosts(p.ctx);
     	
     	
 //    	ret = model.check.CheckIsolationProperty(model.politoErrFunction, model.politoMailClient);
 //    	ret = model.check.CheckIsolationProperty(model.politoMailClient, model.politoMailServer);
 //    	ret = model.check.CheckIsolationProperty(model.politoMailServer, model.politoErrFunction);
+    	long startTime = System.currentTimeMillis();
     	ret = model.check.checkIsolationProperty(model.a,model.b );
+		long endTime = System.currentTimeMillis();
+		long totalTime = (endTime - startTime);
+		System.out.println("Total execution time: " + totalTime + " ms");
+    	
     	
     
     	

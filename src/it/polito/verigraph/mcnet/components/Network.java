@@ -80,8 +80,7 @@ public class Network extends Core {
 			for (Entry<BoolExpr, Tuple<Integer, String>> entry : softConstraints.entrySet()) {
 				// String key = entry.getKey();
 				Tuple<Integer, String> value = entry.getValue();
-				System.out.println("======adding soft for " + entry.getKey() + "\n is " + entry.getValue()._1
-						+ " node is " + entry.getValue()._2 + " ====== ");
+				///System.out.println("======adding soft for " + entry.getKey() + "\n is " + entry.getValue()._1						+ " node is " + entry.getValue()._2 + " ====== ");
 				Handle temp = solver.AssertSoft((entry.getKey()), entry.getValue()._1, "opt");
 				nctx.handles.put("handle_" + entry.getValue()._2, temp);
 
@@ -301,7 +300,7 @@ public class Network extends Core {
 		for (Map.Entry<String, ArrayList<BoolExpr>> entry : collected.entrySet()) {
 			BoolExpr[] pred = new BoolExpr[entry.getValue().size()];
 			HashMap<String, Tuple<Integer, BoolExpr>> sett = latency.get(entry.getKey());
-			System.out.println("-------for " + entry.getKey() + " we have " + sett.size() + " for the node " + node);
+			///System.out.println("-------for " + entry.getKey() + " we have " + sett.size() + " for the node " + node);
 			predicates = ctx.mkOr(entry.getValue().toArray(pred));
 
 			for (Entry<String, Tuple<Integer, BoolExpr>> temp : sett.entrySet()) {
@@ -316,7 +315,7 @@ public class Network extends Core {
 								,1, null, null, null, null))
 						;
 				constraints.add(mkImplies);
-				System.out.println("\n SO for " + node +"w="+latency_val + "\n" + mkImplies );
+				///System.out.println("\n SO for " + node +"w="+latency_val + "\n" + mkImplies );
 			}
 		}
 	}
@@ -358,11 +357,11 @@ public class Network extends Core {
 		// Constraint foreach rtAddr,rtNode in rt( send(node, n_0, p_0, t_0) &&
 		// Or(foreach rtAddr in rt destAddrPredicate(p_0,rtAddr)) -> n_0 ==
 		// rtNode )
-		
+		ArrayList<IntExpr> routes = new ArrayList<>();
 		for (Map.Entry<String, ArrayList<BoolExpr>> entry : collected.entrySet()) {
 			BoolExpr[] pred = new BoolExpr[entry.getValue().size()];
 			HashMap<String, Tuple<Integer, BoolExpr>> sett = latency.get(entry.getKey());
-			System.out.println("-------for " + entry.getKey() + " we have " + sett.size() + " for the node " + node);
+			///System.out.println("-------for " + entry.getKey() + " we have " + sett.size() + " for the node " + node);
 			predicates = ctx.mkOr(entry.getValue().toArray(pred));
 
 			for (Entry<String, Tuple<Integer, BoolExpr>> temp : sett.entrySet()) {
@@ -376,9 +375,12 @@ public class Network extends Core {
 				,1, null, null, null, null);
 				BoolExpr mkImplies = ctx.mkImplies( initial,forTheKey);
 				softConstraints.put(mkImplies, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
-				constraints.add(initial);
-				System.out.println("\n SO for " + node +"w="+latency_val + "\n" + mkImplies );
+				//constraints.add(initial);
+				///System.out.println("\n SO for " + node +"w="+latency_val + "\n" + mkImplies );
+				routes.add(nctx.bool_to_int(mkImplies));
 			}
+			IntExpr list[] = new IntExpr[routes.size()];
+			constraints.add(ctx.mkEq(ctx.mkAdd(routes.toArray(list)), ctx.mkInt(1)));
 		}
 	}
 

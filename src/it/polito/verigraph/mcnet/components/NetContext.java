@@ -129,6 +129,7 @@ public class NetContext extends Core{
 	public IntExpr bool_to_int(BoolExpr value) {
 		IntExpr integer = ctx.mkIntConst("integer_" + value);
 
+
 		constraints.add((ctx.mkImplies(value, ctx.mkEq(integer, ctx.mkInt(1)))));
 		constraints.add((ctx.mkImplies(ctx.mkNot(value), ctx.mkEq(integer, ctx.mkInt(0)))));
 
@@ -151,7 +152,7 @@ public class NetContext extends Core{
             policy.addConstraints(solver);
         }
         for (Tuple<BoolExpr, String> t : softConstraints) {
-			solver.AssertSoft(t._1, 1, t._2);
+			solver.AssertSoft(t._1, -1, t._2);
 		}  
     }
 
