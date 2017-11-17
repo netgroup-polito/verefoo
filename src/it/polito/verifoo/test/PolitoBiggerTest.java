@@ -66,9 +66,23 @@ public class PolitoBiggerTest {
 	public int a_y1 = -10;
 	public int a_y2 = -1;
 	public int y1_y2= -2;
-	public int y1_b= -10;
-	public int y2_b= -100;
+	public int y1_y3= -2;
+	public int y2_y1= -100;
+	public int y2_y3= -100;
+	public int y3_b= -100;
 	
+	
+	public  BoolExpr y1;
+   	public  BoolExpr y2;
+   	public  BoolExpr y3;
+   	
+   	
+   	public  BoolExpr x11;
+   	public  BoolExpr x12;
+   	public  BoolExpr x21;
+   	public  BoolExpr x22;
+   	public  BoolExpr x31;
+   	public  BoolExpr x32;
 	
 	public	PolitoBiggerTest(Context ctx){
 	
@@ -105,25 +119,24 @@ public class PolitoBiggerTest {
 
 		    net.setAddressMappings(adm);
 
+		    //for each Link from Client to Servers
 		    ArrayList<RoutingTable> rtClient = new ArrayList<RoutingTable>();
-			rtClient.add(new RoutingTable(nctx.am.get("ip_b"), x1, nctx.addLatency(a_y1), nctx.x11));
-			rtClient.add(new RoutingTable(nctx.am.get("ip_b"), x1, nctx.addLatency(a_y2), nctx.x12));
+		    //Client sends always to x1 (first middlebox in the graph)
+			rtClient.add(new RoutingTable(nctx.am.get("ip_b"), x1, nctx.addLatency(a_y1), x11));
+			rtClient.add(new RoutingTable(nctx.am.get("ip_b"), x1, nctx.addLatency(a_y2), x12));
 						
 			ArrayList<RoutingTable> rtX1 = new ArrayList<RoutingTable>();
-			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(0),ctx.mkAnd(nctx.x11,nctx.x21)));
-			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(y1_y2),ctx.mkAnd(nctx.x11,nctx.x22)));
-			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(y1_y2),ctx.mkAnd(nctx.x12,nctx.x21)));
-			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(0),ctx.mkAnd(nctx.x12,nctx.x22)));
+			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(0),ctx.mkAnd(x11,x21)));
+			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(0),ctx.mkAnd(x21,x22)));
+			
+			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(y1_y2),ctx.mkAnd(x11,x22)));
+			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(y1_y2),ctx.mkAnd(x11,x22)));
 								
 			ArrayList<RoutingTable> rtX2 = new ArrayList<RoutingTable>();
-			rtX2.add(new RoutingTable(nctx.am.get("ip_b"), x3,nctx.addLatency(0),ctx.mkAnd(nctx.x21,nctx.x31)));
-			rtX2.add(new RoutingTable(nctx.am.get("ip_b"), x3,nctx.addLatency(y1_y2),ctx.mkAnd(nctx.x21,nctx.x32)));
-			rtX2.add(new RoutingTable(nctx.am.get("ip_b"), x3,nctx.addLatency(y1_y2),ctx.mkAnd(nctx.x22,nctx.x31)));
-			rtX2.add(new RoutingTable(nctx.am.get("ip_b"), x3,nctx.addLatency(0),ctx.mkAnd(nctx.x22,nctx.x32)));
+			rtX2.add(new RoutingTable(nctx.am.get("ip_b"), x3,nctx.addLatency(0),ctx.mkAnd(x22,x32)));
 		
 			ArrayList<RoutingTable> rtX3 = new ArrayList<RoutingTable>();
-			rtX3.add(new RoutingTable(nctx.am.get("ip_b"), b,nctx.addLatency(y1_b),nctx.x31));
-			rtX3.add(new RoutingTable(nctx.am.get("ip_b"), b,nctx.addLatency(y2_b),nctx.x32));
+//			rtX3.add(new RoutingTable(nctx.am.get("ip_b"), b,nctx.addLatency(y2_b),nctx.x32));
 			
 		
 			ArrayList<RoutingTable> rtb = new ArrayList<RoutingTable>();

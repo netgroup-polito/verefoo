@@ -23,10 +23,13 @@ package it.polito.verifoo.test;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
+import com.microsoft.z3.Optimize.Handle;
 
 import it.polito.verifoo.components.RoutingTable;
 import it.polito.verigraph.mcnet.components.Checker;
@@ -69,16 +72,27 @@ public class PolitoMultipathTest {
 	public int y1_b= -10;
 	public int y2_b= -100;
 	
+	public  BoolExpr y1;
+   	public  BoolExpr y2;
+   	public  BoolExpr y3;
+   	
+   	
+   	public  BoolExpr x11;
+   	public  BoolExpr x12;
+   	public  BoolExpr x21;
+   	public  BoolExpr x22;
+   	public  BoolExpr x31;
+   	public  BoolExpr x32;
 	
 	public	PolitoMultipathTest(Context ctx){
-	
+			
 		
 			NetContext nctx = new NetContext (ctx,
 					new String[]{"a", "x1","x2","x3", "b"},
 					new String[]{"ip_a", "ip_x1", "ip_x2", "ip_x3", "ip_b"});
 			Network net = new Network (ctx,new Object[]{nctx});
 			
-			
+			setConditions(ctx,nctx);
 			x1 = new AclFirewall(ctx, new Object[]{nctx.nm.get("x1"), net, nctx});
 			x2 = new AclFirewall(ctx, new Object[]{nctx.nm.get("x2"), net, nctx});
 			x3 = new AclFirewall(ctx, new Object[]{nctx.nm.get("x3"), net, nctx});
@@ -106,24 +120,24 @@ public class PolitoMultipathTest {
 		    net.setAddressMappings(adm);
 
 		    ArrayList<RoutingTable> rtClient = new ArrayList<RoutingTable>();
-			rtClient.add(new RoutingTable(nctx.am.get("ip_b"), x1, nctx.addLatency(a_y1), nctx.x11));
-			rtClient.add(new RoutingTable(nctx.am.get("ip_b"), x1, nctx.addLatency(a_y2), nctx.x12));
+			rtClient.add(new RoutingTable(nctx.am.get("ip_b"), x1, nctx.addLatency(a_y1), x11));
+			rtClient.add(new RoutingTable(nctx.am.get("ip_b"), x1, nctx.addLatency(a_y2), x12));
 						
 			ArrayList<RoutingTable> rtX1 = new ArrayList<RoutingTable>();
-			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(0),ctx.mkAnd(nctx.x11,nctx.x21)));
-			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(y1_y2),ctx.mkAnd(nctx.x11,nctx.x22)));
-			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(y1_y2),ctx.mkAnd(nctx.x12,nctx.x21)));
-			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(0),ctx.mkAnd(nctx.x12,nctx.x22)));
+			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(0),ctx.mkAnd(x11,x21)));
+			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(y1_y2),ctx.mkAnd(x11,x22)));
+			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(y1_y2),ctx.mkAnd(x12,x21)));
+			rtX1.add(new RoutingTable(nctx.am.get("ip_b"), x2,nctx.addLatency(0),ctx.mkAnd(x12,x22)));
 								
 			ArrayList<RoutingTable> rtX2 = new ArrayList<RoutingTable>();
-			rtX2.add(new RoutingTable(nctx.am.get("ip_b"), x3,nctx.addLatency(0),ctx.mkAnd(nctx.x21,nctx.x31)));
-			rtX2.add(new RoutingTable(nctx.am.get("ip_b"), x3,nctx.addLatency(y1_y2),ctx.mkAnd(nctx.x21,nctx.x32)));
-			rtX2.add(new RoutingTable(nctx.am.get("ip_b"), x3,nctx.addLatency(y1_y2),ctx.mkAnd(nctx.x22,nctx.x31)));
-			rtX2.add(new RoutingTable(nctx.am.get("ip_b"), x3,nctx.addLatency(0),ctx.mkAnd(nctx.x22,nctx.x32)));
+			rtX2.add(new RoutingTable(nctx.am.get("ip_b"), x3,nctx.addLatency(0),ctx.mkAnd(x21,x31)));
+			rtX2.add(new RoutingTable(nctx.am.get("ip_b"), x3,nctx.addLatency(y1_y2),ctx.mkAnd(x21,x32)));
+			rtX2.add(new RoutingTable(nctx.am.get("ip_b"), x3,nctx.addLatency(y1_y2),ctx.mkAnd(x22,x31)));
+			rtX2.add(new RoutingTable(nctx.am.get("ip_b"), x3,nctx.addLatency(0),ctx.mkAnd(x22,x32)));
 		
 			ArrayList<RoutingTable> rtX3 = new ArrayList<RoutingTable>();
-			rtX3.add(new RoutingTable(nctx.am.get("ip_b"), b,nctx.addLatency(y1_b),nctx.x31));
-			rtX3.add(new RoutingTable(nctx.am.get("ip_b"), b,nctx.addLatency(y2_b),nctx.x32));
+			rtX3.add(new RoutingTable(nctx.am.get("ip_b"), b,nctx.addLatency(y1_b),x31));
+			rtX3.add(new RoutingTable(nctx.am.get("ip_b"), b,nctx.addLatency(y2_b),x32));
 			
 		
 			ArrayList<RoutingTable> rtb = new ArrayList<RoutingTable>();
@@ -139,10 +153,101 @@ public class PolitoMultipathTest {
 	        x2.addAcls(acl);
 	        x3.addAcls(acl);
 	        acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_a"),nctx.am.get("ip_b")));
-	        
-		    net.attach(a, b, x1,x2,x3);
-		    
-		  
+
+	        net.attach(a, b, x1,x2,x3);
 		    check = new Checker(ctx,nctx,net);
 	}
+
+	  private void setConditions(Context ctx, NetContext nctx) {
+		  	y1 = ctx.mkBoolConst("y1");
+			y2 = ctx.mkBoolConst("y2");
+			y3 = ctx.mkBoolConst("y3");
+			
+			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y1), "servers"));
+			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y2), "servers"));
+			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y3), "servers"));
+			
+		  
+	    	int capacity_x1 = 10;
+	    	int capacity_x2 = 10;
+	    	int capacity_x3 = 10;
+	    	
+	    	int capacity_y1 = 20;
+	    	int capacity_y2 = 20;
+	    	
+			x11 = ctx.mkBoolConst("x11");
+			x12 = ctx.mkBoolConst("x12");
+			x21 = ctx.mkBoolConst("x21");
+			x22 = ctx.mkBoolConst("x22");
+			x31 = ctx.mkBoolConst("x31");
+			x32 = ctx.mkBoolConst("x32");
+
+			y1 = ctx.mkBoolConst("y1");
+			y2 = ctx.mkBoolConst("y2");
+
+			nctx.constraints.add(ctx.mkEq(ctx.mkAdd(nctx.bool_to_int(x11),nctx.bool_to_int(x12)), ctx.mkInt(1)));
+			nctx.constraints.add(ctx.mkEq(ctx.mkAdd(nctx.bool_to_int(x21),nctx.bool_to_int(x22)), ctx.mkInt(1)));
+			nctx.constraints.add(ctx.mkEq(ctx.mkAdd(nctx.bool_to_int(x31),nctx.bool_to_int(x32)), ctx.mkInt(1)));
+			
+			nctx.constraints.add(ctx.mkOr(ctx.mkImplies(y1, x11),ctx.mkImplies(y1, x21),ctx.mkImplies(y1, x31)));
+			nctx.constraints.add(ctx.mkOr(ctx.mkImplies(y2, x12),ctx.mkImplies(y2, x22),ctx.mkImplies(y2, x32)));
+			
+		
+			ArithExpr leftSide = 
+				ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), nctx.bool_to_int(x11)),
+						ctx.mkMul(ctx.mkInt(capacity_x2), nctx.bool_to_int(x21)),
+						ctx.mkMul(ctx.mkInt(capacity_x3), nctx.bool_to_int(x31)));
+			nctx.constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y1), nctx.bool_to_int(y1))));
+			
+			leftSide = ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), nctx.bool_to_int(x12)),ctx.mkMul(ctx.mkInt(capacity_x2), nctx.bool_to_int(x22)),ctx.mkMul(ctx.mkInt(capacity_x3), nctx.bool_to_int(x32)));
+			nctx.constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y2), nctx.bool_to_int(y2))));
+			
+			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y1), "num_servers"));
+			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y2), "num_servers"));
+	    	
+	    	
+		}
+
+	  //this is how you can setConditions() automatically using the hosts and nodes
+	  /* public void generateAllocation(List<Host> hosts2, List<Node> nodes2, Prop property) {
+  	this.hosts= hosts2;
+  	this.nodes= nodes2;
+  	
+  	for (Host host : hosts) {
+			HashMap<String,BoolExpr> allocatedBools = new HashMap<String,BoolExpr>();
+			ArrayList<ArithExpr> leftSide = new ArrayList<>();
+			ArrayList<BoolExpr> ors = new ArrayList<>();
+			
+			host.setBool(ctx.mkBoolConst(host.getName()));
+			for (Node node : nodes2) {
+				//x1_y1 x2_y2
+				String boolName = new String (host.getName()+"_"+node.getName());
+				BoolExpr expr = ctx.mkBoolConst(boolName);
+				node.getHosts().add(expr);
+				allocatedBools.put(boolName, expr);
+				
+				ors.add(ctx.mkImplies( host.getBool(),expr));
+				leftSide.add(ctx.mkMul(ctx.mkInt(node.getDisk()),bool_to_int(expr)));
+			}
+			
+			host.setAllocatedBools(allocatedBools);
+			constraints.add(ctx.mkOr(ors.toArray(new BoolExpr[ors.size()])));
+			constraints.add(ctx.mkLe(ctx.mkAdd(leftSide.toArray(new ArithExpr[leftSide.size()])), ctx.mkMul(ctx.mkInt(host.getDisk()),bool_to_int(host.getBool()))));
+			softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(host.getBool()), "servers"));
+		}
+  	
+  	for (Node node : nodes) {
+  		ArrayList<ArithExpr> ones = new ArrayList<>();
+			for (BoolExpr expr : node.getHosts()) {
+				ones.add(bool_to_int(expr));
+			}
+			BoolExpr mkEq = ctx.mkEq(ctx.mkAdd(ones.toArray(new ArithExpr[ones.size()])), ctx.mkInt(1));
+			//System.out.println(mkEq);
+			constraints.add(mkEq);
+		}
+  	
+  	
+  
+  }*/
+	  
 }

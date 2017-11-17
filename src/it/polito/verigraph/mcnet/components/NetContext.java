@@ -45,8 +45,8 @@ import it.polito.verigraph.mcnet.components.NetworkObject;
 public class NetContext extends Core{
 
 
-    List<BoolExpr> constraints;
-    List<Tuple<BoolExpr, String>> softConstraints;
+    public List<BoolExpr> constraints;
+    public List<Tuple<BoolExpr, String>> softConstraints;
     List<Core> policies;
 
     public HashMap<String,NetworkObject> nm; //list of nodes, callable by node name
@@ -68,17 +68,7 @@ public class NetContext extends Core{
     public List<Host> hosts;
     public List<Node> nodes;
     
-	public  BoolExpr y1;
-   	public  BoolExpr y2;
-   	public  BoolExpr y3;
-   	
-   	
-   	public  BoolExpr x11;
-   	public  BoolExpr x12;
-   	public  BoolExpr x21;
-   	public  BoolExpr x22;
-   	public  BoolExpr x31;
-   	public  BoolExpr x32;
+
 
    	public static final int a_fw1=2;
    	public static final int c_fw1=2;
@@ -118,16 +108,9 @@ public class NetContext extends Core{
         
         //variable true that is always true
         ture = ctx.mkBoolConst("ture");
-		//constraints.add(ctx.mkEq(ture, ctx.mkTrue()));
         baseCondition();
-        y1 = ctx.mkBoolConst("y1");
-		y2 = ctx.mkBoolConst("y2");
-		handles = new HashMap<String,Handle>();
-		softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y1), "servers"));
-		softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y2), "servers"));
-		setConditions();
+        handles = new HashMap<String,Handle>();
 		latencyAll= 0;
-        //generate();
         
     }
     
@@ -137,111 +120,14 @@ public class NetContext extends Core{
     }
     
     public HashMap<String,Handle> handles;
-    private void generate() {
-		List<Host> hosts_new = new ArrayList<>(); 
-		List<Node> nodes_new = new ArrayList<>();
-		
-		hosts_new.add(new Host("yy1",5));
-		hosts_new.add(new Host("yy2",10));
-	
-		nodes_new.add(new Node("xx1", 5,Node.VNFType.FW));
-		nodes_new.add(new Node("xx2", 5,Node.VNFType.FW));
-		nodes_new.add(new Node("xx3", 5,Node.VNFType.FW));
-		generateAllocation(hosts_new, nodes_new, Prop.REACHABILITY);
-	}
-	
+  
     
-    public void generateAllocation(List<Host> hosts2, List<Node> nodes2, Prop property) {
-    	this.hosts= hosts2;
-    	this.nodes= nodes2;
-    	
-    	for (Host host : hosts) {
-			HashMap<String,BoolExpr> allocatedBools = new HashMap<String,BoolExpr>();
-			ArrayList<ArithExpr> leftSide = new ArrayList<>();
-			ArrayList<BoolExpr> ors = new ArrayList<>();
-			
-			host.setBool(ctx.mkBoolConst(host.getName()));
-			for (Node node : nodes2) {
-				//x1_y1 x2_y2
-				String boolName = new String (host.getName()+"_"+node.getName());
-				BoolExpr expr = ctx.mkBoolConst(boolName);
-				node.getHosts().add(expr);
-				allocatedBools.put(boolName, expr);
-				
-				ors.add(ctx.mkImplies( host.getBool(),expr));
-				leftSide.add(ctx.mkMul(ctx.mkInt(node.getDisk()),bool_to_int(expr)));
-			}
-			
-			host.setAllocatedBools(allocatedBools);
-			constraints.add(ctx.mkOr(ors.toArray(new BoolExpr[ors.size()])));
-			constraints.add(ctx.mkLe(ctx.mkAdd(leftSide.toArray(new ArithExpr[leftSide.size()])), ctx.mkMul(ctx.mkInt(host.getDisk()),bool_to_int(host.getBool()))));
-			softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(host.getBool()), "servers"));
-		}
-    	
-    	for (Node node : nodes) {
-    		ArrayList<ArithExpr> ones = new ArrayList<>();
-			for (BoolExpr expr : node.getHosts()) {
-				ones.add(bool_to_int(expr));
-			}
-			BoolExpr mkEq = ctx.mkEq(ctx.mkAdd(ones.toArray(new ArithExpr[ones.size()])), ctx.mkInt(1));
-			//System.out.println(mkEq);
-			constraints.add(mkEq);
-		}
-    	
-    	
+  
     
-    }
-    
-    private void setConditions() {
-    	int capacity_x1 = 10;
-    	int capacity_x2 = 10;
-    	int capacity_x3 = 10;
-    	
-    	int capacity_y1 = 20;
-    	int capacity_y2 = 20;
-    	
-		x11 = ctx.mkBoolConst("x11");
-		x12 = ctx.mkBoolConst("x12");
-		x21 = ctx.mkBoolConst("x21");
-		x22 = ctx.mkBoolConst("x22");
-		x31 = ctx.mkBoolConst("x31");
-		x32 = ctx.mkBoolConst("x32");
+  
 
-		y1 = ctx.mkBoolConst("y1");
-		y2 = ctx.mkBoolConst("y2");
-
-		handles = new HashMap<String,Handle>();
-
-		constraints.add(ctx.mkEq(ctx.mkAdd(bool_to_int(x11),bool_to_int(x12)), ctx.mkInt(1)));
-		constraints.add(ctx.mkEq(ctx.mkAdd(bool_to_int(x21),bool_to_int(x22)), ctx.mkInt(1)));
-		constraints.add(ctx.mkEq(ctx.mkAdd(bool_to_int(x31),bool_to_int(x32)), ctx.mkInt(1)));
-		
-		constraints.add(ctx.mkOr(ctx.mkImplies(y1, x11),ctx.mkImplies(y1, x21),ctx.mkImplies(y1, x31)));
-		constraints.add(ctx.mkOr(ctx.mkImplies(y2, x12),ctx.mkImplies(y2, x22),ctx.mkImplies(y2, x32)));
-		
-		
-	
-		ArithExpr leftSide = 
-			ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), bool_to_int(x11)),
-					ctx.mkMul(ctx.mkInt(capacity_x2), bool_to_int(x21)),
-					ctx.mkMul(ctx.mkInt(capacity_x3), bool_to_int(x31)));
-		constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y1), bool_to_int(y1))));
-		
-		leftSide = ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), bool_to_int(x12)),ctx.mkMul(ctx.mkInt(capacity_x2), bool_to_int(x22)),ctx.mkMul(ctx.mkInt(capacity_x3), bool_to_int(x32)));
-		constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y2), bool_to_int(y2))));
-		
-		softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y1), "num_servers"));
-		softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y2), "num_servers"));
-    	
-    	
-	}
-
-	private IntExpr bool_to_int(BoolExpr value) {
+	public IntExpr bool_to_int(BoolExpr value) {
 		IntExpr integer = ctx.mkIntConst("integer_" + value);
-
-		// mkOptimize.Add(ctx.mkEq(integer, ctx.mkInt(0)));
-		// mkOptimize.Add(ctx.mkImplies(value, ctx.mkEq(integer,
-		// ctx.mkInt(1))));
 
 		constraints.add((ctx.mkImplies(value, ctx.mkEq(integer, ctx.mkInt(1)))));
 		constraints.add((ctx.mkImplies(ctx.mkNot(value), ctx.mkEq(integer, ctx.mkInt(0)))));

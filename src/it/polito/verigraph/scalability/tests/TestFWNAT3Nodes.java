@@ -42,7 +42,7 @@ public class TestFWNAT3Nodes {
     public PolitoNat nat;
 
     public  TestFWNAT3Nodes(){
-        ctx = new Context();
+     /*   ctx = new Context();
 
         NetContext nctx  = new NetContext (ctx,new String[]{"a", "b","c", "nat","fw2","fw1"},
                                                 new String[]{"ip_a", "ip_b", "ip_c","ip_nat", "ip_fw2", "ip_fw1"});
@@ -120,7 +120,7 @@ public class TestFWNAT3Nodes {
         ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl2 = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
         fw1.addAcls(acl2);
         
-        check = new Checker(ctx,nctx,net);
+        check = new Checker(ctx,nctx,net);*/
 }
     
     public void resetZ3() throws Z3Exception{

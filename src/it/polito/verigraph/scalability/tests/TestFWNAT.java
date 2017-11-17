@@ -42,7 +42,7 @@ public class TestFWNAT {
     public PolitoNat nat;
 
     public  TestFWNAT(){
-        ctx = new Context();
+        /*ctx = new Context();
 
         NetContext nctx = new NetContext (ctx,new String[]{"a", "b", "nat","fw2","fw1"},
                                                 new String[]{"ip_a", "ip_b", "ip_nat", "ip_fw2", "ip_fw1"});
@@ -107,7 +107,7 @@ public class TestFWNAT {
         acl2.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_fw1"),nctx.am.get("ip_a")));
         fw1.addAcls(acl2);
         
-        check = new Checker(ctx,nctx,net);
+        check = new Checker(ctx,nctx,net);*/
 }
     
     public void resetZ3() throws Z3Exception{
