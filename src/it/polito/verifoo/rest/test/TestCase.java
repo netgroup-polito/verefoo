@@ -114,7 +114,7 @@ public class TestCase {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
         Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
         u.setSchema(schema);
-        u.unmarshal( new FileInputStream( "./testfile/nfvNoXML.xml" ) );
+        u.unmarshal( new FileInputStream( "./testfile/nfvNoXML.xml.txt" ) );
         fail("The test not trown an exception");
 	}
 	@Test(expected=JAXBException.class)
