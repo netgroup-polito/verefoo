@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,22 +50,23 @@ public class VerifooProxy {
 			adm = new ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>>();
 			nodes.forEach(this::generateAddressMapping);
 		    net.setAddressMappings(adm);
-		    //TODO routing table and acl
-		    checkNffg();
-		    netobjs.entrySet().forEach(e ->  {
-							    	net.attach(e.getValue());
-							    }
-		    );
+		    checkNffg();		 
+		    netobjs.forEach(this::attachToNet);
 		    nodes.forEach(this::generateAcl);
 		    check = new Checker(ctx,nctx,net);
 	    }
 	    
+	    private void attachToNet(Node n,NetworkObject obj){
+	    	net.attach(obj);
+	    }
 	    private FName getFunctionalType(String vnf){
 	    	return this.vnfCat.stream().filter(nf -> nf.getName().compareTo(vnf)==0).findFirst().get().getFunctionalType(); 
 	    }
-	    
+	    private VNF getVNF(Node n){
+			return this.vnfCat.stream().filter(nf->nf.getName().compareTo(n.getVNF())==0).findFirst().get();
+	    }
 		private void generateAcl(Node n){
-			VNF vnf=this.vnfCat.stream().filter(nf->nf.getName().compareTo(n.getVNF())==0).findFirst().get();
+			VNF vnf=getVNF(n);
 			if(vnf.getFunctionalType().equals(FName.FW)){
 				vnf.getConfiguration().forEach((c)->{
 					if(c.getName()!=null && c.getValue() !=null && !c.getName().isEmpty()&& !c.getValue().isEmpty()){
@@ -92,11 +91,7 @@ public class VerifooProxy {
 			FName ftype=getFunctionalType(n.getVNF());
 			switch (ftype) {
 				case FW:{
-					//TODO
-					//ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
-					//TODO ASSAI
 					netobjs.put(n,new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
-				    
 					break;
 				}
 				case CLASSIFIER:{					
@@ -108,19 +103,27 @@ public class VerifooProxy {
 					break;
 				}
 				case ENDHOST:{
+					//TODO
 					netobjs.put(n,new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
 					break;
 				}
 				case SPAM:{
-					netobjs.put(n,new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
+					PolitoAntispam spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					netobjs.put(n,spam);
+					int[] blacklist=getVNF(n).getConfiguration().stream().map(ConfigurationType::getValue).mapToInt(s->Integer.parseInt(s)).toArray();
+					spam.installAntispam(blacklist);
 					break;
 				}
 				case CACHE:{
+					//TODO
 					netobjs.put(n,new PolitoCache(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
 					break;
 				}
 				case IDS:{
-					netobjs.put(n,new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
+					PolitoIDS ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					netobjs.put(n,ids);
+					int[] blacklist=getVNF(n).getConfiguration().stream().map(ConfigurationType::getValue).mapToInt(s->Integer.parseInt(s)).toArray();
+					ids.installIDS(blacklist);
 					break;
 				}
 				case MAIL_CLIENT:{
@@ -182,10 +185,7 @@ public class VerifooProxy {
 			
             
 		    
-            setNextHop(client, server);
-			
-            
-			/* End of redirect output to logfile */        
+            setNextHop(client, server);   
 		}
 
 		private boolean setNextHop(Node source, Node server) throws BadNffgException{
