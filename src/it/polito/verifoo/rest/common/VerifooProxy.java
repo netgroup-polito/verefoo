@@ -221,7 +221,7 @@ public class VerifooProxy {
 			
 		}
 		
-		public void checkNFFGProperty(){
+		public String checkNFFGProperty(){
 
             Node source = nodes.stream().filter(n -> {return getFunctionalType(n.getVNF()) == FName.MAIL_CLIENT || getFunctionalType(n.getVNF()) == FName.WEB_CLIENT;}).findFirst().get();
             Node dest = nodes.stream().filter(n -> {return getFunctionalType(n.getVNF()) == FName.MAIL_SERVER || getFunctionalType(n.getVNF()) == FName.WEB_SERVER;}).findFirst().get();
@@ -229,10 +229,11 @@ public class VerifooProxy {
 			IsolationResult ret = this.check.checkIsolationProperty(netobjs.get(source), netobjs.get(dest));
 			if (ret.result == Status.UNSATISFIABLE){
 		     	   System.out.println("UNSAT"); // Nodes a and b are isolated
-		    	}else{
+		    }else{
 		     		System.out.println("SAT ");
 		     		logger.debug( ""+ret.model); //p.printModel(ret.model);
-		     	}
+		    }
+			return ret.model.toString();
 		}
 		
 }
