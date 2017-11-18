@@ -7,7 +7,8 @@
   <property name="dist.dir" location="dist"/>
   <property name="schema.dir" location="xsd" />
   <property name="report.dir" location="log" />
-
+  <property name="lib.dir" location="WebContent/WEB-INF/lib" />
+  <property name="target.dir" location="target" />
   <target name="init">
     <!-- Create the time stamp -->
     <tstamp/>
@@ -74,4 +75,11 @@
 		</test>
 	  </junit>
   </target>
+  <target name="war" depends="compile">
+	  <war destfile="${target.dir}/verifoo.war" webxml="WebContent/WEB-INF/web.xml">
+		    <classes dir="${build.dir}"/>
+		    <lib dir="${lib.dir}">
+		    </lib>
+	  </war>
+  </target>	
 </project>
