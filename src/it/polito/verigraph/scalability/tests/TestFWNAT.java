@@ -7,9 +7,6 @@ package it.polito.verigraph.scalability.tests;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import org.neo4j.cypher.internal.compiler.v2_3.executionplan.checkForEagerLoadCsv;
-
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;

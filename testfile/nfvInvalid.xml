@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
+    <NF-FG name="nffg0">
+        <Node name="node0" NF-FG="nffg0" FunctionalType="WEB_CLIENT"/>
+        <Node name="node1" NF-FG="nffg0" FunctionalType="FW" Ip="ip_2"/>
+        <Node name="node2" NF-FG="nffg0" FunctionalType="FW" Ip="ip_3"/>
+        <Node name="node3" NF-FG="nffg0" FunctionalType="WEB_SERVER" Ip="ip_4"/>
+        <Link name="link0" sourceNode="node0" destNode="node1" NF-FG="nffg0"/>
+        <Link name="link1" sourceNode="node1" destNode="node2" reqLatency="2" NF-FG="nffg0"/>
+        <Link name="link2" sourceNode="node2" destNode="node3" reqLatency="2" NF-FG="nffg0"/>
+    </NF-FG>
+    <Hosts>
+        <Host name="host0">
+            <NodeRef node="node0"/>
+        </Host>
+        <Host name="host1" diskStorage="10.0">
+            <NodeRef node="node2"/>
+        </Host>
+        <Host name="host2" diskStorage="3f.0"/>
+        <Host name="host3" diskStorage="10.0">
+            <NodeRef node="node1"/>
+        </Host>
+        <Host name="host4" diskStorage="10.0">
+            <NodeRef node="node2"/>
+        </Host>
+        <Host name="host5" diskStorage="30.0"/>
+    </Hosts>
+    <Connections>
+        <Connection sourceHost="host0" destHost="host1" avgLatency="1.0"/>
+        <Connection sourceHost="host1" destHost="host2" avgLatency="2.0"/>
+        <Connection sourceHost="host3" destHost="host4" avgLatency="1.0"/>
+        <Connection sourceHost="host4" destHost="host5" avgLatency="2.0"/>
+    </Connections>
+    <VNF-Catalog>
+        <VNF name="f1" FunctionalType="WEB_CLIENT" reqDiskStorage="2.0"/>
+        <VNF name="f5" FunctionalType="WEB_SERVER" reqDiskStorage="1.0"/>
+        <VNF name="f3" FunctionalType="FW" />
+        <VNF name="f4" FunctionalType="NAT" reqDiskStorage="4.0"/>
+        <VNF name="f5" FunctionalType="MAIL_CLIENT" reqDiskStorage="1.0"/>
+        <VNF name="f6" FunctionalType="MAIL_SERVER" reqDiskStorage="10.0"/>
+    </VNF-Catalog>
+</NFV>

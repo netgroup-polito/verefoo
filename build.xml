@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<project name="DP2 Project" default="compile" basedir=".">
+
+  <!-- set global properties for this build -->
+  <property name="src.dir" location="src"/>
+  <property name="build.dir" location="build"/>
+  <property name="dist.dir" location="dist"/>
+  <property name="schema.dir" location="xsd" />
+  <property name="report.dir" location="log" />
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used
+         by compile -->
+    <mkdir dir="${build.dir}"/>
+  </target>
+
+	<!-- Target chk-bindings -->
+	<target name="-chk-bindings">
+		<uptodate property="generate-bindings.notRequired" targetfile="${src.dir}/.flagfile">
+			<srcfiles dir="${schema.dir}" includes="**/*.xsd" />
+		</uptodate>
+	</target>
+	
+	<!-- Target generate-bindings -->
+	<target name="generate-bindings" unless="generate-bindings.notRequired" depends="init,-chk-bindings" description="Generate bindings from schema">
+		<exec executable="xjc" failonerror="true" >
+			<arg value="-d" />
+			<arg value="${src.dir}" />
+			<arg value="-p" />
+			<arg value="it.polito.verifoo.rest.jaxb" />
+			<arg value="${schema.dir}/nfvInfo.xsd" />
+		</exec>
+		<touch file="${src.dir}/.flagfile" />
+	</target>
+  <target name="compile" depends="init, generate-bindings" description="compile the source ">
+    <property name="debug" value="off"/>
+    <property name="debuglevel" value="lines,vars,source"/>
+    <!-- Compile the code from ${src} into ${build} -->
+    <javac 
+    	encoding="ISO-8859-1"
+    	classpath="lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar;lib/junit/junit.jar;lib/Verifoo.jar;lib/com.microsoft.z3.jar;lib/lib4j/log4j-api-2.9.1.jar;lib/lib4j/log4j-core-2.9.1.jar"
+    	includeantruntime="false" 
+    	srcdir="${src.dir}" 
+    	destdir="${build.dir}" 
+    	debug="${debug.dir}" 
+    	debuglevel="${debuglevel}"/>
+  </target>
+
+  <target name="clean" description="clean up">
+    <!-- Delete the ${build} and ${dist} directories -->
+    <delete dir="${build.dir}"/>
+    <delete dir="${dist.dir}"/>
+  </target>
+
+  <target name="dist" depends="compile">
+    <mkdir dir="${dist.dir}"/>  
+    <jar destfile="${dist.dir}/package-${DSTAMP}.jar" basedir="${build.dir}">
+    </jar>
+    <jar destfile="${dist.dir}/src-${DSTAMP}.jar" basedir="${src.dir}"/>
+  </target>
+  <target name="test" depends="compile">
+	    <junit printsummary="yes" haltonfailure="no" showoutput="true">
+		<!-- Project classpath, must include junit.jar -->
+		<classpath location="lib/junit/junit.jar" />
+	    <classpath location="lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar" />
+		<!-- test class -->
+		<classpath location="${build.dir}" />
+		<test name="it.polito.verifoo.rest.test.TestCase"
+			haltonfailure="no" todir="${report.dir}">
+			<formatter type="plain" />
+			<formatter type="xml" />
+		</test>
+	  </junit>
+  </target>
+</project>
