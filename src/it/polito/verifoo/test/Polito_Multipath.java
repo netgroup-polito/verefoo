@@ -71,7 +71,7 @@ public class Polito_Multipath{
     	
     	p.resetZ3(); 	
     	//PolitoMultipathTest model = new PolitoMultipathTest(p.ctx);
-//    	Polito3nodes3hosts model = new Polito3nodes3hosts(p.ctx);
+    	//Polito3nodes3hosts model = new Polito3nodes3hosts(p.ctx);
     	Polito5nodes7hosts model = new Polito5nodes7hosts(p.ctx);
     	
     	
