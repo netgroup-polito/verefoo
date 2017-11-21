@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
+import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Status;
@@ -24,6 +26,7 @@ public class VerifooProxy {
 	    private Network net;
 	    private HashMap<Node,NetworkObject> netobjs;
 	    private HashMap<Node,List<String>> rawConditions;
+	    private HashMap<Node, HashMap<String, BoolExpr>> conditionDB;
 	    private ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>> adm;
 		public Checker check;
 		private Logger logger = LogManager.getLogger("mylog");
@@ -57,18 +60,20 @@ public class VerifooProxy {
 			nodes.forEach(this::generateAddressMapping);
 		    net.setAddressMappings(adm);
 		    rawConditions=new HashMap<>();
-			for(int i = 0; i < nodes.size(); i++){
-				 List<String> conditions = new ArrayList<>();
-				 rawConditions.put(nodes.get(i), conditions);
-			}
+		    conditionDB=new HashMap<>();
+		    nodes.forEach(n -> {
+				rawConditions.put(n, new ArrayList<>());
+		    	conditionDB.put(n, new HashMap<>());
+		    });
 			checkPhysicalNetwork();
-		    checkNffg();		 
+		    checkNffg();	
+		    setConditions();
 		    nodes.forEach(this::generateAcl);
 		    netobjs.forEach(this::attachToNet);
 		    check = new Checker(ctx,nctx,net);
 	    }
 	    
-	    private void attachToNet(Node n,NetworkObject obj){
+	    private void attachToNet(Node n, NetworkObject obj){
 	    	net.attach(obj);
 	    }
 	    private FName getFunctionalType(String vnf){
@@ -168,6 +173,98 @@ public class VerifooProxy {
 					break;
 				}
 			}
+		}
+		
+		private void setConditions() {
+		  	
+			HashMap<String, BoolExpr> hostCondition = new HashMap<>();
+			hosts.forEach(h -> {
+				BoolExpr e = ctx.mkBoolConst(h.getName());
+				hostCondition.put(h.getName(),e);
+				nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(e), "servers"));
+			});
+			System.out.println("Host constraint: " + hostCondition);
+			/*
+	    	int capacity_x1 = 10;
+	    	int capacity_x2 = 10;
+	    	int capacity_x3 = 10;
+	    	
+	    	int capacity_y1 = 10;
+	    	int capacity_y2 = 10;
+	    	int capacity_y3 = 10;
+
+			*/
+			conditionDB.entrySet().forEach(e -> {
+				List<IntExpr> univocity = new ArrayList<>();
+				e.getValue().entrySet().stream()
+										.map(pair -> pair.getValue())
+										.collect(Collectors.toList())
+										.forEach(c -> {
+											univocity.add(nctx.bool_to_int(c));
+										});
+				//System.out.println(e.getKey().getName() + " univocity: " + univocity);
+				ArithExpr uniqueNodeConstraint = null;
+				for(IntExpr u:univocity){
+					if(uniqueNodeConstraint == null){
+						uniqueNodeConstraint = u;
+					}
+					else{
+						uniqueNodeConstraint = ctx.mkAdd(uniqueNodeConstraint, u);
+					}
+					//System.out.println(uniqueNodeConstraint);
+				}
+				if(uniqueNodeConstraint != null){
+					System.out.println(e.getKey().getName() + " adding univocity: " + ctx.mkEq(uniqueNodeConstraint, ctx.mkInt(1)));
+					nctx.constraints.add(ctx.mkEq(uniqueNodeConstraint, ctx.mkInt(1)));
+				}
+			});
+			hosts.forEach(h -> {
+				List<BoolExpr> implications = new ArrayList<>();
+				conditionDB.entrySet().stream()
+									.flatMap(e -> e.getValue().entrySet().stream())
+									.filter(e -> e.getKey().equals(h.getName()))
+									.map(e -> e.getValue())
+									.collect(Collectors.toList())
+									.forEach(i -> {
+										implications.add(ctx.mkImplies(hostCondition.get(h.getName()), i));
+									});
+				//System.out.println(h.getName() + " implication: " + implications);
+				BoolExpr hostImpliesNodeConstraint = null;
+				for(BoolExpr i:implications){
+					if(hostImpliesNodeConstraint == null){
+						hostImpliesNodeConstraint = i;
+					}
+					else{
+						hostImpliesNodeConstraint = ctx.mkOr(hostImpliesNodeConstraint, i);
+					}
+					//System.out.println(hostImpliesNodeConstraint);
+				}
+				if(hostImpliesNodeConstraint != null){
+					System.out.println(h.getName() + " implication: " + hostImpliesNodeConstraint);
+					nctx.constraints.add(hostImpliesNodeConstraint);
+				}
+			});
+			
+			/*
+			ArithExpr leftSide = 
+				ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), nctx.bool_to_int(x11)),
+						ctx.mkMul(ctx.mkInt(capacity_x2), nctx.bool_to_int(x21))
+						);
+			nctx.constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y1), nctx.bool_to_int(y1))));
+			
+			leftSide = ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), nctx.bool_to_int(x12)),ctx.mkMul(ctx.mkInt(capacity_x2), nctx.bool_to_int(x22)),
+					ctx.mkMul(ctx.mkInt(capacity_x3), nctx.bool_to_int(x32)));
+			nctx.constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y2), nctx.bool_to_int(y2))));
+			
+			leftSide = ctx.mkAdd(
+					
+					ctx.mkMul(ctx.mkInt(capacity_x2), nctx.bool_to_int(x23)),
+					ctx.mkMul(ctx.mkInt(capacity_x3), nctx.bool_to_int(x33)));
+			nctx.constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y3), nctx.bool_to_int(y3))));
+			*/
+			hosts.forEach(h -> {
+				nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(hostCondition.get(h.getName())), "num_servers"));
+			});
 		}
 		
 		
@@ -301,6 +398,8 @@ public class VerifooProxy {
 					if(s.lastIndexOf('/') != -1){
 						String first = s.substring(0, s.lastIndexOf('/'));
 						String second = s.substring(s.lastIndexOf('/')+1);
+						String firstNode = first.substring(0,first.lastIndexOf('@'));
+						String secondNode = second.substring(0, second.lastIndexOf('@'));
 						String firstHost = first.substring(first.lastIndexOf('@')+1);
 						String secondHost = second.substring(second.lastIndexOf('@')+1);
 						if(firstHost.equals(secondHost)){
@@ -309,10 +408,15 @@ public class VerifooProxy {
 						else{
 							latency = connections.stream()
 									.filter(con -> con.getSourceHost().equals(firstHost) && con.getDestHost().equals(secondHost)).findFirst().get().getAvgLatency();
-							
 						}
 						//System.out.println("Adding (" + first + " AND " + second+") to the routing table");
 						c = ctx.mkAnd(ctx.mkBoolConst(first), ctx.mkBoolConst(second));
+						if(n.getName().equals(firstNode)){
+							conditionDB.get(n).put(firstHost, ctx.mkBoolConst(first));
+						}
+						if(n.getName().equals(secondNode)){
+							conditionDB.get(n).put(secondHost, ctx.mkBoolConst(second));
+						}
 					}
 					else{
 						String host = s.substring(s.lastIndexOf('@')+1);
@@ -326,14 +430,19 @@ public class VerifooProxy {
 						}
 						//System.out.println("Adding "+s+" to the routing table");
 						c = ctx.mkBoolConst(s);
+						if(n != client && n!= server){
+							conditionDB.get(n).put(host, c);
+						}
+						
 					}
 					rt.add(new RoutingTable(nctx.am.get(server.getIp()), netobjs.get(next), latency, c));
 				}
 				//System.out.println("Adding routing table to "+n.getName());
-				//should we use routingOptimization() or routingTable2()?
-				net.routingTable2(netobjs.get(n), rt);
+				net.routingOptimization(netobjs.get(n), rt);
 			}
-			
+			System.out.println("----CONDITION DB----");
+			conditionDB.entrySet().forEach(e -> {System.out.println(e.getKey().getName() + " -> " + e.getValue());});
+			System.out.println("--------------------");
 		}
 
 		private boolean setNextHop(Node source, Node server, int nChain, int level, String hostServer) throws BadNffgException{

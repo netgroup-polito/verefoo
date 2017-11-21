@@ -49,8 +49,10 @@ public class Main {
 			VerifooProxy test = new VerifooProxy(root.getNFFG(), root.getHosts(), root.getConnections(), root.getVNFCatalog());
 			
             IsolationResult res=test.checkNFFGProperty();
-            new Translator(res.model.toString(),root).convert();
             root.getProperty().setIsSat(res.result!=Status.UNSATISFIABLE);
+            if(res.result == Status.UNSATISFIABLE) return;
+            new Translator(res.model.toString(),root).convert();
+            
             /*// create a Marshaller and marshal to std out
             Marshaller m = jc.createMarshaller();
             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
