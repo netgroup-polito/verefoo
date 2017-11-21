@@ -184,16 +184,6 @@ public class VerifooProxy {
 				nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(e), "servers"));
 			});
 			System.out.println("Host constraint: " + hostCondition);
-			/*
-	    	int capacity_x1 = 10;
-	    	int capacity_x2 = 10;
-	    	int capacity_x3 = 10;
-	    	
-	    	int capacity_y1 = 10;
-	    	int capacity_y2 = 10;
-	    	int capacity_y3 = 10;
-
-			*/
 			conditionDB.entrySet().forEach(e -> {
 				List<IntExpr> univocity = new ArrayList<>();
 				e.getValue().entrySet().stream()
@@ -245,23 +235,38 @@ public class VerifooProxy {
 				}
 			});
 			
-			/*
-			ArithExpr leftSide = 
-				ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), nctx.bool_to_int(x11)),
-						ctx.mkMul(ctx.mkInt(capacity_x2), nctx.bool_to_int(x21))
-						);
-			nctx.constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y1), nctx.bool_to_int(y1))));
+			hosts.forEach(h -> {
+				List<ArithExpr> diskRequirements = new ArrayList<>();
+				conditionDB.entrySet().stream()
+									.flatMap(e -> e.getValue().entrySet().stream())
+									.filter(e -> e.getKey().equals(h.getName()))
+									.map(e -> e.getValue())
+									.collect(Collectors.toList())
+									.forEach(i -> {
+										String node = i.toString().substring(0, i.toString().lastIndexOf('@'));
+										String vnfToFind = nodes.stream().filter(n -> n.getName().equals(node)).findFirst().get().getVNF();
+										int capacity = vnfCat.stream().filter(f -> f.getName().equals(vnfToFind)).findFirst().get().getReqDiskStorage();
+										diskRequirements.add(ctx.mkMul(ctx.mkInt(capacity), nctx.bool_to_int(i)));
+									});
+				System.out.println(h.getName() + " disk requirement: " + diskRequirements);
+				ArithExpr diskConstraint = null;
+				for(ArithExpr d:diskRequirements){
+					if(diskConstraint == null){
+						diskConstraint = d;
+					}
+					else{
+						diskConstraint = ctx.mkAdd(diskConstraint, d);
+					}
+					//System.out.println(hostImpliesNodeConstraint);
+				}
+				if(diskConstraint != null){
+					System.out.println(h.getName() + " left side: " + diskConstraint);
+					System.out.println(h.getName() + " requirements: " + ctx.mkLe(diskConstraint, ctx.mkMul(ctx.mkInt(h.getDiskStorage()), nctx.bool_to_int(hostCondition.get(h.getName())))));
+					nctx.constraints.add(ctx.mkLe(diskConstraint, ctx.mkMul(ctx.mkInt(h.getDiskStorage()), nctx.bool_to_int(hostCondition.get(h.getName())))));
+				}
+			});
 			
-			leftSide = ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), nctx.bool_to_int(x12)),ctx.mkMul(ctx.mkInt(capacity_x2), nctx.bool_to_int(x22)),
-					ctx.mkMul(ctx.mkInt(capacity_x3), nctx.bool_to_int(x32)));
-			nctx.constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y2), nctx.bool_to_int(y2))));
 			
-			leftSide = ctx.mkAdd(
-					
-					ctx.mkMul(ctx.mkInt(capacity_x2), nctx.bool_to_int(x23)),
-					ctx.mkMul(ctx.mkInt(capacity_x3), nctx.bool_to_int(x33)));
-			nctx.constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y3), nctx.bool_to_int(y3))));
-			*/
 			hosts.forEach(h -> {
 				nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(hostCondition.get(h.getName())), "num_servers"));
 			});
@@ -389,7 +394,7 @@ public class VerifooProxy {
 			}	
 			for(Node n : rawConditions.keySet()){
 				ArrayList<RoutingTable> rt = new ArrayList<RoutingTable>();
-				//System.out.println("-----NODE "+n.getName()+"-----");
+				System.out.println("-----NODE "+n.getName()+"-----");
 				List<String> cond = rawConditions.get(n).stream().distinct().collect(Collectors.toList());
 				System.out.println("Condition for node "+ n.getName() +" -> "+ cond);
 				for(String s:cond){
@@ -409,7 +414,7 @@ public class VerifooProxy {
 							latency = connections.stream()
 									.filter(con -> con.getSourceHost().equals(firstHost) && con.getDestHost().equals(secondHost)).findFirst().get().getAvgLatency();
 						}
-						//System.out.println("Adding (" + first + " AND " + second+") to the routing table");
+						System.out.println("Adding (" + first + " AND " + second+") to the routing table");
 						c = ctx.mkAnd(ctx.mkBoolConst(first), ctx.mkBoolConst(second));
 						if(n.getName().equals(firstNode)){
 							conditionDB.get(n).put(firstHost, ctx.mkBoolConst(first));
@@ -428,7 +433,7 @@ public class VerifooProxy {
 							latency = connections.stream()
 									.filter(con -> con.getSourceHost().equals(host) && con.getDestHost().equals(hostServer)).findFirst().get().getAvgLatency();
 						}
-						//System.out.println("Adding "+s+" to the routing table");
+						System.out.println("Adding "+s+" to the routing table");
 						c = ctx.mkBoolConst(s);
 						if(n != client && n!= server){
 							conditionDB.get(n).put(host, c);
@@ -497,7 +502,7 @@ public class VerifooProxy {
 
             Node source = nodes.stream().filter(n -> {return getFunctionalType(n.getVNF()) == FName.MAIL_CLIENT || getFunctionalType(n.getVNF()) == FName.WEB_CLIENT;}).findFirst().get();
             Node dest = nodes.stream().filter(n -> {return getFunctionalType(n.getVNF()) == FName.MAIL_SERVER || getFunctionalType(n.getVNF()) == FName.WEB_SERVER;}).findFirst().get();
-            
+            System.out.println("Checking reachability from " + source.getName() + " to "+ dest.getName());
 			IsolationResult ret = this.check.checkIsolationProperty(netobjs.get(source), netobjs.get(dest));
 			if (ret.result == Status.UNSATISFIABLE){
 		     	   System.out.println("UNSAT"); // Nodes a and b are isolated

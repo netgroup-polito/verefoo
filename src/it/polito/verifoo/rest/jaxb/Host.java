@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2017.11.21 alle 02:44:13 PM CET 
+// Generato il: 2017.11.21 alle 06:21:31 PM CET 
 //
 
 
@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="NodeRef" type="{}NodeRefType" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="diskStorage" use="required" type="{}positiveFloat" />
+ *       &lt;attribute name="diskStorage" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="type" type="{}TypeOfHost" />
  *       &lt;attribute name="active" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/restriction>
@@ -53,7 +53,7 @@ public class Host {
     @XmlAttribute(name = "name", required = true)
     protected String name;
     @XmlAttribute(name = "diskStorage", required = true)
-    protected float diskStorage;
+    protected int diskStorage;
     @XmlAttribute(name = "type")
     protected TypeOfHost type;
     @XmlAttribute(name = "active")
@@ -116,7 +116,7 @@ public class Host {
      * Recupera il valore della proprietà diskStorage.
      * 
      */
-    public float getDiskStorage() {
+    public int getDiskStorage() {
         return diskStorage;
     }
 
@@ -124,7 +124,7 @@ public class Host {
      * Imposta il valore della proprietà diskStorage.
      * 
      */
-    public void setDiskStorage(float value) {
+    public void setDiskStorage(int value) {
         this.diskStorage = value;
     }
 

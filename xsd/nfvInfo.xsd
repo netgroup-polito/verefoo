@@ -126,7 +126,7 @@
 			<xs:element name="NodeRef" type="NodeRefType" maxOccurs="unbounded" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="diskStorage" type="positiveFloat" use="required"/>
+		<xs:attribute name="diskStorage" type="xs:int" use="required"/>
 		<xs:attribute name="type" type="TypeOfHost" use="optional"/>
 		<xs:attribute name="active" type="xs:boolean" use="optional"/>
 	</xs:complexType>
@@ -159,7 +159,7 @@
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="FunctionalType" type="F-name" use="required"/>
-		<xs:attribute name="reqDiskStorage" type="positiveFloat" use="required"/>
+		<xs:attribute name="reqDiskStorage" type="xs:int" use="required"/>
 	</xs:complexType>
 </xs:element>
 <xs:complexType name="NodeRefType">
