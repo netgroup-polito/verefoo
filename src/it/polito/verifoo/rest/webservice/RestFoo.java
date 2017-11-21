@@ -24,17 +24,21 @@ import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 
+import com.microsoft.z3.Status;
+
 import it.polito.verifoo.rest.common.BadNffgException;
+import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
 import it.polito.verifoo.rest.jaxb.NFV;
+import it.polito.verigraph.mcnet.components.IsolationResult;
 
 
 @Path("/rest")
 public class RestFoo {
 	    @POST
 	    @Consumes(MediaType.APPLICATION_XML)
-		@Produces(MediaType.TEXT_PLAIN)
-	    public String put(String nfv) throws JAXBException, SAXException, BadNffgException {
+		@Produces(MediaType.APPLICATION_XML)
+	    public NFV put(String nfv) throws JAXBException, SAXException, BadNffgException {
             // create a JAXBContext capable of handling the generated classes
             JAXBContext jc;
 			try {
@@ -48,8 +52,10 @@ public class RestFoo {
 	            // unmarshal a document into a tree of Java content objects
 	            NFV root = (NFV) u.unmarshal(new ByteArrayInputStream(nfv.getBytes()));
 				VerifooProxy test = new VerifooProxy(root.getNFFG(), root.getHosts(), root.getConnections(), root.getVNFCatalog());
-				
-	            return test.checkNFFGProperty();
+	            IsolationResult res=test.checkNFFGProperty();
+	            new Translator(res.model.toString(),root).convert();
+	            root.getProperty().setIsSat(res.result!=Status.UNSATISFIABLE);
+	            return root;
 	            
 			} catch (JAXBException e) {
 				// TODO Auto-generated catch block

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
+  <Property name="IsolationProperty"/>
   <NF-FG name="nffg0">
     <Node NF-FG="nffg0" name="nodeA" VNF="f1" Ip="ip_0"/>
     <Node NF-FG="nffg0" name="node1" VNF="f3" Ip="ip_1"/>

@@ -3,6 +3,7 @@
 <xs:element name="NFV">
 	<xs:complexType>
 		<xs:sequence>
+			<xs:element name="Property" type="Property" minOccurs="1" maxOccurs="1"/>
 			<xs:element maxOccurs="1" minOccurs="1" ref="NF-FG"/>
 			<xs:element ref="Hosts"/>
 			<xs:element ref="Connections"/>
@@ -196,5 +197,14 @@
 <xs:complexType name="ConfigurationType">
 			<xs:attribute name="name" type="xs:string"/>
 			<xs:attribute name="value" type="xs:string" use="required"/>
+</xs:complexType>
+<xs:simpleType name="P-Name">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="IsolationProperty"/>
+ 	</xs:restriction>
+</xs:simpleType>
+<xs:complexType name="Property">
+			<xs:attribute name="name" type="P-Name" use="required"/>
+			<xs:attribute name="isSat" type="xs:boolean"/>
 </xs:complexType>
 </xs:schema>

@@ -384,7 +384,7 @@ public class VerifooProxy {
 			return found;
 		}
 		
-		public String checkNFFGProperty(){
+		public IsolationResult checkNFFGProperty(){
 
             Node source = nodes.stream().filter(n -> {return getFunctionalType(n.getVNF()) == FName.MAIL_CLIENT || getFunctionalType(n.getVNF()) == FName.WEB_CLIENT;}).findFirst().get();
             Node dest = nodes.stream().filter(n -> {return getFunctionalType(n.getVNF()) == FName.MAIL_SERVER || getFunctionalType(n.getVNF()) == FName.WEB_SERVER;}).findFirst().get();
@@ -396,7 +396,7 @@ public class VerifooProxy {
 		     		System.out.println("SAT ");
 		     		logger.debug( ""+ret.model); //p.printModel(ret.model);
 		    }
-			return ret.model.toString();
+			return ret;
 		}
 		
 }

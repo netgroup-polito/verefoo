@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2017.11.21 alle 12:23:31 PM CET 
+// Generato il: 2017.11.21 alle 01:41:13 PM CET 
 //
 
 
@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
+ *         &lt;element name="Property" type="{}Property"/>
  *         &lt;element ref="{}NF-FG"/>
  *         &lt;element ref="{}Hosts"/>
  *         &lt;element ref="{}Connections"/>
@@ -40,6 +41,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
+    "property",
     "nffg",
     "hosts",
     "connections",
@@ -49,6 +51,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "NFV")
 public class NFV {
 
+    @XmlElement(name = "Property", required = true)
+    protected Property property;
     @XmlElement(name = "NF-FG", required = true)
     protected NFFG nffg;
     @XmlElement(name = "Hosts", required = true)
@@ -59,6 +63,30 @@ public class NFV {
     protected VNFCatalog vnfCatalog;
     @XmlElement(name = "ParsingString")
     protected String parsingString;
+
+    /**
+     * Recupera il valore della proprietà property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Property }
+     *     
+     */
+    public Property getProperty() {
+        return property;
+    }
+
+    /**
+     * Imposta il valore della proprietà property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Property }
+     *     
+     */
+    public void setProperty(Property value) {
+        this.property = value;
+    }
 
     /**
      * Recupera il valore della proprietà nffg.

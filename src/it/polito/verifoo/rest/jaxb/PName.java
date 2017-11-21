@@ -9,39 +9,47 @@
 package it.polito.verifoo.rest.jaxb;
 
 import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlEnumValue;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Classe Java per TypeOfHost.
+ * <p>Classe Java per P-Name.
  * 
  * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
  * <p>
  * <pre>
- * &lt;simpleType name="TypeOfHost">
+ * &lt;simpleType name="P-Name">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="CLIENT"/>
- *     &lt;enumeration value="SERVER"/>
- *     &lt;enumeration value="MIDDLEBOX"/>
+ *     &lt;enumeration value="IsolationProperty"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
  * 
  */
-@XmlType(name = "TypeOfHost")
+@XmlType(name = "P-Name")
 @XmlEnum
-public enum TypeOfHost {
+public enum PName {
 
-    CLIENT,
-    SERVER,
-    MIDDLEBOX;
+    @XmlEnumValue("IsolationProperty")
+    ISOLATION_PROPERTY("IsolationProperty");
+    private final String value;
 
-    public String value() {
-        return name();
+    PName(String v) {
+        value = v;
     }
 
-    public static TypeOfHost fromValue(String v) {
-        return valueOf(v);
+    public String value() {
+        return value;
+    }
+
+    public static PName fromValue(String v) {
+        for (PName c: PName.values()) {
+            if (c.value.equals(v)) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(v);
     }
 
 }

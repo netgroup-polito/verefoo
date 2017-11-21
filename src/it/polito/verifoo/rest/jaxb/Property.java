@@ -15,16 +15,16 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Classe Java per ConfigurationType complex type.
+ * <p>Classe Java per Property complex type.
  * 
  * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
  * 
  * <pre>
- * &lt;complexType name="ConfigurationType">
+ * &lt;complexType name="Property">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="value" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="name" use="required" type="{}P-Name" />
+ *       &lt;attribute name="isSat" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -33,23 +33,23 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ConfigurationType")
-public class ConfigurationType {
+@XmlType(name = "Property")
+public class Property {
 
-    @XmlAttribute(name = "name")
-    protected String name;
-    @XmlAttribute(name = "value", required = true)
-    protected String value;
+    @XmlAttribute(name = "name", required = true)
+    protected PName name;
+    @XmlAttribute(name = "isSat")
+    protected Boolean isSat;
 
     /**
      * Recupera il valore della proprietà name.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link PName }
      *     
      */
-    public String getName() {
+    public PName getName() {
         return name;
     }
 
@@ -58,35 +58,35 @@ public class ConfigurationType {
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link PName }
      *     
      */
-    public void setName(String value) {
+    public void setName(PName value) {
         this.name = value;
     }
 
     /**
-     * Recupera il valore della proprietà value.
+     * Recupera il valore della proprietà isSat.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link Boolean }
      *     
      */
-    public String getValue() {
-        return value;
+    public Boolean isIsSat() {
+        return isSat;
     }
 
     /**
-     * Imposta il valore della proprietà value.
+     * Imposta il valore della proprietà isSat.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link Boolean }
      *     
      */
-    public void setValue(String value) {
-        this.value = value;
+    public void setIsSat(Boolean value) {
+        this.isSat = value;
     }
 
 }

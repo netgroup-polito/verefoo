@@ -18,8 +18,11 @@ import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import com.microsoft.z3.Context;
+import com.microsoft.z3.Status;
+import com.sun.org.apache.bcel.internal.generic.RET;
 
 import it.polito.verifoo.rest.jaxb.*;
+import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verifoo.rest.common.*;
 
 public class Main {
@@ -45,9 +48,10 @@ public class Main {
             
 			VerifooProxy test = new VerifooProxy(root.getNFFG(), root.getHosts(), root.getConnections(), root.getVNFCatalog());
 			
-            test.checkNFFGProperty();
-            
-            /* create a Marshaller and marshal to std out
+            IsolationResult res=test.checkNFFGProperty();
+            new Translator(res.model.toString(),root).convert();
+            root.getProperty().setIsSat(res.result!=Status.UNSATISFIABLE);
+            /*// create a Marshaller and marshal to std out
             Marshaller m = jc.createMarshaller();
             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
             m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvInfo.xsd");
