@@ -13,54 +13,34 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Classe Java per F-name.
+ * <p>Classe Java per TypeOfHost.
  * 
  * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
  * <p>
  * <pre>
- * &lt;simpleType name="F-name">
+ * &lt;simpleType name="TypeOfHost">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="FW"/>
- *     &lt;enumeration value="CLASSIFIER"/>
- *     &lt;enumeration value="DUMB"/>
- *     &lt;enumeration value="ENDHOST"/>
- *     &lt;enumeration value="SPAM"/>
- *     &lt;enumeration value="CACHE"/>
- *     &lt;enumeration value="IDS"/>
- *     &lt;enumeration value="MAIL_CLIENT"/>
- *     &lt;enumeration value="MAIL_SERVER"/>
- *     &lt;enumeration value="NAT"/>
- *     &lt;enumeration value="VPN"/>
- *     &lt;enumeration value="WEB_CLIENT"/>
- *     &lt;enumeration value="WEB_SERVER"/>
+ *     &lt;enumeration value="CLIENT"/>
+ *     &lt;enumeration value="SERVER"/>
+ *     &lt;enumeration value="MIDDLEBOX"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
  * 
  */
-@XmlType(name = "F-name")
+@XmlType(name = "TypeOfHost")
 @XmlEnum
-public enum FName {
+public enum TypeOfHost {
 
-    FW,
-    CLASSIFIER,
-    DUMB,
-    ENDHOST,
-    SPAM,
-    CACHE,
-    IDS,
-    MAIL_CLIENT,
-    MAIL_SERVER,
-    NAT,
-    VPN,
-    WEB_CLIENT,
-    WEB_SERVER;
+    CLIENT,
+    SERVER,
+    MIDDLEBOX;
 
     public String value() {
         return name();
     }
 
-    public static FName fromValue(String v) {
+    public static TypeOfHost fromValue(String v) {
         return valueOf(v);
     }
 

@@ -109,7 +109,6 @@
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="sourceNode" type="xs:string" use="required"/>
 		<xs:attribute name="destNode" type="xs:string" use="required"/>
-		<xs:attribute name="reqLatency" type="xs:int" use="required"/>
 		<xs:attribute name="NF-FG" type="xs:string" use="required"/>
 	</xs:complexType>
 </xs:element>
@@ -127,6 +126,8 @@
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="diskStorage" type="positiveFloat" use="required"/>
+		<xs:attribute name="type" type="TypeOfHost" use="optional"/>
+		<xs:attribute name="active" type="xs:boolean" use="optional"/>
 	</xs:complexType>
 </xs:element>
 <xs:element name="Connections">
@@ -140,7 +141,7 @@
 	<xs:complexType>
 		<xs:attribute name="sourceHost" type="xs:string" use="required"/>
 		<xs:attribute name="destHost" type="xs:string" use="required"/>
-		<xs:attribute name="avgLatency" type="positiveFloat"/>
+		<xs:attribute name="avgLatency" type="xs:int"/>
 	</xs:complexType>
 </xs:element>
 <xs:element name="VNF-Catalog">
@@ -178,6 +179,13 @@
       <xs:enumeration value="VPN"/>
       <xs:enumeration value="WEB_CLIENT"/>
       <xs:enumeration value="WEB_SERVER"/>
+ 	</xs:restriction>
+  </xs:simpleType>
+<xs:simpleType name="TypeOfHost">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CLIENT"/>
+      <xs:enumeration value="SERVER"/>
+      <xs:enumeration value="MIDDLEBOX"/>
  	</xs:restriction>
   </xs:simpleType>
 <xs:simpleType name="positiveFloat">

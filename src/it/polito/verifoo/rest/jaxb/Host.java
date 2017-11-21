@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2017.11.18 alle 10:58:39 AM CET 
+// Generato il: 2017.11.21 alle 12:23:31 PM CET 
 //
 
 
@@ -32,6 +32,8 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;/sequence>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="diskStorage" use="required" type="{}positiveFloat" />
+ *       &lt;attribute name="type" type="{}TypeOfHost" />
+ *       &lt;attribute name="active" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -52,6 +54,10 @@ public class Host {
     protected String name;
     @XmlAttribute(name = "diskStorage", required = true)
     protected float diskStorage;
+    @XmlAttribute(name = "type")
+    protected TypeOfHost type;
+    @XmlAttribute(name = "active")
+    protected Boolean active;
 
     /**
      * Gets the value of the nodeRef property.
@@ -120,6 +126,54 @@ public class Host {
      */
     public void setDiskStorage(float value) {
         this.diskStorage = value;
+    }
+
+    /**
+     * Recupera il valore della proprietà type.
+     * 
+     * @return
+     *     possible object is
+     *     {@link TypeOfHost }
+     *     
+     */
+    public TypeOfHost getType() {
+        return type;
+    }
+
+    /**
+     * Imposta il valore della proprietà type.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link TypeOfHost }
+     *     
+     */
+    public void setType(TypeOfHost value) {
+        this.type = value;
+    }
+
+    /**
+     * Recupera il valore della proprietà active.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isActive() {
+        return active;
+    }
+
+    /**
+     * Imposta il valore della proprietà active.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setActive(Boolean value) {
+        this.active = value;
     }
 
 }
