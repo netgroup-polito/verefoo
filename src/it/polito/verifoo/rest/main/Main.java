@@ -53,11 +53,11 @@ public class Main {
             if(res.result == Status.UNSATISFIABLE) return;
             new Translator(res.model.toString(),root).convert();
             
-            /*// create a Marshaller and marshal to std out
+            // create a Marshaller and marshal to std out
             Marshaller m = jc.createMarshaller();
             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
             m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvInfo.xsd");
-            m.marshal( root, System.out ); */
+            m.marshal( root, System.out ); 
         } catch( JAXBException je ) {
         	logger.error("Error while unmarshalling or marshalling");
             logger.error(je);

@@ -11,23 +11,19 @@ import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Context;
-import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Status;
 
 import it.polito.verifoo.components.RoutingTable;
 import it.polito.verifoo.rest.jaxb.*;
-import it.polito.verifoo.rest.logger.LoggerStream;
 import it.polito.verigraph.mcnet.components.*;
-import it.polito.verigraph.mcnet.netobjs.*;
 
 public class VerifooProxy {
 	    private Context ctx;
 	    private NetContext nctx;
 	    private Network net;
-	    private HashMap<Node,NetworkObject> netobjs;
+	    private NodeNetworkObject netobjs;
 	    private HashMap<Node,List<String>> rawConditions;
 	    private HashMap<Node, HashMap<String, BoolExpr>> conditionDB;
-	    private ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>> adm;
 		public Checker check;
 		private Logger logger = LogManager.getLogger("mylog");
 		private List<VNF> vnfCat;
@@ -45,20 +41,21 @@ public class VerifooProxy {
 		    this.connections = conns.getConnection();
 		    this.vnfCat = vnfCat.getVNF();
 		    this.nffg = nffg;
-			String[] nodesname=new String[nodes.size()];
-			String[] nodesip=new String[nodes.size()];
-		    for(int i = 0; i < nodes.size(); i++){
-		    	nodesname[i] = new String(nodes.get(i).getName());
-				nodesip[i] = new String(nodes.get(i).getIp());
-		    }
-			nctx = new NetContext (ctx,nodesname,nodesip);
+			nctx = NetContextGenerator.generate(ctx,nodes);
+				
 			//System.out.println(nctx.am);
 			net = new Network (ctx,new Object[]{nctx});
-			netobjs=new HashMap<Node,NetworkObject>();
-			nodes.forEach(this::generateNetworkObject);
-			adm = new ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>>();
-			nodes.forEach(this::generateAddressMapping);
+			
+			/* Generate the different network object and map it to XML Node */
+			netobjs=new NodeNetworkObject(ctx, nctx, net, this.vnfCat);			
+			nodes.forEach(netobjs);
+			
+			
+			AddressMapping adm = new AddressMapping(netobjs, nctx);
+			nodes.forEach(adm);
 		    net.setAddressMappings(adm);
+		    
+		    
 		    rawConditions=new HashMap<>();
 		    conditionDB=new HashMap<>();
 		    nodes.forEach(n -> {
@@ -68,113 +65,15 @@ public class VerifooProxy {
 			checkPhysicalNetwork();
 		    checkNffg();	
 		    setConditions();
-		    nodes.forEach(this::generateAcl);
-		    netobjs.forEach(this::attachToNet);
+		    netobjs.generateAcl();
+		    netobjs.attachToNet();
 		    check = new Checker(ctx,nctx,net);
 	    }
 	    
-	    private void attachToNet(Node n, NetworkObject obj){
-	    	net.attach(obj);
-	    }
 	    private FName getFunctionalType(String vnf){
 	    	return this.vnfCat.stream().filter(nf -> nf.getName().equals(vnf)).findFirst().get().getFunctionalType(); 
 	    }
-	    private VNF getVNF(Node n){
-			return this.vnfCat.stream().filter(nf->nf.getName().equals(n.getVNF())).findFirst().get();
-	    }
-		private void generateAcl(Node n){
-			VNF vnf=getVNF(n);
-			if(vnf.getFunctionalType().equals(FName.FW)){
-				vnf.getConfiguration().forEach((c)->{
-					if(c.getName()!=null && c.getValue() !=null && !c.getName().isEmpty()&& !c.getValue().isEmpty()){
-				    	ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
-						((AclFirewall)netobjs.get(n)).addAcls(acl);
-						Tuple<DatatypeExpr,DatatypeExpr> rule=new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(c.getName()),nctx.am.get(c.getValue()));
-						acl.add(rule);
-						logger.debug("Added acl:"+ rule.toString());
-					}else{
-						throw new IllegalArgumentException();
-					} 
-				});
-			}
-		}
-	    private void generateAddressMapping(Node n){
-			ArrayList<DatatypeExpr> al = new ArrayList<DatatypeExpr>();
-			//System.out.println("Adding " + n.getIp() +"/"+ nctx.am.get(n.getIp()));
-			al.add(nctx.am.get(n.getIp()));
-			adm.add(new Tuple<>(netobjs.get(n), al));
-	    }
-		private void generateNetworkObject(Node n){
-			FName ftype=getFunctionalType(n.getVNF());
-			switch (ftype) {
-				case FW:{
-					netobjs.put(n,new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
-					break;
-				}
-				case CLASSIFIER:{					
-					netobjs.put(n,new Classifier(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
-					break;
-				}
-				case DUMB:{
-					netobjs.put(n,new DumbNode(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
-					break;
-				}
-				case ENDHOST:{
-					//TODO
-					netobjs.put(n,new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
-					break;
-				}
-				case SPAM:{
-					PolitoAntispam spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
-					netobjs.put(n,spam);
-					int[] blacklist=getVNF(n).getConfiguration().stream().map(ConfigurationType::getValue).mapToInt(s->Integer.parseInt(s)).toArray();
-					spam.installAntispam(blacklist);
-					break;
-				}
-				case CACHE:{
-					//TODO
-					netobjs.put(n,new PolitoCache(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
-					break;
-				}
-				case IDS:{
-					PolitoIDS ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
-					netobjs.put(n,ids);
-					int[] blacklist=getVNF(n).getConfiguration().stream().map(ConfigurationType::getValue).mapToInt(s->Integer.parseInt(s)).toArray();
-					ids.installIDS(blacklist);
-					break;
-				}
-				case MAIL_CLIENT:{
-					netobjs.put(n,new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
-					break;
-				}
-				// TODO for PolitoMailClient is needed another parameter
-				case MAIL_SERVER:{
-					netobjs.put(n,new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
-					break;
-				}
-				case NAT:{					
-					netobjs.put(n,new PolitoNat(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
-					break;
-				}
-				case VPN:{					
-					break;
-				}
-				case WEB_CLIENT:{
-					// TODO for PolitoWebClient is needed another parameter
-					netobjs.put(n,new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
-					break;
-				}
-				case WEB_SERVER:{
-					netobjs.put(n,new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
-					break;
-				}
-				default:{
-					System.err.println("Braiiinssssssssssss!");
-					break;
-				}
-			}
-		}
-		
+
 		private void setConditions() {
 		  	
 			HashMap<String, BoolExpr> hostCondition = new HashMap<>();
