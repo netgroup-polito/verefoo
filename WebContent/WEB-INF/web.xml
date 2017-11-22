@@ -13,6 +13,10 @@
             <param-name>javax.ws.rs.Application</param-name>
             <param-value>it.polito.verifoo.rest.app.RestFooApplication</param-value>
         </init-param>
+        <init-param>
+    		<param-name>jersey.config.xml.formatOutput</param-name>
+    		<param-value>true</param-value>
+		</init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
 

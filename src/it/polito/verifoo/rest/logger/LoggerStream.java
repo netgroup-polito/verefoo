@@ -2,7 +2,6 @@ package it.polito.verifoo.rest.logger;
 
 import java.io.PrintStream;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
 public class LoggerStream extends PrintStream

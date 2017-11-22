@@ -1,6 +1,4 @@
 package it.polito.verifoo.rest.common;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import it.polito.verifoo.rest.jaxb.*;
 

@@ -1,10 +1,8 @@
 package it.polito.verifoo.rest.main;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
-
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -12,15 +10,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
-
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Status;
-import com.sun.org.apache.bcel.internal.generic.RET;
-
 import it.polito.verifoo.rest.jaxb.*;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verifoo.rest.common.*;
