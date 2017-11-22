@@ -290,7 +290,6 @@ public class VerifooProxy {
 			String hostServer = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.SERVER;}).findFirst().get().getName();
             createHostChain(hostClient, hostServer);
 		}
-		
 		private void createHostChain(String hostClient, String hostServer){
 			List<String> hostChain = new ArrayList<>();
 			hostChain.add(hostClient);
@@ -308,7 +307,6 @@ public class VerifooProxy {
 			System.out.println("Calculated host chain " + savedChain);
 			return;
 		}
-		
 		private void expandHostChain(String lastHost, String hostServer, List<String> hostChain){
 			if(lastHost.equals(hostServer)){
 				//System.out.println("Dest Reached " + lastHost);
@@ -359,7 +357,6 @@ public class VerifooProxy {
             Node server = nodes.stream().filter(n -> {return getFunctionalType(n.getVNF()) == FName.MAIL_SERVER || getFunctionalType(n.getVNF()) == FName.WEB_SERVER;}).findFirst().get();
             createRoutingTables(client, server);   
 		}
-		
 		private void createRoutingTables(Node client, Node server) throws BadNffgException{
 			
 			//System.out.println("Searching next hop for " + client.getName() + " towards " + server.getName());
@@ -440,6 +437,8 @@ public class VerifooProxy {
 						}
 						
 					}
+					Link l = nffg.getLink().stream().filter(li -> li.getSourceNode().equals(n.getName())).findFirst().get();
+					next = nodes.stream().filter(node -> node.getName().equals(l.getDestNode()) ).findFirst().get();
 					rt.add(new RoutingTable(nctx.am.get(server.getIp()), netobjs.get(next), latency, c));
 				}
 				//System.out.println("Adding routing table to "+n.getName());
@@ -449,7 +448,6 @@ public class VerifooProxy {
 			conditionDB.entrySet().forEach(e -> {System.out.println(e.getKey().getName() + " -> " + e.getValue());});
 			System.out.println("--------------------");
 		}
-
 		private boolean setNextHop(Node source, Node server, int nChain, int level, String hostServer) throws BadNffgException{
 			String currentHost = savedChain.get(nChain).get(level);
 			//System.out.println("Searching next hop for " + source.getName() + " towards " + server.getName());
