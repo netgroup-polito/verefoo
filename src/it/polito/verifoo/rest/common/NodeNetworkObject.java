@@ -80,9 +80,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject> implements j
 						vnf.getConfiguration().forEach((c)->{
 							if(c.getName()!=null && c.getValue() !=null && !c.getName().isEmpty()&& !c.getValue().isEmpty()){
 						    	ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
-								((AclFirewall)netobjs).addAcls(acl);
 								Tuple<DatatypeExpr,DatatypeExpr> rule=new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(c.getName()),nctx.am.get(c.getValue()));
 								acl.add(rule);
+								((AclFirewall)netobjs).addAcls(acl);
 								logger.debug("Added acl:"+ rule.toString());
 							}else{
 								throw new IllegalArgumentException();
