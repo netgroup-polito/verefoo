@@ -375,7 +375,7 @@ public class Network extends Core {
 				,1, null, null, null, null);
 				BoolExpr mkImplies = ctx.mkImplies( initial,forTheKey);
 				softConstraints.put(mkImplies, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
-				//constraints.add(initial);
+				constraints.add(initial);
 				///System.out.println("\n SO for " + node +"w="+latency_val + "\n" + mkImplies );
 				routes.add(nctx.bool_to_int(mkImplies));
 			}
