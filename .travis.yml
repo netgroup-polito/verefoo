@@ -1,0 +1,19 @@
+language: java
+install: ant war
+jdk:
+- oraclejdk8
+script:
+- ant test
+- cat log/*.txt
+deploy:
+  provider: cloudfoundry
+  api: https://api.eu-de.bluemix.net
+  username:
+    secure: Zf3/8NMJqH1DA7e/qIQ738m7tcwSXIY6aBOIjSo6H9mwIgFEikvluYEgIUknf7D5jr4ncBpt0A9W6PKWa75bru8zLHt01d3fNoQED+Oy8ioKmBn+bibEGMi0sMnYZZUNpwUBXi8/g9y3TJ/AlOetGmWAzvHwIKkqPRRd9sc5b49WFsZD7OvEndThG1PUBOlEMseBZgMvmmKFyGL/b0uY+p59YGf+waO4uZwyD5UrA9O37ujMvBUKMcp21hk1iL7OhL3lxfhI92+pxkZ4OGsJ7/WXEJ0QkE4fMfcm8+XBvj4Uo3mcQ/x32+CWYoMWqf/8eQfnDUem3/dcbqpsMFvq+YIlngfpn53pEmwWQb9FwcbrBz2FtZb1W/r/YPA7HNu1JEgAgxN6z0xgcxhMk59UvWRCjSJtJQc6O8L+lcK78bgtaIWrj+HJpdoKaVEyc+Curg1nIA7SZSSmbEGKxPMvw7sHY9cZbx0SmCyq7HymKj2nuPZd+0IYWawxYj6Xyu7idvys1NDsWFGmurHGEIpjnGZuUTSEMnw2KBqKA2Tib8MXea4db1m42Ft3/1HfITPlZR2r9kyeCcIoXiJfQ0mNCwZDC8TmTJKGXmtii740x4IJ6FZ5HtXiP2DrgNW1o+l1XmJjegw/A3RX7GPS/TWt+0x4H7p6l7r6HEDIKC2Obd0=
+  password:
+    secure: LH/1EHLvCSHVJpuiLYm2PC9WotD+X2TM7mRQMIX7ixs9wRbtUWaeNc+2t4+wp/o+X3Gvo4x8wyrO0/giWHisfew4hvV/EGeSh1mPUywCPbEoc41ghioYFHuM4U3gMuNr3lX/fVQcZTqZsqGUkcbFwkgKku8FtqB5QseRyeUvHNiHtQGIi3en/SxoqbkxoTElwHHnhrFBDh7c2x1NAHJ1FAQ2BJ+1zGajNZ5vSZVQwOrfboT1DXlM8s6HoPemYplPjmlSll0VJDbSDx6eY45klIkOqcZskr90RRu93qiMH2H6PM9++0nKYffM8sUAOJK9WSKZXbcOOAL6DWE0HE3YWFUmRa+varr9K+W6mca0xh93wwROZqXQ/uknJPZe39JN+6WX2dPqr0bfCE/3YCHo7JlEO6Wi/uo4/EgFqPZ/l8GZfB0OAu1zFkRW5apiGQMDKTc82Mq/aTIB87/1npYVXt80PeQSp3l+TMXwb3thh1phWkogPWFET43rCeDlEwtMYYd5HQbMtGUQJjfOPHLtgdqAN6YKpPs6eGcnyxEia6ACpDu22ngXwQmewFg9JEHrrUZQlb5y/1cFGQm0RGRAjEaty6PoH7zRc/MlqEUSCFur6mjaEVlHkF7/1Tbg49FlvfL81/A7sNa6TCBbyq6hLgXzOa2eTx69ffVN9mW/qp0=
+  organization: raffysommy
+  space: dev
+  on:
+    repo: raffysommy/verifoo
+    branch: ''

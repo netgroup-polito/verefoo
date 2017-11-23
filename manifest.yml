@@ -1,0 +1,11 @@
+---
+applications:
+- name: restfoo
+  memory: 1024M
+  disk_quota: 1024M
+  instances: 1
+  host: restfoo
+  domain: eu-de.mybluemix.net
+  path: target/verifoo.war
+  env:
+    LD_LIBRARY_PATH: /home/vcap/app/wlp/usr/servers/defaultServer/apps/myapp.war/WEB-INF/lib/jni/
