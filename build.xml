@@ -9,12 +9,21 @@
   <property name="report.dir" location="log" />
   <property name="lib.dir" location="WebContent/WEB-INF/lib" />
   <property name="target.dir" location="target" />
+  <path id="class.path">
+    <fileset dir="${lib.dir}">
+       <include name="**/*.jar" />
+    </fileset>
+    <fileset dir="lib/junit/">
+       <include name="**/*.jar" />
+    </fileset>
+  </path>
   <target name="init">
     <!-- Create the time stamp -->
     <tstamp/>
     <!-- Create the build directory structure used
          by compile -->
     <mkdir dir="${build.dir}"/>
+    <mkdir dir="${report.dir}"/>
   </target>
 
 	<!-- Target chk-bindings -->
@@ -41,12 +50,13 @@
     <!-- Compile the code from ${src} into ${build} -->
     <javac 
     	encoding="ISO-8859-1"
-    	classpath="WebContent/WEB-INF/lib/*.jar"
     	includeantruntime="false" 
     	srcdir="${src.dir}" 
     	destdir="${build.dir}" 
     	debug="${debug.dir}" 
-    	debuglevel="${debuglevel}"/>
+    	debuglevel="${debuglevel}">
+        <classpath refid="class.path" />
+    </javac>
   </target>
 
   <target name="clean" description="clean up">
@@ -65,7 +75,7 @@
 	    <junit printsummary="yes" haltonfailure="no" showoutput="true">
 		<!-- Project classpath, must include junit.jar -->
 		<classpath location="lib/junit/junit.jar" />
-	    <classpath location="lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar" />
+	        <classpath location="lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar" />
 		<!-- test class -->
 		<classpath location="${build.dir}" />
 		<test name="it.polito.verifoo.rest.test.TestCase"
