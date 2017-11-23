@@ -16,4 +16,4 @@ deploy:
   space: dev
   on:
     repo: raffysommy/verifoo
-    branch: ''
+    branch: 'rest-service'
