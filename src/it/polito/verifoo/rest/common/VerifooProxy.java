@@ -409,5 +409,9 @@ public class VerifooProxy {
 		    }
 			return ret;
 		}
+
+		public NetContext getNctx() {
+			return nctx;
+		}
 		
 }

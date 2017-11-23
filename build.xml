@@ -41,7 +41,7 @@
     <!-- Compile the code from ${src} into ${build} -->
     <javac 
     	encoding="ISO-8859-1"
-    	classpath="lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar;lib/junit/junit.jar;lib/Verifoo.jar;lib/com.microsoft.z3.jar;lib/lib4j/log4j-api-2.9.1.jar;lib/lib4j/log4j-core-2.9.1.jar"
+    	classpath="WebContent/WEB-INF/lib/*.jar"
     	includeantruntime="false" 
     	srcdir="${src.dir}" 
     	destdir="${build.dir}" 
