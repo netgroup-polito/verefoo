@@ -24,6 +24,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import javax.xml.ws.WebServiceException;
 
 import org.xml.sax.SAXException;
 
@@ -57,8 +58,9 @@ public class XMLProvider implements MessageBodyReader<Object>, MessageBodyWriter
         			e.printStackTrace();
         		}
                 m.marshal(object, entityStream);
-            } catch(JAXBException jaxbException) {
-                throw new WebApplicationException(jaxbException);
+            } catch(JAXBException e) {
+            	e.printStackTrace();
+            	throw new ProcessingException("Error serializing XML:"+e.toString());  
             }
     }
 
@@ -85,7 +87,8 @@ public class XMLProvider implements MessageBodyReader<Object>, MessageBodyWriter
     		}
             return (NFV)u.unmarshal(entityStream);
         } catch(JAXBException e) {
-        	throw new ProcessingException("Error deserializing XML.", e);
+        	e.printStackTrace();
+        	throw new ProcessingException("Error deserializing XML:"+e.toString());
         }
 	}
 
