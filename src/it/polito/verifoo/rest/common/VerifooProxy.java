@@ -338,7 +338,8 @@ public class VerifooProxy {
 					}
 					Link l = nffg.getLink().stream().filter(li -> li.getSourceNode().equals(n.getName())).findFirst().get();
 					next = nodes.stream().filter(node -> node.getName().equals(l.getDestNode()) ).findFirst().get();
-					rt.add(new RoutingTable(nctx.am.get(server.getIp()), netobjs.get(next), latency, c));
+					rt.add(new RoutingTable(nctx.am.get(server.getIp()), netobjs.get(next), nctx.addLatency(latency), c));
+					
 				}
 				//System.out.println("Adding routing table to "+n.getName());
 				net.routingOptimization(netobjs.get(n), rt);
