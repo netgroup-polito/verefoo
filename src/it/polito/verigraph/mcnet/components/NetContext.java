@@ -152,7 +152,7 @@ public class NetContext extends Core{
             policy.addConstraints(solver);
         }
         for (Tuple<BoolExpr, String> t : softConstraints) {
-			solver.AssertSoft(t._1, -1, t._2);
+			solver.AssertSoft(t._1, 100, t._2);
 		}  
     }
 

@@ -80,7 +80,7 @@ public class VerifooProxy {
 			hosts.forEach(h -> {
 				BoolExpr e = ctx.mkBoolConst(h.getName());
 				hostCondition.put(h.getName(),e);
-				nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(e), "servers"));
+				//nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(e), "servers"));
 			});
 			System.out.println("Host constraint: " + hostCondition);
 			conditionDB.entrySet().forEach(e -> {
