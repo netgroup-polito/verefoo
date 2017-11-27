@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{}Host" maxOccurs="unbounded"/>
+ *         &lt;element ref="{}elements" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -38,41 +38,41 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "host"
+    "elements"
 })
-@XmlRootElement(name = "Hosts")
-public class Hosts {
+@XmlRootElement(name = "firewall")
+public class Firewall {
 
-    @XmlElement(name = "Host", required = true)
-    protected List<Host> host;
+    @XmlElement(required = true)
+    protected List<Elements> elements;
 
     /**
-     * Gets the value of the host property.
+     * Gets the value of the elements property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the host property.
+     * This is why there is not a <CODE>set</CODE> method for the elements property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getHost().add(newItem);
+     *    getElements().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Host }
+     * {@link Elements }
      * 
      * 
      */
-    public List<Host> getHost() {
-        if (host == null) {
-            host = new ArrayList<Host>();
+    public List<Elements> getElements() {
+        if (elements == null) {
+            elements = new ArrayList<Elements>();
         }
-        return this.host;
+        return this.elements;
     }
 
 }

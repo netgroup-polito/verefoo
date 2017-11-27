@@ -26,8 +26,8 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{}Host" maxOccurs="unbounded"/>
+ *       &lt;sequence maxOccurs="unbounded">
+ *         &lt;element name="resource" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -38,41 +38,41 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "host"
+    "resource"
 })
-@XmlRootElement(name = "Hosts")
-public class Hosts {
+@XmlRootElement(name = "cache")
+public class Cache {
 
-    @XmlElement(name = "Host", required = true)
-    protected List<Host> host;
+    @XmlElement(required = true)
+    protected List<String> resource;
 
     /**
-     * Gets the value of the host property.
+     * Gets the value of the resource property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the host property.
+     * This is why there is not a <CODE>set</CODE> method for the resource property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getHost().add(newItem);
+     *    getResource().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Host }
+     * {@link String }
      * 
      * 
      */
-    public List<Host> getHost() {
-        if (host == null) {
-            host = new ArrayList<Host>();
+    public List<String> getResource() {
+        if (resource == null) {
+            resource = new ArrayList<String>();
         }
-        return this.host;
+        return this.resource;
     }
 
 }

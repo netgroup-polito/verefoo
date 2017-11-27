@@ -14,28 +14,35 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Classe Java per P-Name.
+ * <p>Classe Java per protocolTypes.
  * 
  * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
  * <p>
  * <pre>
- * &lt;simpleType name="P-Name">
+ * &lt;simpleType name="protocolTypes">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="IsolationProperty"/>
+ *     &lt;enumeration value="HTTP_REQUEST"/>
+ *     &lt;enumeration value="HTTP_RESPONSE"/>
+ *     &lt;enumeration value="POP3_REQUEST"/>
+ *     &lt;enumeration value="POP3_RESPONSE"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
  * 
  */
-@XmlType(name = "P-Name")
+@XmlType(name = "protocolTypes")
 @XmlEnum
-public enum PName {
+public enum ProtocolTypes {
 
-    @XmlEnumValue("IsolationProperty")
-    ISOLATION_PROPERTY("IsolationProperty");
+    HTTP_REQUEST("HTTP_REQUEST"),
+    HTTP_RESPONSE("HTTP_RESPONSE"),
+    @XmlEnumValue("POP3_REQUEST")
+    POP_3_REQUEST("POP3_REQUEST"),
+    @XmlEnumValue("POP3_RESPONSE")
+    POP_3_RESPONSE("POP3_RESPONSE");
     private final String value;
 
-    PName(String v) {
+    ProtocolTypes(String v) {
         value = v;
     }
 
@@ -43,8 +50,8 @@ public enum PName {
         return value;
     }
 
-    public static PName fromValue(String v) {
-        for (PName c: PName.values()) {
+    public static ProtocolTypes fromValue(String v) {
+        for (ProtocolTypes c: ProtocolTypes.values()) {
             if (c.value.equals(v)) {
                 return c;
             }

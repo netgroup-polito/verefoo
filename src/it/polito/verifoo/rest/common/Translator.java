@@ -13,7 +13,7 @@ public class Translator {
 		nfv.getHosts().getHost().forEach(this::searchHost);
 	}
 	public void searchHost(Host host){
-		nfv.getNFFG().getNode().forEach((node)->{
+		nfv.getGraphs().getGraph().forEach((g)->g.getNode().forEach((node)->{
 					String tosearch="(define-fun "+node.getName()+"@"+host.getName()+" () Bool\n  true)";
 					if(model.contains(tosearch)){
 						System.out.println(tosearch);
@@ -23,7 +23,7 @@ public class Translator {
 						host.getNodeRef().add(nr);
 					}
 				}
-		);
+		));
 	}
 	
 }

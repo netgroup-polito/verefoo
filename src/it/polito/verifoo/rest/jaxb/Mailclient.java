@@ -11,19 +11,20 @@ package it.polito.verifoo.rest.jaxb;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Classe Java per NodeRefType complex type.
+ * <p>Classe Java per anonymous complex type.
  * 
  * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
  * 
  * <pre>
- * &lt;complexType name="NodeRefType">
+ * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="node" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="mailserver" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -32,34 +33,35 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "NodeRefType")
-public class NodeRefType {
+@XmlType(name = "")
+@XmlRootElement(name = "mailclient")
+public class Mailclient {
 
-    @XmlAttribute(name = "node", required = true)
-    protected String node;
+    @XmlAttribute(name = "mailserver", required = true)
+    protected String mailserver;
 
     /**
-     * Recupera il valore della proprietà node.
+     * Recupera il valore della proprietà mailserver.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getNode() {
-        return node;
+    public String getMailserver() {
+        return mailserver;
     }
 
     /**
-     * Imposta il valore della proprietà node.
+     * Imposta il valore della proprietà mailserver.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setNode(String value) {
-        this.node = value;
+    public void setMailserver(String value) {
+        this.mailserver = value;
     }
 
 }

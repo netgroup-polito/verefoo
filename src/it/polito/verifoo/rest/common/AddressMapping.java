@@ -30,7 +30,7 @@ public class AddressMapping extends ArrayList<Tuple<NetworkObject,ArrayList<Data
 	@Override
 	public void accept(Node n) {
 		ArrayList<DatatypeExpr> al = new ArrayList<DatatypeExpr>();
-		al.add(nctx.am.get(n.getIp()));
+		al.add(nctx.am.get(n.getName()));
 		this.add(new Tuple<>(netobjs.get(n), al));
 	}
 

@@ -20,7 +20,7 @@ public final class NetContextGenerator{
 		String[] nodesip=new String[nodes.size()];
 	    for(int i = 0; i < nodes.size(); i++){
 	    	nodesname[i] = new String(nodes.get(i).getName());
-			nodesip[i] = new String(nodes.get(i).getIp());
+			nodesip[i] = new String(nodes.get(i).getName());
 	    }
 	    return new NetContext(ctx,nodesname,nodesip);
 	}

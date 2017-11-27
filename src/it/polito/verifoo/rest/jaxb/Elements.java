@@ -10,21 +10,24 @@ package it.polito.verifoo.rest.jaxb;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Classe Java per Property complex type.
+ * <p>Classe Java per anonymous complex type.
  * 
  * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
  * 
  * <pre>
- * &lt;complexType name="Property">
+ * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="name" use="required" type="{}P-Name" />
- *       &lt;attribute name="isSat" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;sequence>
+ *         &lt;element name="source" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="destination" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -33,60 +36,64 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Property")
-public class Property {
+@XmlType(name = "", propOrder = {
+    "source",
+    "destination"
+})
+@XmlRootElement(name = "elements")
+public class Elements {
 
-    @XmlAttribute(name = "name", required = true)
-    protected PName name;
-    @XmlAttribute(name = "isSat")
-    protected Boolean isSat;
+    @XmlElement(required = true)
+    protected String source;
+    @XmlElement(required = true)
+    protected String destination;
 
     /**
-     * Recupera il valore della proprietà name.
+     * Recupera il valore della proprietà source.
      * 
      * @return
      *     possible object is
-     *     {@link PName }
+     *     {@link String }
      *     
      */
-    public PName getName() {
-        return name;
+    public String getSource() {
+        return source;
     }
 
     /**
-     * Imposta il valore della proprietà name.
+     * Imposta il valore della proprietà source.
      * 
      * @param value
      *     allowed object is
-     *     {@link PName }
+     *     {@link String }
      *     
      */
-    public void setName(PName value) {
-        this.name = value;
+    public void setSource(String value) {
+        this.source = value;
     }
 
     /**
-     * Recupera il valore della proprietà isSat.
+     * Recupera il valore della proprietà destination.
      * 
      * @return
      *     possible object is
-     *     {@link Boolean }
+     *     {@link String }
      *     
      */
-    public Boolean isIsSat() {
-        return isSat;
+    public String getDestination() {
+        return destination;
     }
 
     /**
-     * Imposta il valore della proprietà isSat.
+     * Imposta il valore della proprietà destination.
      * 
      * @param value
      *     allowed object is
-     *     {@link Boolean }
+     *     {@link String }
      *     
      */
-    public void setIsSat(Boolean value) {
-        this.isSat = value;
+    public void setDestination(String value) {
+        this.destination = value;
     }
 
 }

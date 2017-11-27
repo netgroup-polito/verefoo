@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2017.11.21 alle 06:21:31 PM CET 
+// Generato il: 2017.11.27 alle 04:59:36 PM CET 
 //
 
 
@@ -34,6 +34,14 @@ public class ObjectFactory {
      * 
      */
     public ObjectFactory() {
+    }
+
+    /**
+     * Create an instance of {@link Mailclient }
+     * 
+     */
+    public Mailclient createMailclient() {
+        return new Mailclient();
     }
 
     /**
@@ -77,51 +85,163 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Fieldmodifier }
+     * 
+     */
+    public Fieldmodifier createFieldmodifier() {
+        return new Fieldmodifier();
+    }
+
+    /**
+     * Create an instance of {@link Antispam }
+     * 
+     */
+    public Antispam createAntispam() {
+        return new Antispam();
+    }
+
+    /**
+     * Create an instance of {@link Webclient }
+     * 
+     */
+    public Webclient createWebclient() {
+        return new Webclient();
+    }
+
+    /**
+     * Create an instance of {@link Configuration }
+     * 
+     */
+    public Configuration createConfiguration() {
+        return new Configuration();
+    }
+
+    /**
+     * Create an instance of {@link Firewall }
+     * 
+     */
+    public Firewall createFirewall() {
+        return new Firewall();
+    }
+
+    /**
+     * Create an instance of {@link Elements }
+     * 
+     */
+    public Elements createElements() {
+        return new Elements();
+    }
+
+    /**
+     * Create an instance of {@link Endhost }
+     * 
+     */
+    public Endhost createEndhost() {
+        return new Endhost();
+    }
+
+    /**
+     * Create an instance of {@link Endpoint }
+     * 
+     */
+    public Endpoint createEndpoint() {
+        return new Endpoint();
+    }
+
+    /**
+     * Create an instance of {@link Cache }
+     * 
+     */
+    public Cache createCache() {
+        return new Cache();
+    }
+
+    /**
+     * Create an instance of {@link Dpi }
+     * 
+     */
+    public Dpi createDpi() {
+        return new Dpi();
+    }
+
+    /**
+     * Create an instance of {@link Mailserver }
+     * 
+     */
+    public Mailserver createMailserver() {
+        return new Mailserver();
+    }
+
+    /**
+     * Create an instance of {@link Nat }
+     * 
+     */
+    public Nat createNat() {
+        return new Nat();
+    }
+
+    /**
+     * Create an instance of {@link Vpnaccess }
+     * 
+     */
+    public Vpnaccess createVpnaccess() {
+        return new Vpnaccess();
+    }
+
+    /**
+     * Create an instance of {@link Vpnexit }
+     * 
+     */
+    public Vpnexit createVpnexit() {
+        return new Vpnexit();
+    }
+
+    /**
+     * Create an instance of {@link Webserver }
+     * 
+     */
+    public Webserver createWebserver() {
+        return new Webserver();
+    }
+
+    /**
+     * Create an instance of {@link Neighbour }
+     * 
+     */
+    public Neighbour createNeighbour() {
+        return new Neighbour();
+    }
+
+    /**
+     * Create an instance of {@link Graphs }
+     * 
+     */
+    public Graphs createGraphs() {
+        return new Graphs();
+    }
+
+    /**
+     * Create an instance of {@link Graph }
+     * 
+     */
+    public Graph createGraph() {
+        return new Graph();
+    }
+
+    /**
+     * Create an instance of {@link Property }
+     * 
+     */
+    public Property createProperty() {
+        return new Property();
+    }
+
+    /**
      * Create an instance of {@link Node }
      * 
      */
     public Node createNode() {
         return new Node();
-    }
-
-    /**
-     * Create an instance of {@link NFFG }
-     * 
-     */
-    public NFFG createNFFG() {
-        return new NFFG();
-    }
-
-    /**
-     * Create an instance of {@link Link }
-     * 
-     */
-    public Link createLink() {
-        return new Link();
-    }
-
-    /**
-     * Create an instance of {@link VNFCatalog }
-     * 
-     */
-    public VNFCatalog createVNFCatalog() {
-        return new VNFCatalog();
-    }
-
-    /**
-     * Create an instance of {@link VNF }
-     * 
-     */
-    public VNF createVNF() {
-        return new VNF();
-    }
-
-    /**
-     * Create an instance of {@link ConfigurationType }
-     * 
-     */
-    public ConfigurationType createConfigurationType() {
-        return new ConfigurationType();
     }
 
     /**
@@ -133,11 +253,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Property }
+     * Create an instance of {@link Paths }
      * 
      */
-    public Property createProperty() {
-        return new Property();
+    public Paths createPaths() {
+        return new Paths();
     }
 
 }

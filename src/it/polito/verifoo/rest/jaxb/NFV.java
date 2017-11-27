@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2017.11.21 alle 06:21:31 PM CET 
+// Generato il: 2017.11.27 alle 04:59:36 PM CET 
 //
 
 
@@ -25,11 +25,9 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Property" type="{}Property"/>
- *         &lt;element ref="{}NF-FG"/>
+ *         &lt;element ref="{}graphs"/>
  *         &lt;element ref="{}Hosts"/>
  *         &lt;element ref="{}Connections"/>
- *         &lt;element ref="{}VNF-Catalog"/>
  *         &lt;element name="ParsingString" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
@@ -41,75 +39,45 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "property",
-    "nffg",
+    "graphs",
     "hosts",
     "connections",
-    "vnfCatalog",
     "parsingString"
 })
 @XmlRootElement(name = "NFV")
 public class NFV {
 
-    @XmlElement(name = "Property", required = true)
-    protected Property property;
-    @XmlElement(name = "NF-FG", required = true)
-    protected NFFG nffg;
+    @XmlElement(required = true)
+    protected Graphs graphs;
     @XmlElement(name = "Hosts", required = true)
     protected Hosts hosts;
     @XmlElement(name = "Connections", required = true)
     protected Connections connections;
-    @XmlElement(name = "VNF-Catalog", required = true)
-    protected VNFCatalog vnfCatalog;
     @XmlElement(name = "ParsingString")
     protected String parsingString;
 
     /**
-     * Recupera il valore della proprietà property.
+     * Recupera il valore della proprietà graphs.
      * 
      * @return
      *     possible object is
-     *     {@link Property }
+     *     {@link Graphs }
      *     
      */
-    public Property getProperty() {
-        return property;
+    public Graphs getGraphs() {
+        return graphs;
     }
 
     /**
-     * Imposta il valore della proprietà property.
+     * Imposta il valore della proprietà graphs.
      * 
      * @param value
      *     allowed object is
-     *     {@link Property }
+     *     {@link Graphs }
      *     
      */
-    public void setProperty(Property value) {
-        this.property = value;
-    }
-
-    /**
-     * Recupera il valore della proprietà nffg.
-     * 
-     * @return
-     *     possible object is
-     *     {@link NFFG }
-     *     
-     */
-    public NFFG getNFFG() {
-        return nffg;
-    }
-
-    /**
-     * Imposta il valore della proprietà nffg.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link NFFG }
-     *     
-     */
-    public void setNFFG(NFFG value) {
-        this.nffg = value;
+    public void setGraphs(Graphs value) {
+        this.graphs = value;
     }
 
     /**
@@ -158,30 +126,6 @@ public class NFV {
      */
     public void setConnections(Connections value) {
         this.connections = value;
-    }
-
-    /**
-     * Recupera il valore della proprietà vnfCatalog.
-     * 
-     * @return
-     *     possible object is
-     *     {@link VNFCatalog }
-     *     
-     */
-    public VNFCatalog getVNFCatalog() {
-        return vnfCatalog;
-    }
-
-    /**
-     * Imposta il valore della proprietà vnfCatalog.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link VNFCatalog }
-     *     
-     */
-    public void setVNFCatalog(VNFCatalog value) {
-        this.vnfCatalog = value;
     }
 
     /**
