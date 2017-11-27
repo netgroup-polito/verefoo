@@ -33,6 +33,7 @@
     <xsd:simpleType name="functionalTypes">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="FIREWALL" />
+            <xsd:enumeration value="CLASSIFIER" />
             <xsd:enumeration value="ENDHOST" />
             <xsd:enumeration value="ENDPOINT" />
             <xsd:enumeration value="ANTISPAM" />
@@ -98,6 +99,7 @@
             <xsd:attribute name="id" type="xsd:long" use="optional" />
             <xsd:attribute name="name" type="xsd:string" use="required" />
             <xsd:attribute name="functional_type" type="functionalTypes" use="required" />
+            <xsd:attribute name="reqDiskStorage" type="xsd:int" use="required" />
         </xsd:complexType>
         <xsd:unique name="uniqueNeighbourId">
             <xsd:selector xpath="neighbour" />
@@ -119,6 +121,7 @@
         <xsd:complexType>
             <xsd:choice>
                 <xsd:element ref="firewall" />
+                <xsd:element ref="classifier" />
                 <xsd:element ref="endhost" />
                 <xsd:element ref="endpoint" />
                 <xsd:element ref="antispam" />
@@ -155,6 +158,8 @@
                 <xsd:element ref="elements" maxOccurs="unbounded" />
             </xsd:sequence>
         </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="classifier">
     </xsd:element>
     <xsd:element name="elements">
         <xsd:complexType>
