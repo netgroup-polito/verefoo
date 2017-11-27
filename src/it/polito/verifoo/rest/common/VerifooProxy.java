@@ -28,6 +28,7 @@ public class VerifooProxy {
 		private Logger logger = LogManager.getLogger("mylog");
 		List<List<String>> savedChain = new ArrayList<>();
 		List<Node> nodes;
+		List<Link> links = new ArrayList<>();
 		List<Host> hosts;
 		List<Connection> connections;
 		Graph graph;
@@ -68,7 +69,7 @@ public class VerifooProxy {
 		    check = new Checker(ctx,nctx,net);
 	    }
 	    
-		private void setConditions() {
+		private void setConditions() throws BadNffgException{
 		  	
 			HashMap<String, BoolExpr> hostCondition = new HashMap<>();
 			hosts.forEach(h -> {
@@ -137,8 +138,7 @@ public class VerifooProxy {
 									.collect(Collectors.toList())
 									.forEach(i -> {
 										String node = i.toString().substring(0, i.toString().lastIndexOf('@'));
-										String vnfToFind = nodes.stream().filter(n -> n.getName().equals(node)).findFirst().get().getVNF();
-										int capacity = vnfCat.stream().filter(f -> f.getName().equals(vnfToFind)).findFirst().get().getReqDiskStorage();
+										int capacity = nodes.stream().filter(n -> n.getName().equals(node)).findFirst().get().getReqDiskStorage();
 										diskRequirements.add(ctx.mkMul(ctx.mkInt(capacity), nctx.bool_to_int(i)));
 									});
 				System.out.println(h.getName() + " disk requirement: " + diskRequirements);
@@ -164,7 +164,7 @@ public class VerifooProxy {
 				nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(hostCondition.get(h.getName())), "num_servers"));
 			});
 		}
-		
+
 		
 		private void checkPhysicalNetwork() throws BadNffgException{
             long nServer = hosts.stream()
@@ -248,13 +248,29 @@ public class VerifooProxy {
             }
             Node client = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT);}).findFirst().get();
             Node server = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).findFirst().get();
+            if(client.getNeighbour().size() != 1 || server.getNeighbour().size() != 1) throw new BadNffgException();
+            String nextName = client.getNeighbour().stream().filter(n -> !(n.getName().equals(client.getName()))).findFirst().get().getName();
+			Node next = nodes.stream().filter(n -> n.getName().equals(nextName)).findFirst().get();
+            createLink(client, next, server);
             createRoutingTables(client, server);   
+		}
+		private void createLink(Node prec, Node current, Node server) throws BadNffgException{
+			if(current.getName().equals(server.getName())){
+				links.add(new Link(prec.getName(), current.getName()));
+				return;
+			}
+			if(current.getNeighbour().size() > 2) throw new BadNffgException();
+			System.out.println("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
+			links.add(new Link(prec.getName(), current.getName()));
+			String neighbour = current.getNeighbour().stream().filter(n -> !(n.getName().equals(prec.getName()))).findFirst().get().getName();
+			Node next = nodes.stream().filter(n -> n.getName().equals(neighbour)).findFirst().get();
+			createLink(current, next, server);
 		}
 		private void createRoutingTables(Node client, Node server) throws BadNffgException{
 			
 			//System.out.println("Searching next hop for " + client.getName() + " towards " + server.getName());
 			
-			Link link = nffg.getLink().stream().filter(l -> l.getSourceNode().equals(client.getName())).findFirst().get();
+			Link link = links.stream().filter(l -> l.getSourceNode().equals(client.getName())).findFirst().get();
 			if(link == null){
 				logger.error("Route: From CLIENT " + client.getName() 
 									+ " to " + nctx.am.get(server.getName()) 
@@ -286,7 +302,7 @@ public class VerifooProxy {
 				ArrayList<RoutingTable> rt = new ArrayList<RoutingTable>();
 				System.out.println("-----NODE "+n.getName()+"-----");
 				List<String> cond = rawConditions.get(n).stream().distinct().collect(Collectors.toList());
-				System.out.println("Condition for node "+ n.getName() +" -> "+ cond);
+				System.out.println("Condition for "+ n.getName() +" -> "+ cond);
 				for(String s:cond){
 					BoolExpr c;
 					int latency = 0;
@@ -330,7 +346,7 @@ public class VerifooProxy {
 						}
 						
 					}
-					Link l = nffg.getLink().stream().filter(li -> li.getSourceNode().equals(n.getName())).findFirst().get();
+					Link l = links.stream().filter(li -> li.getSourceNode().equals(n.getName())).findFirst().get();
 					next = nodes.stream().filter(node -> node.getName().equals(l.getDestNode()) ).findFirst().get();
 					rt.add(new RoutingTable(nctx.am.get(server.getName()), netobjs.get(next), nctx.addLatency(latency), c));
 					
@@ -360,7 +376,7 @@ public class VerifooProxy {
 				//System.out.println("Only server node can be deployed on server host -> tried to deploy " + source.getName() + " on " +currentHost );
 				return false;
 			}
-			Link link = nffg.getLink().stream().filter(l -> l.getSourceNode().equals(source.getName())).findFirst().get();
+			Link link = links.stream().filter(l -> l.getSourceNode().equals(source.getName())).findFirst().orElse(null);
 			if(link == null){
 				logger.error("Route: From " + source.getName() 
 									+ " to " + nctx.am.get(server.getName()) 
