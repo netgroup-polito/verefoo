@@ -16,6 +16,7 @@ import com.microsoft.z3.Status;
 import it.polito.verifoo.rest.common.BadNffgException;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
+import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 
@@ -27,12 +28,13 @@ public class RestFoo {
 		@Produces(MediaType.APPLICATION_XML)
 	    public NFV put(NFV root) throws MalformedURLException {
 			try {
-				VerifooProxy test = new VerifooProxy(root.getNFFG(), root.getHosts(), root.getConnections(), root.getVNFCatalog());
-				IsolationResult res=test.checkNFFGProperty();
-				if(res.result!=Status.UNSATISFIABLE){
-					new Translator(res.model.toString(),root).convert();
-				}
-				root.getProperty().setIsSat(res.result!=Status.UNSATISFIABLE);
+				for(Graph g:root.getGraphs().getGraph()){
+	            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections());
+	            	IsolationResult res=test.checkNFFGProperty();
+	            	if(res.result != Status.UNSATISFIABLE)
+	            		new Translator(res.model.toString(),root).convert();
+	            	g.getProperty().setIsSat(res.result!=Status.UNSATISFIABLE);
+	            }
 				return root;
 			} catch (BadNffgException e) {
 	        	throw new ProcessingException("Error in NFFG: "+e.toString());

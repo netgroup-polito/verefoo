@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2017.11.27 alle 04:59:36 PM CET 
+// Generato il: 2017.11.27 alle 07:48:38 PM CET 
 //
 
 
@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice>
  *         &lt;element ref="{}firewall"/>
+ *         &lt;element ref="{}classifier"/>
  *         &lt;element ref="{}endhost"/>
  *         &lt;element ref="{}endpoint"/>
  *         &lt;element ref="{}antispam"/>
@@ -53,6 +54,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "firewall",
+    "classifier",
     "endhost",
     "endpoint",
     "antispam",
@@ -71,6 +73,7 @@ import javax.xml.bind.annotation.XmlType;
 public class Configuration {
 
     protected Firewall firewall;
+    protected Object classifier;
     protected Endhost endhost;
     protected Endpoint endpoint;
     protected Antispam antispam;
@@ -113,6 +116,30 @@ public class Configuration {
      */
     public void setFirewall(Firewall value) {
         this.firewall = value;
+    }
+
+    /**
+     * Recupera il valore della proprietà classifier.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Object }
+     *     
+     */
+    public Object getClassifier() {
+        return classifier;
+    }
+
+    /**
+     * Imposta il valore della proprietà classifier.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Object }
+     *     
+     */
+    public void setClassifier(Object value) {
+        this.classifier = value;
     }
 
     /**

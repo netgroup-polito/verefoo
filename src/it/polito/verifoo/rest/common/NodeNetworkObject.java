@@ -68,13 +68,14 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject> implements j
 				(n,netobjs)->{
 					if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
 						n.getConfiguration().getFirewall().getElements().forEach((e)->{
-					    	    ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+							ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
 							    Tuple<DatatypeExpr,DatatypeExpr> rule=new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(e.getSource()),nctx.am.get(e.getDestination()));
 							    acl.add(rule);
-								((AclFirewall)netobjs).addAcls(acl);
-								logger.debug("Added acl:"+ rule.toString());
-							}
-						);
+							    System.out.println("Adding blocking rule " + acl);
+							    ((AclFirewall)netobjs).addAcls(acl);
+							    logger.debug("Added acl:"+ rule.toString() +" to "+n.getName());
+						});
+						
 					}
 				}
 		);
@@ -103,6 +104,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject> implements j
 				break;
 			}
 			case ANTISPAM:{
+				//TODO IP are string, this doesn't work
 				PolitoAntispam spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 				this.put(n,spam);
 				int[] blacklist=n.getConfiguration().getAntispam().getSource().stream().mapToInt((s)->Integer.parseInt(s)).toArray();
@@ -115,6 +117,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject> implements j
 				break;
 			}
 			case DPI:{
+				//TODO notAllowed field is a string, this doesn't work
 				PolitoIDS ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 				this.put(n,ids);
 				int[] blacklist=n.getConfiguration().getDpi().getNotAllowed().stream().mapToInt((s)->Integer.parseInt(s)).toArray();

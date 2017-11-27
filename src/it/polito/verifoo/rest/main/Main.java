@@ -36,17 +36,15 @@ public class Main {
             u.setSchema(schema);
             // unmarshal a document into a tree of Java content objects
             NFV root = (NFV) u.unmarshal( new FileInputStream( "./xsd/nfvInfo.xml" ) );
-			// make changes here to the root
             
-             //TODO after routing table and acl are implemented
-            
-			VerifooProxy test = new VerifooProxy(root.getNFFG(), root.getHosts(), root.getConnections(), root.getVNFCatalog());
+            for(Graph g:root.getGraphs().getGraph()){
+            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections());
+            	IsolationResult res=test.checkNFFGProperty();
+            	if(res.result != Status.UNSATISFIABLE)
+            		new Translator(res.model.toString(),root).convert();
+            	g.getProperty().setIsSat(res.result!=Status.UNSATISFIABLE);
+            }
 			
-            IsolationResult res=test.checkNFFGProperty();
-            root.getProperty().setIsSat(res.result!=Status.UNSATISFIABLE);
-            if(res.result == Status.UNSATISFIABLE) return;
-            new Translator(res.model.toString(),root).convert();
-            
             // create a Marshaller and marshal to std out
             Marshaller m = jc.createMarshaller();
             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
@@ -68,7 +66,6 @@ public class Main {
         	logger.error(e);
             System.exit(1);
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
 			logger.error(e);
 			System.exit(1);
 		}
