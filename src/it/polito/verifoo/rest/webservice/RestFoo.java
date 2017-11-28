@@ -36,18 +36,21 @@ public class RestFoo {
 	            	}
 	            	g.getProperty().setIsSat(res.result!=Status.UNSATISFIABLE);
 	            }
-				root.setParsingString(z3model);
-				Response res = ClientBuilder.newClient()
-						.target(req.getRequestURL().toString().replace("/rest", ""))
-						.path("/translate")
-						.request(MediaType.APPLICATION_XML)
-						.accept(MediaType.APPLICATION_XML)
-						.post(Entity.entity(root,MediaType.APPLICATION_XML));
-				if(res.getStatusInfo()==javax.ws.rs.core.Response.Status.OK){
-						return res.readEntity(NFV.class);
-				}else{
-						throw new ProcessingException("Translator Error:"+res.readEntity(String.class));
+				if(!z3model.isEmpty()){
+					root.setParsingString(z3model);			
+					Response res = ClientBuilder.newClient()
+							.target(req.getRequestURL().toString().replace("/rest", ""))
+							.path("/translate")
+							.request(MediaType.APPLICATION_XML)
+							.accept(MediaType.APPLICATION_XML)
+							.post(Entity.entity(root,MediaType.APPLICATION_XML));
+					if(res.getStatusInfo()==javax.ws.rs.core.Response.Status.OK){
+							return res.readEntity(NFV.class);
+					}else{
+							throw new ProcessingException("Translator Error:"+res.readEntity(String.class));
+					}
 				}
+				return root;
 			} catch (BadNffgException e) {
 	        	throw new ProcessingException("Error in NFFG: "+e.toString());
 			}

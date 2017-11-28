@@ -186,8 +186,11 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject> implements j
 					break;
 				}
 			}
-		} catch (BadNffgException e) {
+		}catch (BadNffgException e) {
 			throw new ProcessingException(e.getLocalizedMessage());
+		}
+		catch (NumberFormatException e) {			
+			throw new ProcessingException("Cannot convert to int"+e.getLocalizedMessage());
 		}
 	}
 	
