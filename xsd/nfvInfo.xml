@@ -26,9 +26,7 @@
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf2">
           <cache>
-            <resource>r1</resource>
-            <resource>r2</resource>
-            <resource>r3</resource>
+            <resource>node2</resource>
           </cache>
         </configuration>
       </node>
@@ -60,5 +58,5 @@
   	<Connection sourceHost="host2" destHost="hostB" avgLatency ="-100"/>
   	<Connection sourceHost="host3" destHost="hostB" avgLatency ="-1"/>
   </Connections>
-  <ParsingString>StringToParse</ParsingString>
+  <ParsingString></ParsingString>
 </NFV>

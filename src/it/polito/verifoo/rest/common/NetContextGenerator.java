@@ -3,7 +3,9 @@
  */
 package it.polito.verifoo.rest.common;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.microsoft.z3.Context;
 
@@ -16,12 +18,10 @@ import it.polito.verigraph.mcnet.components.NetContext;
  */
 public final class NetContextGenerator{
 	public static NetContext generate(Context ctx,List<Node> nodes){
-		String[] nodesname=new String[nodes.size()];
-		String[] nodesip=new String[nodes.size()];
-	    for(int i = 0; i < nodes.size(); i++){
-	    	nodesname[i] = new String(nodes.get(i).getName());
-			nodesip[i] = new String(nodes.get(i).getName());
-	    }
+		String[] nodesname={};
+		nodesname=nodes.stream().map((n)->n.getName()).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(nodesname);
+		//suppose nodename=nodeip;
+		String[] nodesip=nodesname;
 	    return new NetContext(ctx,nodesname,nodesip);
 	}
 }

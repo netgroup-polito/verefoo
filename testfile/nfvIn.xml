@@ -1,17 +1,45 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
-    <Property name="IsolationProperty"/>
-    <NF-FG name="nffg0">
-        <Node name="nodeA" NF-FG="nffg0" VNF="f1" Ip="ip_0"/>
-        <Node name="node1" NF-FG="nffg0" VNF="f3" Ip="ip_1"/>
-        <Node name="node2" NF-FG="nffg0" VNF="f7" Ip="ip_2"/>
-        <Node name="node3" NF-FG="nffg0" VNF="f3" Ip="ip_3"/>
-        <Node name="nodeB" NF-FG="nffg0" VNF="f2" Ip="ip_4"/>
-        <Link name="link0" sourceNode="nodeA" destNode="node1" NF-FG="nffg0"/>
-        <Link name="link1" sourceNode="node1" destNode="node2" NF-FG="nffg0"/>
-        <Link name="link3" sourceNode="node2" destNode="node3" NF-FG="nffg0"/>
-        <Link name="link4" sourceNode="node3" destNode="nodeB" NF-FG="nffg0"/>
-    </NF-FG>
+    <graphs>
+        <graph id="0">
+            <Property name="IsolationProperty"/>
+            <node name="nodeA" functional_type="WEBCLIENT" reqDiskStorage="10">
+                <neighbour name="node1"/>
+                <configuration name="confA" description="A simple description">
+                    <webclient nameWebServer="nodeB"/>
+                </configuration>
+            </node>
+            <node name="node1" functional_type="FIREWALL" reqDiskStorage="10">
+                <neighbour name="nodeA"/>
+                <neighbour name="node2"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall>
+                        <elements>
+                            <source>nodeA</source>
+                            <destination>nodeB</destination>
+                        </elements>
+                    </firewall>
+                </configuration>
+            </node>
+            <node name="node2" functional_type="CACHE" reqDiskStorage="10">
+                <neighbour name="node1"/>
+                <neighbour name="nodeB"/>
+                <configuration name="conf2" description="A simple description">
+                    <cache>
+                        <resource>node2</resource>
+                    </cache>
+                </configuration>
+            </node>
+            <node name="nodeB" functional_type="WEBSERVER" reqDiskStorage="10">
+                <neighbour name="node2"/>
+                <configuration name="confB" description="A simple description">
+                    <webserver>
+                        <name>Server1</name>
+                    </webserver>
+                </configuration>
+            </node>
+        </graph>
+    </graphs>
     <Hosts>
         <Host name="hostA" diskStorage="10" type="CLIENT"/>
         <Host name="host1" diskStorage="10" type="MIDDLEBOX"/>
@@ -30,15 +58,5 @@
         <Connection sourceHost="host2" destHost="hostB" avgLatency="-100"/>
         <Connection sourceHost="host3" destHost="hostB" avgLatency="-1"/>
     </Connections>
-    <VNF-Catalog>
-        <VNF name="f1" FunctionalType="WEB_CLIENT" reqDiskStorage="10"/>
-        <VNF name="f2" FunctionalType="WEB_SERVER" reqDiskStorage="10"/>
-        <VNF name="f3" FunctionalType="FW" reqDiskStorage="10">
-            <Configuration name="ip_0" value="ip_4"/>
-        </VNF>
-        <VNF name="f4" FunctionalType="NAT" reqDiskStorage="4"/>
-        <VNF name="f5" FunctionalType="MAIL_CLIENT" reqDiskStorage="10"/>
-        <VNF name="f6" FunctionalType="MAIL_SERVER" reqDiskStorage="10"/>
-        <VNF name="f7" FunctionalType="IDS" reqDiskStorage="10"/>
-    </VNF-Catalog>
+    <ParsingString></ParsingString>
 </NFV>

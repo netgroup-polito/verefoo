@@ -50,9 +50,8 @@ public class VerifooProxy {
 			nodes.forEach(netobjs);
 			
 			
-			AddressMapping adm = new AddressMapping(netobjs, nctx);
-			nodes.forEach(adm);
-		    net.setAddressMappings(adm);
+			AddressMapping adm = new AddressMapping(netobjs, nctx, net);
+			adm.setAddressMappings(nodes);
 		    
 		    
 		    rawConditions=new HashMap<>();
@@ -65,6 +64,8 @@ public class VerifooProxy {
 		    checkNffg();	
 		    setConditions();
 		    netobjs.generateAcl();
+		    //TODO: check
+		    //netobjs.generateCache();
 		    netobjs.attachToNet();
 		    check = new Checker(ctx,nctx,net);
 	    }

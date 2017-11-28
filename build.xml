@@ -91,5 +91,5 @@
 		    <lib dir="${lib.dir}">
 		    </lib>
 	  </war>
-  </target>	
+  </target>
 </project>
