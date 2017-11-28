@@ -1,6 +1,7 @@
 package it.polito.verifoo.rest.common;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -160,7 +161,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject> implements j
 				case NAT:{		
 					PolitoNat nat=new PolitoNat(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,nat);
-					nat.setInternalAddress(n.getConfiguration().getNat().getSource().stream().map((s)->nctx.nm.get(s)).collect(Collectors.toCollection(ArrayList<DatatypeExpr>::new)));
+					nat.setInternalAddress(n.getConfiguration().getNat().getSource().stream().map((s)->nctx.am.get(s)).collect(Collectors.toCollection(ArrayList::new)));							
 					break;
 				}
 				case VPNACCESS:{					
