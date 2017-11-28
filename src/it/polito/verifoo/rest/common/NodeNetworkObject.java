@@ -1,7 +1,6 @@
 package it.polito.verifoo.rest.common;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,13 +25,17 @@ import it.polito.verigraph.mcnet.netobjs.PolitoCache;
 import it.polito.verigraph.mcnet.netobjs.PolitoEndHost;
 import it.polito.verigraph.mcnet.netobjs.PolitoFieldModifier;
 import it.polito.verigraph.mcnet.netobjs.PolitoIDS;
+import it.polito.verigraph.mcnet.netobjs.PolitoMailClient;
+import it.polito.verigraph.mcnet.netobjs.PolitoMailServer;
 import it.polito.verigraph.mcnet.netobjs.PolitoNat;
+import it.polito.verigraph.mcnet.netobjs.PolitoWebClient;
+import it.polito.verigraph.mcnet.netobjs.PolitoWebServer;
 /**
  * This class generate a Map of a new network object and associated node.
  * @author Raffaele
  *
  */
-public class NodeNetworkObject extends HashMap<Node, NetworkObject> implements java.util.function.Consumer<Node>{
+public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	/**
 	 * 
 	 */
@@ -42,17 +45,21 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject> implements j
 	private Context ctx;
     private NetContext nctx;
     private Network net;
+	private List<it.polito.verifoo.rest.jaxb.Node> nodes;
     /**
      * This class is an helper to generate network object
      * @param ctx Z3 Context
      * @param nctx NetworkContext
      * @param net Network
+     * @param nodes 
      */
-    public NodeNetworkObject(Context ctx, NetContext nctx, Network net) {
+    public NodeNetworkObject(Context ctx, NetContext nctx, Network net, List<it.polito.verifoo.rest.jaxb.Node> nodes) {
 		super();
 		this.ctx = ctx;
 		this.nctx = nctx;
 		this.net = net;
+		this.nodes=nodes;
+		nodes.forEach(this::generateNetObj);
 	}
 
 	/**
@@ -98,14 +105,11 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject> implements j
 				}
 		);
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.util.function.Consumer#accept(java.lang.Object)
+	/**
 	 * @param Node n
 	 * @description This function process the node and generate a network object according to VNF type.
 	 */
-	@Override
-	public void accept(Node n) {
+	public void generateNetObj(Node n) {
 		try {
 			FunctionalTypes ftype=n.getFunctionalType();
 			switch (ftype) {
@@ -146,16 +150,14 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject> implements j
 				}
 				case MAILCLIENT:{
 					//TODO
-					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoMailClient eh=new PolitoMailClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getMailclient().getMailserver())});
 					this.put(n,eh);
-					eh.installEndHost(new PacketWrapper(n.getConfiguration().getEndhost(), nctx));
 					break;
 				}
 				// TODO for PolitoMailClient is needed another parameter
 				case MAILSERVER:{
-					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoMailServer eh=new PolitoMailServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);
-					eh.installEndHost(new PacketWrapper(n.getConfiguration().getEndhost(), nctx));
 					break;
 				}
 				case NAT:{		
@@ -171,15 +173,13 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject> implements j
 					break;
 				}
 				case WEBCLIENT:{
-					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoWebClient eh=new PolitoWebClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer())});
 					this.put(n,eh);
-					eh.installEndHost(new PacketWrapper(n.getConfiguration().getEndhost(), nctx));
 					break;
 				}
 				case WEBSERVER:{
-					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoWebServer eh=new PolitoWebServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);
-					eh.installEndHost(new PacketWrapper(n.getConfiguration().getEndhost(), nctx));
 					break;
 				}
 				default:{

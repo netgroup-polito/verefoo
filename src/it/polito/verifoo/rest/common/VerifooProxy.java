@@ -46,9 +46,7 @@ public class VerifooProxy {
 			net = new Network (ctx,new Object[]{nctx});
 			
 			/* Generate the different network object and map it to XML Node */
-			netobjs=new NodeNetworkObject(ctx, nctx, net);			
-			nodes.forEach(netobjs);
-			
+			netobjs=new NodeNetworkObject(ctx, nctx, net,nodes);
 			
 			AddressMapping adm = new AddressMapping(netobjs, nctx, net);
 			adm.setAddressMappings(nodes);

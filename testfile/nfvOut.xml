@@ -34,7 +34,7 @@
                 <neighbour name="node2"/>
                 <configuration name="confB" description="A simple description">
                     <webserver>
-                        <name>Server1</name>
+                        <name>nodeB</name>
                     </webserver>
                 </configuration>
             </node>
