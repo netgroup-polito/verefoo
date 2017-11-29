@@ -94,10 +94,10 @@ public class Checker {
 		this.solver.Add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1));
 
 		// Constraint3nodeHasAddr(srcNode,p1.srcAddr)
-		//this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));
+		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Node(), nctx.pf.get("src").apply(p1)));
 
 		// Constraint4p1.origin == srcNode
-		//this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
+		this.solver.Add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
 
 		// Constraint5nodeHasAddr(destNode,p1.destAddr)
 		this.solver.Add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));

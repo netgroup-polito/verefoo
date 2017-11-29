@@ -104,17 +104,6 @@ public class AclFirewall extends NetworkObject{
 	    	            								nctx.recv.apply(n_1, fw, p_0),1,null,null,null,null), 
 	    	            						ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0))))),1,null,null,null,null));
 
-    	  constraints.add(
-	            	ctx.mkForall(new Expr[]{n_0, p_0},
-	            			ctx.mkImplies(	
-	            					ctx.mkAnd((BoolExpr)nctx.recv.apply(n_0, fw, p_0),
-	            							ctx.mkNot(
-	            									(BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0))
-	            								)),
-	            						ctx.mkAnd(ctx.mkExists(new Expr[]{n_1}, (BoolExpr)nctx.send.apply(new Expr[]{ fw, n_1, p_0}),1,null,null,null,null)
-	            								)
-	    	    	            	)
-	            			,1,null,null,null,null));
     }
 
     private void aclConstraints(Optimize solver){
