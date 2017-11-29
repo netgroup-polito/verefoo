@@ -10,20 +10,20 @@ public class PacketWrapper extends PacketModel {
 		if(eh!=null){
 			try {
 				if(eh.getBody()!=null && !eh.getBody().isEmpty())
-					this.setBody(Integer.parseInt(eh.getBody()));
+					this.setBody(eh.getBody().hashCode());
 				if(eh.getEmailFrom()!=null && !eh.getEmailFrom().isEmpty())
-					this.setEmailFrom(Integer.parseInt(eh.getEmailFrom()));
+					this.setEmailFrom(eh.getEmailFrom().hashCode());
 				if(eh.getDestination()!=null && !eh.getDestination().isEmpty())
 					this.setIp_dest(nctx.am.get(eh.getDestination()));
 				if(eh.getOptions()!=null && !eh.getOptions().isEmpty())
-					this.setOptions(Integer.parseInt(eh.getOptions()));
+					this.setOptions(eh.getOptions().hashCode());
 				//TODO: Check
 				if(eh.getProtocol()!=null)
 					this.setProto((eh.getProtocol().ordinal()));
 				if(eh.getSequence()!=null)
 					this.setSeq(eh.getSequence().intValue());
 				if(eh.getUrl()!=null && !eh.getUrl().isEmpty())
-					this.setUrl(Integer.parseInt(eh.getUrl()));
+					this.setUrl(eh.getUrl().hashCode());
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 				throw new BadNffgException(e.getMessage());

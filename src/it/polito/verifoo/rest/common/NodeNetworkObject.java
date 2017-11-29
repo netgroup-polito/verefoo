@@ -131,7 +131,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					//TODO IP are string, this doesn't work
 					PolitoAntispam spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,spam);
-					int[] blacklist=n.getConfiguration().getAntispam().getSource().stream().mapToInt((s)->Integer.parseInt(s)).toArray();
+					int[] blacklist=n.getConfiguration().getAntispam().getSource().stream().mapToInt((s)->s.hashCode()).toArray();
 					spam.installAntispam(blacklist);
 					break;
 				}
@@ -144,7 +144,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					//TODO notAllowed field is a string, this doesn't work
 					PolitoIDS ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,ids);
-					int[] blacklist=n.getConfiguration().getDpi().getNotAllowed().stream().mapToInt((s)->Integer.parseInt(s)).toArray();
+					int[] blacklist=n.getConfiguration().getDpi().getNotAllowed().stream().mapToInt((s)->s.hashCode()).toArray();
 					ids.installIDS(blacklist);
 					break;
 				}
