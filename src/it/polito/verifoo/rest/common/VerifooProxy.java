@@ -63,7 +63,7 @@ public class VerifooProxy {
 		    setConditions();
 		    netobjs.generateAcl();
 		    //TODO: check
-		    //netobjs.generateCache();
+		    netobjs.generateCache();
 		    netobjs.attachToNet();
 		    check = new Checker(ctx,nctx,net);
 	    }
