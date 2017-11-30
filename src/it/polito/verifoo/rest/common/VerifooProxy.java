@@ -26,13 +26,21 @@ public class VerifooProxy {
 	    private HashMap<Node, HashMap<String, BoolExpr>> conditionDB;
 		public Checker check;
 		private Logger logger = LogManager.getLogger("mylog");
-		List<List<String>> savedChain = new ArrayList<>();
+		private List<List<String>> savedChain = new ArrayList<>();
 		List<Node> nodes;
 		List<Link> links = new ArrayList<>();
 		List<Host> hosts;
 		List<Connection> connections;
 		Graph graph;
 		private List<NodeCapacity> capacities;
+		/**
+		 * Public constructor for the verifoo proxy service
+		 * @param graph The graph that will be deployed on the network
+		 * @param hosts The list of hosts in the network
+		 * @param conns The connections between hosts
+		 * @param capacityDefinition The list of the capacity for each node that will be deployed
+		 * @throws BadNffgException
+		 */
 	    public VerifooProxy(Graph graph,Hosts hosts,Connections conns, CapacityDefinition capacityDefinition) throws BadNffgException{
 			HashMap<String, String> cfg = new HashMap<String, String>();
 		    cfg.put("model", "true");
@@ -65,19 +73,25 @@ public class VerifooProxy {
 		    checkNffg();	
 		    setConditions();
 		    netobjs.generateAcl();
-		    //TODO: check
 		    netobjs.generateCache();
 		    netobjs.attachToNet();
 		    check = new Checker(ctx,nctx,net);
 	    }
-	    
+	    /**
+	     * Set all the conditions for the nodes. First, it sets up the host conditions. 
+	     * Then, it creates the conditions to make that a node is deployed only on one host.
+	     * After that, it creates the condition that if an host has a node deployed on it, it has to be active.
+	     * Lastly, it creates the conditions that the sum of the disk requirements of all the nodes
+	     * deployed on an host, is less than disk capacity of that host 
+	     * @throws BadNffgException
+	     */
 		private void setConditions() throws BadNffgException{
 		  	
 			HashMap<String, BoolExpr> hostCondition = new HashMap<>();
 			hosts.forEach(h -> {
 				BoolExpr e = ctx.mkBoolConst(h.getName());
 				hostCondition.put(h.getName(),e);
-				//nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(e), "servers"));
+				nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(e), "servers"));
 			});
 			System.out.println("Host constraint: " + hostCondition);
 			conditionDB.entrySet().forEach(e -> {
@@ -140,7 +154,12 @@ public class VerifooProxy {
 									.collect(Collectors.toList())
 									.forEach(i -> {
 										String node = i.toString().substring(0, i.toString().lastIndexOf('@'));
-										int capacity = capacities.stream().filter(c->c.getNode().equals(node)).findFirst().get().getCapacity();
+										NodeCapacity app = capacities.stream().filter(c->c.getNode().equals(node)).findFirst().orElse(null);
+										int capacity;
+										if(app == null)
+											capacity = 0;
+										else
+											capacity = app.getCapacity();
 										diskRequirements.add(ctx.mkMul(ctx.mkInt(capacity), nctx.bool_to_int(i)));
 									});
 				System.out.println(h.getName() + " disk requirement: " + diskRequirements);
@@ -167,7 +186,11 @@ public class VerifooProxy {
 			});
 		}
 
-		
+		/**
+		 * Checks if in the xml there are only one host client and one host server, then
+		 * it calls the function to calculate all the possible paths from the host client to the host server
+		 * @throws BadNffgException
+		 */
 		private void checkPhysicalNetwork() throws BadNffgException{
             long nServer = hosts.stream()
 	            	 .filter((h) -> {return h.getType() == TypeOfHost.SERVER;})
@@ -185,6 +208,11 @@ public class VerifooProxy {
 			String hostServer = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.SERVER;}).findFirst().get().getName();
             createHostChain(hostClient, hostServer);
 		}
+		/**
+		 * Calculates all the possible paths from the host client to the host server
+		 * @param hostClient
+		 * @param hostServer
+		 */
 		private void createHostChain(String hostClient, String hostServer){
 			List<String> hostChain = new ArrayList<>();
 			hostChain.add(hostClient);
@@ -202,6 +230,12 @@ public class VerifooProxy {
 			System.out.println("Calculated host chain " + savedChain);
 			return;
 		}
+		/**
+		 * Explores recursively all the possible paths
+		 * @param lastHost the host from which it calculate the next for the recursion
+		 * @param hostServer is the final host of the network
+		 * @param hostChain List of all the hosts encountered in the current chain
+		 */
 		private void expandHostChain(String lastHost, String hostServer, List<String> hostChain){
 			if(lastHost.equals(hostServer)){
 				//System.out.println("Dest Reached " + lastHost);
@@ -226,7 +260,12 @@ public class VerifooProxy {
 			return;
 			
 		}
-		
+		/**
+		 * Checks if in the xml there are only one node that is a client and one node that is a server 
+		 * and they are for the same service (web or mail), then it calls the function to create the link 
+		 * from the node's neighbours. Lastly, it calls a function to create the routing tables
+		 * @throws BadNffgException
+		 */
 		private void checkNffg() throws BadNffgException{
             long nMailServer = nodes.stream()
 	            	 .filter((n) -> n.getFunctionalType().equals(FunctionalTypes.MAILSERVER))
@@ -256,6 +295,13 @@ public class VerifooProxy {
             createLink(client, next, server);
             createRoutingTables(client, server);   
 		}
+		/**
+		 * Creates the link from the node's neighbours
+		 * @param prec previous node in the chain
+		 * @param current current node in the chain
+		 * @param server the node that is the server of the chain
+		 * @throws BadNffgException
+		 */
 		private void createLink(Node prec, Node current, Node server) throws BadNffgException{
 			if(current.getName().equals(server.getName())){
 				links.add(new Link(prec.getName(), current.getName()));
@@ -268,6 +314,13 @@ public class VerifooProxy {
 			Node next = nodes.stream().filter(n -> n.getName().equals(neighbour)).findFirst().get();
 			createLink(current, next, server);
 		}
+		/**
+		 * Creates the routing table by adding the rules by exploring for each possible path between 
+		 * an host client and host server all the possibles deploying scenarios for the nodes
+		 * @param client the node client
+		 * @param server the node server
+		 * @throws BadNffgException
+		 */
 		private void createRoutingTables(Node client, Node server) throws BadNffgException{
 			
 			//System.out.println("Searching next hop for " + client.getName() + " towards " + server.getName());
@@ -320,7 +373,8 @@ public class VerifooProxy {
 						}
 						else{
 							latency = connections.stream()
-									.filter(con -> con.getSourceHost().equals(firstHost) && con.getDestHost().equals(secondHost)).findFirst().get().getAvgLatency();
+									.filter(con -> con.getSourceHost().equals(firstHost) && con.getDestHost().equals(secondHost))
+									.findFirst().get().getAvgLatency();
 						}
 						System.out.println("Adding (" + first + " AND " + second+") to the routing table");
 						c = ctx.mkAnd(ctx.mkBoolConst(first), ctx.mkBoolConst(second));
@@ -335,11 +389,13 @@ public class VerifooProxy {
 						String host = s.substring(s.lastIndexOf('@')+1);
 						if(n.getName().equals(client.getName())){
 							latency = connections.stream()
-									.filter(con -> con.getSourceHost().equals(hostClient) && con.getDestHost().equals(host)).findFirst().get().getAvgLatency();
+									.filter(con -> con.getSourceHost().equals(hostClient) && con.getDestHost().equals(host))
+									.findFirst().get().getAvgLatency();
 						}
 						else{
 							latency = connections.stream()
-									.filter(con -> con.getSourceHost().equals(host) && con.getDestHost().equals(hostServer)).findFirst().get().getAvgLatency();
+									.filter(con -> con.getSourceHost().equals(host) && con.getDestHost().equals(hostServer))
+									.findFirst().get().getAvgLatency();
 						}
 						System.out.println("Adding "+s+" to the routing table");
 						c = ctx.mkBoolConst(s);
@@ -360,6 +416,16 @@ public class VerifooProxy {
 			conditionDB.entrySet().forEach(e -> {System.out.println(e.getKey().getName() + " -> " + e.getValue());});
 			System.out.println("--------------------");
 		}
+		/**
+		 * Explores recursively all the possible solution for setting a next hop condition
+		 * @param source the node from which is exploring the solutions
+		 * @param server the node server
+		 * @param nChain number of the host chain on which it is trying to deploy all the nodes
+		 * @param level on which host in the host chain it is trying to deploy the remaining nodes
+		 * @param hostServer
+		 * @return true if the last node has been deployed on the host server (good path), false otherwise
+		 * @throws BadNffgException
+		 */
 		private boolean setNextHop(Node source, Node server, int nChain, int level, String hostServer) throws BadNffgException{
 			String currentHost = savedChain.get(nChain).get(level);
 			//System.out.println("Searching next hop for " + source.getName() + " towards " + server.getName());
@@ -407,7 +473,10 @@ public class VerifooProxy {
 			}
 			return found;
 		}
-		
+		/**
+		 * Checks if the client node and the server node in a graph are reachable satisfying all the imposed conditions
+		 * @return
+		 */
 		public IsolationResult checkNFFGProperty(){
 
             Node source = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT);}).findFirst().get();
@@ -422,9 +491,12 @@ public class VerifooProxy {
 		    }
 			return ret;
 		}
-
+		/**
+		 * @return the net context
+		 */
 		public NetContext getNctx() {
 			return nctx;
 		}
+		
 		
 }

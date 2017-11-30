@@ -129,20 +129,17 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					break;
 				}
 				case ANTISPAM:{
-					//TODO IP are string, this doesn't work
 					PolitoAntispam spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,spam);
 					int[] blacklist=n.getConfiguration().getAntispam().getSource().stream().mapToInt((s)->s.hashCode()).toArray();
-					spam.installAntispam(blacklist);
+					//spam.installAntispam(blacklist);
 					break;
 				}
 				case CACHE:{
-					//TODO
 					this.put(n,new PolitoCache(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
 					break;
 				}
 				case DPI:{
-					//TODO notAllowed field is a string, this doesn't work
 					PolitoIDS ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,ids);
 					int[] blacklist=n.getConfiguration().getDpi().getNotAllowed().stream().mapToInt((s)->s.hashCode()).toArray();
@@ -150,12 +147,10 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					break;
 				}
 				case MAILCLIENT:{
-					//TODO
 					PolitoMailClient eh=new PolitoMailClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getMailclient().getMailserver())});
 					this.put(n,eh);
 					break;
 				}
-				// TODO for PolitoMailClient is needed another parameter
 				case MAILSERVER:{
 					PolitoMailServer eh=new PolitoMailServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);
@@ -164,7 +159,12 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				case NAT:{		
 					PolitoNat nat=new PolitoNat(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,nat);
-					nat.setInternalAddress(n.getConfiguration().getNat().getSource().stream().map((s)->nctx.am.get(s)).collect(Collectors.toCollection(ArrayList::new)));							
+					ArrayList<DatatypeExpr> address = n.getConfiguration().getNat().getSource().stream()
+							.map((s)->nctx.am.get(s))
+							.filter(e -> e != null)
+							.collect(Collectors.toCollection(ArrayList::new));
+					if(address.size() > 0)
+						//nat.setInternalAddress(address);		
 					break;
 				}
 				case VPNACCESS:{					

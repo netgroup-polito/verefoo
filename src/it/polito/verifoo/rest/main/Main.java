@@ -35,20 +35,21 @@ public class Main {
             Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
             u.setSchema(schema);
             // unmarshal a document into a tree of Java content objects
-            NFV root = (NFV) u.unmarshal( new FileInputStream( "./xsd/nfvInfo.xml" ) );
-            
+            //NFV root = (NFV) u.unmarshal( new FileInputStream( "./xsd/nfvInfo.xml" ) );
+            NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/nfv5nodes7hostsSAT.xml" ) );
+           
             for(Graph g:root.getGraphs().getGraph()){
             	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
             	IsolationResult res=test.checkNFFGProperty();
             	if(res.result != Status.UNSATISFIABLE)
             		new Translator(res.model.toString(),root).convert();
-            	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE);            }
-			
-            // create a Marshaller and marshal to std out
+            	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
+            }
+            // create a Marshaller and marshal to output
             Marshaller m = jc.createMarshaller();
             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
             m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvInfo.xsd");
-            m.marshal( root, System.out ); 
+            //m.marshal( root, System.out ); 
         } catch( JAXBException je ) {
         	logger.error("Error while unmarshalling or marshalling");
             logger.error(je);

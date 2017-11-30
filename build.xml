@@ -78,7 +78,7 @@
 	        <classpath location="lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar" />
 		<!-- test class -->
 		<classpath location="${build.dir}" />
-		<test name="it.polito.verifoo.rest.test.TestCase"
+		<test name="it.polito.verifoo.rest.test.TestXML"
 			haltonfailure="no" todir="${report.dir}">
 			<formatter type="plain" />
 			<formatter type="xml" />
