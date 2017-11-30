@@ -25,7 +25,7 @@
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf2">
           <cache>
-          	<resource>nodeB</resource>
+          	<resource>nodeC</resource>
           </cache>
         </configuration>
       </node>

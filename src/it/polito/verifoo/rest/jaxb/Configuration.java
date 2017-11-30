@@ -1,8 +1,8 @@
 //
-// Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
+// Questo file ï¿½ stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
-// Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2017.11.30 alle 03:03:50 PM CET 
+// Qualsiasi modifica a questo file andrï¿½ persa durante la ricompilazione dello schema di origine. 
+// Generato il: 2017.11.30 alle 09:40:53 PM CET 
 //
 
 
@@ -92,7 +92,7 @@ public class Configuration {
     protected String description;
 
     /**
-     * Recupera il valore della proprietà firewall.
+     * Recupera il valore della proprietï¿½ firewall.
      * 
      * @return
      *     possible object is
@@ -104,7 +104,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà firewall.
+     * Imposta il valore della proprietï¿½ firewall.
      * 
      * @param value
      *     allowed object is
@@ -116,7 +116,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà endhost.
+     * Recupera il valore della proprietï¿½ endhost.
      * 
      * @return
      *     possible object is
@@ -128,7 +128,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà endhost.
+     * Imposta il valore della proprietï¿½ endhost.
      * 
      * @param value
      *     allowed object is
@@ -140,7 +140,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà endpoint.
+     * Recupera il valore della proprietï¿½ endpoint.
      * 
      * @return
      *     possible object is
@@ -152,7 +152,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà endpoint.
+     * Imposta il valore della proprietï¿½ endpoint.
      * 
      * @param value
      *     allowed object is
@@ -164,7 +164,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà antispam.
+     * Recupera il valore della proprietï¿½ antispam.
      * 
      * @return
      *     possible object is
@@ -176,7 +176,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà antispam.
+     * Imposta il valore della proprietï¿½ antispam.
      * 
      * @param value
      *     allowed object is
@@ -188,7 +188,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà cache.
+     * Recupera il valore della proprietï¿½ cache.
      * 
      * @return
      *     possible object is
@@ -200,7 +200,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà cache.
+     * Imposta il valore della proprietï¿½ cache.
      * 
      * @param value
      *     allowed object is
@@ -212,7 +212,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà dpi.
+     * Recupera il valore della proprietï¿½ dpi.
      * 
      * @return
      *     possible object is
@@ -224,7 +224,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà dpi.
+     * Imposta il valore della proprietï¿½ dpi.
      * 
      * @param value
      *     allowed object is
@@ -236,7 +236,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà mailclient.
+     * Recupera il valore della proprietï¿½ mailclient.
      * 
      * @return
      *     possible object is
@@ -248,7 +248,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà mailclient.
+     * Imposta il valore della proprietï¿½ mailclient.
      * 
      * @param value
      *     allowed object is
@@ -260,7 +260,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà mailserver.
+     * Recupera il valore della proprietï¿½ mailserver.
      * 
      * @return
      *     possible object is
@@ -272,7 +272,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà mailserver.
+     * Imposta il valore della proprietï¿½ mailserver.
      * 
      * @param value
      *     allowed object is
@@ -284,7 +284,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà nat.
+     * Recupera il valore della proprietï¿½ nat.
      * 
      * @return
      *     possible object is
@@ -296,7 +296,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà nat.
+     * Imposta il valore della proprietï¿½ nat.
      * 
      * @param value
      *     allowed object is
@@ -308,7 +308,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà vpnaccess.
+     * Recupera il valore della proprietï¿½ vpnaccess.
      * 
      * @return
      *     possible object is
@@ -320,7 +320,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà vpnaccess.
+     * Imposta il valore della proprietï¿½ vpnaccess.
      * 
      * @param value
      *     allowed object is
@@ -332,7 +332,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà vpnexit.
+     * Recupera il valore della proprietï¿½ vpnexit.
      * 
      * @return
      *     possible object is
@@ -344,7 +344,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà vpnexit.
+     * Imposta il valore della proprietï¿½ vpnexit.
      * 
      * @param value
      *     allowed object is
@@ -356,7 +356,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà webclient.
+     * Recupera il valore della proprietï¿½ webclient.
      * 
      * @return
      *     possible object is
@@ -368,7 +368,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà webclient.
+     * Imposta il valore della proprietï¿½ webclient.
      * 
      * @param value
      *     allowed object is
@@ -380,7 +380,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà webserver.
+     * Recupera il valore della proprietï¿½ webserver.
      * 
      * @return
      *     possible object is
@@ -392,7 +392,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà webserver.
+     * Imposta il valore della proprietï¿½ webserver.
      * 
      * @param value
      *     allowed object is
@@ -404,7 +404,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà fieldmodifier.
+     * Recupera il valore della proprietï¿½ fieldmodifier.
      * 
      * @return
      *     possible object is
@@ -416,7 +416,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà fieldmodifier.
+     * Imposta il valore della proprietï¿½ fieldmodifier.
      * 
      * @param value
      *     allowed object is
@@ -428,7 +428,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà id.
+     * Recupera il valore della proprietï¿½ id.
      * 
      * @return
      *     possible object is
@@ -440,7 +440,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà id.
+     * Imposta il valore della proprietï¿½ id.
      * 
      * @param value
      *     allowed object is
@@ -452,7 +452,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà name.
+     * Recupera il valore della proprietï¿½ name.
      * 
      * @return
      *     possible object is
@@ -464,7 +464,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà name.
+     * Imposta il valore della proprietï¿½ name.
      * 
      * @param value
      *     allowed object is
@@ -476,7 +476,7 @@ public class Configuration {
     }
 
     /**
-     * Recupera il valore della proprietà description.
+     * Recupera il valore della proprietï¿½ description.
      * 
      * @return
      *     possible object is
@@ -488,7 +488,7 @@ public class Configuration {
     }
 
     /**
-     * Imposta il valore della proprietà description.
+     * Imposta il valore della proprietï¿½ description.
      * 
      * @param value
      *     allowed object is

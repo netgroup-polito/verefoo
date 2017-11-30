@@ -304,6 +304,7 @@ public class VerifooProxy {
 		 */
 		private void createLink(Node prec, Node current, Node server) throws BadNffgException{
 			if(current.getName().equals(server.getName())){
+				System.out.println("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
 				links.add(new Link(prec.getName(), current.getName()));
 				return;
 			}

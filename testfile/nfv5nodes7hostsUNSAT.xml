@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvInfo.xsd">
+  <graphs>
+    <graph id="0">
+     <node functional_type="WEBCLIENT" name="nodeA">
+        <neighbour name="node1"/>
+        <configuration description="A simple description" name="confA">
+          <webclient nameWebServer="nodeB"/>
+        </configuration>
+      </node>
+      <node functional_type="FIREWALL" name="node1">
+        <neighbour name="nodeA"/>
+        <neighbour name="node2"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall>
+            <elements>
+              <source>nodeC</source>
+              <destination>nodeD</destination>
+            </elements>
+          </firewall>
+        </configuration>
+      </node>
+      <node functional_type="DPI" name="node2">
+        <neighbour name="node1"/>
+        <neighbour name="node3"/>
+        <configuration description="A simple description" name="conf2">
+          <dpi>
+          	<notAllowed>nodeC</notAllowed>
+          </dpi>
+        </configuration>
+      </node>
+      <node functional_type="CACHE" name="node3">
+        <neighbour name="node2"/>
+        <neighbour name="node4"/>
+        <configuration description="A simple description" name="conf3">
+          <cache>
+          	<resource>nodeA</resource>
+          	<resource>node1</resource>
+          	<resource>node2</resource>
+          </cache>
+        </configuration>
+      </node>
+	  <node functional_type="FIELDMODIFIER" name="node4">
+        <neighbour name="node3"/>
+        <neighbour name="node5"/>
+        <configuration description="A simple description" name="conf4">
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
+        </configuration>
+      </node>
+      <node functional_type="FIELDMODIFIER" name="node5">
+        <neighbour name="node4"/>
+        <neighbour name="nodeB"/>
+        <configuration description="A simple description" name="conf5">
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
+        </configuration>
+      </node>
+      <node functional_type="WEBSERVER" name="nodeB">
+        <neighbour name="node5"/>
+        <configuration description="A simple description" name="confB">
+          <webserver>
+          	<name>nodeB</name>
+          </webserver>
+        </configuration>
+      </node>
+    </graph>
+  </graphs>
+  <CapacityDefinition>
+   		<CapacityForNode node="node1" capacity="10"/>
+  		<CapacityForNode node="node2" capacity="10"/>
+  		<CapacityForNode node="node3" capacity="10"/>
+  		<CapacityForNode node="node4" capacity="10"/>
+  		<CapacityForNode node="node5" capacity="10"/>
+  </CapacityDefinition>
+  <PropertyDefinition>
+  		<Property graph="0" name="IsolationProperty"/> 		
+  </PropertyDefinition>
+  <Hosts>
+  	<Host diskStorage="10" name="hostA" type="CLIENT"/>
+  	<Host diskStorage="10" name="host1" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host2" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host3" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host4" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host5" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host6" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host7" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="hostB" type="SERVER"/>
+  </Hosts>
+  <Connections>
+  	<Connection sourceHost="hostA" destHost="host1" avgLatency ="-1"/>
+  	<Connection sourceHost="hostA" destHost="host2" avgLatency ="-100"/>
+  	<Connection sourceHost="host1" destHost="host2" avgLatency ="-1"/>
+  	<Connection sourceHost="host1" destHost="host3" avgLatency ="-1"/>
+  	<Connection sourceHost="host1" destHost="host4" avgLatency ="-1000"/>
+  	<Connection sourceHost="host2" destHost="host1" avgLatency ="-1"/>
+  	<Connection sourceHost="host2" destHost="host3" avgLatency ="-1"/>
+  	<Connection sourceHost="host2" destHost="host4" avgLatency ="-1"/>
+  	<Connection sourceHost="host2" destHost="host6" avgLatency ="-1"/>
+  	<Connection sourceHost="host2" destHost="hostB" avgLatency ="-100"/>
+  	<Connection sourceHost="host3" destHost="host2" avgLatency ="-1"/>
+  	<Connection sourceHost="host3" destHost="host4" avgLatency ="-1"/>
+  	<Connection sourceHost="host3" destHost="host5" avgLatency ="-1"/>
+  	<Connection sourceHost="host3" destHost="hostB" avgLatency ="-1"/>
+  	<Connection sourceHost="host4" destHost="host5" avgLatency ="-1"/>
+  	<Connection sourceHost="host4" destHost="host5" avgLatency ="-1"/>
+  	<Connection sourceHost="host4" destHost="host7" avgLatency ="-1"/>
+  	<Connection sourceHost="host5" destHost="host6" avgLatency ="-1"/>
+  	<Connection sourceHost="host6" destHost="host7" avgLatency ="-1"/>
+  	<Connection sourceHost="host7" destHost="hostB" avgLatency ="-1"/>
+  </Connections>
+  <ParsingString></ParsingString>
+</NFV>

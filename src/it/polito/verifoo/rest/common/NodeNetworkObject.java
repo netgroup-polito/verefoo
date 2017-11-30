@@ -118,8 +118,10 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					this.put(n,new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
 					break;
 				}
-				case FIELDMODIFIER:{					
-					this.put(n,new PolitoFieldModifier(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
+				case FIELDMODIFIER:{	
+					PolitoFieldModifier fm = new PolitoFieldModifier(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					this.put(n,fm);
+					fm.installFieldModifier();
 					break;
 				}
 				case ENDHOST:{
@@ -132,7 +134,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					PolitoAntispam spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,spam);
 					int[] blacklist=n.getConfiguration().getAntispam().getSource().stream().mapToInt((s)->s.hashCode()).toArray();
-					//spam.installAntispam(blacklist);
+					spam.installAntispam(blacklist);
 					break;
 				}
 				case CACHE:{
@@ -147,6 +149,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					break;
 				}
 				case MAILCLIENT:{
+					if(!(nctx.am.containsKey((n.getConfiguration().getMailclient().getMailserver())))) throw new BadNffgException("Mail server not present");
 					PolitoMailClient eh=new PolitoMailClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getMailclient().getMailserver())});
 					this.put(n,eh);
 					break;
@@ -163,8 +166,11 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 							.map((s)->nctx.am.get(s))
 							.filter(e -> e != null)
 							.collect(Collectors.toCollection(ArrayList::new));
-					if(address.size() > 0)
-						//nat.setInternalAddress(address);		
+					if(address.size() > 0){
+						System.out.println("Added to nat " + n.getName() + " "+address);
+						nat.natModel(nctx.am.get(n.getName()));
+						nat.setInternalAddress(address);		
+					}
 					break;
 				}
 				case VPNACCESS:{					
@@ -174,6 +180,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					break;
 				}
 				case WEBCLIENT:{
+					if(!(nctx.am.containsKey((n.getConfiguration().getWebclient().getNameWebServer())))) throw new BadNffgException("Web server not present");
 					PolitoWebClient eh=new PolitoWebClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer())});
 					this.put(n,eh);
 					break;

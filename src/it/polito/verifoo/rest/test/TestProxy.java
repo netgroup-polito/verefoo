@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -94,18 +95,22 @@ public class TestProxy {
         u.setSchema(schema);
         u.unmarshal( new FileInputStream( "./testfile/nfvInvalid.xml" ) );            
 	}*/
+	private NFV init(String file) throws JAXBException, SAXException, IOException{
+		// create a JAXBContext capable of handling the generated classes
+        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
+        // create an Unmarshaller
+        Unmarshaller u = jc.createUnmarshaller();
+        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
+        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
+        u.setSchema(schema);
+        // unmarshal a document into a tree of Java content objects
+        NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
+        return root;
+	}
 	@Test
 	public void test5nodes7hostsSAT() {
 		try {
-			// create a JAXBContext capable of handling the generated classes
-            JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
-            // create an Unmarshaller
-            Unmarshaller u = jc.createUnmarshaller();
-            SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-            Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
-            u.setSchema(schema);
-            // unmarshal a document into a tree of Java content objects
-            NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/nfv5nodes7hostsSAT.xml" ) );
+            NFV root = init( "./testfile/nfv5nodes7hostsUNSAT-CACHE.xml" );
             
             for(Graph g:root.getGraphs().getGraph()){
             	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
@@ -117,8 +122,6 @@ public class TestProxy {
             root.getPropertyDefinition().getProperty().forEach(p ->{
             	org.junit.Assert.assertEquals(p.isIsSat(), true);
             });
-            
-            
         } catch( JAXBException je ) {
         	fail(je.getMessage());
         } catch( IOException ioe ) {
