@@ -159,12 +159,13 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				case NAT:{		
 					PolitoNat nat=new PolitoNat(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,nat);
+					nat.natModel(nctx.am.get(n.getName()));
 					ArrayList<DatatypeExpr> address = n.getConfiguration().getNat().getSource().stream()
 							.map((s)->nctx.am.get(s))
 							.filter(e -> e != null)
 							.collect(Collectors.toCollection(ArrayList::new));
 					if(address.size() > 0)
-						//nat.setInternalAddress(address);		
+						nat.setInternalAddress(address);		
 					break;
 				}
 				case VPNACCESS:{					
