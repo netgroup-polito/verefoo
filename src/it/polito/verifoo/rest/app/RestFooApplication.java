@@ -1,9 +1,11 @@
 package it.polito.verifoo.rest.app;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
@@ -11,7 +13,8 @@ import javax.ws.rs.core.Context;
 import org.glassfish.jersey.server.ResourceConfig;
 
 public class RestFooApplication extends ResourceConfig {
-    public RestFooApplication(@Context ServletContext context) {
+    public RestFooApplication(@Context ServletContext context) throws MalformedURLException {
+		System.setProperty("log4j.configuration", new File("resources", "log4j2.xml").toURI().toURL().toString());
     	this.extractZ3Lib(context);
         // Define the package which contains the service classes.
         packages("it.polito.verifoo.rest.webservice");
