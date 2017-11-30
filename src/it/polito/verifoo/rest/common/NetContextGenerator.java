@@ -13,8 +13,7 @@ import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verigraph.mcnet.components.NetContext;
 
 /**
- * @author Raffaele
- *
+ * This class generate the nework context (the link between nodenames and node ip in z3)
  */
 public final class NetContextGenerator{
 	public static NetContext generate(Context ctx,List<Node> nodes){

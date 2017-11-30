@@ -32,33 +32,27 @@ import it.polito.verigraph.mcnet.netobjs.PolitoWebClient;
 import it.polito.verigraph.mcnet.netobjs.PolitoWebServer;
 /**
  * This class generate a Map of a new network object and associated node.
- * @author Raffaele
- *
+ * The network object are generated inside this class by extracting from the schema the type and by processing the configuration.
+ * It also provide methods for Acl Attaching (for firewall object) and resource Attaching(for cache object)
  */
 public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8001920385236985297L;
 	private Logger logger = LogManager.getLogger("mylog");
-
 	private Context ctx;
     private NetContext nctx;
     private Network net;
-	private List<it.polito.verifoo.rest.jaxb.Node> nodes;
-    /**
+	/**
      * This class is an helper to generate network object
      * @param ctx Z3 Context
      * @param nctx NetworkContext
      * @param net Network
-     * @param nodes 
+     * @param nodes List of nodes from that we will generate NetworkObject
      */
     public NodeNetworkObject(Context ctx, NetContext nctx, Network net, List<it.polito.verifoo.rest.jaxb.Node> nodes) {
 		super();
 		this.ctx = ctx;
 		this.nctx = nctx;
 		this.net = net;
-		this.nodes=nodes;
 		nodes.forEach(this::generateNetObj);
 	}
 
@@ -69,7 +63,8 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 		this.forEach((n,netobjs)->net.attach(netobjs));
 	}
 	/**
-	 * Generate Acl for firewall network objects
+	 * Generate Acl for firewall network objects by processing the configuration
+	 * Please note that invalid configuration will result in a discarded firewall acl (we don't trown an exeption)
 	 */
 	public void generateAcl(){
 		this.forEach(
@@ -91,7 +86,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 		);
 	}
 	/**
-	 * Generate cachematerial for cache network objects
+	 * Generate Cache internal node for cache network objects from cache resources configuration
 	 */
 	public void generateCache(){
 		this.forEach(
@@ -111,7 +106,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	}
 	/**
 	 * @param Node n
-	 * @description This function process the node and generate a network object according to VNF type.
+	 * @description This function process the node and generate a network object according to functional type, 
+	 * it also generate the configuration according to the type.
+	 * @throws ProcessingException if it can't process the network object.
 	 */
 	public void generateNetObj(Node n) {
 		try {
@@ -188,7 +185,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 				default:{
 					System.err.println("Braiiinssssssssssss!");
-					break;
+					throw new BadNffgException("Invalid Node Functional Type"+ftype);
 				}
 			}
 		}catch (BadNffgException e) {

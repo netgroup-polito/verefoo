@@ -29,6 +29,9 @@ import javax.xml.ws.WebServiceException;
 import org.xml.sax.SAXException;
 
 import it.polito.verifoo.rest.jaxb.NFV;
+/**
+ * This class provide the validation of XML schema in input and in output for NFV object.
+ */
 @Provider
 @Produces(MediaType.APPLICATION_XML)
 @Consumes(MediaType.APPLICATION_XML)
