@@ -23,10 +23,6 @@
 	      <xsd:selector xpath="Hosts/Host" />
 	      <xsd:field xpath="@name" />
 	    </xsd:key>
-	    <xsd:key name="keyGraph">
-            <xsd:selector xpath="graphs/graph" />
-            <xsd:field xpath="@id" />
-        </xsd:key>
 	    <xsd:keyref name="ConnectionSourceHost" refer="hostKey">
 	      <xsd:selector xpath="Connections/Connection" />
 	      <xsd:field xpath="@sourceHost" />
@@ -35,10 +31,16 @@
 	      <xsd:selector xpath="Connections/Connection" />
 	      <xsd:field xpath="@destHost" />
 	    </xsd:keyref>
+	    
 	    <xsd:keyref name="CapacityRef" refer="keyNode">
 	      <xsd:selector xpath="CapacityDefinition/CapacityForNode" />
 	      <xsd:field xpath="@node" />
 	    </xsd:keyref>
+	    
+	    <xsd:key name="keyGraph">
+            <xsd:selector xpath="graphs/graph" />
+            <xsd:field xpath="@id" />
+        </xsd:key>
 	    <xsd:keyref name="PropertyRef" refer="keyGraph">
 	      <xsd:selector xpath="PropertyDefinition/Property" />
 	      <xsd:field xpath="@graph" />
