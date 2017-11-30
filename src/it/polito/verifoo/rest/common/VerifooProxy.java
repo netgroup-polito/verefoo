@@ -32,7 +32,8 @@ public class VerifooProxy {
 		List<Host> hosts;
 		List<Connection> connections;
 		Graph graph;
-	    public VerifooProxy(Graph graph,Hosts hosts,Connections conns) throws BadNffgException{
+		private List<NodeCapacity> capacities;
+	    public VerifooProxy(Graph graph,Hosts hosts,Connections conns, CapacityDefinition capacityDefinition) throws BadNffgException{
 			HashMap<String, String> cfg = new HashMap<String, String>();
 		    cfg.put("model", "true");
 		    ctx = new Context(cfg);
@@ -40,6 +41,8 @@ public class VerifooProxy {
 		    this.hosts = hosts.getHost();
 		    this.connections = conns.getConnection();
 		    this.graph=graph;
+		    this.capacities=capacityDefinition.getCapacityForNode();
+		    
 			nctx = NetContextGenerator.generate(ctx,nodes);
 				
 			//System.out.println(nctx.am);
@@ -137,7 +140,7 @@ public class VerifooProxy {
 									.collect(Collectors.toList())
 									.forEach(i -> {
 										String node = i.toString().substring(0, i.toString().lastIndexOf('@'));
-										int capacity = nodes.stream().filter(n -> n.getName().equals(node)).findFirst().get().getReqDiskStorage();
+										int capacity = capacities.stream().filter(c->c.getNode().equals(node)).findFirst().get().getCapacity();
 										diskRequirements.add(ctx.mkMul(ctx.mkInt(capacity), nctx.bool_to_int(i)));
 									});
 				System.out.println(h.getName() + " disk requirement: " + diskRequirements);

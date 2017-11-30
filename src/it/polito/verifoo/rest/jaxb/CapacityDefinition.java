@@ -26,8 +26,8 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence maxOccurs="unbounded">
- *         &lt;element name="source" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *       &lt;sequence>
+ *         &lt;element name="CapacityForNode" type="{}NodeCapacity" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -38,41 +38,41 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "source"
+    "capacityForNode"
 })
-@XmlRootElement(name = "nat")
-public class Nat {
+@XmlRootElement(name = "CapacityDefinition")
+public class CapacityDefinition {
 
-    @XmlElement(required = true)
-    protected List<String> source;
+    @XmlElement(name = "CapacityForNode", required = true)
+    protected List<NodeCapacity> capacityForNode;
 
     /**
-     * Gets the value of the source property.
+     * Gets the value of the capacityForNode property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the source property.
+     * This is why there is not a <CODE>set</CODE> method for the capacityForNode property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getSource().add(newItem);
+     *    getCapacityForNode().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String }
+     * {@link NodeCapacity }
      * 
      * 
      */
-    public List<String> getSource() {
-        if (source == null) {
-            source = new ArrayList<String>();
+    public List<NodeCapacity> getCapacityForNode() {
+        if (capacityForNode == null) {
+            capacityForNode = new ArrayList<NodeCapacity>();
         }
-        return this.source;
+        return this.capacityForNode;
     }
 
 }

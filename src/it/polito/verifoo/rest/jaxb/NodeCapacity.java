@@ -11,20 +11,20 @@ package it.polito.verifoo.rest.jaxb;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Classe Java per anonymous complex type.
+ * <p>Classe Java per NodeCapacity complex type.
  * 
  * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
  * 
  * <pre>
- * &lt;complexType>
+ * &lt;complexType name="NodeCapacity">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="vpnaccess" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="node" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="capacity" type="{http://www.w3.org/2001/XMLSchema}int" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -33,35 +33,60 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
-@XmlRootElement(name = "vpnexit")
-public class Vpnexit {
+@XmlType(name = "NodeCapacity")
+public class NodeCapacity {
 
-    @XmlAttribute(name = "vpnaccess", required = true)
-    protected String vpnaccess;
+    @XmlAttribute(name = "node")
+    protected String node;
+    @XmlAttribute(name = "capacity")
+    protected Integer capacity;
 
     /**
-     * Recupera il valore della proprietà vpnaccess.
+     * Recupera il valore della proprietà node.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getVpnaccess() {
-        return vpnaccess;
+    public String getNode() {
+        return node;
     }
 
     /**
-     * Imposta il valore della proprietà vpnaccess.
+     * Imposta il valore della proprietà node.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setVpnaccess(String value) {
-        this.vpnaccess = value;
+    public void setNode(String value) {
+        this.node = value;
+    }
+
+    /**
+     * Recupera il valore della proprietà capacity.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *     
+     */
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    /**
+     * Imposta il valore della proprietà capacity.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     *     
+     */
+    public void setCapacity(Integer value) {
+        this.capacity = value;
     }
 
 }

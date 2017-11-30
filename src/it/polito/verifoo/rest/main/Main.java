@@ -38,12 +38,11 @@ public class Main {
             NFV root = (NFV) u.unmarshal( new FileInputStream( "./xsd/nfvInfo.xml" ) );
             
             for(Graph g:root.getGraphs().getGraph()){
-            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections());
+            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
             	IsolationResult res=test.checkNFFGProperty();
             	if(res.result != Status.UNSATISFIABLE)
             		new Translator(res.model.toString(),root).convert();
-            	g.getProperty().setIsSat(res.result!=Status.UNSATISFIABLE);
-            }
+            	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE);            }
 			
             // create a Marshaller and marshal to std out
             Marshaller m = jc.createMarshaller();

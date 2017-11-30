@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2017.11.27 alle 07:48:38 PM CET 
+// Generato il: 2017.11.30 alle 03:03:50 PM CET 
 //
 
 
@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;attribute name="name" use="required" type="{}P-Name" />
  *       &lt;attribute name="isSat" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="graph" use="required" type="{http://www.w3.org/2001/XMLSchema}long" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -40,6 +41,8 @@ public class Property {
     protected PName name;
     @XmlAttribute(name = "isSat")
     protected Boolean isSat;
+    @XmlAttribute(name = "graph", required = true)
+    protected long graph;
 
     /**
      * Recupera il valore della proprietà name.
@@ -87,6 +90,22 @@ public class Property {
      */
     public void setIsSat(Boolean value) {
         this.isSat = value;
+    }
+
+    /**
+     * Recupera il valore della proprietà graph.
+     * 
+     */
+    public long getGraph() {
+        return graph;
+    }
+
+    /**
+     * Imposta il valore della proprietà graph.
+     * 
+     */
+    public void setGraph(long value) {
+        this.graph = value;
     }
 
 }

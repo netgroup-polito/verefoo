@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2017.11.27 alle 07:48:38 PM CET 
+// Generato il: 2017.11.30 alle 03:03:50 PM CET 
 //
 
 
@@ -28,7 +28,6 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Property" type="{}Property"/>
  *         &lt;element ref="{}node" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}long" />
@@ -41,42 +40,15 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "property",
     "node"
 })
 @XmlRootElement(name = "graph")
 public class Graph {
 
-    @XmlElement(name = "Property", required = true)
-    protected Property property;
     @XmlElement(required = true)
     protected List<Node> node;
     @XmlAttribute(name = "id")
     protected Long id;
-
-    /**
-     * Recupera il valore della proprietà property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Property }
-     *     
-     */
-    public Property getProperty() {
-        return property;
-    }
-
-    /**
-     * Imposta il valore della proprietà property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Property }
-     *     
-     */
-    public void setProperty(Property value) {
-        this.property = value;
-    }
 
     /**
      * Gets the value of the node property.

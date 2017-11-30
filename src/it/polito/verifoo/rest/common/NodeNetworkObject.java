@@ -77,11 +77,13 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
 						n.getConfiguration().getFirewall().getElements().forEach((e)->{
 							ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
-							    Tuple<DatatypeExpr,DatatypeExpr> rule=new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(e.getSource()),nctx.am.get(e.getDestination()));
-							    acl.add(rule);
-							    System.out.println("Adding blocking rule " + acl);
-							    ((AclFirewall)netobjs).addAcls(acl);
-							    logger.debug("Added acl:"+ rule.toString() +" to "+n.getName());
+								if(nctx.am.get(e.getSource())!=null&&nctx.am.get(e.getDestination())!=null){
+								    Tuple<DatatypeExpr,DatatypeExpr> rule=new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(e.getSource()),nctx.am.get(e.getDestination()));
+								    acl.add(rule);
+								    System.out.println("Adding blocking rule " + acl);
+								    ((AclFirewall)netobjs).addAcls(acl);
+								    logger.debug("Added acl:"+ rule.toString() +" to "+n.getName());
+								}
 						});
 						
 					}

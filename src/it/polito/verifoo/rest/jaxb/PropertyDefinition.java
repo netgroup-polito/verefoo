@@ -26,8 +26,8 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence maxOccurs="unbounded">
- *         &lt;element name="source" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *       &lt;sequence>
+ *         &lt;element name="Property" type="{}Property" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -38,41 +38,41 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "source"
+    "property"
 })
-@XmlRootElement(name = "nat")
-public class Nat {
+@XmlRootElement(name = "PropertyDefinition")
+public class PropertyDefinition {
 
-    @XmlElement(required = true)
-    protected List<String> source;
+    @XmlElement(name = "Property", required = true)
+    protected List<Property> property;
 
     /**
-     * Gets the value of the source property.
+     * Gets the value of the property property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the source property.
+     * This is why there is not a <CODE>set</CODE> method for the property property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getSource().add(newItem);
+     *    getProperty().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String }
+     * {@link Property }
      * 
      * 
      */
-    public List<String> getSource() {
-        if (source == null) {
-            source = new ArrayList<String>();
+    public List<Property> getProperty() {
+        if (property == null) {
+            property = new ArrayList<Property>();
         }
-        return this.source;
+        return this.property;
     }
 
 }

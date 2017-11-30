@@ -29,12 +29,12 @@ public class RestFoo {
 			try {
 				String z3model = new String();
 				for(Graph g:root.getGraphs().getGraph()){
-	            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections());
+	            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getCapacityDefinition());
 	            	IsolationResult res=test.checkNFFGProperty();
 	            	if(res.result != Status.UNSATISFIABLE){
 	            		z3model=z3model.concat(res.model.toString());
 	            	}
-	            	g.getProperty().setIsSat(res.result!=Status.UNSATISFIABLE);
+	            	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE);            
 	            }
 				if(!z3model.isEmpty()){
 					root.setParsingString(z3model);			

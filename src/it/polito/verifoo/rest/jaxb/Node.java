@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2017.11.27 alle 07:48:38 PM CET 
+// Generato il: 2017.11.30 alle 03:03:50 PM CET 
 //
 
 
@@ -34,7 +34,6 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="functional_type" use="required" type="{}functionalTypes" />
- *       &lt;attribute name="reqDiskStorage" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -59,8 +58,6 @@ public class Node {
     protected String name;
     @XmlAttribute(name = "functional_type", required = true)
     protected FunctionalTypes functionalType;
-    @XmlAttribute(name = "reqDiskStorage", required = true)
-    protected int reqDiskStorage;
 
     /**
      * Gets the value of the neighbour property.
@@ -185,22 +182,6 @@ public class Node {
      */
     public void setFunctionalType(FunctionalTypes value) {
         this.functionalType = value;
-    }
-
-    /**
-     * Recupera il valore della proprietà reqDiskStorage.
-     * 
-     */
-    public int getReqDiskStorage() {
-        return reqDiskStorage;
-    }
-
-    /**
-     * Imposta il valore della proprietà reqDiskStorage.
-     * 
-     */
-    public void setReqDiskStorage(int value) {
-        this.reqDiskStorage = value;
     }
 
 }
