@@ -34,6 +34,7 @@
         <neighbour name="node4"/>
         <configuration description="A simple description" name="conf3">
           <cache>
+			<resource>nodeA</resource>
           	<resource>node1</resource>
           	<resource>node2</resource>
           </cache>

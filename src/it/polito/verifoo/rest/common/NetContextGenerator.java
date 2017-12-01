@@ -17,8 +17,10 @@ import it.polito.verigraph.mcnet.components.NetContext;
  */
 public final class NetContextGenerator{
 	public static NetContext generate(Context ctx,List<Node> nodes){
+		List<String> names = nodes.stream().map((n)->n.getName()).collect(Collectors.toCollection(ArrayList<String>::new));
+		names.add("politoErrFunction");
 		String[] nodesname={};
-		nodesname=nodes.stream().map((n)->n.getName()).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(nodesname);
+		nodesname=names.toArray(nodesname);
 		//suppose nodename=nodeip;
 		String[] nodesip=nodesname;
 	    return new NetContext(ctx,nodesname,nodesip);

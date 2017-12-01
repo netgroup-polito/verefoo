@@ -25,17 +25,19 @@
         <neighbour name="node3"/>
         <configuration description="A simple description" name="conf2">
           <dpi>
-          	<notAllowed>nodeA</notAllowed>
+          	<notAllowed>nodeC</notAllowed>
           </dpi>
         </configuration>
       </node>
-      <node functional_type="FIELDMODIFIER" name="node3">
+      <node functional_type="CACHE" name="node3">
         <neighbour name="node2"/>
         <neighbour name="node4"/>
         <configuration description="A simple description" name="conf3">
-          <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
+          <cache>
+          	<resource>nodeA</resource>
+          	<resource>node1</resource>
+          	<resource>node2</resource>
+          </cache>
         </configuration>
       </node>
 	  <node functional_type="FIELDMODIFIER" name="node4">

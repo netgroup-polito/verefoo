@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import com.microsoft.z3.Status;
 import it.polito.verifoo.rest.common.BadNffgException;
+import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.NFV;
@@ -37,6 +38,8 @@ public class RestFoo {
 	            	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE);            
 	            }
 				if(!z3model.isEmpty()){
+		            new Translator(z3model,root).convert();
+					/*
 					root.setParsingString(z3model);			
 					Response res = ClientBuilder.newClient()
 							.target(req.getRequestURL().toString().replace("/rest", ""))
@@ -48,7 +51,7 @@ public class RestFoo {
 							return res.readEntity(NFV.class);
 					}else{
 							throw new ProcessingException("Translator Error:"+res.readEntity(String.class));
-					}
+					}*/
 				}
 				return root;
 			} catch (BadNffgException e) {
