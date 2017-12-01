@@ -20,13 +20,13 @@
           </firewall>
         </configuration>
       </node>
-      <node functional_type="ANTISPAM" name="node2">
+      <node functional_type="DPI" name="node2">
         <neighbour name="node1"/>
         <neighbour name="node3"/>
         <configuration description="A simple description" name="conf2">
-          <antispam>
-          	<source>nodeC</source>
-          </antispam>
+          <dpi>
+          	<notAllowed>nodeC</notAllowed>
+          </dpi>
         </configuration>
       </node>
       <node functional_type="CACHE" name="node3">
@@ -34,27 +34,28 @@
         <neighbour name="node4"/>
         <configuration description="A simple description" name="conf3">
           <cache>
+          	<resource>nodeA</resource>
           	<resource>node1</resource>
           	<resource>node2</resource>
           </cache>
         </configuration>
       </node>
-	  <node functional_type="NAT" name="node4">
+	  <node functional_type="FIELDMODIFIER" name="node4">
         <neighbour name="node3"/>
         <neighbour name="node5"/>
         <configuration description="A simple description" name="conf4">
-          <nat>
-          		<source>nodeA</source>
-          </nat>
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
         </configuration>
       </node>
-      <node functional_type="DPI" name="node5">
+      <node functional_type="FIELDMODIFIER" name="node5">
         <neighbour name="node4"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf5">
-          <dpi>
-         	<notAllowed>nodeC</notAllowed>
-          </dpi>
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
         </configuration>
       </node>
       <node functional_type="WEBSERVER" name="nodeB">

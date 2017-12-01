@@ -69,33 +69,8 @@ public class TestProxy {
 	@After
 	public void tearDown() throws Exception {
 	}
-	/*
-	@Test(expected=JAXBException.class)
-	public void testWrongFormat() throws Exception {
-        // create a JAXBContext capable of handling the generated classes
-        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
-        
-        // create an Unmarshaller
-        Unmarshaller u = jc.createUnmarshaller();
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
-        u.setSchema(schema);
-        u.unmarshal( new FileInputStream( "./testfile/nfvNoXml.txt" ) );
-        fail("The test didn't thrown an exception");
-	}
-	@Test(expected=JAXBException.class)
-	public void testInvalidFormat() throws Exception {
-        // create a JAXBContext capable of handling the generated classes
-        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
-        
-        // create an Unmarshaller
-        Unmarshaller u = jc.createUnmarshaller();
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
-        u.setSchema(schema);
-        u.unmarshal( new FileInputStream( "./testfile/nfvInvalid.xml" ) );            
-	}*/
-	private NFV init(String file) throws JAXBException, SAXException, IOException{
+	
+	private void test(String file, boolean sat) throws JAXBException, SAXException, IOException, BadNffgException{
 		// create a JAXBContext capable of handling the generated classes
         JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
         // create an Unmarshaller
@@ -105,35 +80,75 @@ public class TestProxy {
         u.setSchema(schema);
         // unmarshal a document into a tree of Java content objects
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
-        return root;
-	}
-	@Test
-	public void test5nodes7hostsSAT() {
-		try {
-            NFV root = init( "./testfile/nfv5nodes7hostsUNSAT-CACHE.xml" );
-            
-            for(Graph g:root.getGraphs().getGraph()){
-            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
-            	IsolationResult res=test.checkNFFGProperty();
-            	if(res.result != Status.UNSATISFIABLE)
-            		new Translator(res.model.toString(),root).convert();
-            	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
-            }
-            root.getPropertyDefinition().getProperty().forEach(p ->{
-            	org.junit.Assert.assertEquals(p.isIsSat(), true);
-            });
-        } catch( JAXBException je ) {
-        	fail(je.getMessage());
-        } catch( IOException ioe ) {
-        	fail(ioe.getMessage());
-        } catch( ClassCastException cce) {        	
-    		fail("Wrong data type found in XML document");
-        } catch (SAXException e) {
-			fail(e.getMessage());
-		} catch (BadNffgException e) {
-			fail(e.getMessage());
-		}
+        for(Graph g:root.getGraphs().getGraph()){
+        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
+        	IsolationResult res=test.checkNFFGProperty();
+        	if(res.result != Status.UNSATISFIABLE)
+        		new Translator(res.model.toString(),root).convert();
+        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
+        }
+        root.getPropertyDefinition().getProperty().forEach(p ->{
+        	org.junit.Assert.assertEquals(p.isIsSat(), sat);
+        });
+        return;
 	}
 	
-
+	//@Test
+	public void testBadClientConf() {
+		try {
+			test( "./testfile/nfv5nodes7hostsUNSAT-WEB.xml", false); //Working
+			fail("Exception not thrown");
+		} catch (Exception e) {
+			assert(true);
+		}		
+	}
+	//@Test
+	public void testFW_UNSAT(){
+		try {
+			test( "./testfile/nfv5nodes7hostsUNSAT-FW.xml", false); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	//@Test
+	public void testCACHE_UNSAT(){
+		
+		try {
+			test( "./testfile/nfv5nodes7hostsUNSAT-CACHE.xml", false); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		} 
+	}
+	//@Test
+	public void testDPI_UNSAT() {
+		try {
+			test( "./testfile/nfv5nodes7hostsUNSAT-DPI.xml", false); //NotWorking
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	//@Test
+	public void testNAT_UNSAT() {
+		try {
+			test( "./testfile/nfv5nodes7hostsUNSAT-NAT--notWorking.xml", false); //NotWorking
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testANTISPAM_UNSAT() {
+		try {
+			test( "./testfile/nfv5nodes7hostsUNSAT-ANTISPAM--notWorking.xml", false); //NotWorking
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	//@Test
+	public void testSAT() {
+		try {
+			test( "./testfile/nfv5nodes7hostsSAT.xml", true); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
 }
