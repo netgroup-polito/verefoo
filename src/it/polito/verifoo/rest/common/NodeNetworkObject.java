@@ -97,7 +97,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 						NetworkObject[] internalNodes = {};
 						internalNodes=this.entrySet().stream().filter(obj->resource.contains(obj.getKey().getName())).map(obj->obj.getValue()).collect(Collectors.toList()).toArray(internalNodes);
 						for(NetworkObject no:internalNodes)
-							System.out.println("Install cache on "+no.toString());
+							System.out.println("Install cache with resources "+no.toString());
 						if(internalNodes.length > 0)
 							c.installCache(internalNodes);			
 						
@@ -121,8 +121,8 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 				case FIELDMODIFIER:{	
 					PolitoFieldModifier fm = new PolitoFieldModifier(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
-					this.put(n,fm);
 					fm.installFieldModifier();
+					this.put(n,fm);
 					break;
 				}
 				case ENDHOST:{
@@ -168,7 +168,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 							.filter(e -> e != null)
 							.collect(Collectors.toCollection(ArrayList::new));
 					if(address.size() > 0){
-						System.out.println("Added to nat " + n.getName() + " "+address);
+						System.out.println("Added to nat " + n.getName() + " internal addresses "+address);
 						nat.natModel(nctx.am.get(n.getName()));
 						nat.setInternalAddress(address);		
 					}
