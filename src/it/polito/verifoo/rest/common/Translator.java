@@ -1,5 +1,7 @@
 package it.polito.verifoo.rest.common;
 
+import org.apache.logging.log4j.LogManager;
+
 import it.polito.verifoo.rest.jaxb.*;
 /**
  * This class implements a parser for verifoo output for find on witch host verifoo deploy a node 
@@ -7,6 +9,7 @@ import it.polito.verifoo.rest.jaxb.*;
 public class Translator {
 	private String model;
 	private NFV nfv;
+	private org.apache.logging.log4j.Logger logger = LogManager.getLogger("mylog");
 	/**
 	 * Costructor
 	 * @param model The Verifoo output.
@@ -31,7 +34,7 @@ public class Translator {
 		nfv.getGraphs().getGraph().forEach((g)->g.getNode().forEach((node)->{
 					String tosearch="(define-fun "+node.getName()+"@"+host.getName()+" () Bool\n  true)";
 					if(model.contains(tosearch)){
-						System.out.println(tosearch);
+						logger.debug(tosearch);
 						host.setActive(true);
 						NodeRefType nr=new NodeRefType();
 						nr.setNode(node.getName());

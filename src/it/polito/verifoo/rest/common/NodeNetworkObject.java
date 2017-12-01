@@ -75,7 +75,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 								if(nctx.am.get(e.getSource())!=null&&nctx.am.get(e.getDestination())!=null){
 								    Tuple<DatatypeExpr,DatatypeExpr> rule=new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(e.getSource()),nctx.am.get(e.getDestination()));
 								    acl.add(rule);
-								    System.out.println("Adding blocking rule " + acl);
+								    logger.debug("Adding blocking rule " + acl);
 								    ((AclFirewall)netobjs).addAcls(acl);
 								    logger.debug("Added acl:"+ rule.toString() +" to "+n.getName());
 								}
@@ -97,7 +97,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 						NetworkObject[] internalNodes = {};
 						internalNodes=this.entrySet().stream().filter(obj->resource.contains(obj.getKey().getName())).map(obj->obj.getValue()).collect(Collectors.toList()).toArray(internalNodes);
 						for(NetworkObject no:internalNodes)
-							System.out.println("Install cache with resources "+no.toString());
+							logger.debug("Install cache with resources "+no.toString());
 						if(internalNodes.length > 0)
 							c.installCache(internalNodes);			
 						
