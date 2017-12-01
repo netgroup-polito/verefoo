@@ -14,7 +14,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 public class RestFooApplication extends ResourceConfig {
     public RestFooApplication(@Context ServletContext context) throws MalformedURLException {
-		System.setProperty("log4j.configuration", new File("resources", "log4j2.xml").toURI().toURL().toString());
+		System.setProperty("log4j.configuration", new File(context.getRealPath("/WEB-INF/classes/log4j2.xml")).toURI().toURL().toString());
     	this.extractZ3Lib(context);
         // Define the package which contains the service classes.
         packages("it.polito.verifoo.rest.webservice");
