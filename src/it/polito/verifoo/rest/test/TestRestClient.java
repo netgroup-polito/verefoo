@@ -69,25 +69,67 @@ public class TestRestClient {
 	public void tearDown() throws Exception {
 	}
 	@Test
-	public void test() {
+	public void testRestService() {
 		try {
-			String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfvIn.xml")).collect(Collectors.joining("\n"));
+			String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfv3nodes3hostsSAT-MAIL.xml")).collect(Collectors.joining("\n"));
+			//System.out.println(xmlread);
 			Response res = ClientBuilder.newClient()
 					.target("http://127.0.0.1:8080/verifoo")
 					.path("/rest")
 					.request(MediaType.APPLICATION_XML)
 					.accept(MediaType.APPLICATION_XML)
 					.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
-			if(res.getStatusInfo()==Status.OK){
-				FileWriter fw=new FileWriter("result.xml");
-				fw.write(res.readEntity(String.class));
-				fw.close();
-			}
+			assertEquals(Status.OK, res.getStatusInfo());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			fail(e.toString());
 		}
 	}
-	
-
+	@Test
+	public void testTranslatorOnly() {
+		try {
+			String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfv5nodes7hostsSAT-WEBwithParsingString.xml")).collect(Collectors.joining("\n"));
+			//System.out.println(xmlread);
+			Response res = ClientBuilder.newClient()
+					.target("http://127.0.0.1:8080/verifoo")
+					.path("/translate")
+					.request(MediaType.APPLICATION_XML)
+					.accept(MediaType.APPLICATION_XML)
+					.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
+			assertEquals(Status.OK, res.getStatusInfo());
+		} catch (IOException e) {
+			fail(e.toString());
+		}
+	}
+	@Test
+	public void testBadGraph() {
+		try {
+			String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfv5nodes7hostsUNSAT-WEB.xml")).collect(Collectors.joining("\n"));
+			//System.out.println(xmlread);
+			Response res = ClientBuilder.newClient()
+					.target("http://127.0.0.1:8080/verifoo")
+					.path("/rest")
+					.request(MediaType.APPLICATION_XML)
+					.accept(MediaType.APPLICATION_XML)
+					.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
+			assertEquals(Status.BAD_REQUEST, res.getStatusInfo());
+		} catch (IOException e) {
+			fail(e.toString());
+		}
+	}
+	@Test
+	public void testBadRequest() {
+		try {
+			String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfvNoXml.txt")).collect(Collectors.joining("\n"));
+			//System.out.println(xmlread);
+			Response res = ClientBuilder.newClient()
+					.target("http://127.0.0.1:8080/verifoo")
+					.path("/rest")
+					.request(MediaType.APPLICATION_XML)
+					.accept(MediaType.APPLICATION_XML)
+					.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
+			assertEquals(Status.BAD_REQUEST, res.getStatusInfo());
+		} catch (IOException e) {
+			fail(e.toString());
+		}
+	}
 }

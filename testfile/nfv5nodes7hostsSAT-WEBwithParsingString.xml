@@ -1,0 +1,921 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvInfo.xsd">
+  <graphs>
+    <graph id="0">
+     <node functional_type="WEBCLIENT" name="nodeA">
+        <neighbour name="node1"/>
+        <configuration description="A simple description" name="confA">
+          <webclient nameWebServer="nodeB"/>
+        </configuration>
+      </node>
+      <node functional_type="FIREWALL" name="node1">
+        <neighbour name="nodeA"/>
+        <neighbour name="node2"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall>
+            <elements>
+              <source>nodeC</source>
+              <destination>nodeD</destination>
+            </elements>
+          </firewall>
+        </configuration>
+      </node>
+      <node functional_type="DPI" name="node2">
+        <neighbour name="node1"/>
+        <neighbour name="node3"/>
+        <configuration description="A simple description" name="conf2">
+          <dpi>
+          	<notAllowed>nodeC</notAllowed>
+          </dpi>
+        </configuration>
+      </node>
+      <node functional_type="CACHE" name="node3">
+        <neighbour name="node2"/>
+        <neighbour name="node4"/>
+        <configuration description="A simple description" name="conf3">
+          <cache>
+          	<resource>nodeA</resource>
+          	<resource>node1</resource>
+          	<resource>node2</resource>
+          </cache>
+        </configuration>
+      </node>
+	  <node functional_type="FIELDMODIFIER" name="node4">
+        <neighbour name="node3"/>
+        <neighbour name="node5"/>
+        <configuration description="A simple description" name="conf4">
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
+        </configuration>
+      </node>
+      <node functional_type="FIELDMODIFIER" name="node5">
+        <neighbour name="node4"/>
+        <neighbour name="nodeB"/>
+        <configuration description="A simple description" name="conf5">
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
+        </configuration>
+      </node>
+      <node functional_type="WEBSERVER" name="nodeB">
+        <neighbour name="node5"/>
+        <configuration description="A simple description" name="confB">
+          <webserver>
+          	<name>nodeB</name>
+          </webserver>
+        </configuration>
+      </node>
+    </graph>
+  </graphs>
+  <CapacityDefinition>
+   		<CapacityForNode node="node1" capacity="10"/>
+  		<CapacityForNode node="node2" capacity="10"/>
+  		<CapacityForNode node="node3" capacity="10"/>
+  		<CapacityForNode node="node4" capacity="10"/>
+  		<CapacityForNode node="node5" capacity="10"/>
+  </CapacityDefinition>
+  <PropertyDefinition>
+  		<Property graph="0" name="IsolationProperty"/> 		
+  </PropertyDefinition>
+  <Hosts>
+  	<Host diskStorage="10" name="hostA" type="CLIENT"/>
+  	<Host diskStorage="10" name="host1" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host2" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host3" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host4" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host5" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host6" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host7" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="hostB" type="SERVER"/>
+  </Hosts>
+  <Connections>
+  	<Connection sourceHost="hostA" destHost="host1" avgLatency ="-1"/>
+  	<Connection sourceHost="hostA" destHost="host2" avgLatency ="-100"/>
+  	<Connection sourceHost="host1" destHost="host2" avgLatency ="-1"/>
+  	<Connection sourceHost="host1" destHost="host3" avgLatency ="-1"/>
+  	<Connection sourceHost="host1" destHost="host4" avgLatency ="-1000"/>
+  	<Connection sourceHost="host2" destHost="host1" avgLatency ="-1"/>
+  	<Connection sourceHost="host2" destHost="host3" avgLatency ="-1"/>
+  	<Connection sourceHost="host2" destHost="host4" avgLatency ="-1"/>
+  	<Connection sourceHost="host2" destHost="host6" avgLatency ="-1"/>
+  	<Connection sourceHost="host2" destHost="hostB" avgLatency ="-100"/>
+  	<Connection sourceHost="host3" destHost="host2" avgLatency ="-1"/>
+  	<Connection sourceHost="host3" destHost="host4" avgLatency ="-1"/>
+  	<Connection sourceHost="host3" destHost="host5" avgLatency ="-1"/>
+  	<Connection sourceHost="host3" destHost="hostB" avgLatency ="-1"/>
+  	<Connection sourceHost="host4" destHost="host5" avgLatency ="-1"/>
+  	<Connection sourceHost="host4" destHost="host5" avgLatency ="-1"/>
+  	<Connection sourceHost="host4" destHost="host7" avgLatency ="-1"/>
+  	<Connection sourceHost="host5" destHost="host6" avgLatency ="-1"/>
+  	<Connection sourceHost="host6" destHost="host7" avgLatency ="-1"/>
+  	<Connection sourceHost="host7" destHost="hostB" avgLatency ="-1"/>
+  </Connections>
+  <ParsingString>(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host1 node4@host4)))| () Int
+  0)
+(define-fun node2@host6 () Bool
+  false)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host4 node4@host4)))| () Int
+  0)
+(define-fun node5@host3 () Bool
+  false)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host2 node4@host4)))| () Int
+  0)
+(define-fun integer_node3@host7 () Int
+  0)
+(define-fun host2 () Bool
+  true)
+(define-fun integer_host7 () Int
+  1)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host3 node3@host5)))| () Int
+  0)
+(define-fun integer_node4@host2 () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host1 node3@host3)))| () Int
+  0)
+(define-fun node3@host1 () Bool
+  false)
+(define-fun host6 () Bool
+  false)
+(define-fun integer_node3@host6 () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host2 node3@host1)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host3 node3@host4)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host3 node4@host4)))| () Int
+  1)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host2 node3@host2)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host6 node3@host6)))| () Int
+  0)
+(define-fun integer_host5 () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host4 node4@host7)))| () Int
+  0)
+(define-fun integer_node4@host7 () Int
+  0)
+(define-fun node4@host1 () Bool
+  false)
+(define-fun integer_node2@host6 () Int
+  0)
+(define-fun check_isolation_n_0_nodeA_nodeB () Node
+  node5)
+(define-fun integer_host1 () Int
+  1)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host3 node3@host3)))| () Int
+  0)
+(define-fun node3@host7 () Bool
+  false)
+(define-fun node3@host2 () Bool
+  false)
+(define-fun host7 () Bool
+  true)
+(define-fun node4@host4 () Bool
+  true)
+(define-fun integer_node3@host3 () Int
+  1)
+(define-fun node4@host3 () Bool
+  false)
+(define-fun node1@host1 () Bool
+  true)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host1 node4@host1)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host2 node4@host3)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host3 node3@host2)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((nodeA_composition_n_0 Node) (nodeA_composition_p_0 packet))
+             (let ((a!1 (and (send nodeA
+                                   nodeA_composition_n_0
+                                   nodeA_composition_p_0)
+                             (or (= (dest nodeA_composition_p_0) nodeB)))))
+               (=> a!1 (and (= nodeA_composition_n_0 node1)))))))
+  (=> a!1 node1@host1))| () Int
+  1)
+(define-fun |integer_(let ((a!1 (forall ((node5_composition_n_0 Node) (node5_composition_p_0 packet))
+             (let ((a!1 (and (send node5
+                                   node5_composition_n_0
+                                   node5_composition_p_0)
+                             (or (= (dest node5_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node5_composition_n_0 nodeB)))))))
+  (=> a!1 node5@host3))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node4_composition_n_0 Node) (node4_composition_p_0 packet))
+             (let ((a!1 (and (send node4
+                                   node4_composition_n_0
+                                   node4_composition_p_0)
+                             (or (= (dest node4_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node4_composition_n_0 node5)))))))
+  (=> a!1 (and node4@host6 node5@host7)))| () Int
+  0)
+(define-fun node3@host3 () Bool
+  true)
+(define-fun node3@host4 () Bool
+  false)
+(define-fun node2@host4 () Bool
+  false)
+(define-fun host3 () Bool
+  true)
+(define-fun node3@host5 () Bool
+  false)
+(define-fun host1 () Bool
+  true)
+(define-fun hostB () Bool
+  false)
+(define-fun |integer_(let ((a!1 (forall ((node4_composition_n_0 Node) (node4_composition_p_0 packet))
+             (let ((a!1 (and (send node4
+                                   node4_composition_n_0
+                                   node4_composition_p_0)
+                             (or (= (dest node4_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node4_composition_n_0 node5)))))))
+  (=> a!1 (and node4@host1 node5@host3)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node5_composition_n_0 Node) (node5_composition_p_0 packet))
+             (let ((a!1 (and (send node5
+                                   node5_composition_n_0
+                                   node5_composition_p_0)
+                             (or (= (dest node5_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node5_composition_n_0 nodeB)))))))
+  (=> a!1 node5@host7))| () Int
+  1)
+(define-fun integer_node5@host3 () Int
+  0)
+(define-fun hostA () Bool
+  false)
+(define-fun integer_host6 () Int
+  0)
+(define-fun node4@host6 () Bool
+  false)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host2 node4@host6)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host3 node4@host3)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node1_composition_n_0 Node) (node1_composition_p_0 packet))
+             (let ((a!1 (and (send node1
+                                   node1_composition_n_0
+                                   node1_composition_p_0)
+                             (or (= (dest node1_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node1_composition_n_0 node2)))))))
+  (=> a!1 (and node1@host1 node2@host2)))| () Int
+  1)
+(define-fun node4@host7 () Bool
+  false)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host6 node3@host7)))| () Int
+  0)
+(define-fun integer_node3@host2 () Int
+  0)
+(define-fun node5@host7 () Bool
+  true)
+(define-fun politoCache_node3_p_1 () packet
+  (packet null null null null node1 63 64 65 66 67 68 69 false))
+(define-fun node1@host2 () Bool
+  false)
+(define-fun |integer_(let ((a!1 (forall ((node4_composition_n_0 Node) (node4_composition_p_0 packet))
+             (let ((a!1 (and (send node4
+                                   node4_composition_n_0
+                                   node4_composition_p_0)
+                             (or (= (dest node4_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node4_composition_n_0 node5)))))))
+  (=> a!1 (and node4@host2 node5@host3)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host5 node4@host6)))| () Int
+  0)
+(define-fun node2@host3 () Bool
+  false)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host4 node3@host5)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host2 node3@host4)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node1_composition_n_0 Node) (node1_composition_p_0 packet))
+             (let ((a!1 (and (send node1
+                                   node1_composition_n_0
+                                   node1_composition_p_0)
+                             (or (= (dest node1_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node1_composition_n_0 node2)))))))
+  (=> a!1 (and node1@host2 node2@host1)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host2 node3@host3)))| () Int
+  1)
+(define-fun |integer_(let ((a!1 (forall ((node1_composition_n_0 Node) (node1_composition_p_0 packet))
+             (let ((a!1 (and (send node1
+                                   node1_composition_n_0
+                                   node1_composition_p_0)
+                             (or (= (dest node1_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node1_composition_n_0 node2)))))))
+  (=> a!1 (and node1@host2 node2@host3)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node1_composition_n_0 Node) (node1_composition_p_0 packet))
+             (let ((a!1 (and (send node1
+                                   node1_composition_n_0
+                                   node1_composition_p_0)
+                             (or (= (dest node1_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node1_composition_n_0 node2)))))))
+  (=> a!1 (and node1@host1 node2@host1)))| () Int
+  0)
+(define-fun integer_node4@host1 () Int
+  0)
+(define-fun integer_node2@host2 () Int
+  1)
+(define-fun integer_host3 () Int
+  1)
+(define-fun integer_node2@host3 () Int
+  0)
+(define-fun node5@host2 () Bool
+  false)
+(define-fun check_isolation_p1_nodeA_nodeB () packet
+  (packet nodeA nodeB node2 node4 nodeA 35 35 36 1 37 38 39 false))
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host1 node3@host4)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host2 node3@host6)))| () Int
+  0)
+(define-fun integer_node2@host1 () Int
+  0)
+(define-fun host5 () Bool
+  false)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host6 node4@host6)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host1 node3@host2)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host2 node4@host2)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host4 node3@host7)))| () Int
+  0)
+(define-fun integer_host4 () Int
+  1)
+(define-fun check_isolation_n_1_nodeA_nodeB () Node
+  node1)
+(define-fun |integer_(let ((a!1 (forall ((node1_composition_n_0 Node) (node1_composition_p_0 packet))
+             (let ((a!1 (and (send node1
+                                   node1_composition_n_0
+                                   node1_composition_p_0)
+                             (or (= (dest node1_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node1_composition_n_0 node2)))))))
+  (=> a!1 (and node1@host2 node2@host6)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host6 node4@host7)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node1_composition_n_0 Node) (node1_composition_p_0 packet))
+             (let ((a!1 (and (send node1
+                                   node1_composition_n_0
+                                   node1_composition_p_0)
+                             (or (= (dest node1_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node1_composition_n_0 node2)))))))
+  (=> a!1 (and node1@host2 node2@host2)))| () Int
+  0)
+(define-fun integer_node4@host3 () Int
+  0)
+(define-fun check_isolation_p0_nodeA_nodeB () packet
+  (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 33 34 false))
+(define-fun integer_node3@host1 () Int
+  0)
+(define-fun node3@host6 () Bool
+  false)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host1 node4@host3)))| () Int
+  0)
+(define-fun host4 () Bool
+  true)
+(define-fun integer_node1@host2 () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host3 node4@host2)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node1_composition_n_0 Node) (node1_composition_p_0 packet))
+             (let ((a!1 (and (send node1
+                                   node1_composition_n_0
+                                   node1_composition_p_0)
+                             (or (= (dest node1_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node1_composition_n_0 node2)))))))
+  (=> a!1 (and node1@host2 node2@host4)))| () Int
+  0)
+(define-fun integer_node3@host4 () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node4_composition_n_0 Node) (node4_composition_p_0 packet))
+             (let ((a!1 (and (send node4
+                                   node4_composition_n_0
+                                   node4_composition_p_0)
+                             (or (= (dest node4_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node4_composition_n_0 node5)))))))
+  (=> a!1 (and node4@host1 node5@host2)))| () Int
+  0)
+(define-fun integer_node5@host2 () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node4_composition_n_0 Node) (node4_composition_p_0 packet))
+             (let ((a!1 (and (send node4
+                                   node4_composition_n_0
+                                   node4_composition_p_0)
+                             (or (= (dest node4_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node4_composition_n_0 node5)))))))
+  (=> a!1 (and node4@host3 node5@host3)))| () Int
+  0)
+(define-fun node2@host1 () Bool
+  false)
+(define-fun |integer_(let ((a!1 (forall ((node4_composition_n_0 Node) (node4_composition_p_0 packet))
+             (let ((a!1 (and (send node4
+                                   node4_composition_n_0
+                                   node4_composition_p_0)
+                             (or (= (dest node4_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node4_composition_n_0 node5)))))))
+  (=> a!1 (and node4@host2 node5@host2)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host4 node3@host4)))| () Int
+  0)
+(define-fun integer_node4@host6 () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host2 node4@host1)))| () Int
+  0)
+(define-fun integer_host2 () Int
+  1)
+(define-fun |integer_(let ((a!1 (forall ((node1_composition_n_0 Node) (node1_composition_p_0 packet))
+             (let ((a!1 (and (send node1
+                                   node1_composition_n_0
+                                   node1_composition_p_0)
+                             (or (= (dest node1_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node1_composition_n_0 node2)))))))
+  (=> a!1 (and node1@host1 node2@host3)))| () Int
+  0)
+(define-fun node2@host2 () Bool
+  true)
+(define-fun |integer_(let ((a!1 (forall ((node4_composition_n_0 Node) (node4_composition_p_0 packet))
+             (let ((a!1 (and (send node4
+                                   node4_composition_n_0
+                                   node4_composition_p_0)
+                             (or (= (dest node4_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node4_composition_n_0 node5)))))))
+  (=> a!1 (and node4@host3 node5@host2)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host1 node4@host2)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node4_composition_n_0 Node) (node4_composition_p_0 packet))
+             (let ((a!1 (and (send node4
+                                   node4_composition_n_0
+                                   node4_composition_p_0)
+                             (or (= (dest node4_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node4_composition_n_0 node5)))))))
+  (=> a!1 (and node4@host7 node5@host7)))| () Int
+  0)
+(define-fun node4@host2 () Bool
+  false)
+(define-fun |integer_(let ((a!1 (forall ((node1_composition_n_0 Node) (node1_composition_p_0 packet))
+             (let ((a!1 (and (send node1
+                                   node1_composition_n_0
+                                   node1_composition_p_0)
+                             (or (= (dest node1_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node1_composition_n_0 node2)))))))
+  (=> a!1 (and node1@host1 node2@host4)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((nodeA_composition_n_0 Node) (nodeA_composition_p_0 packet))
+             (let ((a!1 (and (send nodeA
+                                   nodeA_composition_n_0
+                                   nodeA_composition_p_0)
+                             (or (= (dest nodeA_composition_p_0) nodeB)))))
+               (=> a!1 (and (= nodeA_composition_n_0 node1)))))))
+  (=> a!1 node1@host2))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node5_composition_n_0 Node) (node5_composition_p_0 packet))
+             (let ((a!1 (and (send node5
+                                   node5_composition_n_0
+                                   node5_composition_p_0)
+                             (or (= (dest node5_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node5_composition_n_0 nodeB)))))))
+  (=> a!1 node5@host2))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node2_composition_n_0 Node) (node2_composition_p_0 packet))
+             (let ((a!1 (and (send node2
+                                   node2_composition_n_0
+                                   node2_composition_p_0)
+                             (or (= (dest node2_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node2_composition_n_0 node3)))))))
+  (=> a!1 (and node2@host1 node3@host1)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node3_composition_n_0 Node) (node3_composition_p_0 packet))
+             (let ((a!1 (and (send node3
+                                   node3_composition_n_0
+                                   node3_composition_p_0)
+                             (or (= (dest node3_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node3_composition_n_0 node4)))))))
+  (=> a!1 (and node3@host7 node4@host7)))| () Int
+  0)
+(define-fun |integer_(let ((a!1 (forall ((node4_composition_n_0 Node) (node4_composition_p_0 packet))
+             (let ((a!1 (and (send node4
+                                   node4_composition_n_0
+                                   node4_composition_p_0)
+                             (or (= (dest node4_composition_p_0) nodeB)))))
+               (=> a!1 (and (= node4_composition_n_0 node5)))))))
+  (=> a!1 (and node4@host4 node5@host7)))| () Int
+  1)
+(define-fun integer_node1@host1 () Int
+  1)
+(define-fun integer_node5@host7 () Int
+  1)
+(define-fun integer_node2@host4 () Int
+  0)
+(define-fun integer_node3@host5 () Int
+  0)
+(define-fun integer_node4@host4 () Int
+  1)
+(define-fun politoFieldModifier_node5_p_1!14!1370 ((x!0 packet)) packet
+  (ite (= x!0 (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 40 34 false))
+    (packet null null null null node1 70 71 72 73 74 75 76 false)
+    (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 40 34 false)))
+(define-fun k!1365 ((x!0 packet)) packet
+  (ite (= x!0 (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 33 34 false))
+    (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 33 34 false)
+  (ite (= x!0 (packet nodeA nodeB node2 node4 nodeA 35 35 36 1 37 38 39 false))
+    (packet nodeA nodeB node2 node4 nodeA 35 35 36 1 37 38 39 false)
+  (ite (= x!0 (packet node2 node2 node2 node2 node1 0 3 4 5 6 7 8 false))
+    (packet node2 node2 node2 node2 node1 0 3 4 5 6 7 8 false)
+  (ite (= x!0 (packet node2 node2 node2 node2 node1 0 1 2 3 4 5 6 false))
+    (packet node2 node2 node2 node2 node1 0 1 2 3 4 5 6 false)
+  (ite (= x!0 (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 41 34 false))
+    (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 41 34 false)
+  (ite (= x!0 (packet null node2 node2 node2 node1 0 1 2 3 4 5 6 false))
+    (packet null node2 node2 node2 node1 0 1 2 3 4 5 6 false)
+  (ite (= x!0 (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 40 34 false))
+    (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 40 34 false)
+  (ite (= x!0 (packet node2 node2 nodeA nodeA nodeA 0 2 3 4 5 6 7 true))
+    (packet node2 node2 nodeA nodeA nodeA 0 2 3 4 5 6 7 true)
+  (ite (= x!0 (packet node2 node2 node2 null node1 0 2 3 4 5 6 7 false))
+    (packet node2 node2 node2 null node1 0 2 3 4 5 6 7 false)
+  (ite (= x!0 (packet node2 node2 null node2 node1 0 2 3 4 5 6 7 false))
+    (packet node2 node2 null node2 node1 0 2 3 4 5 6 7 false)
+    (packet node2 node2 node2 node2 node1 0 2 3 4 5 6 7 false))))))))))))
+(define-fun politoFieldModifier_node5_p_1!14 ((x!0 packet)) packet
+  (politoFieldModifier_node5_p_1!14!1370 (k!1365 x!0)))
+(define-fun politoFieldModifier_node4_p_1!5!1372 ((x!0 packet)) packet
+  (ite (= x!0 (packet nodeA nodeB node2 node4 nodeA 35 35 36 1 37 38 39 false))
+    (packet null null null null node1 49 50 51 52 53 54 55 false)
+    (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 41 34 false)))
+(define-fun politoFieldModifier_node4_p_1!5 ((x!0 packet)) packet
+  (politoFieldModifier_node4_p_1!5!1372 (k!1365 x!0)))
+(define-fun node3_isInternalNode!1371 ((x!0 Node)) Bool
+  (ite (= x!0 node2) true
+  (ite (= x!0 node1) true
+  (ite (= x!0 nodeA) true
+    false))))
+(define-fun k!1366 ((x!0 Node)) Node
+  (ite (= x!0 node3) node3
+  (ite (= x!0 node1) node1
+  (ite (= x!0 node5) node5
+  (ite (= x!0 nodeA) nodeA
+  (ite (= x!0 node2) node2
+  (ite (= x!0 nodeB) nodeB
+    node4)))))))
+(define-fun node3_isInternalNode ((x!0 Node)) Bool
+  (node3_isInternalNode!1371 (k!1366 x!0)))
+(define-fun politoFieldModifier_node5_y!15!1374 ((x!0 packet)) Node
+  (ite (= x!0 (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 40 34 false))
+    node1
+    node4))
+(define-fun webserver_nodeB_p_1!4 ((x!0 packet) (x!1 Node)) packet
+  (packet null null null null node1 42 43 44 45 46 47 48 false))
+(define-fun recv!1373 ((x!0 Node) (x!1 Node) (x!2 packet)) Bool
+  (ite (and (= x!0 node5)
+            (= x!1 nodeB)
+            (= x!2
+               (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 33 34 false)))
+    true
+  (ite (and (= x!0 nodeA)
+            (= x!1 node1)
+            (= x!2
+               (packet nodeA nodeB node2 node4 nodeA 35 35 36 1 37 38 39 false)))
+    true
+  (ite (and (= x!0 node2)
+            (= x!1 node3)
+            (= x!2
+               (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 41 34 false)))
+    true
+  (ite (and (= x!0 node4)
+            (= x!1 node5)
+            (= x!2
+               (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 40 34 false)))
+    true
+  (ite (and (= x!0 node3)
+            (= x!1 node4)
+            (= x!2
+               (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 41 34 false)))
+    true
+  (ite (and (= x!0 node1)
+            (= x!1 node2)
+            (= x!2
+               (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 41 34 false)))
+    true
+  (ite (and (= x!0 nodeA)
+            (= x!1 node1)
+            (= x!2
+               (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 41 34 false)))
+    true
+    false))))))))
+(define-fun recv ((x!0 Node) (x!1 Node) (x!2 packet)) Bool
+  (recv!1373 (k!1366 x!0) (k!1366 x!1) (k!1365 x!2)))
+(define-fun politoFieldModifier_node5_y!15 ((x!0 packet)) Node
+  (politoFieldModifier_node5_y!15!1374 (k!1365 x!0)))
+(define-fun node3_isInCache ((x!0 Int)) Bool
+  false)
+(define-fun node2_n_1!13 ((x!0 packet)) Node
+  node1)
+(define-fun send!1377 ((x!0 Node) (x!1 Node) (x!2 packet)) Bool
+  (ite (and (= x!0 nodeA)
+            (= x!1 node1)
+            (= x!2
+               (packet nodeA nodeB node2 node4 nodeA 35 35 36 1 37 38 39 false)))
+    true
+  (ite (and (= x!0 node5)
+            (= x!1 nodeB)
+            (= x!2
+               (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 33 34 false)))
+    true
+  (ite (and (= x!0 node3)
+            (= x!1 node4)
+            (= x!2
+               (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 41 34 false)))
+    true
+  (ite (and (= x!0 node4)
+            (= x!1 node5)
+            (= x!2
+               (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 40 34 false)))
+    true
+  (ite (and (= x!0 node2)
+            (= x!1 node3)
+            (= x!2
+               (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 41 34 false)))
+    true
+  (ite (and (= x!0 node1)
+            (= x!1 node2)
+            (= x!2
+               (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 41 34 false)))
+    true
+  (ite (and (= x!0 nodeA)
+            (= x!1 node1)
+            (= x!2
+               (packet nodeA nodeB node4 node2 nodeA 30 30 31 1 32 41 34 false)))
+    true
+    false))))))))
+(define-fun politoCache_node3_p_2!9 ((x!0 Int)) packet
+  (packet node2 node2 node2 node2 node1 0 2 3 4 5 6 7 false))
+(define-fun nodeHasAddr!1378 ((x!0 Node) (x!1 Address)) Bool
+  (ite (and (= x!0 nodeA) (= x!1 nodeA)) true
+  (ite (and (= x!0 nodeB) (= x!1 nodeB)) true
+  (ite (and (= x!0 node1) (= x!1 node1)) true
+  (ite (and (= x!0 node2) (= x!1 node2)) true
+  (ite (and (= x!0 node3) (= x!1 node3)) true
+  (ite (and (= x!0 node4) (= x!1 node4)) true
+  (ite (and (= x!0 node5) (= x!1 node5)) true
+    false))))))))
+(define-fun politoCache_node3_p_1!12 ((x!0 packet) (x!1 Node)) packet
+  (packet null null null null node1 56 57 58 59 60 61 62 false))
+(define-fun node1_firewall_send_n_1!16 ((x!0 packet)) Node
+  nodeA)
+(define-fun politoCache_node3_p_1!10 ((x!0 Int)) packet
+  (packet node2 node2 node2 node2 node1 0 2 3 4 5 6 7 false))
+(define-fun dport ((x!0 packet)) Int
+  0)
+(define-fun node2_isInBlacklist!1375 ((x!0 Int)) Bool
+  (ite (= x!0 104993409) true
+    false))
+(define-fun k!1369 ((x!0 Int)) Int
+  (ite (= x!0 104993409) 104993409
+    30))
+(define-fun node2_isInBlacklist ((x!0 Int)) Bool
+  (node2_isInBlacklist!1375 (k!1369 x!0)))
+(define-fun politoCache_node3_n_1!8 ((x!0 Int)) Node
+  node2)
+(define-fun k!1368 ((x!0 Address)) Address
+  (ite (= x!0 nodeA) nodeA
+  (ite (= x!0 node2) node2
+  (ite (= x!0 node4) node4
+  (ite (= x!0 node1) node1
+  (ite (= x!0 nodeB) nodeB
+  (ite (= x!0 node5) node5
+  (ite (= x!0 node3) node3
+    null))))))))
+(define-fun politoFieldModifier_node4_y!6!1376 ((x!0 packet)) Node
+  (ite (= x!0 (packet nodeA nodeB node2 node4 nodeA 35 35 36 1 37 38 39 false))
+    node1
+    node3))
+(define-fun politoFieldModifier_node4_y!6 ((x!0 packet)) Node
+  (politoFieldModifier_node4_y!6!1376 (k!1365 x!0)))
+(define-fun send ((x!0 Node) (x!1 Node) (x!2 packet)) Bool
+  (send!1377 (k!1366 x!0) (k!1366 x!1) (k!1365 x!2)))
+(define-fun nodeHasAddr ((x!0 Node) (x!1 Address)) Bool
+  (nodeHasAddr!1378 x!0 (k!1368 x!1)))
+(define-fun node1_acl_func ((x!0 Address) (x!1 Address)) Bool
+  false)
+(define-fun politoCache_node3_n_2!7 ((x!0 Int)) Node
+  node2)
+(define-fun politoCache_node3_n_1!11 ((x!0 packet)) Node
+  node2)
+(define-fun addrToNode ((x!0 Address)) Node
+  (ite (= x!0 node1) node1
+  (ite (= x!0 node2) node2
+  (ite (= x!0 node3) node3
+  (ite (= x!0 node4) node4
+  (ite (= x!0 node5) node5
+  (ite (= x!0 nodeB) nodeB
+    nodeA)))))))
+(define-fun sport ((x!0 packet)) Int
+  0)</ParsingString>
+</NFV>
