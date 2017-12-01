@@ -68,18 +68,20 @@ public class TestRestClient {
 	@After
 	public void tearDown() throws Exception {
 	}
+	//final String target = "http://127.0.0.1:8080/verifoo";
+	final String target = "http://restfoo.eu-de.mybluemix.net";
 	@Test
 	public void testRestService() {
 		try {
 			String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfv3nodes3hostsSAT-MAIL.xml")).collect(Collectors.joining("\n"));
 			//System.out.println(xmlread);
 			Response res = ClientBuilder.newClient()
-					.target("http://127.0.0.1:8080/verifoo")
+					.target(target)
 					.path("/rest")
 					.request(MediaType.APPLICATION_XML)
 					.accept(MediaType.APPLICATION_XML)
 					.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
-			assertEquals(Status.OK, res.getStatusInfo());
+			assertEquals(Status.OK.getStatusCode(), res.getStatus());
 		} catch (IOException e) {
 			fail(e.toString());
 		}
@@ -90,12 +92,12 @@ public class TestRestClient {
 			String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfv5nodes7hostsSAT-WEBwithParsingString.xml")).collect(Collectors.joining("\n"));
 			//System.out.println(xmlread);
 			Response res = ClientBuilder.newClient()
-					.target("http://127.0.0.1:8080/verifoo")
+					.target(target)
 					.path("/translate")
 					.request(MediaType.APPLICATION_XML)
 					.accept(MediaType.APPLICATION_XML)
 					.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
-			assertEquals(Status.OK, res.getStatusInfo());
+			assertEquals(Status.OK.getStatusCode(),res.getStatus());
 		} catch (IOException e) {
 			fail(e.toString());
 		}
@@ -106,12 +108,12 @@ public class TestRestClient {
 			String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfv5nodes7hostsUNSAT-WEB.xml")).collect(Collectors.joining("\n"));
 			//System.out.println(xmlread);
 			Response res = ClientBuilder.newClient()
-					.target("http://127.0.0.1:8080/verifoo")
+					.target(target)
 					.path("/rest")
 					.request(MediaType.APPLICATION_XML)
 					.accept(MediaType.APPLICATION_XML)
 					.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
-			assertEquals(Status.BAD_REQUEST, res.getStatusInfo());
+			assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
 		} catch (IOException e) {
 			fail(e.toString());
 		}
@@ -122,12 +124,12 @@ public class TestRestClient {
 			String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfvNoXml.txt")).collect(Collectors.joining("\n"));
 			//System.out.println(xmlread);
 			Response res = ClientBuilder.newClient()
-					.target("http://127.0.0.1:8080/verifoo")
+					.target(target)
 					.path("/rest")
 					.request(MediaType.APPLICATION_XML)
 					.accept(MediaType.APPLICATION_XML)
 					.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
-			assertEquals(Status.BAD_REQUEST, res.getStatusInfo());
+			assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
 		} catch (IOException e) {
 			fail(e.toString());
 		}
