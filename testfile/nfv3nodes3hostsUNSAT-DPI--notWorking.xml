@@ -20,14 +20,14 @@
           </firewall>
         </configuration>
       </node>
-      <node functional_type="CACHE" name="node2">
+      <node functional_type="DPI" name="node2">
         <neighbour name="node1"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf2">
-          <cache>
-			<resource>nodeA</resource>
-          	<resource>nodeC</resource>
-          </cache>
+          <dpi>
+          	<notAllowed>nodeA</notAllowed>
+			<notAllowed>node1</notAllowed>
+          </dpi>
         </configuration>
       </node>
       <node functional_type="WEBSERVER" name="nodeB">

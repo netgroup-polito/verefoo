@@ -88,7 +88,7 @@ public class TestProxy {
         	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
         }
         root.getPropertyDefinition().getProperty().forEach(p ->{
-        	org.junit.Assert.assertEquals(p.isIsSat(), sat);
+        	org.junit.Assert.assertEquals(sat, p.isIsSat());
         });
         return;
 	}
@@ -119,10 +119,10 @@ public class TestProxy {
 			fail(e.toString());
 		} 
 	}
-	//@Test
+	@Test
 	public void testDPI_UNSAT() {
 		try {
-			test( "./testfile/nfv5nodes7hostsUNSAT-DPI.xml", false); //NotWorking
+			test( "./testfile/nfv3nodes3hostsUNSAT-DPI--notWorking.xml", false); //NotWorking
 		} catch (Exception e) {
 			fail(e.toString());
 		}		
@@ -130,12 +130,12 @@ public class TestProxy {
 	//@Test
 	public void testNAT_UNSAT() {
 		try {
-			test( "./testfile/nfv5nodes7hostsUNSAT-NAT--notWorking.xml", false); //NotWorking
+			test( "./testfile/nfv3nodes3hostsUNSAT-NAT.xml", false); //Working
 		} catch (Exception e) {
 			fail(e.toString());
 		}		
 	}
-	@Test
+	//@Test
 	public void testANTISPAM_UNSAT() {
 		try {
 			test( "./testfile/nfv5nodes7hostsUNSAT-ANTISPAM--notWorking.xml", false); //NotWorking
@@ -144,11 +144,19 @@ public class TestProxy {
 		}		
 	}
 	//@Test
-	public void testSAT() {
+	public void testMAIL_SAT() {
 		try {
-			test( "./testfile/nfv5nodes7hostsSAT.xml", true); //Working
+			test( "./testfile/nfv3nodes3hostsSAT-MAIL.xml", true); //Working
 		} catch (Exception e) {
 			fail(e.toString());
 		}		
 	}
+	//@Test
+		public void testAllMiddleboxes_SAT() {
+			try {
+				test( "./testfile/nfv5nodes7hostsSAT.xml", true); //Working
+			} catch (Exception e) {
+				fail(e.toString());
+			}		
+		}
 }

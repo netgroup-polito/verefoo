@@ -134,7 +134,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				case ANTISPAM:{
 					PolitoAntispam spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,spam);
-					int[] blacklist=n.getConfiguration().getAntispam().getSource().stream().mapToInt((s)->s.hashCode()).toArray();
+					int[] blacklist=listToIntArguments(n.getConfiguration().getAntispam().getSource());
 					spam.installAntispam(blacklist);
 					break;
 				}
@@ -144,9 +144,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 				case DPI:{
 					PolitoIDS ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
-					this.put(n,ids);
-					int[] blacklist=n.getConfiguration().getDpi().getNotAllowed().stream().mapToInt((s)->s.hashCode()).toArray();
+					int[] blacklist=listToIntArguments(n.getConfiguration().getDpi().getNotAllowed());
 					ids.installIDS(blacklist);
+					this.put(n,ids);
 					break;
 				}
 				case MAILCLIENT:{
@@ -204,5 +204,13 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 		}
 	}
 	
+	private int[] listToIntArguments(List<String> arg) {
+        int[] o= new int[arg.size()];
+        for(int i=0; i<arg.size(); i++){
+            if(arg.get(i)!=null)
+                o[i]= String.valueOf(arg.get(i)).hashCode();
+        }
+        return o;
+    }
 	
 }

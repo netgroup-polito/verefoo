@@ -20,13 +20,13 @@
           </firewall>
         </configuration>
       </node>
-      <node functional_type="NAT" name="node2">
+      <node functional_type="ANTISPAM" name="node2">
         <neighbour name="node1"/>
         <neighbour name="node3"/>
         <configuration description="A simple description" name="conf2">
-          <nat>
+          <antispam>
           	<source>nodeA</source>
-          </nat>
+          </antispam>
         </configuration>
       </node>
       <node functional_type="FIELDMODIFIER" name="node3">

@@ -54,7 +54,7 @@
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf5">
          <antispam>
-          	<source>nodeA</source>
+          	<source>nodeC</source>
          </antispam>
         </configuration>
       </node>
