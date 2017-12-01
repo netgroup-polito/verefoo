@@ -98,7 +98,8 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 						internalNodes=this.entrySet().stream().filter(obj->resource.contains(obj.getKey().getName())).map(obj->obj.getValue()).collect(Collectors.toList()).toArray(internalNodes);
 						for(NetworkObject no:internalNodes)
 							System.out.println("Install cache on "+no.toString());
-						c.installCache(internalNodes);			
+						if(internalNodes.length > 0)
+							c.installCache(internalNodes);			
 						
 					}
 				}
