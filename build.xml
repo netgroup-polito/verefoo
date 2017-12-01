@@ -4,6 +4,7 @@
   <!-- set global properties for this build -->
   <property name="src.dir" location="src"/>
   <property name="build.dir" location="build"/>
+  <property name="resources.dir" location="resources"/>
   <property name="dist.dir" location="dist"/>
   <property name="schema.dir" location="xsd" />
   <property name="report.dir" location="log" />
@@ -93,6 +94,7 @@
   <target name="war" depends="compile">
 	  <war destfile="${target.dir}/verifoo.war" webxml="WebContent/WEB-INF/web.xml">
 		    <classes dir="${build.dir}"/>
+	 	    <classes dir="${resources.dir}"/>
 		    <lib dir="${lib.dir}">
 		    </lib>
 	  </war>
