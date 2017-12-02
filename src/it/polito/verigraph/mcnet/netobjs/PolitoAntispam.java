@@ -100,13 +100,12 @@ public class PolitoAntispam extends NetworkObject{
 
         //Constraint4 send(politoAntispam, politoErrFunction, p, t_0) ->
         //            (exist n_1,t_1 : (recv(n_1, politoAntispam, p, t_1) && t_1 < t_0 && p.emailFrom ==1))
-        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
+      /*  constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
                 ctx.mkImplies((BoolExpr)nctx.send.apply(politoAntispam, nctx.nm.get("politoErrFunction").getZ3Node(), p_0),
                         ctx.mkAnd(ctx.mkExists(new Expr[]{n_1},
                                 ctx.mkAnd((BoolExpr)nctx.recv.apply(n_1, politoAntispam, p_0),
-                                        
                                         ctx.mkEq(nctx.pf.get("emailFrom").apply(p_0),ctx.mkInt(1))),1,null,null,null,null))),1,null,null,null,null));
-
+*/
         //Constraint5 send(politoAntispam, n_0, p, t_0) -> p.proto == POP_REQ || p.protpo == POP_RESP
         constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
                 ctx.mkImplies((BoolExpr)nctx.send.apply(politoAntispam, n_0, p_0),
