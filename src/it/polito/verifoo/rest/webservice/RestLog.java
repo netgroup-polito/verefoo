@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Comparator;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
@@ -34,12 +33,8 @@ public class RestLog {
 	    @GET
 		@Produces(MediaType.TEXT_HTML)
 	    public String get() throws IOException {
-	    	Stack<String> debugst=new Stack<String>();
-	    	Stack<String> errorst=new Stack<String>();
-	    	debugst.addAll(Files.readAllLines(Paths.get(DebugFile)));
-	    	errorst.addAll(Files.readAllLines(Paths.get(ErrorFile)));
-	    	String debug=debugst.stream().collect(Collectors.joining("</br>"));
-			String error=errorst.stream().collect(Collectors.joining("</br>"));
+	    	String debug=Files.readAllLines(Paths.get(DebugFile)).stream().collect(Collectors.joining("</br>"));
+			String error=Files.readAllLines(Paths.get(ErrorFile)).stream().collect(Collectors.joining("</br>"));
 	    	String html="<!DOCTYPE html><html><body><h1>Error Log</h1><p>"
 	    			    +error
 	    			    +"</p><h1>Debug Log</h1><p>"
