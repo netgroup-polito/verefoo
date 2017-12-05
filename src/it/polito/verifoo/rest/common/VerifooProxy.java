@@ -236,12 +236,13 @@ public class VerifooProxy {
 		 * @param hostServer is the final host of the network
 		 * @param hostChain List of all the hosts encountered in the current chain
 		 */
-		private void expandHostChain(String lastHost, String hostServer, List<String> hostChain){
+		private boolean expandHostChain(String lastHost, String hostServer, List<String> hostChain){
 			if(lastHost.equals(hostServer)){
 				//System.out.println("Dest Reached " + lastHost);
 				savedChain.add(new ArrayList<>(hostChain));
-				return;
+				return true;
 			}
+			if(hostChain.size() > nodes.size()) return false;
 			List<String> destinations = connections.stream()
 									.filter(c -> c.getSourceHost().equals(lastHost))
 									.map(c -> c.getDestHost())
@@ -257,7 +258,8 @@ public class VerifooProxy {
 				expandHostChain(h, hostServer, hostChain);
 				hostChain.remove(h);
 			}
-			return;
+			
+			return true;
 			
 		}
 		/**

@@ -93,7 +93,7 @@ public class TestProxy {
         return;
 	}
 	
-	//@Test
+	@Test
 	public void testBadClientConf() {
 		try {
 			test( "./testfile/nfv5nodes7hostsUNSAT-WEB.xml", false); //Working
@@ -102,7 +102,7 @@ public class TestProxy {
 			assert(true);
 		}		
 	}
-	//@Test
+	@Test
 	public void testFW_UNSAT(){
 		try {
 			test( "./testfile/nfv5nodes7hostsUNSAT-FW.xml", false); //Working
@@ -110,7 +110,7 @@ public class TestProxy {
 			fail(e.toString());
 		}
 	}
-	//@Test
+	@Test
 	public void testCACHE_UNSAT(){
 		
 		try {
@@ -127,7 +127,7 @@ public class TestProxy {
 			fail(e.toString());
 		}		
 	}
-	//@Test
+	@Test
 	public void testNAT_UNSAT() {
 		try {
 			test( "./testfile/nfv3nodes3hostsUNSAT-NAT.xml", false); //Working
@@ -135,7 +135,7 @@ public class TestProxy {
 			fail(e.toString());
 		}		
 	}
-	//@Test
+	@Test
 	public void testANTISPAM_UNSAT() {
 		try {
 			test( "./testfile/nfv5nodes7hostsUNSAT-ANTISPAM--notWorking.xml", false); //NotWorking
@@ -143,7 +143,7 @@ public class TestProxy {
 			fail(e.toString());
 		}		
 	}
-	//@Test
+	@Test
 	public void testMAIL_SAT() {
 		try {
 			test( "./testfile/nfv3nodes3hostsSAT-MAIL.xml", true); //Working
@@ -151,7 +151,7 @@ public class TestProxy {
 			fail(e.toString());
 		}		
 	}
-	//@Test
+	@Test
 		public void testAllMiddleboxes_SAT() {
 			try {
 				test( "./testfile/nfv5nodes7hostsSAT.xml", true); //Working
