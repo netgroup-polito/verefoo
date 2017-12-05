@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvInfo.xsd">
+  <graphs>
+    <graph id="0">
+     <node functional_type="WEBCLIENT" name="nodeA">
+        <neighbour name="node1"/>
+        <configuration description="A simple description" name="confA">
+          <webclient nameWebServer="nodeB"/>
+        </configuration>
+      </node>
+      <node functional_type="FIREWALL" name="node1">
+        <neighbour name="nodeA"/>
+        <neighbour name="node2"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall>
+            <elements>
+              <source>nodeC</source>
+              <destination>nodeD</destination>
+            </elements>
+          </firewall>
+        </configuration>
+      </node>
+      <node functional_type="DPI" name="node2">
+        <neighbour name="node1"/>
+        <neighbour name="node3"/>
+        <configuration description="A simple description" name="conf2">
+          <dpi>
+          	<notAllowed>nodeC</notAllowed>
+          </dpi>
+        </configuration>
+      </node>
+      <node functional_type="CACHE" name="node3">
+        <neighbour name="node2"/>
+        <neighbour name="node4"/>
+        <configuration description="A simple description" name="conf3">
+          <cache>
+          	<resource>nodeA</resource>
+          	<resource>node1</resource>
+          	<resource>node2</resource>
+          </cache>
+        </configuration>
+      </node>
+	  <node functional_type="NAT" name="node4">
+        <neighbour name="node3"/>
+        <neighbour name="nodeB"/>
+        <configuration description="A simple description" name="conf4">
+         <nat>
+          		<source>nodeA</source>
+          		<source>node1</source>
+          		<source>node2</source>
+          		<source>node3</source>
+          </nat>
+        </configuration>
+      </node>
+   
+      <node functional_type="WEBSERVER" name="nodeB">
+        <neighbour name="node4"/>
+        <configuration description="A simple description" name="confB">
+          <webserver>
+          	<name>nodeB</name>
+          </webserver>
+        </configuration>
+      </node>
+    </graph>
+  </graphs>
+  <CapacityDefinition>
+   		<CapacityForNode node="node1" capacity="50"/>
+  		<CapacityForNode node="node2" capacity="50"/>
+  		<CapacityForNode node="node3" capacity="68"/>
+  		<CapacityForNode node="node4" capacity="45"/>
+  </CapacityDefinition>
+  <PropertyDefinition>
+  		<Property graph="0" name="IsolationProperty"/> 		
+  </PropertyDefinition>
+   <Hosts>
+        <Host name="N1" diskStorage="108" type="CLIENT"/>
+        <Host name="N2" diskStorage="122" type="MIDDLEBOX"/>
+        <Host name="N3" diskStorage="116" type="MIDDLEBOX"/>
+        <Host name="N4" diskStorage="125" type="MIDDLEBOX"/>
+        <Host name="N5" diskStorage="100" type="MIDDLEBOX"/>
+        <Host name="N6" diskStorage="124" type="MIDDLEBOX"/>
+        <Host name="N7" diskStorage="141" type="MIDDLEBOX"/>
+        <Host name="N8" diskStorage="116" type="MIDDLEBOX"/>
+        <Host name="N9" diskStorage="127" type="MIDDLEBOX"/>
+        <Host name="N10" diskStorage="120" type="MIDDLEBOX"/>
+        <Host name="N11" diskStorage="130" type="MIDDLEBOX"/>
+        <Host name="N12" diskStorage="116" type="MIDDLEBOX"/>
+        <Host name="N13" diskStorage="121" type="MIDDLEBOX"/>
+        <Host name="N14" diskStorage="122" type="MIDDLEBOX"/>
+        <Host name="N15" diskStorage="124" type="MIDDLEBOX"/>
+        <Host name="N16" diskStorage="134" type="MIDDLEBOX"/>
+        <Host name="N17" diskStorage="105" type="MIDDLEBOX"/>
+        <Host name="N18" diskStorage="118" type="MIDDLEBOX"/>
+        <Host name="N19" diskStorage="123" type="MIDDLEBOX"/>
+        <Host name="N20" diskStorage="138" type="MIDDLEBOX"/>
+        <Host name="N21" diskStorage="144" type="MIDDLEBOX"/>
+        <Host name="N22" diskStorage="134" type="MIDDLEBOX"/>
+        <Host name="N23" diskStorage="136" type="MIDDLEBOX"/>
+        <Host name="N24" diskStorage="113" type="SERVER"/>
+    </Hosts>
+    <Connections>
+        <Connection sourceHost="N20" destHost="N3" avgLatency="162160"/>
+        <Connection sourceHost="N3" destHost="N20" avgLatency="162160"/>
+        <Connection sourceHost="N20" destHost="N4" avgLatency="280094"/>
+        <Connection sourceHost="N4" destHost="N20" avgLatency="280094"/>
+        <Connection sourceHost="N20" destHost="N12" avgLatency="398029"/>
+        <Connection sourceHost="N12" destHost="N20" avgLatency="398029"/>
+        <Connection sourceHost="N20" destHost="N15" avgLatency="987701"/>
+        <Connection sourceHost="N15" destHost="N20" avgLatency="987701"/>
+        <Connection sourceHost="N17" destHost="N20" avgLatency="88450"/>
+        <Connection sourceHost="N20" destHost="N17" avgLatency="88450"/>
+        <Connection sourceHost="N20" destHost="N22" avgLatency="1105636"/>
+        <Connection sourceHost="N22" destHost="N20" avgLatency="1105636"/>
+        <Connection sourceHost="N20" destHost="N23" avgLatency="619156"/>
+        <Connection sourceHost="N23" destHost="N20" avgLatency="619156"/>
+        <Connection sourceHost="N21" destHost="N10" avgLatency="309578"/>
+        <Connection sourceHost="N10" destHost="N21" avgLatency="309578"/>
+        <Connection sourceHost="N23" destHost="N9" avgLatency="456996"/>
+        <Connection sourceHost="N9" destHost="N23" avgLatency="456996"/>
+        <Connection sourceHost="N23" destHost="N14" avgLatency="280094"/>
+        <Connection sourceHost="N14" destHost="N23" avgLatency="280094"/>
+        <Connection sourceHost="N23" destHost="N24" avgLatency="117934"/>
+        <Connection sourceHost="N24" destHost="N23" avgLatency="117934"/>
+        <Connection sourceHost="N24" destHost="N14" avgLatency="176901"/>
+        <Connection sourceHost="N14" destHost="N24" avgLatency="176901"/>
+        <Connection sourceHost="N2" destHost="N12" avgLatency="796058"/>
+        <Connection sourceHost="N12" destHost="N2" avgLatency="796058"/>
+        <Connection sourceHost="N2" destHost="N15" avgLatency="884509"/>
+        <Connection sourceHost="N15" destHost="N2" avgLatency="884509"/>
+        <Connection sourceHost="N3" destHost="N14" avgLatency="545447"/>
+        <Connection sourceHost="N14" destHost="N3" avgLatency="545447"/>
+        <Connection sourceHost="N3" destHost="N15" avgLatency="840283"/>
+        <Connection sourceHost="N15" destHost="N3" avgLatency="840283"/>
+        <Connection sourceHost="N4" destHost="N8" avgLatency="648640"/>
+        <Connection sourceHost="N8" destHost="N4" avgLatency="648640"/>
+        <Connection sourceHost="N3" destHost="N5" avgLatency="398029"/>
+        <Connection sourceHost="N5" destHost="N3" avgLatency="398029"/>
+        <Connection sourceHost="N5" destHost="N6" avgLatency="206385"/>
+        <Connection sourceHost="N6" destHost="N5" avgLatency="206385"/>
+        <Connection sourceHost="N5" destHost="N15" avgLatency="456996"/>
+        <Connection sourceHost="N15" destHost="N5" avgLatency="456996"/>
+        <Connection sourceHost="N6" destHost="N15" avgLatency="250610"/>
+        <Connection sourceHost="N15" destHost="N6" avgLatency="250610"/>
+        <Connection sourceHost="N8" destHost="N22" avgLatency="191643"/>
+        <Connection sourceHost="N22" destHost="N8" avgLatency="191643"/>
+        <Connection sourceHost="N10" destHost="N15" avgLatency="456996"/>
+        <Connection sourceHost="N15" destHost="N10" avgLatency="456996"/>
+        <Connection sourceHost="N11" destHost="N15" avgLatency="368545"/>
+        <Connection sourceHost="N15" destHost="N11" avgLatency="368545"/>
+        <Connection sourceHost="N15" destHost="N16" avgLatency="29483"/>
+        <Connection sourceHost="N16" destHost="N15" avgLatency="29483"/>
+        <Connection sourceHost="N17" destHost="N1" avgLatency="353803"/>
+        <Connection sourceHost="N1" destHost="N17" avgLatency="353803"/>
+        <Connection sourceHost="N18" destHost="N11" avgLatency="280094"/>
+        <Connection sourceHost="N11" destHost="N18" avgLatency="280094"/>
+        <Connection sourceHost="N18" destHost="N21" avgLatency="280094"/>
+        <Connection sourceHost="N21" destHost="N18" avgLatency="280094"/>
+        <Connection sourceHost="N2" destHost="N19" avgLatency="398029"/>
+        <Connection sourceHost="N19" destHost="N2" avgLatency="398029"/>
+        <Connection sourceHost="N15" destHost="N19" avgLatency="486480"/>
+        <Connection sourceHost="N19" destHost="N15" avgLatency="486480"/>
+        <Connection sourceHost="N15" destHost="N18" avgLatency="235869"/>
+        <Connection sourceHost="N18" destHost="N15" avgLatency="235869"/>
+        <Connection sourceHost="N1" destHost="N9" avgLatency="943476"/>
+        <Connection sourceHost="N9" destHost="N1" avgLatency="943476"/>
+        <Connection sourceHost="N1" destHost="N20" avgLatency="427512"/>
+        <Connection sourceHost="N20" destHost="N1" avgLatency="427512"/>
+        <Connection sourceHost="N12" destHost="N22" avgLatency="751832"/>
+        <Connection sourceHost="N22" destHost="N12" avgLatency="751832"/>
+        <Connection sourceHost="N8" destHost="N20" avgLatency="928734"/>
+        <Connection sourceHost="N20" destHost="N8" avgLatency="928734"/>
+        <Connection sourceHost="N2" destHost="N5" avgLatency="781316"/>
+        <Connection sourceHost="N5" destHost="N2" avgLatency="781316"/>
+        <Connection sourceHost="N5" destHost="N12" avgLatency="855025"/>
+        <Connection sourceHost="N12" destHost="N5" avgLatency="855025"/>
+        <Connection sourceHost="N11" destHost="N16" avgLatency="339061"/>
+        <Connection sourceHost="N16" destHost="N11" avgLatency="339061"/>
+        <Connection sourceHost="N18" destHost="N16" avgLatency="221127"/>
+        <Connection sourceHost="N16" destHost="N18" avgLatency="221127"/>
+        <Connection sourceHost="N16" destHost="N10" avgLatency="427512"/>
+        <Connection sourceHost="N10" destHost="N16" avgLatency="427512"/>
+        <Connection sourceHost="N16" destHost="N19" avgLatency="471738"/>
+        <Connection sourceHost="N19" destHost="N16" avgLatency="471738"/>
+        <Connection sourceHost="N9" destHost="N20" avgLatency="1076152"/>
+        <Connection sourceHost="N20" destHost="N9" avgLatency="1076152"/>
+        <Connection sourceHost="N15" destHost="N23" avgLatency="1606858"/>
+        <Connection sourceHost="N23" destHost="N15" avgLatency="1606858"/>
+        <Connection sourceHost="N7" destHost="N19" avgLatency="265352"/>
+        <Connection sourceHost="N19" destHost="N7" avgLatency="265352"/>
+        <Connection sourceHost="N4" destHost="N12" avgLatency="117934"/>
+        <Connection sourceHost="N12" destHost="N4" avgLatency="117934"/>
+        <Connection sourceHost="N12" destHost="N13" avgLatency="442254"/>
+        <Connection sourceHost="N13" destHost="N12" avgLatency="442254"/>
+        <Connection sourceHost="N5" destHost="N13" avgLatency="427512"/>
+        <Connection sourceHost="N13" destHost="N5" avgLatency="427512"/>
+        <Connection sourceHost="N2" destHost="N13" avgLatency="368545"/>
+        <Connection sourceHost="N13" destHost="N2" avgLatency="368545"/>
+        <Connection sourceHost="N7" destHost="N16" avgLatency="206385"/>
+        <Connection sourceHost="N16" destHost="N7" avgLatency="206385"/>
+        <Connection sourceHost="N17" destHost="N23" avgLatency="530705"/>
+        <Connection sourceHost="N23" destHost="N17" avgLatency="530705"/>
+        <Connection sourceHost="N3" destHost="N5" avgLatency="398029"/>
+        <Connection sourceHost="N5" destHost="N3" avgLatency="398029"/>
+        <Connection sourceHost="N10" destHost="N7" avgLatency="221127"/>
+        <Connection sourceHost="N7" destHost="N10" avgLatency="221127"/>
+        <Connection sourceHost="N11" destHost="N16" avgLatency="339061"/>
+        <Connection sourceHost="N16" destHost="N11" avgLatency="339061"/>
+        <Connection sourceHost="N17" destHost="N20" avgLatency="88450"/>
+        <Connection sourceHost="N20" destHost="N17" avgLatency="88450"/>
+        <Connection sourceHost="N18" destHost="N16" avgLatency="221127"/>
+        <Connection sourceHost="N16" destHost="N18" avgLatency="221127"/>
+    </Connections>
+  <ParsingString></ParsingString>
+</NFV>

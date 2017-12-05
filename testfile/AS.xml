@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvInfo.xsd">
+  <graphs>
+    <graph id="0">
+     <node functional_type="WEBCLIENT" name="nodeA">
+        <neighbour name="node1"/>
+        <configuration description="A simple description" name="confA">
+          <webclient nameWebServer="nodeB"/>
+        </configuration>
+      </node>
+      <node functional_type="FIREWALL" name="node1">
+        <neighbour name="nodeA"/>
+        <neighbour name="node2"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall>
+            <elements>
+              <source>nodeC</source>
+              <destination>nodeD</destination>
+            </elements>
+          </firewall>
+        </configuration>
+      </node>
+      <node functional_type="DPI" name="node2">
+        <neighbour name="node1"/>
+        <neighbour name="node3"/>
+        <configuration description="A simple description" name="conf2">
+          <dpi>
+          	<notAllowed>nodeC</notAllowed>
+          </dpi>
+        </configuration>
+      </node>
+      <node functional_type="CACHE" name="node3">
+        <neighbour name="node2"/>
+        <neighbour name="node4"/>
+        <configuration description="A simple description" name="conf3">
+          <cache>
+          	<resource>nodeA</resource>
+          	<resource>node1</resource>
+          	<resource>node2</resource>
+          </cache>
+        </configuration>
+      </node>
+	  <node functional_type="NAT" name="node4">
+        <neighbour name="node3"/>
+        <neighbour name="nodeB"/>
+        <configuration description="A simple description" name="conf4">
+         <nat>
+          		<source>nodeA</source>
+          		<source>node1</source>
+          		<source>node2</source>
+          		<source>node3</source>
+          </nat>
+        </configuration>
+      </node>
+   
+      <node functional_type="WEBSERVER" name="nodeB">
+        <neighbour name="node4"/>
+        <configuration description="A simple description" name="confB">
+          <webserver>
+          	<name>nodeB</name>
+          </webserver>
+        </configuration>
+      </node>
+    </graph>
+  </graphs>
+  <CapacityDefinition>
+   		<CapacityForNode node="node1" capacity="50"/>
+  		<CapacityForNode node="node2" capacity="50"/>
+  		<CapacityForNode node="node3" capacity="68"/>
+  		<CapacityForNode node="node4" capacity="45"/>
+  </CapacityDefinition>
+  <PropertyDefinition>
+  		<Property graph="0" name="IsolationProperty"/> 		
+  </PropertyDefinition>
+  <Hosts>
+        <Host name="e050caaa" diskStorage="137" type="CLIENT"/>
+        <Host name="5a01b700" diskStorage="122" type="MIDDLEBOX"/>
+        <Host name="5a01b6ff" diskStorage="148" type="MIDDLEBOX"/>
+        <Host name="c0286ecd" diskStorage="106" type="MIDDLEBOX"/>
+        <Host name="c0286ece" diskStorage="147" type="MIDDLEBOX"/>
+        <Host name="e050ca8c" diskStorage="127" type="MIDDLEBOX"/>
+        <Host name="5a01b706" diskStorage="142" type="MIDDLEBOX"/>
+        <Host name="6f3cda8c" diskStorage="125" type="MIDDLEBOX"/>
+        <Host name="8951021b" diskStorage="143" type="MIDDLEBOX"/>
+        <Host name="fe24ec49" diskStorage="102" type="MIDDLEBOX"/>
+        <Host name="8951021c" diskStorage="127" type="MIDDLEBOX"/>
+        <Host name="e050ca8d" diskStorage="113" type="MIDDLEBOX"/>
+        <Host name="65d5058" diskStorage="110" type="MIDDLEBOX"/>
+        <Host name="65ade8e6" diskStorage="142" type="MIDDLEBOX"/>
+        <Host name="65d5057" diskStorage="133" type="MIDDLEBOX"/>
+        <Host name="65ade8e5" diskStorage="133" type="MIDDLEBOX"/>
+        <Host name="6f3cda68" diskStorage="147" type="MIDDLEBOX"/>
+        <Host name="c02871d5" diskStorage="136" type="MIDDLEBOX"/>
+        <Host name="e489dbc1" diskStorage="123" type="MIDDLEBOX"/>
+        <Host name="2d720ca9" diskStorage="125" type="MIDDLEBOX"/>
+        <Host name="70c5b272" diskStorage="110" type="MIDDLEBOX"/>
+        <Host name="70c5b271" diskStorage="146" type="MIDDLEBOX"/>
+        <Host name="6f99c30f" diskStorage="110" type="MIDDLEBOX"/>
+        <Host name="e489dbc0" diskStorage="137" type="MIDDLEBOX"/>
+        <Host name="2d720ca8" diskStorage="123" type="MIDDLEBOX"/>
+        <Host name="8006a058" diskStorage="138" type="MIDDLEBOX"/>
+        <Host name="137ee469" diskStorage="115" type="MIDDLEBOX"/>
+        <Host name="46327e0" diskStorage="146" type="MIDDLEBOX"/>
+        <Host name="5a01b6c4" diskStorage="130" type="MIDDLEBOX"/>
+        <Host name="5a01b6c3" diskStorage="112" type="MIDDLEBOX"/>
+        <Host name="8006a057" diskStorage="115" type="MIDDLEBOX"/>
+        <Host name="46327df" diskStorage="107" type="MIDDLEBOX"/>
+        <Host name="7ad4715a" diskStorage="124" type="MIDDLEBOX"/>
+        <Host name="faa2b04b" diskStorage="119" type="MIDDLEBOX"/>
+        <Host name="d627a04" diskStorage="126" type="MIDDLEBOX"/>
+        <Host name="d627a03" diskStorage="139" type="MIDDLEBOX"/>
+        <Host name="c028720d" diskStorage="110" type="MIDDLEBOX"/>
+        <Host name="6f99c2f9" diskStorage="114" type="MIDDLEBOX"/>
+        <Host name="c028720e" diskStorage="104" type="MIDDLEBOX"/>
+        <Host name="c65d1744" diskStorage="121" type="MIDDLEBOX"/>
+        <Host name="137ee46a" diskStorage="118" type="MIDDLEBOX"/>
+        <Host name="65d5041" diskStorage="114" type="MIDDLEBOX"/>
+        <Host name="c65d1746" diskStorage="117" type="MIDDLEBOX"/>
+        <Host name="6f3cda6f" diskStorage="140" type="MIDDLEBOX"/>
+        <Host name="c0286e8a" diskStorage="123" type="MIDDLEBOX"/>
+        <Host name="c0286e8b" diskStorage="112" type="MIDDLEBOX"/>
+        <Host name="6f99c330" diskStorage="133" type="MIDDLEBOX"/>
+        <Host name="c0286e8c" diskStorage="117" type="MIDDLEBOX"/>
+        <Host name="ca73e3fc" diskStorage="107" type="MIDDLEBOX"/>
+        <Host name="ca73e3fd" diskStorage="135" type="MIDDLEBOX"/>
+        <Host name="faa2b04a" diskStorage="103" type="MIDDLEBOX"/>
+        <Host name="6f3cda87" diskStorage="149" type="MIDDLEBOX"/>
+        <Host name="7ad47159" diskStorage="109" type="MIDDLEBOX"/>
+        <Host name="e489dbe3" diskStorage="108" type="MIDDLEBOX"/>
+        <Host name="6f99c32f" diskStorage="114" type="MIDDLEBOX"/>
+        <Host name="6f3cda69" diskStorage="137" type="MIDDLEBOX"/>
+        <Host name="c0287191" diskStorage="100" type="MIDDLEBOX"/>
+        <Host name="c0287192" diskStorage="119" type="MIDDLEBOX"/>
+        <Host name="fe24ec4a" diskStorage="122" type="MIDDLEBOX"/>
+        <Host name="e489dbe2" diskStorage="145" type="MIDDLEBOX"/>
+        <Host name="c0287193" diskStorage="120" type="MIDDLEBOX"/>
+        <Host name="c02871eb" diskStorage="141" type="MIDDLEBOX"/>
+        <Host name="c02871ec" diskStorage="132" type="MIDDLEBOX"/>
+        <Host name="c65d1497" diskStorage="117" type="MIDDLEBOX"/>
+        <Host name="7ad47157" diskStorage="124" type="MIDDLEBOX"/>
+        <Host name="70c5b2ac" diskStorage="146" type="MIDDLEBOX"/>
+        <Host name="7ad47158" diskStorage="101" type="MIDDLEBOX"/>
+        <Host name="463203b" diskStorage="128" type="MIDDLEBOX"/>
+        <Host name="6f3cda70" diskStorage="104" type="MIDDLEBOX"/>
+        <Host name="6f3cda71" diskStorage="115" type="MIDDLEBOX"/>
+        <Host name="c3295332" diskStorage="140" type="MIDDLEBOX"/>
+        <Host name="80061e23" diskStorage="132" type="MIDDLEBOX"/>
+        <Host name="c3295333" diskStorage="104" type="MIDDLEBOX"/>
+        <Host name="fe24ec65" diskStorage="117" type="MIDDLEBOX"/>
+        <Host name="5a01b6e9" diskStorage="142" type="MIDDLEBOX"/>
+        <Host name="5a01b6e8" diskStorage="108" type="MIDDLEBOX"/>
+        <Host name="c65d1fdc" diskStorage="128" type="MIDDLEBOX"/>
+        <Host name="c65d1fdd" diskStorage="100" type="MIDDLEBOX"/>
+        <Host name="c0286e30" diskStorage="114" type="SERVER"/>
+    </Hosts>
+    <Connections>
+        <Connection sourceHost="6f99c32f" destHost="c028720e" avgLatency="2"/>
+        <Connection sourceHost="6f99c32f" destHost="c0286ece" avgLatency="2"/>
+        <Connection sourceHost="6f99c32f" destHost="6f99c330" avgLatency="1"/>
+        <Connection sourceHost="6f99c32f" destHost="6f3cda69" avgLatency="16"/>
+        <Connection sourceHost="6f99c330" destHost="6f99c32f" avgLatency="1"/>
+        <Connection sourceHost="6f99c330" destHost="c02871eb" avgLatency="2"/>
+        <Connection sourceHost="6f99c330" destHost="c0286ece" avgLatency="2"/>
+        <Connection sourceHost="6f99c330" destHost="c02871ec" avgLatency="2"/>
+        <Connection sourceHost="e050ca8c" destHost="2d720ca8" avgLatency="2"/>
+        <Connection sourceHost="e050ca8c" destHost="fe24ec4a" avgLatency="7"/>
+        <Connection sourceHost="e050ca8c" destHost="2d720ca9" avgLatency="2"/>
+        <Connection sourceHost="e050ca8c" destHost="e050ca8d" avgLatency="1"/>
+        <Connection sourceHost="e050ca8c" destHost="e050caaa" avgLatency="1"/>
+        <Connection sourceHost="e050ca8c" destHost="6f3cda68" avgLatency="7"/>
+        <Connection sourceHost="e050ca8c" destHost="70c5b271" avgLatency="2"/>
+        <Connection sourceHost="6f3cda6f" destHost="6f3cda8c" avgLatency="1"/>
+        <Connection sourceHost="6f3cda6f" destHost="6f3cda68" avgLatency="1"/>
+        <Connection sourceHost="6f3cda6f" destHost="6f3cda69" avgLatency="1"/>
+        <Connection sourceHost="c65d1497" destHost="c65d1fdd" avgLatency="1"/>
+        <Connection sourceHost="c65d1497" destHost="fe24ec49" avgLatency="6"/>
+        <Connection sourceHost="c65d1497" destHost="fe24ec4a" avgLatency="6"/>
+        <Connection sourceHost="e050ca8d" destHost="70c5b272" avgLatency="2"/>
+        <Connection sourceHost="e050ca8d" destHost="7ad47157" avgLatency="29"/>
+        <Connection sourceHost="e050ca8d" destHost="7ad47158" avgLatency="29"/>
+        <Connection sourceHost="e050ca8d" destHost="7ad47159" avgLatency="29"/>
+        <Connection sourceHost="e050ca8d" destHost="e050ca8c" avgLatency="1"/>
+        <Connection sourceHost="e050ca8d" destHost="e050caaa" avgLatency="1"/>
+        <Connection sourceHost="e050ca8d" destHost="2d720ca8" avgLatency="2"/>
+        <Connection sourceHost="e050ca8d" destHost="c65d1fdc" avgLatency="3"/>
+        <Connection sourceHost="6f3cda70" destHost="6f3cda8c" avgLatency="1"/>
+        <Connection sourceHost="6f3cda70" destHost="6f3cda68" avgLatency="1"/>
+        <Connection sourceHost="6f3cda70" destHost="6f3cda69" avgLatency="1"/>
+        <Connection sourceHost="8951021b" destHost="e489dbc0" avgLatency="2"/>
+        <Connection sourceHost="6f3cda71" destHost="6f3cda68" avgLatency="1"/>
+        <Connection sourceHost="6f3cda71" destHost="6f3cda69" avgLatency="1"/>
+        <Connection sourceHost="8951021c" destHost="6f3cda68" avgLatency="8"/>
+        <Connection sourceHost="46327df" destHost="c0286ecd" avgLatency="2"/>
+        <Connection sourceHost="46327df" destHost="463203b" avgLatency="1"/>
+        <Connection sourceHost="46327df" destHost="c0286e30" avgLatency="2"/>
+        <Connection sourceHost="46327df" destHost="46327e0" avgLatency="1"/>
+        <Connection sourceHost="46327e0" destHost="c0286e8a" avgLatency="2"/>
+        <Connection sourceHost="46327e0" destHost="c0286e8b" avgLatency="2"/>
+        <Connection sourceHost="46327e0" destHost="46327df" avgLatency="1"/>
+        <Connection sourceHost="80061e23" destHost="7ad47157" avgLatency="3"/>
+        <Connection sourceHost="80061e23" destHost="7ad47158" avgLatency="3"/>
+        <Connection sourceHost="80061e23" destHost="faa2b04b" avgLatency="3"/>
+        <Connection sourceHost="d627a03" destHost="d627a04" avgLatency="1"/>
+        <Connection sourceHost="d627a03" destHost="c02871d5" avgLatency="7"/>
+        <Connection sourceHost="d627a03" destHost="65ade8e5" avgLatency="15"/>
+        <Connection sourceHost="6f3cda87" destHost="6f3cda68" avgLatency="1"/>
+        <Connection sourceHost="6f3cda87" destHost="6f3cda69" avgLatency="1"/>
+        <Connection sourceHost="d627a04" destHost="65ade8e5" avgLatency="15"/>
+        <Connection sourceHost="d627a04" destHost="d627a03" avgLatency="1"/>
+        <Connection sourceHost="c0286ecd" destHost="c02871eb" avgLatency="1"/>
+        <Connection sourceHost="c0286ecd" destHost="c0286ece" avgLatency="1"/>
+        <Connection sourceHost="c0286ecd" destHost="46327df" avgLatency="2"/>
+        <Connection sourceHost="c0286ecd" destHost="6f99c30f" avgLatency="2"/>
+        <Connection sourceHost="463203b" destHost="c028720e" avgLatency="2"/>
+        <Connection sourceHost="463203b" destHost="c0286e8c" avgLatency="2"/>
+        <Connection sourceHost="463203b" destHost="46327df" avgLatency="1"/>
+        <Connection sourceHost="463203b" destHost="c0287191" avgLatency="2"/>
+        <Connection sourceHost="c0286ece" destHost="6f99c32f" avgLatency="2"/>
+        <Connection sourceHost="c0286ece" destHost="c0286ecd" avgLatency="1"/>
+        <Connection sourceHost="c0286ece" destHost="6f99c330" avgLatency="2"/>
+        <Connection sourceHost="c0286ece" destHost="c028720d" avgLatency="1"/>
+        <Connection sourceHost="c0286ece" destHost="c0287191" avgLatency="1"/>
+        <Connection sourceHost="6f3cda8c" destHost="6f3cda6f" avgLatency="1"/>
+        <Connection sourceHost="6f3cda8c" destHost="6f3cda68" avgLatency="1"/>
+        <Connection sourceHost="6f3cda8c" destHost="6f3cda70" avgLatency="1"/>
+        <Connection sourceHost="6f3cda8c" destHost="6f3cda69" avgLatency="1"/>
+        <Connection sourceHost="e050caaa" destHost="e050ca8c" avgLatency="1"/>
+        <Connection sourceHost="e050caaa" destHost="e050ca8d" avgLatency="1"/>
+        <Connection sourceHost="e050caaa" destHost="6f3cda68" avgLatency="7"/>
+        <Connection sourceHost="65ade8e5" destHost="d627a04" avgLatency="15"/>
+        <Connection sourceHost="65ade8e5" destHost="6f3cda69" avgLatency="2"/>
+        <Connection sourceHost="65ade8e5" destHost="65ade8e6" avgLatency="1"/>
+        <Connection sourceHost="65ade8e5" destHost="d627a03" avgLatency="15"/>
+        <Connection sourceHost="65ade8e6" destHost="6f3cda68" avgLatency="2"/>
+        <Connection sourceHost="65ade8e6" destHost="65d5041" avgLatency="8"/>
+        <Connection sourceHost="65ade8e6" destHost="65ade8e5" avgLatency="1"/>
+        <Connection sourceHost="65d5041" destHost="5a01b6e8" avgLatency="11"/>
+        <Connection sourceHost="65d5041" destHost="8006a058" avgLatency="3"/>
+        <Connection sourceHost="65d5041" destHost="65d5057" avgLatency="1"/>
+        <Connection sourceHost="65d5041" destHost="65ade8e6" avgLatency="8"/>
+        <Connection sourceHost="65d5041" destHost="c0287191" avgLatency="13"/>
+        <Connection sourceHost="65d5041" destHost="65d5058" avgLatency="1"/>
+        <Connection sourceHost="c65d1fdc" destHost="c65d1fdd" avgLatency="1"/>
+        <Connection sourceHost="c65d1fdc" destHost="c65d1746" avgLatency="1"/>
+        <Connection sourceHost="c65d1fdc" destHost="e050ca8d" avgLatency="3"/>
+        <Connection sourceHost="70c5b271" destHost="70c5b2ac" avgLatency="1"/>
+        <Connection sourceHost="70c5b271" destHost="faa2b04a" avgLatency="32"/>
+        <Connection sourceHost="70c5b271" destHost="70c5b272" avgLatency="1"/>
+        <Connection sourceHost="70c5b271" destHost="e050ca8c" avgLatency="2"/>
+        <Connection sourceHost="70c5b271" destHost="e489dbe2" avgLatency="3"/>
+        <Connection sourceHost="70c5b271" destHost="7ad4715a" avgLatency="29"/>
+        <Connection sourceHost="70c5b271" destHost="e489dbe3" avgLatency="3"/>
+        <Connection sourceHost="c65d1fdd" destHost="c02871d5" avgLatency="21"/>
+        <Connection sourceHost="c65d1fdd" destHost="c65d1497" avgLatency="1"/>
+        <Connection sourceHost="c65d1fdd" destHost="c65d1fdc" avgLatency="1"/>
+        <Connection sourceHost="5a01b6c3" destHost="ca73e3fc" avgLatency="2"/>
+        <Connection sourceHost="c3295332" destHost="c0287192" avgLatency="43"/>
+        <Connection sourceHost="c3295332" destHost="c3295333" avgLatency="1"/>
+        <Connection sourceHost="5a01b6c4" destHost="c0287192" avgLatency="4"/>
+        <Connection sourceHost="5a01b6c4" destHost="5a01b6e8" avgLatency="1"/>
+        <Connection sourceHost="5a01b6c4" destHost="ca73e3fd" avgLatency="2"/>
+        <Connection sourceHost="70c5b272" destHost="70c5b2ac" avgLatency="1"/>
+        <Connection sourceHost="70c5b272" destHost="7ad47157" avgLatency="29"/>
+        <Connection sourceHost="70c5b272" destHost="2d720ca9" avgLatency="2"/>
+        <Connection sourceHost="70c5b272" destHost="7ad47158" avgLatency="29"/>
+        <Connection sourceHost="70c5b272" destHost="7ad47159" avgLatency="29"/>
+        <Connection sourceHost="70c5b272" destHost="e050ca8d" avgLatency="2"/>
+        <Connection sourceHost="70c5b272" destHost="70c5b271" avgLatency="1"/>
+        <Connection sourceHost="c3295333" destHost="c3295332" avgLatency="1"/>
+        <Connection sourceHost="c3295333" destHost="c0286e30" avgLatency="43"/>
+        <Connection sourceHost="c3295333" destHost="6f99c30f" avgLatency="44"/>
+        <Connection sourceHost="e489dbc0" destHost="e489dbc1" avgLatency="1"/>
+        <Connection sourceHost="e489dbc0" destHost="e489dbe2" avgLatency="1"/>
+        <Connection sourceHost="e489dbc0" destHost="6f3cda68" avgLatency="8"/>
+        <Connection sourceHost="e489dbc0" destHost="8951021b" avgLatency="2"/>
+        <Connection sourceHost="e489dbc1" destHost="6f3cda68" avgLatency="8"/>
+        <Connection sourceHost="e489dbc1" destHost="e489dbe3" avgLatency="1"/>
+        <Connection sourceHost="e489dbc1" destHost="e489dbc0" avgLatency="1"/>
+        <Connection sourceHost="c65d1744" destHost="2d720ca8" avgLatency="3"/>
+        <Connection sourceHost="c65d1744" destHost="c65d1746" avgLatency="1"/>
+        <Connection sourceHost="c02871d5" destHost="c65d1fdd" avgLatency="21"/>
+        <Connection sourceHost="c02871d5" destHost="c02871eb" avgLatency="1"/>
+        <Connection sourceHost="c02871d5" destHost="c02871ec" avgLatency="1"/>
+        <Connection sourceHost="c02871d5" destHost="6f99c2f9" avgLatency="2"/>
+        <Connection sourceHost="c02871d5" destHost="d627a03" avgLatency="7"/>
+        <Connection sourceHost="c02871d5" destHost="c0287191" avgLatency="1"/>
+        <Connection sourceHost="c65d1746" destHost="c65d1744" avgLatency="1"/>
+        <Connection sourceHost="c65d1746" destHost="2d720ca8" avgLatency="3"/>
+        <Connection sourceHost="c65d1746" destHost="c65d1fdc" avgLatency="1"/>
+        <Connection sourceHost="fe24ec49" destHost="fe24ec4a" avgLatency="1"/>
+        <Connection sourceHost="fe24ec49" destHost="c65d1497" avgLatency="6"/>
+        <Connection sourceHost="fe24ec49" destHost="fe24ec65" avgLatency="1"/>
+        <Connection sourceHost="137ee469" destHost="2d720ca8" avgLatency="10"/>
+        <Connection sourceHost="137ee469" destHost="137ee46a" avgLatency="1"/>
+        <Connection sourceHost="fe24ec4a" destHost="fe24ec49" avgLatency="1"/>
+        <Connection sourceHost="fe24ec4a" destHost="137ee46a" avgLatency="6"/>
+        <Connection sourceHost="fe24ec4a" destHost="e050ca8c" avgLatency="7"/>
+        <Connection sourceHost="fe24ec4a" destHost="c65d1497" avgLatency="6"/>
+        <Connection sourceHost="fe24ec4a" destHost="65d5057" avgLatency="8"/>
+        <Connection sourceHost="fe24ec4a" destHost="fe24ec65" avgLatency="1"/>
+        <Connection sourceHost="137ee46a" destHost="137ee469" avgLatency="1"/>
+        <Connection sourceHost="137ee46a" destHost="fe24ec4a" avgLatency="6"/>
+        <Connection sourceHost="65d5057" destHost="5a01b6e8" avgLatency="11"/>
+        <Connection sourceHost="65d5057" destHost="fe24ec4a" avgLatency="8"/>
+        <Connection sourceHost="65d5057" destHost="5a01b6e9" avgLatency="11"/>
+        <Connection sourceHost="65d5057" destHost="8006a057" avgLatency="3"/>
+        <Connection sourceHost="65d5057" destHost="65d5041" avgLatency="1"/>
+        <Connection sourceHost="65d5057" destHost="65d5058" avgLatency="1"/>
+        <Connection sourceHost="6f99c2f9" destHost="c02871d5" avgLatency="2"/>
+        <Connection sourceHost="6f99c2f9" destHost="6f99c30f" avgLatency="1"/>
+        <Connection sourceHost="65d5058" destHost="65d5041" avgLatency="1"/>
+        <Connection sourceHost="65d5058" destHost="65d5057" avgLatency="1"/>
+        <Connection sourceHost="2d720ca8" destHost="137ee469" avgLatency="10"/>
+        <Connection sourceHost="2d720ca8" destHost="c65d1744" avgLatency="3"/>
+        <Connection sourceHost="2d720ca8" destHost="c65d1746" avgLatency="3"/>
+        <Connection sourceHost="2d720ca8" destHost="2d720ca9" avgLatency="1"/>
+        <Connection sourceHost="2d720ca8" destHost="e050ca8c" avgLatency="2"/>
+        <Connection sourceHost="2d720ca8" destHost="e050ca8d" avgLatency="2"/>
+        <Connection sourceHost="2d720ca9" destHost="70c5b272" avgLatency="2"/>
+        <Connection sourceHost="2d720ca9" destHost="2d720ca8" avgLatency="1"/>
+        <Connection sourceHost="2d720ca9" destHost="e050ca8c" avgLatency="2"/>
+        <Connection sourceHost="7ad47157" destHost="70c5b272" avgLatency="29"/>
+        <Connection sourceHost="7ad47157" destHost="80061e23" avgLatency="3"/>
+        <Connection sourceHost="7ad47157" destHost="e050ca8d" avgLatency="29"/>
+        <Connection sourceHost="7ad47158" destHost="70c5b272" avgLatency="29"/>
+        <Connection sourceHost="7ad47158" destHost="80061e23" avgLatency="3"/>
+        <Connection sourceHost="7ad47158" destHost="e050ca8d" avgLatency="29"/>
+        <Connection sourceHost="c02871eb" destHost="c0287192" avgLatency="1"/>
+        <Connection sourceHost="c02871eb" destHost="c0286e8b" avgLatency="1"/>
+        <Connection sourceHost="c02871eb" destHost="c02871d5" avgLatency="1"/>
+        <Connection sourceHost="c02871eb" destHost="c0286ecd" avgLatency="1"/>
+        <Connection sourceHost="c02871eb" destHost="6f99c330" avgLatency="2"/>
+        <Connection sourceHost="c02871eb" destHost="c0286e30" avgLatency="1"/>
+        <Connection sourceHost="c02871eb" destHost="c028720d" avgLatency="1"/>
+        <Connection sourceHost="7ad47159" destHost="70c5b272" avgLatency="29"/>
+        <Connection sourceHost="7ad47159" destHost="e050ca8d" avgLatency="29"/>
+        <Connection sourceHost="c02871ec" destHost="c0286e8a" avgLatency="1"/>
+        <Connection sourceHost="c02871ec" destHost="c02871d5" avgLatency="1"/>
+        <Connection sourceHost="c02871ec" destHost="c0286e8b" avgLatency="1"/>
+        <Connection sourceHost="c02871ec" destHost="c0286e8c" avgLatency="1"/>
+        <Connection sourceHost="c02871ec" destHost="6f99c330" avgLatency="2"/>
+        <Connection sourceHost="c02871ec" destHost="c028720d" avgLatency="1"/>
+        <Connection sourceHost="7ad4715a" destHost="70c5b271" avgLatency="29"/>
+        <Connection sourceHost="c0286e8a" destHost="c02871ec" avgLatency="1"/>
+        <Connection sourceHost="c0286e8a" destHost="46327e0" avgLatency="2"/>
+        <Connection sourceHost="5a01b6e8" destHost="5a01b6c4" avgLatency="1"/>
+        <Connection sourceHost="5a01b6e8" destHost="5a01b6e9" avgLatency="1"/>
+        <Connection sourceHost="5a01b6e8" destHost="5a01b706" avgLatency="1"/>
+        <Connection sourceHost="5a01b6e8" destHost="5a01b6ff" avgLatency="1"/>
+        <Connection sourceHost="5a01b6e8" destHost="5a01b700" avgLatency="1"/>
+        <Connection sourceHost="5a01b6e8" destHost="65d5041" avgLatency="11"/>
+        <Connection sourceHost="5a01b6e8" destHost="65d5057" avgLatency="11"/>
+        <Connection sourceHost="c0286e8b" destHost="c02871eb" avgLatency="1"/>
+        <Connection sourceHost="c0286e8b" destHost="c02871ec" avgLatency="1"/>
+        <Connection sourceHost="c0286e8b" destHost="46327e0" avgLatency="2"/>
+        <Connection sourceHost="5a01b6e9" destHost="5a01b6e8" avgLatency="1"/>
+        <Connection sourceHost="5a01b6e9" destHost="ca73e3fd" avgLatency="2"/>
+        <Connection sourceHost="5a01b6e9" destHost="65d5057" avgLatency="11"/>
+        <Connection sourceHost="c0286e8c" destHost="463203b" avgLatency="2"/>
+        <Connection sourceHost="c0286e8c" destHost="c02871ec" avgLatency="1"/>
+        <Connection sourceHost="e489dbe2" destHost="e489dbe3" avgLatency="1"/>
+        <Connection sourceHost="e489dbe2" destHost="70c5b271" avgLatency="3"/>
+        <Connection sourceHost="e489dbe2" destHost="e489dbc0" avgLatency="1"/>
+        <Connection sourceHost="e489dbe3" destHost="e489dbc1" avgLatency="1"/>
+        <Connection sourceHost="e489dbe3" destHost="e489dbe2" avgLatency="1"/>
+        <Connection sourceHost="e489dbe3" destHost="70c5b271" avgLatency="3"/>
+        <Connection sourceHost="fe24ec65" destHost="fe24ec49" avgLatency="1"/>
+        <Connection sourceHost="fe24ec65" destHost="fe24ec4a" avgLatency="1"/>
+        <Connection sourceHost="6f99c30f" destHost="c3295333" avgLatency="44"/>
+        <Connection sourceHost="6f99c30f" destHost="c0286ecd" avgLatency="2"/>
+        <Connection sourceHost="6f99c30f" destHost="6f99c2f9" avgLatency="1"/>
+        <Connection sourceHost="6f99c30f" destHost="c028720d" avgLatency="2"/>
+        <Connection sourceHost="ca73e3fc" destHost="5a01b6c3" avgLatency="2"/>
+        <Connection sourceHost="ca73e3fc" destHost="c0287192" avgLatency="4"/>
+        <Connection sourceHost="ca73e3fc" destHost="c0287193" avgLatency="4"/>
+        <Connection sourceHost="ca73e3fc" destHost="ca73e3fd" avgLatency="1"/>
+        <Connection sourceHost="ca73e3fc" destHost="8006a058" avgLatency="11"/>
+        <Connection sourceHost="8006a057" destHost="65d5057" avgLatency="3"/>
+        <Connection sourceHost="ca73e3fd" destHost="5a01b6c4" avgLatency="2"/>
+        <Connection sourceHost="ca73e3fd" destHost="5a01b6e9" avgLatency="2"/>
+        <Connection sourceHost="ca73e3fd" destHost="5a01b6ff" avgLatency="2"/>
+        <Connection sourceHost="ca73e3fd" destHost="5a01b700" avgLatency="2"/>
+        <Connection sourceHost="ca73e3fd" destHost="ca73e3fc" avgLatency="1"/>
+        <Connection sourceHost="ca73e3fd" destHost="c0287191" avgLatency="4"/>
+        <Connection sourceHost="ca73e3fd" destHost="c028720d" avgLatency="4"/>
+        <Connection sourceHost="8006a058" destHost="ca73e3fc" avgLatency="11"/>
+        <Connection sourceHost="8006a058" destHost="65d5041" avgLatency="3"/>
+        <Connection sourceHost="c0287191" destHost="c028720e" avgLatency="1"/>
+        <Connection sourceHost="c0287191" destHost="c0287192" avgLatency="1"/>
+        <Connection sourceHost="c0287191" destHost="c02871d5" avgLatency="1"/>
+        <Connection sourceHost="c0287191" destHost="c0287193" avgLatency="1"/>
+        <Connection sourceHost="c0287191" destHost="463203b" avgLatency="2"/>
+        <Connection sourceHost="c0287191" destHost="c0286ece" avgLatency="1"/>
+        <Connection sourceHost="c0287191" destHost="65d5041" avgLatency="13"/>
+        <Connection sourceHost="c0287191" destHost="ca73e3fd" avgLatency="4"/>
+        <Connection sourceHost="70c5b2ac" destHost="70c5b272" avgLatency="1"/>
+        <Connection sourceHost="70c5b2ac" destHost="70c5b271" avgLatency="1"/>
+        <Connection sourceHost="c0287192" destHost="c028720e" avgLatency="1"/>
+        <Connection sourceHost="c0287192" destHost="5a01b6c4" avgLatency="4"/>
+        <Connection sourceHost="c0287192" destHost="c3295332" avgLatency="43"/>
+        <Connection sourceHost="c0287192" destHost="c02871eb" avgLatency="1"/>
+        <Connection sourceHost="c0287192" destHost="ca73e3fc" avgLatency="4"/>
+        <Connection sourceHost="c0287192" destHost="c028720d" avgLatency="1"/>
+        <Connection sourceHost="c0287192" destHost="c0287191" avgLatency="1"/>
+        <Connection sourceHost="c0287193" destHost="ca73e3fc" avgLatency="4"/>
+        <Connection sourceHost="c0287193" destHost="c0287191" avgLatency="1"/>
+        <Connection sourceHost="5a01b6ff" destHost="5a01b6e8" avgLatency="1"/>
+        <Connection sourceHost="5a01b6ff" destHost="ca73e3fd" avgLatency="2"/>
+        <Connection sourceHost="5a01b700" destHost="5a01b6e8" avgLatency="1"/>
+        <Connection sourceHost="5a01b700" destHost="5a01b706" avgLatency="1"/>
+        <Connection sourceHost="5a01b700" destHost="ca73e3fd" avgLatency="2"/>
+        <Connection sourceHost="c0286e30" destHost="c3295333" avgLatency="43"/>
+        <Connection sourceHost="c0286e30" destHost="c02871eb" avgLatency="1"/>
+        <Connection sourceHost="c0286e30" destHost="46327df" avgLatency="2"/>
+        <Connection sourceHost="c028720d" destHost="c028720e" avgLatency="1"/>
+        <Connection sourceHost="c028720d" destHost="c0287192" avgLatency="1"/>
+        <Connection sourceHost="c028720d" destHost="c02871eb" avgLatency="1"/>
+        <Connection sourceHost="c028720d" destHost="c02871ec" avgLatency="1"/>
+        <Connection sourceHost="c028720d" destHost="c0286ece" avgLatency="1"/>
+        <Connection sourceHost="c028720d" destHost="ca73e3fd" avgLatency="4"/>
+        <Connection sourceHost="c028720d" destHost="6f99c30f" avgLatency="2"/>
+        <Connection sourceHost="c028720e" destHost="c0287192" avgLatency="1"/>
+        <Connection sourceHost="c028720e" destHost="6f99c32f" avgLatency="2"/>
+        <Connection sourceHost="c028720e" destHost="463203b" avgLatency="2"/>
+        <Connection sourceHost="c028720e" destHost="c028720d" avgLatency="1"/>
+        <Connection sourceHost="c028720e" destHost="c0287191" avgLatency="1"/>
+        <Connection sourceHost="faa2b04a" destHost="70c5b271" avgLatency="32"/>
+        <Connection sourceHost="5a01b706" destHost="5a01b6e8" avgLatency="1"/>
+        <Connection sourceHost="5a01b706" destHost="5a01b700" avgLatency="1"/>
+        <Connection sourceHost="faa2b04b" destHost="80061e23" avgLatency="3"/>
+        <Connection sourceHost="6f3cda68" destHost="e050ca8c" avgLatency="7"/>
+        <Connection sourceHost="6f3cda68" destHost="6f3cda6f" avgLatency="1"/>
+        <Connection sourceHost="6f3cda68" destHost="6f3cda8c" avgLatency="1"/>
+        <Connection sourceHost="6f3cda68" destHost="e050caaa" avgLatency="7"/>
+        <Connection sourceHost="6f3cda68" destHost="6f3cda70" avgLatency="1"/>
+        <Connection sourceHost="6f3cda68" destHost="6f3cda71" avgLatency="1"/>
+        <Connection sourceHost="6f3cda68" destHost="65ade8e6" avgLatency="2"/>
+        <Connection sourceHost="6f3cda68" destHost="8951021c" avgLatency="8"/>
+        <Connection sourceHost="6f3cda68" destHost="e489dbc0" avgLatency="8"/>
+        <Connection sourceHost="6f3cda68" destHost="e489dbc1" avgLatency="8"/>
+        <Connection sourceHost="6f3cda68" destHost="6f3cda69" avgLatency="1"/>
+        <Connection sourceHost="6f3cda68" destHost="6f3cda87" avgLatency="1"/>
+        <Connection sourceHost="6f3cda69" destHost="6f99c32f" avgLatency="16"/>
+        <Connection sourceHost="6f3cda69" destHost="6f3cda6f" avgLatency="1"/>
+        <Connection sourceHost="6f3cda69" destHost="6f3cda8c" avgLatency="1"/>
+        <Connection sourceHost="6f3cda69" destHost="6f3cda70" avgLatency="1"/>
+        <Connection sourceHost="6f3cda69" destHost="65ade8e5" avgLatency="2"/>
+        <Connection sourceHost="6f3cda69" destHost="6f3cda71" avgLatency="1"/>
+        <Connection sourceHost="6f3cda69" destHost="6f3cda68" avgLatency="1"/>
+        <Connection sourceHost="6f3cda69" destHost="6f3cda87" avgLatency="1"/>
+    </Connections>
+  <ParsingString></ParsingString>
+</NFV>
