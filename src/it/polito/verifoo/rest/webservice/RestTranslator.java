@@ -11,7 +11,7 @@ import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.jaxb.NFV;
 
 
-@Path("/translate")
+@Path("/converter")
 public class RestTranslator {
 	    @POST
 	    @Consumes(MediaType.APPLICATION_XML)

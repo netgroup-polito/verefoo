@@ -21,7 +21,7 @@ import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 
 
-@Path("/rest")
+@Path("/deployment")
 public class RestFoo {
 	    @POST
 	    @Consumes(MediaType.APPLICATION_XML)

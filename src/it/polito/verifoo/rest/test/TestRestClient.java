@@ -69,15 +69,15 @@ public class TestRestClient {
 	public void tearDown() throws Exception {
 	}
 	final String target = "http://127.0.0.1:8080/verifoo";
-	//final String target = "http://restfoo.eu-de.mybluemix.net";
+	//final String target = "http://deploymentfoo.eu-de.mybluemix.net";
 	@Test
-	public void testRestService() {
+	public void testdeploymentService() {
 		try {
 			String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfv3nodes3hostsSAT-MAIL.xml")).collect(Collectors.joining("\n"));
 			//System.out.println(xmlread);
 			Response res = ClientBuilder.newClient()
 					.target(target)
-					.path("/rest")
+					.path("/deployment")
 					.request(MediaType.APPLICATION_XML)
 					.accept(MediaType.APPLICATION_XML)
 					.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
@@ -93,7 +93,7 @@ public class TestRestClient {
 			//System.out.println(xmlread);
 			Response res = ClientBuilder.newClient()
 					.target(target)
-					.path("/translate")
+					.path("/converter")
 					.request(MediaType.APPLICATION_XML)
 					.accept(MediaType.APPLICATION_XML)
 					.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
@@ -109,7 +109,7 @@ public class TestRestClient {
 			//System.out.println(xmlread);
 			Response res = ClientBuilder.newClient()
 					.target(target)
-					.path("/rest")
+					.path("/deployment")
 					.request(MediaType.APPLICATION_XML)
 					.accept(MediaType.APPLICATION_XML)
 					.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
@@ -125,7 +125,7 @@ public class TestRestClient {
 			//System.out.println(xmlread);
 			Response res = ClientBuilder.newClient()
 					.target(target)
-					.path("/rest")
+					.path("/deployment")
 					.request(MediaType.APPLICATION_XML)
 					.accept(MediaType.APPLICATION_XML)
 					.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
