@@ -80,7 +80,12 @@
 	    	<classpath location="lib/com.microsoft.z3.jar" />
 	    	<classpath location="lib/lib4j/log4j-api-2.9.1.jar" />
 	    	<classpath location="lib/lib4j/log4j-core-2.9.1.jar" />
-		<!-- test class -->
+	    	  <classpath>
+	    	    <fileset dir="${lib.dir}">
+	    	       <include name="**/*.jar" />
+	    	    </fileset>
+	    	  </classpath>
+	    	<!-- test class -->
 		<classpath location="${build.dir}" />
 		<test name="it.polito.verifoo.rest.test.TestXML"
 			haltonfailure="no" todir="${report.dir}">
