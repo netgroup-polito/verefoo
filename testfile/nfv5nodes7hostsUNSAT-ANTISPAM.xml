@@ -2,10 +2,10 @@
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvInfo.xsd">
   <graphs>
     <graph id="0">
-     <node functional_type="WEBCLIENT" name="nodeA">
+     <node functional_type="MAILCLIENT" name="nodeA">
         <neighbour name="node1"/>
         <configuration description="A simple description" name="confA">
-          <webclient nameWebServer="nodeB"/>
+          <mailclient mailserver="nodeB"/>
         </configuration>
       </node>
       <node functional_type="FIREWALL" name="node1">
@@ -54,16 +54,16 @@
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf5">
          <antispam>
-          	<source>nodeC</source>
+          	<source>nodeA</source>
          </antispam>
         </configuration>
       </node>
-      <node functional_type="WEBSERVER" name="nodeB">
+      <node functional_type="MAILSERVER" name="nodeB">
         <neighbour name="node5"/>
         <configuration description="A simple description" name="confB">
-          <webserver>
+          <mailserver>
           	<name>nodeB</name>
-          </webserver>
+          </mailserver>
         </configuration>
       </node>
     </graph>

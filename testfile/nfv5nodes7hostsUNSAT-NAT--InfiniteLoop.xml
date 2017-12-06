@@ -25,6 +25,8 @@
         <neighbour name="node3"/>
         <configuration description="A simple description" name="conf2">
           <nat>
+			<source>nodeA</source>
+			<source>node1</source>
           	<source>nodeB</source>
           </nat>
         </configuration>

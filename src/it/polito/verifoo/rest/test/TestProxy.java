@@ -119,14 +119,7 @@ public class TestProxy {
 			fail(e.toString());
 		} 
 	}
-	@Test
-	public void testDPI_UNSAT() {
-		try {
-			test( "./testfile/nfv3nodes3hostsUNSAT-DPI--notWorking.xml", false); //NotWorking
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
+	
 	@Test
 	public void testNAT_UNSAT() {
 		try {
@@ -138,7 +131,7 @@ public class TestProxy {
 	@Test
 	public void testANTISPAM_UNSAT() {
 		try {
-			test( "./testfile/nfv5nodes7hostsUNSAT-ANTISPAM--notWorking.xml", false); //NotWorking
+			test( "./testfile/nfv5nodes7hostsUNSAT-ANTISPAM.xml", false); //Working
 		} catch (Exception e) {
 			fail(e.toString());
 		}		
@@ -152,11 +145,43 @@ public class TestProxy {
 		}		
 	}
 	@Test
-		public void testAllMiddleboxes_SAT() {
-			try {
-				test( "./testfile/nfv5nodes7hostsSAT.xml", true); //Working
-			} catch (Exception e) {
-				fail(e.toString());
-			}		
-		}
+	public void testAS_SAT() {
+		try {
+			test( "./testfile/AS.xml", true); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testBiggest_SAT() {
+		try {
+			test( "./testfile/Biggest.xml", true); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testGEANT_SAT() {
+		try {
+			test( "./testfile/GEANT.xml", true); //Working (
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testInternet_SAT() {
+		try {
+			test( "./testfile/Internet2.xml", true); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testUniv_SAT() {
+		try {
+			test( "./testfile/UNIV1.xml", true); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
 }

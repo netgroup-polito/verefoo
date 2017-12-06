@@ -68,8 +68,8 @@ public class TestRestClient {
 	@After
 	public void tearDown() throws Exception {
 	}
-	//final String target = "http://127.0.0.1:8080/verifoo";
-	final String target = "http://restfoo.eu-de.mybluemix.net";
+	final String target = "http://127.0.0.1:8080/verifoo";
+	//final String target = "http://restfoo.eu-de.mybluemix.net";
 	@Test
 	public void testRestService() {
 		try {

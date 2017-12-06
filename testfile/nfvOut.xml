@@ -2,44 +2,50 @@
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
     <graphs>
         <graph id="0">
-            <Property name="IsolationProperty"/>
-            <node name="nodeA" functional_type="WEBCLIENT" reqDiskStorage="10">
+            <node name="nodeA" functional_type="MAILCLIENT">
                 <neighbour name="node1"/>
                 <configuration name="confA" description="A simple description">
-                    <webclient nameWebServer="nodeB"/>
+                    <mailclient mailserver="nodeB"/>
                 </configuration>
             </node>
-            <node name="node1" functional_type="FIREWALL" reqDiskStorage="10">
+            <node name="node1" functional_type="FIREWALL">
                 <neighbour name="nodeA"/>
                 <neighbour name="node2"/>
                 <configuration name="conf1" description="A simple description">
                     <firewall>
                         <elements>
-                            <source>nodeA</source>
-                            <destination>nodeB</destination>
+                            <source>nodeC</source>
+                            <destination>nodeD</destination>
                         </elements>
                     </firewall>
                 </configuration>
             </node>
-            <node name="node2" functional_type="CACHE" reqDiskStorage="10">
+            <node name="node2" functional_type="NAT">
                 <neighbour name="node1"/>
                 <neighbour name="nodeB"/>
                 <configuration name="conf2" description="A simple description">
-                    <cache>
-                        <resource>node2</resource>
-                    </cache>
+                    <nat>
+                        <source>nodeA</source>
+                    </nat>
                 </configuration>
             </node>
-            <node name="nodeB" functional_type="WEBSERVER" reqDiskStorage="10">
+            <node name="nodeB" functional_type="MAILSERVER">
                 <neighbour name="node2"/>
                 <configuration name="confB" description="A simple description">
-                    <webserver>
+                    <mailserver>
                         <name>nodeB</name>
-                    </webserver>
+                    </mailserver>
                 </configuration>
             </node>
         </graph>
     </graphs>
+    <CapacityDefinition>
+        <CapacityForNode node="node1" capacity="10"/>
+        <CapacityForNode node="node2" capacity="10"/>
+    </CapacityDefinition>
+    <PropertyDefinition>
+        <Property name="IsolationProperty" graph="0"/>
+    </PropertyDefinition>
     <Hosts>
         <Host name="hostA" diskStorage="10" type="CLIENT"/>
         <Host name="host1" diskStorage="10" type="MIDDLEBOX"/>
