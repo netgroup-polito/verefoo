@@ -168,7 +168,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 							.filter(e -> e != null)
 							.collect(Collectors.toCollection(ArrayList::new));
       				if(address.size() > 0){
-						System.out.println("Added to nat " + n.getName() + " internal addresses "+address);
+						logger.debug("Added to nat " + n.getName() + " internal addresses "+address);
 						nat.natModel(nctx.am.get(n.getName()));
 						nat.setInternalAddress(address);		
 					}

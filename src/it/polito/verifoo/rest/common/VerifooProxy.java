@@ -78,7 +78,7 @@ public class VerifooProxy {
 		    check = new Checker(ctx,nctx,net);
 	    }
 	    /**
-	     * Set all the conditions for the nodes. First, it sets up the host conditions. 
+	     * Sets all the conditions for the nodes. First, it sets up the host conditions. 
 	     * Then, it creates the conditions to make that a node is deployed only on one host.
 	     * After that, it creates the condition that if an host has a node deployed on it, it has to be active.
 	     * Lastly, it creates the conditions that the sum of the disk requirements of all the nodes
@@ -204,7 +204,7 @@ public class VerifooProxy {
             /*System.out.println("nPhysicalServer: " + nServer +
             				   " nPhysicalClient: " + nClient);*/
             if(nServer != 1 || nClient != 1){
-            	System.err.println("Only one client and one server are allowed in the physical network");
+            	//System.err.println("Only one client and one server are allowed in the physical network");
             	throw new BadGraphException("Only one client and one server are allowed in the physical network");
             }  
             if(nMiddle == 0) throw new BadGraphException("At least one middle host has to be defined");
@@ -291,7 +291,7 @@ public class VerifooProxy {
             				   " nWebServer: " + nWebServer +
             				   " nWebClient: " + nWebClient);*/
             if(nMailServer != nMailClient || nWebServer != nWebClient || nMailServer+nWebServer>1){
-            	System.err.println("Only one client and one server of the same type is allowed");
+            	//System.err.println("Only one client and one server of the same type is allowed");
             	throw new BadGraphException("Only one client and one server of the same type is allowed");
             }
             Node client = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT);}).findFirst().get();
@@ -489,12 +489,12 @@ public class VerifooProxy {
 
             Node source = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT);}).findFirst().get();
             Node dest = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).findFirst().get();
-            System.out.println("Checking reachability from " + source.getName() + " to "+ dest.getName());
+            logger.debug("Checking reachability from " + source.getName() + " to "+ dest.getName());
 			IsolationResult ret = this.check.checkIsolationProperty(netobjs.get(source), netobjs.get(dest));
 			if (ret.result == Status.UNSATISFIABLE){
-		     	   System.out.println("UNSAT"); // Nodes a and b are isolated
+				 	logger.debug("UNSAT"); // Nodes a and b are isolated
 		    }else{
-		     		System.out.println("SAT ");
+		    	 	logger.debug("SAT ");
 		     		logger.debug( ""+ret.model); //p.printModel(ret.model);
 		    }
 			return ret;

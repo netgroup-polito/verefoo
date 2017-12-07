@@ -10,7 +10,7 @@
       </node>
       <node functional_type="FIREWALL" name="node1">
         <neighbour name="nodeA"/>
-        <neighbour name="node2"/>
+        <neighbour name="nodeC"/>
         <configuration description="A simple description" name="conf1">
           <firewall>
             <elements>
@@ -30,7 +30,7 @@
         </configuration>
       </node>
       <node functional_type="MAILSERVER" name="nodeB">
-        <neighbour name="node2"/>
+        <neighbour name="nodeC"/>
         <configuration description="A simple description" name="confB">
           <mailserver>
           	<name>nodeB</name>
@@ -41,7 +41,6 @@
   </graphs>
   <CapacityDefinition>
    		<CapacityForNode node="node1" capacity="10"/>
-  		<CapacityForNode node="node2" capacity="10"/>
   </CapacityDefinition>
   <PropertyDefinition>
   		<Property graph="0" name="IsolationProperty"/> 		
