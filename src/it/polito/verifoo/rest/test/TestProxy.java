@@ -70,7 +70,7 @@ public class TestProxy {
 	public void tearDown() throws Exception {
 	}
 	
-	private void test(String file, boolean sat) throws JAXBException, SAXException, IOException, BadGraphException{
+	private void test(String file, boolean sat) throws Exception{
 		// create a JAXBContext capable of handling the generated classes
         JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
         // create an Unmarshaller
@@ -93,14 +93,10 @@ public class TestProxy {
         return;
 	}
 	
-	@Test
-	public void testBadClientConf() {
-		try {
-			test( "./testfile/nfv5nodes7hostsUNSAT-WEB.xml", false); //Working
-			fail("Exception not thrown");
-		} catch (Exception e) {
-			assert(true);
-		}		
+	@Test(expected=Exception.class)
+	public void testBadClientConf() throws Exception {
+		test( "./testfile/nfv5nodes7hostsUNSAT-WEB.xml", false); //Working
+		fail("Exception not thrown");
 	}
 	@Test
 	public void testFW_UNSAT(){
@@ -184,28 +180,20 @@ public class TestProxy {
 			fail(e.toString());
 		}	
 	}
-	@Test
-	public void testNoMiddeleBoxes() {
-		try {
-			test( "./testfile/nfv3nodes2hostsNoMIDDLEBOXES.xml", false); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}
+	@Test(expected=BadGraphException.class)
+	public void testNoMiddeleBoxes() throws Exception {
+		test( "./testfile/nfv3nodes2hostsNoMIDDLEBOXES.xml", false); //Working
+		fail("Exception not thrown");
+		
 	}
-	@Test
-	public void testHostDisconnected() {
-		try {
-			test( "./testfile/nfv3nodes3hostsHostsDisconnected.xml", false); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}
+	@Test(expected=BadGraphException.class)
+	public void testHostDisconnected() throws Exception {
+		test( "./testfile/nfv3nodes3hostsHostsDisconnected.xml", false); //Working
+		fail("Exception not thrown");
 	}
-	@Test
-	public void testWrongNodesConfiguration() {
-		try {
-			test( "./testfile/nfv3nodes3hostsWrongNodesConfiguration.xml", false); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}
+	@Test(expected=BadGraphException.class)
+	public void testWrongNodesConfiguration() throws Exception {
+		test( "./testfile/nfv3nodes3hostsWrongNodesConfiguration.xml", false); //Working
+		fail("Exception not thrown");
 	}
 }
