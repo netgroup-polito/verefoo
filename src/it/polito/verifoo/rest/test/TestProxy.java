@@ -182,6 +182,30 @@ public class TestProxy {
 			test( "./testfile/UNIV1.xml", true); //Working
 		} catch (Exception e) {
 			fail(e.toString());
-		}		
+		}	
+	}
+	@Test
+	public void testNoMiddeleBoxes() {
+		try {
+			test( "./testfile/nfv3nodes2hostsNoMIDDLEBOXES.xml", false); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	@Test
+	public void testHostDisconnected() {
+		try {
+			test( "./testfile/nfv3nodes3hostsHostsDisconnected.xml", false); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	@Test
+	public void testWrongNodesConfiguration() {
+		try {
+			test( "./testfile/nfv3nodes3hostsWrongNodesConfiguration.xml", false); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}
 	}
 }
