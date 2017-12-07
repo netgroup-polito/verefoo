@@ -198,15 +198,20 @@ public class VerifooProxy {
             long nClient = hosts.stream()
 	            	 .filter((h) -> {return h.getType() == TypeOfHost.CLIENT;})
 	            	 .count();
+            long nMiddle = hosts.stream()
+	            	 .filter((h) -> {return h.getType() == TypeOfHost.MIDDLEBOX;})
+	            	 .count();
             /*System.out.println("nPhysicalServer: " + nServer +
             				   " nPhysicalClient: " + nClient);*/
             if(nServer != 1 || nClient != 1){
-            	System.err.println("Only one client and one server is allowed in the physical network");
-            	throw new BadGraphException("Only one client and one server is allowed in the physical network");
+            	System.err.println("Only one client and one server are allowed in the physical network");
+            	throw new BadGraphException("Only one client and one server are allowed in the physical network");
             }  
+            if(nMiddle == 0) throw new BadGraphException("At least one middle host has to be defined");
             String hostClient = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.CLIENT;}).findFirst().get().getName();
 			String hostServer = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.SERVER;}).findFirst().get().getName();
             createHostChain(hostClient, hostServer);
+            if(savedChain.size() == 0) throw new BadGraphException("Host client and host server are not connected");
 		}
 		/**
 		 * Calculates all the possible paths from the host client to the host server

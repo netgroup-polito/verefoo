@@ -55,7 +55,7 @@ public class RestFoo {
 				}
 				return root;
 			} catch (BadGraphException e) {
-	        	throw new ProcessingException("Error in NFFG: "+e.toString());
+	        	throw new ProcessingException("Error in input XML: "+e.getMessage());
 			}
 	    }
 
