@@ -150,7 +150,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					break;
 				}
 				case MAILCLIENT:{
-					if(!(nctx.am.containsKey((n.getConfiguration().getMailclient().getMailserver())))) throw new BadNffgException("Mail server not present");
+					if(!(nctx.am.containsKey((n.getConfiguration().getMailclient().getMailserver())))) throw new BadGraphException("Mail server not present");
 					PolitoMailClient eh=new PolitoMailClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getMailclient().getMailserver())});
 					this.put(n,eh);
 					break;
@@ -181,7 +181,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					break;
 				}
 				case WEBCLIENT:{
-					if(!(nctx.am.containsKey((n.getConfiguration().getWebclient().getNameWebServer())))) throw new BadNffgException("Web server not present");
+					if(!(nctx.am.containsKey((n.getConfiguration().getWebclient().getNameWebServer())))) throw new BadGraphException("Web server not present");
 					PolitoWebClient eh=new PolitoWebClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer())});
 					this.put(n,eh);
 					break;
@@ -193,10 +193,10 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 				default:{
 					System.err.println("Braiiinssssssssssss!");
-					throw new BadNffgException("Invalid Node Functional Type"+ftype);
+					throw new BadGraphException("Invalid Node Functional Type"+ftype);
 				}
 			}
-		}catch (BadNffgException e) {
+		}catch (BadGraphException e) {
 			throw new ProcessingException(e.getLocalizedMessage());
 		}
 		catch (NumberFormatException e) {			

@@ -13,7 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import com.microsoft.z3.Status;
-import it.polito.verifoo.rest.common.BadNffgException;
+import it.polito.verifoo.rest.common.BadGraphException;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
 import it.polito.verifoo.rest.jaxb.Graph;
@@ -54,7 +54,7 @@ public class RestFoo {
 					}*/
 				}
 				return root;
-			} catch (BadNffgException e) {
+			} catch (BadGraphException e) {
 	        	throw new ProcessingException("Error in NFFG: "+e.toString());
 			}
 	    }

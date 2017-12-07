@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 
 import com.microsoft.z3.Status;
 
-import it.polito.verifoo.rest.common.BadNffgException;
+import it.polito.verifoo.rest.common.BadGraphException;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
 import it.polito.verifoo.rest.jaxb.Graph;
@@ -70,7 +70,7 @@ public class TestProxy {
 	public void tearDown() throws Exception {
 	}
 	
-	private void test(String file, boolean sat) throws JAXBException, SAXException, IOException, BadNffgException{
+	private void test(String file, boolean sat) throws JAXBException, SAXException, IOException, BadGraphException{
 		// create a JAXBContext capable of handling the generated classes
         JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
         // create an Unmarshaller

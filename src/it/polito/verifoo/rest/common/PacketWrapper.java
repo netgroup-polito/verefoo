@@ -12,9 +12,9 @@ public class PacketWrapper extends PacketModel {
 	 * This class convert our EndHost Packet Model configuration in the verigraph one
 	 * @param eh EndHost Packet Model
 	 * @param nctx Network Context.
-	 * @throws BadNffgException Invalid Configuration
+	 * @throws BadGraphException Invalid Configuration
 	 */
-	public PacketWrapper(Endhost eh, NetContext nctx) throws BadNffgException {
+	public PacketWrapper(Endhost eh, NetContext nctx) throws BadGraphException {
 		if(eh!=null){
 			try {
 				if(eh.getBody()!=null && !eh.getBody().isEmpty())
@@ -34,7 +34,7 @@ public class PacketWrapper extends PacketModel {
 					this.setUrl(eh.getUrl().hashCode());
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
-				throw new BadNffgException(e.getMessage());
+				throw new BadGraphException(e.getMessage());
 			}
 		}
 	}

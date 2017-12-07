@@ -1,27 +1,27 @@
 package it.polito.verifoo.rest.common;
 
-public class BadNffgException extends Exception {
+public class BadGraphException extends Exception {
 
-	public BadNffgException() {
+	public BadGraphException() {
 		super();
 	}
 
-	public BadNffgException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+	public BadGraphException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 		// TODO Auto-generated constructor stub
 	}
 
-	public BadNffgException(String message, Throwable cause) {
+	public BadGraphException(String message, Throwable cause) {
 		super(message, cause);
 		// TODO Auto-generated constructor stub
 	}
 
-	public BadNffgException(Throwable cause) {
+	public BadGraphException(Throwable cause) {
 		super(cause);
 		// TODO Auto-generated constructor stub
 	}
 
-	public BadNffgException(String message) {
+	public BadGraphException(String message) {
 		super(message,null);
 	}
 
