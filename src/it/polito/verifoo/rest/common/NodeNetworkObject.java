@@ -119,13 +119,14 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
               	 .filter((e) -> e.getKey().getFunctionalType().equals(FunctionalTypes.VPNEXIT))
                	 .map(e -> e.getKey())
               	 .collect(Collectors.toList());
-        vpnAccessNodes.forEach(nA -> {
+        for(Node nA:vpnAccessNodes){
         	Node vpnExit = vpnExitNodes.stream()
-        				.filter(nE -> nE.getName() == nA.getName()).findFirst().get();
+        				.filter(nE -> nE.getName().equals(nA.getConfiguration().getVpnaccess().getVpnexit())).findFirst().orElse(null);
+        	if(vpnExit == null) throw new BadGraphException("VPN not correctly configured");
         	
-        	((PolitoVpnExit) this.get(vpnExit)).vpnExitModel(nctx.am.get(nA.getName()), nctx.am.get(vpnExit.getName()));
-        	((PolitoVpnAccess) this.get(nA)).vpnAccessModel(nctx.am.get(nA.getName()), nctx.am.get(vpnExit.getName()));
-        });
+        	//((PolitoVpnExit) this.get(vpnExit)).vpnExitModel(nctx.am.get(nA.getName()), nctx.am.get(vpnExit.getName()));
+        	//((PolitoVpnAccess) this.get(nA)).vpnAccessModel(nctx.am.get(nA.getName()), nctx.am.get(vpnExit.getName()));
+        }
 		
 	}
 	
@@ -137,7 +138,10 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	 */
 	public void generateNetObj(Node n) {
 		try {
-			FunctionalTypes ftype=n.getFunctionalType();
+			FunctionalTypes ftype = null;
+			synchronized(ftype){
+				ftype=n.getFunctionalType();
+			}
 			switch (ftype) {
 				case FIREWALL:{
 					this.put(n,new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
@@ -201,12 +205,14 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				case VPNACCESS:{
 					if(!(nctx.am.containsKey((n.getConfiguration().getVpnaccess().getVpnexit())))) throw new BadGraphException("VPN Exit not present");
 					PolitoVpnAccess vpn=new PolitoVpnAccess(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					logger.debug("VPN Access: " +n.getName() + " with exit " + n.getConfiguration().getVpnaccess().getVpnexit());
 					this.put(n,vpn);
 					break;
 				}
 				case VPNEXIT:{
 					if(!(nctx.am.containsKey((n.getConfiguration().getVpnexit().getVpnaccess())))) throw new BadGraphException("VPN Access not present");
 					PolitoVpnExit vpn=new PolitoVpnExit(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					logger.debug("VPN Exit: " +n.getName() + " with access " + n.getConfiguration().getVpnexit().getVpnaccess());
 					this.put(n,vpn);
 					break;
 				}

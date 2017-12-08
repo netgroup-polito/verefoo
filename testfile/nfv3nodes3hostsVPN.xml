@@ -19,7 +19,7 @@
         <neighbour name="node1"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf2">
-          <vpnexit vpnaccess="node1"/>
+          <vpnexit vpnaccess="node2"/>
         </configuration>
       </node>
       <node functional_type="MAILSERVER" name="nodeB">

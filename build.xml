@@ -72,10 +72,36 @@
     </jar>
     <jar destfile="${dist.dir}/src-${DSTAMP}.jar" basedir="${src.dir}"/>
   </target>
-  <target name="test" depends="compile">
+	<target name="testMT" depends="compile">
+		    <junit 
+		    	printsummary="yes" haltonfailure="no" showoutput="true">
+		    	<jvmarg value=" -javaagent:'C:\Users\Antonio\SkyDrive\Polito\Magistrale\Distributed Proramming II\Laboratorio\.metadata\.plugins\com.anarsoft.plugin.sync.bug\agent.jar'"/>
+			<!-- Project classpath, must include junit.jar -->
+				<classpath location="lib/junit/junit.jar" />
+		    	<classpath location="lib/junit/concurrent-junit-1.0.0.jar" />
+		        <classpath location="lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar" />
+		    	<classpath location="lib/com.microsoft.z3.jar" />
+		    	<classpath location="lib/lib4j/log4j-api-2.9.1.jar" />
+		    	<classpath location="lib/lib4j/log4j-core-2.9.1.jar" />
+		    	  <classpath>
+		    	    <fileset dir="${lib.dir}">
+		    	       <include name="**/*.jar" />
+		    	    </fileset>
+		    	  </classpath>
+		    	<!-- test class -->
+			<classpath location="${build.dir}" />
+	    	<test name="it.polito.verifoo.rest.test.TestMultithreading"
+	    	    				haltonfailure="no" todir="${report.dir}">
+	    	    				<formatter type="plain" />
+	    	    				<formatter type="xml" />
+	    	</test>
+		  </junit>
+	  </target>
+  <target name="testAll" depends="compile">
 	    <junit printsummary="yes" haltonfailure="no" showoutput="true">
 		<!-- Project classpath, must include junit.jar -->
-		<classpath location="lib/junit/junit.jar" />
+			<classpath location="lib/junit/junit.jar" />
+	    	<classpath location="lib/junit/concurrent-junit-1.0.0.jar" />
 	        <classpath location="lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar" />
 	    	<classpath location="lib/com.microsoft.z3.jar" />
 	    	<classpath location="lib/lib4j/log4j-api-2.9.1.jar" />
@@ -92,6 +118,11 @@
 			<formatter type="plain" />
 			<formatter type="xml" />
 		</test>
+    	<test name="it.polito.verifoo.rest.test.TestMultithreading"
+    	    				haltonfailure="no" todir="${report.dir}">
+    	    				<formatter type="plain" />
+    	    				<formatter type="xml" />
+    	</test>
     	<test name="it.polito.verifoo.rest.test.TestProxy"
     				haltonfailure="no" todir="${report.dir}">
     				<formatter type="plain" />
