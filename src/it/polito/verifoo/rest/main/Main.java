@@ -20,7 +20,6 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verifoo.rest.common.*;
 
 public class Main {
-	Context ctx;
 	public static void main(String[] args) throws MalformedURLException{
 		System.setProperty("log4j.configuration", new File("resources", "log4j2.xml").toURI().toURL().toString());
         Logger logger = LogManager.getLogger("mylog"); 
@@ -28,8 +27,11 @@ public class Main {
 	        new Thread(){
 	        	public void run() {
 	        		try {
+	        			 JAXBContext jc;
 		                    // create a JAXBContext capable of handling the generated classes
-		                    JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
+	        			synchronized(logger){
+	        				jc= JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
+	        			}
 		                    // create an Unmarshaller
 		                    Unmarshaller u = jc.createUnmarshaller();
 		                    SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 

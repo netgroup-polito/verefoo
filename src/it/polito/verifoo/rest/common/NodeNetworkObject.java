@@ -138,10 +138,10 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	 */
 	public void generateNetObj(Node n) {
 		try {
-			FunctionalTypes ftype = null;
-			synchronized(ftype){
+			FunctionalTypes ftype;
+			//synchronized(n.getFunctionalType()){
 				ftype=n.getFunctionalType();
-			}
+			//}
 			switch (ftype) {
 				case FIREWALL:{
 					this.put(n,new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
