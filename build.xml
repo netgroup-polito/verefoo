@@ -10,6 +10,7 @@
   <property name="report.dir" location="log" />
   <property name="lib.dir" location="WebContent/WEB-INF/lib" />
   <property name="target.dir" location="target" />
+  <property name="vmlensAgent.dir" location="C:\Users\Antonio\SkyDrive\Polito\Magistrale\Distributed Proramming II\Laboratorio\.metadata\.plugins\com.anarsoft.plugin.sync.bug\agent.jar" />
   <path id="class.path">
     <fileset dir="${lib.dir}">
        <include name="**/*.jar" />
@@ -73,9 +74,10 @@
     <jar destfile="${dist.dir}/src-${DSTAMP}.jar" basedir="${src.dir}"/>
   </target>
 	<target name="testMT" depends="compile">
+			
 		    <junit 
-		    	printsummary="yes" haltonfailure="no" showoutput="true">
-		    	<jvmarg value=" -javaagent:'C:\Users\Antonio\SkyDrive\Polito\Magistrale\Distributed Proramming II\Laboratorio\.metadata\.plugins\com.anarsoft.plugin.sync.bug\agent.jar'"/>
+		    	printsummary="yes" haltonfailure="no" showoutput="true" fork="yes" forkmode="once">
+		    	<jvmarg value="-javaagent:${vmlensAgent.dir}"/>
 			<!-- Project classpath, must include junit.jar -->
 				<classpath location="lib/junit/junit.jar" />
 		    	<classpath location="lib/junit/concurrent-junit-1.0.0.jar" />

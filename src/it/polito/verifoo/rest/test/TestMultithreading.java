@@ -42,13 +42,12 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
 
 @RunWith(ConcurrentTestRunner.class)
 public class TestMultithreading {
-	private final static int THREAD_COUNT = 5;
+	private final static int THREAD_COUNT = 4;
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		Thread.sleep(10000);
 	}
 
 	/**
@@ -74,7 +73,10 @@ public class TestMultithreading {
 	
 	private void test(String file, boolean sat) throws Exception{
 		// create a JAXBContext capable of handling the generated classes
-        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
+		JAXBContext jc;
+		synchronized(this){
+			jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
+		}
         // create an Unmarshaller
         Unmarshaller u = jc.createUnmarshaller();
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
@@ -96,22 +98,6 @@ public class TestMultithreading {
 	}
 	@Test
 	@ThreadCount(THREAD_COUNT)
-	public void testNAT_UNSAT() {
-		try {
-			test( "./testfile/nfv3nodes3hostsUNSAT-NAT.xml", false); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
-	//@Test
-	public void testGEANT_SAT() {
-		try {
-			test( "./testfile/GEANT.xml", true); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
-	//@Test
 	public void testMultiThread_SAT() {
 		try {
 			test( "./testfile/nfv3nodes3hostsSAT-MAIL.xml", true); //Working
