@@ -74,6 +74,7 @@ public class VerifooProxy {
 		    setConditions();
 		    netobjs.generateAcl();
 		    netobjs.generateCache();
+		    netobjs.generateVPN();
 		    netobjs.attachToNet();
 		    check = new Checker(ctx,nctx,net);
 	    }

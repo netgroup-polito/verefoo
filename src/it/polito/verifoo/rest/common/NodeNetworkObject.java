@@ -3,6 +3,7 @@ package it.polito.verifoo.rest.common;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.ProcessingException;
@@ -19,19 +20,9 @@ import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 import it.polito.verigraph.mcnet.components.Tuple;
-import it.polito.verigraph.mcnet.netobjs.AclFirewall;
-import it.polito.verigraph.mcnet.netobjs.PolitoAntispam;
-import it.polito.verigraph.mcnet.netobjs.PolitoCache;
-import it.polito.verigraph.mcnet.netobjs.PolitoEndHost;
-import it.polito.verigraph.mcnet.netobjs.PolitoFieldModifier;
-import it.polito.verigraph.mcnet.netobjs.PolitoIDS;
-import it.polito.verigraph.mcnet.netobjs.PolitoMailClient;
-import it.polito.verigraph.mcnet.netobjs.PolitoMailServer;
-import it.polito.verigraph.mcnet.netobjs.PolitoNat;
-import it.polito.verigraph.mcnet.netobjs.PolitoWebClient;
-import it.polito.verigraph.mcnet.netobjs.PolitoWebServer;
+import it.polito.verigraph.mcnet.netobjs.*;;
 /**
- * This class generate a Map of a new network object and associated node.
+ * This class generates a Map of a new network object and associated node.
  * The network object are generated inside this class by extracting from the schema the type and by processing the configuration.
  * It also provide methods for Acl Attaching (for firewall object) and resource Attaching(for cache object)
  */
@@ -57,13 +48,13 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	}
 
 	/**
-	 * Attach all network objects to the Network
+	 * Attaches all network objects to the Network
 	 */
 	public void attachToNet(){
 		this.forEach((n,netobjs)->net.attach(netobjs));
 	}
 	/**
-	 * Generate Acl for firewall network objects by processing the configuration
+	 * Generates Acl for firewall network objects by processing the configuration
 	 * Please note that invalid configuration will result in a discarded firewall acl (we don't trown an exeption)
 	 */
 	public void generateAcl(){
@@ -86,7 +77,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 		);
 	}
 	/**
-	 * Generate Cache internal node for cache network objects from cache resources configuration
+	 * Generates Cache internal node for cache network objects from cache resources configuration
 	 */
 	public void generateCache(){
 		this.forEach(
@@ -105,6 +96,39 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 		);
 	}
+	
+	/**
+	 * Generates the vpn model
+	 * @throws BadGraphException 
+	 */
+	public void generateVPN() throws BadGraphException {
+		 long nVpnAccess = this.keySet().stream()
+            	 .filter((n) -> n.getFunctionalType().equals(FunctionalTypes.VPNACCESS))
+            	 .count();
+        long nVpnExit = this.keySet().stream()
+            	 .filter((n) -> n.getFunctionalType().equals(FunctionalTypes.VPNEXIT))
+            	 .count();
+        if(nVpnAccess > 0 || nVpnExit > 0) {
+        	if(nVpnAccess != nVpnExit) throw new BadGraphException("VPN Access and Exit must be in equal number");
+        }
+        List<Node> vpnAccessNodes = this.entrySet().stream()
+           	 .filter((e) -> e.getKey().getFunctionalType().equals(FunctionalTypes.VPNACCESS))
+           	 .map(e -> e.getKey())
+           	 .collect(Collectors.toList());
+        List<Node> vpnExitNodes = this.entrySet().stream()
+              	 .filter((e) -> e.getKey().getFunctionalType().equals(FunctionalTypes.VPNEXIT))
+               	 .map(e -> e.getKey())
+              	 .collect(Collectors.toList());
+        vpnAccessNodes.forEach(nA -> {
+        	Node vpnExit = vpnExitNodes.stream()
+        				.filter(nE -> nE.getName() == nA.getName()).findFirst().get();
+        	
+        	((PolitoVpnExit) this.get(vpnExit)).vpnExitModel(nctx.am.get(nA.getName()), nctx.am.get(vpnExit.getName()));
+        	((PolitoVpnAccess) this.get(nA)).vpnAccessModel(nctx.am.get(nA.getName()), nctx.am.get(vpnExit.getName()));
+        });
+		
+	}
+	
 	/**
 	 * @param Node n
 	 * @description This function process the node and generate a network object according to functional type, 
@@ -174,10 +198,16 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					}
 					break;
 				}
-				case VPNACCESS:{					
+				case VPNACCESS:{
+					if(!(nctx.am.containsKey((n.getConfiguration().getVpnaccess().getVpnexit())))) throw new BadGraphException("VPN Exit not present");
+					PolitoVpnAccess vpn=new PolitoVpnAccess(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					this.put(n,vpn);
 					break;
 				}
-				case VPNEXIT:{					
+				case VPNEXIT:{
+					if(!(nctx.am.containsKey((n.getConfiguration().getVpnexit().getVpnaccess())))) throw new BadGraphException("VPN Access not present");
+					PolitoVpnExit vpn=new PolitoVpnExit(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					this.put(n,vpn);
 					break;
 				}
 				case WEBCLIENT:{
