@@ -40,11 +40,6 @@ public class TestMultithreading {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
-		String dir=System.getenv("TRAVIS_BUILD_DIR");
-		if(dir != null && !dir.isEmpty()){
-			JniFinder.extractZ3Lib(dir+"/WebContent/WEB-INF/lib/jni/");
-		}
-
 	}
 
 	/**
