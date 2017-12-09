@@ -24,8 +24,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import javax.xml.ws.WebServiceException;
-
 import org.xml.sax.SAXException;
 
 import it.polito.verifoo.rest.jaxb.NFV;
@@ -48,7 +46,10 @@ public class XMLProvider implements MessageBodyReader<Object>, MessageBodyWriter
             OutputStream entityStream) throws IOException,
             WebApplicationException {
             try {
-                Marshaller m = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb").createMarshaller();
+            	Marshaller m; 
+            	synchronized(this){
+            		m = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb").createMarshaller();
+            	}
                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                 m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"https://raw.githubusercontent.com/netgroup-polito/verifoo/rest-service/xsd/nfvInfo.xsd");
         		try {
@@ -78,7 +79,10 @@ public class XMLProvider implements MessageBodyReader<Object>, MessageBodyWriter
             MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
             throws IOException, WebApplicationException {
 		try {
-            Unmarshaller u = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb").createUnmarshaller();
+			Unmarshaller u;
+        	synchronized(this){
+        		u = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb").createUnmarshaller();
+        	}
         	try {
     			SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);    
     			Schema schema = sf.newSchema( new URL("https://raw.githubusercontent.com/netgroup-polito/verifoo/rest-service/xsd/nfvInfo.xsd"));

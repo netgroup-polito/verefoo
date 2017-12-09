@@ -3,7 +3,6 @@ package it.polito.verifoo.rest.common;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.ProcessingException;
@@ -144,22 +143,34 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 			//}
 			switch (ftype) {
 				case FIREWALL:{
+					if(n.getConfiguration().getFirewall()==null){
+						throw new BadGraphException("You have specified a FIREWALL Type but you provide a configuration of another type");
+					}
 					this.put(n,new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
 					break;
 				}
 				case FIELDMODIFIER:{	
+					if(n.getConfiguration().getFieldmodifier()==null){
+						throw new BadGraphException("You have specified a FIELDMODIFIER Type but you provide a configuration of another type");
+					}
 					PolitoFieldModifier fm = new PolitoFieldModifier(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					fm.installFieldModifier();
 					this.put(n,fm);
 					break;
 				}
 				case ENDHOST:{
+					if(n.getConfiguration().getEndhost()==null){
+						throw new BadGraphException("You have specified a ENDHOST Type but you provide a configuration of another type");
+					}
 					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);
 					eh.installEndHost(new PacketWrapper(n.getConfiguration().getEndhost(), nctx));
 					break;
 				}
 				case ANTISPAM:{
+					if(n.getConfiguration().getAntispam()==null){
+						throw new BadGraphException("You have specified a ANTISPAM Type but you provide a configuration of another type");
+					}
 					PolitoAntispam spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,spam);
 					int[] blacklist=listToIntArguments(n.getConfiguration().getAntispam().getSource());
@@ -167,10 +178,16 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					break;
 				}
 				case CACHE:{
+					if(n.getConfiguration().getCache()==null){
+						throw new BadGraphException("You have specified a CACHE Type but you provide a configuration of another type");
+					}
 					this.put(n,new PolitoCache(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
 					break;
 				}
 				case DPI:{
+					if(n.getConfiguration().getDpi()==null){
+						throw new BadGraphException("You have specified a DPI Type but you provide a configuration of another type");
+					}
 					PolitoIDS ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					int[] blacklist=listToIntArguments(n.getConfiguration().getDpi().getNotAllowed());
 					ids.installIDS(blacklist);
@@ -178,17 +195,26 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					break;
 				}
 				case MAILCLIENT:{
+					if(n.getConfiguration().getMailclient()==null){
+						throw new BadGraphException("You have specified a MAILCLIENT Type but you provide a configuration of another type");
+					}
 					if(!(nctx.am.containsKey((n.getConfiguration().getMailclient().getMailserver())))) throw new BadGraphException("Mail server not present");
 					PolitoMailClient eh=new PolitoMailClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getMailclient().getMailserver())});
 					this.put(n,eh);
 					break;
 				}
 				case MAILSERVER:{
+					if(n.getConfiguration().getMailserver()==null){
+						throw new BadGraphException("You have specified a MAILSERVER Type but you provide a configuration of another type");
+					}
 					PolitoMailServer eh=new PolitoMailServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);
 					break;
 				}
-				case NAT:{		
+				case NAT:{
+					if(n.getConfiguration().getNat()==null){
+						throw new BadGraphException("You have specified a NAT Type but you provide a configuration of another type");
+					}
 					PolitoNat nat=new PolitoNat(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,nat);
 					ArrayList<DatatypeExpr> address = n.getConfiguration().getNat().getSource().stream()
@@ -203,6 +229,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					break;
 				}
 				case VPNACCESS:{
+					if(n.getConfiguration().getVpnaccess()==null){
+						throw new BadGraphException("You have specified a VPNACCESS Type but you provide a configuration of another type");
+					}
 					if(!(nctx.am.containsKey((n.getConfiguration().getVpnaccess().getVpnexit())))) throw new BadGraphException("VPN Exit not present");
 					PolitoVpnAccess vpn=new PolitoVpnAccess(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					logger.debug("VPN Access: " +n.getName() + " with exit " + n.getConfiguration().getVpnaccess().getVpnexit());
@@ -210,6 +239,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					break;
 				}
 				case VPNEXIT:{
+					if(n.getConfiguration().getVpnexit()==null){
+						throw new BadGraphException("You have specified a VPNEXIT Type but you provide a configuration of another type");
+					}
 					if(!(nctx.am.containsKey((n.getConfiguration().getVpnexit().getVpnaccess())))) throw new BadGraphException("VPN Access not present");
 					PolitoVpnExit vpn=new PolitoVpnExit(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					logger.debug("VPN Exit: " +n.getName() + " with access " + n.getConfiguration().getVpnexit().getVpnaccess());
@@ -217,12 +249,18 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					break;
 				}
 				case WEBCLIENT:{
+					if(n.getConfiguration().getWebclient()==null){
+						throw new BadGraphException("You have specified a WEBCLIENT Type but you provide a configuration of another type");
+					}
 					if(!(nctx.am.containsKey((n.getConfiguration().getWebclient().getNameWebServer())))) throw new BadGraphException("Web server not present");
 					PolitoWebClient eh=new PolitoWebClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer())});
 					this.put(n,eh);
 					break;
 				}
 				case WEBSERVER:{
+					if(n.getConfiguration().getWebserver()==null){
+						throw new BadGraphException("You have specified a WEBSERVER Type but you provide a configuration of another type");
+					}
 					PolitoWebServer eh=new PolitoWebServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);
 					break;

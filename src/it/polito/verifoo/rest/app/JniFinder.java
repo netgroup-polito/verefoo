@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 
-import javax.servlet.ServletContext;
-
 public final class JniFinder {
 
 	 public static void extractZ3Lib(String fullPath){

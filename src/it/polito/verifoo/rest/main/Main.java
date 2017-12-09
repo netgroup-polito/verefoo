@@ -13,7 +13,6 @@ import javax.xml.validation.SchemaFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
-import com.microsoft.z3.Context;
 import com.microsoft.z3.Status;
 import it.polito.verifoo.rest.jaxb.*;
 import it.polito.verigraph.mcnet.components.IsolationResult;
