@@ -99,7 +99,7 @@
 	    	</test>
 		  </junit>
 	  </target>
-  <target name="testAll" depends="compile">
+  <target name="test" depends="compile">
 	    <junit printsummary="yes" haltonfailure="no" showoutput="true">
 		<!-- Project classpath, must include junit.jar -->
 			<classpath location="lib/junit/junit.jar" />

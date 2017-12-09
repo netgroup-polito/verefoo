@@ -19,5 +19,6 @@
 	<classpathentry kind="lib" path="lib/lib4j/log4j-core-2.9.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="lib" path="lib/junit/concurrent-junit-1.0.0.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

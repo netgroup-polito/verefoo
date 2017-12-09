@@ -7,17 +7,8 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -28,8 +19,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.xml.sax.SAXException;
-
 import com.anarsoft.vmlens.concurrent.junit.ConcurrentTestRunner;
 import com.anarsoft.vmlens.concurrent.junit.ThreadCount;
 import com.microsoft.z3.Status;
@@ -43,11 +32,14 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
 @RunWith(ConcurrentTestRunner.class)
 public class TestMultithreading {
 	private final static int THREAD_COUNT = 4;
+	private static 	JAXBContext	jc;
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
+
 	}
 
 	/**
@@ -72,11 +64,6 @@ public class TestMultithreading {
 	}
 	
 	private void test(String file, boolean sat) throws Exception{
-		// create a JAXBContext capable of handling the generated classes
-		JAXBContext jc;
-		synchronized(this){
-			jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
-		}
         // create an Unmarshaller
         Unmarshaller u = jc.createUnmarshaller();
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
