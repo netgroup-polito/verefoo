@@ -1,10 +1,16 @@
 language: java
-install: ant war
 jdk:
 - oraclejdk8
+before_script:
+  - tar --xvzpf $TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/ubuntu64.tar.gz -C $TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/
 script:
 - ant test
 - cat log/*.txt
+after_script:
+  - rm -rf log/*
+  - find $TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/ -type f ! -iname "*.tar.gz" -delete
+install: ant war
 deploy:
   provider: cloudfoundry
   api: https://api.eu-de.bluemix.net
