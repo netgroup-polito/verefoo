@@ -50,7 +50,7 @@ public class TestProxy {
 	public static void setUpBeforeClass() throws Exception {
 		String dir=System.getenv("TRAVIS_BUILD_DIR");
 		if(dir != null && !dir.isEmpty()){
-			JniFinder.extractZ3Lib(dir+"/WebContent//EB-INF/lib/jni/");
+			JniFinder.extractZ3Lib(dir+"/WebContent/WEB-INF/lib/jni/");
 		}
 	}
 

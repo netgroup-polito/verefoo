@@ -42,7 +42,7 @@ public class TestMultithreading {
 		jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
 		String dir=System.getenv("TRAVIS_BUILD_DIR");
 		if(dir != null && !dir.isEmpty()){
-			JniFinder.extractZ3Lib(dir+"/WebContent//EB-INF/lib/jni/");
+			JniFinder.extractZ3Lib(dir+"/WebContent/WEB-INF/lib/jni/");
 		}
 
 	}
