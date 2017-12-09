@@ -2,7 +2,7 @@ language: java
 jdk:
 - oraclejdk8
 before_script:
-  - tar --xvzpf $TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/ubuntu64.tar.gz -C $TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/
+  - tar --xzvf $TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/ubuntu64.tar.gz -C $TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/
 script:
 - ant test
