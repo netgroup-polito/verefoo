@@ -32,6 +32,7 @@ import org.xml.sax.SAXException;
 
 import com.microsoft.z3.Status;
 
+import it.polito.verifoo.rest.app.JniFinder;
 import it.polito.verifoo.rest.common.BadGraphException;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
@@ -47,6 +48,10 @@ public class TestProxy {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		String dir=System.getenv("TRAVIS_BUILD_DIR");
+		if(dir != null && !dir.isEmpty()){
+			JniFinder.extractZ3Lib(dir+"/WebContent//EB-INF/lib/jni/");
+		}
 	}
 
 	/**
