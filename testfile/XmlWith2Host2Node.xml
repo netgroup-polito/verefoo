@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
+  <graphs>
+    <graph id="0">
+     <node functional_type="MAILCLIENT" name="nodeA">
+        <neighbour name="nodeB"/>
+        <configuration description="A simple description" name="confA">
+          <mailclient mailserver="nodeB"/>
+        </configuration>
+      </node>
+      <node functional_type="MAILSERVER" name="nodeB">
+        <neighbour name="nodeA"/>
+        <configuration description="A simple description" name="confB">
+          <mailserver>
+          	<name>nodeB</name>
+          </mailserver>
+        </configuration>
+      </node>
+    </graph>
+  </graphs>
+  <CapacityDefinition>
+   		<CapacityForNode node="nodeA" capacity="10"/>
+  		<CapacityForNode node="nodeB" capacity="10"/>
+  </CapacityDefinition>
+  <PropertyDefinition>
+  		<Property graph="0" name="IsolationProperty"/> 		
+  </PropertyDefinition>
+  <Hosts>
+  	<Host diskStorage="10" name="hostA" type="CLIENT"/>
+  	<Host diskStorage="10" name="hostB" type="SERVER"/>
+  </Hosts>
+  <Connections>
+  	<Connection sourceHost="hostA" destHost="hostB" avgLatency ="-1"/>
+  </Connections>
+  <ParsingString></ParsingString>
+</NFV>

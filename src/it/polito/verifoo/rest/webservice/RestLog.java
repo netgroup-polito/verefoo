@@ -31,14 +31,19 @@ public class RestLog {
 		
 	    @GET
 		@Produces(MediaType.TEXT_HTML)
-	    public String get() throws IOException {
-	    	String debug=Files.readAllLines(Paths.get(DebugFile)).stream().collect(Collectors.joining("</br>"));
-			String error=Files.readAllLines(Paths.get(ErrorFile)).stream().collect(Collectors.joining("</br>"));
-	    	String html="<!DOCTYPE html><html><body><h1>Error Log</h1><p>"
-	    			    +error
-	    			    +"</p><h1>Debug Log</h1><p>"
-	    			    +debug
-	    			    +"</p></body></html>";
-			return html;
+	    public String get(){
+	    	try {
+				String debug=Files.readAllLines(Paths.get(DebugFile)).stream().collect(Collectors.joining("</br>"));
+				String error=Files.readAllLines(Paths.get(ErrorFile)).stream().collect(Collectors.joining("</br>"));
+				String html="<!DOCTYPE html><html><body><h1>Error Log</h1><p>"
+						    +error
+						    +"</p><h1>Debug Log</h1><p>"
+						    +debug
+						    +"</p></body></html>";
+				return html;
+			} catch (Exception e) {
+				System.out.println("Still no log created");
+			}
+			return "Still no log created";
 	    }
 }

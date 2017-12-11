@@ -20,5 +20,6 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="lib/junit/concurrent-junit-1.0.0.jar"/>
+	<classpathentry kind="var" path="CATALINA_HOME"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

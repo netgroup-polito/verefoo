@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
+  <Hosts>
+  	<Host diskStorage="10" name="hostA" type="CLIENT"/>
+  	<Host diskStorage="10" name="host1" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host2" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host3" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="hostB" type="SERVER"/>
+  </Hosts>
+  <Connections>
+  	<Connection sourceHost="hostA" destHost="host1" avgLatency ="-1"/>
+  	<Connection sourceHost="hostA" destHost="host2" avgLatency ="-100"/>
+  	<Connection sourceHost="host1" destHost="host2" avgLatency ="-1"/>
+  	<Connection sourceHost="host1" destHost="host3" avgLatency ="-100"/>
+  	<Connection sourceHost="host2" destHost="host1" avgLatency ="-1"/>
+  	<Connection sourceHost="host3" destHost="host2" avgLatency ="-1"/>
+  	<Connection sourceHost="host2" destHost="host3" avgLatency ="-1"/>
+  	<Connection sourceHost="host2" destHost="hostB" avgLatency ="-100"/>
+  	<Connection sourceHost="host3" destHost="hostB" avgLatency ="-1"/>
+  </Connections>
+  <ParsingString></ParsingString>
+</NFV>

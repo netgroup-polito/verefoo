@@ -3,6 +3,10 @@ jdk:
 - oraclejdk8
 install: ant war
 before_script:
+  - wget http://it.apache.contactlab.it/tomcat/tomcat-9/v9.0.2/bin/apache-tomcat-9.0.2.tar.gz
+  - tar -xzvf apache-tomcat-9.0.2.tar.gz
+  - export CATALINA_HOME=$TRAVIS_BUILD_DIR/apache-tomcat-9.0.2
+  - wget http://bit.ly/2iPUBvf -o $CATALINA_HOME/conf/tomcat-users.xml
   - tar -xzvpf $TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/ubuntu64.tar.gz -C $TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/
 script:
@@ -10,6 +14,7 @@ script:
 - cat log/*.txt
 before_deploy:
   - rm -rf log/*
+  - rm -rf apache-tomcat-9.0.2
   - find $TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/ -type f ! -iname "*.tar.gz" -delete
 deploy:
   provider: cloudfoundry

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
+  <graphs>
+    <graph id="0">
+     <node functional_type="MAILCLIENT" name="nodeA">
+        <neighbour name="node1"/>
+        <configuration description="A simple description" name="confA">
+          <mailclient mailserver="nodeB"/>
+        </configuration>
+      </node>
+      <node functional_type="FIREWALL" name="node1">
+        <neighbour name="nodeA"/>
+        <neighbour name="node2"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall>
+            <elements>
+              <source>nodeC</source>
+              <destination>nodeD</destination>
+            </elements>
+          </firewall>
+        </configuration>
+      </node>
+      <node functional_type="NAT" name="node2">
+        <neighbour name="node1"/>
+        <neighbour name="nodeB"/>
+        <configuration description="A simple description" name="conf2">
+          <nat>
+          	<source>nodeA</source>
+          </nat>
+        </configuration>
+      </node>
+      <node functional_type="MAILSERVER" name="nodeB">
+        <neighbour name="node2"/>
+        <configuration description="A simple description" name="confB">
+          <mailserver>
+          	<name>nodeB</name>
+          </mailserver>
+        </configuration>
+      </node>
+    </graph>
+  </graphs>
+  <CapacityDefinition>
+   		<CapacityForNode node="node1" capacity="10"/>
+  		<CapacityForNode node="node2" capacity="10"/>
+  </CapacityDefinition>
+  <PropertyDefinition>
+  		<Property graph="0" name="IsolationProperty"/> 		
+  </PropertyDefinition>
+  <Hosts>
+  	<Host diskStorage="10" name="hostA" type="CLIENT"/>
+  </Hosts>
+  <Connections>
+  	<Connection sourceHost="hostA" destHost="hostA" avgLatency ="-1"/>
+  </Connections>
+  <ParsingString></ParsingString>
+</NFV>
