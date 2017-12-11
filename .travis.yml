@@ -5,7 +5,7 @@ before_install:
   - wget http://it.apache.contactlab.it/tomcat/tomcat-9/v9.0.2/bin/apache-tomcat-9.0.2.tar.gz
   - tar -xzvf apache-tomcat-9.0.2.tar.gz
   - export CATALINA_HOME=$TRAVIS_BUILD_DIR/apache-tomcat-9.0.2
-  - wget http://bit.ly/2iPUBvf -o $CATALINA_HOME/conf/tomcat-users.xml
+  - wget http://bit.ly/2iPUBvf -O $CATALINA_HOME/conf/tomcat-users.xml
 install: ant war
 before_script:
   - tar -xzvpf $TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/ubuntu64.tar.gz -C $TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/
