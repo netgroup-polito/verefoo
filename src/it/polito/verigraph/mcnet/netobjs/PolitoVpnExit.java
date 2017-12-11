@@ -64,21 +64,18 @@ public class PolitoVpnExit extends NetworkObject {
         Expr p_0 = ctx.mkConst("vpn_p_0", nctx.packet);
         Expr p_1 = ctx.mkConst("vpn_p_1", nctx.packet);
 
-        IntExpr t_0 = ctx.mkIntConst("vpn_t_0");
-        IntExpr t_1 = ctx.mkIntConst("vpn_t_1");
-
         private_addr_func = ctx.mkFuncDecl("vpn_private_addr_func", nctx.address, ctx.mkBoolSort());
 
-        BoolExpr constraint1 = ctx.mkForall(new Expr[]{t_0, p_0, x},
+        BoolExpr constraint1 = ctx.mkForall(new Expr[]{ p_0, x},
                 ctx.mkImplies(ctx.mkAnd(
-                        (BoolExpr)nctx.send.apply(politoVpnExit, x, p_0, t_0),
+                        (BoolExpr)nctx.send.apply(politoVpnExit, x, p_0),
                         ctx.mkEq(nctx.pf.get("inner_src").apply(p_0), nctx.am.get("null"))),
                         ctx.mkAnd(
                                 (BoolExpr)private_addr_func.apply(nctx.pf.get("src").apply(p_0)),
                                 ctx.mkNot((BoolExpr)nctx.pf.get("encrypted").apply(p_0)),
-                                ctx.mkExists(new Expr[]{y, p_1, t_1},
-                                        ctx.mkAnd((BoolExpr)nctx.recv.apply(y, politoVpnExit, p_1, t_1),
-                                                ctx.mkLt(t_1, t_0),
+                                ctx.mkExists(new Expr[]{y, p_1},
+                                        ctx.mkAnd((BoolExpr)nctx.recv.apply(y, politoVpnExit, p_1),
+                                         
                                                 (BoolExpr)nctx.pf.get("encrypted").apply(p_1),
                                                 ctx.mkEq(nctx.pf.get("src").apply(p_1), vpnAccessIp),
                                                 ctx.mkEq(nctx.pf.get("dest").apply(p_1), vpnExitIp),
@@ -96,9 +93,9 @@ public class PolitoVpnExit extends NetworkObject {
 
         constraints.add(constraint1);
 
-        BoolExpr constraint2 = ctx.mkForall(new Expr[]{t_0, p_0, x},
+        BoolExpr constraint2 = ctx.mkForall(new Expr[]{ p_0, x},
                 ctx.mkImplies(ctx.mkAnd(
-                        (BoolExpr)nctx.send.apply(politoVpnExit, x, p_0, t_0),
+                        (BoolExpr)nctx.send.apply(politoVpnExit, x, p_0),
                         ctx.mkNot(ctx.mkEq(nctx.pf.get("inner_src").apply(p_0), nctx.am.get("null")))),
                         ctx.mkAnd(
                                 ctx.mkEq(nctx.pf.get("src").apply(p_0), vpnExitIp),
@@ -106,9 +103,9 @@ public class PolitoVpnExit extends NetworkObject {
                                 (BoolExpr)private_addr_func.apply(nctx.pf.get("dest").apply(p_0)),
                                 ctx.mkNot(ctx.mkEq(nctx.pf.get("inner_dest").apply(p_1), vpnExitIp)),
                                 (BoolExpr)nctx.pf.get("encrypted").apply(p_0),
-                                ctx.mkExists(new Expr[]{y, p_1, t_1},
-                                        ctx.mkAnd((BoolExpr)nctx.recv.apply(y, politoVpnExit, p_1, t_1),
-                                                ctx.mkLt(t_1, t_0),
+                                ctx.mkExists(new Expr[]{y, p_1},
+                                        ctx.mkAnd((BoolExpr)nctx.recv.apply(y, politoVpnExit, p_1),
+                                                
                                                 ctx.mkNot((BoolExpr)nctx.pf.get("encrypted").apply(p_1)),
                                                 ctx.mkEq(nctx.pf.get("src").apply(p_1), nctx.pf.get("inner_src").apply(p_0)),
                                                 ctx.mkEq(nctx.pf.get("dest").apply(p_1), nctx.pf.get("inner_dest").apply(p_0)),
