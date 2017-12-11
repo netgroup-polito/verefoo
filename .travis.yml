@@ -12,6 +12,7 @@ before_script:
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TRAVIS_BUILD_DIR/WebContent/WEB-INF/lib/jni/
 script:
 - ant test
+- ant testWS
 - cat log/*.txt
 before_deploy:
   - rm -rf log/*
