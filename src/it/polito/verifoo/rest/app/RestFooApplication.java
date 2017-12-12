@@ -7,7 +7,9 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
 
 import org.glassfish.jersey.server.ResourceConfig;
-
+/**
+ * Main Rest Class
+ */
 public class RestFooApplication extends ResourceConfig {
     public RestFooApplication(@Context ServletContext context) throws MalformedURLException {
 		System.setProperty("log4j.configuration", new File(context.getRealPath("/WEB-INF/classes/log4j2.xml")).toURI().toURL().toString());

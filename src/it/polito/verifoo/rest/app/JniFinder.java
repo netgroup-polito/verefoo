@@ -4,9 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-
+/**
+ * This class provide a convenient way for extract and set path of Z3 Lib
+ */
 public final class JniFinder {
-
+	 /** Extract and add z3 library to java library path.
+	  * @param fullPath Path of z3 jni archive folder
+	  */
 	 public static void extractZ3Lib(String fullPath){
 	    	try {
 				Process proc=Runtime.getRuntime().exec("lsb_release -d -s");
@@ -38,6 +42,11 @@ public final class JniFinder {
 				// Probably Windows :D
 			}
 	    }
+	 	/**
+	 	 * Set java.library.path dynamically.
+	 	 * WARNING: in some cases this not working.
+	 	 * @param path Path of extracted z3 archive
+	 	 */
 	    private static void setJavaLibPath(String path){
 				try {
 					System.setProperty("java.library.path", path );
