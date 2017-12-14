@@ -287,15 +287,18 @@ public class VerifooProxy {
             long nWebClient = nodes.stream()
 	            	 .filter((n) -> n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT))
 	            	 .count();
+            long nEndHost	= nodes.stream()
+            		 .filter((n) -> n.getFunctionalType().equals(FunctionalTypes.ENDHOST))
+            		 .count();
             /*System.out.println("nMailServer: " + nMailServer +
             				   " nMailClient: " + nMailClient +
             				   " nWebServer: " + nWebServer +
             				   " nWebClient: " + nWebClient);*/
-            if(nMailServer != nMailClient || nWebServer != nWebClient || nMailServer+nWebServer>1){
+            if(nMailServer != nMailClient+nEndHost || nWebServer != nWebClient+nEndHost || nMailServer+nWebServer>1){
             	//System.err.println("Only one client and one server of the same type is allowed");
             	throw new BadGraphException("Only one client and one server of the same type is allowed");
             }
-            Node client = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT);}).findFirst().get();
+            Node client = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).findFirst().get();
             Node server = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).findFirst().get();
             if(client.getNeighbour().size() != 1 || server.getNeighbour().size() != 1) throw new BadGraphException("Nodes must be in a chain");
             String nextName = client.getNeighbour().stream().filter(n -> !(n.getName().equals(client.getName()))).findFirst().get().getName();
@@ -488,7 +491,7 @@ public class VerifooProxy {
 		 */
 		public IsolationResult checkNFFGProperty(){
 
-            Node source = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT);}).findFirst().get();
+            Node source = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).findFirst().get();
             Node dest = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).findFirst().get();
             logger.debug("Checking reachability from " + source.getName() + " to "+ dest.getName());
 			IsolationResult ret = this.check.checkIsolationProperty(netobjs.get(source), netobjs.get(dest));
