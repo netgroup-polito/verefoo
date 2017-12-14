@@ -295,9 +295,9 @@ public class VerifooProxy {
             				   " nWebServer: " + nWebServer +
             				   " nWebClient: " + nWebClient);*/
             if((nMailServer>0 && nMailServer != nMailClient+nEndHost) 
-            	|| (nMailServer==0 && nMailClient==0) 
+            	|| (nMailServer==0 && nMailClient!=nMailServer) 
             	|| (nWebServer>0 && nWebServer != nWebClient+nEndHost)
-            	|| (nWebServer==0 && nWebClient==0)
+            	|| (nWebServer==0 && nWebClient!=nWebServer)
             	|| nMailServer+nWebServer>1){
             	//System.err.println("Only one client and one server of the same type is allowed");
             	throw new BadGraphException("Only one client and one server of the same type is allowed");
