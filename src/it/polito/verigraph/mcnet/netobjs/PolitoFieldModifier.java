@@ -10,6 +10,8 @@ package it.polito.verigraph.mcnet.netobjs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
@@ -54,7 +56,61 @@ public class PolitoFieldModifier extends NetworkObject {
         BoolExpr[] constr = new BoolExpr[constraints.size()];
         solver.Add(constraints.toArray(constr));
     }
+    
+    public void installFieldModifier (Optional<PacketModel> packet){
+        Expr x = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_x", nctx.node);
+        Expr y = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_y", nctx.node);
 
+        Expr p_0 = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_p_0", nctx.packet);
+        Expr p_1 = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_p_1", nctx.packet);
+        BoolExpr predicatesOnPktFields = ctx.mkTrue();
+
+        if(packet.isPresent() && packet.get().getIp_dest() != null)
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("dest").apply(p_0), packet.get().getIp_dest()));
+        else
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields,ctx.mkEq(nctx.pf.get("dest").apply(p_0), nctx.pf.get("dest").apply(p_1)));
+        if(packet.isPresent() && packet.get().getBody() != null)
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("body").apply(p_0), ctx.mkInt(packet.get().getBody())));
+        else
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields,ctx.mkEq(nctx.pf.get("body").apply(p_0), nctx.pf.get("body").apply(p_1)));
+        if(packet.isPresent() && packet.get().getEmailFrom() != null)
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("emailFrom").apply(p_0), ctx.mkInt(packet.get().getEmailFrom())));
+        else
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields,ctx.mkEq(nctx.pf.get("emailFrom").apply(p_0), nctx.pf.get("emailFrom").apply(p_1)));
+        if(packet.isPresent() && packet.get().getOptions() != null)
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("options").apply(p_0), ctx.mkInt(packet.get().getOptions())));
+        else
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields,ctx.mkEq(nctx.pf.get("options").apply(p_0), nctx.pf.get("options").apply(p_1)));
+        if(packet.isPresent() && packet.get().getProto() != null)
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(packet.get().getProto())));
+        else
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields,ctx.mkEq(nctx.pf.get("proto").apply(p_0), nctx.pf.get("proto").apply(p_1)));
+        if(packet.isPresent() && packet.get().getSeq() != null)
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("seq").apply(p_0), ctx.mkInt(packet.get().getSeq())));
+        else
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields,ctx.mkEq(nctx.pf.get("seq").apply(p_0), nctx.pf.get("seq").apply(p_1)));
+        if(packet.isPresent() && packet.get().getUrl() != null)
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("url").apply(p_0), ctx.mkInt(packet.get().getUrl())));
+        else
+            predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields,ctx.mkEq(nctx.pf.get("url").apply(p_0), nctx.pf.get("url").apply(p_1)));
+
+        constraints.add(
+                ctx.mkForall(new Expr[]{ p_0, x},
+                        ctx.mkImplies((BoolExpr)nctx.send.apply(politoFieldModifier,x,p_0),
+                                ctx.mkExists(new Expr[]{y, p_1},
+                                        ctx.mkAnd(predicatesOnPktFields,
+                                                (BoolExpr)nctx.recv.apply(y, politoFieldModifier, p_1),
+                                                ctx.mkEq(nctx.pf.get("encrypted").apply(p_0), nctx.pf.get("encrypted").apply(p_1)),
+                                                ctx.mkEq(nctx.pf.get("src").apply(p_0), nctx.pf.get("src").apply(p_1)),
+                                                ctx.mkEq(nctx.pf.get("inner_src").apply(p_0), nctx.pf.get("inner_src").apply(p_1)),
+                                                ctx.mkEq(nctx.pf.get("inner_dest").apply(p_0), nctx.pf.get("inner_dest").apply(p_1)),
+                                                ctx.mkEq(nctx.pf.get("origin").apply(p_0), nctx.pf.get("origin").apply(p_1)),
+                                                ctx.mkEq(nctx.pf.get("orig_body").apply(p_0), nctx.pf.get("orig_body").apply(p_1))
+                                                ),1,null,null,null,null)),
+                        1,null,null,null,null));
+    }
+
+    //TODO: old version, you can remove this method
     public void installFieldModifier (){
         Expr x = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_x", nctx.node);
         Expr y = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_y", nctx.node);
@@ -65,26 +121,7 @@ public class PolitoFieldModifier extends NetworkObject {
         /*IntExpr t_0 = ctx.mkIntConst("politoFieldModifier_"+politoFieldModifier+"_t_0");
         IntExpr t_1 = ctx.mkIntConst("politoFieldModifier_"+politoFieldModifier+"_t_1");
 */
-        constraints.add(
-                ctx.mkForall(new Expr[]{ p_0, x},
-                        ctx.mkImplies((BoolExpr)nctx.send.apply(politoFieldModifier,x,p_0),
-                                ctx.mkExists(new Expr[]{y, p_1},
-                                        ctx.mkAnd(
-                                                (BoolExpr)nctx.recv.apply(y, politoFieldModifier, p_1),
-                                                ctx.mkEq(nctx.pf.get("encrypted").apply(p_0), nctx.pf.get("encrypted").apply(p_1)),
-                                                ctx.mkEq(nctx.pf.get("src").apply(p_0), nctx.pf.get("src").apply(p_1)),
-                                                ctx.mkEq(nctx.pf.get("dest").apply(p_0), nctx.pf.get("dest").apply(p_1)),
-                                                ctx.mkEq(nctx.pf.get("inner_src").apply(p_0), nctx.pf.get("inner_src").apply(p_1)),
-                                                ctx.mkEq(nctx.pf.get("inner_dest").apply(p_0), nctx.pf.get("inner_dest").apply(p_1)),
-                                                ctx.mkEq(nctx.pf.get("origin").apply(p_0), nctx.pf.get("origin").apply(p_1)),
-                                                ctx.mkEq(nctx.pf.get("orig_body").apply(p_0), nctx.pf.get("orig_body").apply(p_1)),
-                                                ctx.mkEq(nctx.pf.get("body").apply(p_0), nctx.pf.get("body").apply(p_1)),
-                                                ctx.mkEq(nctx.pf.get("seq").apply(p_0), nctx.pf.get("seq").apply(p_1)),
-                                                ctx.mkEq(nctx.pf.get("proto").apply(p_0), nctx.pf.get("proto").apply(p_1)),
-                                                ctx.mkEq(nctx.pf.get("emailFrom").apply(p_0), nctx.pf.get("emailFrom").apply(p_1)),
-                                                ctx.mkNot(ctx.mkEq(nctx.pf.get("url").apply(p_0), nctx.pf.get("url").apply(p_1))),
-                                                ctx.mkEq(nctx.pf.get("options").apply(p_0), nctx.pf.get("options").apply(p_1))),1,null,null,null,null)),
-                        1,null,null,null,null));
+       
     }
 
 }
