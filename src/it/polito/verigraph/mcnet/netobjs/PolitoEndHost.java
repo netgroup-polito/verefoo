@@ -72,8 +72,9 @@ public class PolitoEndHost extends NetworkObject {
                predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("dest").apply(p_0), packet.getIp_dest()));
            if(packet.getBody() != null)
                predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("body").apply(p_0), ctx.mkInt(packet.getBody())));
-           if(packet.getEmailFrom() != null)
+           if(packet.getEmailFrom() != null){
                predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("emailFrom").apply(p_0), ctx.mkInt(packet.getEmailFrom())));
+           }
            if(packet.getOptions() != null)
                predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("options").apply(p_0), ctx.mkInt(packet.getOptions())));
            if(packet.getProto() != null)
@@ -90,7 +91,7 @@ public class PolitoEndHost extends NetworkObject {
         //constraints.add((BoolExpr)nctx.send.apply(politoEndHost, n_0, p_0));
         constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
                 ctx.mkImplies((BoolExpr)nctx.send.apply(politoEndHost, n_0, p_0),
-                        ctx.mkAnd(
+                        ctx.mkAnd(predicatesOnPktFields,
                                 ctx.mkEq(nctx.pf.get("origin").apply(p_0),politoEndHost),
                                 (BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.pf.get("inner_src").apply(p_0)),
                                 //(BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.pf.get("inner_dest").apply(p_0)),

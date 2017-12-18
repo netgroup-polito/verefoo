@@ -2,14 +2,14 @@
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
   <graphs>
     <graph id="0">
-     <node functional_type="MAILCLIENT" name="nodeA">
+     <node functional_type="ENDHOST" name="nodeAs">
         <neighbour name="node1"/>
         <configuration description="A simple description" name="confA">
-          <mailclient mailserver="nodeB"/>
+          <endhost email_from="4" protocol = "POP3_REQUEST"/>
         </configuration>
       </node>
       <node functional_type="FIREWALL" name="node1">
-        <neighbour name="nodeA"/>
+        <neighbour name="nodeAs"/>
         <neighbour name="node2"/>
         <configuration description="A simple description" name="conf1">
           <firewall>
@@ -25,7 +25,9 @@
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf2">
           <antispam>
-          	<source>nodeA</source>
+          	<source>1</source>
+          		<source>2</source>
+          			<source>3</source>
           </antispam>
         </configuration>
       </node>
