@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvInfo.xsd">
+<!-- In this example there was a DPI and CACHE VNFs which will work on the HTTP traffic and will not
+forward packets other than HTTP. That is why this test was unsat.
+-->
   <graphs>
     <graph id="0">
-     <node functional_type="MAILCLIENT" name="nodeA">
+     <node functional_type="WEBCLIENT" name="nodeA">
         <neighbour name="node1"/>
         <configuration description="A simple description" name="confA">
-          <mailclient mailserver="nodeB"/>
+          <webclient nameWebServer="nodeB"/>
         </configuration>
       </node>
       <node functional_type="FIREWALL" name="node1">
@@ -58,12 +61,12 @@
          </fieldmodifier>
         </configuration>
       </node>
-      <node functional_type="MAILSERVER" name="nodeB">
+      <node functional_type="WEBSERVER" name="nodeB">
         <neighbour name="node5"/>
         <configuration description="A simple description" name="confB">
-          <mailserver>
+         <webserver>
           	<name>nodeB</name>
-          </mailserver>
+          </webserver>
         </configuration>
       </node>
     </graph>
