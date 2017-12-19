@@ -98,7 +98,7 @@ public class TestProxy {
 	public void testCACHE_UNSAT(){
 		
 		try {
-			test( "./testfile/nfv5nodes7hostsUNSAT-CACHE.xml", false); //Working
+			test( "./testfile/nfv5nodes7hostsSAT-CACHE.xml", true); //Working
 		} catch (Exception e) {
 			fail(e.toString());
 		} 
@@ -107,7 +107,7 @@ public class TestProxy {
 	@Test
 	public void testNAT_UNSAT() {
 		try {
-			test( "./testfile/nfv3nodes3hostsUNSAT-NAT.xml", false); //Working
+			test( "./testfile/nfv3nodes3hostsSAT-NAT.xml", true); //Working
 		} catch (Exception e) {
 			fail(e.toString());
 		}		
@@ -115,7 +115,7 @@ public class TestProxy {
 	@Test
 	public void testANTISPAM_UNSAT() {
 		try {
-			test( "./testfile/nfv5nodes7hostsUNSAT-ANTISPAM.xml", false); //Working
+			test( "./testfile/nfv5nodes7hostsSAT-ANTISPAM.xml", true); //Working
 		} catch (Exception e) {
 			fail(e.toString());
 		}		
