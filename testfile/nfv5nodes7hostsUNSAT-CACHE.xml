@@ -31,7 +31,7 @@
       </node>
       <node functional_type="CACHE" name="node3">
         <neighbour name="node2"/>
-        <neighbour name="node4"/>
+        <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf3">
           <cache>
           	<resource>nodeA</resource>
@@ -40,26 +40,8 @@
           </cache>
         </configuration>
       </node>
-	  <node functional_type="FIELDMODIFIER" name="node4">
-        <neighbour name="node3"/>
-        <neighbour name="node5"/>
-        <configuration description="A simple description" name="conf4">
-         <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
-        </configuration>
-      </node>
-      <node functional_type="FIELDMODIFIER" name="node5">
-        <neighbour name="node4"/>
-        <neighbour name="nodeB"/>
-        <configuration description="A simple description" name="conf5">
-         <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
-        </configuration>
-      </node>
       <node functional_type="WEBSERVER" name="nodeB">
-        <neighbour name="node5"/>
+        <neighbour name="node3"/>
         <configuration description="A simple description" name="confB">
           <webserver>
           	<name>nodeB</name>
@@ -72,8 +54,6 @@
    		<CapacityForNode node="node1" capacity="10"/>
   		<CapacityForNode node="node2" capacity="10"/>
   		<CapacityForNode node="node3" capacity="10"/>
-  		<CapacityForNode node="node4" capacity="10"/>
-  		<CapacityForNode node="node5" capacity="10"/>
   </CapacityDefinition>
   <PropertyDefinition>
   		<Property graph="0" name="IsolationProperty"/> 		
