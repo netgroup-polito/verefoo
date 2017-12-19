@@ -5,7 +5,7 @@
      <node functional_type="ENDHOST" name="nodeAs">
         <neighbour name="node1"/>
         <configuration description="A simple description" name="confA">
-          <endhost email_from="4" protocol = "POP3_REQUEST"/>
+          <endhost email_from="3" protocol = "POP3_REQUEST"/>
         </configuration>
       </node>
       <node functional_type="FIREWALL" name="node1">
