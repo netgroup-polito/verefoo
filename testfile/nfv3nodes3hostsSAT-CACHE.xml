@@ -26,7 +26,7 @@
         <configuration description="A simple description" name="conf2">
           <cache>
 			<resource>nodeA</resource>
-          	<resource>nodeC</resource>
+          	<resource>node1</resource>
           </cache>
         </configuration>
       </node>

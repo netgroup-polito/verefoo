@@ -108,10 +108,13 @@ public class PolitoFieldModifier extends NetworkObject {
                                                 ctx.mkEq(nctx.pf.get("orig_body").apply(p_0), nctx.pf.get("orig_body").apply(p_1))
                                                 ),1,null,null,null,null)),
                         1,null,null,null,null));
+        
+      
     }
 
     //TODO: old version, you can remove this method
     public void installFieldModifier (){
+    	installFieldModifier(Optional.of(new PacketModel()));
         Expr x = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_x", nctx.node);
         Expr y = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_y", nctx.node);
 

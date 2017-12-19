@@ -20,13 +20,14 @@
           </firewall>
         </configuration>
       </node>
-      <node functional_type="DPI" name="node2">
+      <node functional_type="NAT" name="node2">
         <neighbour name="node1"/>
         <neighbour name="node3"/>
         <configuration description="A simple description" name="conf2">
-          <dpi>
-          	<notAllowed>nodeC</notAllowed>
-          </dpi>
+          <nat>
+			<source>nodeA</source>
+			<source>node1</source>
+          </nat>
         </configuration>
       </node>
       <node functional_type="CACHE" name="node3">
@@ -36,7 +37,7 @@
           <cache>
           	<resource>nodeA</resource>
           	<resource>node1</resource>
-          	<resource>nodeC</resource>
+          	<resource>node2</resource>
           </cache>
         </configuration>
       </node>
