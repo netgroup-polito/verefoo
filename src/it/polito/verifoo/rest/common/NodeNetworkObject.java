@@ -138,9 +138,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	public void generateNetObj(Node n) {
 		try {
 			FunctionalTypes ftype;
-			//synchronized(n.getFunctionalType()){
+			synchronized(n.getFunctionalType()){
 				ftype=n.getFunctionalType();
-			//}
+			}
 			switch (ftype) {
 				case FIREWALL:{
 					if(n.getConfiguration().getFirewall()==null){
