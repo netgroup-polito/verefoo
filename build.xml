@@ -12,7 +12,7 @@
   <property name="target.dir" location="target" />
   <property name="vmlensAgent.dir" location="${lib.dir}/junit/concurrent-junit-1.0.0.jar" />
   <property name="PORT" value="8080"/>
-  <property name="URL" value="http://localhost:${PORT}/verifoo/"/>
+  <property name="URL" value="http://localhost:${PORT}/verifoo/rest"/>
 
 <path id="class.path">
     <fileset dir="${lib.dir}">
@@ -134,6 +134,7 @@
 	    	    </fileset>
 	    	  </classpath>
 	    	<!-- test class -->
+	    <sysproperty key="it.polito.rest.test.URL" value="${URL}"/>
 		<classpath location="${build.dir}" />
 		<test name="it.polito.verifoo.rest.test.TestRestConcurrency"
 			haltonfailure="no" todir="${report.dir}">

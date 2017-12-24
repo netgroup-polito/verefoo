@@ -3,7 +3,11 @@ package it.polito.verifoo.rest.logger;
 import java.io.PrintStream;
 
 import org.apache.logging.log4j.Logger;
-
+/**
+ * 
+ * Provides an efficent way to redirect the output to a log file
+ *
+ */
 public class LoggerStream extends PrintStream
 {
 private final Logger logger;

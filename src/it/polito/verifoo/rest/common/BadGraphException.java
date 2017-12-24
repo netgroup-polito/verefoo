@@ -1,5 +1,9 @@
 package it.polito.verifoo.rest.common;
-
+/**
+ * 
+ * This class represents the main exception that will be thrown by the VerifooProxy Class
+ *
+ */
 public class BadGraphException extends Exception {
 
 	public BadGraphException() {

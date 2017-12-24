@@ -1,5 +1,9 @@
 package it.polito.verifoo.rest.common;
-
+/**
+ * 
+ * This class is being used to convert the neighbor node notion into a more convenient form for Verifoo 
+ *
+ */
 public class Link {
 	String sourceNode;
 	String destNode;

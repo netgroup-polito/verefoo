@@ -25,7 +25,7 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
 @Api("/deployment")
 public class RestFoo {
 	    @POST
-	    @ApiOperation(value = "Test and Deploy a network model", notes = "This is the main API of the Verifoo Service. It provides, for each graph, the verification of the validity of the network model and the optimised deployment on the hosts.",
+	    @ApiOperation(value = "Tests and Deploys a network model", notes = "This is the main API of the Verifoo Service. It provides, for each graph, the verification of the validity of the network model and the optimised deployment on the hosts.",
 	    response=NFV.class)
 	    
 	    @ApiResponses(value = {

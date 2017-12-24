@@ -14,7 +14,8 @@ import javax.ws.rs.core.Response.Status;
 
 public class Concurrency {
 	private ArrayList<String> file=new ArrayList<String>();
-    private final String resturl="http://restfoo.eu-de.mybluemix.net/deployment";
+    //private final String resturl="http://restfoo.eu-de.mybluemix.net/deployment";
+	private final String resturl = System.getProperty("it.polito.rest.test.URL")+"/deployment";
 	private ArrayList<Thread> threadlist=new ArrayList<Thread>();
 	public Concurrency(String file1,String file2,String file3,String file4) throws IOException {
 		this.file.add(java.nio.file.Files.lines(Paths.get(file1)).collect(Collectors.joining("\n")));

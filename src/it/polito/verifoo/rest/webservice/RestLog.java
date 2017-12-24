@@ -19,7 +19,7 @@ import io.swagger.annotations.*;
 
 
 @Path("/log")
-@Api(value = "/time")
+@Api(value = "/log")
 
 public class RestLog {
 		private static final org.apache.logging.log4j.Logger LOG = LogManager.getLogger("mylog");
