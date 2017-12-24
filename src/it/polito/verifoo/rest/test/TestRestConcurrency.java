@@ -44,7 +44,8 @@ public class TestRestConcurrency {
 	@Test
     @ThreadCount(THREAD_COUNT)
 	public void TestConcurrentRequest() throws IOException {
-		String service="http://127.0.0.1:8080/verifoo/deployment";
+		//String service="http://127.0.0.1:8080/verifoo/deployment";
+		String service = System.getProperty("it.polito.rest.test.URL")+"/deployment";
 		String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfv3nodes3hostsSAT-MAIL.xml")).collect(Collectors.joining("\n"));
 		javax.ws.rs.core.Response res=ClientBuilder.newClient()
 			.target(service)
@@ -57,7 +58,7 @@ public class TestRestConcurrency {
 	@Test
     @ThreadCount(THREAD_COUNT)
 	public void TestConcurrentLog() {
-		String service="http://127.0.0.1:8080/verifoo/log";
+		String service=System.getProperty("it.polito.rest.test.URL")+"/rest/log";
 		javax.ws.rs.core.Response res=ClientBuilder.newClient()
 				.target(service)
 				.request(MediaType.TEXT_HTML)
@@ -68,7 +69,7 @@ public class TestRestConcurrency {
 	@Test
     @ThreadCount(THREAD_COUNT)
 	public void TestConcurrentConverter() throws IOException {
-		String service="http://127.0.0.1:8080/verifoo/converter";
+		String service = System.getProperty("it.polito.rest.test.URL")+"/converter";
 		String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfv5nodes7hostsSAT-WEBwithParsingString.xml")).collect(Collectors.joining("\n"));
 		Response res = ClientBuilder.newClient()
 				.target(service)

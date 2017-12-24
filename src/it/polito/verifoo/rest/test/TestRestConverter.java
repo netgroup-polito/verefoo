@@ -19,8 +19,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestRestConverter {
-	private static String service="http://127.0.0.1:8080/verifoo/converter";
-
+	//private static String service="http://127.0.0.1:8080/verifoo/converter";
+	String service = System.getProperty("it.polito.rest.test.URL")+"/converter";
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}

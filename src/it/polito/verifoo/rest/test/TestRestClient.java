@@ -50,8 +50,8 @@ public class TestRestClient {
 	@After
 	public void tearDown() throws Exception {
 	}
-	final String target = "http://127.0.0.1:8080/verifoo";
-	//final String target = "http://deploymentfoo.eu-de.mybluemix.net";
+	//final String target = "http://127.0.0.1:8080/verifoo/rest";
+	String target = System.getProperty("it.polito.rest.test.URL");
 	@Test
 	public void testdeploymentService() {
 		try {
@@ -104,7 +104,7 @@ public class TestRestClient {
 	public void testBadRequest() {
 		try {
 			String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfvNoXml.txt")).collect(Collectors.joining("\n"));
-			//System.out.println(xmlread);
+			//System.out.println(target);
 			Response res = ClientBuilder.newClient()
 					.target(target)
 					.path("/deployment")
