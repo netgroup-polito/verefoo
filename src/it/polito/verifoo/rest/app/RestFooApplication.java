@@ -3,10 +3,15 @@ package it.polito.verifoo.rest.app;
 import java.io.File;
 import java.net.MalformedURLException;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Context;
 
 import org.glassfish.jersey.server.ResourceConfig;
+
+import io.swagger.config.ScannerFactory;
+import io.swagger.jaxrs.config.BeanConfig;
+import io.swagger.jaxrs.config.ReflectiveJaxrsScanner;
 /**
  * Main Rest Class
  */
@@ -16,6 +21,22 @@ public class RestFooApplication extends ResourceConfig {
 		String fullPath = context.getRealPath("/WEB-INF/lib/jni/");
     	JniFinder.extractZ3Lib(fullPath);
         // Define the package which contains the service classes.
+    	register(io.swagger.jaxrs.listing.ApiListingResource.class);
+        register(io.swagger.jaxrs.listing.SwaggerSerializers.class);
         packages("it.polito.verifoo.rest.webservice");
     }
+    @PostConstruct
+    /**
+     * Initializes Swagger Configuration
+     */
+    public void initializeSwaggerConfiguration() {
+        BeanConfig config = new BeanConfig();
+        config.setTitle("Restfoo");
+        config.setDescription("Verifoo Rest Service");
+        config.setVersion("1.0");
+        config.setBasePath("/rest");
+        config.setResourcePackage("it.polito.verifoo.rest.webservice");
+        config.setScan(true);
+    }
+    
 }

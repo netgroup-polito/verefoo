@@ -7,7 +7,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="resources"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.8.0_131">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre1.8.0_152">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
@@ -21,5 +21,10 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="lib/junit/concurrent-junit-1.0.0.jar"/>
 	<classpathentry kind="var" path="CATALINA_HOME"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/swagger-annotations-1.5.0.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/swagger-core-1.5.0.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/swagger-jaxrs-1.5.0.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/swagger-jersey2-jaxrs-1.5.0.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/swagger-models-1.5.0.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>

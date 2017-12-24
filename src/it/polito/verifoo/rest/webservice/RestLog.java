@@ -14,9 +14,13 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.FileAppender;
 
+import io.swagger.annotations.*;
+
 
 
 @Path("/log")
+@Api(value = "/time")
+
 public class RestLog {
 		private static final org.apache.logging.log4j.Logger LOG = LogManager.getLogger("mylog");
 
@@ -29,6 +33,12 @@ public class RestLog {
 		private static String ErrorFile=RestLog.getLoggerFileName("ErrorFile");
 		
 	    @GET
+	    @ApiOperation(value = "Get Verifoo Log", notes = "Get the log of Verifoo Processing"
+	    		)
+   	    @ApiResponses(value = {
+	    		@ApiResponse(code = 200, message = "OK"),
+   	    		@ApiResponse(code = 500, message = "Something wrong in Server")})
+
 		@Produces(MediaType.TEXT_HTML)
 	    public String get(){
 	    	try {
