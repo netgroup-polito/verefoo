@@ -10,10 +10,10 @@ import javax.ws.rs.ext.Provider;
  * @see ProcessingException
  */
 @Provider
-public class ProcessingExceptionMapper implements ExceptionMapper<ProcessingException> {
+public class InvalidXMLExceptionMapper implements ExceptionMapper<InvalidXMLException> {
 
 	@Override
-	public Response toResponse(ProcessingException arg0) {
+	public Response toResponse(InvalidXMLException arg0) {
 		return Response
                 .status(Response.Status.BAD_REQUEST)
                 .entity(arg0.getMessage())

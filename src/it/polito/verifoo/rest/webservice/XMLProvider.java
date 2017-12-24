@@ -8,9 +8,11 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.naming.ServiceUnavailableException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.Produces;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -52,20 +54,17 @@ public class XMLProvider implements MessageBodyReader<Object>, MessageBodyWriter
             	}
                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                 m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"https://raw.githubusercontent.com/netgroup-polito/verifoo/rest-service/xsd/nfvInfo.xsd");
-        		try {
-        			SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);    
-        			Schema schema = sf.newSchema( new URL("https://raw.githubusercontent.com/netgroup-polito/verifoo/rest-service/xsd/nfvInfo.xsd"));
-        			m.setSchema(schema);
-        		} catch (MalformedURLException e) {
-        			e.printStackTrace();
-        		} catch (SAXException e) {
-        			e.printStackTrace();
-        		}
+    			SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);    
+    			Schema schema = sf.newSchema( new URL("https://raw.githubusercontent.com/netgroup-polito/verifoo/rest-service/xsd/nfvInfo.xsd"));
+    			m.setSchema(schema);
                 m.marshal(object, entityStream);
             } catch(JAXBException e) {
             	e.printStackTrace();
-            	throw new ProcessingException("Error serializing XML:"+e.toString());  
-            }
+            	throw new InvalidXMLException("Error serializing XML:"+e.toString());  
+            } catch (SAXException e) {
+				// TODO Auto-generated catch block
+            	throw new ServerErrorException(503);
+			}
     }
 
     @Override
@@ -83,20 +82,16 @@ public class XMLProvider implements MessageBodyReader<Object>, MessageBodyWriter
         	synchronized(this){
         		u = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb").createUnmarshaller();
         	}
-        	try {
-    			SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);    
-    			Schema schema = sf.newSchema( new URL("https://raw.githubusercontent.com/netgroup-polito/verifoo/rest-service/xsd/nfvInfo.xsd"));
-    			u.setSchema(schema);
-    		} catch (MalformedURLException e) {
-    			e.printStackTrace();
-    		} catch (SAXException e) {
-    			e.printStackTrace();
-    		}
+        	SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);    
+    		Schema schema = sf.newSchema( new URL("https://raw.githubusercontent.com/netgroup-polito/verifoo/rest-service/xsd/nfvInfo.xsd"));
+    		u.setSchema(schema);
             return (NFV)u.unmarshal(entityStream);
         } catch(JAXBException e) {
         	e.printStackTrace();
-        	throw new ProcessingException("Error deserializing XML:"+e.toString());
-        }
+        	throw new InvalidXMLException("Error deserializing XML:"+e.toString());
+        } catch (SAXException e) {
+        	throw new ServerErrorException(503);
+		}
 	}
 
 
