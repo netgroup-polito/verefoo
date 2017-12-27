@@ -15,6 +15,7 @@ import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.FileAppender;
 
 import io.swagger.annotations.*;
+import it.polito.verifoo.rest.common.LogReader;
 
 
 
@@ -42,8 +43,8 @@ public class RestLog {
 		@Produces(MediaType.TEXT_HTML)
 	    public String get(){
 	    	try {
-				String debug=Files.readAllLines(Paths.get(DebugFile)).stream().collect(Collectors.joining("</br>"));
-				String error=Files.readAllLines(Paths.get(ErrorFile)).stream().collect(Collectors.joining("</br>"));
+				String debug=LogReader.get(Paths.get(DebugFile),200).stream().collect(Collectors.joining("</br>"));
+				String error=LogReader.get(Paths.get(ErrorFile),200).stream().collect(Collectors.joining("</br>"));
 				String html="<!DOCTYPE html><html><body><h1>Error Log</h1><p>"
 						    +error
 						    +"</p><h1>Debug Log</h1><p>"
