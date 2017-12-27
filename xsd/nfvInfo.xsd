@@ -7,6 +7,7 @@
  http://www.apache.org/licenses/LICENSE-2.0
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:include schemaLocation="errorSchema.xsd"/>
     <xsd:include schemaLocation="xml_components.xsd"/>
 	<xsd:element name="NFV">
 		<xsd:complexType>
@@ -116,24 +117,4 @@
 				<xsd:attribute name="isSat" type="xsd:boolean"/>
 				<xsd:attribute name="graph" type="xsd:long" use="required"/>
 	</xsd:complexType>
-	<xsd:element name="ApplicationError">
-		<xsd:complexType>
-			<xsd:attribute name="type" type="E-Type" use="required"/>
-			<xsd:attribute name="message" type="xsd:string"/>
-		</xsd:complexType>
-	</xsd:element>
-	<xsd:simpleType name="E-Type">
-	    <xsd:restriction base="xsd:string">
-	      <xsd:enumeration value="XMLValidationError"/>
-	      <xsd:enumeration value="InvalidServerClientConf"/>
-	      <xsd:enumeration value="InvalidNodeChain"/>
-	      <xsd:enumeration value="PHYClientServerNotConnected"/>
-	      <xsd:enumeration value="InvalidPHYServerClientConf"/>
-	      <xsd:enumeration value="NoMiddleHostDefined"/>
-	      <xsd:enumeration value="InvalidNodeConfiguration"/>
-	      <xsd:enumeration value="InvalidVPNConfiguration"/>	      
-	      <xsd:enumeration value="InvalidParsingString"/>
-	      <xsd:enumeration value="InternalServerError"/>
-	 	</xsd:restriction>
-	</xsd:simpleType>
 </xsd:schema>
