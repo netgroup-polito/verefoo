@@ -20,7 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import com.microsoft.z3.Status;
 
-import it.polito.verifoo.rest.common.BadGraphException;
+import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
 import it.polito.verifoo.rest.jaxb.Graph;
@@ -168,18 +168,18 @@ public class TestProxy {
 			fail(e.toString());
 		}	
 	}
-	@Test(expected=BadGraphException.class)
+	@Test(expected=BadGraphError.class)
 	public void testNoMiddeleBoxes() throws Exception {
 		test( "./testfile/nfv3nodes2hostsNoMIDDLEBOXES.xml", false); //Working
 		fail("Exception not thrown");
 		
 	}
-	@Test(expected=BadGraphException.class)
+	@Test(expected=BadGraphError.class)
 	public void testHostDisconnected() throws Exception {
 		test( "./testfile/nfv3nodes3hostsHostsDisconnected.xml", false); //Working
 		fail("Exception not thrown");
 	}
-	@Test(expected=BadGraphException.class)
+	@Test(expected=BadGraphError.class)
 	public void testWrongNodesConfiguration() throws Exception {
 		test( "./testfile/nfv3nodes3hostsWrongNodesConfiguration.xml", false); //Working
 		fail("Exception not thrown");

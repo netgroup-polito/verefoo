@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 
+import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verigraph.mcnet.components.NetContext;
@@ -98,9 +99,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	
 	/**
 	 * Generates the vpn model
-	 * @throws BadGraphException 
+	 * @throws BadGraphError 
 	 */
-	public void generateVPN() throws BadGraphException {
+	public void generateVPN() throws BadGraphError {
 		 long nVpnAccess = this.keySet().stream()
             	 .filter((n) -> n.getFunctionalType().equals(FunctionalTypes.VPNACCESS))
             	 .count();
@@ -108,7 +109,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
             	 .filter((n) -> n.getFunctionalType().equals(FunctionalTypes.VPNEXIT))
             	 .count();
         if(nVpnAccess > 0 || nVpnExit > 0) {
-        	if(nVpnAccess != nVpnExit) throw new BadGraphException("VPN Access and Exit must be in equal number");
+        	if(nVpnAccess != nVpnExit) throw new BadGraphError("VPN Access and Exit must be in equal number",EType.INVALID_VPN_CONFIGURATION);
         }
         List<Node> vpnAccessNodes = this.entrySet().stream()
            	 .filter((e) -> e.getKey().getFunctionalType().equals(FunctionalTypes.VPNACCESS))
@@ -121,7 +122,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
         for(Node nA:vpnAccessNodes){
         	Node vpnExit = vpnExitNodes.stream()
         				.filter(nE -> nE.getName().equals(nA.getConfiguration().getVpnaccess().getVpnexit())).findFirst().orElse(null);
-        	if(vpnExit == null) throw new BadGraphException("VPN not correctly configured");
+        	if(vpnExit == null) throw new BadGraphError("VPN not correctly configured",EType.INVALID_VPN_CONFIGURATION);
         	
         	((PolitoVpnExit) this.get(vpnExit)).vpnExitModel(nctx.am.get(nA.getName()), nctx.am.get(vpnExit.getName()));
         	((PolitoVpnAccess) this.get(nA)).vpnAccessModel(nctx.am.get(nA.getName()), nctx.am.get(vpnExit.getName()));
@@ -131,12 +132,12 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	
 	/**
 	 * @param Node n
+	 * @throws BadGraphError 
 	 * @description This function process the node and generate a network object according to functional type, 
 	 * it also generate the configuration according to the type.
 	 * @throws ProcessingException if it can't process the network object.
 	 */
-	public void generateNetObj(Node n) {
-		try {
+	public void generateNetObj(Node n){
 			FunctionalTypes ftype;
 			//synchronized(n.getFunctionalType()){
 				ftype=n.getFunctionalType();
@@ -144,14 +145,14 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 			switch (ftype) {
 				case FIREWALL:{
 					if(n.getConfiguration().getFirewall()==null){
-						throw new BadGraphException("You have specified a FIREWALL Type but you provide a configuration of another type");
+						throw new BadGraphError("You have specified a FIREWALL Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					this.put(n,new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
 					break;
 				}
 				case FIELDMODIFIER:{	
 					if(n.getConfiguration().getFieldmodifier()==null){
-						throw new BadGraphException("You have specified a FIELDMODIFIER Type but you provide a configuration of another type");
+						throw new BadGraphError("You have specified a FIELDMODIFIER Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					PolitoFieldModifier fm = new PolitoFieldModifier(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					fm.installFieldModifier();
@@ -160,7 +161,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 				case ENDHOST:{
 					if(n.getConfiguration().getEndhost()==null){
-						throw new BadGraphException("You have specified a ENDHOST Type but you provide a configuration of another type");
+						throw new BadGraphError("You have specified a ENDHOST Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);
@@ -169,7 +170,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 				case ANTISPAM:{
 					if(n.getConfiguration().getAntispam()==null){
-						throw new BadGraphException("You have specified a ANTISPAM Type but you provide a configuration of another type");
+						throw new BadGraphError("You have specified a ANTISPAM Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					PolitoAntispam spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,spam);
@@ -179,14 +180,14 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 				case CACHE:{
 					if(n.getConfiguration().getCache()==null){
-						throw new BadGraphException("You have specified a CACHE Type but you provide a configuration of another type");
+						throw new BadGraphError("You have specified a CACHE Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					this.put(n,new PolitoCache(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
 					break;
 				}
 				case DPI:{
 					if(n.getConfiguration().getDpi()==null){
-						throw new BadGraphException("You have specified a DPI Type but you provide a configuration of another type");
+						throw new BadGraphError("You have specified a DPI Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					PolitoIDS ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					int[] blacklist=listToIntArguments(n.getConfiguration().getDpi().getNotAllowed());
@@ -196,16 +197,16 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 				case MAILCLIENT:{
 					if(n.getConfiguration().getMailclient()==null){
-						throw new BadGraphException("You have specified a MAILCLIENT Type but you provide a configuration of another type");
+						throw new BadGraphError("You have specified a MAILCLIENT Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					if(!(nctx.am.containsKey((n.getConfiguration().getMailclient().getMailserver())))) throw new BadGraphException("Mail server not present");
+					if(!(nctx.am.containsKey((n.getConfiguration().getMailclient().getMailserver())))) throw new BadGraphError("Mail server not present",EType.INVALID_NODE_CONFIGURATION);
 					PolitoMailClient eh=new PolitoMailClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getMailclient().getMailserver())});
 					this.put(n,eh);
 					break;
 				}
 				case MAILSERVER:{
 					if(n.getConfiguration().getMailserver()==null){
-						throw new BadGraphException("You have specified a MAILSERVER Type but you provide a configuration of another type");
+						throw new BadGraphError("You have specified a MAILSERVER Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					PolitoMailServer eh=new PolitoMailServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);
@@ -213,7 +214,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 				case NAT:{
 					if(n.getConfiguration().getNat()==null){
-						throw new BadGraphException("You have specified a NAT Type but you provide a configuration of another type");
+						throw new BadGraphError("You have specified a NAT Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					PolitoNat nat=new PolitoNat(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,nat);
@@ -230,9 +231,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 				case VPNACCESS:{
 					if(n.getConfiguration().getVpnaccess()==null){
-						throw new BadGraphException("You have specified a VPNACCESS Type but you provide a configuration of another type");
+						throw new BadGraphError("You have specified a VPNACCESS Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					if(!(nctx.am.containsKey((n.getConfiguration().getVpnaccess().getVpnexit())))) throw new BadGraphException("VPN Exit not present");
+					if(!(nctx.am.containsKey((n.getConfiguration().getVpnaccess().getVpnexit())))) throw new BadGraphError("VPN Exit not present",EType.INVALID_NODE_CONFIGURATION);
 					PolitoVpnAccess vpn=new PolitoVpnAccess(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					logger.debug("VPN Access: " +n.getName() + " with exit " + n.getConfiguration().getVpnaccess().getVpnexit());
 					this.put(n,vpn);
@@ -240,9 +241,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 				case VPNEXIT:{
 					if(n.getConfiguration().getVpnexit()==null){
-						throw new BadGraphException("You have specified a VPNEXIT Type but you provide a configuration of another type");
+						throw new BadGraphError("You have specified a VPNEXIT Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					if(!(nctx.am.containsKey((n.getConfiguration().getVpnexit().getVpnaccess())))) throw new BadGraphException("VPN Access not present");
+					if(!(nctx.am.containsKey((n.getConfiguration().getVpnexit().getVpnaccess())))) throw new BadGraphError("VPN Access not present",EType.INVALID_NODE_CONFIGURATION);
 					PolitoVpnExit vpn=new PolitoVpnExit(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					logger.debug("VPN Exit: " +n.getName() + " with access " + n.getConfiguration().getVpnexit().getVpnaccess());
 					this.put(n,vpn);
@@ -250,16 +251,16 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 				case WEBCLIENT:{
 					if(n.getConfiguration().getWebclient()==null){
-						throw new BadGraphException("You have specified a WEBCLIENT Type but you provide a configuration of another type");
+						throw new BadGraphError("You have specified a WEBCLIENT Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					if(!(nctx.am.containsKey((n.getConfiguration().getWebclient().getNameWebServer())))) throw new BadGraphException("Web server not present");
+					if(!(nctx.am.containsKey((n.getConfiguration().getWebclient().getNameWebServer())))) throw new BadGraphError("Web server not present",EType.INVALID_NODE_CONFIGURATION);
 					PolitoWebClient eh=new PolitoWebClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer())});
 					this.put(n,eh);
 					break;
 				}
 				case WEBSERVER:{
 					if(n.getConfiguration().getWebserver()==null){
-						throw new BadGraphException("You have specified a WEBSERVER Type but you provide a configuration of another type");
+						throw new BadGraphError("You have specified a WEBSERVER Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					PolitoWebServer eh=new PolitoWebServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);
@@ -267,15 +268,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 				default:{
 					System.err.println("Braiiinssssssssssss!");
-					throw new BadGraphException("Invalid Node Functional Type"+ftype);
+					throw new BadGraphError("Invalid Node Functional Type"+ftype,EType.INVALID_NODE_CONFIGURATION);
 				}
 			}
-		}catch (BadGraphException e) {
-			throw new ProcessingException(e.getLocalizedMessage());
-		}
-		catch (NumberFormatException e) {			
-			throw new ProcessingException("Cannot convert to int"+e.getLocalizedMessage());
-		}
 	}
 	
 	private int[] listToIntArguments(List<String> arg) {

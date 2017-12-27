@@ -58,7 +58,7 @@ public class TestRestConcurrency {
 	@Test
     @ThreadCount(THREAD_COUNT)
 	public void TestConcurrentLog() {
-		String service=System.getProperty("it.polito.rest.test.URL")+"/rest/log";
+		String service=System.getProperty("it.polito.rest.test.URL")+"/log";
 		javax.ws.rs.core.Response res=ClientBuilder.newClient()
 				.target(service)
 				.request(MediaType.TEXT_HTML)

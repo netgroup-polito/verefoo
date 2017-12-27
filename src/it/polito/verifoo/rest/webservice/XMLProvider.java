@@ -61,8 +61,8 @@ public class XMLProvider implements MessageBodyReader<Object>, MessageBodyWriter
             } catch(JAXBException e) {
             	e.printStackTrace();
             	throw new InvalidXMLException("Error serializing XML:"+e.toString());  
-            } catch (SAXException e) {
-				// TODO Auto-generated catch block
+            } catch (SAXException|MalformedURLException e) {
+            	// TODO Auto-generated catch block
             	throw new ServerErrorException(503);
 			}
     }
@@ -89,7 +89,7 @@ public class XMLProvider implements MessageBodyReader<Object>, MessageBodyWriter
         } catch(JAXBException e) {
         	e.printStackTrace();
         	throw new InvalidXMLException("Error deserializing XML:"+e.toString());
-        } catch (SAXException e) {
+        } catch (SAXException|MalformedURLException e) {
         	throw new ServerErrorException(503);
 		}
 	}

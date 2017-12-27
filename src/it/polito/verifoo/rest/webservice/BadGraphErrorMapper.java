@@ -6,6 +6,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.jaxb.ApplicationError;
 import it.polito.verifoo.rest.jaxb.EType;
 /**
@@ -13,12 +14,12 @@ import it.polito.verifoo.rest.jaxb.EType;
  * @see ProcessingException
  */
 @Provider
-public class InvalidXMLExceptionMapper implements ExceptionMapper<InvalidXMLException> {
+public class BadGraphErrorMapper implements ExceptionMapper<BadGraphError> {
 
 	@Override
-	public Response toResponse(InvalidXMLException arg0) {
+	public Response toResponse(BadGraphError arg0) {
 		ApplicationError e=new ApplicationError();
-		e.setType(EType.XML_VALIDATION_ERROR);
+		e.setType(arg0.getE());
 		e.setMessage(arg0.getMessage());
 		return Response
                 .status(Response.Status.BAD_REQUEST)

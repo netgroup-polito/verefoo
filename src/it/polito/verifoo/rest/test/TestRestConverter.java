@@ -18,6 +18,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import it.polito.verifoo.rest.jaxb.ApplicationError;
+import it.polito.verifoo.rest.jaxb.EType;
+
 public class TestRestConverter {
 	//private static String service="http://127.0.0.1:8080/verifoo/converter";
 	String service = System.getProperty("it.polito.rest.test.URL")+"/converter";
@@ -45,7 +48,7 @@ public class TestRestConverter {
 			.accept(MediaType.APPLICATION_XML)
 			.post(Entity.entity("thisisnoreallyanxmlfile",MediaType.APPLICATION_XML));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
-		assertTrue(res.readEntity(String.class).contains("org.xml.sax.SAXParseException"));
+		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.XML_VALIDATION_ERROR));
 	}
 	@Test
 	public void TestValidConversionRequest() throws IOException {
@@ -66,8 +69,8 @@ public class TestRestConverter {
 			.request(MediaType.APPLICATION_XML)
 			.accept(MediaType.APPLICATION_XML)
 			.post(Entity.entity("<?xml version=\"1.0\" encoding=\"UTF-8\"?>",MediaType.APPLICATION_XML));
-		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
-		assertTrue(res.readEntity(String.class).contains("org.xml.sax.SAXParseException"));
+		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());	
+		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.XML_VALIDATION_ERROR));
 	}
 	@Test
 	public void TestInvalidConversionRequest() throws IOException {

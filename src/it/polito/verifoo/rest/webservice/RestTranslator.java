@@ -12,7 +12,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Translator;
+import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.NFV;
 
 
@@ -36,7 +38,7 @@ public class RestTranslator {
 	            root.setParsingString("");
 				return root;
 	    	}else{
-	    		throw new ProcessingException("No string to parse is provided");
+	    		throw new BadGraphError("No string to parse is provided",EType.INVALID_PARSING_STRING);
 	    	}
 	    }
 }

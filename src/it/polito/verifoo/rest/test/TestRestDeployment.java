@@ -20,6 +20,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import it.polito.verifoo.rest.jaxb.ApplicationError;
+import it.polito.verifoo.rest.jaxb.EType;
+
 /**
  * @author Raffaele
  *
@@ -64,7 +67,7 @@ public class TestRestDeployment {
 			.accept(MediaType.APPLICATION_XML)
 			.post(Entity.entity("thisisnoreallyanxmlfile",MediaType.APPLICATION_XML));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
-		assertTrue(res.readEntity(String.class).contains("org.xml.sax.SAXParseException"));
+		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.XML_VALIDATION_ERROR));
 	}
 	@Test
 	public void TestValidVoidXMLRequest() {
@@ -74,7 +77,7 @@ public class TestRestDeployment {
 			.accept(MediaType.APPLICATION_XML)
 			.post(Entity.entity("<?xml version=\"1.0\" encoding=\"UTF-8\"?>",MediaType.APPLICATION_XML));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
-		assertTrue(res.readEntity(String.class).contains("org.xml.sax.SAXParseException"));
+		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.XML_VALIDATION_ERROR));
 	}
 	@Test
 	public void TestInvalidGetRequest() {
@@ -123,7 +126,7 @@ public class TestRestDeployment {
 			.accept(MediaType.APPLICATION_XML)
 			.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
-		assertTrue(res.readEntity(String.class).contains("org.xml.sax.SAXParseException"));
+		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.XML_VALIDATION_ERROR));
 	}
 	@Test
 	public void TestXMLWithoutHostsRequest() throws IOException {
@@ -134,7 +137,7 @@ public class TestRestDeployment {
 			.accept(MediaType.APPLICATION_XML)
 			.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
-		assertTrue(res.readEntity(String.class).contains("org.xml.sax.SAXParseException"));
+		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.XML_VALIDATION_ERROR));
 	}
 	@Test
 	public void TestXMLWithoutConnectionRequest() throws IOException {
@@ -145,7 +148,7 @@ public class TestRestDeployment {
 			.accept(MediaType.APPLICATION_XML)
 			.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
-		assertTrue(res.readEntity(String.class).contains("org.xml.sax.SAXParseException"));
+		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.XML_VALIDATION_ERROR));
 	}
 	@Test
 	public void TestXMLWith2Host() throws IOException {
@@ -156,7 +159,7 @@ public class TestRestDeployment {
 			.accept(MediaType.APPLICATION_XML)
 			.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
-		assertTrue(res.readEntity(String.class).contains("Error in input XML: At least one middle host has to be defined"));
+		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.NO_MIDDLE_HOST_DEFINED));
 	}
 	@Test
 	public void TestXMLWith1Host() throws IOException {
@@ -167,7 +170,7 @@ public class TestRestDeployment {
 			.accept(MediaType.APPLICATION_XML)
 			.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
-		assertTrue(res.readEntity(String.class).contains("Error in input XML: Only one client and one server are allowed in the physical network"));
+		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.INVALID_PHY_SERVER_CLIENT_CONF));
 	}
 	@Test
 	public void TestXMLWithHostNoClientServer() throws IOException {
@@ -178,7 +181,7 @@ public class TestRestDeployment {
 			.accept(MediaType.APPLICATION_XML)
 			.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
-		assertTrue(res.readEntity(String.class).contains("Error in input XML: Only one client and one server are allowed in the physical network"));
+		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.INVALID_PHY_SERVER_CLIENT_CONF));
 	}
 	@Test
 	public void TestXMLWith2Host2Node() throws IOException {
@@ -189,7 +192,7 @@ public class TestRestDeployment {
 			.accept(MediaType.APPLICATION_XML)
 			.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
-		assertTrue(res.readEntity(String.class).contains("Error in input XML: At least one middle host has to be defined"));
+		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.NO_MIDDLE_HOST_DEFINED));
 	}
 
 }

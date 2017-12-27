@@ -96,6 +96,8 @@
     				<formatter type="xml" />
     	</test>
 	  </junit>
+	<fail if="test_failed" message="*** Some Tests FAILED ***"/>
+	<echo>*** All Tests PASSED  ***</echo>
   </target>
   <target name="war" depends="compile">
 	  <war destfile="${target.dir}/verifoo.war" webxml="WebContent/WEB-INF/web.xml">

@@ -13,7 +13,7 @@ import javax.ws.rs.core.MediaType;
 import com.microsoft.z3.Status;
 
 import io.swagger.annotations.*;
-import it.polito.verifoo.rest.common.BadGraphException;
+import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
 import it.polito.verifoo.rest.jaxb.Graph;
@@ -36,7 +36,6 @@ public class RestFoo {
 	    @Consumes(MediaType.APPLICATION_XML)
 		@Produces(MediaType.APPLICATION_XML)
 	    public NFV put(@Context HttpServletRequest req,@ApiParam(value = "Network Schema", required = true) NFV root) throws MalformedURLException {
-	    	try {
 				String z3model = new String();
 				for(Graph g:root.getGraphs().getGraph()){
 	            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getCapacityDefinition());
@@ -63,9 +62,6 @@ public class RestFoo {
 					}*/
 				}
 				return root;
-			} catch (BadGraphException e) {
-	        	throw new ProcessingException("Error in input XML: "+e.getMessage());
-			}
 	    }
 
 }

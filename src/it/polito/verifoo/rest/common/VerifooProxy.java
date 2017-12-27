@@ -43,9 +43,9 @@ public class VerifooProxy {
 		 * @param hosts The list of hosts in the network
 		 * @param conns The connections between hosts
 		 * @param capacityDefinition The list of the capacity for each node that will be deployed
-		 * @throws BadGraphException
+		 * @throws BadGraphError
 		 */
-	    public VerifooProxy(Graph graph,Hosts hosts,Connections conns, CapacityDefinition capacityDefinition) throws BadGraphException{
+	    public VerifooProxy(Graph graph,Hosts hosts,Connections conns, CapacityDefinition capacityDefinition) throws BadGraphError{
 			HashMap<String, String> cfg = new HashMap<String, String>();
 		    cfg.put("model", "true");
 		    ctx = new Context(cfg);
@@ -88,9 +88,9 @@ public class VerifooProxy {
 	     * After that, it creates the condition that if an host has a node deployed on it, it has to be active.
 	     * Lastly, it creates the conditions that the sum of the disk requirements of all the nodes
 	     * deployed on an host, is less than disk capacity of that host 
-	     * @throws BadGraphException
+	     * @throws BadGraphError
 	     */
-		private void setConditions() throws BadGraphException{
+		private void setConditions() throws BadGraphError{
 		  	
 			HashMap<String, BoolExpr> hostCondition = new HashMap<>();
 			hosts.forEach(h -> {
@@ -194,9 +194,9 @@ public class VerifooProxy {
 		/**
 		 * Checks if in the xml there are only one host client and one host server, then
 		 * it calls the function to calculate all the possible paths from the host client to the host server
-		 * @throws BadGraphException
+		 * @throws BadGraphError
 		 */
-		private void checkPhysicalNetwork() throws BadGraphException{
+		private void checkPhysicalNetwork() throws BadGraphError{
             long nServer = hosts.stream()
 	            	 .filter((h) -> {return h.getType() == TypeOfHost.SERVER;})
 	            	 .count();
@@ -210,13 +210,13 @@ public class VerifooProxy {
             				   " nPhysicalClient: " + nClient);*/
             if(nServer != 1 || nClient != 1){
             	//System.err.println("Only one client and one server are allowed in the physical network");
-            	throw new BadGraphException("Only one client and one server are allowed in the physical network");
+            	throw new BadGraphError("Only one client and one server are allowed in the physical network",EType.INVALID_PHY_SERVER_CLIENT_CONF);
             }  
-            if(nMiddle == 0) throw new BadGraphException("At least one middle host has to be defined");
+            if(nMiddle == 0) throw new BadGraphError("At least one middle host has to be defined",EType.NO_MIDDLE_HOST_DEFINED);
             String hostClient = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.CLIENT;}).findFirst().get().getName();
 			String hostServer = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.SERVER;}).findFirst().get().getName();
             createHostChain(hostClient, hostServer);
-            if(savedChain.size() == 0) throw new BadGraphException("Host client and host server are not connected");
+            if(savedChain.size() == 0) throw new BadGraphError("Host client and host server are not connected",EType.INVALID_PHY_SERVER_CLIENT_CONF);
 		}
 		/**
 		 * Calculates all the possible paths from the host client to the host server
@@ -276,9 +276,9 @@ public class VerifooProxy {
 		 * Checks if in the xml there are only one node that is a client and one node that is a server 
 		 * and they are for the same service (web or mail), then it calls the function to create the link 
 		 * from the node's neighbours. Lastly, it calls a function to create the routing tables
-		 * @throws BadGraphException
+		 * @throws BadGraphError
 		 */
-		private void checkNffg() throws BadGraphException{
+		private void checkNffg() throws BadGraphError{
             long nMailServer = nodes.stream()
 	            	 .filter((n) -> n.getFunctionalType().equals(FunctionalTypes.MAILSERVER))
 	            	 .count();
@@ -304,11 +304,11 @@ public class VerifooProxy {
             	|| (nWebServer==0 && nWebClient!=nWebServer)
             	|| nMailServer+nWebServer>1){
             	//System.err.println("Only one client and one server of the same type is allowed");
-            	throw new BadGraphException("Only one client and one server of the same type is allowed");
+            	throw new BadGraphError("Only one client and one server of the same type is allowed",EType.INVALID_SERVER_CLIENT_CONF);
             }
             Node client = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).findFirst().get();
             Node server = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).findFirst().get();
-            if(client.getNeighbour().size() != 1 || server.getNeighbour().size() != 1) throw new BadGraphException("Nodes must be in a chain");
+            if(client.getNeighbour().size() != 1 || server.getNeighbour().size() != 1) throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
             String nextName = client.getNeighbour().stream().filter(n -> !(n.getName().equals(client.getName()))).findFirst().get().getName();
 			Node next = nodes.stream().filter(n -> n.getName().equals(nextName)).findFirst().get();
             createLink(client, next, server);
@@ -319,15 +319,15 @@ public class VerifooProxy {
 		 * @param prec previous node in the chain
 		 * @param current current node in the chain
 		 * @param server the node that is the server of the chain
-		 * @throws BadGraphException
+		 * @throws BadGraphError
 		 */
-		private void createLink(Node prec, Node current, Node server) throws BadGraphException{
+		private void createLink(Node prec, Node current, Node server) throws BadGraphError{
 			if(current.getName().equals(server.getName())){
 				logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
 				links.add(new Link(prec.getName(), current.getName()));
 				return;
 			}
-			if(current.getNeighbour().size() > 2) throw new BadGraphException("Nodes must be in a chain");
+			if(current.getNeighbour().size() > 2) throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
 			logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
 			links.add(new Link(prec.getName(), current.getName()));
 			String neighbour = current.getNeighbour().stream().filter(n -> !(n.getName().equals(prec.getName()))).findFirst().get().getName();
@@ -339,9 +339,9 @@ public class VerifooProxy {
 		 * an host client and host server all the possibles deploying scenarios for the nodes
 		 * @param client the node client
 		 * @param server the node server
-		 * @throws BadGraphException
+		 * @throws BadGraphError
 		 */
-		private void createRoutingTables(Node client, Node server) throws BadGraphException{
+		private void createRoutingTables(Node client, Node server) throws BadGraphError{
 			
 			//System.out.println("Searching next hop for " + client.getName() + " towards " + server.getName());
 			
@@ -350,7 +350,7 @@ public class VerifooProxy {
 				logger.error("Route: From CLIENT " + client.getName() 
 									+ " to " + nctx.am.get(server.getName()) 
 									+ " -> Dead End");
-				throw new BadGraphException("Nodes must be in a chain");
+				throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
 			}
 			Node next = nodes.stream().filter(n -> n.getName().equals(link.getDestNode()) ).findFirst().get();
 			//System.out.println("Route from CLIENT " + client.getName() 
@@ -444,9 +444,9 @@ public class VerifooProxy {
 		 * @param level on which host in the host chain it is trying to deploy the remaining nodes
 		 * @param hostServer
 		 * @return true if the last node has been deployed on the host server (good path), false otherwise
-		 * @throws BadGraphException
+		 * @throws BadGraphError
 		 */
-		private boolean setNextHop(Node source, Node server, int nChain, int level, String hostServer) throws BadGraphException{
+		private boolean setNextHop(Node source, Node server, int nChain, int level, String hostServer) throws BadGraphError{
 			String currentHost = savedChain.get(nChain).get(level);
 			//System.out.println("Searching next hop for " + source.getName() + " towards " + server.getName());
 			if(source.getName().equals(server.getName())){
@@ -469,7 +469,7 @@ public class VerifooProxy {
 				logger.error("Route: From " + source.getName() 
 									+ " to " + nctx.am.get(server.getName()) 
 									+ " -> Dead End");
-				throw new BadGraphException("Nodes must be in a chain");
+				throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
 			}
 			Node next = nodes.stream().filter(n -> n.getName().equals(link.getDestNode()) ).findFirst().get();
 			//System.out.println("Route from " + source.getName()+ " to " + nctx.am.get(server.getIp())+ " -> next hop: " + netobjs.get(next));

@@ -64,7 +64,7 @@ public class Main {
 		                	logger.error("Wrong data type found in XML document");
 		                	logger.error(cce);
 		                    System.exit(1);
-		                } catch (BadGraphException e) {
+		                } catch (BadGraphError e) {
 		        			logger.error("Graph semantically incorrect");
 		                	logger.error(e);
 		                    System.exit(1);

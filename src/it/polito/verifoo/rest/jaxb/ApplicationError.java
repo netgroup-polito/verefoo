@@ -24,7 +24,8 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="mailserver" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="type" use="required" type="{}E-Type" />
+ *       &lt;attribute name="message" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -34,34 +35,60 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
-@XmlRootElement(name = "mailclient")
-public class Mailclient {
+@XmlRootElement(name = "ApplicationError")
+public class ApplicationError {
 
-    @XmlAttribute(name = "mailserver", required = true)
-    protected String mailserver;
+    @XmlAttribute(name = "type", required = true)
+    protected EType type;
+    @XmlAttribute(name = "message")
+    protected String message;
 
     /**
-     * Recupera il valore della proprietà mailserver.
+     * Recupera il valore della proprietà type.
+     * 
+     * @return
+     *     possible object is
+     *     {@link EType }
+     *     
+     */
+    public EType getType() {
+        return type;
+    }
+
+    /**
+     * Imposta il valore della proprietà type.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link EType }
+     *     
+     */
+    public void setType(EType value) {
+        this.type = value;
+    }
+
+    /**
+     * Recupera il valore della proprietà message.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getMailserver() {
-        return mailserver;
+    public String getMessage() {
+        return message;
     }
 
     /**
-     * Imposta il valore della proprietà mailserver.
+     * Imposta il valore della proprietà message.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setMailserver(String value) {
-        this.mailserver = value;
+    public void setMessage(String value) {
+        this.message = value;
     }
 
 }

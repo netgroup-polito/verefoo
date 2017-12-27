@@ -1,5 +1,6 @@
 package it.polito.verifoo.rest.common;
 
+import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Endhost;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.netobjs.PacketModel;
@@ -12,9 +13,9 @@ public class PacketWrapper extends PacketModel {
 	 * This class convert our EndHost Packet Model configuration in the verigraph one
 	 * @param eh EndHost Packet Model
 	 * @param nctx Network Context.
-	 * @throws BadGraphException Invalid Configuration
+	 * @throws BadGraphError Invalid Configuration
 	 */
-	public PacketWrapper(Endhost eh, NetContext nctx) throws BadGraphException {
+	public PacketWrapper(Endhost eh, NetContext nctx) throws BadGraphError {
 		if(eh!=null){
 			try {
 				if(eh.getBody()!=null && !eh.getBody().isEmpty())
@@ -34,7 +35,7 @@ public class PacketWrapper extends PacketModel {
 					this.setUrl(eh.getUrl().hashCode());
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
-				throw new BadGraphException(e.getMessage());
+				throw new BadGraphError(e.getMessage(),EType.INVALID_NODE_CONFIGURATION);
 			}
 		}
 	}
