@@ -15,8 +15,9 @@ public class RestExceptionMapper implements ExceptionMapper<Exception>{
 		ApplicationError e=new ApplicationError();
 		e.setType(EType.INTERNAL_SERVER_ERROR);
 		e.setMessage("Check the log on the server for more information");
+		ex.printStackTrace();
 		return Response
-                .status(Response.Status.SERVICE_UNAVAILABLE)
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(ex.getMessage())
                 .type(MediaType.APPLICATION_XML)
                 .build();

@@ -20,8 +20,9 @@ public class ErrorMapper implements ExceptionMapper<Error> {
 		ApplicationError e=new ApplicationError();
 		e.setType(EType.INTERNAL_SERVER_ERROR);
 		e.setMessage("Check the log on the server for more information");
+		arg0.printStackTrace();
 		return Response
-                .status(Response.Status.SERVICE_UNAVAILABLE)
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(arg0.getMessage())
                 .type(MediaType.APPLICATION_XML)
                 .build();

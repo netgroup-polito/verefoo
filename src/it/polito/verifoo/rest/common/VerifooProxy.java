@@ -3,6 +3,7 @@ package it.polito.verifoo.rest.common;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -311,8 +312,12 @@ public class VerifooProxy {
             if(client.getNeighbour().size() != 1 || server.getNeighbour().size() != 1) throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
             String nextName = client.getNeighbour().stream().filter(n -> !(n.getName().equals(client.getName()))).findFirst().get().getName();
 			Node next = nodes.stream().filter(n -> n.getName().equals(nextName)).findFirst().get();
-            createLink(client, next, server);
-            createRoutingTables(client, server);   
+			try{
+				createLink(client, next, server);
+            	createRoutingTables(client, server);   
+			}catch(StackOverflowError e) {
+            	throw new BadGraphError("The chain of nodes is invalid",EType.INVALID_NODE_CHAIN);
+			}
 		}
 		/**
 		 * Creates the link from the node's neighbours
@@ -330,9 +335,13 @@ public class VerifooProxy {
 			if(current.getNeighbour().size() > 2) throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
 			logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
 			links.add(new Link(prec.getName(), current.getName()));
-			String neighbour = current.getNeighbour().stream().filter(n -> !(n.getName().equals(prec.getName()))).findFirst().get().getName();
-			Node next = nodes.stream().filter(n -> n.getName().equals(neighbour)).findFirst().get();
-			createLink(current, next, server);
+			try {
+				String neighbour = current.getNeighbour().stream().filter(n -> !(n.getName().equals(prec.getName()))).findFirst().get().getName();
+				Node next = nodes.stream().filter(n -> n.getName().equals(neighbour)).findFirst().get();
+				createLink(current, next, server);
+			} catch (NoSuchElementException e) {
+				throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
+			}
 		}
 		/**
 		 * Creates the routing table by adding the rules by exploring for each possible path between 
