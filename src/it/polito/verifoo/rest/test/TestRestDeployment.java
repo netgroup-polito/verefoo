@@ -1,6 +1,3 @@
-/**
- * 
- */
 package it.polito.verifoo.rest.test;
 
 import static org.junit.Assert.*;
@@ -24,7 +21,8 @@ import it.polito.verifoo.rest.jaxb.ApplicationError;
 import it.polito.verifoo.rest.jaxb.EType;
 
 /**
- * @author Raffaele
+ * 
+ * This class tests the deployment web service
  *
  */
 public class TestRestDeployment {

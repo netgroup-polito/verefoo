@@ -9,7 +9,7 @@ import javax.ws.rs.ext.Provider;
 import it.polito.verifoo.rest.jaxb.ApplicationError;
 import it.polito.verifoo.rest.jaxb.EType;
 /**
- * This class wrap the output of a Processing Exception to the user
+ * This class wrap the output of an Error to the user
  * @see ProcessingException
  */
 @Provider

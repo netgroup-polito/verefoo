@@ -21,8 +21,12 @@ import org.junit.runner.RunWith;
 
 import com.anarsoft.vmlens.concurrent.junit.ConcurrentTestRunner;
 import com.anarsoft.vmlens.concurrent.junit.ThreadCount;
+/**
+ * 
+ * This class tests the web service with concurrent requests
+ *
+ */
 @RunWith(ConcurrentTestRunner.class)
-
 public class TestRestConcurrency {
     private final static int THREAD_COUNT = 5;
 	@BeforeClass
