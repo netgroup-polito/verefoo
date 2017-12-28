@@ -1,5 +1,5 @@
 # Verifoo
-###### Verification and Optimization Orchestrator component for join Service Graph mapping and verification. The component exploits the z3Opt engine for solving MaxSAT and VNE problem
+##### Verification and Optimization Orchestrator component for join Service Graph mapping and verification. The component exploits the z3Opt engine for solving MaxSAT and VNE problem
 
 ## Folder Structure:
 -   doc/
@@ -28,7 +28,7 @@
     -   it/polito/verifoo/rest/test/ --- Test classes
     -   it/polito/verifoo/rest/webservice/ --- WebService classes
     -   it/polito/verifoo/test --- Simple examples on how Verifoo works
-    -   it/polito/verigraph/\* --- Basical Verigraph classes
+    -   it/polito/verigraph/ --- Basical Verigraph classes
 -   target/ --- Folder for the war file
 -   testfile/ --- XML files that are used to test the application
 -   WebContent/ --- Files needed in order to deploy the service
