@@ -5,12 +5,12 @@
   <property name="src.dir" location="src"/>
   <property name="build.dir" location="build"/>
   <property name="resources.dir" location="resources"/>
+  <property name="javadoc.dir" location="resources/doc/Javadoc"/>
   <property name="dist.dir" location="dist"/>
   <property name="schema.dir" location="xsd" />
   <property name="report.dir" location="log" />
   <property name="lib.dir" location="WebContent/WEB-INF/lib" />
   <property name="target.dir" location="target" />
-  <property name="vmlensAgent.dir" location="${lib.dir}/junit/concurrent-junit-1.0.0.jar" />
   <property name="PORT" value="8080"/>
   <property name="URL" value="http://localhost:${PORT}/verifoo/rest"/>
 
@@ -29,6 +29,7 @@
          by compile -->
     <mkdir dir="${build.dir}"/>
     <mkdir dir="${report.dir}"/>
+  	<mkdir dir="${javadoc.dir}"/>
   </target>
 
 	<!-- Target chk-bindings -->
@@ -63,7 +64,14 @@
         <classpath refid="class.path" />
     </javac>
   </target>
-
+	<!-- Automatically generate the javadoc -->
+   <target name="javadoc" depends="compile" description="generate the javadoc">
+       <javadoc access="public" author="false" 
+       			classpath="WebContent/WEB-INF/lib/com.microsoft.z3.jar;WebContent/WEB-INF/lib/hk2-api-2.5.0-b42.jar;lib/junit/junit.jar;WebContent/WEB-INF/lib/yasson-1.0.jar;WebContent/WEB-INF/lib/jersey-common.jar;WebContent/WEB-INF/lib/jersey-server.jar;WebContent/WEB-INF/lib/javassist-3.22.0-CR2.jar;WebContent/WEB-INF/lib/swagger-jaxrs-1.5.0.jar;WebContent/WEB-INF/lib/persistence-api-1.0.jar;WebContent/WEB-INF/lib/jersey-media-json-binding.jar;WebContent/WEB-INF/lib/swagger-jersey2-jaxrs-1.5.0.jar;WebContent/WEB-INF/lib/javax.inject-1.jar;WebContent/WEB-INF/lib/jaxb-api-2.2.7.jar;WebContent/WEB-INF/lib/hk2-utils-2.5.0-b42.jar;WebContent/WEB-INF/lib/javax.json-1.1.jar;WebContent/WEB-INF/lib/jersey-media-sse.jar;WebContent/WEB-INF/lib/jsr250-api-1.0.jar;WebContent/WEB-INF/lib/hk2-locator-2.5.0-b42.jar;WebContent/WEB-INF/lib/org.osgi.core-4.2.0.jar;lib/com.microsoft.z3.jar;WebContent/WEB-INF/lib/jersey-container-servlet.jar;WebContent/WEB-INF/lib/validation-api-1.1.0.Final.jar;lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar;WebContent/WEB-INF/lib/jersey-media-jaxb.jar;WebContent/WEB-INF/lib/javax.inject-2.5.0-b42.jar;lib/lib4j/log4j-api-2.9.1.jar;WebContent/WEB-INF/lib/jackson-annotations-2.9.3.jar;WebContent/WEB-INF/lib/jackson-core-2.9.3.jar;WebContent/WEB-INF/lib/jboss-interceptors-api_1.1_spec-1.0.0.Beta1.jar;WebContent/WEB-INF/lib/javax.annotation-api-1.2.jar;WebContent/WEB-INF/lib/swagger-annotations-1.5.0.jar;WebContent/WEB-INF/lib/javax.json.bind-api-1.0.jar;WebContent/WEB-INF/lib/commons-lang3-3.7.jar;WebContent/WEB-INF/lib/osgi-resource-locator-1.0.1.jar;WebContent/WEB-INF/lib/jersey-hk2.jar;WebContent/WEB-INF/lib/swagger-core-1.5.0.jar;WebContent/WEB-INF/lib/jersey-container-servlet-core.jar;WebContent/WEB-INF/lib/javax.servlet-api-3.0.1.jar;WebContent/WEB-INF/lib/jersey-client.jar;WebContent/WEB-INF/lib/reflections-0.9.11.jar;WebContent/WEB-INF/lib/slf4j-simple-1.7.25.jar;lib/lib4j/log4j-core-2.9.1.jar;WebContent/WEB-INF/lib/log4j-api-2.9.1.jar;WebContent/WEB-INF/lib/slf4j-api-1.7.25.jar;WebContent/WEB-INF/lib/el-api-2.2.jar;WebContent/WEB-INF/lib/swagger-models-1.5.0.jar;lib/junit/concurrent-junit-1.0.0.jar;WebContent/WEB-INF/lib/javax.ws.rs-api-2.1.jar;WebContent/WEB-INF/lib/jackson-databind-2.9.3.jar;WebContent/WEB-INF/lib/aopalliance-repackaged-2.5.0-b42.jar;WebContent/WEB-INF/lib/jersey-media-multipart-2.26.jar;WebContent/WEB-INF/lib/javax.json-api-1.1.jar;WebContent/WEB-INF/lib/log4j-core-2.9.1.jar;WebContent/WEB-INF/lib/guava-23.6-jre.jar;WebContent/WEB-INF/lib/cdi-api-1.1.jar" 
+       			destdir="${javadoc.dir}" nodeprecated="false" nodeprecatedlist="false" 
+       			noindex="false" nonavbar="false" notree="false" 
+       			packagenames="it.polito.verigraph.mcnet.components,it.polito.verigraph.scalability.tests,it.polito.verifoo.rest.app,it.polito.verifoo.rest.test,it.polito.verifoo.rest.jaxb,it.polito.verifoo.rest.logger,it.polito.verifoo.test,it.polito.verifoo.rest.common,it.polito.verifoo.rest.main,it.polito.verigraph.mcnet.netobjs,it.polito.verifoo.rest.webservice,it.polito.verifoo.components" source="1.8" sourcepath="src;resources" splitindex="true" use="true" version="true"/>
+   </target>
   <target name="test" depends="compile">
 	    <junit printsummary="yes" haltonfailure="no" showoutput="true">
 		<!-- Project classpath, must include junit.jar -->
@@ -85,11 +93,6 @@
 			<formatter type="plain" />
 			<formatter type="xml" />
 		</test>
-    	<test name="it.polito.verifoo.rest.test.TestMultithreading"
-    	    				haltonfailure="no" todir="${report.dir}">
-    	    				<formatter type="plain" />
-    	    				<formatter type="xml" />
-    	</test>
     	<test name="it.polito.verifoo.rest.test.TestProxy"
     				haltonfailure="no" todir="${report.dir}">
     				<formatter type="plain" />
@@ -139,11 +142,6 @@
 	    <sysproperty key="it.polito.rest.test.URL" value="${URL}"/>
 		<classpath location="${build.dir}" />
 		<test name="it.polito.verifoo.rest.test.TestRestConcurrency"
-			haltonfailure="no" todir="${report.dir}">
-			<formatter type="plain" />
-			<formatter type="xml" />
-		</test>
-		<test name="it.polito.verifoo.rest.test.TestRestConvConcurr"
 			haltonfailure="no" todir="${report.dir}">
 			<formatter type="plain" />
 			<formatter type="xml" />
