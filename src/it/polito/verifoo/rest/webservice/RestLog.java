@@ -17,7 +17,11 @@ import org.apache.logging.log4j.core.appender.FileAppender;
 import io.swagger.annotations.*;
 import it.polito.verifoo.rest.common.LogReader;
 
-
+/**
+ * 
+ * This class implements the web service that deals with the log request (present only for debugging purposes)
+ *
+ */
 
 @Path("/log")
 @Api(value = "/log")
@@ -38,7 +42,8 @@ public class RestLog {
 	    		)
    	    @ApiResponses(value = {
 	    		@ApiResponse(code = 200, message = "OK"),
-   	    		@ApiResponse(code = 500, message = "Something wrong in Server")})
+	    		@ApiResponse(code = 415, message = "Invalid Media Type")
+	    		})
 
 		@Produces(MediaType.TEXT_HTML)
 	    public String get(){

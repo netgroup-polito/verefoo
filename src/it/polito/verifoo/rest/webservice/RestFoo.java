@@ -16,11 +16,16 @@ import io.swagger.annotations.*;
 import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
+import it.polito.verifoo.rest.jaxb.ApplicationError;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 
-
+/**
+ * 
+ * This class implements the web service that deals with the deployment requests
+ *
+ */
 @Path("/deployment")
 @Api("/deployment")
 public class RestFoo {
@@ -29,10 +34,11 @@ public class RestFoo {
 	    response=NFV.class)
 	    
 	    @ApiResponses(value = {
-	    	    		@ApiResponse(code = 200, message = "OK"),
-	    	    		@ApiResponse(code = 400, message = "Something wrong in Client"),
-	    	    		@ApiResponse(code = 500, message = "Something wrong in Server")})
-
+	    	    		@ApiResponse(code = 200, message = "OK", response=NFV.class),
+	    	    		@ApiResponse(code = 400, message = "Something wrong with the client request",response=ApplicationError.class),
+	    	    		@ApiResponse(code = 415, message = "Invalid Media Type"),
+	    	    		@ApiResponse(code = 500, message = "Something wrong with server", response=ApplicationError.class),
+	    				@ApiResponse(code = 503, message = "Service temporarily unavailable")})
 	    @Consumes(MediaType.APPLICATION_XML)
 		@Produces(MediaType.APPLICATION_XML)
 	    public NFV put(@Context HttpServletRequest req,@ApiParam(value = "Network Schema", required = true) NFV root) throws MalformedURLException {

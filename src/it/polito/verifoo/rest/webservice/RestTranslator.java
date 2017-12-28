@@ -10,14 +10,20 @@ import javax.ws.rs.core.MediaType;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Translator;
+import it.polito.verifoo.rest.jaxb.ApplicationError;
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.NFV;
 
-
+/**
+ * 
+ * This class implements the web service that deals with the converter requests
+ *
+ */
 @Path("/converter")
 @Api("/converter")
 public class RestTranslator {
@@ -25,14 +31,16 @@ public class RestTranslator {
 	    @ApiOperation(value = "Converts the output model of Verifoo", notes = "This API takes an XML file containing the output model of Verifoo and it converts it into an XML with the correct deployment.",
 	    	    response=NFV.class)
 	    
-	    	    @ApiResponses(value = {
-	    	    	    		@ApiResponse(code = 200, message = "OK"),
-	    	    	    		@ApiResponse(code = 400, message = "Something wrong in Client"),
-	    	    	    		@ApiResponse(code = 500, message = "Something wrong in Server")})
+	    @ApiResponses(value = {
+	    		@ApiResponse(code = 200, message = "OK", response=NFV.class),
+	    		@ApiResponse(code = 400, message = "Something wrong with the client request",response=ApplicationError.class),
+	    		@ApiResponse(code = 415, message = "Invalid Media Type"),
+	    		@ApiResponse(code = 500, message = "Something wrong with server", response=ApplicationError.class),
+				@ApiResponse(code = 503, message = "Service temporarily unavailable")})
 	    
 	    @Consumes(MediaType.APPLICATION_XML)
 		@Produces(MediaType.APPLICATION_XML)
-	    public NFV put(NFV root) throws MalformedURLException {
+	    public NFV put(@ApiParam(value = "Network Schema with parsing string", required = true)NFV root) throws MalformedURLException {
 	    	if(!root.getParsingString().isEmpty()){
 	            new Translator(root.getParsingString(),root).convert();
 	            root.setParsingString("");
