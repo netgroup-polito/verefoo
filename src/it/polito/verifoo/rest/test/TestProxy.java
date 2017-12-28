@@ -26,8 +26,11 @@ import it.polito.verifoo.rest.common.VerifooProxy;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verigraph.mcnet.components.IsolationResult;
-
-
+/**
+ * 
+ * This class runs some tests in order to check the correctness of the VerifooProxy class 
+ *
+ */
 public class TestProxy {
 
 	/**

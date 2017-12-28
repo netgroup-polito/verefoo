@@ -25,8 +25,9 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import it.polito.verifoo.rest.jaxb.NFV;
-
-
+/**
+ *  This class runs some tests to check the validation of the XML files
+ */
 public class TestXML {
 
 	/**

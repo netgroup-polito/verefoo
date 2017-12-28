@@ -11,7 +11,11 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
+/**
+ * 
+ * This class tests the log web service (present only for debugging purposes)
+ *
+ */
 public class TestRestLog {
 	//private static String service="http://127.0.0.1:8080/verifoo/log";
 	private static String service = System.getProperty("it.polito.rest.test.URL")+"/log";

@@ -17,7 +17,11 @@ import com.microsoft.z3.Status;
 import it.polito.verifoo.rest.jaxb.*;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verifoo.rest.common.*;
-
+/**
+ * 
+ * This is the main class only for testing the VerifooProxy
+ *
+ */
 public class Main {
 	public static void main(String[] args) throws MalformedURLException{
 		System.setProperty("log4j.configuration", new File("resources", "log4j2.xml").toURI().toURL().toString());

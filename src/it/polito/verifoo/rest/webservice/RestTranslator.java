@@ -16,8 +16,11 @@ import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.NFV;
-
-
+/**
+ * 
+ * This class implements the web service that deals with the converter requests
+ *
+ */
 @Path("/converter")
 @Api("/converter")
 public class RestTranslator {

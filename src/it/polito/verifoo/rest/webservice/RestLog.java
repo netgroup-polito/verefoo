@@ -16,9 +16,11 @@ import org.apache.logging.log4j.core.appender.FileAppender;
 
 import io.swagger.annotations.*;
 import it.polito.verifoo.rest.common.LogReader;
-
-
-
+/**
+ * 
+ * This class implements the web service that deals with the log request (present only for debugging purposes)
+ *
+ */
 @Path("/log")
 @Api(value = "/log")
 

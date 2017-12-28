@@ -19,8 +19,11 @@ import it.polito.verifoo.rest.common.VerifooProxy;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verigraph.mcnet.components.IsolationResult;
-
-
+/**
+ * 
+ * This class implements the web service that deals with the deployment requests
+ *
+ */
 @Path("/deployment")
 @Api("/deployment")
 public class RestFoo {

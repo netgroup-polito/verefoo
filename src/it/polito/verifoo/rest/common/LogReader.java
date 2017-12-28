@@ -7,7 +7,11 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
+/**
+ * 
+ * This class implements a way to retrive the log with a limited number of lines
+ *
+ */
 public class LogReader {
 	/**
 	 *  Ring Buffer implementation

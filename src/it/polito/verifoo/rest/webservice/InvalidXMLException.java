@@ -1,10 +1,10 @@
 package it.polito.verifoo.rest.webservice;
-
+/**
+ *  This exception will be thrown by the web service if there is an error in the marshalling or the unmarshalling of a request 
+ */
 public class InvalidXMLException extends RuntimeException {
 
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -1171106531665313527L;
 	public InvalidXMLException() {
 		super();

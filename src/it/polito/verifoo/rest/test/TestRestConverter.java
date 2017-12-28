@@ -20,7 +20,11 @@ import org.junit.Test;
 
 import it.polito.verifoo.rest.jaxb.ApplicationError;
 import it.polito.verifoo.rest.jaxb.EType;
-
+/**
+ * 
+ * This class tests the converter web service
+ *
+ */
 public class TestRestConverter {
 	//private static String service="http://127.0.0.1:8080/verifoo/converter";
 	String service = System.getProperty("it.polito.rest.test.URL")+"/converter";

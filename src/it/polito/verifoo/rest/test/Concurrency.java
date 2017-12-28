@@ -11,7 +11,11 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
+/**
+ * 
+ * This class implements the threads that will test the concurrency of the web service
+ *
+ */
 public class Concurrency {
 	private ArrayList<String> file=new ArrayList<String>();
     //private final String resturl="http://restfoo.eu-de.mybluemix.net/deployment";
