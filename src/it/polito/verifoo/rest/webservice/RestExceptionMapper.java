@@ -18,7 +18,7 @@ public class RestExceptionMapper implements ExceptionMapper<Exception>{
 		ex.printStackTrace();
 		return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(ex.getMessage())
+                .entity(e)
                 .type(MediaType.APPLICATION_XML)
                 .build();
 	}

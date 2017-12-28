@@ -23,7 +23,7 @@ public class ErrorMapper implements ExceptionMapper<Error> {
 		arg0.printStackTrace();
 		return Response
                 .status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(arg0.getMessage())
+                .entity(e)
                 .type(MediaType.APPLICATION_XML)
                 .build();
 	}
