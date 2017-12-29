@@ -8,7 +8,10 @@
 This web service has two resources named <a href="/rest/deployment">deployment</a> and <a href="/rest/converter">converter</a>.
 The deployment web service recives an XML file containing a NFV element that describes some service chains and a physical netwok. It returns the correspondent deployment. The converter web service recives also an XML file containing a NFV element
 </p>
-<p><a href="_swagger-ui/index.html?url=http://127.0.0.1:8080/verifoo/rest/swagger.json">Swagger documentation</a>
+<p><a id="swaggerdocs" href="_swagger-ui/index.html?url=http://127.0.0.1:8080/verifoo/rest/swagger.json">Swagger documentation</a>
 </p>
 </body>
+<script type="text/javascript">
+	document.getElementById('swaggerdocs').href = '_swagger-ui/index.html?url='+window.location.href.replace('index.html','')+'rest/swagger.json';
+</script>
 </html>

@@ -2,8 +2,7 @@
 ##### Verification and Optimization Orchestrator component for join Service Graph mapping and verification. The component exploits the z3Opt engine for solving MaxSAT and VNE problem
 
 ## Folder Structure:
--   doc/
-    -   Javadoc/ --- Documentation of the code
+-   docs/ --- Documentation of the code (Javadoc) and of service and schema (Pdf=
     -   VerifooDocs.pdf --- Documentation of the web service and other
         useful information
     -   verigraphdoc.pdf --- Verigraph documentation for further details
