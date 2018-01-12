@@ -1,8 +1,16 @@
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://www.w3.org/2005/Atom">
-	<xsd:element name="Links">
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="Hyperlinks">
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element name="Link" type="ns2:Link"></xsd:element>
+				<xsd:element name="Link" minOccurs="0" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:attribute name="rel" type="xsd:string"/>
+						<xsd:attribute name="href" type="xsd:string"/>
+						<xsd:attribute name="type" type="xsd:string"/>
+						<xsd:attribute name="method" type="xsd:string"/>
+					</xsd:complexType>
+				</xsd:element>
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>

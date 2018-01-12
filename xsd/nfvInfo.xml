@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd"
+	xmlns:ns2="http://www.w3.org/2005/Atom">
   <graphs>
     <graph id="0">
      <node functional_type="WEBCLIENT" name="nodeA">
@@ -65,5 +66,5 @@
   	<Connection sourceHost="host2" destHost="hostB" avgLatency ="-100"/>
   	<Connection sourceHost="host3" destHost="hostB" avgLatency ="-1"/>
   </Connections>
-  <ParsingString></ParsingString>
+  <ParsingString></ParsingString>  
 </NFV>

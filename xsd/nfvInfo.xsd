@@ -8,6 +8,7 @@
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <xsd:include schemaLocation="errorSchema.xsd"/>
+    <xsd:include schemaLocation="hateoasLinks.xsd"/>
     <xsd:include schemaLocation="xml_components.xsd"/>
 	<xsd:element name="NFV">
 		<xsd:complexType>
