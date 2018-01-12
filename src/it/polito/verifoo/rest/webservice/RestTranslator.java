@@ -2,10 +2,12 @@ package it.polito.verifoo.rest.webservice;
 
 import java.net.MalformedURLException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import io.swagger.annotations.Api;
@@ -40,10 +42,22 @@ public class RestTranslator {
 	    
 	    @Consumes(MediaType.APPLICATION_XML)
 		@Produces(MediaType.APPLICATION_XML)
-	    public NFV put(@ApiParam(value = "Network Schema with parsing string", required = true)NFV root) throws MalformedURLException {
+	    public NFV put(@ApiParam(value = "Complete or Tiny Response")@DefaultValue("true")@QueryParam("complete") Boolean complete,@ApiParam(value = "Network Schema with parsing string", required = true)NFV root) throws MalformedURLException {
 	    	if(!root.getParsingString().isEmpty()){
 	            new Translator(root.getParsingString(),root).convert();
 	            root.setParsingString("");
+	            if(complete!=true) {
+					if(root.getPropertyDefinition().getProperty().stream().filter((p)->p.isIsSat()).count()>0) {			
+						root.getHosts().getHost().removeIf((h)->!h.isActive());
+						root.getConnections().getConnection().removeIf((c)->{
+							return !(
+								root.getHosts().getHost().stream().filter((h)->h.getName().equals(c.getSourceHost())).findFirst().isPresent()
+								&&
+								root.getHosts().getHost().stream().filter((h)->h.getName().equals(c.getDestHost())).findFirst().isPresent()
+							);
+						});	
+					}
+				}
 				return root;
 	    	}else{
 	    		throw new BadGraphError("No string to parse is provided",EType.INVALID_PARSING_STRING);

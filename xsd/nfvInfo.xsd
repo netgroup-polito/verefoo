@@ -80,7 +80,7 @@
 			<xsd:attribute name="name" type="xsd:string" use="required"/>
 			<xsd:attribute name="diskStorage" type="xsd:int" use="required"/>
 			<xsd:attribute name="type" type="TypeOfHost" use="optional"/>
-			<xsd:attribute name="active" type="xsd:boolean" use="optional"/>
+			<xsd:attribute name="active" type="xsd:boolean" use="optional" default="false"/>
 		</xsd:complexType>
 	</xsd:element>
 	<xsd:element name="Connections">

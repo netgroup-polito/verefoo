@@ -37,7 +37,7 @@ public class RestLog {
 		private static String ErrorFile=RestLog.getLoggerFileName("ErrorFile");
 		
 	    @GET
-	    @ApiOperation(value = "Get Verifoo Log", notes = "Get the log of Verifoo Processing"
+	    @ApiOperation(value = "Get Verifoo Log", notes = "Get the last 200 log lines of Verifoo Processing"
 	    		)
    	    @ApiResponses(value = {
 	    		@ApiResponse(code = 200, message = "OK"),
