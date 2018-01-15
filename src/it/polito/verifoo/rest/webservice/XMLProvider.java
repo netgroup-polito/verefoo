@@ -94,5 +94,11 @@ public class XMLProvider implements MessageBodyReader<Object>, MessageBodyWriter
 		}
 	}
 
+	@Override
+	public long getSize(Object arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 
 }

@@ -9,8 +9,8 @@
 	<condition property="serverloc" value="${env.CATALINA_HOME}" else="C:\Tomcat">
 	    <isset property="env.CATALINA_HOME" />
 	</condition>
-	<property name="tomcatUsername" value="admin" />
-	<property name="tomcatPassword" value="admin" />
+	<property name="tomcatUsername" value="root" />
+	<property name="tomcatPassword" value="root" />
 	<property name="server.location" location="${serverloc}" />
 	<property name="tomcatPort" value="8080" />
 	<property name="tomcatUrl" value="http://localhost:${tomcatPort}/manager/text" />
