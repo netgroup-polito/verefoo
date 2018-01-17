@@ -111,8 +111,8 @@
 	 	    <classes dir="${resources.dir}"/>
 	  </war>
   </target>
-	<target name="war_no_shared_lib" depends="compile">
-		  <war destfile="${target.dir}/verifoo.war" webxml="WebContent/WEB-INF/web.xml">
+	<target name="war_j2ee" depends="compile">
+		  <war destfile="${target.dir}/verifoo_j2ee.war" webxml="WebContent/WEB-INF/web.xml">
 			      <fileset dir = "WebContent">
 			      	<exclude name = "WEB-INF/lib/aopalliance-repackaged-2.5.0-b32.jar"/>
 			      	<exclude name = "WEB-INF/lib/commons-lang3-3.2.1.jar"/>
@@ -158,6 +158,15 @@
 		<antcall target="stop-tomcat"/>
 	    <antcall target="start-tomcat"/>
 	    <antcall target="redeployWS"/>
+  	</sequential>
+  </target>
+  <target name="deploy_j2ee" depends="war_j2ee">
+  	<sequential>
+		<antcall target="stop-tomcat"/>
+	    <antcall target="start-tomcat"/>
+	    <antcall target="redeployWS">
+	  	  	<param name="service.name" value="verifoo_j2ee" />
+	    </antcall>
   	</sequential>
   </target>
   <!-- Ant Script for controlling Tomcat-->
