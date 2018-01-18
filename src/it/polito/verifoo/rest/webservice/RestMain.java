@@ -1,10 +1,5 @@
 package it.polito.verifoo.rest.webservice;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.stream.Collectors;
-
-import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -12,15 +7,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.Logger;
-import org.apache.logging.log4j.core.appender.FileAppender;
-
 import io.swagger.annotations.*;
-import it.polito.verifoo.rest.common.LogReader;
 import it.polito.verifoo.rest.jaxb.Hyperlinks;
-import it.polito.verifoo.rest.jaxb.NFV;
 /**
  * This class is the root resources that will provide to the client the links for the other resources
  *

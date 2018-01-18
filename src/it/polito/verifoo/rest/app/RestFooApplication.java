@@ -9,9 +9,7 @@ import javax.ws.rs.core.Context;
 
 import org.glassfish.jersey.server.ResourceConfig;
 
-import io.swagger.config.ScannerFactory;
 import io.swagger.jaxrs.config.BeanConfig;
-import io.swagger.jaxrs.config.ReflectiveJaxrsScanner;
 /**
  * Main Rest Class
  */

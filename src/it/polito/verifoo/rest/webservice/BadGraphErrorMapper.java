@@ -8,7 +8,6 @@ import javax.ws.rs.ext.Provider;
 
 import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.jaxb.ApplicationError;
-import it.polito.verifoo.rest.jaxb.EType;
 /**
  * This class wrap the output of a BadGraphError to the user
  * @see ProcessingException
