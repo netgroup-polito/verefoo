@@ -16,11 +16,13 @@ import io.swagger.jaxrs.config.ReflectiveJaxrsScanner;
  * Main Rest Class
  */
 public class RestFooApplication extends ResourceConfig {
+	private String contextpath;
     public RestFooApplication(@Context ServletContext context) throws MalformedURLException {
 		System.setProperty("log4j.configuration", new File(context.getRealPath("/WEB-INF/classes/log4j2.xml")).toURI().toURL().toString());
 		String fullPath = context.getRealPath("/WEB-INF/lib/jni/");
     	JniFinder.extractZ3Lib(fullPath);
         // Define the package which contains the service classes.
+    	this.contextpath=context.getContextPath();
     	register(io.swagger.jaxrs.listing.ApiListingResource.class);
         register(io.swagger.jaxrs.listing.SwaggerSerializers.class);
         packages("it.polito.verifoo.rest.webservice");
@@ -34,7 +36,11 @@ public class RestFooApplication extends ResourceConfig {
         config.setTitle("Restfoo");
         config.setDescription("Verifoo Rest Service");
         config.setVersion("1.0");
-        config.setBasePath("/rest");
+        if(contextpath!=null || !contextpath.isEmpty()){
+            config.setBasePath(contextpath+"/rest");
+        }else{
+        	config.setBasePath("/rest");
+        }
         config.setResourcePackage("it.polito.verifoo.rest.webservice");
         config.setScan(true);
     }

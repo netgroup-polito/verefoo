@@ -20,6 +20,7 @@ import org.apache.logging.log4j.core.appender.FileAppender;
 import io.swagger.annotations.*;
 import it.polito.verifoo.rest.common.LogReader;
 import it.polito.verifoo.rest.jaxb.Hyperlinks;
+import it.polito.verifoo.rest.jaxb.NFV;
 /**
  * This class is the root resources that will provide to the client the links for the other resources
  *
@@ -33,7 +34,7 @@ public class RestMain {
 	    @ApiOperation(value = "Get Verifoo Webservice Links", notes = "Get Links for Hateoas compliancy"
 	    		)
    	    @ApiResponses(value = {
-	    		@ApiResponse(code = 200, message = "OK"),
+	    		@ApiResponse(code = 200, message = "OK",response=Hyperlinks.class),
 	    		})
 
 		@Produces(MediaType.APPLICATION_XML)
