@@ -43,7 +43,7 @@ public class RestTranslator {
 	    @Consumes(MediaType.APPLICATION_XML)
 		@Produces(MediaType.APPLICATION_XML)
 	    public NFV put(@ApiParam(value = "Complete or Tiny Response")@DefaultValue("true")@QueryParam("complete") Boolean complete,@ApiParam(value = "Network Schema with parsing string", required = true)NFV root) throws MalformedURLException {
-	    	if(!root.getParsingString().isEmpty()){
+	    	if(root.getParsingString()!=null && !root.getParsingString().isEmpty()){
 	            new Translator(root.getParsingString(),root).convert();
 	            root.setParsingString("");
 	            if(complete!=true) {

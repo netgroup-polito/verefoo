@@ -49,7 +49,7 @@ public class RestFoo {
 					try {
 						root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get();
 					} catch (NoSuchElementException e) {
-						throw new BadGraphError("No property defined for the Graph",EType.INVALID_PROPERTY_DEFINITION);
+						throw new BadGraphError("No property defined for the Graph "+g.getId(),EType.INVALID_PROPERTY_DEFINITION);
 					}
 	            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getCapacityDefinition());
 	            	IsolationResult res=test.checkNFFGProperty();

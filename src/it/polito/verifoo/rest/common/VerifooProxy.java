@@ -17,6 +17,7 @@ import com.microsoft.z3.Status;
 import it.polito.verifoo.components.RoutingTable;
 import it.polito.verifoo.rest.jaxb.*;
 import it.polito.verigraph.mcnet.components.*;
+import jersey.repackaged.com.google.common.base.Optional;
 /**
  * 
  * This is the main class that will interface with the Verifoo classes
@@ -54,8 +55,11 @@ public class VerifooProxy {
 		    this.hosts = hosts.getHost();
 		    this.connections = conns.getConnection();
 		    this.graph=graph;
-		    this.capacities=capacityDefinition.getCapacityForNode();
-		    
+		    if(capacityDefinition!=null){
+		    	this.capacities=capacityDefinition.getCapacityForNode();
+		    }else{
+		    	this.capacities=new ArrayList<NodeCapacity>();
+		    }
 			nctx = NetContextGenerator.generate(ctx,nodes);
 				
 			//System.out.println(nctx.am);
