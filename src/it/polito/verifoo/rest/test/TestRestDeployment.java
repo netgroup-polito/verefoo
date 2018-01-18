@@ -135,7 +135,7 @@ public class TestRestDeployment {
 			.accept(MediaType.APPLICATION_XML)
 			.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
-		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.XML_VALIDATION_ERROR));
+		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.INVALID_PHY_SERVER_CLIENT_CONF));
 	}
 	@Test
 	public void TestXMLWithoutConnectionRequest() throws IOException {
@@ -146,7 +146,7 @@ public class TestRestDeployment {
 			.accept(MediaType.APPLICATION_XML)
 			.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
-		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.XML_VALIDATION_ERROR));
+		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.INVALID_PHY_SERVER_CLIENT_CONF));
 	}
 	@Test
 	public void TestXMLWith2Host() throws IOException {
