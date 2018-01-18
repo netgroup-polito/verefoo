@@ -13,9 +13,15 @@ import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verigraph.mcnet.components.NetContext;
 
 /**
- * This class generate the nework context (the link between nodenames and node ip in z3)
+ * This class generates the nework context (the link between nodenames and node ip in z3)
  */
 public final class NetContextGenerator{
+	/**
+	 * This method generates the nework context (the link between nodenames and node ip in z3)
+	 * @param ctx Z3 Context
+	 * @param nodes Node List
+	 * @return NetContext
+	 */
 	public static NetContext generate(Context ctx,List<Node> nodes){
 		String[] nodesname={};
 		nodesname=nodes.stream().map((n)->n.getName()).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(nodesname);

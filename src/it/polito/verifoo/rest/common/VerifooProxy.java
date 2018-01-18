@@ -525,6 +525,7 @@ public class VerifooProxy {
 			return ret;
 		}
 		/**
+		 * Get Net Context
 		 * @return the net context
 		 */
 		public NetContext getNctx() {

@@ -17,6 +17,11 @@ import io.swagger.jaxrs.config.ReflectiveJaxrsScanner;
  */
 public class RestFooApplication extends ResourceConfig {
 	private String contextpath;
+	/**
+	 * Constructor of Main RestClass
+	 * @param context Servlet Context
+	 * @throws MalformedURLException Log4j Configuration File not found.
+	 */
     public RestFooApplication(@Context ServletContext context) throws MalformedURLException {
 		System.setProperty("log4j.configuration", new File(context.getRealPath("/WEB-INF/classes/log4j2.xml")).toURI().toURL().toString());
 		String fullPath = context.getRealPath("/WEB-INF/lib/jni/");

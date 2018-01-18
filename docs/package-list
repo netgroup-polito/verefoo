@@ -2,7 +2,6 @@ it.polito.verifoo.components
 it.polito.verifoo.rest.app
 it.polito.verifoo.rest.common
 it.polito.verifoo.rest.jaxb
-it.polito.verifoo.rest.logger
 it.polito.verifoo.rest.main
 it.polito.verifoo.rest.test
 it.polito.verifoo.rest.webservice

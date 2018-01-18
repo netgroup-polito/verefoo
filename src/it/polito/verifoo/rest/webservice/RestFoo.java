@@ -62,16 +62,14 @@ public class RestFoo {
 				if(!z3model.isEmpty()){
 		            new Translator(z3model,root).convert();				}
 				if(complete!=true) {
-					if(root.getPropertyDefinition().getProperty().stream().filter((p)->p.isIsSat()).count()>0) {			
-						root.getHosts().getHost().removeIf((h)->!h.isActive());
-						root.getConnections().getConnection().removeIf((c)->{
-							return !(
-								root.getHosts().getHost().stream().filter((h)->h.getName().equals(c.getSourceHost())).findFirst().isPresent()
-								&&
-								root.getHosts().getHost().stream().filter((h)->h.getName().equals(c.getDestHost())).findFirst().isPresent()
-							);
-						});	
-					}
+					root.getHosts().getHost().removeIf((h)->!h.isActive());
+					root.getConnections().getConnection().removeIf((c)->{
+						return !(
+							root.getHosts().getHost().stream().filter((h)->h.getName().equals(c.getSourceHost())).findFirst().isPresent()
+							&&
+							root.getHosts().getHost().stream().filter((h)->h.getName().equals(c.getDestHost())).findFirst().isPresent()
+						);
+					});						
 				}
 				return root;
 	    }

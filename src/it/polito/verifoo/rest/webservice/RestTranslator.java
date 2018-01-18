@@ -47,16 +47,14 @@ public class RestTranslator {
 	            new Translator(root.getParsingString(),root).convert();
 	            root.setParsingString("");
 	            if(complete!=true) {
-					if(root.getPropertyDefinition().getProperty().stream().filter((p)->p.isIsSat()).count()>0) {			
-						root.getHosts().getHost().removeIf((h)->!h.isActive());
-						root.getConnections().getConnection().removeIf((c)->{
-							return !(
-								root.getHosts().getHost().stream().filter((h)->h.getName().equals(c.getSourceHost())).findFirst().isPresent()
-								&&
-								root.getHosts().getHost().stream().filter((h)->h.getName().equals(c.getDestHost())).findFirst().isPresent()
-							);
-						});	
-					}
+					root.getHosts().getHost().removeIf((h)->!h.isActive());
+					root.getConnections().getConnection().removeIf((c)->{
+						return !(
+							root.getHosts().getHost().stream().filter((h)->h.getName().equals(c.getSourceHost())).findFirst().isPresent()
+							&&
+							root.getHosts().getHost().stream().filter((h)->h.getName().equals(c.getDestHost())).findFirst().isPresent()
+						);
+					});						
 				}
 				return root;
 	    	}else{

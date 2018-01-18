@@ -272,7 +272,11 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 				}
 			}
 	}
-	
+	/**
+	 * Transform a list of string in array of number
+	 * @param arg List of String
+	 * @return Array of int
+	 */
 	private int[] listToIntArguments(List<String> arg) {
         int[] o= new int[arg.size()];
         for(int i=0; i<arg.size(); i++){

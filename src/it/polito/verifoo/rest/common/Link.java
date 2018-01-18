@@ -1,7 +1,7 @@
 package it.polito.verifoo.rest.common;
 /**
  * 
- * This class is being used to convert the neighbor node notion into a more convenient form in order to pass the correct information to Verifoo 
+ * This class is used to convert the neighbor node notion into a more convenient form in order to pass the correct information to Verifoo 
  *
  */
 public class Link {
