@@ -2,40 +2,47 @@
 ##### Verification and Optimization Orchestrator component for join Service Graph mapping and verification. The component exploits the z3Opt engine for solving MaxSAT and VNE problem
 
 ## Folder Structure:
--   docs/ --- Documentation of the code (Javadoc) and of service and schema (Pdf=
+-   docs/ -- Documentation of the code (including javadoc)
     -   VerifooDocs.pdf --- Documentation of the web service and other
         useful information
-    -   verigraphdoc.pdf --- Verigraph documentation for further details
--   lib/ --- All the external library (e.g. Z3 library)
-    -   junit/ --- Library for running
-    -   lib4j/ --- Library for manage the logging operations
+    -   verigraph\_doc.pdf --- Documentation of Verigraph for further
+        details
+-   lib/ --- All the external libraries (e.g. Z3 library)
+    -   junit/ --- Libraries for running tests
+    -   lib4j/ --- Libraries for managing the logging operations
 -   log/ --- All the logs (for debugging purposes)
 -   resources/ ---
     -   log4j2.xml --- Settings of the logs
--   src/ --- Java classes
+-   src/ --- Java classes (for further information see the javadoc)
     -   it/polito/verifoo/components/ --- Basical Verifoo classes
     -   it/polito/verifoo/rest/app/ --- Classes to start the Rest
         application
     -   it/polito/verifoo/rest/common/ --- Classes that retrieve the
-        informations from the XML and pass them to Verifoo
+        informations from the JAXB class objects and pass them to
+        Verifoo
     -   it/polito/verifoo/rest/jaxb/ --- Automatically generated JAXB
         classes
-    -   it/polito/verifoo/rest/logger/ --- Classes that handle the
-        logging operations
     -   it/polito/verifoo/rest/main/ --- Main class for debugging
         purposes
-    -   it/polito/verifoo/rest/test/ --- Test classes
-    -   it/polito/verifoo/rest/webservice/ --- WebService classes
+    -   it/polito/verifoo/rest/test/ --- Classes that manage all the
+        tests
+    -   it/polito/verifoo/rest/webservice/ --- Classes needed for the
+        WebService
     -   it/polito/verifoo/test --- Simple examples on how Verifoo works
-    -   it/polito/verigraph/ --- Basical Verigraph classes
+    -   it/polito/verigraph/\* --- Basical Verigraph classes
 -   target/ --- Folder for the war file
 -   testfile/ --- XML files that are used to test the application
 -   WebContent/ --- Files needed in order to deploy the service
 -   xsd/ --- XML schemas needed for the application
-	- errorSchema.xsd -- XML schema of Rest error response
-	- nfvInfo.xsd  -- XML schema of Verifoo
-	- xml_components.xsd -- XML schema of Verigraph (used into verifoo)
--   build.xml --- Ant script
+    -   errorSchema.xsd -- XML schema of the response in case an error
+        occurred
+    -   nfvInfo.xsd -- XML schema of Verifoo
+    -   xml\_components.xsd -- XML schema of Verigraph (used into
+        verifoo)
+    -   hateoasLinks.xsd -- XML schema used by the root resource to let
+        the client know all the links of the REST WebService
+-   build.xml --- Ant script to automate the compiling and the
+    deployment
 
 ## Resources:
 
