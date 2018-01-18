@@ -69,7 +69,7 @@
 	<xsd:element name="Hosts">
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element maxOccurs="unbounded" ref="Host"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="Host"/>
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
@@ -87,7 +87,7 @@
 	<xsd:element name="Connections">
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element maxOccurs="unbounded" ref="Connection"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="Connection"/>
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
