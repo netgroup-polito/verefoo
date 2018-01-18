@@ -22,7 +22,8 @@
 	      <xsd:enumeration value="InvalidPHYServerClientConf"/>
 	      <xsd:enumeration value="NoMiddleHostDefined"/>
 	      <xsd:enumeration value="InvalidNodeConfiguration"/>
-	      <xsd:enumeration value="InvalidVPNConfiguration"/>	      
+	      <xsd:enumeration value="InvalidVPNConfiguration"/>	
+	      <xsd:enumeration value="InvalidPropertyDefinition"/>      
 	      <xsd:enumeration value="InvalidParsingString"/>
 	      <xsd:enumeration value="InternalServerError"/>
 	 	</xsd:restriction>

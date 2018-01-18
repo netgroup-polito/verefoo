@@ -1,6 +1,8 @@
 package it.polito.verifoo.rest.webservice;
 
 import java.net.MalformedURLException;
+import java.util.NoSuchElementException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -13,9 +15,11 @@ import javax.ws.rs.core.MediaType;
 import com.microsoft.z3.Status;
 
 import io.swagger.annotations.*;
+import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
 import it.polito.verifoo.rest.jaxb.ApplicationError;
+import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verigraph.mcnet.components.IsolationResult;
@@ -42,12 +46,18 @@ public class RestFoo {
 	    public NFV put(@Context HttpServletRequest req,@ApiParam(value = "Complete or Tiny Response")@DefaultValue("true")@QueryParam("complete") Boolean complete,@ApiParam(value = "Network Schema", required = true) NFV root) throws MalformedURLException {
 				String z3model = new String();
 				for(Graph g:root.getGraphs().getGraph()){
+					try {
+						root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get();
+					} catch (NoSuchElementException e) {
+						throw new BadGraphError("No property defined for the Graph",EType.INVALID_PROPERTY_DEFINITION);
+					}
 	            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getCapacityDefinition());
 	            	IsolationResult res=test.checkNFFGProperty();
 	            	if(res.result != Status.UNSATISFIABLE){
 	            		z3model=z3model.concat(res.model.toString());
 	            	}
-	            	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE);            
+	            	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE);
+	            	            
 	            }
 				if(!z3model.isEmpty()){
 		            new Translator(z3model,root).convert();				}

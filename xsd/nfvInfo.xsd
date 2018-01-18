@@ -14,7 +14,7 @@
 		<xsd:complexType>
 			<xsd:sequence>
 				<xsd:element ref="graphs" minOccurs="1" maxOccurs="1"/>
-				<xsd:element ref="CapacityDefinition" minOccurs="1" maxOccurs="1"/>
+				<xsd:element ref="CapacityDefinition" minOccurs="0" maxOccurs="1"/>
 				<xsd:element ref="PropertyDefinition" minOccurs="1" maxOccurs="1"/>
 				<xsd:element ref="Hosts"/>
 				<xsd:element ref="Connections"/>

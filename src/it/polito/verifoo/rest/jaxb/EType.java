@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.01.15 alle 10:24:09 PM CET 
+// Generato il: 2018.01.18 alle 04:37:52 PM CET 
 //
 
 
@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;enumeration value="NoMiddleHostDefined"/>
  *     &lt;enumeration value="InvalidNodeConfiguration"/>
  *     &lt;enumeration value="InvalidVPNConfiguration"/>
+ *     &lt;enumeration value="InvalidPropertyDefinition"/>
  *     &lt;enumeration value="InvalidParsingString"/>
  *     &lt;enumeration value="InternalServerError"/>
  *   &lt;/restriction>
@@ -56,6 +57,8 @@ public enum EType {
     INVALID_NODE_CONFIGURATION("InvalidNodeConfiguration"),
     @XmlEnumValue("InvalidVPNConfiguration")
     INVALID_VPN_CONFIGURATION("InvalidVPNConfiguration"),
+    @XmlEnumValue("InvalidPropertyDefinition")
+    INVALID_PROPERTY_DEFINITION("InvalidPropertyDefinition"),
     @XmlEnumValue("InvalidParsingString")
     INVALID_PARSING_STRING("InvalidParsingString"),
     @XmlEnumValue("InternalServerError")

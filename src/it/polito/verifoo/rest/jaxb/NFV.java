@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.01.15 alle 10:24:09 PM CET 
+// Generato il: 2018.01.18 alle 04:37:52 PM CET 
 //
 
 
@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element ref="{}graphs"/>
- *         &lt;element ref="{}CapacityDefinition"/>
+ *         &lt;element ref="{}CapacityDefinition" minOccurs="0"/>
  *         &lt;element ref="{}PropertyDefinition"/>
  *         &lt;element ref="{}Hosts"/>
  *         &lt;element ref="{}Connections"/>
@@ -53,7 +53,7 @@ public class NFV {
 
     @XmlElement(required = true)
     protected Graphs graphs;
-    @XmlElement(name = "CapacityDefinition", required = true)
+    @XmlElement(name = "CapacityDefinition")
     protected CapacityDefinition capacityDefinition;
     @XmlElement(name = "PropertyDefinition", required = true)
     protected PropertyDefinition propertyDefinition;
