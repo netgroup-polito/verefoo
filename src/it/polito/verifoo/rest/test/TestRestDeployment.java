@@ -191,6 +191,17 @@ public class TestRestDeployment {
 			.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
 		assertEquals(Status.BAD_REQUEST.getStatusCode(),res.getStatus());
 		assertTrue(res.readEntity(ApplicationError.class).getType().equals(EType.NO_MIDDLE_HOST_DEFINED));
+	}	
+	@Test
+	public void TestExamNfv() throws IOException {
+		String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/ExamNfv.xml")).collect(Collectors.joining("\n"));
+		javax.ws.rs.core.Response res=ClientBuilder.newClient()
+			.target(service)
+			.request(MediaType.APPLICATION_XML)
+			.accept(MediaType.APPLICATION_XML)
+			.post(Entity.entity(xmlread,MediaType.APPLICATION_XML));
+		assertEquals(Status.OK.getStatusCode(),res.getStatus());
+		assertTrue(res.readEntity(String.class).contains("NodeRef"));
 	}
 
 }
