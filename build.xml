@@ -13,7 +13,7 @@
   <property name="target.dir" location="target" />
   <property name="PORT" value="8080"/>
   <property name="URL" value="http://localhost:${PORT}/verifoo/rest"/>
-
+  <property name="URL_j2ee" value="http://localhost:${PORT}/verifoo_j2ee/rest"/>
 <path id="class.path">
     <fileset dir="${lib.dir}">
        <include name="**/*.jar" />
@@ -220,6 +220,53 @@
 	<echo>*** All Tests PASSED  ***</echo>
 	<antcall target="stop-tomcat"/>
  </target>
+	 <target name="testWS_j2ee" depends="deploy_j2ee">
+		    <junit printsummary="yes" haltonfailure="no" showoutput="true">
+			<!-- Project classpath, must include junit.jar -->
+				<classpath location="lib/junit/junit.jar" />
+		    	<classpath location="lib/junit/concurrent-junit-1.0.0.jar" />
+		        <classpath location="lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar" />
+		    	<classpath location="lib/com.microsoft.z3.jar" />
+		    	<classpath location="lib/lib4j/log4j-api-2.9.1.jar" />
+		    	<classpath location="lib/lib4j/log4j-core-2.9.1.jar" />
+		    	  <classpath>
+		    	    <fileset dir="${lib.dir}">
+		    	       <include name="**/*.jar" />
+		    	    </fileset>
+		    	  </classpath>
+		    	<!-- test class -->
+		    <sysproperty key="it.polito.rest.test.URL" value="${URL_j2ee}"/>
+			<classpath location="${build.dir}" />
+			<test name="it.polito.verifoo.rest.test.TestRestConcurrency"
+				haltonfailure="no" todir="${report.dir}">
+				<formatter type="plain" />
+				<formatter type="xml" />
+			</test>
+			<test name="it.polito.verifoo.rest.test.TestRestConverter"
+				haltonfailure="no" todir="${report.dir}">
+				<formatter type="plain" />
+				<formatter type="xml" />
+			</test>
+			<test name="it.polito.verifoo.rest.test.TestRestDeployment"
+				haltonfailure="no" todir="${report.dir}">
+				<formatter type="plain" />
+				<formatter type="xml" />
+			</test>	
+			<test name="it.polito.verifoo.rest.test.TestRestLog"
+				haltonfailure="no" todir="${report.dir}">
+				<formatter type="plain" />
+				<formatter type="xml" />
+			</test>	 
+	    	<test name="it.polito.verifoo.rest.test.TestRestClient"
+	    	    				haltonfailure="no" todir="${report.dir}">
+	    	    				<formatter type="plain" />
+	    	    				<formatter type="xml" />
+	    	</test>
+		  </junit>
+		<fail if="test_failed" message="*** Some Tests FAILED ***"/>
+		<echo>*** All Tests PASSED  ***</echo>
+		<antcall target="stop-tomcat"/>
+	 </target>
 <target name="clean" description="clean up">
     <!-- Delete the ${build} and ${dist} directories -->
     <delete dir="${build.dir}"/>
