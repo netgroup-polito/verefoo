@@ -46,4 +46,4 @@
 
 ## Resources:
 
- * [VerifooDocs.pdf](https://github.com/netgroup-polito/verifoo/blob/rest-service/doc/VerifooDocs.pdf) for documentation.
+ * [VerifooDocs.pdf](https://github.com/netgroup-polito/verifoo/blob/rest-service/docs/VerifooDocs.pdf) for documentation.
