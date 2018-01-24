@@ -2,7 +2,7 @@ language: java
 jdk:
 - oraclejdk8
 before_install:
-  - wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.2/bin/apache-tomcat-9.0.2.tar.gz
+  - wget http://archive.apache.org/dist/tomcat/tomcat-9/v9.0.2/bin/apache-tomcat-9.0.2.tar.gz
   - tar -xzvf apache-tomcat-9.0.2.tar.gz
   - export CATALINA_HOME=$TRAVIS_BUILD_DIR/apache-tomcat-9.0.2
   - wget http://bit.ly/2iPUBvf -O $CATALINA_HOME/conf/tomcat-users.xml
