@@ -219,63 +219,10 @@ public class VerifooProxy {
             if(nMiddle == 0) throw new BadGraphError("At least one middle host has to be defined",EType.NO_MIDDLE_HOST_DEFINED);
             String hostClient = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.CLIENT;}).findFirst().get().getName();
 			String hostServer = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.SERVER;}).findFirst().get().getName();
-            createHostChain(hostClient, hostServer);
+            savedChain = ChainExtractor.createHostChain(hostClient, hostServer, connections, nodes.size());
             if(savedChain.size() == 0) throw new BadGraphError("Host client and host server are not connected",EType.INVALID_PHY_SERVER_CLIENT_CONF);
 		}
-		/**
-		 * Calculates all the possible paths from the host client to the host server
-		 * @param hostClient
-		 * @param hostServer
-		 */
-		private void createHostChain(String hostClient, String hostServer){
-			List<String> hostChain = new ArrayList<>();
-			hostChain.add(hostClient);
-			
-			List<String> destinations = connections.stream()
-									.filter(c -> c.getSourceHost().equals(hostClient))
-									.map(c -> c.getDestHost())
-									.collect(Collectors.toList());
-			for(String h:destinations){
-				//System.out.println("Adding dest: "+h);
-				hostChain.add(h);
-				expandHostChain(h, hostServer, hostChain);
-				hostChain.remove(h);
-			}
-			logger.debug("Calculated host chain " + savedChain);
-			return;
-		}
-		/**
-		 * Explores recursively all the possible paths
-		 * @param lastHost the host from which it calculate the next for the recursion
-		 * @param hostServer is the final host of the network
-		 * @param hostChain List of all the hosts encountered in the current chain
-		 */
-		private boolean expandHostChain(String lastHost, String hostServer, List<String> hostChain){
-			if(lastHost.equals(hostServer)){
-				//System.out.println("Dest Reached " + lastHost);
-				savedChain.add(new ArrayList<>(hostChain));
-				return true;
-			}
-			if(hostChain.size() > nodes.size()) return false;
-			List<String> destinations = connections.stream()
-									.filter(c -> c.getSourceHost().equals(lastHost))
-									.map(c -> c.getDestHost())
-									.collect(Collectors.toList());
-			for(String h:destinations){
-				if(hostChain.contains(h)){
-					//System.out.println("Host already in chain "+h);
-					continue;
-				}
-				hostChain.add(h);
-				//System.out.println("Adding dest: "+h);
-				//System.out.println("Host in chain: "+hostChain);
-				expandHostChain(h, hostServer, hostChain);
-				hostChain.remove(h);
-			}
-			
-			return true;
-			
-		}
+		
 		/**
 		 * Checks if in the xml there are only one node that is a client and one node that is a server 
 		 * and they are for the same service (web or mail), then it calls the function to create the link 
@@ -316,8 +263,9 @@ public class VerifooProxy {
             String nextName = client.getNeighbour().stream().filter(n -> !(n.getName().equals(client.getName()))).findFirst().get().getName();
 			Node next = nodes.stream().filter(n -> n.getName().equals(nextName)).findFirst().get();
 			try{
-				createLink(client, next, server);
-            	createRoutingTables(client, server);   
+				createLink(client, next, server, new ArrayList<>(), new ArrayList<>());
+				//logger.debug("Links created");
+				createRoutingTables(client, server);   
 			}catch(StackOverflowError e) {
             	throw new BadGraphError("The chain of nodes is invalid",EType.INVALID_NODE_CHAIN);
 			}
@@ -329,22 +277,51 @@ public class VerifooProxy {
 		 * @param server the node that is the server of the chain
 		 * @throws BadGraphError
 		 */
-		private void createLink(Node prec, Node current, Node server) throws BadGraphError{
+		private boolean createLink(Node prec, Node current, Node server, List<String> converting, List<String> converted) throws BadGraphError{
 			if(current.getName().equals(server.getName())){
+				//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server");
 				logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
 				links.add(new Link(prec.getName(), current.getName()));
-				return;
+				return true;
 			}
-			if(current.getNeighbour().size() > 2) throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
-			logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
-			links.add(new Link(prec.getName(), current.getName()));
+			if(converted.contains(current.getName())){
+				//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server");
+				logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
+				links.add(new Link(prec.getName(), current.getName()));
+				return true;
+			}
+			
+			//if(current.getNeighbour().size() > 2) throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
+			boolean found = false;
 			try {
-				String neighbour = current.getNeighbour().stream().filter(n -> !(n.getName().equals(prec.getName()))).findFirst().get().getName();
-				Node next = nodes.stream().filter(n -> n.getName().equals(neighbour)).findFirst().get();
-				createLink(current, next, server);
+				List<String> neighbours = current.getNeighbour().stream()
+												.filter(n -> !(n.getName().equals(prec.getName())))
+												.map(n -> n.getName())
+												.collect(Collectors.toList());
+				converting.add(current.getName());
+				//logger.debug("From " + prec.getName() + " converting neighbours of " + current.getName() + " " + neighbours +" into links");
+				
+				for(String neighbour : neighbours){
+					if(!converting.contains(neighbour)){
+						Node next = nodes.stream().filter(n -> n.getName().equals(neighbour)).findFirst().get();
+						//If neighbour reaches the server or a node that reaches the server then... 
+						if(createLink(current, next, server, converting, converted) ){
+							//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server");
+							logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
+							links.add(new Link(prec.getName(), current.getName()));
+							converted.add(current.getName());
+							found = true;
+						}
+						else{
+							//logger.debug("Neighbour from " + current.getName() + " (" + neighbour +") don't reach the server");
+						}
+					}
+				}
+				converting.remove(current.getName());
 			} catch (NoSuchElementException e) {
 				throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
 			}
+			return found;
 		}
 		/**
 		 * Creates the routing table by adding the rules by exploring for each possible path between 
@@ -357,20 +334,21 @@ public class VerifooProxy {
 			
 			//System.out.println("Searching next hop for " + client.getName() + " towards " + server.getName());
 			
-			Link link = links.stream().filter(l -> l.getSourceNode().equals(client.getName())).findFirst().get();
+			Link link = links.stream().filter(l -> l.getSourceNode().equals(client.getName())).findFirst().orElse(null);
 			if(link == null){
 				logger.error("Route: From CLIENT " + client.getName() 
 									+ " to " + nctx.am.get(server.getName()) 
 									+ " -> Dead End");
 				throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
 			}
+			String hostClient = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.CLIENT;}).findFirst().get().getName();
+			String hostServer = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.SERVER;}).findFirst().get().getName();
+			//System.out.println("The host client is: " + hostClient+" and the host server is "+hostServer);
 			Node next = nodes.stream().filter(n -> n.getName().equals(link.getDestNode()) ).findFirst().get();
 			//System.out.println("Route from CLIENT " + client.getName() 
 			//								+ " to " + nctx.am.get(server.getIp()) 
 			//								+ " -> next hop: " + netobjs.get(next));
-			String hostClient = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.CLIENT;}).findFirst().get().getName();
-			String hostServer = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.SERVER;}).findFirst().get().getName();
-			//System.out.println("The host client is: " + hostClient+" and the host server is "+hostServer);
+			
 			for(int i = 0; i < savedChain.size(); i++){
 				String host1 = savedChain.get(i).get(1);
 				//System.out.println("Chain -> " + savedChain.get(i));
@@ -460,47 +438,55 @@ public class VerifooProxy {
 		 */
 		private boolean setNextHop(Node source, Node server, int nChain, int level, String hostServer) throws BadGraphError{
 			String currentHost = savedChain.get(nChain).get(level);
-			//System.out.println("Searching next hop for " + source.getName() + " towards " + server.getName());
+			//logger.debug("Searching next hop for " + source.getName() + " towards " + server.getName());
 			if(source.getName().equals(server.getName())){
 				if(currentHost.equals(hostServer)){
-					//System.out.println("Route from SERVER " + source.getName() + " to " + nctx.am.get(server.getIp())  + " -> next hop: DESTINATION REACHED" + " CurrentHost: " + currentHost);
-					//System.out.println("Found path from lv " + level + " of chain " +nChain );
+					//logger.debug("Route from SERVER " + source.getName() + " to " + nctx.am.get(server.getName())  + " -> next hop: DESTINATION REACHED" + " CurrentHost: " + currentHost);
+					//logger.debug("Found path from lv " + level + " of chain " +nChain );
 					return true;
 				}
 				else{
-					//System.out.println("Path not found path from lv " + level + " of chain " +nChain );
+					//logger.debug("Path not found path from lv " + level + " of chain " +nChain );
 					return false;
 				}
 			}
 			if(currentHost.equals(hostServer)){
-				//System.out.println("Only server node can be deployed on server host -> tried to deploy " + source.getName() + " on " +currentHost );
+				//logger.debug("Only server node can be deployed on server host -> tried to deploy " + source.getName() + " on " +currentHost );
 				return false;
 			}
-			Link link = links.stream().filter(l -> l.getSourceNode().equals(source.getName())).findFirst().orElse(null);
-			if(link == null){
+			List<String> nextDest = links.stream().filter(l -> l.getSourceNode().equals(source.getName())).map(l -> l.getDestNode() ).collect(Collectors.toList());
+			if(nextDest.size() == 0){
 				logger.error("Route: From " + source.getName() 
 									+ " to " + nctx.am.get(server.getName()) 
 									+ " -> Dead End");
-				throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
+				throw new BadGraphError("Invalid leaf for the service graph",EType.INVALID_NODE_CHAIN);
 			}
-			Node next = nodes.stream().filter(n -> n.getName().equals(link.getDestNode()) ).findFirst().get();
-			//System.out.println("Route from " + source.getName()+ " to " + nctx.am.get(server.getIp())+ " -> next hop: " + netobjs.get(next));
+			/*logger.debug("Route: From " + source.getName() 
+								+ " to " + nctx.am.get(server.getName()) 
+								+ " -> Possible Next Hop "+nextDest);*/
 			boolean found = false;
-			for(int i = level; i < savedChain.get(nChain).size() && i <= level+1; i++){
-				String nextHost = savedChain.get(nChain).get(i);
-				//System.out.println("RECURSION -> Deploying " + next.getName() +" on lv " + i + " of chain " +nChain +"("+nextHost+")");
-				if(setNextHop(next, server, nChain, i, hostServer)){
-					//System.out.println("From " + currentHost + " to " + nextHost);
-					//System.out.print("On RT("+source.getName()+") ");
-					if(nextHost.equals(hostServer)){
-						//System.out.println(source.getName()+"@"+currentHost);
-						rawConditions.get(source).add(source.getName()+"@"+currentHost);
+			for(String dest:nextDest){
+				Node next = nodes.stream().filter(n -> n.getName().equals(dest)).findFirst().orElse(null);
+				if(next == null){
+					throw new BadGraphError("Incoherent service graph",EType.INVALID_NODE_CHAIN);
+				}
+				//logger.debug("Route from " + source.getName()+ " to " + nctx.am.get(server.getName())+ " -> next hop: " + netobjs.get(next));
+				for(int i = level; i < savedChain.get(nChain).size() && i <= level+1; i++){
+					String nextHost = savedChain.get(nChain).get(i);
+					//logger.debug("RECURSION -> Deploying " + next.getName() +" on lv " + i + " of chain " +nChain +"("+nextHost+")");
+					if(setNextHop(next, server, nChain, i, hostServer)){
+						//logger.debug("From " + currentHost + " to " + nextHost);
+						//logger.debug("On RT("+source.getName()+") ");
+						if(nextHost.equals(hostServer)){
+							//logger.debug("\t"+source.getName()+"@"+currentHost);
+							rawConditions.get(source).add(source.getName()+"@"+currentHost);
+						}
+						else{
+							//logger.debug("\t"+source.getName()+"@"+currentHost + " AND " + next.getName()+"@"+savedChain.get(nChain).get(i));
+							rawConditions.get(source).add(source.getName()+"@"+currentHost + "/" + next.getName()+"@"+savedChain.get(nChain).get(i));
+						}
+						found = true;
 					}
-					else{
-						//System.out.println(source.getName()+"@"+currentHost + " AND " + next.getName()+"@"+savedChain.get(nChain).get(i));
-						rawConditions.get(source).add(source.getName()+"@"+currentHost + "/" + next.getName()+"@"+savedChain.get(nChain).get(i));
-					}
-					found = true;
 				}
 			}
 			return found;
@@ -517,6 +503,8 @@ public class VerifooProxy {
 			IsolationResult ret = this.check.checkIsolationProperty(netobjs.get(source), netobjs.get(dest));
 			if (ret.result == Status.UNSATISFIABLE){
 				 	logger.debug("UNSAT"); // Nodes a and b are isolated
+				 	logger.debug(ret.assertions.toString());
+				 	
 		    }else{
 		    	 	logger.debug("SAT ");
 		     		logger.debug( ""+ret.model); //p.printModel(ret.model);
