@@ -55,7 +55,7 @@ public class ChainExtractor {
 	 */
 	private static boolean expandHostChain(String lastHost, String hostServer, List<String> hostChain, List<Connection> connections, int maxSize){
 		if(lastHost.equals(hostServer)){
-			//System.out.println("Dest Reached " + lastHost);
+			//logger.debug("Dest Reached " + lastHost);
 			savedChain.add(new ArrayList<>(hostChain));
 			return true;
 		}
@@ -66,12 +66,12 @@ public class ChainExtractor {
 								.collect(Collectors.toList());
 		for(String h:destinations){
 			if(hostChain.contains(h)){
-				//System.out.println("Host already in chain "+h);
+				//logger.debug("Host already in chain "+h);
 				continue;
 			}
 			hostChain.add(h);
-			//System.out.println("Adding dest: "+h);
-			//System.out.println("Host in chain: "+hostChain);
+			//logger.debug("Adding dest: "+h);
+			//logger.debug("Host in chain: "+hostChain);
 			expandHostChain(h, hostServer, hostChain, connections, maxSize);
 			hostChain.remove(h);
 		}

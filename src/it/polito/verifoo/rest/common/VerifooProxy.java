@@ -171,7 +171,7 @@ public class VerifooProxy {
 											capacity = app.getCapacity();
 										diskRequirements.add(ctx.mkMul(ctx.mkInt(capacity), nctx.bool_to_int(i)));
 									});
-				logger.debug(h.getName() + " disk requirement: " + diskRequirements);
+				//logger.debug(h.getName() + " disk requirement: " + diskRequirements);
 				ArithExpr diskConstraint = null;
 				for(ArithExpr d:diskRequirements){
 					if(diskConstraint == null){
@@ -183,7 +183,7 @@ public class VerifooProxy {
 					//System.out.println(hostImpliesNodeConstraint);
 				}
 				if(diskConstraint != null){
-					logger.debug(h.getName() + " left side: " + diskConstraint);
+					//logger.debug(h.getName() + " left side: " + diskConstraint);
 					logger.debug(h.getName() + " requirements: " + ctx.mkLe(diskConstraint, ctx.mkMul(ctx.mkInt(h.getDiskStorage()), nctx.bool_to_int(hostCondition.get(h.getName())))));
 					nctx.constraints.add(ctx.mkLe(diskConstraint, ctx.mkMul(ctx.mkInt(h.getDiskStorage()), nctx.bool_to_int(hostCondition.get(h.getName())))));
 				}
@@ -259,70 +259,16 @@ public class VerifooProxy {
             }
             Node client = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).findFirst().get();
             Node server = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).findFirst().get();
-            if(client.getNeighbour().size() != 1 || server.getNeighbour().size() != 1) throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
-            String nextName = client.getNeighbour().stream().filter(n -> !(n.getName().equals(client.getName()))).findFirst().get().getName();
-			Node next = nodes.stream().filter(n -> n.getName().equals(nextName)).findFirst().get();
-			try{
-				createLink(client, next, server, new ArrayList<>(), new ArrayList<>());
+            if(client.getNeighbour().size() != 1 || server.getNeighbour().size() != 1) throw new BadGraphError("Nodes must have 1 client and 1 server",EType.INVALID_NODE_CHAIN);
+            try{
+				links = (new LinkCreator(nodes)).getLinks();
 				//logger.debug("Links created");
 				createRoutingTables(client, server);   
 			}catch(StackOverflowError e) {
             	throw new BadGraphError("The chain of nodes is invalid",EType.INVALID_NODE_CHAIN);
 			}
 		}
-		/**
-		 * Creates the link from the node's neighbours
-		 * @param prec previous node in the chain
-		 * @param current current node in the chain
-		 * @param server the node that is the server of the chain
-		 * @throws BadGraphError
-		 */
-		private boolean createLink(Node prec, Node current, Node server, List<String> converting, List<String> converted) throws BadGraphError{
-			if(current.getName().equals(server.getName())){
-				//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server");
-				logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
-				links.add(new Link(prec.getName(), current.getName()));
-				return true;
-			}
-			if(converted.contains(current.getName())){
-				//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server");
-				logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
-				links.add(new Link(prec.getName(), current.getName()));
-				return true;
-			}
-			
-			//if(current.getNeighbour().size() > 2) throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
-			boolean found = false;
-			try {
-				List<String> neighbours = current.getNeighbour().stream()
-												.filter(n -> !(n.getName().equals(prec.getName())))
-												.map(n -> n.getName())
-												.collect(Collectors.toList());
-				converting.add(current.getName());
-				//logger.debug("From " + prec.getName() + " converting neighbours of " + current.getName() + " " + neighbours +" into links");
-				
-				for(String neighbour : neighbours){
-					if(!converting.contains(neighbour)){
-						Node next = nodes.stream().filter(n -> n.getName().equals(neighbour)).findFirst().get();
-						//If neighbour reaches the server or a node that reaches the server then... 
-						if(createLink(current, next, server, converting, converted) ){
-							//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server");
-							logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
-							links.add(new Link(prec.getName(), current.getName()));
-							converted.add(current.getName());
-							found = true;
-						}
-						else{
-							//logger.debug("Neighbour from " + current.getName() + " (" + neighbour +") don't reach the server");
-						}
-					}
-				}
-				converting.remove(current.getName());
-			} catch (NoSuchElementException e) {
-				throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
-			}
-			return found;
-		}
+		
 		/**
 		 * Creates the routing table by adding the rules by exploring for each possible path between 
 		 * an host client and host server all the possibles deploying scenarios for the nodes
@@ -367,7 +313,7 @@ public class VerifooProxy {
 				ArrayList<RoutingTable> rt = new ArrayList<RoutingTable>();
 				logger.debug("-----NODE "+n.getName()+"-----");
 				List<String> cond = rawConditions.get(n).stream().distinct().collect(Collectors.toList());
-				logger.debug("Condition for "+ n.getName() +" -> "+ cond);
+				//logger.debug("Condition for "+ n.getName() +" -> "+ cond);
 				for(String s:cond){
 					BoolExpr c;
 					int latency = 0;
@@ -386,7 +332,9 @@ public class VerifooProxy {
 									.filter(con -> con.getSourceHost().equals(firstHost) && con.getDestHost().equals(secondHost))
 									.findFirst().get().getAvgLatency();
 						}
-						logger.debug("Adding (" + first + " AND " + second+") to the routing table");
+						//logger.debug("Adding (" + first + " AND " + second+") to the routing table with latency " + latency);
+						//List<String> l = links.stream().filter(li -> li.getSourceNode().equals(n.getName())).map(li -> li.getDestNode()).collect(Collectors.toList());
+						next = nodes.stream().filter(node -> node.getName().equals(secondNode)  ).findFirst().get();
 						c = ctx.mkAnd(ctx.mkBoolConst(first), ctx.mkBoolConst(second));
 						if(n.getName().equals(firstNode)){
 							conditionDB.get(n).put(firstHost, ctx.mkBoolConst(first));
@@ -396,6 +344,7 @@ public class VerifooProxy {
 						}
 					}
 					else{
+						String node = s.substring(0,s.lastIndexOf('@'));
 						String host = s.substring(s.lastIndexOf('@')+1);
 						if(n.getName().equals(client.getName())){
 							latency = connections.stream()
@@ -407,19 +356,25 @@ public class VerifooProxy {
 									.filter(con -> con.getSourceHost().equals(host) && con.getDestHost().equals(hostServer))
 									.findFirst().get().getAvgLatency();
 						}
-						logger.debug("Adding "+s+" to the routing table");
+						//Link l = links.stream().filter(li -> li.getSourceNode().equals(n.getName())).findFirst().get();
+						if(n.getName().equals(client.getName())){
+							next = nodes.stream().filter(no -> no.getName().equals(node) ).findFirst().get();
+						}else{
+							next = nodes.stream().filter(no -> no.getName().equals(server.getName()) ).findFirst().get();
+						}
+						
+						//logger.debug("Adding "+s+" to the routing table with latency " + latency);
 						c = ctx.mkBoolConst(s);
 						if(n != client && n!= server){
 							conditionDB.get(n).put(host, c);
 						}
 						
 					}
-					Link l = links.stream().filter(li -> li.getSourceNode().equals(n.getName())).findFirst().get();
-					next = nodes.stream().filter(node -> node.getName().equals(l.getDestNode()) ).findFirst().get();
+					logger.debug("Adding ("+ c +") to the routing table, from "+ n.getName() +" next hop is " + next.getName() + " with latency " + latency);
 					rt.add(new RoutingTable(nctx.am.get(server.getName()), netobjs.get(next), nctx.addLatency(latency), c));
 					
 				}
-				//System.out.println("Adding routing table to "+n.getName());
+				logger.debug("Adding routing table to "+n.getName());
 				net.routingOptimization(netobjs.get(n), rt);
 			}
 			logger.debug("----CONDITION DB----");
@@ -498,12 +453,12 @@ public class VerifooProxy {
 		public IsolationResult checkNFFGProperty(){
 
             Node source = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).findFirst().get();
-            Node dest = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).findFirst().get();
+            //Node source = nodes.stream().filter(n -> n.getName().equals("node3")).findFirst().orElse(null);
+			Node dest = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).findFirst().get();
             logger.debug("Checking reachability from " + source.getName() + " to "+ dest.getName());
 			IsolationResult ret = this.check.checkIsolationProperty(netobjs.get(source), netobjs.get(dest));
 			if (ret.result == Status.UNSATISFIABLE){
 				 	logger.debug("UNSAT"); // Nodes a and b are isolated
-				 	logger.debug(ret.assertions.toString());
 				 	
 		    }else{
 		    	 	logger.debug("SAT ");

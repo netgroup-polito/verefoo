@@ -40,7 +40,7 @@ public class Main {
                 // unmarshal a document into a tree of Java content objects
                 //NFV root = (NFV) u.unmarshal( new FileInputStream( "./xsd/nfvInfo.xml" ) );
                 
-                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/nfv4nodes3hostsSAT-SG.xml" ) );
+                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/sg5nodes3host_ERROR.xml" ) );
                
                 for(Graph g:root.getGraphs().getGraph()){
                 	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());

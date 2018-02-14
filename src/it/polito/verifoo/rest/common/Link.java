@@ -40,5 +40,41 @@ public class Link {
 	public void setDestNode(String destNode) {
 		this.destNode = destNode;
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((destNode == null) ? 0 : destNode.hashCode());
+		result = prime * result + ((sourceNode == null) ? 0 : sourceNode.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof Link)) {
+			return false;
+		}
+		Link other = (Link) obj;
+		if (destNode == null) {
+			if (other.destNode != null) {
+				return false;
+			}
+		} else if (!destNode.equals(other.destNode)) {
+			return false;
+		}
+		if (sourceNode == null) {
+			if (other.sourceNode != null) {
+				return false;
+			}
+		} else if (!sourceNode.equals(other.sourceNode)) {
+			return false;
+		}
+		return true;
+	}
 
 }
