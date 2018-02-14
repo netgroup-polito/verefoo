@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+
+|nodeA|_______|node1|_______|node2|_______|nodeB|
+				   |		 |
+		   	       |		 |
+			    |node3|___|node4|
+-->
+
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
   <graphs>
     <graph id="0">
@@ -29,6 +37,15 @@
       </node>
 	  <node functional_type="FIELDMODIFIER" name="node3">
         <neighbour name="node1"/>
+        <neighbour name="node4"/>
+        <configuration description="A simple description" name="conf3">
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
+        </configuration>
+      </node>
+	   <node functional_type="FIELDMODIFIER" name="node4">
+        <neighbour name="node3"/>
         <neighbour name="node2"/>
         <configuration description="A simple description" name="conf3">
          <fieldmodifier>
@@ -50,27 +67,36 @@
    		<CapacityForNode node="node1" capacity="10"/>
   		<CapacityForNode node="node2" capacity="10"/>
 		<CapacityForNode node="node3" capacity="10"/>
+		<CapacityForNode node="node4" capacity="10"/>
   </CapacityDefinition>
   <PropertyDefinition>
   		<Property graph="0" name="IsolationProperty"/> 		
   </PropertyDefinition>
   <Hosts>
   	<Host diskStorage="10" name="hostA" type="CLIENT"/>
-  	<Host diskStorage="20" name="host1" type="MIDDLEBOX"/>
-  	<Host diskStorage="20" name="host2" type="MIDDLEBOX"/>
-  	<Host diskStorage="10" name="host3" type="MIDDLEBOX"/>
+  	<Host diskStorage="50" name="host1" type="MIDDLEBOX"/>
+  	<Host diskStorage="50" name="host2" type="MIDDLEBOX"/>
+  	<Host diskStorage="50" name="host3" type="MIDDLEBOX"/>
+	<Host diskStorage="50" name="host4" type="MIDDLEBOX"/>
+	<Host diskStorage="50" name="host5" type="MIDDLEBOX"/>
   	<Host diskStorage="10" name="hostB" type="SERVER"/>
   </Hosts>
   <Connections>
   	<Connection sourceHost="hostA" destHost="host1" avgLatency ="-1"/>
-  	<Connection sourceHost="hostA" destHost="host2" avgLatency ="-100"/>
   	<Connection sourceHost="host1" destHost="host2" avgLatency ="-1"/>
-  	<Connection sourceHost="host1" destHost="host3" avgLatency ="-100"/>
   	<Connection sourceHost="host2" destHost="host1" avgLatency ="-1"/>
   	<Connection sourceHost="host3" destHost="host2" avgLatency ="-1"/>
   	<Connection sourceHost="host2" destHost="host3" avgLatency ="-1"/>
+	<Connection sourceHost="host2" destHost="host4" avgLatency ="-1"/>
+	<Connection sourceHost="host1" destHost="host4" avgLatency ="-1"/>
+	<Connection sourceHost="host4" destHost="host1" avgLatency ="-1"/>
+  	<Connection sourceHost="host4" destHost="host2" avgLatency ="-1"/>
+	<Connection sourceHost="host4" destHost="host5" avgLatency ="-1"/>
+  	<Connection sourceHost="host5" destHost="host4" avgLatency ="-1"/>
+	<Connection sourceHost="host5" destHost="host2" avgLatency ="-1"/>
+	<Connection sourceHost="host2" destHost="host5" avgLatency ="-1"/>
   	<Connection sourceHost="host2" destHost="hostB" avgLatency ="-100"/>
-  	<Connection sourceHost="host3" destHost="hostB" avgLatency ="-1"/>
+  	<Connection sourceHost="host5" destHost="hostB" avgLatency ="-1"/>
   </Connections>
   <ParsingString></ParsingString>
 </NFV>
