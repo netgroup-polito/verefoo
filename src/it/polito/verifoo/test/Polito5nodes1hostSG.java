@@ -94,8 +94,8 @@ public class Polito5nodes1hostSG {
 		    adm.add(new Tuple<>(x1, al1));
 		    adm.add(new Tuple<>(x2, al2));
 		    adm.add(new Tuple<>(x3, al3));
-		    adm.add(new Tuple<>(x3, al4));
-		    adm.add(new Tuple<>(x3, al5));
+		    adm.add(new Tuple<>(x4, al4));
+		    adm.add(new Tuple<>(x5, al5));
 		    net.setAddressMappings(adm);
 
 		    //for each Link from Client to Servers
