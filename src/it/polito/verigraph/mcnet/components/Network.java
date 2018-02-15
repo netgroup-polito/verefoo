@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -329,10 +330,11 @@ public class Network extends Core {
 		HashMap<String, ArrayList<BoolExpr>> collected = new HashMap<String, ArrayList<BoolExpr>>();
 		HashMap<String, NetworkObject> node_dict = new HashMap<String, NetworkObject>();
 		HashMap<String, HashMap<String, Tuple<Integer, BoolExpr>>> latency = new HashMap<>();
-
+		System.out.println("==========NEW ROUTING TABLE==========");
 		BoolExpr predicates;
 		for (int y = 0; y < rta.size(); y++) {
 			RoutingTable tp = rta.get(y);
+			System.out.println(tp.condition + " lat: "+ tp.latency);
 			Tuple<Integer, BoolExpr> temp = new Tuple<>(tp.latency, tp.condition);
 			if (collected.containsKey("" + tp.nextHop)) {
 				if (!collected.get("" + tp.nextHop).contains(nctx.destAddrPredicate(p_0, tp.ip)))
@@ -351,9 +353,11 @@ public class Network extends Core {
 				latency.put("" + tp.nextHop, lists);
 			}
 			node_dict.put("" + tp.nextHop, tp.nextHop);
-
 		}
 
+		System.out.println("Collected: " + collected);
+		System.out.println("Latency: " + latency);
+		System.out.println("Node_dict: " + node_dict);
 		// Constraint foreach rtAddr,rtNode in rt( send(node, n_0, p_0, t_0) &&
 		// Or(foreach rtAddr in rt destAddrPredicate(p_0,rtAddr)) -> n_0 ==
 		// rtNode )
@@ -361,11 +365,13 @@ public class Network extends Core {
 		for (Map.Entry<String, ArrayList<BoolExpr>> entry : collected.entrySet()) {
 			BoolExpr[] pred = new BoolExpr[entry.getValue().size()];
 			HashMap<String, Tuple<Integer, BoolExpr>> sett = latency.get(entry.getKey());
-			///System.out.println("-------for " + entry.getKey() + " we have " + sett.size() + " for the node " + node);
+			System.out.println("In the node " + node + " we have " + sett.size() + " possible scenario the for next hop: " + entry.getKey() +"(can be deployed on " + sett.size() + " different combination of hosts)" );
+			System.out.println("Entry: " + entry);
 			predicates = ctx.mkOr(entry.getValue().toArray(pred));
-
+			System.out.println("Predicates: " + predicates);
 			for (Entry<String, Tuple<Integer, BoolExpr>> temp : sett.entrySet()) {
 				//constraints.add(ctx.mkEq(nctx.y1, ctx.mkFalse()));
+				System.out.println("Temp: " + temp.getValue());
 				BoolExpr forTheKey = temp.getValue()._2;
 				Integer latency_val = temp.getValue()._1;
 				BoolExpr initial = ctx.mkForall(new Expr[] { n_0,p_0 },
@@ -373,6 +379,7 @@ public class Network extends Core {
 										ctx.mkAnd(ctx.mkEq(n_0,node_dict.get(entry.getKey()).getZ3Node()))
 										)
 				,1, null, null, null, null);
+				System.out.println(initial + " => " + forTheKey);
 				BoolExpr mkImplies = ctx.mkImplies( initial,forTheKey);
 				softConstraints.put(mkImplies, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
 				constraints.add(initial);
@@ -380,11 +387,99 @@ public class Network extends Core {
 				routes.add(nctx.bool_to_int(mkImplies));
 			}
 			IntExpr list[] = new IntExpr[routes.size()];
+			System.out.println("Route List: " + routes);
 			constraints.add(ctx.mkEq(ctx.mkAdd(routes.toArray(list)), ctx.mkInt(1)));
 		}
 	}
 
-	
+	public void routingOptimizationSG(NetworkObject node,
+			ArrayList<RoutingTable> rta) {
+		// Policy is of the form predicate -> node
+		Expr p_0 = ctx.mkConst(node + "_composition_p_0", nctx.packet);
+		Expr n_0 = ctx.mkConst(node + "_composition_n_0", nctx.node);
+
+		HashMap<String, ArrayList<BoolExpr>> collected = new HashMap<String, ArrayList<BoolExpr>>();
+		HashMap<String, NetworkObject> node_dict = new HashMap<String, NetworkObject>();
+		HashMap<String, HashMap<String, Tuple<Integer, BoolExpr>>> latency = new HashMap<>();
+		System.out.println("==========NEW ROUTING TABLE==========");
+		BoolExpr predicates;
+		//Collect some information in order to build the conditions in the next step
+		for (int y = 0; y < rta.size(); y++) {
+			RoutingTable tp = rta.get(y);
+			System.out.println(tp.condition + " lat: "+ tp.latency);
+			Tuple<Integer, BoolExpr> temp = new Tuple<>(tp.latency, tp.condition);
+			if (collected.containsKey("" + tp.nextHop)) {
+				if (!collected.get("" + tp.nextHop).contains(nctx.destAddrPredicate(p_0, tp.ip)))
+					collected.get("" + tp.nextHop).add(nctx.destAddrPredicate(p_0, tp.ip));
+				latency.get("" + tp.nextHop).put("" + tp.latency + "_" + tp.condition, temp);
+			} else {
+				HashMap<String, Tuple<Integer, BoolExpr>> lists = new HashMap<>();
+				ArrayList<BoolExpr> alb = new ArrayList<BoolExpr>();
+				if (!alb.contains(nctx.destAddrPredicate(p_0, tp.ip)))
+					alb.add(nctx.destAddrPredicate(p_0, tp.ip));
+				collected.put("" + tp.nextHop, alb);
+				// list contains [latency with boolean] to the actual tuple
+				// like 1_y1 with (1,y1)
+				lists.put("" + tp.latency + "_" + tp.condition, temp);
+				// latency contains element to be forwarded to with the lists
+				latency.put("" + tp.nextHop, lists);
+			}
+			node_dict.put("" + tp.nextHop, tp.nextHop);
+		}
+
+		System.out.println("Collected: " + collected);
+		System.out.println("Latency: " + latency);
+		System.out.println("Node_dict: " + node_dict);
+		// Constraint foreach rtAddr,rtNode in rt( send(node, n_0, p_0, t_0) &&
+		// Or(foreach rtAddr in rt destAddrPredicate(p_0,rtAddr)) -> n_0 ==
+		// rtNode )
+		List<BoolExpr> possibleNextHop = new ArrayList<>();
+		Map<String, List<BoolExpr>> initials = new HashMap<>();
+		ArrayList<IntExpr> routes = new ArrayList<>();
+		for (Map.Entry<String, ArrayList<BoolExpr>> entry : collected.entrySet()) {
+			BoolExpr[] pred = new BoolExpr[entry.getValue().size()];
+			HashMap<String, Tuple<Integer, BoolExpr>> sett = latency.get(entry.getKey());
+			System.out.println("In the node " + node + " we have " + sett.size() + " possible scenario the for next hop: " + entry.getKey() +"(can be deployed on " + sett.size() + " different combination of hosts)" );
+			System.out.println("Entry: " + entry);
+			predicates = ctx.mkOr(entry.getValue().toArray(pred));
+			System.out.println("Predicates: " + predicates);
+			for (Entry<String, Tuple<Integer, BoolExpr>> temp : sett.entrySet()) {
+				//constraints.add(ctx.mkEq(nctx.y1, ctx.mkFalse()));
+				System.out.println("Temp: " + temp.getValue());
+				BoolExpr forTheKey = temp.getValue()._2;
+				Integer latency_val = temp.getValue()._1;
+				BoolExpr initial = ctx.mkForall(new Expr[] { n_0,p_0 },
+				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(node.getZ3Node(), n_0, p_0),predicates),
+										ctx.mkAnd(ctx.mkEq(n_0,node_dict.get(entry.getKey()).getZ3Node()))
+										)
+				,1, null, null, null, null);
+				System.out.println(initial + " => " + forTheKey);
+				BoolExpr mkImplies = ctx.mkImplies( initial,forTheKey);
+				softConstraints.put(mkImplies, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
+				if(!initials.containsKey(entry.getKey())){
+					initials.put(entry.getKey(), new ArrayList<>());
+				}
+				initials.get(entry.getKey()).add(initial);
+				///System.out.println("\n SO for " + node +"w="+latency_val + "\n" + mkImplies );
+				routes.add(nctx.bool_to_int(mkImplies));
+			}
+			
+			IntExpr list[] = new IntExpr[routes.size()];
+			System.out.println("Route List: " + routes);
+			possibleNextHop.add(ctx.mkEq(ctx.mkAdd(routes.toArray(list)), ctx.mkInt(1)));
+		}
+		if(initials.size() > 0){
+			BoolExpr initList[] = new BoolExpr[initials.size()];
+			System.out.println("Initial List: " + initials.entrySet().stream().flatMap(e -> e.getValue().stream()).collect(Collectors.toList()));
+			constraints.add(ctx.mkOr(initials.entrySet().stream().flatMap(e -> e.getValue().stream()).collect(Collectors.toList()).toArray(initList)));
+		}
+		if(possibleNextHop.size() > 0){
+			BoolExpr list[] = new BoolExpr[possibleNextHop.size()];
+			//System.out.println("All Conditions: " + possibleNextHop.toArray(list).length);
+			System.out.println("OR Conditions: " + ctx.mkOr(possibleNextHop.toArray(list)));
+			constraints.add(ctx.mkOr(possibleNextHop.toArray(list)));
+		}
+	}
 
 	
 

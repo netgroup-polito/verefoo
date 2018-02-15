@@ -245,7 +245,7 @@ public class VerifooProxy {
             long nEndHost	= nodes.stream()
             		 .filter((n) -> n.getFunctionalType().equals(FunctionalTypes.ENDHOST))
             		 .count();
-            /*System.out.println("nMailServer: " + nMailServer +
+            /*logger.debug("nMailServer: " + nMailServer +
             				   " nMailClient: " + nMailClient +
             				   " nWebServer: " + nWebServer +
             				   " nWebClient: " + nWebClient);*/
@@ -265,7 +265,7 @@ public class VerifooProxy {
 				//logger.debug("Links created");
 				createRoutingTables(client, server);   
 			}catch(StackOverflowError e) {
-            	throw new BadGraphError("The chain of nodes is invalid",EType.INVALID_NODE_CHAIN);
+            	throw new BadGraphError("The graph of nodes is invalid",EType.INVALID_NODE_CHAIN);
 			}
 		}
 		
@@ -311,7 +311,7 @@ public class VerifooProxy {
 			}	
 			for(Node n : rawConditions.keySet()){
 				ArrayList<RoutingTable> rt = new ArrayList<RoutingTable>();
-				logger.debug("-----NODE "+n.getName()+"-----");
+				logger.debug("-----Routing Table NODE "+n.getName()+"-----");
 				List<String> cond = rawConditions.get(n).stream().distinct().collect(Collectors.toList());
 				//logger.debug("Condition for "+ n.getName() +" -> "+ cond);
 				for(String s:cond){
@@ -370,12 +370,12 @@ public class VerifooProxy {
 						}
 						
 					}
-					logger.debug("Adding ("+ c +") to the routing table, from "+ n.getName() +" next hop is " + next.getName() + " with latency " + latency);
+					logger.debug("Adding ("+ c +"), from "+ n.getName() +" next hop is " + next.getName() + " with latency " + latency);
 					rt.add(new RoutingTable(nctx.am.get(server.getName()), netobjs.get(next), nctx.addLatency(latency), c));
 					
 				}
-				logger.debug("Adding routing table to "+n.getName());
-				net.routingOptimization(netobjs.get(n), rt);
+				//logger.debug("Adding routing table to "+n.getName());
+				net.routingOptimizationSG(netobjs.get(n), rt);
 			}
 			logger.debug("----CONDITION DB----");
 			conditionDB.entrySet().forEach(e -> {logger.debug(e.getKey().getName() + " -> " + e.getValue());});
@@ -463,6 +463,7 @@ public class VerifooProxy {
 		    }else{
 		    	 	logger.debug("SAT ");
 		     		logger.debug( ""+ret.model); //p.printModel(ret.model);
+		     		
 		    }
 			return ret;
 		}
