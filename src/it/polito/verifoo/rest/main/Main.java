@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 import com.microsoft.z3.Status;
 import it.polito.verifoo.rest.jaxb.*;
+import it.polito.verifoo.rest.medicine.MedicineSimulator;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verifoo.rest.common.*;
 /**
@@ -54,6 +55,9 @@ public class Main {
                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                 m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvInfo.xsd");
                 m.marshal( root, System.out ); 
+                //MedicineSimulator sim = new MedicineSimulator(root);
+                //sim.printTopology();
+                //sim.printPlacement();
             } catch( JAXBException je ) {
             	logger.error("Error while unmarshalling or marshalling");
                 logger.error(je);

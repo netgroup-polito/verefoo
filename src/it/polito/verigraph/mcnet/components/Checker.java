@@ -524,8 +524,8 @@ public class Checker {
 	 */
 
 	public void addConstraints() {
-		nctx.addConstraints(solver);
 		net.addConstraints(solver);
+		nctx.addConstraints(solver);
 		for (NetworkObject el : net.elements)
 			el.addConstraints(solver);
 		for (BoolExpr boolExpr : constraintList) {

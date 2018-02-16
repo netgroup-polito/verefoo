@@ -2,9 +2,9 @@
 <!-- 
 
 |nodeA|_______|node1|_______|node2|_______|nodeB|
-			   |			_/   |
-		   	   |		   /     |
-		   |node3|___|node4|___|node5|
+					\_		_/   
+					  \	   /     
+					 |node3|
 -->
 
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
@@ -28,8 +28,7 @@
       </node>
       <node functional_type="FIELDMODIFIER" name="node2">
         <neighbour name="node1"/>
-		<neighbour name="node4"/>
-		<neighbour name="node5"/>
+		<neighbour name="node3"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf2">
          <fieldmodifier>
@@ -39,25 +38,6 @@
       </node>
 	  <node functional_type="FIELDMODIFIER" name="node3">
         <neighbour name="node1"/>
-        <neighbour name="node4"/>
-        <configuration description="A simple description" name="conf3">
-         <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
-        </configuration>
-      </node>
-	   <node functional_type="FIELDMODIFIER" name="node4">
-        <neighbour name="node3"/>
-		<neighbour name="node2"/>
-        <neighbour name="node5"/>
-        <configuration description="A simple description" name="conf3">
-         <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
-        </configuration>
-      </node>
-	   <node functional_type="FIELDMODIFIER" name="node5">
-        <neighbour name="node4"/>
         <neighbour name="node2"/>
         <configuration description="A simple description" name="conf3">
          <fieldmodifier>
@@ -79,17 +59,15 @@
    		<CapacityForNode node="node1" capacity="10"/>
   		<CapacityForNode node="node2" capacity="10"/>
 		<CapacityForNode node="node3" capacity="10"/>
-		<CapacityForNode node="node4" capacity="10"/>
-		<CapacityForNode node="node5" capacity="10"/>
   </CapacityDefinition>
   <PropertyDefinition>
   		<Property graph="0" name="IsolationProperty"/> 		
   </PropertyDefinition>
   <Hosts>
   	<Host diskStorage="10" name="hostA" type="CLIENT"/>
-  	<Host diskStorage="20" name="host1" type="MIDDLEBOX"/>
-  	<Host diskStorage="50" name="host2" type="MIDDLEBOX"/>
-  	<Host diskStorage="20" name="host3" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host1" type="MIDDLEBOX"/>
+  	<Host diskStorage="20" name="host2" type="MIDDLEBOX"/>
+  	<Host diskStorage="10" name="host3" type="MIDDLEBOX"/>
   	<Host diskStorage="10" name="hostB" type="SERVER"/>
   </Hosts>
   <Connections>
