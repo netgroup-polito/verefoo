@@ -29,6 +29,8 @@ public class VerifooProxy {
 	    private NodeNetworkObject netobjs;
 	    private HashMap<Node,List<String>> rawConditions;
 	    private HashMap<Node, HashMap<String, BoolExpr>> conditionDB;
+	    private HashMap<Node, HashMap<String, BoolExpr>> stageConditions;
+	    private HashMap<String, Integer> countConditions;
 		public Checker check;
 		private Logger logger = LogManager.getLogger("mylog");
 		private List<List<String>> savedChain = new ArrayList<>();
@@ -37,6 +39,7 @@ public class VerifooProxy {
 		List<Host> hosts;
 		List<Connection> connections;
 		Graph graph;
+		int clientServerCombinations = 0;
 		private List<NodeCapacity> capacities;
 		/**
 		 * Public constructor for the verifoo proxy service
@@ -73,9 +76,12 @@ public class VerifooProxy {
 		    
 		    rawConditions=new HashMap<>();
 		    conditionDB=new HashMap<>();
+		    stageConditions = new HashMap<>();
+		    countConditions = new HashMap<>();
 		    nodes.forEach(n -> {
 				rawConditions.put(n, new ArrayList<>());
 		    	conditionDB.put(n, new HashMap<>());
+		    	stageConditions.put(n, new HashMap<>());
 		    });
 			checkPhysicalNetwork();
 		    checkNffg();	
@@ -95,7 +101,20 @@ public class VerifooProxy {
 	     * @throws BadGraphError
 	     */
 		private void setConditions() throws BadGraphError{
-		  	
+			
+			for(Node n:conditionDB.keySet()){
+				for(String h:conditionDB.get(n).keySet()){
+					if(countConditions.get(n.getName()+"_"+h) < clientServerCombinations){
+						logger.debug("Found condition that is not valid for all the client/server combinations " + conditionDB.get(n).get(h) +" -> making it false");
+						nctx.constraints.add(ctx.mkEq(conditionDB.get(n).get(h), ctx.mkFalse()));
+					}
+				}
+			}
+			
+			
+			logger.debug("----CONDITION DB----");
+			conditionDB.entrySet().forEach(e -> {logger.debug(e.getKey().getName() + " -> " + e.getValue());});
+			logger.debug("--------------------");
 			HashMap<String, BoolExpr> hostCondition = new HashMap<>();
 			hosts.forEach(h -> {
 				BoolExpr e = ctx.mkBoolConst(h.getName());
@@ -193,6 +212,7 @@ public class VerifooProxy {
 			hosts.forEach(h -> {
 				nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(hostCondition.get(h.getName())), "num_servers"));
 			});
+			
 		}
 
 		/**
@@ -249,21 +269,38 @@ public class VerifooProxy {
             				   " nMailClient: " + nMailClient +
             				   " nWebServer: " + nWebServer +
             				   " nWebClient: " + nWebClient);*/
-            if((nMailServer>0 && nMailServer != nMailClient+nEndHost) 
+            /*if((nMailServer>0 && nMailServer != nMailClient+nEndHost) 
             	|| (nMailServer==0 && nMailClient!=nMailServer) 
             	|| (nWebServer>0 && nWebServer != nWebClient+nEndHost)
             	|| (nWebServer==0 && nWebClient!=nWebServer)
             	|| nMailServer+nWebServer>1){
             	//System.err.println("Only one client and one server of the same type is allowed");
             	throw new BadGraphError("Only one client and one server of the same type is allowed",EType.INVALID_SERVER_CLIENT_CONF);
-            }
-            Node client = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).findFirst().get();
-            Node server = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).findFirst().get();
-            if(client.getNeighbour().size() != 1 || server.getNeighbour().size() != 1) throw new BadGraphError("Nodes must have 1 client and 1 server",EType.INVALID_NODE_CHAIN);
+            }*/
+            List<Node> clients = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).collect(Collectors.toList());
+            List<Node> servers = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).collect(Collectors.toList());
+            //if(client.getNeighbour().size() != 1 || server.getNeighbour().size() != 1) throw new BadGraphError("Nodes must have 1 client and 1 server",EType.INVALID_NODE_CHAIN);
             try{
 				links = (new LinkCreator(nodes)).getLinks();
 				//logger.debug("Links created");
-				createRoutingTables(client, server);   
+				for(Node c:clients){
+					for(Node s:servers){
+						clientServerCombinations++;
+						logger.debug(">>>>NEW client/server combination (total: " + clientServerCombinations + ") -> " + c.getName() + " to " + s.getName());
+						createRoutingTables(c, s);
+						nodes.forEach(n -> {
+							for(String h:stageConditions.get(n).keySet()){
+								if(!countConditions.containsKey(n.getName()+"_"+h)){
+									countConditions.put(n.getName()+"_"+h, 0);
+								}
+								countConditions.put(n.getName()+"_"+h, countConditions.get(n.getName()+"_"+h)+1);
+							}
+							stageConditions.get(n).clear();
+							rawConditions.get(n).clear();
+					    });
+					}
+				}
+				
 			}catch(StackOverflowError e) {
             	throw new BadGraphError("The graph of nodes is invalid",EType.INVALID_NODE_CHAIN);
 			}
@@ -274,6 +311,7 @@ public class VerifooProxy {
 		 * an host client and host server all the possibles deploying scenarios for the nodes
 		 * @param client the node client
 		 * @param server the node server
+		 * @param stageConditions 
 		 * @throws BadGraphError
 		 */
 		private void createRoutingTables(Node client, Node server) throws BadGraphError{
@@ -298,7 +336,7 @@ public class VerifooProxy {
 			for(int i = 0; i < savedChain.size(); i++){
 				String host1 = savedChain.get(i).get(1);
 				//System.out.println("Chain -> " + savedChain.get(i));
-				if(setNextHop(next, server, i, 1, hostServer)){
+				if(setNextHop(next, server, i, 1, hostServer, new ArrayList<>())){
 					/*System.out.println("Route from " + client.getName() 
 					+ " to " + nctx.am.get(server.getIp()) 
 					+ " -> next hop: " + netobjs.get(next));
@@ -313,7 +351,7 @@ public class VerifooProxy {
 				ArrayList<RoutingTable> rt = new ArrayList<RoutingTable>();
 				logger.debug("-----Routing Table NODE "+n.getName()+"-----");
 				List<String> cond = rawConditions.get(n).stream().distinct().collect(Collectors.toList());
-				//logger.debug("Condition for "+ n.getName() +" -> "+ cond);
+				logger.debug("Condition for "+ n.getName() +" -> "+ cond);
 				for(String s:cond){
 					BoolExpr c;
 					int latency = 0;
@@ -338,9 +376,11 @@ public class VerifooProxy {
 						c = ctx.mkAnd(ctx.mkBoolConst(first), ctx.mkBoolConst(second));
 						if(n.getName().equals(firstNode)){
 							conditionDB.get(n).put(firstHost, ctx.mkBoolConst(first));
+							stageConditions.get(n).put(firstHost, ctx.mkBoolConst(first));
 						}
 						if(n.getName().equals(secondNode)){
 							conditionDB.get(n).put(secondHost, ctx.mkBoolConst(second));
+							stageConditions.get(n).put(secondHost, ctx.mkBoolConst(second));
 						}
 					}
 					else{
@@ -352,6 +392,7 @@ public class VerifooProxy {
 									.findFirst().get().getAvgLatency();
 						}
 						else{
+							//logger.debug("Finding latency between " + host + " and " + hostServer);
 							latency = connections.stream()
 									.filter(con -> con.getSourceHost().equals(host) && con.getDestHost().equals(hostServer))
 									.findFirst().get().getAvgLatency();
@@ -367,6 +408,7 @@ public class VerifooProxy {
 						c = ctx.mkBoolConst(s);
 						if(n != client && n!= server){
 							conditionDB.get(n).put(host, c);
+							stageConditions.get(n).put(host, c);
 						}
 						
 					}
@@ -375,10 +417,10 @@ public class VerifooProxy {
 					
 				}
 				//logger.debug("Adding routing table to "+n.getName());
-				net.routingOptimizationSG(netobjs.get(n), rt);
+				net.routingOptimizationSG2(netobjs.get(n), rt);
 			}
-			logger.debug("----CONDITION DB----");
-			conditionDB.entrySet().forEach(e -> {logger.debug(e.getKey().getName() + " -> " + e.getValue());});
+			logger.debug("----STAGE CONDITION DB----");
+			stageConditions.entrySet().forEach(e -> {logger.debug(e.getKey().getName() + " -> " + e.getValue());});
 			logger.debug("--------------------");
 		}
 		/**
@@ -391,7 +433,7 @@ public class VerifooProxy {
 		 * @return true if the last node has been deployed on the host server (good path), false otherwise
 		 * @throws BadGraphError
 		 */
-		private boolean setNextHop(Node source, Node server, int nChain, int level, String hostServer) throws BadGraphError{
+		private boolean setNextHop(Node source, Node server, int nChain, int level, String hostServer, List<Node> visited) throws BadGraphError{
 			String currentHost = savedChain.get(nChain).get(level);
 			//logger.debug("Searching next hop for " + source.getName() + " towards " + server.getName());
 			if(source.getName().equals(server.getName())){
@@ -409,27 +451,35 @@ public class VerifooProxy {
 				//logger.debug("Only server node can be deployed on server host -> tried to deploy " + source.getName() + " on " +currentHost );
 				return false;
 			}
+			
 			List<String> nextDest = links.stream().filter(l -> l.getSourceNode().equals(source.getName())).map(l -> l.getDestNode() ).collect(Collectors.toList());
 			if(nextDest.size() == 0){
-				logger.error("Route: From " + source.getName() 
+				/*logger.debug("Route: From " + source.getName() 
 									+ " to " + nctx.am.get(server.getName()) 
-									+ " -> Dead End");
-				throw new BadGraphError("Invalid leaf for the service graph",EType.INVALID_NODE_CHAIN);
+									+ " -> Dead End");*/
+				return false;
 			}
 			/*logger.debug("Route: From " + source.getName() 
 								+ " to " + nctx.am.get(server.getName()) 
 								+ " -> Possible Next Hop "+nextDest);*/
+			//logger.debug("Adding to visited " + source.getName());
+			visited.add(source);
 			boolean found = false;
 			for(String dest:nextDest){
 				Node next = nodes.stream().filter(n -> n.getName().equals(dest)).findFirst().orElse(null);
 				if(next == null){
 					throw new BadGraphError("Incoherent service graph",EType.INVALID_NODE_CHAIN);
 				}
+				if(visited.contains(next)){
+					//logger.debug("Next node already visited -> From " + source.getName() + " to " + next.getName() + " in " + nextDest);
+					continue;
+				}
+				
 				//logger.debug("Route from " + source.getName()+ " to " + nctx.am.get(server.getName())+ " -> next hop: " + netobjs.get(next));
 				for(int i = level; i < savedChain.get(nChain).size() && i <= level+1; i++){
 					String nextHost = savedChain.get(nChain).get(i);
 					//logger.debug("RECURSION -> Deploying " + next.getName() +" on lv " + i + " of chain " +nChain +"("+nextHost+")");
-					if(setNextHop(next, server, nChain, i, hostServer)){
+					if(setNextHop(next, server, nChain, i, hostServer, visited)){
 						//logger.debug("From " + currentHost + " to " + nextHost);
 						//logger.debug("On RT("+source.getName()+") ");
 						if(nextHost.equals(hostServer)){
@@ -444,6 +494,8 @@ public class VerifooProxy {
 					}
 				}
 			}
+			//logger.debug("Removing from visited " + source.getName());
+			visited.remove(source);
 			return found;
 		}
 		/**

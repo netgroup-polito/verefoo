@@ -30,14 +30,20 @@ public class LinkCreator {
 	 * @return
 	 */
 	public List<Link> getLinks(){
-		Node client = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).findFirst().get();
-        Node server = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).findFirst().get();
-        if(client.getNeighbour().size() != 1 || server.getNeighbour().size() != 1) throw new BadGraphError("Nodes must have 1 client and 1 server",EType.INVALID_NODE_CHAIN);
-        String nextName = client.getNeighbour().stream().filter(n -> !(n.getName().equals(client.getName()))).findFirst().get().getName();
-        Node next = nodes.stream().filter(n -> n.getName().equals(nextName)).findFirst().get();
-		createLink(client, next, server, new ArrayList<>(), new ArrayList<>());
-		logger.debug("New Link from " + client.getName() + " to "+ next.getName() +" towards server "+server.getName());
-		links.add(new Link(client.getName(), next.getName()));
+		List<Node> clients = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).collect(Collectors.toList());
+        List<Node> servers = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).collect(Collectors.toList());
+        //if(client.getNeighbour().size() != 1 || server.getNeighbour().size() != 1) throw new BadGraphError("Nodes must have 1 client and 1 server",EType.INVALID_NODE_CHAIN);
+        for(Node client:clients){
+			for(Node server:servers){
+				String nextName = client.getNeighbour().stream().filter(n -> !(n.getName().equals(client.getName()))).findFirst().get().getName();
+		        Node next = nodes.stream().filter(n -> n.getName().equals(nextName)).findFirst().get();
+		        //logger.debug("Creating path from client " + client.getName() + " to server "+server.getName());
+				createLink(client, next, client, server, new ArrayList<>(), new ArrayList<>());
+				//logger.debug("New Link from " + client.getName() + " to "+ next.getName() +" towards server "+server.getName());
+				//links.add(new Link(client.getName(), next.getName()));
+			}
+		}
+        
 		List<Link> orderedLinks = links.stream()
 										.sorted(comparing(Link::getSourceNode).thenComparing(Link::getDestNode))
 										.distinct()
@@ -53,16 +59,20 @@ public class LinkCreator {
 	 * @param server the node that is the server of the chain
 	 * @throws BadGraphError
 	 */
-	private boolean createLink(Node prec, Node current, Node server, List<String> converting, List<String> converted) throws BadGraphError{
+	private boolean createLink(Node prec, Node current, Node client, Node server, List<String> converting, List<String> converted) throws BadGraphError{
 		if(current.getName().equals(server.getName())){
-			//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server");
-			logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
+			//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server " + server.getName());
+			//logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
 			links.add(new Link(prec.getName(), current.getName()));
 			return true;
 		}
+		if(current.getName().equals(client.getName())){
+			//logger.debug("Link from " + prec.getName() + " to "+ current.getName() +" reaches "+client.getName());
+			return false;
+		}
 		if(converted.contains(current.getName())){
-			//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server");
-			logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
+			//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server " + server.getName());
+			//logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
 			links.add(new Link(prec.getName(), current.getName()));
 			return true;
 		}
@@ -80,17 +90,17 @@ public class LinkCreator {
 			for(String neighbour : neighbours){
 				if(!converting.contains(neighbour)){
 					Node next = nodes.stream().filter(n -> n.getName().equals(neighbour)).findFirst().get();
-					//If neighbour reaches the server or a node that reaches the server then... 
-					if(createLink(current, next, server, converting, converted) ){
-						//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server");
+					//If neighbour reaches the server or reaches a node that reaches the server then... 
+					if(createLink(current, next, client, server, converting, converted) ){
+						//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server " + server.getName());
 						Link l = new Link(prec.getName(), current.getName());
-						logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
+						//logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
 						links.add(l);
 						converted.add(current.getName());
 						found = true;
 					}
 					else{
-						//logger.debug("Neighbour from " + current.getName() + " (" + neighbour +") don't reach the server");
+						//logger.debug("Neighbour from " + current.getName() + " (" + neighbour +") don't reach the server " + server.getName());
 					}
 				}
 			}
