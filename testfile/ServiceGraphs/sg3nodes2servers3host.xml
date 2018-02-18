@@ -4,7 +4,7 @@
 |nodeA|_______|node1|_______|node2|_______|nodeB|
 					\_		_/   
 					  \	   /     
-					 |node3|
+					 |node3|_____|nodeC|
 -->
 
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
@@ -39,6 +39,7 @@
 	  <node functional_type="FIELDMODIFIER" name="node3">
         <neighbour name="node1"/>
         <neighbour name="node2"/>
+		<neighbour name="nodeC"/>
         <configuration description="A simple description" name="conf3">
          <fieldmodifier>
           	<name>name</name>
@@ -50,6 +51,14 @@
         <configuration description="A simple description" name="confB">
           <webserver>
           	<name>nodeB</name>
+          </webserver>
+        </configuration>
+      </node>
+	  <node functional_type="WEBSERVER" name="nodeC">
+        <neighbour name="node3"/>
+        <configuration description="A simple description" name="confB">
+          <webserver>
+          	<name>nodeC</name>
           </webserver>
         </configuration>
       </node>
@@ -65,9 +74,9 @@
   </PropertyDefinition>
   <Hosts>
   	<Host diskStorage="10" name="hostA" type="CLIENT"/>
-  	<Host diskStorage="10" name="host1" type="MIDDLEBOX"/>
-  	<Host diskStorage="20" name="host2" type="MIDDLEBOX"/>
-  	<Host diskStorage="10" name="host3" type="MIDDLEBOX"/>
+  	<Host diskStorage="30" name="host1" type="MIDDLEBOX"/>
+  	<Host diskStorage="30" name="host2" type="MIDDLEBOX"/>
+  	<Host diskStorage="30" name="host3" type="MIDDLEBOX"/>
   	<Host diskStorage="10" name="hostB" type="SERVER"/>
   </Hosts>
   <Connections>

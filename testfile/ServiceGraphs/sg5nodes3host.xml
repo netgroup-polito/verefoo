@@ -89,7 +89,7 @@
   	<Host diskStorage="10" name="hostA" type="CLIENT"/>
   	<Host diskStorage="20" name="host1" type="MIDDLEBOX"/>
   	<Host diskStorage="50" name="host2" type="MIDDLEBOX"/>
-  	<Host diskStorage="20" name="host3" type="MIDDLEBOX"/>
+  	<Host diskStorage="50" name="host3" type="MIDDLEBOX"/>
   	<Host diskStorage="10" name="hostB" type="SERVER"/>
   </Hosts>
   <Connections>
