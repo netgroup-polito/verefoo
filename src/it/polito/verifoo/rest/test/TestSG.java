@@ -225,5 +225,57 @@ public class TestSG {
         org.junit.Assert.assertEquals(true, n.contains("node2") && n.contains("node3"));
         return;
 	}
+	@Test
+	public void test2Clients2Servers() throws Exception {
+		// create a JAXBContext capable of handling the generated classes
+        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
+        // create an Unmarshaller
+        Unmarshaller u = jc.createUnmarshaller();
+        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
+        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
+        u.setSchema(schema);
+        // unmarshal a document into a tree of Java content objects
+        NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg2clients4nodes2servers3host.xml" ) );
+        for(Graph g:root.getGraphs().getGraph()){
+        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
+        	IsolationResult res=test.checkNFFGProperty();
+        	if(res.result != Status.UNSATISFIABLE)
+        		new Translator(res.model.toString(),root).convert();
+        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
+        }
+        root.getPropertyDefinition().getProperty().forEach(p ->{
+        	org.junit.Assert.assertEquals(true, p.isIsSat());
+        });
+        List<String> n1 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host1")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
+        org.junit.Assert.assertEquals(true, n1.contains("node1") && n1.contains("node3"));
+        List<String> n2 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host3")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
+        org.junit.Assert.assertEquals(true, n2.contains("node2") && n2.contains("node4"));
+        return;
+	}
+	@Test
+	public void test2Clients2ServersSmall() throws Exception {
+		// create a JAXBContext capable of handling the generated classes
+        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
+        // create an Unmarshaller
+        Unmarshaller u = jc.createUnmarshaller();
+        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
+        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
+        u.setSchema(schema);
+        // unmarshal a document into a tree of Java content objects
+        NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg2clients3nodes2servers3host.xml" ) );
+        for(Graph g:root.getGraphs().getGraph()){
+        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
+        	IsolationResult res=test.checkNFFGProperty();
+        	if(res.result != Status.UNSATISFIABLE)
+        		new Translator(res.model.toString(),root).convert();
+        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
+        }
+        root.getPropertyDefinition().getProperty().forEach(p ->{
+        	org.junit.Assert.assertEquals(true, p.isIsSat());
+        });
+        List<String> n1 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host1")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
+        org.junit.Assert.assertEquals(true, n1.contains("node1") && n1.contains("node2") && n1.contains("node3"));
+        return;
+	}
 
 }

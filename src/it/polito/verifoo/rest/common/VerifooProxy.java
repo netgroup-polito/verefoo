@@ -336,7 +336,7 @@ public class VerifooProxy {
 			for(int i = 0; i < savedChain.size(); i++){
 				String host1 = savedChain.get(i).get(1);
 				//System.out.println("Chain -> " + savedChain.get(i));
-				if(setNextHop(next, server, i, 1, hostServer, new ArrayList<>())){
+				if(setNextHop(client, next, server, i, 1, hostServer, new HashMap<>())){
 					/*System.out.println("Route from " + client.getName() 
 					+ " to " + nctx.am.get(server.getIp()) 
 					+ " -> next hop: " + netobjs.get(next));
@@ -433,7 +433,7 @@ public class VerifooProxy {
 		 * @return true if the last node has been deployed on the host server (good path), false otherwise
 		 * @throws BadGraphError
 		 */
-		private boolean setNextHop(Node source, Node server, int nChain, int level, String hostServer, List<Node> visited) throws BadGraphError{
+		private boolean setNextHop(Node prec, Node source, Node server, int nChain, int level, String hostServer, HashMap<Node, List<String>> visited) throws BadGraphError{
 			String currentHost = savedChain.get(nChain).get(level);
 			//logger.debug("Searching next hop for " + source.getName() + " towards " + server.getName());
 			if(source.getName().equals(server.getName())){
@@ -462,24 +462,28 @@ public class VerifooProxy {
 			/*logger.debug("Route: From " + source.getName() 
 								+ " to " + nctx.am.get(server.getName()) 
 								+ " -> Possible Next Hop "+nextDest);*/
-			//logger.debug("Adding to visited " + source.getName());
-			visited.add(source);
+			
+			if(!visited.containsKey(source)){
+				//logger.debug("New node visited -> " + source.getName());
+				visited.put(source, new ArrayList<>());
+			}
 			boolean found = false;
 			for(String dest:nextDest){
 				Node next = nodes.stream().filter(n -> n.getName().equals(dest)).findFirst().orElse(null);
 				if(next == null){
 					throw new BadGraphError("Incoherent service graph",EType.INVALID_NODE_CHAIN);
 				}
-				if(visited.contains(next)){
+				if(visited.get(source).contains(dest) || dest.equals(prec.getName())){
 					//logger.debug("Next node already visited -> From " + source.getName() + " to " + next.getName() + " in " + nextDest);
 					continue;
 				}
-				
+				//logger.debug("Adding to visited from " + source.getName() +" to " + dest);
+				visited.get(source).add(dest);
 				//logger.debug("Route from " + source.getName()+ " to " + nctx.am.get(server.getName())+ " -> next hop: " + netobjs.get(next));
 				for(int i = level; i < savedChain.get(nChain).size() && i <= level+1; i++){
 					String nextHost = savedChain.get(nChain).get(i);
 					//logger.debug("RECURSION -> Deploying " + next.getName() +" on lv " + i + " of chain " +nChain +"("+nextHost+")");
-					if(setNextHop(next, server, nChain, i, hostServer, visited)){
+					if(setNextHop(source, next, server, nChain, i, hostServer, visited)){
 						//logger.debug("From " + currentHost + " to " + nextHost);
 						//logger.debug("On RT("+source.getName()+") ");
 						if(nextHost.equals(hostServer)){
@@ -493,9 +497,11 @@ public class VerifooProxy {
 						found = true;
 					}
 				}
+				//logger.debug("Removing to visited from " + source.getName() +" to " + dest);
+				visited.get(source).remove(dest);
 			}
 			//logger.debug("Removing from visited " + source.getName());
-			visited.remove(source);
+			//visited.remove(source);
 			return found;
 		}
 		/**
