@@ -36,6 +36,7 @@ public class MedicineSimulator {
 	private List<NodeCapacity> capacities;
 	PhysicalTopology phy;
 	VNFDeployment d;
+	Process containernet;
 	public MedicineSimulator(NFV root){
 		logger.debug("------------MEDICINE SIMULATION------------");
 		hosts = root.getHosts().getHost();
@@ -44,39 +45,68 @@ public class MedicineSimulator {
 		capacities = root.getCapacityDefinition().getCapacityForNode();
 		logger.debug("Creating Physical Network");
 		phy = new PhysicalTopology(root.getHosts().getHost(), root.getConnections().getConnection());
+		
 		createIN("");
 		d = new VNFDeployment(root.getHosts().getHost());
-		//deployVNF();
+		deployVNF();
+		try {
+			containernet.waitFor();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		logger.debug("-------------------------------------------");
 	}
 	
 	private void createIN(String file) {
 		try {
-			InputStreamReader input;
-		    OutputStreamWriter output;
+			file = "/home/sonata/demo/topologies/test_topology.py";
+		    
 	        //Create the process and start it.
-	        Process pb = new ProcessBuilder(new String[]{"/bin/bash", "-c", "sudo python "+file}).start();
-	        output = new OutputStreamWriter(pb.getOutputStream());
-	        input = new InputStreamReader(pb.getInputStream());
-
-	        int bytes;
-	        char buffer[] = new char[1024];
-	        while ((bytes = input.read(buffer, 0, 1024)) != -1) {
-	            if(bytes == 0)
-	                continue;
-	            //Output the data to console, for debug purposes
-	            String data = String.valueOf(buffer, 0, bytes);
-	            System.out.println(data);
-	            // Check for password request
-	            if (data.contains("conteinernet>")) {
-	                
-	                output.write("client ./start.sh");
-	                output.write('\n');
-	                output.flush();
+	        logger.debug("Launching physical topology");
+	        //String[] args = new String[] {"/bin/bash", "-c", "sudo python", "/home/sonata/demo/topologies/test_topology.py", "2>&1"};
+	        String[] args = new String[] {"/bin/bash", "-c", "/home/sonata/startTopology.sh"};
+	        containernet = new ProcessBuilder(args).start();
+	        //containernet = new ProcessBuilder("/home/sonata/startTopology.sh").start();
+	        
+	        String line = "";
+	        BufferedReader input = new BufferedReader(new InputStreamReader(containernet.getInputStream()));
+	        BufferedReader errorReader = new BufferedReader(new InputStreamReader (containernet.getErrorStream()));
+	        OutputStreamWriter output= new OutputStreamWriter(containernet.getOutputStream());
+	        while ((line = input.readLine()) != null) {
+	            System.out.println(line);
+	            if(line.contains("*** Starting CLI")){
+	            	System.out.println("Containernet bootstrap terminated");
+	            	break;
 	            }
+	        };
+	        //Process pb = Runtime.getRuntime().exec("sudo ls");
+	        output = new OutputStreamWriter(containernet.getOutputStream());
+	        //out = containernet.getOutputStream();  
+	        output.write("client ./start.sh");
+            output.write('\n');
+            output.flush();
+            System.out.println(input.readLine());
+	       
+	        logger.debug("Deploying nodes");
+	        Process pb = Runtime.getRuntime().exec("son-emu-cli compute start -d hostA -n client -i verifoo/client-vnf");
+	        
+	        input = new BufferedReader(new InputStreamReader(pb.getInputStream()));
+	        
+	        
+	        
+	        while ((line = input.readLine()) != null) {
+	            System.out.println(line);
 	        }
+	        System.out.println("Deploying exited with code:" + pb.waitFor());
+	        //System.out.println("Containernet exited with code:" + containernet.waitFor());
+	        
 		} catch (IOException e) {
+			e.printStackTrace();
 			System.out.println("The MeDICINE simulation can be run only on linux machines");
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 	}
@@ -117,7 +147,7 @@ public class MedicineSimulator {
 						.request(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON)
 						.put(Entity.entity(request, MediaType.APPLICATION_JSON));
-				logger.debug(res.getEntity().toString() + " connecting " + l.getSourceNode() + " -> " + l.getDestNode());
+				logger.debug(res.getEntity() + " connecting " + l.getSourceNode() + " -> " + l.getDestNode());
 			});
 		}catch(Exception e){
 			System.err.println("Medicine Remote Service not available");
