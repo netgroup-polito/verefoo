@@ -33,6 +33,8 @@ public class Main {
 			synchronized(logger){
 				jc= JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
 			}
+			
+	        	
                 // create an Unmarshaller
                 Unmarshaller u = jc.createUnmarshaller();
                 SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
@@ -42,19 +44,19 @@ public class Main {
                 //NFV root = (NFV) u.unmarshal( new FileInputStream( "./xsd/nfvInfo.xml" ) );
                 
                 NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg2clients3nodes2servers3host.xml" ) );
-               
-                for(Graph g:root.getGraphs().getGraph()){
+                MedicineSimulator sim = new MedicineSimulator(root);
+                /*for(Graph g:root.getGraphs().getGraph()){
                 	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
                 	IsolationResult res=test.checkNFFGProperty();
                 	if(res.result != Status.UNSATISFIABLE)
                 		new Translator(res.model.toString(),root).convert();
                 	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
-                }
+                }*/
                 // create a Marshaller and marshal to output
                 Marshaller m = jc.createMarshaller();
                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                 m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvInfo.xsd");
-                m.marshal( root, System.out ); 
+                //m.marshal( root, System.out ); 
                 //MedicineSimulator sim = new MedicineSimulator(root);
                 //sim.printTopology();
                 //sim.printPlacement();

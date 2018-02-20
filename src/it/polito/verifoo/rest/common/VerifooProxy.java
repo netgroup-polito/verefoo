@@ -50,7 +50,9 @@ public class VerifooProxy {
 		 * @throws BadGraphError
 		 */
 	    public VerifooProxy(Graph graph,Hosts hosts,Connections conns, CapacityDefinition capacityDefinition) throws BadGraphError{
-			HashMap<String, String> cfg = new HashMap<String, String>();
+	    	System.loadLibrary("z3");
+        	System.loadLibrary("z3java");
+	    	HashMap<String, String> cfg = new HashMap<String, String>();
 		    cfg.put("model", "true");
 		    ctx = new Context(cfg);
 		    nodes=graph.getNode();
