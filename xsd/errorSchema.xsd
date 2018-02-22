@@ -17,7 +17,7 @@
 	    <xsd:restriction base="xsd:string">
 	      <xsd:enumeration value="XMLValidationError"/>
 	      <xsd:enumeration value="InvalidServerClientConf"/>
-	      <xsd:enumeration value="InvalidNodeChain"/>
+	      <xsd:enumeration value="InvalidServiceGraph"/>
 	      <xsd:enumeration value="PHYClientServerNotConnected"/>
 	      <xsd:enumeration value="InvalidPHYServerClientConf"/>
 	      <xsd:enumeration value="NoMiddleHostDefined"/>

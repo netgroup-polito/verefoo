@@ -10,7 +10,7 @@ package it.polito.verifoo.rest.jaxb;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -24,8 +24,10 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="type" use="required" type="{}E-Type" />
- *       &lt;attribute name="message" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;sequence>
+ *         &lt;element ref="{}NodeConstraints"/>
+ *         &lt;element ref="{}BandwidthConstraints"/>
+ *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -34,61 +36,64 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
-@XmlRootElement(name = "ApplicationError")
-public class ApplicationError {
+@XmlType(name = "", propOrder = {
+    "nodeConstraints",
+    "bandwidthConstraints"
+})
+@XmlRootElement(name = "Constraints")
+public class Constraints {
 
-    @XmlAttribute(name = "type", required = true)
-    protected EType type;
-    @XmlAttribute(name = "message")
-    protected String message;
+    @XmlElement(name = "NodeConstraints", required = true)
+    protected NodeConstraints nodeConstraints;
+    @XmlElement(name = "BandwidthConstraints", required = true)
+    protected BandwidthConstraints bandwidthConstraints;
 
     /**
-     * Recupera il valore della proprietà type.
+     * Recupera il valore della proprietà nodeConstraints.
      * 
      * @return
      *     possible object is
-     *     {@link EType }
+     *     {@link NodeConstraints }
      *     
      */
-    public EType getType() {
-        return type;
+    public NodeConstraints getNodeConstraints() {
+        return nodeConstraints;
     }
 
     /**
-     * Imposta il valore della proprietà type.
+     * Imposta il valore della proprietà nodeConstraints.
      * 
      * @param value
      *     allowed object is
-     *     {@link EType }
+     *     {@link NodeConstraints }
      *     
      */
-    public void setType(EType value) {
-        this.type = value;
+    public void setNodeConstraints(NodeConstraints value) {
+        this.nodeConstraints = value;
     }
 
     /**
-     * Recupera il valore della proprietà message.
+     * Recupera il valore della proprietà bandwidthConstraints.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link BandwidthConstraints }
      *     
      */
-    public String getMessage() {
-        return message;
+    public BandwidthConstraints getBandwidthConstraints() {
+        return bandwidthConstraints;
     }
 
     /**
-     * Imposta il valore della proprietà message.
+     * Imposta il valore della proprietà bandwidthConstraints.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link BandwidthConstraints }
      *     
      */
-    public void setMessage(String value) {
-        this.message = value;
+    public void setBandwidthConstraints(BandwidthConstraints value) {
+        this.bandwidthConstraints = value;
     }
 
 }

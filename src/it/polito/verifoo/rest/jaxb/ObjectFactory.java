@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.01.18 alle 10:29:56 PM CET 
+// Generato il: 2018.02.22 alle 03:55:55 PM CET 
 //
 
 
@@ -34,6 +34,22 @@ public class ObjectFactory {
      * 
      */
     public ObjectFactory() {
+    }
+
+    /**
+     * Create an instance of {@link BandwidthConstraints }
+     * 
+     */
+    public BandwidthConstraints createBandwidthConstraints() {
+        return new BandwidthConstraints();
+    }
+
+    /**
+     * Create an instance of {@link NodeConstraints }
+     * 
+     */
+    public NodeConstraints createNodeConstraints() {
+        return new NodeConstraints();
     }
 
     /**
@@ -82,6 +98,14 @@ public class ObjectFactory {
      */
     public Host createHost() {
         return new Host();
+    }
+
+    /**
+     * Create an instance of {@link SupportedVNFType }
+     * 
+     */
+    public SupportedVNFType createSupportedVNFType() {
+        return new SupportedVNFType();
     }
 
     /**
@@ -245,11 +269,27 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link BandwidthConstraints.BandwidthMetrics }
+     * 
+     */
+    public BandwidthConstraints.BandwidthMetrics createBandwidthConstraintsBandwidthMetrics() {
+        return new BandwidthConstraints.BandwidthMetrics();
+    }
+
+    /**
      * Create an instance of {@link ApplicationError }
      * 
      */
     public ApplicationError createApplicationError() {
         return new ApplicationError();
+    }
+
+    /**
+     * Create an instance of {@link NodeConstraints.NodeMetrics }
+     * 
+     */
+    public NodeConstraints.NodeMetrics createNodeConstraintsNodeMetrics() {
+        return new NodeConstraints.NodeMetrics();
     }
 
     /**
@@ -261,19 +301,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link CapacityDefinition }
+     * Create an instance of {@link Constraints }
      * 
      */
-    public CapacityDefinition createCapacityDefinition() {
-        return new CapacityDefinition();
-    }
-
-    /**
-     * Create an instance of {@link NodeCapacity }
-     * 
-     */
-    public NodeCapacity createNodeCapacity() {
-        return new NodeCapacity();
+    public Constraints createConstraints() {
+        return new Constraints();
     }
 
     /**

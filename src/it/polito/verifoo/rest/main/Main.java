@@ -38,25 +38,27 @@ public class Main {
                 // create an Unmarshaller
                 Unmarshaller u = jc.createUnmarshaller();
                 SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-                Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
+                Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
                 u.setSchema(schema);
                 // unmarshal a document into a tree of Java content objects
                 //NFV root = (NFV) u.unmarshal( new FileInputStream( "./xsd/nfvInfo.xml" ) );
                 
-                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg2clients3nodes2servers3host.xml" ) );
-                MedicineSimulator sim = new MedicineSimulator(root);
-                /*for(Graph g:root.getGraphs().getGraph()){
-                	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
+                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg4nodes5hostConnection.xml" ) );
+                //MedicineSimulator sim = new MedicineSimulator(root);
+                for(Graph g:root.getGraphs().getGraph()){
+                	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
+                	Property pd = root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId() && p.getName().equals(PName.ISOLATION_PROPERTY)).findFirst().orElse(null);
+                	if(pd == null) break;
                 	IsolationResult res=test.checkNFFGProperty();
                 	if(res.result != Status.UNSATISFIABLE)
                 		new Translator(res.model.toString(),root).convert();
                 	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
-                }*/
+                }
                 // create a Marshaller and marshal to output
                 Marshaller m = jc.createMarshaller();
                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-                m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvInfo.xsd");
-                //m.marshal( root, System.out ); 
+                m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
+                m.marshal( root, System.out ); 
                 //MedicineSimulator sim = new MedicineSimulator(root);
                 //sim.printTopology();
                 //sim.printPlacement();

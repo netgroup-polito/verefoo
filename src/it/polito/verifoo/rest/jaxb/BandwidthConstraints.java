@@ -28,14 +28,13 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Link" maxOccurs="unbounded" minOccurs="0">
+ *         &lt;element name="BandwidthMetrics" maxOccurs="unbounded" minOccurs="0">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                 &lt;attribute name="rel" type="{http://www.w3.org/2001/XMLSchema}string" />
- *                 &lt;attribute name="href" type="{http://www.w3.org/2001/XMLSchema}string" />
- *                 &lt;attribute name="type" type="{http://www.w3.org/2001/XMLSchema}string" />
- *                 &lt;attribute name="method" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                 &lt;attribute name="src" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                 &lt;attribute name="dst" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                 &lt;attribute name="reqLatency" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
@@ -50,41 +49,41 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "link"
+    "bandwidthMetrics"
 })
-@XmlRootElement(name = "Hyperlinks")
-public class Hyperlinks {
+@XmlRootElement(name = "BandwidthConstraints")
+public class BandwidthConstraints {
 
-    @XmlElement(name = "Link")
-    protected List<Hyperlinks.Link> link;
+    @XmlElement(name = "BandwidthMetrics")
+    protected List<BandwidthConstraints.BandwidthMetrics> bandwidthMetrics;
 
     /**
-     * Gets the value of the link property.
+     * Gets the value of the bandwidthMetrics property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the link property.
+     * This is why there is not a <CODE>set</CODE> method for the bandwidthMetrics property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getLink().add(newItem);
+     *    getBandwidthMetrics().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Hyperlinks.Link }
+     * {@link BandwidthConstraints.BandwidthMetrics }
      * 
      * 
      */
-    public List<Hyperlinks.Link> getLink() {
-        if (link == null) {
-            link = new ArrayList<Hyperlinks.Link>();
+    public List<BandwidthConstraints.BandwidthMetrics> getBandwidthMetrics() {
+        if (bandwidthMetrics == null) {
+            bandwidthMetrics = new ArrayList<BandwidthConstraints.BandwidthMetrics>();
         }
-        return this.link;
+        return this.bandwidthMetrics;
     }
 
 
@@ -97,10 +96,9 @@ public class Hyperlinks {
      * &lt;complexType>
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;attribute name="rel" type="{http://www.w3.org/2001/XMLSchema}string" />
-     *       &lt;attribute name="href" type="{http://www.w3.org/2001/XMLSchema}string" />
-     *       &lt;attribute name="type" type="{http://www.w3.org/2001/XMLSchema}string" />
-     *       &lt;attribute name="method" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *       &lt;attribute name="src" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *       &lt;attribute name="dst" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *       &lt;attribute name="reqLatency" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>
@@ -110,111 +108,77 @@ public class Hyperlinks {
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "")
-    public static class Link {
+    public static class BandwidthMetrics {
 
-        @XmlAttribute(name = "rel")
-        protected String rel;
-        @XmlAttribute(name = "href")
-        protected String href;
-        @XmlAttribute(name = "type")
-        protected String type;
-        @XmlAttribute(name = "method")
-        protected String method;
+        @XmlAttribute(name = "src", required = true)
+        protected String src;
+        @XmlAttribute(name = "dst", required = true)
+        protected String dst;
+        @XmlAttribute(name = "reqLatency", required = true)
+        protected int reqLatency;
 
         /**
-         * Recupera il valore della proprietà rel.
+         * Recupera il valore della proprietà src.
          * 
          * @return
          *     possible object is
          *     {@link String }
          *     
          */
-        public String getRel() {
-            return rel;
+        public String getSrc() {
+            return src;
         }
 
         /**
-         * Imposta il valore della proprietà rel.
+         * Imposta il valore della proprietà src.
          * 
          * @param value
          *     allowed object is
          *     {@link String }
          *     
          */
-        public void setRel(String value) {
-            this.rel = value;
+        public void setSrc(String value) {
+            this.src = value;
         }
 
         /**
-         * Recupera il valore della proprietà href.
+         * Recupera il valore della proprietà dst.
          * 
          * @return
          *     possible object is
          *     {@link String }
          *     
          */
-        public String getHref() {
-            return href;
+        public String getDst() {
+            return dst;
         }
 
         /**
-         * Imposta il valore della proprietà href.
+         * Imposta il valore della proprietà dst.
          * 
          * @param value
          *     allowed object is
          *     {@link String }
          *     
          */
-        public void setHref(String value) {
-            this.href = value;
+        public void setDst(String value) {
+            this.dst = value;
         }
 
         /**
-         * Recupera il valore della proprietà type.
+         * Recupera il valore della proprietà reqLatency.
          * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
          */
-        public String getType() {
-            return type;
+        public int getReqLatency() {
+            return reqLatency;
         }
 
         /**
-         * Imposta il valore della proprietà type.
+         * Imposta il valore della proprietà reqLatency.
          * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
          */
-        public void setType(String value) {
-            this.type = value;
-        }
-
-        /**
-         * Recupera il valore della proprietà method.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getMethod() {
-            return method;
-        }
-
-        /**
-         * Imposta il valore della proprietà method.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setMethod(String value) {
-            this.method = value;
+        public void setReqLatency(int value) {
+            this.reqLatency = value;
         }
 
     }

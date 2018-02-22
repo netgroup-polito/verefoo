@@ -4,6 +4,7 @@
 package it.polito.verifoo.rest.common;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,8 +14,7 @@ import org.apache.logging.log4j.Logger;
 import it.polito.verifoo.rest.jaxb.Connection;
 
 /**
- * This is the class that extract all the possible chain from a physical network or 
- * a service graph
+ * This is the class that extract all the possible chain from a physical network
  * @author Antonio
  *
  */
@@ -38,13 +38,15 @@ public class ChainExtractor {
 								.filter(c -> c.getSourceHost().equals(hostClient))
 								.map(c -> c.getDestHost())
 								.collect(Collectors.toList());
-		for(String h:destinations){
-			//System.out.println("Adding dest: "+h);
-			hostChain.add(h);
-			expandHostChain(h, hostServer, hostChain, connections, maxSize);
-			hostChain.remove(h);
+		for(String dest:destinations){
+			//logger.debug("Adding host to the current hostChain: "+h);
+			hostChain.add(dest);
+			expandHostChain(dest, hostServer, hostChain, connections, new HashMap<>(), maxSize);
+			//logger.debug("Removing host from the current hostChain: "+dest);
+			//logger.debug("Host in chain: "+hostChain);
+			hostChain.remove(hostChain.lastIndexOf(dest));
 		}
-		logger.debug("Calculated host chain " + savedChain);
+		//logger.debug("Calculated host chain " + savedChain);
 		return new ArrayList<List<String>>(savedChain);
 	}
 	/**
@@ -53,27 +55,45 @@ public class ChainExtractor {
 	 * @param hostServer is the final host of the network
 	 * @param hostChain List of all the hosts encountered in the current chain
 	 */
-	private static boolean expandHostChain(String lastHost, String hostServer, List<String> hostChain, List<Connection> connections, int maxSize){
+	private static boolean expandHostChain(String lastHost, String hostServer, List<String> hostChain, List<Connection> connections, HashMap<String, List<String>> visited, int maxSize){
 		if(lastHost.equals(hostServer)){
 			//logger.debug("Dest Reached " + lastHost);
 			savedChain.add(new ArrayList<>(hostChain));
 			return true;
 		}
-		if(hostChain.size() > maxSize) return false;
+		if(hostChain.size() >= maxSize){ 
+			//logger.debug("Chain MAX Size reached");
+			return false;
+		}
 		List<String> destinations = connections.stream()
 								.filter(c -> c.getSourceHost().equals(lastHost))
 								.map(c -> c.getDestHost())
 								.collect(Collectors.toList());
-		for(String h:destinations){
+		if(!visited.containsKey(lastHost)){
+			//logger.debug("New host visited -> " + lastHost);
+			visited.put(lastHost, new ArrayList<>());
+		}
+		for(String dest:destinations){
+			if(visited.get(lastHost).contains(dest) || dest.equals(lastHost)){
+				//logger.debug("Host already visited -> From " + lastHost + " to " + dest + " in " + destinations);
+				continue;
+			}
+			//logger.debug("Adding to visited from " + lastHost +" to " + dest);
+			visited.get(lastHost).add(dest);
+			/*
 			if(hostChain.contains(h)){
 				//logger.debug("Host already in chain "+h);
 				continue;
-			}
-			hostChain.add(h);
-			//logger.debug("Adding dest: "+h);
+			}*/
+			hostChain.add(dest);
+			//logger.debug("Adding host to the current hostChain: "+dest);
 			//logger.debug("Host in chain: "+hostChain);
-			expandHostChain(h, hostServer, hostChain, connections, maxSize);
-			hostChain.remove(h);
+			expandHostChain(dest, hostServer, hostChain, connections, visited, maxSize);
+			//logger.debug("Removing host from the current hostChain: "+dest);
+			//logger.debug("Host in chain: "+hostChain);
+			hostChain.remove(hostChain.lastIndexOf(dest));
+			//logger.debug("Removing to visited from " + lastHost +" to " + dest);
+			visited.get(lastHost).remove(dest);
 		}
 		
 		return true;

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2017 Politecnico di Torino and others.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Apache License, Version 2.0
+ which accompanies this distribution, and is available at
+ http://www.apache.org/licenses/LICENSE-2.0
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:include schemaLocation="errorSchema.xsd"/>
+    <xsd:include schemaLocation="hateoasLinks.xsd"/>
+    <xsd:include schemaLocation="xml_components.xsd"/>
+	<xsd:element name="NFV">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="graphs" minOccurs="1" maxOccurs="1"/>
+				<xsd:element ref="Constraints" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="PropertyDefinition" minOccurs="1" maxOccurs="1"/>
+				<xsd:element ref="Hosts"/>
+				<xsd:element ref="Connections"/>
+				<xsd:element name="ParsingString" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+			</xsd:sequence>
+		</xsd:complexType>		
+	    <xsd:key name="hostKey">
+	      <xsd:selector xpath="Hosts/Host" />
+	      <xsd:field xpath="@name" />
+	    </xsd:key>
+	    <xsd:keyref name="ConnectionSourceHost" refer="hostKey">
+	      <xsd:selector xpath="Connections/Connection" />
+	      <xsd:field xpath="@sourceHost" />
+	    </xsd:keyref>
+	    <xsd:keyref name="ConnectionDestHost" refer="hostKey">
+	      <xsd:selector xpath="Connections/Connection" />
+	      <xsd:field xpath="@destHost" />
+	    </xsd:keyref>
+	    
+	     <xsd:unique name="ConnectionUniqueness">
+		    <xsd:selector xpath="Connections/Connection"/>
+		    <xsd:field xpath="@sourceHost"/>
+		    <xsd:field xpath="@destHost"/>
+		</xsd:unique>
+	    
+	    
+	    <xsd:keyref name="NodeMetricsRef" refer="keyNode">
+	      <xsd:selector xpath="Constraints/NodeConstraints/NodeMetrics" />
+	      <xsd:field xpath="@node" />
+	    </xsd:keyref>
+	    <xsd:keyref name="BandwidthSrcRef" refer="keyNode">
+	      <xsd:selector xpath="Constraints/BandwidthConstraints/BandwidthMetrics" />
+	      <xsd:field xpath="@src" />
+	    </xsd:keyref>
+	    <xsd:keyref name="BandwidthDstRef" refer="keyNode">
+	      <xsd:selector xpath="Constraints/BandwidthConstraints/BandwidthMetrics" />
+	      <xsd:field xpath="@dst" />
+	    </xsd:keyref>
+	    
+	    <xsd:unique name="BandwidthUniqueness">
+		    <xsd:selector xpath="Constraints/BandwidthConstraints/BandwidthMetrics"/>
+		    <xsd:field xpath="@src"/>
+		    <xsd:field xpath="@dst"/>
+		</xsd:unique>
+	    
+	    <xsd:keyref name="fixedEndpointRef" refer="keyNode">
+	      <xsd:selector xpath="Hosts/Host" />
+	      <xsd:field xpath="@fixedEndpoint" />
+	    </xsd:keyref>
+	    <xsd:key name="keyGraph">
+            <xsd:selector xpath="graphs/graph" />
+            <xsd:field xpath="@id" />
+        </xsd:key>
+	    <xsd:keyref name="PropertyRef" refer="keyGraph">
+	      <xsd:selector xpath="PropertyDefinition/Property" />
+	      <xsd:field xpath="@graph" />
+	    </xsd:keyref>
+	</xsd:element>
+	<xsd:element name="PropertyDefinition">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Property" type="Property" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Constraints">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="NodeConstraints" maxOccurs="1"/>
+				<xsd:element ref="BandwidthConstraints" maxOccurs="1"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NodeConstraints">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="NodeMetrics" minOccurs="0" maxOccurs="unbounded">
+					<xsd:complexType>
+			            <xsd:attribute name="node" type="xsd:string" use="required" />
+			            <xsd:attribute name="nrOfOperations" type="xsd:long" use="optional"/>
+			            <xsd:attribute name="maxNodeLatency" type="xsd:int" use="optional"/>
+			            <xsd:attribute name="reqStorage" type="xsd:int" use="optional" default="0"/>
+			            <xsd:attribute name="cores" type="xsd:int" use="optional" default="0"/>
+			        </xsd:complexType>
+       	 		</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="BandwidthConstraints">
+		<xsd:complexType>
+			<xsd:sequence>
+       	 		<xsd:element name="BandwidthMetrics" minOccurs="0" maxOccurs="unbounded">
+					<xsd:complexType>
+			            <xsd:attribute name="src" type="xsd:string" use="required" />
+			            <xsd:attribute name="dst" type="xsd:string" use="required" />
+			            <xsd:attribute name="reqLatency" type="xsd:int" use="required"/>
+			        </xsd:complexType>
+       	 		</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Hosts">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="Host"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Host">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="SupportedVNF" type="SupportedVNFType" maxOccurs="unbounded" minOccurs="0" />
+				<xsd:element name="NodeRef" type="NodeRefType" maxOccurs="unbounded" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
+			<xsd:attribute name="cpu" type="xsd:int" use="required"/>
+			<xsd:attribute name="cores" type="xsd:int" use="required"/>
+			<xsd:attribute name="diskStorage" type="xsd:int" use="required"/>
+			<xsd:attribute name="maxVNF" type="xsd:int" use="optional"/>
+			<xsd:attribute name="type" type="TypeOfHost" use="optional"/>
+			<xsd:attribute name="fixedEndpoint" type="xsd:string" use="optional"/>
+			<xsd:attribute name="active" type="xsd:boolean" use="optional" default="false"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Connections">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Connection" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Connection">
+		<xsd:complexType>
+			<xsd:attribute name="sourceHost" type="xsd:string" use="required"/>
+			<xsd:attribute name="destHost" type="xsd:string" use="required"/>
+			<xsd:attribute name="avgLatency" type="xsd:int"/>
+		</xsd:complexType>
+		</xsd:element>
+	<xsd:complexType name="NodeRefType">
+		<xsd:attribute name="node" type="xsd:string" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="SupportedVNFType">
+		<xsd:attribute name="functional_type" type="functionalTypes" use="required" />
+	</xsd:complexType>
+	<xsd:simpleType name="TypeOfHost">
+	    <xsd:restriction base="xsd:string">
+	      <xsd:enumeration value="CLIENT"/>
+	      <xsd:enumeration value="SERVER"/>
+	      <xsd:enumeration value="MIDDLEBOX"/>
+	 	</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="P-Name">
+	    <xsd:restriction base="xsd:string">
+	      <xsd:enumeration value="IsolationProperty"/>
+	 	</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="Property">
+				<xsd:attribute name="name" type="P-Name" use="required"/>
+				<xsd:attribute name="graph" type="xsd:long" use="required"/>
+				<xsd:attribute name="src" type="xsd:string" use="required"/>
+				<xsd:attribute name="dst" type="xsd:string" use="required"/>
+				<xsd:attribute name="isSat" type="xsd:boolean"/>
+	</xsd:complexType>
+</xsd:schema>

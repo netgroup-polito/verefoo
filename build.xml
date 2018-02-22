@@ -46,7 +46,7 @@
 			<arg value="${src.dir}" />
 			<arg value="-p" />
 			<arg value="it.polito.verifoo.rest.jaxb" />
-			<arg value="${schema.dir}/nfvInfo.xsd" />
+			<arg value="${schema.dir}/nfvSchema.xsd" />
 		</exec>
 		<touch file="${src.dir}/.flagfile" />
 	</target>

@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.01.18 alle 10:29:56 PM CET 
+// Generato il: 2018.02.22 alle 03:55:55 PM CET 
 //
 
 
@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element ref="{}graphs"/>
- *         &lt;element ref="{}CapacityDefinition" minOccurs="0"/>
+ *         &lt;element ref="{}Constraints" minOccurs="0"/>
  *         &lt;element ref="{}PropertyDefinition"/>
  *         &lt;element ref="{}Hosts"/>
  *         &lt;element ref="{}Connections"/>
@@ -42,7 +42,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "graphs",
-    "capacityDefinition",
+    "constraints",
     "propertyDefinition",
     "hosts",
     "connections",
@@ -53,8 +53,8 @@ public class NFV {
 
     @XmlElement(required = true)
     protected Graphs graphs;
-    @XmlElement(name = "CapacityDefinition")
-    protected CapacityDefinition capacityDefinition;
+    @XmlElement(name = "Constraints")
+    protected Constraints constraints;
     @XmlElement(name = "PropertyDefinition", required = true)
     protected PropertyDefinition propertyDefinition;
     @XmlElement(name = "Hosts", required = true)
@@ -89,27 +89,27 @@ public class NFV {
     }
 
     /**
-     * Recupera il valore della proprietà capacityDefinition.
+     * Recupera il valore della proprietà constraints.
      * 
      * @return
      *     possible object is
-     *     {@link CapacityDefinition }
+     *     {@link Constraints }
      *     
      */
-    public CapacityDefinition getCapacityDefinition() {
-        return capacityDefinition;
+    public Constraints getConstraints() {
+        return constraints;
     }
 
     /**
-     * Imposta il valore della proprietà capacityDefinition.
+     * Imposta il valore della proprietà constraints.
      * 
      * @param value
      *     allowed object is
-     *     {@link CapacityDefinition }
+     *     {@link Constraints }
      *     
      */
-    public void setCapacityDefinition(CapacityDefinition value) {
-        this.capacityDefinition = value;
+    public void setConstraints(Constraints value) {
+        this.constraints = value;
     }
 
     /**

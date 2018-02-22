@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.01.18 alle 10:29:56 PM CET 
+// Generato il: 2018.02.22 alle 03:55:55 PM CET 
 //
 
 
@@ -24,8 +24,10 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;attribute name="name" use="required" type="{}P-Name" />
- *       &lt;attribute name="isSat" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="graph" use="required" type="{http://www.w3.org/2001/XMLSchema}long" />
+ *       &lt;attribute name="src" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="dst" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="isSat" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -39,10 +41,14 @@ public class Property {
 
     @XmlAttribute(name = "name", required = true)
     protected PName name;
-    @XmlAttribute(name = "isSat")
-    protected Boolean isSat;
     @XmlAttribute(name = "graph", required = true)
     protected long graph;
+    @XmlAttribute(name = "src", required = true)
+    protected String src;
+    @XmlAttribute(name = "dst", required = true)
+    protected String dst;
+    @XmlAttribute(name = "isSat")
+    protected Boolean isSat;
 
     /**
      * Recupera il valore della proprietà name.
@@ -69,6 +75,70 @@ public class Property {
     }
 
     /**
+     * Recupera il valore della proprietà graph.
+     * 
+     */
+    public long getGraph() {
+        return graph;
+    }
+
+    /**
+     * Imposta il valore della proprietà graph.
+     * 
+     */
+    public void setGraph(long value) {
+        this.graph = value;
+    }
+
+    /**
+     * Recupera il valore della proprietà src.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getSrc() {
+        return src;
+    }
+
+    /**
+     * Imposta il valore della proprietà src.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setSrc(String value) {
+        this.src = value;
+    }
+
+    /**
+     * Recupera il valore della proprietà dst.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getDst() {
+        return dst;
+    }
+
+    /**
+     * Imposta il valore della proprietà dst.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setDst(String value) {
+        this.dst = value;
+    }
+
+    /**
      * Recupera il valore della proprietà isSat.
      * 
      * @return
@@ -90,22 +160,6 @@ public class Property {
      */
     public void setIsSat(Boolean value) {
         this.isSat = value;
-    }
-
-    /**
-     * Recupera il valore della proprietà graph.
-     * 
-     */
-    public long getGraph() {
-        return graph;
-    }
-
-    /**
-     * Imposta il valore della proprietà graph.
-     * 
-     */
-    public void setGraph(long value) {
-        this.graph = value;
     }
 
 }

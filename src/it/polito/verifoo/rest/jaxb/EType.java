@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.01.18 alle 10:29:56 PM CET 
+// Generato il: 2018.02.22 alle 03:55:55 PM CET 
 //
 
 
@@ -23,7 +23,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *     &lt;enumeration value="XMLValidationError"/>
  *     &lt;enumeration value="InvalidServerClientConf"/>
- *     &lt;enumeration value="InvalidNodeChain"/>
+ *     &lt;enumeration value="InvalidServiceGraph"/>
+ *     &lt;enumeration value="InvalidPhysicalTopology"/>
  *     &lt;enumeration value="PHYClientServerNotConnected"/>
  *     &lt;enumeration value="InvalidPHYServerClientConf"/>
  *     &lt;enumeration value="NoMiddleHostDefined"/>
@@ -45,8 +46,10 @@ public enum EType {
     XML_VALIDATION_ERROR("XMLValidationError"),
     @XmlEnumValue("InvalidServerClientConf")
     INVALID_SERVER_CLIENT_CONF("InvalidServerClientConf"),
-    @XmlEnumValue("InvalidNodeChain")
-    INVALID_NODE_CHAIN("InvalidNodeChain"),
+    @XmlEnumValue("InvalidServiceGraph")
+    INVALID_SERVICE_GRAPH("InvalidServiceGraph"),
+    @XmlEnumValue("InvalidPhysicalTopology")
+    INVALID_PHYSICAL_TOPOLOGY("InvalidPhysicalTopology"),
     @XmlEnumValue("PHYClientServerNotConnected")
     PHY_CLIENT_SERVER_NOT_CONNECTED("PHYClientServerNotConnected"),
     @XmlEnumValue("InvalidPHYServerClientConf")

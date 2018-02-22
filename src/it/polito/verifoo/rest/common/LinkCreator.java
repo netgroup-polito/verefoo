@@ -3,14 +3,12 @@ package it.polito.verifoo.rest.common;
 import java.util.ArrayList;
 import static java.util.Comparator.*;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Node;
 /**
@@ -79,7 +77,6 @@ public class LinkCreator {
 		
 		//if(current.getNeighbour().size() > 2) throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
 		boolean found = false;
-		try {
 			List<String> neighbours = current.getNeighbour().stream()
 											.filter(n -> !(n.getName().equals(prec.getName())))
 											.map(n -> n.getName())
@@ -90,7 +87,7 @@ public class LinkCreator {
 			for(String neighbour : neighbours){
 				if(!converting.contains(neighbour)){
 					Node next = nodes.stream().filter(n -> n.getName().equals(neighbour)).findFirst().get();
-					//If neighbour reaches the server or reaches a node that reaches the server then... 
+					//If the neighbour reaches the server or reaches a node that reaches the server then... 
 					if(createLink(current, next, client, server, converting, converted) ){
 						//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server " + server.getName());
 						Link l = new Link(prec.getName(), current.getName());
@@ -105,9 +102,6 @@ public class LinkCreator {
 				}
 			}
 			converting.remove(current.getName());
-		} catch (NoSuchElementException e) {
-			throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
-		}
 		return found;
 	}
 }
