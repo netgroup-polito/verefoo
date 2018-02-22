@@ -72,7 +72,7 @@ public class TestProxy {
         // unmarshal a document into a tree of Java content objects
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
         for(Graph g:root.getGraphs().getGraph()){
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
+        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
         	IsolationResult res=test.checkNFFGProperty();
         	if(res.result != Status.UNSATISFIABLE)
         		new Translator(res.model.toString(),root).convert();

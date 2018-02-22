@@ -7,11 +7,13 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
@@ -22,6 +24,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.xml.sax.SAXException;
+
 import com.microsoft.z3.Status;
 
 import it.polito.verifoo.rest.common.BadGraphError;
@@ -66,7 +70,7 @@ public class TestSG {
 	public void tearDown() throws Exception {
 	}
 	
-	private void test(String file, boolean sat) throws Exception{
+	private NFV init(String file) throws JAXBException, SAXException, FileNotFoundException{
 		// create a JAXBContext capable of handling the generated classes
         JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
         // create an Unmarshaller
@@ -77,12 +81,18 @@ public class TestSG {
         // unmarshal a document into a tree of Java content objects
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
         for(Graph g:root.getGraphs().getGraph()){
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
+        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
         	IsolationResult res=test.checkNFFGProperty();
         	if(res.result != Status.UNSATISFIABLE)
         		new Translator(res.model.toString(),root).convert();
         	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
         }
+		return root;
+		
+	}
+	
+	private void test(String file, boolean sat) throws Exception{
+		NFV root = init(file);
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(sat, p.isIsSat());
         });
@@ -99,22 +109,7 @@ public class TestSG {
 	
 	@Test
 	public void testMinimizeLatency() throws Exception {
-		// create a JAXBContext capable of handling the generated classes
-        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
-        // create an Unmarshaller
-        Unmarshaller u = jc.createUnmarshaller();
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
-        u.setSchema(schema);
-        // unmarshal a document into a tree of Java content objects
-        NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg4nodes5host.xml" ) );
-        for(Graph g:root.getGraphs().getGraph()){
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
-        	IsolationResult res=test.checkNFFGProperty();
-        	if(res.result != Status.UNSATISFIABLE)
-        		new Translator(res.model.toString(),root).convert();
-        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
-        }
+        NFV root = init("./testfile/ServiceGraphs/sg4nodes5host.xml");
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(true, p.isIsSat());
         });
@@ -124,22 +119,7 @@ public class TestSG {
 	}
 	@Test
 	public void testMinimizeLatencyAndServers() throws Exception {
-		// create a JAXBContext capable of handling the generated classes
-        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
-        // create an Unmarshaller
-        Unmarshaller u = jc.createUnmarshaller();
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
-        u.setSchema(schema);
-        // unmarshal a document into a tree of Java content objects
-        NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg5nodes3host.xml" ) );
-        for(Graph g:root.getGraphs().getGraph()){
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
-        	IsolationResult res=test.checkNFFGProperty();
-        	if(res.result != Status.UNSATISFIABLE)
-        		new Translator(res.model.toString(),root).convert();
-        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
-        }
+        NFV root = init("./testfile/ServiceGraphs/sg5nodes3host.xml");
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(true, p.isIsSat());
         });
@@ -150,22 +130,7 @@ public class TestSG {
 	}
 	@Test
 	public void testModel() throws Exception {
-		// create a JAXBContext capable of handling the generated classes
-        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
-        // create an Unmarshaller
-        Unmarshaller u = jc.createUnmarshaller();
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
-        u.setSchema(schema);
-        // unmarshal a document into a tree of Java content objects
-        NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg4nodes5hostConnection.xml" ) );
-        for(Graph g:root.getGraphs().getGraph()){
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
-        	IsolationResult res=test.checkNFFGProperty();
-        	if(res.result != Status.UNSATISFIABLE)
-        		new Translator(res.model.toString(),root).convert();
-        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
-        }
+        NFV root = init("./testfile/ServiceGraphs/sg4nodes5hostConnection.xml");
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(true, p.isIsSat());
         });
@@ -176,22 +141,7 @@ public class TestSG {
 	
 	@Test
 	public void test2Clients() throws Exception {
-		// create a JAXBContext capable of handling the generated classes
-        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
-        // create an Unmarshaller
-        Unmarshaller u = jc.createUnmarshaller();
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
-        u.setSchema(schema);
-        // unmarshal a document into a tree of Java content objects
-        NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg2clients3nodes3host.xml" ) );
-        for(Graph g:root.getGraphs().getGraph()){
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
-        	IsolationResult res=test.checkNFFGProperty();
-        	if(res.result != Status.UNSATISFIABLE)
-        		new Translator(res.model.toString(),root).convert();
-        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
-        }
+        NFV root = init("./testfile/ServiceGraphs/sg2clients3nodes3host.xml");
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(true, p.isIsSat());
         });
@@ -202,22 +152,7 @@ public class TestSG {
 	
 	@Test
 	public void test2Servers() throws Exception {
-		// create a JAXBContext capable of handling the generated classes
-        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
-        // create an Unmarshaller
-        Unmarshaller u = jc.createUnmarshaller();
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
-        u.setSchema(schema);
-        // unmarshal a document into a tree of Java content objects
-        NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg3nodes2servers3host.xml" ) );
-        for(Graph g:root.getGraphs().getGraph()){
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
-        	IsolationResult res=test.checkNFFGProperty();
-        	if(res.result != Status.UNSATISFIABLE)
-        		new Translator(res.model.toString(),root).convert();
-        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
-        }
+        NFV root = init("./testfile/ServiceGraphs/sg3nodes2servers3host.xml");
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(true, p.isIsSat());
         });
@@ -227,22 +162,7 @@ public class TestSG {
 	}
 	@Test
 	public void test2Clients2Servers() throws Exception {
-		// create a JAXBContext capable of handling the generated classes
-        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
-        // create an Unmarshaller
-        Unmarshaller u = jc.createUnmarshaller();
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
-        u.setSchema(schema);
-        // unmarshal a document into a tree of Java content objects
-        NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg2clients4nodes2servers3host.xml" ) );
-        for(Graph g:root.getGraphs().getGraph()){
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
-        	IsolationResult res=test.checkNFFGProperty();
-        	if(res.result != Status.UNSATISFIABLE)
-        		new Translator(res.model.toString(),root).convert();
-        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
-        }
+        NFV root = init("./testfile/ServiceGraphs/sg2clients4nodes2servers3host.xml");
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(true, p.isIsSat());
         });
@@ -254,22 +174,7 @@ public class TestSG {
 	}
 	@Test
 	public void test2Clients2ServersSmall() throws Exception {
-		// create a JAXBContext capable of handling the generated classes
-        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
-        // create an Unmarshaller
-        Unmarshaller u = jc.createUnmarshaller();
-        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
-        u.setSchema(schema);
-        // unmarshal a document into a tree of Java content objects
-        NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg2clients3nodes2servers3host.xml" ) );
-        for(Graph g:root.getGraphs().getGraph()){
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getCapacityDefinition());
-        	IsolationResult res=test.checkNFFGProperty();
-        	if(res.result != Status.UNSATISFIABLE)
-        		new Translator(res.model.toString(),root).convert();
-        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
-        }
+        NFV root = init("./testfile/ServiceGraphs/sg2clients3nodes2servers3host.xml");
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(true, p.isIsSat());
         });
