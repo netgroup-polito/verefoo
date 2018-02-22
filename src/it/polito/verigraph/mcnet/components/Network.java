@@ -28,6 +28,8 @@ import com.microsoft.z3.Solver;
 import com.microsoft.z3.Z3Exception;
 
 import it.polito.verifoo.components.RoutingTable;
+import it.polito.verifoo.rest.jaxb.BandwidthConstraints;
+import it.polito.verifoo.rest.jaxb.BandwidthConstraints.BandwidthMetrics;
 import it.polito.verigraph.mcnet.components.Core;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.NetworkObject;
@@ -486,8 +488,7 @@ public class Network extends Core {
 		}
 	}
 
-	public void routingOptimizationSG2(NetworkObject node,
-			ArrayList<RoutingTable> rta) {
+	public void routingOptimizationSG2(NetworkObject node, ArrayList<RoutingTable> rta, List<BandwidthMetrics> bConstraints) {
 		// Policy is of the form predicate -> node
 		Expr p_0 = ctx.mkConst(node + "_composition_p_0", nctx.packet);
 		Expr n_0 = ctx.mkConst(node + "_composition_n_0", nctx.node);
@@ -551,6 +552,10 @@ public class Network extends Core {
 			}
 			initials.get(entry.getKey()).add(initial);
 			ArrayList<IntExpr> routes = new ArrayList<>();
+			Integer minLatency = null;
+			if(bConstraints.size() > 0){
+				minLatency = bConstraints.stream().filter(b -> b.getDst().equals(entry.getKey())).map(b -> b.getReqLatency()).findFirst().orElse(null);
+			}
 			for (Entry<String, Tuple<Integer, BoolExpr>> temp : sett.entrySet()) {
 				System.out.println("Temp: " + temp.getValue());
 				BoolExpr forTheKey = temp.getValue()._2;
@@ -559,8 +564,11 @@ public class Network extends Core {
 				BoolExpr mkImplies = ctx.mkImplies( initial,forTheKey);
 				softConstraints.put(forTheKey, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
 				routes.add(nctx.bool_to_int(mkImplies));
-				///System.out.println("\n SO for " + node +"w="+latency_val + "\n" + mkImplies );
 				
+				if(minLatency != null){
+					System.out.println("Latency Constraint: " + ctx.mkLe(ctx.mkMul(ctx.mkInt(-latency_val),nctx.bool_to_int(forTheKey)), ctx.mkMul(ctx.mkInt(minLatency),nctx.bool_to_int(forTheKey))));
+					constraints.add(ctx.mkLe(ctx.mkMul(ctx.mkInt(-latency_val),nctx.bool_to_int(forTheKey)), ctx.mkMul(ctx.mkInt(minLatency),nctx.bool_to_int(forTheKey))));
+				}
 			}
 			IntExpr list[] = new IntExpr[routes.size()];
 			System.out.println("Route List: " + routes);
