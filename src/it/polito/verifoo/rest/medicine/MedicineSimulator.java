@@ -23,7 +23,7 @@ import it.polito.verifoo.rest.common.LinkCreator;
 import it.polito.verifoo.rest.jaxb.Host;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Node;
-import it.polito.verifoo.rest.jaxb.NodeCapacity;
+import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 
 public class MedicineSimulator {
 	
@@ -33,7 +33,7 @@ public class MedicineSimulator {
 	private List<Host> hosts;
 	private List<Node> nodes;
 	private List<Link> links;
-	private List<NodeCapacity> capacities;
+	private List<NodeMetrics> nodeMetrics;
 	PhysicalTopology phy;
 	VNFDeployment d;
 	Process containernet;
@@ -42,7 +42,7 @@ public class MedicineSimulator {
 		hosts = root.getHosts().getHost();
 		nodes = root.getGraphs().getGraph().stream().flatMap(g -> g.getNode().stream()).collect(Collectors.toList());
 		links = (new LinkCreator(nodes)).getLinks();
-		capacities = root.getCapacityDefinition().getCapacityForNode();
+		nodeMetrics = root.getConstraints().getNodeConstraints().getNodeMetrics();
 		logger.debug("Creating Physical Network");
 		phy = new PhysicalTopology(root.getHosts().getHost(), root.getConnections().getConnection());
 		
@@ -125,7 +125,7 @@ public class MedicineSimulator {
 			hosts.forEach(h->{
 				if(h.isActive()){
 					h.getNodeRef().forEach(n ->{
-						int mem_limit = capacities.stream().filter(c -> c.getNode().equals(n.getNode())).map(c -> c.getCapacity()).findFirst().orElse(0);
+						int mem_limit = nodeMetrics.stream().filter(n1 -> n1.getNode().equals(n.getNode())).map(n1 -> n1.getReqStorage()).findFirst().orElse(0);
 						String request = "{ \"image\":\"ubuntu:trusty\","
 										  + "\"mem_limit\": \""+ mem_limit + "\"}";
 						logger.debug(request);
