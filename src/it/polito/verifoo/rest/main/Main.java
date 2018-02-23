@@ -43,8 +43,7 @@ public class Main {
                 // unmarshal a document into a tree of Java content objects
                 //NFV root = (NFV) u.unmarshal( new FileInputStream( "./xsd/nfvInfo.xml" ) );
                 
-                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg4nodes5hostConnection.xml" ) );
-                //MedicineSimulator sim = new MedicineSimulator(root);
+                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/nfv3nodes3hosts.xml" ) );
                 for(Graph g:root.getGraphs().getGraph()){
                 	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
                 	Property pd = root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId() && p.getName().equals(PName.ISOLATION_PROPERTY)).findFirst().orElse(null);
@@ -58,10 +57,9 @@ public class Main {
                 Marshaller m = jc.createMarshaller();
                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                 m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                m.marshal( root, System.out ); 
-                //MedicineSimulator sim = new MedicineSimulator(root);
-                //sim.printTopology();
-                //sim.printPlacement();
+                //m.marshal( root, System.out ); 
+                MedicineSimulator sim = new MedicineSimulator(root);
+                //sim.printAll();
             } catch( JAXBException je ) {
             	logger.error("Error while unmarshalling or marshalling");
                 logger.error(je);
