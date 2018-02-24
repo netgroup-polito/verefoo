@@ -20,11 +20,14 @@ public class VNFDeployment {
 							+"\tdef place(self, nsd, vnfds, saps, dcs):\n";
 		for(Host h:hosts){
 			for(NodeRefType n : h.getNodeRef()){
-				placement += "\t\tvnfds['"+n.getNode()+"'][\"dc\"] = dcs['"+h.getName()+"']\n";
+				placement += "\t\tvnfds['"+n.getNode().toLowerCase()+"'][\"dc\"] = dcs['"+h.getName()+"']\n";
+			}
+			if(h.getFixedEndpoint() != null){
+				placement += "\t\tvnfds['"+h.getFixedEndpoint().toLowerCase()+"'][\"dc\"] = dcs['"+h.getName()+"']\n";
 			}
 		}
-		 placement +="\t\tsaps['SGinput'][\"dc\"] = dcs['hostA']\n"
-				 	 +"\t\tsaps['SGoutput'][\"dc\"] = dcs['hostB']\n";
+		 placement +="\t\tsaps['ns_input'][\"dc\"] = dcs['hostA']\n"
+				 	 +"\t\tsaps['ns_output'][\"dc\"] = dcs['hostB']\n";
 
 	}
 	public String getPlacementDescription(){

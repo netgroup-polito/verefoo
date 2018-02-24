@@ -1,5 +1,6 @@
 package it.polito.verifoo.rest.medicine;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,8 @@ public class ServiceDescriptor {
 						+ "name: \"sonata-service\"\n"
 						+ "version: \"0.1\"\n"
 						+ "network_functions:\n";
-	
+	private String networkBuild = "#!/bin/sh\n";
+	private List<String> testCommands = new ArrayList<>();
 	public ServiceDescriptor(List<Node> nodes, List<Link> links, Map<String, VNFDescriptor> vnfds) {
 		this.nodes = nodes;
 		this.links = links;
@@ -62,10 +64,21 @@ public class ServiceDescriptor {
 				  + "    connection_points_reference:\n"
 				  + "      - \""+l.getSourceNode().toLowerCase()+":output"+vnfds.get(l.getSourceNode().toLowerCase()).bookOutInterface()+"\"\n"
 				  + "      - \""+l.getDestNode().toLowerCase()+":input"+vnfds.get(l.getDestNode().toLowerCase()).bookInInterface()+"\"\n";
+			networkBuild += "son-emu-cli network add -b -src " 
+					+ l.getSourceNode().toLowerCase()+":output"+vnfds.get(l.getSourceNode().toLowerCase()).getFreeOutInterface() 
+					+ " -dst " + l.getDestNode().toLowerCase()+":input"+vnfds.get(l.getDestNode().toLowerCase()).getFreeInInterface()
+					+ "\n";
+			testCommands.add(l.getSourceNode().toLowerCase()+" ping -c1 "+l.getDestNode().toLowerCase()); 
 		});
 	} 
 	public String getServiceDescriptor(){
 		return file;
+	}
+	public String getNetworkBuild(){
+		return networkBuild;
+	}
+	public List<String> getTestCommands() {
+		return testCommands;
 	}
 		      
 }

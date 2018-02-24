@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvInfo.xsd">
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
   <graphs>
     <graph id="0">
      <node functional_type="WEBCLIENT" name="nodeA">
@@ -66,26 +66,59 @@
       </node>
     </graph>
   </graphs>
-  <CapacityDefinition>
-   		<CapacityForNode node="node1" capacity="10"/>
-  		<CapacityForNode node="node2" capacity="10"/>
-  		<CapacityForNode node="node3" capacity="10"/>
-  		<CapacityForNode node="node4" capacity="10"/>
-  		<CapacityForNode node="node5" capacity="10"/>
-  </CapacityDefinition>
+  <Constraints>
+	  <NodeConstraints>
+			<NodeMetrics node="node1" reqStorage="10"/>
+			<NodeMetrics node="node2" reqStorage="10"/>
+			<NodeMetrics node="node3" reqStorage="10"/>
+			<NodeMetrics node="node4" reqStorage="10"/>
+			<NodeMetrics node="node5" reqStorage="10"/>
+	  </NodeConstraints>
+	  <BandwidthConstraints>
+			<BandwidthMetrics src="node4" dst="node2" reqLatency="10"/>
+	  </BandwidthConstraints>
+  </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="IsolationProperty"/> 		
+  		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
   </PropertyDefinition>
   <Hosts>
-  	<Host diskStorage="10" name="hostA" type="CLIENT"/>
-  	<Host diskStorage="10" name="host1" type="MIDDLEBOX"/>
-  	<Host diskStorage="10" name="host2" type="MIDDLEBOX"/>
-  	<Host diskStorage="10" name="host3" type="MIDDLEBOX"/>
-  	<Host diskStorage="10" name="host4" type="MIDDLEBOX"/>
-  	<Host diskStorage="10" name="host5" type="MIDDLEBOX"/>
-  	<Host diskStorage="10" name="host6" type="MIDDLEBOX"/>
-  	<Host diskStorage="10" name="host7" type="MIDDLEBOX"/>
-  	<Host diskStorage="10" name="hostB" type="SERVER"/>
+  	<Host name="hostA" cpu="2000" cores="2" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
+  	<Host name="host1" cpu="1000" cores="4" diskStorage="50" maxVNF="1" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="FIELDMODIFIER"/>
+	</Host>
+  	<Host name="host2" cpu="3700" cores="8" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="FIELDMODIFIER"/>
+	</Host>
+  	<Host name="host3" cpu="4100" cores="4" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="FIELDMODIFIER"/>
+	</Host>
+	<Host name="host4" cpu="4100" cores="4" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="FIELDMODIFIER"/>
+	</Host>
+	<Host name="host5" cpu="4100" cores="4" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="FIELDMODIFIER"/>
+	</Host>
+	<Host name="host6" cpu="4100" cores="4" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="FIELDMODIFIER"/>
+	</Host>
+	<Host name="host7" cpu="4100" cores="4" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="FIELDMODIFIER"/>
+	</Host>
+  	<Host name="hostB" cpu="2000" cores="2" diskStorage="50" type="SERVER" fixedEndpoint="nodeB"/>
   </Hosts>
   <Connections>
   	<Connection sourceHost="hostA" destHost="host1" avgLatency ="-1"/>
@@ -102,7 +135,6 @@
   	<Connection sourceHost="host3" destHost="host4" avgLatency ="-1"/>
   	<Connection sourceHost="host3" destHost="host5" avgLatency ="-1"/>
   	<Connection sourceHost="host3" destHost="hostB" avgLatency ="-1"/>
-  	<Connection sourceHost="host4" destHost="host5" avgLatency ="-1"/>
   	<Connection sourceHost="host4" destHost="host5" avgLatency ="-1"/>
   	<Connection sourceHost="host4" destHost="host7" avgLatency ="-1"/>
   	<Connection sourceHost="host5" destHost="host6" avgLatency ="-1"/>
