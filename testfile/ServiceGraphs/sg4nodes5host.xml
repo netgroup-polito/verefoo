@@ -63,23 +63,46 @@
       </node>
     </graph>
   </graphs>
-  <CapacityDefinition>
-   		<CapacityForNode node="node1" capacity="10"/>
-  		<CapacityForNode node="node2" capacity="10"/>
-		<CapacityForNode node="node3" capacity="10"/>
-		<CapacityForNode node="node4" capacity="10"/>
-  </CapacityDefinition>
+  <Constraints>
+	  <NodeConstraints>
+			<NodeMetrics node="node1" reqStorage="10"/>
+			<NodeMetrics node="node2" reqStorage="10"/>
+			<NodeMetrics node="node3" reqStorage="10"/>
+			<NodeMetrics node="node4" reqStorage="10"/>
+	  </NodeConstraints>
+	  <BandwidthConstraints/>
+  </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="IsolationProperty"/> 		
+  		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
   </PropertyDefinition>
   <Hosts>
-  	<Host diskStorage="10" name="hostA" type="CLIENT"/>
-  	<Host diskStorage="50" name="host1" type="MIDDLEBOX"/>
-  	<Host diskStorage="10" name="host2" type="MIDDLEBOX"/>
-  	<Host diskStorage="50" name="host3" type="MIDDLEBOX"/>
-	<Host diskStorage="50" name="host4" type="MIDDLEBOX"/>
-	<Host diskStorage="50" name="host5" type="MIDDLEBOX"/>
-  	<Host diskStorage="10" name="hostB" type="SERVER"/>
+  	<Host name="hostA" cpu="2000" cores="2" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
+  	<Host name="host1" cpu="1000" cores="4" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="FIELDMODIFIER"/>
+	</Host>
+  	<Host name="host2" cpu="3700" cores="8" diskStorage="10" maxVNF="4" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="FIELDMODIFIER"/>
+	</Host>
+  	<Host name="host3" cpu="4100" cores="4" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="FIELDMODIFIER"/>
+	</Host>
+	<Host name="host4" cpu="7000" cores="16" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="FIELDMODIFIER"/>
+	</Host>
+	<Host name="host5" cpu="3000" cores="2" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="FIELDMODIFIER"/>
+	</Host>
+  	<Host name="hostB" cpu="2000" cores="2" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
   </Hosts>
   <Connections>
   	<Connection sourceHost="hostA" destHost="host1" avgLatency ="-1"/>

@@ -38,6 +38,7 @@ public class MedicineSimulator {
 	private WebTarget client = ClientBuilder.newClient().target(target);
 	private String projDir = System.getProperty("user.dir");
 	private String sonEmuDir = "/home/sonata/";
+	String topologyFile = "";
 	private String projectDesc = "package:\n"
 							   + "  description: \"Service Package\"\n"
 							   + "  maintainer: \"Verifoo\"\n"
@@ -89,20 +90,15 @@ public class MedicineSimulator {
 			deployVNF();
 			if(containernet != null){
 				String line = "";
-		        //BufferedReader input = new BufferedReader(new InputStreamReader(containernet.getInputStream()));
-				OutputStreamWriter output= new OutputStreamWriter(containernet.getOutputStream());
+		        OutputStreamWriter output= new OutputStreamWriter(containernet.getOutputStream());
 				BufferedReader input = new BufferedReader(new InputStreamReader(containernet.getInputStream()));
 		        
 				while (input.ready()) {
 					line = input.readLine();
-					System.out.println(line);
+					//System.out.println(line);
 		        }
 				System.out.println("Testing topology...");
 				for(String c : sd.getTestCommands()){
-					//String[] args = new String[] {"/bin/bash", "-c", c + " 2>&1"};
-			        //String[] args = new String[] {"/bin/bash", "-c", "/home/sonata/startTopology.sh"};
-			        //containernet = new ProcessBuilder(args).start();
-			        //containernet = new ProcessBuilder("/home/sonata/startTopology.sh").start();
 					//BufferedReader errorReader = new BufferedReader(new InputStreamReader (containernet.getErrorStream()));
 					input = new BufferedReader(new InputStreamReader(containernet.getInputStream()));
 					output= new OutputStreamWriter(containernet.getOutputStream());
@@ -115,16 +111,15 @@ public class MedicineSimulator {
 		            
 		            Thread.sleep(1000);
 			        while (input.ready() && (line = input.readLine()) != null) {
-			            System.out.println(line);
+			            //System.out.println(line);
+			            if(line.contains("100% packet loss")){
+			            	System.out.println("Packet lost with command: " + c);
+			            	logger.debug("Packet lost with command: " + c);
+			            }
 			        }
-			        /*if((line = input.readLine()) != null)
-			            System.out.println(line);
-			        if((line = input.readLine()) != null)
-			            System.out.println(line);
-			        if((line = input.readLine()) != null)
-			            System.out.println(line);*/
-			        
 				}
+				System.out.println("Testing complete");
+				logger.debug("Testing complete");
 				containernet.destroy();
 				//containernet.waitFor();
 			}
@@ -140,7 +135,7 @@ public class MedicineSimulator {
 	
 	private void createIN() throws InterruptedException {
 		try {
-			String topologyFile = "topology.py";
+			topologyFile = "topology.py";
 			printInFile(topologyFile, phy.getTopologyDescription());
 			String placementFile = "placement.py";
 			printInFile(placementFile, d.getPlacementDescription());
@@ -153,17 +148,13 @@ public class MedicineSimulator {
             OutputStreamWriter output= new OutputStreamWriter(executeCommands.getOutputStream());
             String line;
             while ((line = input.readLine()) != null) {
-                System.out.println(line);
+                //System.out.println(line);
                 }
             executeCommands.waitFor();   
-	        //Create the process and start it.
 	        logger.debug("Launching physical topology");
 	        System.out.println("Launching physical topology...");
 	        String[] args = new String[] {"/bin/bash", "-c", "sudo python " + topologyFile + " 2>&1"};
-	        //String[] args = new String[] {"/bin/bash", "-c", "/home/sonata/startTopology.sh"};
 	        containernet = new ProcessBuilder(args).start();
-	        //containernet = new ProcessBuilder("/home/sonata/startTopology.sh").start();
-
 	        input = new BufferedReader(new InputStreamReader(containernet.getInputStream()));
 	        errorReader = new BufferedReader(new InputStreamReader (containernet.getErrorStream()));
 	        output= new OutputStreamWriter(containernet.getOutputStream());
@@ -248,6 +239,7 @@ public class MedicineSimulator {
 		commands.add(new String[] {"/bin/bash", "-c", "./networkBuild.sh 2>&1"});
 		commands.add(new String[] {"/bin/bash", "-c", "rm build.sh 2>&1"});
 		commands.add(new String[] {"/bin/bash", "-c", "rm networkBuild.sh 2>&1"});
+		commands.add(new String[] {"/bin/bash", "-c", "rm " + topologyFile + " 2>&1"});
         for(String[] c : commands){
         	logger.debug("Executing command -> " + c[2]);
             executeCommands = new ProcessBuilder(c).start();
@@ -260,6 +252,7 @@ public class MedicineSimulator {
                 }
             executeCommands.waitFor();   
         }
+        logger.debug("Service Chain deployed");
         System.out.println("Service Chain deployed");
 	}
 }
