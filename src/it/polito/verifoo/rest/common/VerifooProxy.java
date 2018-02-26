@@ -157,7 +157,7 @@ public class VerifooProxy {
 												//the host cpu power is expressed in MHz
 												nodeCurrLatency = n.getNrOfOperations()/((long) h.getCpu()*1000000);
 											}
-											if( n.getMaxNodeLatency() == null ){
+											if( n == null || n.getMaxNodeLatency() == null ){
 												cpuRequirements.put(ctx.mkMul(ctx.mkInt((int) nodeCurrLatency),nctx.bool_to_int(c)), ctx.mkMul(ctx.mkInt((int) nodeCurrLatency),nctx.bool_to_int(c)));
 											}
 											else{
@@ -204,6 +204,7 @@ public class VerifooProxy {
 				List<ArithExpr> diskRequirements = new ArrayList<>();
 				List<ArithExpr> maxVNFRequirements = new ArrayList<>();
 				List<ArithExpr> coreRequirements = new ArrayList<>();
+				List<ArithExpr> memoryRequirements = new ArrayList<>();
 				conditionDB.entrySet().stream()
 									.flatMap(e -> e.getValue().entrySet().stream())
 									.filter(e -> e.getKey().equals(h.getName()))
@@ -217,6 +218,8 @@ public class VerifooProxy {
 										maxVNFRequirements.add(nctx.bool_to_int(i));
 										if(n != null)
 											coreRequirements.add(ctx.mkMul(ctx.mkInt(n.getCores()),nctx.bool_to_int(i)));
+										if(n != null)
+											memoryRequirements.add(ctx.mkMul(ctx.mkInt(n.getMemory()), nctx.bool_to_int(i)));
 										
 									});
 				//logger.debug(h.getName() + " disk requirement: " + diskRequirements);
@@ -240,6 +243,13 @@ public class VerifooProxy {
 					//logger.debug(h.getName() + " left side: " + diskConstraint);
 					logger.debug(h.getName() + " core requirements: " + ctx.mkLe(coreConstraint, ctx.mkMul(ctx.mkInt(h.getMaxVNF()), nctx.bool_to_int(hostCondition.get(h.getName())))));
 					nctx.constraints.add(ctx.mkLe(coreConstraint, ctx.mkMul(ctx.mkInt(h.getMaxVNF()), nctx.bool_to_int(hostCondition.get(h.getName())))));
+				}
+				if(memoryRequirements.size() > 0){
+					ArithExpr[] tmp = new ArithExpr[memoryRequirements.size()];
+					ArithExpr memoryConstraint = ctx.mkAdd(memoryRequirements.toArray(tmp));
+					//logger.debug(h.getName() + " left side: " + diskConstraint);
+					logger.debug(h.getName() + " disk requirements: " + ctx.mkLe(memoryConstraint, ctx.mkMul(ctx.mkInt(h.getMemory()), nctx.bool_to_int(hostCondition.get(h.getName())))));
+					nctx.constraints.add(ctx.mkLe(memoryConstraint, ctx.mkMul(ctx.mkInt(h.getMemory()), nctx.bool_to_int(hostCondition.get(h.getName())))));
 				}
 			});
 			
@@ -480,7 +490,7 @@ public class VerifooProxy {
 				}
 				List<BandwidthMetrics> bConstraints = bandwidthMetrics.stream().filter(b -> b.getSrc().equals(n.getName())).collect(Collectors.toList());
 				//logger.debug("Adding routing table to "+n.getName());
-				net.routingOptimizationSG2(netobjs.get(n), rt, bConstraints);
+				net.routingOptimizationSG2(netobjs.get(client), netobjs.get(n), rt, bConstraints);
 			}
 			logger.debug("----STAGE CONDITION DB----");
 			stageConditions.entrySet().forEach(e -> {logger.debug(e.getKey().getName() + " -> " + e.getValue());});
@@ -572,11 +582,13 @@ public class VerifooProxy {
 		 * Checks if the client node and the server node in a graph are reachable satisfying all the imposed conditions
 		 * @return
 		 */
-		public IsolationResult checkNFFGProperty(){
+		public IsolationResult checkNFFGProperty(String src, String dst){
 
-            Node source = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).findFirst().get();
+            Node source = nodes.stream().filter(n -> {return n.getName().equals(src);}).findFirst().get();
+            //Node source = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT);}).findFirst().get();
             //Node source = nodes.stream().filter(n -> n.getName().equals("node3")).findFirst().orElse(null);
-			Node dest = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).findFirst().get();
+			Node dest = nodes.stream().filter(n -> {return n.getName().equals(dst);}).findFirst().get();
+			//Node dest = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).findFirst().get();
             logger.debug("Checking reachability from " + source.getName() + " to "+ dest.getName());
 			IsolationResult ret = this.check.checkIsolationProperty(netobjs.get(source), netobjs.get(dest));
 			if (ret.result == Status.UNSATISFIABLE){

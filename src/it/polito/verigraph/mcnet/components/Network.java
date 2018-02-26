@@ -397,8 +397,7 @@ public class Network extends Core {
 		}
 	}
 
-	public void routingOptimizationSG(NetworkObject node,
-			ArrayList<RoutingTable> rta) {
+	public void routingOptimizationSG2(NetworkObject origin, NetworkObject node, ArrayList<RoutingTable> rta, List<BandwidthMetrics> bConstraints) {
 		// Policy is of the form predicate -> node
 		Expr p_0 = ctx.mkConst(node + "_composition_p_0", nctx.packet);
 		Expr n_0 = ctx.mkConst(node + "_composition_n_0", nctx.node);
@@ -435,9 +434,15 @@ public class Network extends Core {
 		System.out.println("Collected: " + collected);
 		System.out.println("Latency: " + latency);
 		System.out.println("Node_dict: " + node_dict);
-
+		BoolExpr originCond = ctx.mkEq(nctx.pf.get("origin").apply(p_0), (origin.getZ3Node()));
 		List<BoolExpr> possibleNextHops = new ArrayList<>();
 		Map<String, List<BoolExpr>> initials = new HashMap<>();
+		List<BoolExpr> nextHops = new ArrayList<>();
+		for(String s : collected.keySet()){
+			nextHops.add(ctx.mkEq(n_0,node_dict.get(s).getZ3Node()));
+		}
+		System.out.println("Next Hops: " + nextHops);
+		//Build the conditions that will be received by Verifoo
 		for (Map.Entry<String, ArrayList<BoolExpr>> entry : collected.entrySet()) {
 			BoolExpr[] pred = new BoolExpr[entry.getValue().size()];
 			HashMap<String, Tuple<Integer, BoolExpr>> sett = latency.get(entry.getKey());
@@ -445,9 +450,10 @@ public class Network extends Core {
 			System.out.println("Entry: " + entry);
 			predicates = ctx.mkOr(entry.getValue().toArray(pred));
 			System.out.println("Predicates: " + predicates);
+			BoolExpr[] tmp = new BoolExpr[nextHops.size()];
 			BoolExpr initial = ctx.mkForall(new Expr[] { n_0,p_0 },
-											ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(node.getZ3Node(), n_0, p_0),predicates),
-																	ctx.mkEq(n_0,node_dict.get(entry.getKey()).getZ3Node())
+											ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(node.getZ3Node(), n_0, p_0),predicates, originCond),
+																	ctx.mkOr(nextHops.toArray(tmp))
 															)
 											,1, null, null, null, null);
 			//BoolExpr initial = ctx.mkEq(n_0,node_dict.get(entry.getKey()).getZ3Node());
@@ -456,16 +462,23 @@ public class Network extends Core {
 			}
 			initials.get(entry.getKey()).add(initial);
 			ArrayList<IntExpr> routes = new ArrayList<>();
+			Integer minLatency = null;
+			if(bConstraints.size() > 0){
+				minLatency = bConstraints.stream().filter(b -> b.getDst().equals(entry.getKey())).map(b -> b.getReqLatency()).findFirst().orElse(null);
+			}
 			for (Entry<String, Tuple<Integer, BoolExpr>> temp : sett.entrySet()) {
 				System.out.println("Temp: " + temp.getValue());
 				BoolExpr forTheKey = temp.getValue()._2;
 				Integer latency_val = temp.getValue()._1;
 				System.out.println(initial + " => " + forTheKey);
 				BoolExpr mkImplies = ctx.mkImplies( initial,forTheKey);
-				softConstraints.put(mkImplies, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
+				softConstraints.put(forTheKey, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
 				routes.add(nctx.bool_to_int(mkImplies));
-				///System.out.println("\n SO for " + node +"w="+latency_val + "\n" + mkImplies );
 				
+				if(minLatency != null){
+					System.out.println("Latency Constraint: " + ctx.mkLe(ctx.mkMul(ctx.mkInt(-latency_val),nctx.bool_to_int(forTheKey)), ctx.mkMul(ctx.mkInt(minLatency),nctx.bool_to_int(forTheKey))));
+					constraints.add(ctx.mkLe(ctx.mkMul(ctx.mkInt(-latency_val),nctx.bool_to_int(forTheKey)), ctx.mkMul(ctx.mkInt(minLatency),nctx.bool_to_int(forTheKey))));
+				}
 			}
 			IntExpr list[] = new IntExpr[routes.size()];
 			System.out.println("Route List: " + routes);
@@ -483,12 +496,12 @@ public class Network extends Core {
 			
 			BoolExpr l[] = new BoolExpr[possibleNextHops.size()];
 			//System.out.println("All Conditions: " + possibleNextHop.toArray(list).length);
-			System.out.println("OR Conditions: " + possibleNextHops);
-			constraints.add(ctx.mkOr(possibleNextHops.toArray(l)));
+			System.out.println("AND Conditions: " + possibleNextHops);
+			constraints.add(ctx.mkAnd(possibleNextHops.toArray(l)));
 		}
 	}
-
-	public void routingOptimizationSG2(NetworkObject node, ArrayList<RoutingTable> rta, List<BandwidthMetrics> bConstraints) {
+	
+	public void routingOptimizationSG(NetworkObject node, ArrayList<RoutingTable> rta, List<BandwidthMetrics> bConstraints) {
 		// Policy is of the form predicate -> node
 		Expr p_0 = ctx.mkConst(node + "_composition_p_0", nctx.packet);
 		Expr n_0 = ctx.mkConst(node + "_composition_n_0", nctx.node);

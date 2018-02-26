@@ -34,6 +34,8 @@ import it.polito.verifoo.rest.common.VerifooProxy;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.NodeRefType;
+import it.polito.verifoo.rest.jaxb.PName;
+import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 /**
  * 
@@ -82,7 +84,9 @@ public class TestSG {
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
         for(Graph g:root.getGraphs().getGraph()){
         	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
-        	IsolationResult res=test.checkNFFGProperty();
+        	Property pd = root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId() && p.getName().equals(PName.ISOLATION_PROPERTY)).findFirst().orElse(null);
+        	if(pd == null) break;
+        	IsolationResult res=test.checkNFFGProperty(pd.getSrc(), pd.getDst());
         	if(res.result != Status.UNSATISFIABLE)
         		new Translator(res.model.toString(),root).convert();
         	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 

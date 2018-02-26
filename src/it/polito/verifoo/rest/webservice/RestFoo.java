@@ -22,6 +22,8 @@ import it.polito.verifoo.rest.jaxb.ApplicationError;
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.NFV;
+import it.polito.verifoo.rest.jaxb.PName;
+import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 
 /**
@@ -52,7 +54,9 @@ public class RestFoo {
 						throw new BadGraphError("No property defined for the Graph "+g.getId(),EType.INVALID_PROPERTY_DEFINITION);
 					}
 	            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints());
-	            	IsolationResult res=test.checkNFFGProperty();
+	            	Property pd = root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId() && p.getName().equals(PName.ISOLATION_PROPERTY)).findFirst().orElse(null);
+                	if(pd == null) break;
+                	IsolationResult res=test.checkNFFGProperty(pd.getSrc(), pd.getDst());
 	            	if(res.result != Status.UNSATISFIABLE){
 	            		z3model=z3model.concat(res.model.toString());
 	            	}

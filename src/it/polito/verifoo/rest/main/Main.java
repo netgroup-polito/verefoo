@@ -43,12 +43,12 @@ public class Main {
                 // unmarshal a document into a tree of Java content objects
                 //NFV root = (NFV) u.unmarshal( new FileInputStream( "./xsd/nfvInfo.xml" ) );
                 
-                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg4nodes5host.xml" ) );
+                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg4nodes3hostMemory.xml" ) );
                 for(Graph g:root.getGraphs().getGraph()){
                 	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
                 	Property pd = root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId() && p.getName().equals(PName.ISOLATION_PROPERTY)).findFirst().orElse(null);
                 	if(pd == null) break;
-                	IsolationResult res=test.checkNFFGProperty();
+                	IsolationResult res=test.checkNFFGProperty(pd.getSrc(), pd.getDst());
                 	if(res.result != Status.UNSATISFIABLE)
                 		new Translator(res.model.toString(),root).convert();
                 	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
@@ -57,8 +57,8 @@ public class Main {
                 Marshaller m = jc.createMarshaller();
                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                 m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                //m.marshal( root, System.out ); 
-                MedicineSimulator sim = new MedicineSimulator(root);
+                m.marshal( root, System.out ); 
+                //MedicineSimulator sim = new MedicineSimulator(root);
                 //sim.printAll();
             } catch( JAXBException je ) {
             	logger.error("Error while unmarshalling or marshalling");
