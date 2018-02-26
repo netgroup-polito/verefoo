@@ -87,20 +87,20 @@
   		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
   </PropertyDefinition>
   <Hosts>
-  	<Host name="hostA" cpu="1000" cores="2" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
-  	<Host name="host1" cpu="3000" cores="16" diskStorage="50" maxVNF="1" type="MIDDLEBOX">
+  	<Host name="hostA" cpu="1000" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
+  	<Host name="host1" cpu="3000" cores="16" memory="16" diskStorage="50" maxVNF="1" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="host2" cpu="4000" cores="4" diskStorage="20" maxVNF="2" type="MIDDLEBOX">
+  	<Host name="host2" cpu="4000" cores="4" memory="16" diskStorage="20" maxVNF="2" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 	</Host>
-  	<Host name="host3" cpu="3000" cores="8" diskStorage="10" maxVNF="3" type="MIDDLEBOX">
+  	<Host name="host3" cpu="3000" cores="8" memory="16" diskStorage="10" maxVNF="3" type="MIDDLEBOX">
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="hostB" cpu="1000" cores="2" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
+  	<Host name="hostB" cpu="1000" cores="2" memory="2" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
   </Hosts>
   <Connections>
   	<Connection sourceHost="hostA" destHost="host1" avgLatency ="-1"/>

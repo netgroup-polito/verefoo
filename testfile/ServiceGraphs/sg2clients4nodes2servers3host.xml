@@ -29,7 +29,7 @@
           <firewall>
             <elements>
               <source>nodeC</source>
-              <destination>nodeC</destination>
+              <destination>nodeD</destination>
             </elements>
           </firewall>
         </configuration>
@@ -42,17 +42,22 @@
           <cache>
           	<resource>nodeA</resource>
           	<resource>node1</resource>
+			<resource>node3</resource>
+			<resource>node4</resource>
           </cache>
         </configuration>
       </node>
-	   <node functional_type="FIELDMODIFIER" name="node3">
+	   <node functional_type="FIREWALL" name="node3">
 		<neighbour name="nodeC"/>
         <neighbour name="node1"/>
         <neighbour name="node4"/>
         <configuration description="A simple description" name="conf3">
-         <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
+         <firewall>
+            <elements>
+              <source>nodeA</source>
+              <destination>nodeB</destination>
+            </elements>
+          </firewall>
         </configuration>
       </node>
 	  <node functional_type="FIELDMODIFIER" name="node4">
@@ -94,28 +99,28 @@
 	  </BandwidthConstraints>
   </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
+  		<Property graph="0" name="IsolationProperty" src="nodeC" dst="nodeD"/> 		
   </PropertyDefinition>
   <Hosts>
-  	<Host name="hostA" cpu="2000" cores="2" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
-  	<Host name="hostC" cpu="2000" cores="2" diskStorage="10" type="CLIENT" fixedEndpoint="nodeC"/>
-  	<Host name="host1" cpu="1000" cores="4" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
+  	<Host name="hostA" cpu="2000" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
+  	<Host name="hostC" cpu="2000" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeC"/>
+  	<Host name="host1" cpu="1000" cores="4" memory="16" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="host2" cpu="3700" cores="8" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
+  	<Host name="host2" cpu="3700" cores="8" memory="16" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="host3" cpu="4100" cores="4" diskStorage="20" maxVNF="4" type="MIDDLEBOX">
+  	<Host name="host3" cpu="4100" cores="4" memory="16" diskStorage="20" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="hostB" cpu="2000" cores="2" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
-	<Host name="hostD" cpu="2000" cores="2" diskStorage="10" type="SERVER" fixedEndpoint="nodeD"/>
+  	<Host name="hostB" cpu="2000" cores="2" memory="4" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
+	<Host name="hostD" cpu="2000" cores="2" memory="4" diskStorage="10" type="SERVER" fixedEndpoint="nodeD"/>
   </Hosts>
   <Connections>
   	<Connection sourceHost="hostA" destHost="host1" avgLatency ="-1"/>

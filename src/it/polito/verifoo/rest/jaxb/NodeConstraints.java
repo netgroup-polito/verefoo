@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.02.22 alle 03:55:55 PM CET 
+// Generato il: 2018.02.26 alle 10:45:10 AM CET 
 //
 
 
@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlType;
  *                 &lt;attribute name="maxNodeLatency" type="{http://www.w3.org/2001/XMLSchema}int" />
  *                 &lt;attribute name="reqStorage" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
  *                 &lt;attribute name="cores" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
+ *                 &lt;attribute name="memory" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
@@ -103,6 +104,7 @@ public class NodeConstraints {
      *       &lt;attribute name="maxNodeLatency" type="{http://www.w3.org/2001/XMLSchema}int" />
      *       &lt;attribute name="reqStorage" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
      *       &lt;attribute name="cores" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
+     *       &lt;attribute name="memory" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>
@@ -124,6 +126,8 @@ public class NodeConstraints {
         protected Integer reqStorage;
         @XmlAttribute(name = "cores")
         protected Integer cores;
+        @XmlAttribute(name = "memory")
+        protected Integer memory;
 
         /**
          * Recupera il valore della proprietà node.
@@ -251,6 +255,34 @@ public class NodeConstraints {
          */
         public void setCores(Integer value) {
             this.cores = value;
+        }
+
+        /**
+         * Recupera il valore della proprietà memory.
+         * 
+         * @return
+         *     possible object is
+         *     {@link Integer }
+         *     
+         */
+        public int getMemory() {
+            if (memory == null) {
+                return  0;
+            } else {
+                return memory;
+            }
+        }
+
+        /**
+         * Imposta il valore della proprietà memory.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link Integer }
+         *     
+         */
+        public void setMemory(Integer value) {
+            this.memory = value;
         }
 
     }

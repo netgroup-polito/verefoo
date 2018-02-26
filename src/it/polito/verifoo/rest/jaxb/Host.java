@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.02.22 alle 03:55:55 PM CET 
+// Generato il: 2018.02.26 alle 10:45:10 AM CET 
 //
 
 
@@ -35,6 +35,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="cpu" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="cores" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="diskStorage" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
+ *       &lt;attribute name="memory" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="maxVNF" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="type" type="{}TypeOfHost" />
  *       &lt;attribute name="fixedEndpoint" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -66,6 +67,8 @@ public class Host {
     protected int cores;
     @XmlAttribute(name = "diskStorage", required = true)
     protected int diskStorage;
+    @XmlAttribute(name = "memory", required = true)
+    protected int memory;
     @XmlAttribute(name = "maxVNF")
     protected Integer maxVNF;
     @XmlAttribute(name = "type")
@@ -203,6 +206,22 @@ public class Host {
      */
     public void setDiskStorage(int value) {
         this.diskStorage = value;
+    }
+
+    /**
+     * Recupera il valore della proprietà memory.
+     * 
+     */
+    public int getMemory() {
+        return memory;
+    }
+
+    /**
+     * Imposta il valore della proprietà memory.
+     * 
+     */
+    public void setMemory(int value) {
+        this.memory = value;
     }
 
     /**
