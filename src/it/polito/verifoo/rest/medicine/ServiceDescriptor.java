@@ -31,9 +31,9 @@ public class ServiceDescriptor {
 		});
 		file += "connection_points:\n";
 		for(int i = 0; i < nExternal; i++){
-			file += "  - id: \"ns:external" + i + "\"\n"
+			file += "  - id: \"ns:ext" + i + "\"\n"
 				  + "    interface: \"ipv4\"\n"
-				  + "    type: \"external\"\n";
+				  + "    type: \"ext\"\n";
 		}
 		file += "virtual_links:\n";
 		int nE = 0;
@@ -44,7 +44,7 @@ public class ServiceDescriptor {
 				file += "  - id: \"link-ext_to_"+n.getName().toLowerCase()+"\"\n"
 					  + "    connectivity_type: \"E-Line\"\n"
 					  + "    connection_points_reference:\n"
-					  + "      - \"ns:external" + nE + "\"\n"
+					  + "      - \"ns:ext" + nE + "\"\n"
 					  + "      - \""+n.getName().toLowerCase()+":intf-ext\"\n";
 				nE++;
 			}
@@ -54,7 +54,7 @@ public class ServiceDescriptor {
 					  + "    connectivity_type: \"E-Line\"\n"
 					  + "    connection_points_reference:\n"
 					  + "      - \""+n.getName().toLowerCase()+":intf-ext\"\n"
-					  + "      - \"ns:external" + nE + "\"\n";
+					  + "      - \"ns:ext" + nE + "\"\n";
 				nE++;
 			}
 		}	  

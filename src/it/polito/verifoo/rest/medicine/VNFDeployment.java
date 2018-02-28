@@ -25,7 +25,7 @@ public class VNFDeployment {
 			}
 			if(h.getFixedEndpoint() != null){
 				placement += "\t\tvnfds['"+h.getFixedEndpoint().toLowerCase()+"'][\"dc\"] = dcs['"+h.getName()+"']\n";
-				placement +="\t\tsaps['ns_external" + nE + "'][\"dc\"] = dcs['"+h.getName()+"']\n";
+				placement +="\t\tsaps['ns_ext" + nE + "'][\"dc\"] = dcs['"+h.getName()+"']\n";
 				nE++;
 			}
 		}
