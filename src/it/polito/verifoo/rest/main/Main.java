@@ -41,23 +41,26 @@ public class Main {
                 Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
                 u.setSchema(schema);
                 // unmarshal a document into a tree of Java content objects
-                //NFV root = (NFV) u.unmarshal( new FileInputStream( "./xsd/nfvInfo.xml" ) );
-                
-                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg4nodes3hostMemory.xml" ) );
+                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg2clients4nodes2servers3hostSAT_AtoB-FW.xml" ) );
                 for(Graph g:root.getGraphs().getGraph()){
                 	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
                 	Property pd = root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId() && p.getName().equals(PName.ISOLATION_PROPERTY)).findFirst().orElse(null);
                 	if(pd == null) break;
                 	IsolationResult res=test.checkNFFGProperty(pd.getSrc(), pd.getDst());
-                	if(res.result != Status.UNSATISFIABLE)
+                	if(res.result != Status.UNSATISFIABLE){
+                		System.out.println("SAT");
                 		new Translator(res.model.toString(),root).convert();
+                	}
+                	else{
+                		System.out.println("UNSAT");
+                	}
                 	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
                 }
                 // create a Marshaller and marshal to output
                 Marshaller m = jc.createMarshaller();
                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                 m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                m.marshal( root, System.out ); 
+                //m.marshal( root, System.out ); 
                 //MedicineSimulator sim = new MedicineSimulator(root);
                 //sim.printAll();
             } catch( JAXBException je ) {

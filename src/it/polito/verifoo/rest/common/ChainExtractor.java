@@ -90,8 +90,8 @@ public class ChainExtractor {
 			//logger.debug("Host in chain: "+hostChain);
 			expandHostChain(dest, hostServer, hostChain, connections, visited, maxSize);
 			//logger.debug("Removing host from the current hostChain: "+dest);
-			//logger.debug("Host in chain: "+hostChain);
 			hostChain.remove(hostChain.lastIndexOf(dest));
+			//logger.debug("Host in chain: "+hostChain);
 			//logger.debug("Removing to visited from " + lastHost +" to " + dest);
 			visited.get(lastHost).remove(dest);
 		}

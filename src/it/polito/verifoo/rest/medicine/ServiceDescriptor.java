@@ -19,7 +19,7 @@ public class ServiceDescriptor {
 						+ "network_functions:\n";
 	private String networkBuild = "#!/bin/sh\n";
 	private List<String> testCommands = new ArrayList<>();
-	public ServiceDescriptor(List<Node> nodes, List<Link> links, Map<String, VNFDescriptor> vnfds) {
+	public ServiceDescriptor(List<Node> nodes, List<Link> links, Map<String, VNFDescriptor> vnfds, long nExternal) {
 		this.nodes = nodes;
 		this.links = links;
 		
@@ -29,24 +29,24 @@ public class ServiceDescriptor {
 				  + "     vnf_name: \""+n.getName().toLowerCase()+"-vnf\"\n"
 				  + "     vnf_version: \"0.1\"\n";
 		});
-		file += "connection_points:\n"
-			  + "  - id: \"ns:input\"\n"
-			  + "    interface: \"ipv4\"\n"
-			  + "    type: \"external\"\n"
-			  + "  - id: \"ns:output\"\n"
-			  + "    interface: \"ipv4\"\n"
-			  + "    type: \"external\"\n"
-			  + "virtual_links:\n";
-		nodes.forEach(n ->{
+		file += "connection_points:\n";
+		for(int i = 0; i < nExternal; i++){
+			file += "  - id: \"ns:external" + i + "\"\n"
+				  + "    interface: \"ipv4\"\n"
+				  + "    type: \"external\"\n";
+		}
+		file += "virtual_links:\n";
+		int nE = 0;
+		for(Node n : nodes){
 			if(n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) ||
 					   n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT) ||	
 					   n.getFunctionalType().equals(FunctionalTypes.ENDHOST)){
 				file += "  - id: \"link-ext_to_"+n.getName().toLowerCase()+"\"\n"
 					  + "    connectivity_type: \"E-Line\"\n"
 					  + "    connection_points_reference:\n"
-					  + "      - \"ns:input\"\n"
+					  + "      - \"ns:external" + nE + "\"\n"
 					  + "      - \""+n.getName().toLowerCase()+":intf-ext\"\n";
-				
+				nE++;
 			}
 			if(n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) ||
 					   n.getFunctionalType().equals(FunctionalTypes.WEBSERVER)){
@@ -54,10 +54,10 @@ public class ServiceDescriptor {
 					  + "    connectivity_type: \"E-Line\"\n"
 					  + "    connection_points_reference:\n"
 					  + "      - \""+n.getName().toLowerCase()+":intf-ext\"\n"
-					  + "      - \"ns:output\"\n";
-				
+					  + "      - \"ns:external" + nE + "\"\n";
+				nE++;
 			}
-		});	  
+		}	  
 		links.forEach(l ->{
 			file += "  - id: \"link-"+l.getSourceNode()+"_to_"+l.getDestNode()+"\"\n"
 				  + "    connectivity_type: \"E-Line\"\n"

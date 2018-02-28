@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvInfo.xsd">
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
   <graphs>
     <graph id="0">
      <node functional_type="WEBCLIENT" name="nodeA">
@@ -63,40 +63,197 @@
       </node>
     </graph>
   </graphs>
-  <CapacityDefinition>
-   		<CapacityForNode node="node1" capacity="50"/>
-  		<CapacityForNode node="node2" capacity="50"/>
-  		<CapacityForNode node="node3" capacity="68"/>
-  		<CapacityForNode node="node4" capacity="45"/>
-  </CapacityDefinition>
+   <Constraints>
+	  <NodeConstraints>
+			<NodeMetrics node="node1" reqStorage="50"/>
+			<NodeMetrics node="node2" reqStorage="50"/>
+			<NodeMetrics node="node3" reqStorage="68"/>
+			<NodeMetrics node="node4" reqStorage="45"/>
+	  </NodeConstraints>
+	  <BandwidthConstraints/>
+  </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="IsolationProperty"/> 		
+  		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
   </PropertyDefinition>
    <Hosts>
-        <Host name="N1" diskStorage="108" type="CLIENT"/>
-        <Host name="N2" diskStorage="122" type="MIDDLEBOX"/>
-        <Host name="N3" diskStorage="116" type="MIDDLEBOX"/>
-        <Host name="N4" diskStorage="125" type="MIDDLEBOX"/>
-        <Host name="N5" diskStorage="100" type="MIDDLEBOX"/>
-        <Host name="N6" diskStorage="124" type="MIDDLEBOX"/>
-        <Host name="N7" diskStorage="141" type="MIDDLEBOX"/>
-        <Host name="N8" diskStorage="116" type="MIDDLEBOX"/>
-        <Host name="N9" diskStorage="127" type="MIDDLEBOX"/>
-        <Host name="N10" diskStorage="120" type="MIDDLEBOX"/>
-        <Host name="N11" diskStorage="130" type="MIDDLEBOX"/>
-        <Host name="N12" diskStorage="116" type="MIDDLEBOX"/>
-        <Host name="N13" diskStorage="121" type="MIDDLEBOX"/>
-        <Host name="N14" diskStorage="122" type="MIDDLEBOX"/>
-        <Host name="N15" diskStorage="124" type="MIDDLEBOX"/>
-        <Host name="N16" diskStorage="134" type="MIDDLEBOX"/>
-        <Host name="N17" diskStorage="105" type="MIDDLEBOX"/>
-        <Host name="N18" diskStorage="118" type="MIDDLEBOX"/>
-        <Host name="N19" diskStorage="123" type="MIDDLEBOX"/>
-        <Host name="N20" diskStorage="138" type="MIDDLEBOX"/>
-        <Host name="N21" diskStorage="144" type="MIDDLEBOX"/>
-        <Host name="N22" diskStorage="134" type="MIDDLEBOX"/>
-        <Host name="N23" diskStorage="136" type="MIDDLEBOX"/>
-        <Host name="N24" diskStorage="113" type="SERVER"/>
+        <Host name="N1" cpu="2" cores="2" memory="4" fixedEndpoint="nodeA" diskStorage="108" type="CLIENT"/>
+        <Host name="N2" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="122" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N3" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="116" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N4" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="125" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N5" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="100" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N6" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="124" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N7" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="141" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N8" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="116" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N9" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="127" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N10" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="120" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N11" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="130" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N12" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="116" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N13" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="121" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N14" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="122" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N15" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="124" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N16" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="134" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N17" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="105" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N18" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="118" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N19" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="123" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N20" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="138" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N21" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="144" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N22" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="134" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N23" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="136" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="N24" cpu="2" cores="2" memory="4" fixedEndpoint="nodeB" diskStorage="113" type="SERVER"/>
     </Hosts>
     <Connections>
         <Connection sourceHost="N20" destHost="N3" avgLatency="162160"/>
@@ -199,16 +356,8 @@
         <Connection sourceHost="N16" destHost="N7" avgLatency="206385"/>
         <Connection sourceHost="N17" destHost="N23" avgLatency="530705"/>
         <Connection sourceHost="N23" destHost="N17" avgLatency="530705"/>
-        <Connection sourceHost="N3" destHost="N5" avgLatency="398029"/>
-        <Connection sourceHost="N5" destHost="N3" avgLatency="398029"/>
         <Connection sourceHost="N10" destHost="N7" avgLatency="221127"/>
         <Connection sourceHost="N7" destHost="N10" avgLatency="221127"/>
-        <Connection sourceHost="N11" destHost="N16" avgLatency="339061"/>
-        <Connection sourceHost="N16" destHost="N11" avgLatency="339061"/>
-        <Connection sourceHost="N17" destHost="N20" avgLatency="88450"/>
-        <Connection sourceHost="N20" destHost="N17" avgLatency="88450"/>
-        <Connection sourceHost="N18" destHost="N16" avgLatency="221127"/>
-        <Connection sourceHost="N16" destHost="N18" avgLatency="221127"/>
     </Connections>
   <ParsingString></ParsingString>
 </NFV>

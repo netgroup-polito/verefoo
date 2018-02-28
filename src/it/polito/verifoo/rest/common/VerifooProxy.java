@@ -154,8 +154,8 @@ public class VerifooProxy {
 											if(n == null || n.getNrOfOperations() == null)
 												nodeCurrLatency = 0;
 											else{
-												//the host cpu power is expressed in MHz
-												nodeCurrLatency = n.getNrOfOperations()/((long) h.getCpu()*1000000);
+												//the host cpu power is expressed in GHz
+												nodeCurrLatency = n.getNrOfOperations()/((long) h.getCpu()*1000000000);
 											}
 											if( n == null || n.getMaxNodeLatency() == null ){
 												cpuRequirements.put(ctx.mkMul(ctx.mkInt((int) nodeCurrLatency),nctx.bool_to_int(c)), ctx.mkMul(ctx.mkInt((int) nodeCurrLatency),nctx.bool_to_int(c)));
@@ -234,15 +234,17 @@ public class VerifooProxy {
 					ArithExpr[] tmp = new ArithExpr[maxVNFRequirements.size()];
 					ArithExpr maxVNFConstraint = ctx.mkAdd(maxVNFRequirements.toArray(tmp));
 					//logger.debug(h.getName() + " left side: " + diskConstraint);
-					logger.debug(h.getName() + " max VNF requirements: " + ctx.mkLe(maxVNFConstraint, ctx.mkMul(ctx.mkInt(h.getMaxVNF()), nctx.bool_to_int(hostCondition.get(h.getName())))));
-					nctx.constraints.add(ctx.mkLe(maxVNFConstraint, ctx.mkMul(ctx.mkInt(h.getMaxVNF()), nctx.bool_to_int(hostCondition.get(h.getName())))));
+					if(h.getMaxVNF() != null){
+						logger.debug(h.getName() + " max VNF requirements: " + ctx.mkLe(maxVNFConstraint, ctx.mkMul(ctx.mkInt(h.getMaxVNF()), nctx.bool_to_int(hostCondition.get(h.getName())))));
+						nctx.constraints.add(ctx.mkLe(maxVNFConstraint, ctx.mkMul(ctx.mkInt(h.getMaxVNF()), nctx.bool_to_int(hostCondition.get(h.getName())))));
+					}
 				}
 				if(coreRequirements.size() > 0){
 					ArithExpr[] tmp = new ArithExpr[coreRequirements.size()];
 					ArithExpr coreConstraint = ctx.mkAdd(coreRequirements.toArray(tmp));
 					//logger.debug(h.getName() + " left side: " + diskConstraint);
-					logger.debug(h.getName() + " core requirements: " + ctx.mkLe(coreConstraint, ctx.mkMul(ctx.mkInt(h.getMaxVNF()), nctx.bool_to_int(hostCondition.get(h.getName())))));
-					nctx.constraints.add(ctx.mkLe(coreConstraint, ctx.mkMul(ctx.mkInt(h.getMaxVNF()), nctx.bool_to_int(hostCondition.get(h.getName())))));
+					logger.debug(h.getName() + " core requirements: " + ctx.mkLe(coreConstraint, ctx.mkMul(ctx.mkInt(h.getCores()), nctx.bool_to_int(hostCondition.get(h.getName())))));
+					nctx.constraints.add(ctx.mkLe(coreConstraint, ctx.mkMul(ctx.mkInt(h.getCores()), nctx.bool_to_int(hostCondition.get(h.getName())))));
 				}
 				if(memoryRequirements.size() > 0){
 					ArithExpr[] tmp = new ArithExpr[memoryRequirements.size()];
@@ -490,7 +492,8 @@ public class VerifooProxy {
 				}
 				List<BandwidthMetrics> bConstraints = bandwidthMetrics.stream().filter(b -> b.getSrc().equals(n.getName())).collect(Collectors.toList());
 				//logger.debug("Adding routing table to "+n.getName());
-				net.routingOptimizationSG2(netobjs.get(client), netobjs.get(n), rt, bConstraints);
+				net.routingOptimizationSG(netobjs.get(n), rt, bConstraints);
+				//net.routingOptimizationSG2(netobjs.get(client), netobjs.get(n), rt, bConstraints);
 			}
 			logger.debug("----STAGE CONDITION DB----");
 			stageConditions.entrySet().forEach(e -> {logger.debug(e.getKey().getName() + " -> " + e.getValue());});

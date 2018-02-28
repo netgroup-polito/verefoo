@@ -26,7 +26,7 @@ public class VNFDescriptor {
 		else{
 			cores = nMetrics.getCores()==0?1:nMetrics.getCores();
 			reqStor = nMetrics.getReqStorage()==0?1:nMetrics.getReqStorage();
-			mem = 1;
+			mem = nMetrics.getMemory()==0?1:nMetrics.getMemory();
 					
 		}
 		if(node.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) ||

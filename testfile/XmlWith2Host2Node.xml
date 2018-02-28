@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvSchema.xsd">
   <graphs>
     <graph id="0">
      <node functional_type="MAILCLIENT" name="nodeA">
@@ -18,19 +18,19 @@
       </node>
     </graph>
   </graphs>
-  <CapacityDefinition>
-   		<CapacityForNode node="nodeA" capacity="10"/>
-  		<CapacityForNode node="nodeB" capacity="10"/>
-  </CapacityDefinition>
+  <Constraints>
+	  <NodeConstraints/>
+	  <BandwidthConstraints/>
+  </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="IsolationProperty"/> 		
+  		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
   </PropertyDefinition>
   <Hosts>
-  	<Host diskStorage="10" name="hostA" type="CLIENT"/>
-  	<Host diskStorage="10" name="hostB" type="SERVER"/>
+  	<Host name="hostA" cpu="2" cores="2" memory="16" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
+  	<Host name="hostB" cpu="2" cores="2" memory="16" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
   </Hosts>
   <Connections>
-  	<Connection sourceHost="hostA" destHost="hostB" avgLatency ="-1"/>
+  	<Connection sourceHost="hostA" destHost="hostB" avgLatency ="1"/>
   </Connections>
   <ParsingString></ParsingString>
 </NFV>

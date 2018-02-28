@@ -64,12 +64,7 @@
     </graph>
   </graphs>
   <Constraints>
-	  <NodeConstraints>
-			<NodeMetrics node="node1" reqStorage="38"/>
-			<NodeMetrics node="node2" reqStorage="20"/>
-			<NodeMetrics node="node3" reqStorage="50"/>
-			<NodeMetrics node="node4" reqStorage="38"/>
-	  </NodeConstraints>
+	  <NodeConstraints/>
 	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>

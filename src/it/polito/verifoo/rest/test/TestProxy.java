@@ -65,23 +65,36 @@ public class TestProxy {
 	
 	private void test(String file, boolean sat) throws Exception{
 		// create a JAXBContext capable of handling the generated classes
+        System.out.println("===========FILE " + file + "===========");
+		long beginAll=System.currentTimeMillis();
         JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
         // create an Unmarshaller
         Unmarshaller u = jc.createUnmarshaller();
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
+        Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
         u.setSchema(schema);
         // unmarshal a document into a tree of Java content objects
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
+		long endU=System.currentTimeMillis();
+        System.out.println("Unmarshalling -> " + ((endU-beginAll)/1000) );
         for(Graph g:root.getGraphs().getGraph()){
+        	long beginVP=System.currentTimeMillis();
         	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
+        	long endVP=System.currentTimeMillis();
+            System.out.println("Graph " + g.getId() + ": creating condition -> " + ((endVP-beginVP)/1000) );
         	Property pd = root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId() && p.getName().equals(PName.ISOLATION_PROPERTY)).findFirst().orElse(null);
         	if(pd == null) break;
         	IsolationResult res=test.checkNFFGProperty(pd.getSrc(), pd.getDst());
+        	long endCheck=System.currentTimeMillis();
+            System.out.println(g.getId() + ": checking property -> " + ((endCheck-endVP)/1000) );
         	if(res.result != Status.UNSATISFIABLE)
         		new Translator(res.model.toString(),root).convert();
         	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
+        	long endT=System.currentTimeMillis();
+            System.out.println(g.getId() + ": translating model -> " + ((endT-endCheck)/1000) );
         }
+		long endAll=System.currentTimeMillis();
+        System.out.println("Total time -> " + ((endAll-beginAll)/1000) );
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(sat, p.isIsSat());
         });
@@ -177,7 +190,7 @@ public class TestProxy {
 	}
 	@Test(expected=BadGraphError.class)
 	public void testNoMiddeleBoxes() throws Exception {
-		test( "./testfile/nfv3nodes2hostsNoMIDDLEBOXES.xml", false); //Working
+		test( "./testfile/XmlWith2Host.xml", false); //Working
 		fail("Exception not thrown");
 		
 	}
@@ -188,7 +201,7 @@ public class TestProxy {
 	}
 	@Test(expected=BadGraphError.class)
 	public void testWrongNodesConfiguration() throws Exception {
-		test( "./testfile/nfv3nodes3hostsWrongNodesConfiguration.xml", false); //Working
+		test( "./testfile/XmlWith2Host2Node.xml", false); //Working
 		fail("Exception not thrown");
 	}
 }

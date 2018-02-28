@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvSchema.xsd">
   <graphs>
     <graph id="0">
      <node functional_type="MAILCLIENT" name="nodeA">
@@ -39,16 +39,21 @@
       </node>
     </graph>
   </graphs>
-  <CapacityDefinition>
-   		<CapacityForNode node="node1" capacity="10"/>
-  		<CapacityForNode node="node2" capacity="10"/>
-  </CapacityDefinition>
+ <Constraints>
+	  <NodeConstraints>
+			<NodeMetrics node="node1" nrOfOperations="1000" maxNodeLatency="10" reqStorage="10" cores="1"/>
+			<NodeMetrics node="node2" nrOfOperations="1000" maxNodeLatency="20" reqStorage="10" cores="2"/>
+	  </NodeConstraints>
+	  <BandwidthConstraints>
+			<BandwidthMetrics src="node1" dst="node2" reqLatency="10"/>
+	  </BandwidthConstraints>
+  </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="IsolationProperty"/> 		
+  		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
   </PropertyDefinition>
   <Hosts>
-  	<Host diskStorage="10" name="hostA" type="MIDDLEBOX"/>
- 	<Host diskStorage="10" name="hostB" type="MIDDLEBOX"/> 	
+  	<Host name="hostA" cpu="2" cores="2" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
+  	<Host name="hostB" cpu="2" cores="2" diskStorage="10" type="CLIENT" fixedEndpoint="nodeB"/>
   </Hosts>
   <Connections>
   	<Connection sourceHost="hostA" destHost="hostB" avgLatency ="-1"/>
