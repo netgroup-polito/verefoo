@@ -64,24 +64,7 @@ public class NetContext extends Core{
     public final int POP3_REQUEST    = 3;
     public final int POP3_RESPONSE   = 4;
 
-    
-    public List<Host> hosts;
-    public List<Node> nodes;
-    
-
-
-   	public static final int a_fw1=2;
-   	public static final int c_fw1=2;
-   	public static final int a_nat=5;
-   	public static final int c_nat=5;
-   	public static final int fw1_nat=1;
-   	public static final int nat_fw2=2;
-   	public static final int fw2_b=1;
-   	public static final int nat_b=2;
-   	
    	public int latencyAll;
-   	
-   	
 	public  BoolExpr ture;
     /**
      * Context for all of the rest that follows. Every network needs one of these
@@ -206,30 +189,12 @@ public class NetContext extends Core{
         src_port = ctx.mkFuncDecl("sport", packet, ctx.mkIntSort());
         dest_port = ctx.mkFuncDecl("dport", packet, ctx.mkIntSort());
 
-        // Some commonly used relations
-
-        // nodeHasAddr: node -> address -> boolean
-
-        /* OUTPUT:
-         * declare-fun nodeHasAddr (Node Address) Bool
-         * declare-fun addrToNode (Address) Node
-         */
-
+   
         nodeHasAddr = ctx.mkFuncDecl("nodeHasAddr", new Sort[]{node, address},ctx.mkBoolSort());
 
 
         // addrToNode: address -> node
         addrToNode = ctx.mkFuncDecl("addrToNode", address, node);
-
-
-        // Send and receive both have the form:
-        // source-> destination -> packet-> int-> bool
-
-
-        /*OUTPUT:
-         * declare-fun send (Node Node packet Int) Bool
-         * declare-fun recv(Node Node paket Int) Bool
-         */
 
 
         // send: node -> node -> packet-> int-> bool
@@ -301,17 +266,6 @@ public class NetContext extends Core{
                                 ctx.mkAnd( ctx.mkGe((IntExpr)dest_port.apply(p_0),(IntExpr)ctx.mkInt(0)),
                                         ctx.mkLt((IntExpr)dest_port.apply(p_0),(IntExpr) ctx.mkInt(MAX_PORT)))),1,null,null,null,null));
 
-        // Constraint8 recv(n_0, n_1, p_0, t_0) -> t_0 > 0
-        /*constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
-                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
-                                ctx.mkGt(t_0,ctx.mkInt(0))),1,null,null,null,null));*/
-
-        // Constraint9 send(n_0, n_1, p_0, t_0) -> t_0 > 0
-        /*constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, t_0},
-                        ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0, t_0),
-                                ctx.mkGt(t_0,ctx.mkInt(0))),1,null,null,null,null));*/
 
         // Extra constriants for supporting the VPN gateway
         constraints.add(

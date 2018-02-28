@@ -105,9 +105,7 @@ public class Test3FieldModifiers {
         net.attach(a, b, fm1, fm2, fm3);
 
         //Configuring middleboxes
-        fm1.installFieldModifier();
-        fm2.installFieldModifier();
-        fm3.installFieldModifier();
+  
 
         check = new Checker(ctx,nctx,net);
 }

@@ -102,15 +102,38 @@ public class AclFirewall extends NetworkObject{
 	    	            			ctx.mkAnd(
 	    	            						ctx.mkExists(new Expr[]{n_1}, 
 	    	            								nctx.recv.apply(n_1, fw, p_0),1,null,null,null,null), 
-	    	            						ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0))))),1,null,null,null,null));
+	    	            						ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0))
+	    	            								))),1,null,null,null,null));
 
+    	  
+    	  //Constraint2 obliges this VNF to send the packets that have been received
+    	  constraints.add(
+	            	ctx.mkForall(new Expr[]{n_0, p_0},
+	            			ctx.mkImplies(	
+	            					ctx.mkAnd( (BoolExpr)nctx.recv.apply(n_0, fw, p_0)
+	            								,ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0)))
+	            							),
+	            						ctx.mkAnd(ctx.mkExists(new Expr[]{n_1}, (BoolExpr)nctx.send.apply(new Expr[]{ fw, n_1, p_0}),1,null,null,null,null)
+//	            								//,ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0)))
+	            								)
+	            						
+	    	    	            	)
+	            			,1,null,null,null,null));
+    	  
     }
 
     private void aclConstraints(Optimize solver){
-    	if (acls.size() == 0)
-            return;
-        Expr a_0 = ctx.mkConst(fw+"_firewall_acl_a_0", nctx.address);
-        Expr a_1 = ctx.mkConst(fw+"_firewall_acl_a_1", nctx.address);
+    	 Expr a_0 = ctx.mkConst(fw+"_firewall_acl_a_0", nctx.address);
+         Expr a_1 = ctx.mkConst(fw+"_firewall_acl_a_1", nctx.address);
+    	if (acls.size() == 0){
+    		//If the size of the ACL list is empty then by default acl_func must be false
+    		 solver.Add(ctx.mkForall(new Expr[]{a_0, a_1},
+						ctx.mkEq( 
+								acl_func.apply(a_0, a_1), ctx.mkFalse()),1,null,null,null,null));
+    		return;
+    	}
+            
+       
         BoolExpr[] acl_map = new BoolExpr[acls.size()];
         for(int y=0;y<acls.size();y++){
         	Tuple<DatatypeExpr,DatatypeExpr> tp = acls.get(y);

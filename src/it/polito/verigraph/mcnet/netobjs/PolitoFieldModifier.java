@@ -58,6 +58,7 @@ public class PolitoFieldModifier extends NetworkObject {
     }
     
     public void installFieldModifier (Optional<PacketModel> packet){
+    
         Expr x = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_x", nctx.node);
         Expr y = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_y", nctx.node);
 
@@ -112,19 +113,8 @@ public class PolitoFieldModifier extends NetworkObject {
       
     }
 
-    //TODO: old version, you can remove this method
-    public void installFieldModifier (){
-    	installFieldModifier(Optional.of(new PacketModel()));
-        Expr x = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_x", nctx.node);
-        Expr y = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_y", nctx.node);
-
-        Expr p_0 = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_p_0", nctx.packet);
-        Expr p_1 = ctx.mkConst("politoFieldModifier_"+politoFieldModifier+"_p_1", nctx.packet);
-
-        /*IntExpr t_0 = ctx.mkIntConst("politoFieldModifier_"+politoFieldModifier+"_t_0");
-        IntExpr t_1 = ctx.mkIntConst("politoFieldModifier_"+politoFieldModifier+"_t_1");
-*/
+  
        
-    }
+  
 
 }

@@ -8,7 +8,7 @@ package it.polito.verigraph.scalability.tests;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
+import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
@@ -39,14 +39,24 @@ public class TestFWNAT3Nodes {
     public PolitoEndHost a,b,c;
     public AclFirewallAuto fw1,fw2;
     public PolitoNat nat;
+    
+    public  BoolExpr y1;
+    public  BoolExpr y2;
+   	
+   	
+   	public  BoolExpr x11;
+   	public  BoolExpr x21;
+   	public  BoolExpr x31;
+   	public  BoolExpr x41;
+   	public  BoolExpr x51;
 
     public  TestFWNAT3Nodes(){
-     /*   ctx = new Context();
+        ctx = new Context();
 
         NetContext nctx  = new NetContext (ctx,new String[]{"a", "b","c", "nat","fw2","fw1"},
                                                 new String[]{"ip_a", "ip_b", "ip_c","ip_nat", "ip_fw2", "ip_fw1"});
         Network net = new Network (ctx,new Object[]{nctx});
-
+        setConditions(ctx,nctx);
         a = new PolitoEndHost(ctx, new Object[]{nctx.nm.get("a"), net, nctx});
         b = new PolitoEndHost(ctx, new Object[]{nctx.nm.get("b"), net, nctx});
         c = new PolitoEndHost(ctx, new Object[]{nctx.nm.get("c"), net, nctx});
@@ -77,28 +87,28 @@ public class TestFWNAT3Nodes {
 
         
         ArrayList<RoutingTable> rta = new ArrayList<RoutingTable>();
-        rta.add(new RoutingTable(nctx.am.get("ip_b"), fw1,NetContext.a_fw1,nctx.y1));
-        rta.add(new RoutingTable(nctx.am.get("ip_b"), nat,NetContext.a_nat,ctx.mkNot(nctx.y1)));
+        rta.add(new RoutingTable(nctx.am.get("ip_b"), fw1,10,y1));
+        rta.add(new RoutingTable(nctx.am.get("ip_b"), nat,10,ctx.mkNot(y1)));
         net.routingTable2(a, rta);
         
         ArrayList<RoutingTable> rtfw1 = new ArrayList<RoutingTable>();
-        rtfw1.add(new RoutingTable(nctx.am.get("ip_b"), nat,NetContext.fw1_nat,nctx.y1));
-        rtfw1.add(new RoutingTable(nctx.am.get("ip_b"), fw1,NetContext.fw1_nat,ctx.mkNot(nctx.y1)));
+        rtfw1.add(new RoutingTable(nctx.am.get("ip_b"), nat,10,y1));
+        rtfw1.add(new RoutingTable(nctx.am.get("ip_b"), fw1,10,ctx.mkNot(y1)));
         net.routingTable2(fw1, rtfw1);
 
         ArrayList<RoutingTable> rtnat = new ArrayList<RoutingTable>();
-        rtnat.add(new RoutingTable(nctx.am.get("ip_b"), fw2,NetContext.nat_fw2,nctx.y2));
-        rtnat.add(new RoutingTable(nctx.am.get("ip_b"), b,NetContext.nat_b,ctx.mkNot(nctx.y2)));
+        rtnat.add(new RoutingTable(nctx.am.get("ip_b"), fw2,10,y2));
+        rtnat.add(new RoutingTable(nctx.am.get("ip_b"), b,10,ctx.mkNot(y2)));
         net.routingTable2(nat, rtnat);
         
         ArrayList<RoutingTable> rtfw2 = new ArrayList<RoutingTable>();
-        rtfw2.add(new RoutingTable(nctx.am.get("ip_b"), b,NetContext.fw2_b,nctx.y2));
-        rtfw2.add(new RoutingTable(nctx.am.get("ip_b"), fw2,NetContext.fw2_b,ctx.mkNot(nctx.y2)));
+        rtfw2.add(new RoutingTable(nctx.am.get("ip_b"), b,10,y2));
+        rtfw2.add(new RoutingTable(nctx.am.get("ip_b"), fw2,10,ctx.mkNot(y2)));
         net.routingTable2(fw2, rtfw2);       
         
         ArrayList<RoutingTable> rtc = new ArrayList<RoutingTable>();
-        rtc.add(new RoutingTable(nctx.am.get("ip_b"), fw1,NetContext.c_fw1,nctx.y1));
-        rtc.add(new RoutingTable(nctx.am.get("ip_b"), nat,NetContext.c_nat,ctx.mkNot(nctx.y1))); 
+        rtc.add(new RoutingTable(nctx.am.get("ip_b"), fw1,10,y1));
+        rtc.add(new RoutingTable(nctx.am.get("ip_b"), nat,10,ctx.mkNot(y1))); 
         net.routingTable2(c, rtc); 
         
         ArrayList<RoutingTable> rtb = new ArrayList<RoutingTable>();
@@ -119,7 +129,7 @@ public class TestFWNAT3Nodes {
         ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl2 = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
         fw1.addAcls(acl2);
         
-        check = new Checker(ctx,nctx,net);*/
+        check = new Checker(ctx,nctx,net);
 }
     
     public void resetZ3() throws Z3Exception{
@@ -161,11 +171,49 @@ public class TestFWNAT3Nodes {
         }else{
             System.out.println("SAT ");
             System.out.println(ret.model);
-//            System.out.print( "Model -> ");model.printModel(ret.model);
-//          System.out.println( "Violating packet -> " +ret.violating_packet);
-//          System.out.println("Last hop -> " +ret.last_hop);
-//          System.out.println("Last send_time -> " +ret.last_send_time);
-//          System.out.println( "Last recv_time -> " +ret.last_recv_time);
         }
     }
+    private void setConditions(Context ctx, NetContext nctx) {
+	  	y1 = ctx.mkBoolConst("y1");
+	  	y2 = ctx.mkBoolConst("y2");
+		
+		nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y1), "servers"));
+		nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y2), "servers"));
+		
+	  
+    	int capacity_x1 = 10;
+    	int capacity_x2 = 10;
+    	int capacity_x3 = 10;
+    	int capacity_x4 = 10;
+    	int capacity_x5 = 10;
+    	
+    	int capacity_y1 = 1000;
+    
+    	
+		x11 = ctx.mkBoolConst("x11");
+		x21 = ctx.mkBoolConst("x21");
+		x31 = ctx.mkBoolConst("x31");
+		x41 = ctx.mkBoolConst("x41");
+		x51 = ctx.mkBoolConst("x51");
+
+		y1 = ctx.mkBoolConst("y1");
+
+		nctx.constraints.add(ctx.mkEq(nctx.bool_to_int(x11), ctx.mkInt(1)));
+		nctx.constraints.add(ctx.mkEq(nctx.bool_to_int(x21), ctx.mkInt(1)));
+		nctx.constraints.add(ctx.mkEq(nctx.bool_to_int(x31), ctx.mkInt(1)));
+		nctx.constraints.add(ctx.mkEq(nctx.bool_to_int(x41), ctx.mkInt(1)));
+		nctx.constraints.add(ctx.mkEq(nctx.bool_to_int(x51), ctx.mkInt(1)));
+		
+		nctx.constraints.add(ctx.mkOr(ctx.mkImplies(y1, x11),ctx.mkImplies(y1, x21),ctx.mkImplies(y1, x31),ctx.mkImplies(y1, x41),ctx.mkImplies(y1, x51)));
+		
+	
+		ArithExpr leftSide = 
+			ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), nctx.bool_to_int(x11)),
+					ctx.mkMul(ctx.mkInt(capacity_x2), nctx.bool_to_int(x21)),
+					ctx.mkMul(ctx.mkInt(capacity_x3), nctx.bool_to_int(x31)),
+					ctx.mkMul(ctx.mkInt(capacity_x4), nctx.bool_to_int(x41)),
+					ctx.mkMul(ctx.mkInt(capacity_x5), nctx.bool_to_int(x51))
+					);
+		nctx.constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y1), nctx.bool_to_int(y1))));
+	}
 }
