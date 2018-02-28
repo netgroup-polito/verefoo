@@ -64,19 +64,21 @@
     </graph>
   </graphs>
  <Constraints>
-	  <NodeConstraints>
-			<NodeMetrics node="node1" reqStorage="38"/>
-			<NodeMetrics node="node2" reqStorage="20"/>
-			<NodeMetrics node="node3" reqStorage="50"/>
-			<NodeMetrics node="node4" reqStorage="38"/>
-	  </NodeConstraints>
+	  <NodeConstraints/>
 	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 		
   </PropertyDefinition>
     <Hosts>
-        <Host name="N1" cpu="2" cores="2" memory="4" fixedEndpoint="nodeA" diskStorage="108" type="CLIENT"/>
+        <Host name="N1" cpu="2" cores="2" memory="4" fixedEndpoint="nodeA" diskStorage="108" type="CLIENT">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
         <Host name="N2" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="122" type="MIDDLEBOX">
 			<SupportedVNF functional_type="FIREWALL"/>
 			<SupportedVNF functional_type="CACHE"/>
@@ -581,7 +583,14 @@
 			<SupportedVNF functional_type="NAT"/>
 			<SupportedVNF functional_type="FIELDMODIFIER"/>
 		</Host>
-        <Host name="N65" cpu="2" cores="2" memory="4" fixedEndpoint="nodeB" diskStorage="130" type="SERVER"/>
+        <Host name="N65" cpu="2" cores="2" memory="4" fixedEndpoint="nodeB" diskStorage="130" type="SERVER">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
     </Hosts>
     <Connections>
         <Connection sourceHost="N1" destHost="N31" avgLatency="162160"/>

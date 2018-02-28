@@ -75,21 +75,19 @@ public class TestProxy {
         u.setSchema(schema);
         // unmarshal a document into a tree of Java content objects
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
-		long endU=System.currentTimeMillis();
-        System.out.println("Unmarshalling -> " + ((endU-beginAll)/1000) );
+		//long endU=System.currentTimeMillis();
+        //System.out.println("Unmarshalling -> " + ((endU-beginAll)/1000) );
         for(Graph g:root.getGraphs().getGraph()){
         	long beginVP=System.currentTimeMillis();
         	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
         	long endVP=System.currentTimeMillis();
             System.out.println("Graph " + g.getId() + ": creating condition -> " + ((endVP-beginVP)/1000) );
-        	Property pd = root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId() && p.getName().equals(PName.ISOLATION_PROPERTY)).findFirst().orElse(null);
-        	if(pd == null) break;
-        	IsolationResult res=test.checkNFFGProperty(pd.getSrc(), pd.getDst());
+        	IsolationResult res=test.checkNFFGProperty(root.getPropertyDefinition());
         	long endCheck=System.currentTimeMillis();
             System.out.println(g.getId() + ": checking property -> " + ((endCheck-endVP)/1000) );
         	if(res.result != Status.UNSATISFIABLE)
         		new Translator(res.model.toString(),root).convert();
-        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE); 
+        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
         	long endT=System.currentTimeMillis();
             System.out.println(g.getId() + ": translating model -> " + ((endT-endCheck)/1000) );
         }

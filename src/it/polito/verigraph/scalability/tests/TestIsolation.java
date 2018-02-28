@@ -78,7 +78,7 @@ public class TestIsolation {
 
         ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
         //acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_x"),nctx.am.get("ip_b")));
-        acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_a"),nctx.am.get("ip_b")));
+        //acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_a"),nctx.am.get("ip_b")));
         x.addAcls(acl);
         
         check = new Checker(ctx,nctx,net);
@@ -115,7 +115,7 @@ public class TestIsolation {
         TestIsolation model = new TestIsolation();
         model.resetZ3();
         
-        //model.check.propertyAdd(model.a, model.b, Prop.ISOLATION);
+        model.check.propertyAdd(model.a, model.b, Prop.ISOLATION);
         model.check.propertyAdd(model.a, model.b, Prop.REACHABILITY);
         IsolationResult ret = model.check.propertyCheck();
         if (ret.result == Status.UNSATISFIABLE){

@@ -68,10 +68,17 @@
 	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
+  		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 		
   </PropertyDefinition>
     <Hosts>
-		<Host name="at1.at" cpu="2" cores="2" memory="4" fixedEndpoint="nodeA" diskStorage="108" type="CLIENT"/>
+		<Host name="at1.at" cpu="2" cores="2" memory="4" fixedEndpoint="nodeA" diskStorage="108" type="CLIENT">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
 		<Host name="be1.be" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="122" type="MIDDLEBOX">
 			<SupportedVNF functional_type="FIREWALL"/>
 			<SupportedVNF functional_type="CACHE"/>
@@ -232,7 +239,14 @@
 			<SupportedVNF functional_type="NAT"/>
 			<SupportedVNF functional_type="FIELDMODIFIER"/>
 		</Host>
-		<Host name="uk1.uk" cpu="2" cores="2" memory="4" fixedEndpoint="nodeB" diskStorage="144" type="SERVER"/>
+		<Host name="uk1.uk" cpu="2" cores="2" memory="4" fixedEndpoint="nodeB" diskStorage="144" type="SERVER">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
     </Hosts>
     <Connections>
         <Connection sourceHost="at1.at" destHost="ch1.ch" avgLatency="804"/>

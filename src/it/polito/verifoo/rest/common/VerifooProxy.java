@@ -19,6 +19,7 @@ import it.polito.verifoo.rest.jaxb.*;
 import it.polito.verifoo.rest.jaxb.BandwidthConstraints.BandwidthMetrics;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verigraph.mcnet.components.*;
+import it.polito.verigraph.mcnet.components.Checker.Prop;
 /**
  * 
  * This is the main class that will interface with the Verifoo classes
@@ -583,17 +584,27 @@ public class VerifooProxy {
 		}
 		/**
 		 * Checks if the client node and the server node in a graph are reachable satisfying all the imposed conditions
+		 * @param propertyDefinition 
 		 * @return
 		 */
-		public IsolationResult checkNFFGProperty(String src, String dst){
-
-            Node source = nodes.stream().filter(n -> {return n.getName().equals(src);}).findFirst().get();
-            //Node source = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT);}).findFirst().get();
-            //Node source = nodes.stream().filter(n -> n.getName().equals("node3")).findFirst().orElse(null);
-			Node dest = nodes.stream().filter(n -> {return n.getName().equals(dst);}).findFirst().get();
-			//Node dest = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).findFirst().get();
-            logger.debug("Checking reachability from " + source.getName() + " to "+ dest.getName());
-			IsolationResult ret = this.check.checkIsolationProperty(netobjs.get(source), netobjs.get(dest));
+		public IsolationResult checkNFFGProperty(PropertyDefinition propertyDefinition){
+			propertyDefinition.getProperty().forEach(p ->{
+				String src = p.getSrc(), dst = p.getDst();
+	            Node source = nodes.stream().filter(n -> {return n.getName().equals(src);}).findFirst().get();
+				Node dest = nodes.stream().filter(n -> {return n.getName().equals(dst);}).findFirst().get();
+				logger.debug("Adding check on "+ p.getName() + " from " + source.getName() + " to "+ dest.getName());
+				switch (p.getName()) {
+				case ISOLATION_PROPERTY: 
+						check.propertyAdd(netobjs.get(source), netobjs.get(dest), Prop.ISOLATION);
+						break;
+				case REACHABILITY_PROPERTY: 
+						check.propertyAdd(netobjs.get(source), netobjs.get(dest), Prop.REACHABILITY);
+					break;
+				}
+			});
+			
+            
+			IsolationResult ret = this.check.propertyCheck();
 			if (ret.result == Status.UNSATISFIABLE){
 				 	logger.debug("UNSAT"); // Nodes a and b are isolated
 				 	

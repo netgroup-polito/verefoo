@@ -44,7 +44,7 @@
         <CapacityForNode node="node2" capacity="10"/>
     </CapacityDefinition>
     <PropertyDefinition>
-        <Property name="IsolationProperty" graph="0"/>
+        <Property name="ReachabilityProperty" graph="0"/>
     </PropertyDefinition>
     <Hosts>
         <Host name="hostA" diskStorage="10" type="CLIENT"/>

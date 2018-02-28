@@ -54,13 +54,11 @@ public class RestFoo {
 						throw new BadGraphError("No property defined for the Graph "+g.getId(),EType.INVALID_PROPERTY_DEFINITION);
 					}
 	            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints());
-	            	Property pd = root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId() && p.getName().equals(PName.ISOLATION_PROPERTY)).findFirst().orElse(null);
-                	if(pd == null) break;
-                	IsolationResult res=test.checkNFFGProperty(pd.getSrc(), pd.getDst());
+                	IsolationResult res=test.checkNFFGProperty(root.getPropertyDefinition());
 	            	if(res.result != Status.UNSATISFIABLE){
 	            		z3model=z3model.concat(res.model.toString());
 	            	}
-	            	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get().setIsSat(res.result!=Status.UNSATISFIABLE);
+                	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
 	            	            
 	            }
 				if(!z3model.isEmpty()){

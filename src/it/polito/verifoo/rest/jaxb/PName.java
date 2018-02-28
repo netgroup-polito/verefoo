@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.02.26 alle 10:45:10 AM CET 
+// Generato il: 2018.02.28 alle 04:58:39 PM CET 
 //
 
 
@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;simpleType name="P-Name">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *     &lt;enumeration value="IsolationProperty"/>
+ *     &lt;enumeration value="ReachabilityProperty"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
@@ -32,7 +33,9 @@ import javax.xml.bind.annotation.XmlType;
 public enum PName {
 
     @XmlEnumValue("IsolationProperty")
-    ISOLATION_PROPERTY("IsolationProperty");
+    ISOLATION_PROPERTY("IsolationProperty"),
+    @XmlEnumValue("ReachabilityProperty")
+    REACHABILITY_PROPERTY("ReachabilityProperty");
     private final String value;
 
     PName(String v) {
