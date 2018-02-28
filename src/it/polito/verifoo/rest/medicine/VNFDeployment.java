@@ -18,16 +18,17 @@ public class VNFDeployment {
 	private void CreatePlacement(){
 		placement = "class CustomPlacement(object):\n"
 							+"\tdef place(self, nsd, vnfds, saps, dcs):\n";
+		int nE = 0;
 		for(Host h:hosts){
 			for(NodeRefType n : h.getNodeRef()){
 				placement += "\t\tvnfds['"+n.getNode().toLowerCase()+"'][\"dc\"] = dcs['"+h.getName()+"']\n";
 			}
 			if(h.getFixedEndpoint() != null){
 				placement += "\t\tvnfds['"+h.getFixedEndpoint().toLowerCase()+"'][\"dc\"] = dcs['"+h.getName()+"']\n";
+				placement +="\t\tsaps['ns_external" + nE + "'][\"dc\"] = dcs['"+h.getName()+"']\n";
+				nE++;
 			}
 		}
-		 placement +="\t\tsaps['ns_input'][\"dc\"] = dcs['hostA']\n"
-				 	 +"\t\tsaps['ns_output'][\"dc\"] = dcs['hostB']\n";
 
 	}
 	public String getPlacementDescription(){

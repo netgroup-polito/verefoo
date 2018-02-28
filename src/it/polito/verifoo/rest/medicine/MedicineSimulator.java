@@ -26,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Link;
 import it.polito.verifoo.rest.common.LinkCreator;
+import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Host;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Node;
@@ -83,7 +84,11 @@ public class MedicineSimulator {
 			//System.out.println(n.getName()+" "+ nm + " " + inLinks + " " + outLinks);
 			vnfds.put(n.getName().toLowerCase(), new VNFDescriptor(n, nm, inLinks, outLinks));
 		}
-		sd = new ServiceDescriptor(nodes, links, vnfds);
+		long nExternal = nodes.stream()
+		   	 .filter((n) -> n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT) || n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.ENDHOST)
+		   	  			|| n.getFunctionalType().equals(FunctionalTypes.WEBSERVER) || n.getFunctionalType().equals(FunctionalTypes.MAILSERVER))
+		   	 .count();
+		sd = new ServiceDescriptor(nodes, links, vnfds, nExternal);
 
 		try {
 			createIN();
