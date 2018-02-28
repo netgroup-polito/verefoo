@@ -78,7 +78,7 @@ public class TestSG {
         // create an Unmarshaller
         Unmarshaller u = jc.createUnmarshaller();
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-        Schema schema = sf.newSchema( new File( "./xsd/nfvInfo.xsd" )); 
+        Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
         u.setSchema(schema);
         // unmarshal a document into a tree of Java content objects
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
@@ -110,28 +110,6 @@ public class TestSG {
 			fail(e.toString());
 		}
 	}
-	
-	@Test
-	public void testMinimizeLatency() throws Exception {
-        NFV root = init("./testfile/ServiceGraphs/sg4nodes5host.xml");
-        root.getPropertyDefinition().getProperty().forEach(p ->{
-        	org.junit.Assert.assertEquals(true, p.isIsSat());
-        });
-        List<String> n = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host5")).findFirst().get().getNodeRef().stream().map(nr -> nr.getNode()).collect(Collectors.toList());
-        org.junit.Assert.assertEquals(true, n.contains("node2"));
-        return;
-	}
-	@Test
-	public void testMinimizeLatencyAndServers() throws Exception {
-        NFV root = init("./testfile/ServiceGraphs/sg5nodes3host.xml");
-        root.getPropertyDefinition().getProperty().forEach(p ->{
-        	org.junit.Assert.assertEquals(true, p.isIsSat());
-        });
-        List<String> n = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host3")).findFirst().get().getNodeRef().stream().map(nr -> nr.getNode()).collect(Collectors.toList());
-        org.junit.Assert.assertEquals(true, n.contains("node2"));
-        org.junit.Assert.assertEquals(false, root.getHosts().getHost().stream().filter(h-> h.getName().equals("host2")).findFirst().get().isActive());
-        return;
-	}
 	@Test
 	public void testModel() throws Exception {
         NFV root = init("./testfile/ServiceGraphs/sg4nodes5hostConnection.xml");
@@ -142,31 +120,46 @@ public class TestSG {
         org.junit.Assert.assertEquals(true, n.contains("node1") && n.contains("node2") && n.contains("node3"));
         return;
 	}
+	@Test
+	public void testOptimalPlacement() throws Exception {
+        //minimize latency
+        NFV root = init("./testfile/ServiceGraphs/sg4nodes5host.xml");
+        root.getPropertyDefinition().getProperty().forEach(p ->{
+        	org.junit.Assert.assertEquals(true, p.isIsSat());
+        });
+        List<String> n = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host5")).findFirst().get().getNodeRef().stream().map(nr -> nr.getNode()).collect(Collectors.toList());
+        org.junit.Assert.assertEquals(true, n.contains("node2"));
+        //minimize latency and number of servers used
+        root = init("./testfile/ServiceGraphs/sg5nodes3host.xml");
+        root.getPropertyDefinition().getProperty().forEach(p ->{
+        	org.junit.Assert.assertEquals(true, p.isIsSat());
+        });
+        n = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host3")).findFirst().get().getNodeRef().stream().map(nr -> nr.getNode()).collect(Collectors.toList());
+        org.junit.Assert.assertEquals(true, n.contains("node2"));
+        org.junit.Assert.assertEquals(false, root.getHosts().getHost().stream().filter(h-> h.getName().equals("host2")).findFirst().get().isActive());
+        return;
+	}
 	
 	@Test
-	public void test2Clients() throws Exception {
+	public void testMultipleEndpointWithSamePlacement() throws Exception {
+		//2 clients
         NFV root = init("./testfile/ServiceGraphs/sg2clients3nodes3host.xml");
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(true, p.isIsSat());
         });
         List<String> n = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host1")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
         org.junit.Assert.assertEquals(true, n.contains("node1") && n.contains("node3"));
-        return;
-	}
-	
-	@Test
-	public void test2Servers() throws Exception {
-        NFV root = init("./testfile/ServiceGraphs/sg3nodes2servers3host.xml");
+
+		//2 servers
+        root = init("./testfile/ServiceGraphs/sg3nodes2servers3host.xml");
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(true, p.isIsSat());
         });
-        List<String> n = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host3")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
+        n = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host3")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
         org.junit.Assert.assertEquals(true, n.contains("node2") && n.contains("node3"));
-        return;
-	}
-	@Test
-	public void test2Clients2Servers() throws Exception {
-        NFV root = init("./testfile/ServiceGraphs/sg2clients4nodes2servers3host.xml");
+
+		//2 clients and 2 servers
+        root = init("./testfile/ServiceGraphs/sg2clients4nodes2servers3host.xml");
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(true, p.isIsSat());
         });
@@ -174,16 +167,50 @@ public class TestSG {
         org.junit.Assert.assertEquals(true, n1.contains("node1") && n1.contains("node3"));
         List<String> n2 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host3")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
         org.junit.Assert.assertEquals(true, n2.contains("node2") && n2.contains("node4"));
+        
+		//2 clients and 2 servers in a limit case (see the XML for more info)
+        root = init("./testfile/ServiceGraphs/sg2clients3nodes2servers3host.xml");
+        root.getPropertyDefinition().getProperty().forEach(p ->{
+        	org.junit.Assert.assertEquals(true, p.isIsSat());
+        });
+        n1 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host1")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
+        org.junit.Assert.assertEquals(true, n1.contains("node1") && n1.contains("node2") && n1.contains("node3"));
         return;
 	}
+	
 	@Test
-	public void test2Clients2ServersSmall() throws Exception {
-        NFV root = init("./testfile/ServiceGraphs/sg2clients3nodes2servers3host.xml");
+	public void testMultipleEndpointWithDifferentPlacement() throws Exception {
+		//2 clients
+        NFV root = init("./testfile/ServiceGraphs/sg2clients3nodes3hostDiffEndpoints.xml");
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(true, p.isIsSat());
         });
         List<String> n1 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host1")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
-        org.junit.Assert.assertEquals(true, n1.contains("node1") && n1.contains("node2") && n1.contains("node3"));
+        org.junit.Assert.assertEquals(true, n1.contains("node1"));
+        List<String> n2 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host2")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
+        org.junit.Assert.assertEquals(true, n2.contains("node3"));
+
+		//2 servers
+        root = init("./testfile/ServiceGraphs/sg3nodes2servers3hostDiffEndpoints.xml");
+        root.getPropertyDefinition().getProperty().forEach(p ->{
+        	org.junit.Assert.assertEquals(true, p.isIsSat());
+        });
+        n1 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host2")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
+        org.junit.Assert.assertEquals(true, n1.contains("node3"));
+        n2 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host3")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
+        org.junit.Assert.assertEquals(true, n2.contains("node2"));
+        
+		//2 clients and 2 servers
+        root = init("./testfile/ServiceGraphs/sg2clients4nodes2servers3hostDiffEndpoints.xml");
+        root.getPropertyDefinition().getProperty().forEach(p ->{
+        	org.junit.Assert.assertEquals(true, p.isIsSat());
+        });
+        n1 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host1")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
+        org.junit.Assert.assertEquals(true, n1.contains("node1"));
+        n2 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host2")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
+        org.junit.Assert.assertEquals(true, n2.contains("node3") && n2.contains("node4"));
+        n1 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host3")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
+        org.junit.Assert.assertEquals(true, n1.contains("node2"));
         return;
 	}
 

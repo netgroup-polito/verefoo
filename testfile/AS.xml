@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvInfo.xsd">
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
   <graphs>
     <graph id="0">
      <node functional_type="WEBCLIENT" name="nodeA">
@@ -63,95 +63,637 @@
       </node>
     </graph>
   </graphs>
-  <CapacityDefinition>
-   		<CapacityForNode node="node1" capacity="50"/>
-  		<CapacityForNode node="node2" capacity="50"/>
-  		<CapacityForNode node="node3" capacity="68"/>
-  		<CapacityForNode node="node4" capacity="45"/>
-  </CapacityDefinition>
+  <Constraints>
+	  <NodeConstraints>
+			<NodeMetrics node="node1" reqStorage="38"/>
+			<NodeMetrics node="node2" reqStorage="20"/>
+			<NodeMetrics node="node3" reqStorage="50"/>
+			<NodeMetrics node="node4" reqStorage="38"/>
+	  </NodeConstraints>
+	  <BandwidthConstraints/>
+  </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="IsolationProperty"/> 		
+  		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
   </PropertyDefinition>
   <Hosts>
-        <Host name="e050caaa" diskStorage="137" type="CLIENT"/>
-        <Host name="5a01b700" diskStorage="122" type="MIDDLEBOX"/>
-        <Host name="5a01b6ff" diskStorage="148" type="MIDDLEBOX"/>
-        <Host name="c0286ecd" diskStorage="106" type="MIDDLEBOX"/>
-        <Host name="c0286ece" diskStorage="147" type="MIDDLEBOX"/>
-        <Host name="e050ca8c" diskStorage="127" type="MIDDLEBOX"/>
-        <Host name="5a01b706" diskStorage="142" type="MIDDLEBOX"/>
-        <Host name="6f3cda8c" diskStorage="125" type="MIDDLEBOX"/>
-        <Host name="8951021b" diskStorage="143" type="MIDDLEBOX"/>
-        <Host name="fe24ec49" diskStorage="102" type="MIDDLEBOX"/>
-        <Host name="8951021c" diskStorage="127" type="MIDDLEBOX"/>
-        <Host name="e050ca8d" diskStorage="113" type="MIDDLEBOX"/>
-        <Host name="65d5058" diskStorage="110" type="MIDDLEBOX"/>
-        <Host name="65ade8e6" diskStorage="142" type="MIDDLEBOX"/>
-        <Host name="65d5057" diskStorage="133" type="MIDDLEBOX"/>
-        <Host name="65ade8e5" diskStorage="133" type="MIDDLEBOX"/>
-        <Host name="6f3cda68" diskStorage="147" type="MIDDLEBOX"/>
-        <Host name="c02871d5" diskStorage="136" type="MIDDLEBOX"/>
-        <Host name="e489dbc1" diskStorage="123" type="MIDDLEBOX"/>
-        <Host name="2d720ca9" diskStorage="125" type="MIDDLEBOX"/>
-        <Host name="70c5b272" diskStorage="110" type="MIDDLEBOX"/>
-        <Host name="70c5b271" diskStorage="146" type="MIDDLEBOX"/>
-        <Host name="6f99c30f" diskStorage="110" type="MIDDLEBOX"/>
-        <Host name="e489dbc0" diskStorage="137" type="MIDDLEBOX"/>
-        <Host name="2d720ca8" diskStorage="123" type="MIDDLEBOX"/>
-        <Host name="8006a058" diskStorage="138" type="MIDDLEBOX"/>
-        <Host name="137ee469" diskStorage="115" type="MIDDLEBOX"/>
-        <Host name="46327e0" diskStorage="146" type="MIDDLEBOX"/>
-        <Host name="5a01b6c4" diskStorage="130" type="MIDDLEBOX"/>
-        <Host name="5a01b6c3" diskStorage="112" type="MIDDLEBOX"/>
-        <Host name="8006a057" diskStorage="115" type="MIDDLEBOX"/>
-        <Host name="46327df" diskStorage="107" type="MIDDLEBOX"/>
-        <Host name="7ad4715a" diskStorage="124" type="MIDDLEBOX"/>
-        <Host name="faa2b04b" diskStorage="119" type="MIDDLEBOX"/>
-        <Host name="d627a04" diskStorage="126" type="MIDDLEBOX"/>
-        <Host name="d627a03" diskStorage="139" type="MIDDLEBOX"/>
-        <Host name="c028720d" diskStorage="110" type="MIDDLEBOX"/>
-        <Host name="6f99c2f9" diskStorage="114" type="MIDDLEBOX"/>
-        <Host name="c028720e" diskStorage="104" type="MIDDLEBOX"/>
-        <Host name="c65d1744" diskStorage="121" type="MIDDLEBOX"/>
-        <Host name="137ee46a" diskStorage="118" type="MIDDLEBOX"/>
-        <Host name="65d5041" diskStorage="114" type="MIDDLEBOX"/>
-        <Host name="c65d1746" diskStorage="117" type="MIDDLEBOX"/>
-        <Host name="6f3cda6f" diskStorage="140" type="MIDDLEBOX"/>
-        <Host name="c0286e8a" diskStorage="123" type="MIDDLEBOX"/>
-        <Host name="c0286e8b" diskStorage="112" type="MIDDLEBOX"/>
-        <Host name="6f99c330" diskStorage="133" type="MIDDLEBOX"/>
-        <Host name="c0286e8c" diskStorage="117" type="MIDDLEBOX"/>
-        <Host name="ca73e3fc" diskStorage="107" type="MIDDLEBOX"/>
-        <Host name="ca73e3fd" diskStorage="135" type="MIDDLEBOX"/>
-        <Host name="faa2b04a" diskStorage="103" type="MIDDLEBOX"/>
-        <Host name="6f3cda87" diskStorage="149" type="MIDDLEBOX"/>
-        <Host name="7ad47159" diskStorage="109" type="MIDDLEBOX"/>
-        <Host name="e489dbe3" diskStorage="108" type="MIDDLEBOX"/>
-        <Host name="6f99c32f" diskStorage="114" type="MIDDLEBOX"/>
-        <Host name="6f3cda69" diskStorage="137" type="MIDDLEBOX"/>
-        <Host name="c0287191" diskStorage="100" type="MIDDLEBOX"/>
-        <Host name="c0287192" diskStorage="119" type="MIDDLEBOX"/>
-        <Host name="fe24ec4a" diskStorage="122" type="MIDDLEBOX"/>
-        <Host name="e489dbe2" diskStorage="145" type="MIDDLEBOX"/>
-        <Host name="c0287193" diskStorage="120" type="MIDDLEBOX"/>
-        <Host name="c02871eb" diskStorage="141" type="MIDDLEBOX"/>
-        <Host name="c02871ec" diskStorage="132" type="MIDDLEBOX"/>
-        <Host name="c65d1497" diskStorage="117" type="MIDDLEBOX"/>
-        <Host name="7ad47157" diskStorage="124" type="MIDDLEBOX"/>
-        <Host name="70c5b2ac" diskStorage="146" type="MIDDLEBOX"/>
-        <Host name="7ad47158" diskStorage="101" type="MIDDLEBOX"/>
-        <Host name="463203b" diskStorage="128" type="MIDDLEBOX"/>
-        <Host name="6f3cda70" diskStorage="104" type="MIDDLEBOX"/>
-        <Host name="6f3cda71" diskStorage="115" type="MIDDLEBOX"/>
-        <Host name="c3295332" diskStorage="140" type="MIDDLEBOX"/>
-        <Host name="80061e23" diskStorage="132" type="MIDDLEBOX"/>
-        <Host name="c3295333" diskStorage="104" type="MIDDLEBOX"/>
-        <Host name="fe24ec65" diskStorage="117" type="MIDDLEBOX"/>
-        <Host name="5a01b6e9" diskStorage="142" type="MIDDLEBOX"/>
-        <Host name="5a01b6e8" diskStorage="108" type="MIDDLEBOX"/>
-        <Host name="c65d1fdc" diskStorage="128" type="MIDDLEBOX"/>
-        <Host name="c65d1fdd" diskStorage="100" type="MIDDLEBOX"/>
-        <Host name="c0286e30" diskStorage="114" type="SERVER"/>
+        <Host name="e050caaa" cpu="2" cores="2" memory="4" fixedEndpoint="nodeA" diskStorage="137" type="CLIENT"/>
+        <Host name="5a01b700" cpu="4" cores="4" memory="16" maxVNF="4"  diskStorage="122" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="5a01b6ff" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="148" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c0286ecd" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="106" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c0286ece" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="147" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="e050ca8c" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="127" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="5a01b706" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="142" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="6f3cda8c" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="125" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="8951021b" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="143" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="fe24ec49" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="102" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="8951021c" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="127" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="e050ca8d" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="113" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="65d5058" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="110" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="65ade8e6" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="142" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="65d5057" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="133" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="65ade8e5" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="133" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="6f3cda68" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="147" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c02871d5" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="136" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="e489dbc1" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="123" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="2d720ca9" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="125" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="70c5b272" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="110" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="70c5b271" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="146" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="6f99c30f" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="110" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="e489dbc0" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="137" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="2d720ca8" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="123" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="8006a058" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="138" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="137ee469" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="115" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="46327e0" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="146" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="5a01b6c4" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="130" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="5a01b6c3" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="112" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="8006a057" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="115" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="46327df" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="107" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="7ad4715a" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="124" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="faa2b04b" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="119" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="d627a04" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="126" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="d627a03" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="139" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c028720d" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="110" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="6f99c2f9" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="114" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c028720e" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="104" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c65d1744" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="121" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="137ee46a" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="118" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="65d5041" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="114" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c65d1746" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="117" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="6f3cda6f" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="140" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c0286e8a" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="123" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c0286e8b" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="112" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="6f99c330" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="133" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c0286e8c" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="117" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="ca73e3fc" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="107" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="ca73e3fd" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="135" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="faa2b04a" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="103" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="6f3cda87" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="149" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="7ad47159" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="109" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="e489dbe3" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="108" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="6f99c32f" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="114" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="6f3cda69" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="137" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c0287191" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="100" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c0287192" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="119" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="fe24ec4a" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="122" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="e489dbe2" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="145" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c0287193" cpu="4" cores="4" memory="16" maxVNF="4"  diskStorage="120" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c02871eb" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="141" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c02871ec" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="132" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c65d1497" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="117" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="7ad47157" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="124" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="70c5b2ac" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="146" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="7ad47158" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="101" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="463203b" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="128" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="6f3cda70" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="104" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="6f3cda71" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="115" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c3295332" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="140" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="80061e23" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="132" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c3295333" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="104" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="fe24ec65" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="117" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="5a01b6e9" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="142" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="5a01b6e8" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="108" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c65d1fdc" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="128" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c65d1fdd" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="100" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="c0286e30" cpu="2" cores="2" memory="4" fixedEndpoint="nodeB" diskStorage="114" type="SERVER"/>
     </Hosts>
     <Connections>
         <Connection sourceHost="6f99c32f" destHost="c028720e" avgLatency="2"/>
@@ -172,6 +714,7 @@
         <Connection sourceHost="6f3cda6f" destHost="6f3cda8c" avgLatency="1"/>
         <Connection sourceHost="6f3cda6f" destHost="6f3cda68" avgLatency="1"/>
         <Connection sourceHost="6f3cda6f" destHost="6f3cda69" avgLatency="1"/>
+		<Connection sourceHost="6f3cda69" destHost="c0286e30" avgLatency="1"/>
         <Connection sourceHost="c65d1497" destHost="c65d1fdd" avgLatency="1"/>
         <Connection sourceHost="c65d1497" destHost="fe24ec49" avgLatency="6"/>
         <Connection sourceHost="c65d1497" destHost="fe24ec4a" avgLatency="6"/>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvInfo.xsd">
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
   <graphs>
     <graph id="0">
      <node functional_type="ENDHOST" name="nodeA">
@@ -63,38 +63,181 @@
       </node>
     </graph>
   </graphs>
-  <CapacityDefinition>
-   		<CapacityForNode node="node1" capacity="35"/>
-  		<CapacityForNode node="node2" capacity="20"/>
-  		<CapacityForNode node="node3" capacity="50"/>
-  		<CapacityForNode node="node4" capacity="38"/>
-  </CapacityDefinition>
+  <Constraints>
+	  <NodeConstraints>
+			<NodeMetrics node="node1" reqStorage="38"/>
+			<NodeMetrics node="node2" reqStorage="20"/>
+			<NodeMetrics node="node3" reqStorage="50"/>
+			<NodeMetrics node="node4" reqStorage="38"/>
+	  </NodeConstraints>
+	  <BandwidthConstraints/>
+  </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="IsolationProperty"/> 		
+  		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
   </PropertyDefinition>
     <Hosts>
-        <Host name="at1.at" diskStorage="108" type="CLIENT"/>
-        <Host name="be1.be" diskStorage="122" type="MIDDLEBOX"/>
-        <Host name="ch1.ch" diskStorage="116" type="MIDDLEBOX"/>
-        <Host name="cz1.cz" diskStorage="125" type="MIDDLEBOX"/>
-        <Host name="de1.de" diskStorage="100" type="MIDDLEBOX"/>
-        <Host name="es1.es" diskStorage="124" type="MIDDLEBOX"/>
-        <Host name="fr1.fr" diskStorage="141" type="MIDDLEBOX"/>
-        <Host name="gr1.gr" diskStorage="116" type="MIDDLEBOX"/>
-        <Host name="hr1.hr" diskStorage="127" type="MIDDLEBOX"/>
-        <Host name="hu1.hu" diskStorage="120" type="MIDDLEBOX"/>
-        <Host name="ie1.ie" diskStorage="130" type="MIDDLEBOX"/>
-        <Host name="il1.il" diskStorage="116" type="MIDDLEBOX"/>
-        <Host name="it1.it" diskStorage="121" type="MIDDLEBOX"/>
-        <Host name="lu1.lu" diskStorage="122" type="MIDDLEBOX"/>
-        <Host name="nl1.nl" diskStorage="124" type="MIDDLEBOX"/>
-        <Host name="ny1.ny" diskStorage="134" type="MIDDLEBOX"/>
-        <Host name="pl1.pl" diskStorage="105" type="MIDDLEBOX"/>
-        <Host name="pt1.pt" diskStorage="118" type="MIDDLEBOX"/>
-        <Host name="se1.se" diskStorage="123" type="MIDDLEBOX"/>
-        <Host name="si1.si" diskStorage="138" type="MIDDLEBOX"/>
-        <Host name="sk1.sk" diskStorage="144" type="MIDDLEBOX"/>
-        <Host name="uk1.uk" diskStorage="134" type="SERVER"/>
+		<Host name="at1.at" cpu="2" cores="2" memory="4" fixedEndpoint="nodeA" diskStorage="108" type="CLIENT"/>
+		<Host name="be1.be" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="122" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="ch1.ch" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="116" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="cz1.cz" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="125" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="de1.de" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="100" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="es1.es" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="124" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="fr1.fr" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="141" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="gr1.gr" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="116" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="hr1.hr" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="127" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="hu1.hu" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="120" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="ie1.ie" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="130" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="il1.il" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="116" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="it1.it" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="121" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="lu1.lu" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="122" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="nl1.nl" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="124" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="ny1.ny" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="134" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="pl1.pl" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="105" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="pt1.pt" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="118" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="se1.se" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="123" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="si1.si" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="138" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="sk1.sk" cpu="4" cores="4" memory="16" maxVNF="4" diskStorage="144" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+		<Host name="uk1.uk" cpu="2" cores="2" memory="4" fixedEndpoint="nodeB" diskStorage="144" type="SERVER"/>
     </Hosts>
     <Connections>
         <Connection sourceHost="at1.at" destHost="ch1.ch" avgLatency="804"/>

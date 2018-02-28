@@ -78,33 +78,33 @@
   		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
   </PropertyDefinition>
   <Hosts>
-  	<Host name="hostA" cpu="2000" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
-  	<Host name="host1" cpu="1000" cores="4" memory="16" diskStorage="50" maxVNF="1" type="MIDDLEBOX">
+  	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
+  	<Host name="host1" cpu="1" cores="4" memory="16" diskStorage="50" maxVNF="1" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="host2" cpu="3700" cores="8" memory="16" diskStorage="10" maxVNF="4" type="MIDDLEBOX">
+  	<Host name="host2" cpu="3" cores="8" memory="16" diskStorage="10" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="host3" cpu="4100" cores="4" memory="16" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
+  	<Host name="host3" cpu="4" cores="4" memory="16" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="hostB" cpu="2000" cores="2" memory="4" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
+  	<Host name="hostB" cpu="2" cores="2" memory="4" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
   </Hosts>
   <Connections>
-  	<Connection sourceHost="hostA" destHost="host1" avgLatency ="-1"/>
-  	<Connection sourceHost="host1" destHost="host2" avgLatency ="-100"/>
-  	<Connection sourceHost="host2" destHost="host1" avgLatency ="-100"/>
-  	<Connection sourceHost="host3" destHost="host2" avgLatency ="-100"/>
-  	<Connection sourceHost="host2" destHost="host3" avgLatency ="-100"/>
-	<Connection sourceHost="host1" destHost="host3" avgLatency ="-1"/>
-	<Connection sourceHost="host3" destHost="host1" avgLatency ="-1"/>
-  	<Connection sourceHost="host2" destHost="hostB" avgLatency ="-1"/>
+  	<Connection sourceHost="hostA" destHost="host1" avgLatency ="1"/>
+  	<Connection sourceHost="host1" destHost="host2" avgLatency ="100"/>
+  	<Connection sourceHost="host2" destHost="host1" avgLatency ="100"/>
+  	<Connection sourceHost="host3" destHost="host2" avgLatency ="100"/>
+  	<Connection sourceHost="host2" destHost="host3" avgLatency ="100"/>
+	<Connection sourceHost="host1" destHost="host3" avgLatency ="1"/>
+	<Connection sourceHost="host3" destHost="host1" avgLatency ="1"/>
+  	<Connection sourceHost="host2" destHost="hostB" avgLatency ="1"/>
   </Connections>
   <ParsingString></ParsingString>
 </NFV>

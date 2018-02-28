@@ -6,7 +6,7 @@
 				 |	  	       |  
 |nodeC|_______|node3|_______|node4|_______|nodeD|
 -->
-<NFV>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvSchema.xsd">
   <graphs>
     <graph id="0">
      <node functional_type="WEBCLIENT" name="nodeA">
@@ -102,38 +102,38 @@
   		<Property graph="0" name="IsolationProperty" src="nodeC" dst="nodeD"/> 		
   </PropertyDefinition>
   <Hosts>
-  	<Host name="hostA" cpu="2000" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
-  	<Host name="hostC" cpu="2000" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeC"/>
-  	<Host name="host1" cpu="1000" cores="4" memory="16" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
+  	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
+  	<Host name="hostC" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeC"/>
+  	<Host name="host1" cpu="2" cores="4" memory="16" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="host2" cpu="3700" cores="8" memory="16" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
+  	<Host name="host2" cpu="3" cores="8" memory="16" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="host3" cpu="4100" cores="4" memory="16" diskStorage="20" maxVNF="4" type="MIDDLEBOX">
+  	<Host name="host3" cpu="4" cores="4" memory="16" diskStorage="20" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="hostB" cpu="2000" cores="2" memory="4" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
-	<Host name="hostD" cpu="2000" cores="2" memory="4" diskStorage="10" type="SERVER" fixedEndpoint="nodeD"/>
+  	<Host name="hostB" cpu="2" cores="2" memory="4" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
+	<Host name="hostD" cpu="2" cores="2" memory="4" diskStorage="10" type="SERVER" fixedEndpoint="nodeD"/>
   </Hosts>
   <Connections>
-  	<Connection sourceHost="hostA" destHost="host1" avgLatency ="-1"/>
-	<Connection sourceHost="hostC" destHost="host1" avgLatency ="-1"/>
-  	<Connection sourceHost="host1" destHost="host2" avgLatency ="-1"/>
-  	<Connection sourceHost="host2" destHost="host1" avgLatency ="-1"/>
-	<Connection sourceHost="host1" destHost="host3" avgLatency ="-1"/>
-  	<Connection sourceHost="host3" destHost="host1" avgLatency ="-1"/>
-  	<Connection sourceHost="host3" destHost="host2" avgLatency ="-1"/>
-  	<Connection sourceHost="host2" destHost="host3" avgLatency ="-1"/>
-  	<Connection sourceHost="host2" destHost="hostB" avgLatency ="-100"/>
-  	<Connection sourceHost="host3" destHost="hostB" avgLatency ="-1"/>
-	<Connection sourceHost="host3" destHost="hostD" avgLatency ="-1"/>
+  	<Connection sourceHost="hostA" destHost="host1" avgLatency ="1"/>
+	<Connection sourceHost="hostC" destHost="host1" avgLatency ="1"/>
+  	<Connection sourceHost="host1" destHost="host2" avgLatency ="1"/>
+  	<Connection sourceHost="host2" destHost="host1" avgLatency ="1"/>
+	<Connection sourceHost="host1" destHost="host3" avgLatency ="1"/>
+  	<Connection sourceHost="host3" destHost="host1" avgLatency ="1"/>
+  	<Connection sourceHost="host3" destHost="host2" avgLatency ="1"/>
+  	<Connection sourceHost="host2" destHost="host3" avgLatency ="1"/>
+  	<Connection sourceHost="host2" destHost="hostB" avgLatency ="100"/>
+  	<Connection sourceHost="host3" destHost="hostB" avgLatency ="1"/>
+	<Connection sourceHost="host3" destHost="hostD" avgLatency ="1"/>
   </Connections>
   <ParsingString></ParsingString>  
 </NFV>
