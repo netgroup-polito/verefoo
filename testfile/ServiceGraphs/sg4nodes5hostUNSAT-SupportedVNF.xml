@@ -7,7 +7,7 @@
 			    |node3|___|node4|
 -->
 
-<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvSchema.xsd">
   <graphs>
     <graph id="0">
      <node functional_type="WEBCLIENT" name="nodeA">
@@ -64,15 +64,8 @@
     </graph>
   </graphs>
   <Constraints>
-	  <NodeConstraints>
-			<NodeMetrics node="node1" reqStorage="10"/>
-			<NodeMetrics node="node2" reqStorage="10"/>
-			<NodeMetrics node="node3" reqStorage="10"/>
-			<NodeMetrics node="node4" reqStorage="10"/>
-	  </NodeConstraints>
-	  <BandwidthConstraints>
-			<BandwidthMetrics src="node4" dst="node2" reqLatency="10"/>
-	  </BandwidthConstraints>
+	  <NodeConstraints/>
+	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
@@ -82,29 +75,42 @@
   	<Host name="host1" cpu="1" cores="4" memory="16" diskStorage="50" maxVNF="1" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
-		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="host2" cpu="3" cores="8" memory="16" diskStorage="10" maxVNF="4" type="MIDDLEBOX">
+  	<Host name="host2" cpu="3" cores="8" memory="16" diskStorage="10" maxVNF="1" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
-		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="host3" cpu="4" cores="4" memory="16" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
+  	<Host name="host3" cpu="4" cores="4" memory="16" diskStorage="50" maxVNF="1" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
-		<SupportedVNF functional_type="FIELDMODIFIER"/>
+	</Host>
+	<Host name="host4" cpu="7" cores="16" memory="16" diskStorage="50" maxVNF="1" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+	</Host>
+	<Host name="host5" cpu="3" cores="2" memory="16" diskStorage="50" maxVNF="1" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
 	</Host>
   	<Host name="hostB" cpu="2" cores="2" memory="4" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
   </Hosts>
   <Connections>
   	<Connection sourceHost="hostA" destHost="host1" avgLatency ="1"/>
-  	<Connection sourceHost="host1" destHost="host2" avgLatency ="100"/>
-  	<Connection sourceHost="host2" destHost="host1" avgLatency ="100"/>
-  	<Connection sourceHost="host3" destHost="host2" avgLatency ="100"/>
-  	<Connection sourceHost="host2" destHost="host3" avgLatency ="100"/>
-	<Connection sourceHost="host1" destHost="host3" avgLatency ="1"/>
-	<Connection sourceHost="host3" destHost="host1" avgLatency ="1"/>
-  	<Connection sourceHost="host2" destHost="hostB" avgLatency ="1"/>
+  	<Connection sourceHost="host1" destHost="host2" avgLatency ="1"/>
+  	<Connection sourceHost="host2" destHost="host1" avgLatency ="1"/>
+  	<Connection sourceHost="host3" destHost="host2" avgLatency ="1"/>
+  	<Connection sourceHost="host2" destHost="host3" avgLatency ="1"/>
+	<Connection sourceHost="host2" destHost="host4" avgLatency ="1"/>
+	<Connection sourceHost="host1" destHost="host4" avgLatency ="1"/>
+	<Connection sourceHost="host4" destHost="host1" avgLatency ="1"/>
+  	<Connection sourceHost="host4" destHost="host2" avgLatency ="1"/>
+	<Connection sourceHost="host4" destHost="host5" avgLatency ="1"/>
+  	<Connection sourceHost="host5" destHost="host4" avgLatency ="1"/>
+	<Connection sourceHost="host5" destHost="host2" avgLatency ="1"/>
+	<Connection sourceHost="host2" destHost="host5" avgLatency ="1"/>
+  	<Connection sourceHost="host2" destHost="hostB" avgLatency ="100"/>
+	<Connection sourceHost="host4" destHost="hostB" avgLatency ="100"/>
+  	<Connection sourceHost="host5" destHost="hostB" avgLatency ="1"/>
   </Connections>
   <ParsingString></ParsingString>
 </NFV>

@@ -81,7 +81,7 @@ public class TestProxy {
         	long beginVP=System.currentTimeMillis();
         	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
         	long endVP=System.currentTimeMillis();
-            System.out.println("Graph " + g.getId() + ": creating condition -> " + (endVP-beginVP) );
+            System.out.println("Graph " + g.getId() + ": creating condition -> " + ((endVP-beginVP)/1000) );
         	Property pd = root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId() && p.getName().equals(PName.ISOLATION_PROPERTY)).findFirst().orElse(null);
         	if(pd == null) break;
         	IsolationResult res=test.checkNFFGProperty(pd.getSrc(), pd.getDst());

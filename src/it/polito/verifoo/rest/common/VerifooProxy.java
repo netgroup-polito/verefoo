@@ -493,6 +493,7 @@ public class VerifooProxy {
 				List<BandwidthMetrics> bConstraints = bandwidthMetrics.stream().filter(b -> b.getSrc().equals(n.getName())).collect(Collectors.toList());
 				//logger.debug("Adding routing table to "+n.getName());
 				net.routingOptimizationSG(netobjs.get(n), rt, bConstraints);
+				//net.routingOptimizationSG2(netobjs.get(client), netobjs.get(n), rt, bConstraints);
 			}
 			logger.debug("----STAGE CONDITION DB----");
 			stageConditions.entrySet().forEach(e -> {logger.debug(e.getKey().getName() + " -> " + e.getValue());});

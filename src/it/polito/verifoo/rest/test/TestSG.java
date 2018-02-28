@@ -213,5 +213,33 @@ public class TestSG {
         org.junit.Assert.assertEquals(true, n1.contains("node2"));
         return;
 	}
-
+	
+	@Test
+	public void testNewConstraints(){
+		try {
+			test( "./testfile/ServiceGraphs/sg4nodes5hostSAT-NoConstraints.xml", true);
+			test( "./testfile/ServiceGraphs/sg4nodes3hostUNSAT-Bandwidth.xml", false);
+			test( "./testfile/ServiceGraphs/sg4nodes5hostUNSAT-CPU.xml", false);
+			test( "./testfile/ServiceGraphs/sg4nodes3hostUNSAT-MaxVNF.xml", false);
+			test( "./testfile/ServiceGraphs/sg4nodes5hostUNSAT-SupportedVNF.xml", false);
+			test( "./testfile/ServiceGraphs/sg4nodes5hostUNSAT-Memory.xml", false);
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	@Test
+	public void testReachPropBetweenDiffEndpoints(){
+		try {
+			test( "./testfile/ServiceGraphs/sg2clients4nodes2servers3hostSAT_AtoB-FW.xml", true);
+			test( "./testfile/ServiceGraphs/sg2clients4nodes2servers3hostSAT_AtoD-FW.xml", true);
+			test( "./testfile/ServiceGraphs/sg2clients4nodes2servers3hostSAT_CtoB-FW.xml", true);
+			test( "./testfile/ServiceGraphs/sg2clients4nodes2servers3hostSAT_CtoD-FW.xml", true);
+			test( "./testfile/ServiceGraphs/sg2clients4nodes2servers3hostUNSAT_AtoB-FW.xml", false);
+			test( "./testfile/ServiceGraphs/sg2clients4nodes2servers3hostUNSAT_AtoD-FW.xml", false);
+			test( "./testfile/ServiceGraphs/sg2clients4nodes2servers3hostUNSAT_CtoB-FW.xml", false);
+			test( "./testfile/ServiceGraphs/sg2clients4nodes2servers3hostUNSAT_CtoD-FW.xml", false);
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
 }
