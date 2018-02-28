@@ -95,6 +95,7 @@ public class PolitoFieldModifier extends NetworkObject {
         else
             predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields,ctx.mkEq(nctx.pf.get("url").apply(p_0), nctx.pf.get("url").apply(p_1)));
 
+        
         constraints.add(
                 ctx.mkForall(new Expr[]{ p_0, x},
                         ctx.mkImplies((BoolExpr)nctx.send.apply(politoFieldModifier,x,p_0),

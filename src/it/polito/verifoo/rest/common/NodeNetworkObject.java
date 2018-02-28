@@ -20,7 +20,8 @@ import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 import it.polito.verigraph.mcnet.components.Tuple;
-import it.polito.verigraph.mcnet.netobjs.*;;
+import it.polito.verigraph.mcnet.netobjs.*;
+import java.util.Optional;
 /**
  * This class generates a Map of a new network object and associated node.
  * The network object are generated inside this class by extracting from the schema the type and by processing the configuration.
@@ -155,7 +156,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 						throw new BadGraphError("You have specified a FIELDMODIFIER Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					PolitoFieldModifier fm = new PolitoFieldModifier(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
-					//fm.installFieldModifier();
+					fm.installFieldModifier(Optional.ofNullable(null));
 					// TODO: Field Modifier requires a packet model
 					this.put(n,fm);
 					break;
