@@ -20,6 +20,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -51,6 +53,7 @@ public class TestPerformance {
 	private long maxCondTime = 0, maxCheckTimeSAT = 0, maxCheckTimeUNSAT = 0, maxTotTime = 0;
 	private int nSAT = 0, nUNSAT = 0;
 	private List<Host> pastClients = new ArrayList<>(), pastServers = new ArrayList<>();
+	private Logger logger = LogManager.getLogger("mylog");
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -166,6 +169,14 @@ public class TestPerformance {
 			List<String> files = new ArrayList<>();
 			files.add("./testfile/Performance/bgGEANT.xml");
 			files.add("./testfile/Performance/bgGEANTWithConstraints.xml");
+			files.add("./testfile/Performance/bgAS.xml");
+			files.add("./testfile/Performance/bgASWithConstraints.xml");
+			files.add("./testfile/Performance/bgBiggest.xml");
+			files.add("./testfile/Performance/bgBiggestWithConstraints.xml");
+			files.add("./testfile/Performance/bgInternet2.xml");
+			files.add("./testfile/Performance/bgInternet2WithConstraints.xml");
+			files.add("./testfile/Performance/bgUNIV1.xml");
+			files.add("./testfile/Performance/bgUNIV1WithConstraints.xml");
 			//files.add("./testfile/Performance/sgGEANT.xml");
 			//files.add("./testfile/Performance/sgGEANTDiffEndpoints.xml");
 			//files.add("./testfile/Performance/sgGEANTDiffEndpointsWithConstraints.xml");
@@ -181,6 +192,7 @@ public class TestPerformance {
 				nSAT = 0;
 				nUNSAT = 0;
 				System.out.println("===========FILE " + f + "===========");
+				logger.debug("===========FILE " + f + "===========");
 				// create a JAXBContext capable of handling the generated classes
 				//long beginAll=System.currentTimeMillis();
 		        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
@@ -206,19 +218,34 @@ public class TestPerformance {
 		        		.findFirst().get();
 		        int i = 0;
 				do{
-					System.out.println("Simulation nr " + i);
-					test(root);
-					i++;
+					//System.out.println("Simulation nr " + i);
+					try{
+						test(root);
+						i++;
+					}catch(BadGraphError e){
+						
+					}
 				}while(changeEndpoints(root.getHosts().getHost(), clientName, serverName) != null);
 				
 				
 				System.out.println("AVG creating condition -> " + (condTime/i) + "ms");
-				if(nSAT > 0)
+				logger.debug("AVG creating condition -> " + (condTime/i) + "ms");
+				logger.debug("MAX creating condition -> " + (maxCondTime) + "ms");
+				if(nSAT > 0){
 					System.out.println("AVG checking property when SAT -> " + (checkTimeSAT/nSAT) + "ms");
-				if(nUNSAT > 0)
+					logger.debug("AVG checking property when SAT -> " + (checkTimeSAT/nSAT) + "ms");
+					logger.debug("MAX checking property when SAT -> " + (maxCheckTimeSAT) + "ms");
+				}
+				if(nUNSAT > 0){
 					System.out.println("AVG checking property when UNSAT-> " + (checkTimeUNSAT/nUNSAT) + "ms");
+					logger.debug("AVG checking property when UNSAT-> " + (checkTimeUNSAT/nUNSAT) + "ms");
+					logger.debug("MAX checking property when UNSAT-> " + (maxCheckTimeUNSAT) + "ms");
+				}
 				System.out.println("AVG total time -> " + (totTime/nSAT) + "ms");
 				System.out.println("=====================================");
+				logger.debug("AVG total time -> " + (totTime/nSAT) + "ms");
+				logger.debug("MAX total time -> " + (maxTotTime) + "ms");
+				logger.debug("=====================================");
 
 			}
 		} catch (Exception e) {
