@@ -51,7 +51,7 @@ public class ChainExtractor {
 	}
 	/**
 	 * Explores recursively all the possible paths
-	 * @param lastHost the host from which it calculate the next for the recursion
+	 * @param lastHost the host from which it calculate the next, for the recursion
 	 * @param hostServer is the final host of the network
 	 * @param hostChain List of all the hosts encountered in the current chain
 	 */
@@ -94,6 +94,68 @@ public class ChainExtractor {
 			//logger.debug("Host in chain: "+hostChain);
 			//logger.debug("Removing to visited from " + lastHost +" to " + dest);
 			visited.get(lastHost).remove(dest);
+		}
+		
+		return true;
+		
+	}
+	
+	/**
+	 * Calculates all the possible paths from the node client to the node server
+	 * @param hostClient
+	 * @param hostServer
+	 * @return 
+	 */
+	public static List<List<String>> createNodeChain(String nodeClient, String nodeServer, List<Link> links){
+		List<String> nodeChain = new ArrayList<>();
+		savedChain = new ArrayList<>();
+		
+		nodeChain.add(nodeClient);
+		
+		List<String> destinations = links.stream()
+								.filter(l -> l.getSourceNode().equals(nodeClient))
+								.map(l -> l.getDestNode())
+								.collect(Collectors.toList());
+		for(String dest:destinations){
+			//logger.debug("Adding host to the current hostChain: "+h);
+			nodeChain.add(dest);
+			expandNodeChain(dest, nodeServer, nodeChain, links);
+			//logger.debug("Removing host from the current hostChain: "+dest);
+			//logger.debug("Host in chain: "+hostChain);
+			nodeChain.remove(nodeChain.lastIndexOf(dest));
+		}
+		//logger.debug("Calculated node chain " + savedChain);
+		return new ArrayList<List<String>>(savedChain);
+	}
+	/**
+	 * Explores recursively all the possible paths
+	 * @param lastNode the node from which it calculates the next, for the recursion
+	 * @param nodeServer is the final node of the network
+	 * @param nodeChain List of all the nodes encountered in the current chain
+	 */
+	private static boolean expandNodeChain(String lastNode, String nodeServer, List<String> nodeChain, List<Link> links){
+		if(lastNode.equals(nodeServer)){
+			//logger.debug("Dest Reached " + lastnode);
+			savedChain.add(new ArrayList<>(nodeChain));
+			return true;
+		}
+		List<String> destinations = links.stream()
+								.filter(l -> l.getSourceNode().equals(lastNode))
+								.map(l -> l.getDestNode())
+								.collect(Collectors.toList());
+		for(String dest:destinations){
+			//logger.debug("Adding to visited from " + lastnode +" to " + dest);
+			if(nodeChain.contains(dest)){
+				//logger.debug("node already in chain "+h);
+				continue;
+			}
+			nodeChain.add(dest);
+			//logger.debug("Adding node to the current nodeChain: "+dest);
+			//logger.debug("node in chain: "+nodeChain);
+			expandNodeChain(dest, nodeServer, nodeChain, links);
+			//logger.debug("Removing node from the current nodeChain: "+dest);
+			nodeChain.remove(dest);
+			//logger.debug("node in chain: "+nodeChain);
 		}
 		
 		return true;

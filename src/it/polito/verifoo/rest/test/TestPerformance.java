@@ -168,15 +168,15 @@ public class TestPerformance {
 		try {
 			List<String> files = new ArrayList<>();
 			files.add("./testfile/Performance/bgGEANT.xml");
-			files.add("./testfile/Performance/bgGEANTWithConstraints.xml");
-			files.add("./testfile/Performance/bgAS.xml");
-			files.add("./testfile/Performance/bgASWithConstraints.xml");
-			files.add("./testfile/Performance/bgBiggest.xml");
-			files.add("./testfile/Performance/bgBiggestWithConstraints.xml");
-			files.add("./testfile/Performance/bgInternet2.xml");
-			files.add("./testfile/Performance/bgInternet2WithConstraints.xml");
-			files.add("./testfile/Performance/bgUNIV1.xml");
-			files.add("./testfile/Performance/bgUNIV1WithConstraints.xml");
+			//files.add("./testfile/Performance/bgGEANTWithConstraints.xml");
+			//files.add("./testfile/Performance/bgAS.xml");
+			//files.add("./testfile/Performance/bgASWithConstraints.xml");
+			//files.add("./testfile/Performance/bgBiggest.xml");
+			//files.add("./testfile/Performance/bgBiggestWithConstraints.xml");
+			//files.add("./testfile/Performance/bgInternet2.xml");
+			//files.add("./testfile/Performance/bgInternet2WithConstraints.xml");
+			//files.add("./testfile/Performance/bgUNIV1.xml");
+			//files.add("./testfile/Performance/bgUNIV1WithConstraints.xml");
 			//files.add("./testfile/Performance/sgGEANT.xml");
 			//files.add("./testfile/Performance/sgGEANTDiffEndpoints.xml");
 			//files.add("./testfile/Performance/sgGEANTDiffEndpointsWithConstraints.xml");

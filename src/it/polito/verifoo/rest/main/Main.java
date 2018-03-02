@@ -41,7 +41,7 @@ public class Main {
                 Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
                 u.setSchema(schema);
                 // unmarshal a document into a tree of Java content objects
-                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg2clients4nodes2servers3hostUNSAT_AtoB-FW.xml" ) );
+                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/nfv5nodes7hostsUNSAT-FW-InternalNodes.xml" ) );
                 for(Graph g:root.getGraphs().getGraph()){
                 	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
                 	IsolationResult res=test.checkNFFGProperty(root.getPropertyDefinition());
@@ -58,7 +58,7 @@ public class Main {
                 Marshaller m = jc.createMarshaller();
                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                 m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                //m.marshal( root, System.out ); 
+                m.marshal( root, System.out ); 
                 //MedicineSimulator sim = new MedicineSimulator(root);
                 //sim.printAll();
             } catch( JAXBException je ) {

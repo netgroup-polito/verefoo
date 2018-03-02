@@ -81,18 +81,18 @@ public class TestProxy {
         	long beginVP=System.currentTimeMillis();
         	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
         	long endVP=System.currentTimeMillis();
-            System.out.println("Graph " + g.getId() + ": creating condition -> " + ((endVP-beginVP)/1000) );
+            System.out.println("Graph " + g.getId() + ": creating condition -> " + (endVP-beginVP)+"ms" );
         	IsolationResult res=test.checkNFFGProperty(root.getPropertyDefinition());
         	long endCheck=System.currentTimeMillis();
-            System.out.println(g.getId() + ": checking property -> " + ((endCheck-endVP)/1000) );
+            System.out.println(g.getId() + ": checking property -> " + (endCheck-endVP)+"ms" );
         	if(res.result != Status.UNSATISFIABLE)
         		new Translator(res.model.toString(),root).convert();
         	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
         	long endT=System.currentTimeMillis();
-            System.out.println(g.getId() + ": translating model -> " + ((endT-endCheck)/1000) );
+            System.out.println(g.getId() + ": translating model -> " + (endT-endCheck)+"ms" );
         }
 		long endAll=System.currentTimeMillis();
-        System.out.println("Total time -> " + ((endAll-beginAll)/1000) );
+        System.out.println("Total time -> " + (endAll-beginAll)+"ms" );
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(sat, p.isIsSat());
         });
