@@ -1,0 +1,82 @@
+				BG-OLD		BG-NEW				SG-NEW
+Internet2 		2.857	-->	2.876 (+0.67%)		0.000
+			with constr	--> 3.617 (+26.60%)
+GEANT 			5.256	-->	5.103 (-2.91%)
+			with constr	--> 6.919 (+31.64%)
+UNIV1 			10.571	-->	10.515 (-0.53%)
+			with constr	--> ()
+AS-3679 		--> ()
+						--> ()
+						
+===========FILE ./testfile/Performance/bgInternet2.xml OLD MODEL===========
+AVG creating condition -> 15ms
+MAX creating condition -> 1742ms
+AVG checking property when SAT -> 2835ms
+MAX checking property when SAT -> 6574ms
+AVG total time -> 2857ms
+MAX total time -> 6598ms
+=====================================
+===========FILE ./testfile/Performance/bgInternet2.xml===========
+AVG creating condition -> 15ms
+MAX creating condition -> 1722ms
+AVG checking property when SAT -> 2853ms
+MAX checking property when SAT -> 6791ms
+AVG total time -> 2876ms
+MAX total time -> 6816ms
+=====================================
+===========FILE ./testfile/Performance/bgInternet2WithConstraints.xml===========
+AVG creating condition -> 17ms
+MAX creating condition -> 1959ms
+AVG checking property when SAT -> 3592ms
+MAX checking property when SAT -> 8995ms
+AVG total time -> 3617ms
+MAX total time -> 9026ms
+=====================================
+
+
+
+===========FILE ./testfile/Performance/bgGEANT.xml OLD MODEL===========
+AVG creating condition -> 25ms
+MAX creating condition -> 10861ms
+AVG checking property when SAT -> 5221ms
+MAX checking property when SAT -> 16622ms
+AVG total time -> 5256ms
+MAX total time -> 16673ms
+=====================================
+===========FILE ./testfile/Performance/bgGEANT.xml===========
+AVG creating condition -> 28ms
+MAX creating condition -> 12030ms
+AVG checking property when SAT -> 5064ms
+MAX checking property when SAT -> 15719ms
+AVG total time -> 5103ms
+MAX total time -> 15781ms
+=====================================
+===========FILE ./testfile/Performance/bgGEANTWithConstraints.xml===========
+AVG creating condition -> 29ms
+MAX creating condition -> 12514ms
+AVG checking property when SAT -> 6879ms
+MAX checking property when SAT -> 24338ms
+AVG total time -> 6919ms
+MAX total time -> 24402ms
+=====================================
+
+
+
+===========FILE ./testfile/Performance/bgUNIV1.xml OLD MODEL===========
+AVG creating condition -> 42ms
+MAX creating condition -> 21609ms
+AVG checking property when SAT -> 10571ms
+MAX checking property when SAT -> 55515ms
+AVG total time -> 10625ms
+MAX total time -> 55583ms
+=====================================
+===========FILE ./testfile/Performance/bgUNIV1.xml===========
+AVG creating condition -> 43ms
+MAX creating condition -> 22250ms
+AVG checking property when SAT -> 10460ms
+MAX checking property when SAT -> 44888ms
+AVG total time -> 10515ms
+MAX total time -> 44967ms
+=====================================
+
+
