@@ -84,18 +84,18 @@ public class PolitoIDS extends NetworkObject {
                     1,
                     null, null, null, null));
 
-        }else{
+        }/*else if(blackList==null){
             this.constraints.add(ctx.mkForall(new Expr[]{b_0},
                     ctx.mkEq(isInBlacklist.apply(b_0), ctx.mkBool(false)),
                     1,
                     null, null, null, null));
-        }
+        }*/
 
         //Constraint2 send(politoIDS, n_0, p, t_0) && (p.proto(HTTP_RESPONSE) || p.proto(HTTP_REQUEST)) ->
         //(exist  n_1,t_1 : (recv(n_1, politoIDS, p, t_1) && t_1 < t_0)) && !isInBlackList(p.body)
 
         this.constraints.add(ctx.mkForall(new Expr[]{n_0, p_0},
-                ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.send.apply(politoIDS, n_0, p_0), ctx.mkOr(ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.HTTP_RESPONSE)), ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.HTTP_REQUEST)))),
+                ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.send.apply(politoIDS, n_0, p_0)),
                         ctx.mkAnd(ctx.mkExists(new Expr[]{n_1},
                                 ctx.mkAnd((BoolExpr)nctx.recv.apply(n_1,politoIDS,p_0)),
                                 1,
@@ -104,37 +104,22 @@ public class PolitoIDS extends NetworkObject {
                 1,
                 null, null, null, null));
 
-        //Constraint3 send(politoIDS, n_0, p, t_0) && p.proto(HTTP_REQUEST) ->
-        //(exist n_1,t_1 : (recv(n_1, politoIDS, p, t_1) && t_1 < t_0)) Constraint not needed anymore (included in contr. 2)
-        /* this.constraints.add(ctx.mkForall(new Expr[]{n_0, p_0, t_0},
-              ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.send.apply(politoIDS, n_0, p_0, t_0), ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.HTTP_REQUEST))),
-              ctx.mkAnd(ctx.mkExists(new Expr[]{n_1,t_1},
-                 ctx.mkAnd((BoolExpr)nctx.recv.apply(n_1,politoIDS,p_0,t_1),ctx.mkLt(t_1, t_0)),
-                 1,
-                 null, null, null, null))),
-              1,
-              null, null, null, null));
-         */
-
-        //Constraint5send(politoIDS, n_0, p, t_0) -> p.proto == HTTP_REQ || p.protpo == HTTP_RESP
-
         this.constraints.add(ctx.mkForall(new Expr[]{n_0, p_0},
-                ctx.mkImplies((BoolExpr)nctx.send.apply(politoIDS, n_0, p_0),
-                        ctx.mkOr(ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.HTTP_REQUEST)),
-                                ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.HTTP_RESPONSE)))),
-                1,
-                null,null,null,null));
-
-        //Constraint6send(politoIDS, n_0, p, t_0) -> nodeHasAddr(politoIDS,p.src)
-
-        this.constraints.add(ctx.mkForall(new Expr[]{n_0, p_0},
-                ctx.mkImplies((BoolExpr)nctx.send.apply(politoIDS, n_0, p_0),
-                        ctx.mkNot((BoolExpr)nctx.nodeHasAddr.apply(politoIDS,nctx.pf.get("src").apply(p_0)))),
-                1,
-                null,null,null,null));
+                ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.recv.apply(n_0, politoIDS,  p_0),
+                		ctx.mkNot((BoolExpr)isInBlacklist.apply(nctx.pf.get("body").apply(p_0)))),
+                		
+                		ctx.mkExists(new Expr[]{n_1},((BoolExpr)nctx.send.apply(politoIDS,n_1,p_0)),1,null, null, null, null))
+                ,1,null, null, null, null));
+      
 
 
-
+        /*this.constraints.add(ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.recv.apply(n_0, politoIDS,  p_0)),
+                		ctx.mkAnd(
+                				ctx.mkExists(new Expr[]{n_1},((BoolExpr)nctx.send.apply(politoIDS,n_1,p_0)),1,null, null, null, null)
+                		,ctx.mkNot((BoolExpr)isInBlacklist.apply(nctx.pf.get("body").apply(p_0)))))
+                		
+                ,1,null, null, null, null));*/
     }
 
 }

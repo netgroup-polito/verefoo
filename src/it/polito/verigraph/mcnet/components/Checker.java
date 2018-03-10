@@ -230,7 +230,7 @@ public class Checker {
 		constraintList.add((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0));
 
 		// Constraint4p1.origin == srcNode
-		constraintList.add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Node()));
+		constraintList.add(ctx.mkEq(nctx.pf.get("origin").apply(p0), src.getZ3Node()));
 
 		// Constraint7nodeHasAddr(destNode, p0.destAddr)
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p0)));
