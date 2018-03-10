@@ -64,17 +64,13 @@
     </graph>
   </graphs>
    <Constraints>
-	   <NodeConstraints>
-			<NodeMetrics node="node1" nrOfOperations="1000" maxNodeLatency="10" memory="2" reqStorage="38" cores="1"/>
-			<NodeMetrics node="node2" nrOfOperations="1000" maxNodeLatency="20" memory="2" reqStorage="20" cores="2"/>
-			<NodeMetrics node="node3" nrOfOperations="4500" maxNodeLatency="10" memory="2" reqStorage="50" cores="1"/>
-			<NodeMetrics node="node4" nrOfOperations="1000" maxNodeLatency="10" memory="2" reqStorage="38" cores="2"/>
+	 <NodeConstraints>
+			<NodeMetrics node="node1" nrOfOperations="1000" maxNodeLatency="10" reqStorage="38"/>
+			<NodeMetrics node="node2" nrOfOperations="1000" maxNodeLatency="20" reqStorage="20"/>
+			<NodeMetrics node="node3" nrOfOperations="4500" maxNodeLatency="10" reqStorage="50"/>
+			<NodeMetrics node="node4" nrOfOperations="1000" maxNodeLatency="10" reqStorage="38"/>
 	  </NodeConstraints>
-	  <BandwidthConstraints>
-			<BandwidthMetrics src="node1" dst="node2" reqLatency="1000000"/>
-			<BandwidthMetrics src="node2" dst="node3" reqLatency="1000000"/>
-			<BandwidthMetrics src="node3" dst="node4" reqLatency="1000000"/>
-	  </BandwidthConstraints>
+	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 		

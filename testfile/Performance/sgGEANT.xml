@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
 
-|nodeA|_______|node1|_______|node2|_______|nodeB|
-				   |		 |
-		   	       |		 |
-			    |node3|___|node4|
+|nodeA|_______|node1|_______|node5|_______|node2|_______|nodeB|
+				   |		 				|
+		   	       |		 				|
+			     |node3|____|node6|_____|node4|
 -->
 
-<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvSchema.xsd">
   <graphs>
     <graph id="0">
      <node functional_type="WEBCLIENT" name="nodeA">
@@ -18,7 +18,7 @@
       </node>
       <node functional_type="FIELDMODIFIER" name="node1">
         <neighbour name="nodeA"/>
-        <neighbour name="node2"/>
+        <neighbour name="node5"/>
 		<neighbour name="node3"/>
         <configuration description="A simple description" name="conf1">
          <fieldmodifier>
@@ -26,8 +26,18 @@
          </fieldmodifier>
         </configuration>
       </node>
-      <node functional_type="FIELDMODIFIER" name="node2">
+      <node functional_type="FIELDMODIFIER" name="node5">
         <neighbour name="node1"/>
+        <neighbour name="node2"/>
+        <configuration description="A simple description" name="conf2">
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
+        </configuration>
+      </node>
+      <node functional_type="FIELDMODIFIER" name="node2">
+        <neighbour name="node5"/>
+        <neighbour name="node4"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf2">
          <fieldmodifier>
@@ -37,6 +47,15 @@
       </node>
 	  <node functional_type="FIELDMODIFIER" name="node3">
         <neighbour name="node1"/>
+        <neighbour name="node6"/>
+        <configuration description="A simple description" name="conf3">
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
+        </configuration>
+      </node>
+      <node functional_type="FIELDMODIFIER" name="node6">
+        <neighbour name="node3"/>
         <neighbour name="node4"/>
         <configuration description="A simple description" name="conf3">
          <fieldmodifier>
@@ -45,7 +64,7 @@
         </configuration>
       </node>
 	   <node functional_type="FIELDMODIFIER" name="node4">
-        <neighbour name="node3"/>
+        <neighbour name="node6"/>
         <neighbour name="node2"/>
         <configuration description="A simple description" name="conf3">
          <fieldmodifier>

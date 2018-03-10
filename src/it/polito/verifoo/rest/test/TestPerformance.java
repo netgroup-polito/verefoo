@@ -51,7 +51,8 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
 public class TestPerformance {
 	private long condTime = 0, checkTimeSAT = 0, checkTimeUNSAT = 0, totTime = 0;
 	private long maxCondTime = 0, maxCheckTimeSAT = 0, maxCheckTimeUNSAT = 0, maxTotTime = 0;
-	private int nSAT = 0, nUNSAT = 0;
+	private int nSAT = 0, nUNSAT = 0, i = 0, err = 0;;
+	NFV root;
 	private List<Host> pastClients = new ArrayList<>(), pastServers = new ArrayList<>();
 	private Logger logger = LogManager.getLogger("mylog");
 	/**
@@ -120,7 +121,8 @@ public class TestPerformance {
 		rootTest.getPropertyDefinition().getProperty().forEach(p ->{
         	if(p.isIsSat()){
 				maxTotTime = maxTotTime<(endAll-beginAll)? (endAll-beginAll) : maxTotTime;
-        		totTime += (endAll-beginAll);
+				System.out.print("time: " + (endAll-beginAll) + "ms;");
+				totTime += (endAll-beginAll);
         		nSAT++;
         	}
         	else{
@@ -167,19 +169,48 @@ public class TestPerformance {
 	public void testBGPerformance(){
 		try {
 			List<String> files = new ArrayList<>();
-			files.add("./testfile/Performance/bgGEANT.xml");
+			//files.add("./testfile/Performance/bgInternet2.xml");
+			//files.add("./testfile/Performance/bgGEANT.xml");
+			//files.add("./testfile/Performance/bgUNIV1.xml");
+			
+			//files.add("./testfile/Performance/bgInternet2With1Constraint.xml");
+			//files.add("./testfile/Performance/bgInternet2With1Constraint(test).xml");
+			//files.add("./testfile/Performance/bgInternet2With2Constraints.xml");
+			//files.add("./testfile/Performance/bgInternet2With3Constraints.xml");
+			//files.add("./testfile/Performance/bgInternet2With4Constraints.xml");
+			//files.add("./testfile/Performance/bgInternet2WithConstraints.xml");
+			
+			//files.add("./testfile/Performance/bgGEANTWith1Constraint.xml");
+			//files.add("./testfile/Performance/bgGEANTWith2Constraints.xml");
+			//files.add("./testfile/Performance/bgGEANTWith3Constraints.xml");
+			//files.add("./testfile/Performance/bgGEANTWith4Constraints.xml");
 			//files.add("./testfile/Performance/bgGEANTWithConstraints.xml");
+			
+			//files.add("./testfile/Performance/bgUNIV1With1Constraint.xml");
+			//files.add("./testfile/Performance/bgUNIV1With2Constraints.xml");
+			//files.add("./testfile/Performance/bgUNIV1With3Constraints.xml");
+			//files.add("./testfile/Performance/bgUNIV1With4Constraints.xml");
+			//files.add("./testfile/Performance/bgUNIV1WithConstraints.xml");
+			
+			//files.add("./testfile/Performance/bgInternet2_3Nodes.xml");
+			//files.add("./testfile/Performance/bgGEANT_3Nodes.xml");
+			//files.add("./testfile/Performance/bgUNIV1_3Nodes.xml");
+			
+			//files.add("./testfile/Performance/bgInternet2_5Nodes.xml");
+			//files.add("./testfile/Performance/bgGEANT_5Nodes.xml");
+			//files.add("./testfile/Performance/bgUNIV1_5Nodes.xml");
+			
+			//files.add("./testfile/Performance/sgInternet2.xml");
+			//files.add("./testfile/Performance/sgInternet2WithConstraints.xml");
+			//files.add("./testfile/Performance/sgGEANT.xml");
+			//files.add("./testfile/Performance/sgGEANTWithConstraints.xml");
+			//files.add("./testfile/Performance/sgUNIV1.xml");
+			files.add("./testfile/Performance/sgUNIV1WithConstraints.xml");
+
 			//files.add("./testfile/Performance/bgAS.xml");
 			//files.add("./testfile/Performance/bgASWithConstraints.xml");
 			//files.add("./testfile/Performance/bgBiggest.xml");
 			//files.add("./testfile/Performance/bgBiggestWithConstraints.xml");
-			//files.add("./testfile/Performance/bgInternet2.xml");
-			//files.add("./testfile/Performance/bgInternet2WithConstraints.xml");
-			//files.add("./testfile/Performance/bgUNIV1.xml");
-			//files.add("./testfile/Performance/bgUNIV1WithConstraints.xml");
-			//files.add("./testfile/Performance/sgGEANT.xml");
-			//files.add("./testfile/Performance/sgGEANTDiffEndpoints.xml");
-			//files.add("./testfile/Performance/sgGEANTDiffEndpointsWithConstraints.xml");
 			for(String f : files){
 				condTime = 0;
 				checkTimeSAT = 0;
@@ -191,6 +222,8 @@ public class TestPerformance {
 				maxTotTime = 0;
 				nSAT = 0;
 				nUNSAT = 0;
+				i = 0;
+				err = 0;
 				System.out.println("===========FILE " + f + "===========");
 				logger.debug("===========FILE " + f + "===========");
 				// create a JAXBContext capable of handling the generated classes
@@ -202,7 +235,7 @@ public class TestPerformance {
 		        Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
 		        u.setSchema(schema);
 		        // unmarshal a document into a tree of Java content objects
-		        NFV root = (NFV) u.unmarshal( new FileInputStream( f ) );
+		        root = (NFV) u.unmarshal( new FileInputStream( f ) );
 		        String clientName = root.getGraphs().getGraph().stream()
 		        		.flatMap(g -> g.getNode().stream())
 		        		.filter(n -> n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT) 
@@ -216,32 +249,57 @@ public class TestPerformance {
 		        				|| n.getFunctionalType().equals(FunctionalTypes.MAILSERVER))
 		        		.map(n -> n.getName())
 		        		.findFirst().get();
-		        int i = 0;
+		        
 				do{
-					//System.out.println("Simulation nr " + i);
+					System.out.print("Simulation nr " + i+" ");
 					try{
-						test(root);
-						i++;
-					}catch(BadGraphError e){
+						Thread t = new Thread(){
+							public void run(){
+								try {
+									test(root);
+									i++;
+									if(i%50 == 0) System.out.println("");
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									err++;
+								}
+							}
+						};
+						t.start();
+						//avoid deadlock
+						t.join(6000000);
+						if(t.isAlive()){
+							Host currClient = root.getHosts().getHost().stream().filter(h -> h.getType().equals(TypeOfHost.CLIENT)).findAny().orElse(null);
+							Host currServer = root.getHosts().getHost().stream().filter(h -> h.getType().equals(TypeOfHost.SERVER)).findAny().orElse(null);
+							System.out.println("Simulation " + i + " has deadlock with client on " + currClient.getName() + " and server on " + currServer.getName());
+							throw new BadGraphError();
+						}
 						
+					}catch(BadGraphError e){
+						err++;
 					}
 				}while(changeEndpoints(root.getHosts().getHost(), clientName, serverName) != null);
 				
-				
-				System.out.println("AVG creating condition -> " + (condTime/i) + "ms");
-				logger.debug("AVG creating condition -> " + (condTime/i) + "ms");
+				System.out.println("Simulations -> " + i + " / Errors -> " + err);
+				logger.debug("Simulations -> " + i + " / Errors -> " + err);
+				System.out.println("AVG creating condition -> " + (condTime/(i-err)) + "ms");
+				System.out.println("MAX creating condition -> " + (maxCondTime) + "ms");
+				logger.debug("AVG creating condition -> " + (condTime/(i-err)) + "ms");
 				logger.debug("MAX creating condition -> " + (maxCondTime) + "ms");
 				if(nSAT > 0){
 					System.out.println("AVG checking property when SAT -> " + (checkTimeSAT/nSAT) + "ms");
+					System.out.println("MAX checking property when SAT -> " + (maxCheckTimeSAT) + "ms");
 					logger.debug("AVG checking property when SAT -> " + (checkTimeSAT/nSAT) + "ms");
 					logger.debug("MAX checking property when SAT -> " + (maxCheckTimeSAT) + "ms");
 				}
 				if(nUNSAT > 0){
 					System.out.println("AVG checking property when UNSAT-> " + (checkTimeUNSAT/nUNSAT) + "ms");
+					System.out.println("MAX checking property when UNSAT-> " + (maxCheckTimeUNSAT) + "ms");
 					logger.debug("AVG checking property when UNSAT-> " + (checkTimeUNSAT/nUNSAT) + "ms");
 					logger.debug("MAX checking property when UNSAT-> " + (maxCheckTimeUNSAT) + "ms");
 				}
 				System.out.println("AVG total time -> " + (totTime/nSAT) + "ms");
+				System.out.println("MAX total time -> " + (maxTotTime) + "ms");
 				System.out.println("=====================================");
 				logger.debug("AVG total time -> " + (totTime/nSAT) + "ms");
 				logger.debug("MAX total time -> " + (maxTotTime) + "ms");

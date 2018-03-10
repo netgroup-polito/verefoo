@@ -111,16 +111,16 @@ public class VerifooProxy {
 			for(Node n:conditionDB.keySet()){
 				for(String h:conditionDB.get(n).keySet()){
 					if(countConditions.get(n.getName()+"_"+h) < clientServerCombinations){
-						logger.debug("Found condition that is not valid for all the client/server combinations " + conditionDB.get(n).get(h) +" -> making it false");
+						//logger.debug("Found condition that is not valid for all the client/server combinations " + conditionDB.get(n).get(h) +" -> making it false");
 						nctx.constraints.add(ctx.mkEq(conditionDB.get(n).get(h), ctx.mkFalse()));
 					}
 				}
 			}
 			
 			
-			logger.debug("----CONDITION DB----");
+			/*logger.debug("----CONDITION DB----");
 			conditionDB.entrySet().forEach(e -> {logger.debug(e.getKey().getName() + " -> " + e.getValue());});
-			logger.debug("--------------------");
+			logger.debug("--------------------");*/
 			HashMap<String, BoolExpr> hostCondition = new HashMap<>();
 			HashMap<String, BoolExpr> hostSupportedVNF = new HashMap<>();
 			hosts.forEach(h -> {
@@ -339,7 +339,7 @@ public class VerifooProxy {
 				for(Node c:clients){
 					for(Node s:servers){
 						clientServerCombinations++;
-						logger.debug(">>>>NEW client/server combination (total: " + clientServerCombinations + ") -> " + c.getName() + " to " + s.getName());
+						//logger.debug(">>>>NEW client/server combination (total: " + clientServerCombinations + ") -> " + c.getName() + " to " + s.getName());
 						String fixedHostClient = hosts.stream()
 													.filter(h -> h.getFixedEndpoint() != null && h.getFixedEndpoint().equals(c.getName()))
 													.map(h -> h.getName())
@@ -357,7 +357,7 @@ public class VerifooProxy {
 						validChain = savedChain.stream()
 												.filter(list -> list.contains(fixedHostClient) && list.contains(fixedHostServer))
 												.collect(Collectors.toList());
-						logger.debug(">>>>Valid Chain found -> " + validChain);
+						//logger.debug(">>>>Valid Chain found -> " + validChain);
 						createRoutingConditions(c, s, validChain, fixedHostClient, fixedHostServer);
 						nodes.forEach(n -> {
 							for(String h:stageConditions.get(n).keySet()){
@@ -506,9 +506,9 @@ public class VerifooProxy {
 			
 			for(Node n : rawConditions.keySet()){
 				ArrayList<RoutingTable> rt = new ArrayList<RoutingTable>();
-				logger.debug("-----Routing Table NODE "+n.getName()+"-----");
+				//logger.debug("-----Routing Table NODE "+n.getName()+"-----");
 				List<String> cond = rawConditions.get(n).stream().distinct().collect(Collectors.toList());
-				logger.debug("Condition for "+ n.getName() +" -> "+ cond);
+				//logger.debug("Condition for "+ n.getName() +" -> "+ cond);
 				Map<String, List<DatatypeExpr>> destinations = new HashMap<>();
 				for(String s:cond){
 					BoolExpr c;
@@ -570,7 +570,7 @@ public class VerifooProxy {
 						}
 						
 					}
-					logger.debug("Adding ("+ c +"), from "+ n.getName() +" next hop is " + next.getName() + " with latency " + latency);
+					//logger.debug("Adding ("+ c +"), from "+ n.getName() +" next hop is " + next.getName() + " with latency " + latency);
 					rt.add(new RoutingTable(nctx.am.get(server.getName()), netobjs.get(next), nctx.addLatency(latency), c));
 					Node tmp = next;
 					if(routingRule.containsKey(n)){
@@ -584,16 +584,17 @@ public class VerifooProxy {
 				}
 				List<BandwidthMetrics> bConstraints = bandwidthMetrics.stream().filter(b -> b.getSrc().equals(n.getName())).collect(Collectors.toList());
 				
-				logger.debug(n.getName() + " uses the previous next hop for the following destinations: " + destinations);
+				//logger.debug(n.getName() + " uses the previous next hop for the following destinations: " + destinations);
 				//net.internalRoutingOptimizationSG(netobjs.get(n), destinations, netobjs.get(next));
 				//System.out.println(n.getName() + " uses " + next.getName() + " as next hop for the following destinations: " + destinations);
 				//logger.debug("Adding routing table to "+n.getName());
 				//net.routingOptimizationSG2(netobjs.get(n), rt, bConstraints, destinations);
 				net.routingOptimizationSG(netobjs.get(n), rt, bConstraints);
+				//net.routingOptimization(netobjs.get(n), rt);
 			}
-			logger.debug("----STAGE CONDITION DB----");
+			/*logger.debug("----STAGE CONDITION DB----");
 			stageConditions.entrySet().forEach(e -> {logger.debug(e.getKey().getName() + " -> " + e.getValue());});
-			logger.debug("--------------------");
+			logger.debug("--------------------");*/
 		}
 		/**
 		 * Explores recursively all the possible solution for setting a next hop condition
@@ -687,7 +688,7 @@ public class VerifooProxy {
 				String src = p.getSrc(), dst = p.getDst();
 	            Node source = nodes.stream().filter(n -> {return n.getName().equals(src);}).findFirst().get();
 				Node dest = nodes.stream().filter(n -> {return n.getName().equals(dst);}).findFirst().get();
-				logger.debug("Adding check on "+ p.getName() + " from " + source.getName() + " to "+ dest.getName());
+				//logger.debug("Adding check on "+ p.getName() + " from " + source.getName() + " to "+ dest.getName());
 				switch (p.getName()) {
 				case ISOLATION_PROPERTY: 
 						check.propertyAdd(netobjs.get(source), netobjs.get(dest), Prop.ISOLATION);
@@ -705,7 +706,7 @@ public class VerifooProxy {
 				 	
 		    }else{
 		    	 	logger.debug("SAT ");
-		     		logger.debug( ""+ret.model); //p.printModel(ret.model);
+		     		//logger.debug( ""+ret.model); //p.printModel(ret.model);
 		     		
 		    }
 			return ret;
