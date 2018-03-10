@@ -328,8 +328,8 @@ public class VerifooProxy {
             				   " nMailClient: " + nMailClient +
             				   " nWebServer: " + nWebServer +
             				   " nWebClient: " + nWebClient);*/
-            List<Node> clients = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).collect(Collectors.toList());
-            List<Node> servers = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).collect(Collectors.toList());
+            List<Node> clients = nodes.stream().filter(n -> {return nodeIsClient(n);}).collect(Collectors.toList());
+            List<Node> servers = nodes.stream().filter(n -> {return nodeIsServer(n);}).collect(Collectors.toList());
     
             try{
 				links = (new LinkCreator(nodes)).getLinks();
@@ -385,7 +385,6 @@ public class VerifooProxy {
 			try{
 		        for(Node nodeClient: clients){
 		        	for(Node nodeServer: servers){
-		        		//logger.debug("Calculating host chain between " + hostClient + " and " + hostServer + " composed by max " + (nodes.size()-clients.size()-servers.size()+2) + " hosts"); 
 		        		savedNodeChain.addAll(ChainExtractor.createNodeChain(nodeClient.getName(), nodeServer.getName(), links));
 		                if(savedNodeChain.size() == 0) throw new BadGraphError("Node client and node server are not connected",EType.INVALID_SERVICE_GRAPH);
 		            }
@@ -397,7 +396,7 @@ public class VerifooProxy {
             for(List<String> chain:savedNodeChain){
             	for(Node src:nodes){
 	            	int iSrc = chain.lastIndexOf(src.getName());
-	            	if(iSrc < 0 || clients.contains(src) || servers.contains(src)){
+	            	if(iSrc < 0){
             			continue;
             		}
 	            	if(!routingRule.containsKey(src)){
@@ -405,7 +404,7 @@ public class VerifooProxy {
             		}
 	            	for(Node dst:nodes){
 	            		int iDst = chain.lastIndexOf(dst.getName());
-	            		if(iDst < 0 || clients.contains(dst) || servers.contains(dst) || src == dst){
+	            		if(iDst < 0 || servers.contains(dst) || src == dst){
 	            			continue;
 	            		}
 	            		int distance = iDst - iSrc;
@@ -589,11 +588,20 @@ public class VerifooProxy {
 				//System.out.println(n.getName() + " uses " + next.getName() + " as next hop for the following destinations: " + destinations);
 				//logger.debug("Adding routing table to "+n.getName());
 				//net.routingOptimizationSG2(netobjs.get(n), rt, bConstraints, destinations);
-				//net.routingOptimizationSG(netobjs.get(n), rt, bConstraints);
-				net.routingOptimization(netobjs.get(n), rt);
+				net.routingOptimizationSG(netobjs.get(n), rt, bConstraints);
+				//net.routingOptimization(netobjs.get(n), rt);
 			}
 			logger.debug("----STAGE CONDITION DB----");
-			stageConditions.entrySet().forEach(e -> {logger.debug(e.getKey().getName() + " -> " + e.getValue());});
+			stageConditions.entrySet().forEach(e -> {
+				if( !nodeIsClient(e.getKey()) && !nodeIsServer(e.getKey()) && e.getValue().size() == 0){
+					logger.debug(" No Constraints on next node " );
+					hosts.forEach(h ->{
+						if(h.getType().equals(TypeOfHost.MIDDLEBOX))
+							e.getValue().put(h.getName(), ctx.mkBoolConst(e.getKey().getName()+"@"+h.getName()));
+					});
+				}
+				logger.debug(e.getKey().getName() + " -> " + e.getValue());
+				});
 			logger.debug("--------------------");
 		}
 		/**
@@ -718,6 +726,22 @@ public class VerifooProxy {
 		public NetContext getNctx() {
 			return nctx;
 		}
-		
-		
+		/**
+		 * Returns true if the node is a client
+		 * @param n
+		 * @return
+		 */
+		public boolean nodeIsClient(Node n){
+			return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);
+            
+		}
+		/**
+		 * Returns true if the node is a server
+		 * @param n
+		 * @return
+		 */
+		public boolean nodeIsServer(Node n){
+			return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);
+    
+		}
 }
