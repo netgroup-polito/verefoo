@@ -34,7 +34,7 @@ public class Translator {
 		nfv.getGraphs().getGraph().forEach((g)->g.getNode().forEach((node)->{
 					String tosearch="(define-fun "+node.getName()+"@"+host.getName()+" () Bool\n  true)";
 					if(model.contains(tosearch)){
-						logger.debug(tosearch);
+						//logger.debug(tosearch);
 						host.setActive(true);
 						NodeRefType nr=new NodeRefType();
 						nr.setNode(node.getName());

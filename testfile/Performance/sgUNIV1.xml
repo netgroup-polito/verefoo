@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
+<!-- 
+
+|nodeA|_______|node1|_______|node5|_______|node2|_______|nodeB|
+				   |		 				|
+		   	       |		 				|
+			     |node3|_______________|node4|
+-->
+
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvSchema.xsd">
   <graphs>
     <graph id="0">
      <node functional_type="WEBCLIENT" name="nodeA">
@@ -8,53 +16,55 @@
           <webclient nameWebServer="nodeB"/>
         </configuration>
       </node>
-      <node functional_type="FIREWALL" name="node1">
+      <node functional_type="FIELDMODIFIER" name="node1">
         <neighbour name="nodeA"/>
-        <neighbour name="node2"/>
+        <neighbour name="node5"/>
+		<neighbour name="node3"/>
         <configuration description="A simple description" name="conf1">
-          <firewall>
-            <elements>
-              <source>nodeC</source>
-              <destination>nodeD</destination>
-            </elements>
-          </firewall>
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
         </configuration>
       </node>
-      <node functional_type="DPI" name="node2">
+      <node functional_type="FIELDMODIFIER" name="node5">
         <neighbour name="node1"/>
-        <neighbour name="node3"/>
+        <neighbour name="node2"/>
         <configuration description="A simple description" name="conf2">
-          <dpi>
-          	<notAllowed>nodeC</notAllowed>
-          </dpi>
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
         </configuration>
       </node>
-      <node functional_type="CACHE" name="node3">
-        <neighbour name="node2"/>
+      <node functional_type="FIELDMODIFIER" name="node2">
+        <neighbour name="node5"/>
+        <neighbour name="node4"/>
+        <neighbour name="nodeB"/>
+        <configuration description="A simple description" name="conf2">
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
+        </configuration>
+      </node>
+	  <node functional_type="FIELDMODIFIER" name="node3">
+        <neighbour name="node1"/>
         <neighbour name="node4"/>
         <configuration description="A simple description" name="conf3">
-          <cache>
-          	<resource>nodeA</resource>
-          	<resource>node1</resource>
-          	<resource>node2</resource>
-          </cache>
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
         </configuration>
       </node>
-	  <node functional_type="NAT" name="node4">
+	   <node functional_type="FIELDMODIFIER" name="node4">
         <neighbour name="node3"/>
-        <neighbour name="nodeB"/>
-        <configuration description="A simple description" name="conf4">
-         <nat>
-          		<source>nodeA</source>
-          		<source>node1</source>
-          		<source>node2</source>
-          		<source>node3</source>
-          </nat>
+        <neighbour name="node2"/>
+        <configuration description="A simple description" name="conf3">
+         <fieldmodifier>
+          	<name>name</name>
+         </fieldmodifier>
         </configuration>
       </node>
-   
       <node functional_type="WEBSERVER" name="nodeB">
-        <neighbour name="node4"/>
+        <neighbour name="node2"/>
         <configuration description="A simple description" name="confB">
           <webserver>
           	<name>nodeB</name>
@@ -64,17 +74,8 @@
     </graph>
   </graphs>
    <Constraints>
-	   <NodeConstraints>
-			<NodeMetrics node="node1" nrOfOperations="1000" maxNodeLatency="10" memory="2" reqStorage="38" cores="1"/>
-			<NodeMetrics node="node2" nrOfOperations="1000" maxNodeLatency="20" memory="2" reqStorage="20" cores="2"/>
-			<NodeMetrics node="node3" nrOfOperations="4500" maxNodeLatency="10" memory="2" reqStorage="50" cores="1"/>
-			<NodeMetrics node="node4" nrOfOperations="1000" maxNodeLatency="10" memory="2" reqStorage="38" cores="2"/>
-	  </NodeConstraints>
-	  <BandwidthConstraints>
-			<BandwidthMetrics src="node1" dst="node2" reqLatency="1000000"/>
-			<BandwidthMetrics src="node2" dst="node3" reqLatency="1000000"/>
-			<BandwidthMetrics src="node3" dst="node4" reqLatency="1000000"/>
-	  </BandwidthConstraints>
+	  <NodeConstraints/>
+	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 		

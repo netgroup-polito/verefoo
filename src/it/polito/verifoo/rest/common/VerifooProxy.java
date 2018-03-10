@@ -588,9 +588,9 @@ public class VerifooProxy {
 				//net.internalRoutingOptimizationSG(netobjs.get(n), destinations, netobjs.get(next));
 				//System.out.println(n.getName() + " uses " + next.getName() + " as next hop for the following destinations: " + destinations);
 				//logger.debug("Adding routing table to "+n.getName());
-				net.routingOptimizationSG2(netobjs.get(n), rt, bConstraints, destinations);
+				//net.routingOptimizationSG2(netobjs.get(n), rt, bConstraints, destinations);
 				//net.routingOptimizationSG(netobjs.get(n), rt, bConstraints);
-				//net.routingOptimization(netobjs.get(n), rt);
+				net.routingOptimization(netobjs.get(n), rt);
 			}
 			logger.debug("----STAGE CONDITION DB----");
 			stageConditions.entrySet().forEach(e -> {logger.debug(e.getKey().getName() + " -> " + e.getValue());});
