@@ -202,24 +202,24 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 						throw new BadGraphError("You have specified a MAILCLIENT Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					if(!(nctx.am.containsKey((n.getConfiguration().getMailclient().getMailserver())))) throw new BadGraphError("Mail server not present",EType.INVALID_NODE_CONFIGURATION);
-					PolitoMailClient eh=new PolitoMailClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getMailclient().getMailserver())});
-					this.put(n,eh);
-					/*PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					/*PolitoMailClient eh=new PolitoMailClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getMailclient().getMailserver())});
+					this.put(n,eh);*/
+					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					PacketModel p = new PacketModel();
 					this.put(n,eh);
-					eh.installAsPOP3MailClient(nctx.am.get(n.getConfiguration().getMailclient().getMailserver()), p);*/
+					eh.installAsPOP3MailClient(nctx.am.get(n.getConfiguration().getMailclient().getMailserver()), p);
 					break;
 				}
 				case MAILSERVER:{
 					if(n.getConfiguration().getMailserver()==null){
 						throw new BadGraphError("You have specified a MAILSERVER Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					PolitoMailServer eh=new PolitoMailServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
-					this.put(n,eh);
-					/*PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					/*PolitoMailServer eh=new PolitoMailServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					this.put(n,eh);*/
+					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					PacketModel p = new PacketModel();
 					this.put(n,eh);
-					eh.installAsPOP3MailServer(p);*/
+					eh.installAsPOP3MailServer(p);
 					break;
 				}
 				case NAT:{
@@ -264,24 +264,24 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 						throw new BadGraphError("You have specified a WEBCLIENT Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					if(!(nctx.am.containsKey((n.getConfiguration().getWebclient().getNameWebServer())))) throw new BadGraphError("Web server not present",EType.INVALID_NODE_CONFIGURATION);
-					PolitoWebClient eh=new PolitoWebClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer())});
-					this.put(n,eh);
-					/*PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					/*PolitoWebClient eh=new PolitoWebClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer())});
+					this.put(n,eh);*/
+					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					PacketModel p = new PacketModel();
 					this.put(n,eh);
-					eh.installAsWebClient(nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer()), p);*/
+					eh.installAsWebClient(nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer()), p);
 					break;
 				}
 				case WEBSERVER:{
 					if(n.getConfiguration().getWebserver()==null){
 						throw new BadGraphError("You have specified a WEBSERVER Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					PolitoWebServer eh=new PolitoWebServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
-					this.put(n,eh);
-					/*PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					/*PolitoWebServer eh=new PolitoWebServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					this.put(n,eh);*/
+					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					PacketModel p = new PacketModel();
 					this.put(n,eh);
-					eh.installAsWebServer(p);*/
+					eh.installAsWebServer(p);
 					break;
 				}
 				default:{
