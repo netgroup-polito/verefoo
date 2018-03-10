@@ -113,7 +113,7 @@ public class TestProxy {
 		}
 	}
 	@Test
-	public void testCACHE_UNSAT(){
+	public void testCACHE_SAT(){
 		
 		try {
 			test( "./testfile/nfv5nodes7hostsSAT-CACHE.xml", true); //Working
@@ -123,7 +123,7 @@ public class TestProxy {
 	}
 	
 	@Test
-	public void testNAT_UNSAT() {
+	public void testNAT_SAT() {
 		try {
 			test( "./testfile/nfv3nodes3hostsSAT-NAT.xml", true); //Working
 		} catch (Exception e) {
@@ -131,7 +131,7 @@ public class TestProxy {
 		}		
 	}
 	@Test
-	public void testANTISPAM_UNSAT() {
+	public void testANTISPAM_SAT() {
 		try {
 			test( "./testfile/nfv5nodes7hostsSAT-ANTISPAM.xml", true); //Working
 		} catch (Exception e) {

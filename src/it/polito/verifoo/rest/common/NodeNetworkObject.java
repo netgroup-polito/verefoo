@@ -204,6 +204,10 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(!(nctx.am.containsKey((n.getConfiguration().getMailclient().getMailserver())))) throw new BadGraphError("Mail server not present",EType.INVALID_NODE_CONFIGURATION);
 					PolitoMailClient eh=new PolitoMailClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getMailclient().getMailserver())});
 					this.put(n,eh);
+					/*PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PacketModel p = new PacketModel();
+					this.put(n,eh);
+					eh.installAsPOP3MailClient(nctx.am.get(n.getConfiguration().getMailclient().getMailserver()), p);*/
 					break;
 				}
 				case MAILSERVER:{
@@ -212,6 +216,10 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					}
 					PolitoMailServer eh=new PolitoMailServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);
+					/*PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PacketModel p = new PacketModel();
+					this.put(n,eh);
+					eh.installAsPOP3MailServer(p);*/
 					break;
 				}
 				case NAT:{
@@ -258,6 +266,10 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(!(nctx.am.containsKey((n.getConfiguration().getWebclient().getNameWebServer())))) throw new BadGraphError("Web server not present",EType.INVALID_NODE_CONFIGURATION);
 					PolitoWebClient eh=new PolitoWebClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer())});
 					this.put(n,eh);
+					/*PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PacketModel p = new PacketModel();
+					this.put(n,eh);
+					eh.installAsWebClient(nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer()), p);*/
 					break;
 				}
 				case WEBSERVER:{
@@ -266,6 +278,10 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					}
 					PolitoWebServer eh=new PolitoWebServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);
+					/*PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PacketModel p = new PacketModel();
+					this.put(n,eh);
+					eh.installAsWebServer(p);*/
 					break;
 				}
 				default:{

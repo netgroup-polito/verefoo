@@ -509,7 +509,7 @@ public class Network extends Core {
 		HashMap<String, ArrayList<BoolExpr>> collected = new HashMap<String, ArrayList<BoolExpr>>();
 		HashMap<String, NetworkObject> node_dict = new HashMap<String, NetworkObject>();
 		HashMap<String, HashMap<String, Tuple<Integer, BoolExpr>>> latency = new HashMap<>();
-		System.out.println("==========NEW ROUTING TABLE for " + node + "==========");
+		//System.out.println("==========NEW ROUTING TABLE for " + node + "==========");
 		BoolExpr predicates = null;
 		//Collect some information in order to build the conditions in the next step
 		
@@ -597,7 +597,6 @@ public class Network extends Core {
 					System.out.println(initial + " => " + forTheKey);
 					mkImplies = ctx.mkImplies(initial , forTheKey );
 				}*/
-				//System.out.println(initial + " => " + forTheKey);
 				mkImplies = ctx.mkImplies(initial , forTheKey );
 				softConstraints.put(forTheKey, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
 				routes.add(nctx.bool_to_int(mkImplies));
