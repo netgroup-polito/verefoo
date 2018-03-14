@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 
 import it.polito.verifoo.rest.common.Link;
 import it.polito.verifoo.rest.common.LinkCreator;
-import it.polito.verifoo.rest.common.ResourceModel;
+import it.polito.verifoo.rest.common.PhyResourceModel;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Host;
 import it.polito.verifoo.rest.jaxb.Hosts;
@@ -30,7 +30,7 @@ import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 
-public class MedicineSimulator implements ResourceModel {
+public class MedicineSimulator implements PhyResourceModel {
 	
 	private Logger logger = LogManager.getLogger("mylog");
 	private String target = "http://127.0.0.1:5001/restapi";

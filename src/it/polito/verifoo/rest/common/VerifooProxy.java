@@ -128,6 +128,18 @@ public class VerifooProxy {
 				BoolExpr e = ctx.mkBoolConst(h.getName());
 				hostCondition.put(h.getName(),e);
 				nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(e), "servers"));
+				
+				if(h.getNodeRef().size() > 0){
+					h.getNodeRef().forEach(nr ->{
+						Node n = nodes.stream().filter(n1 -> n1.getName().equals(nr)).findFirst().orElse(null);
+						if(n != null && conditionDB.get(n) != null){
+							if(conditionDB.get(n).get(h) != null)
+								logger.debug(h.getName()+" has already " + nr + " deployed -> making the corrispondent condition true");
+								nctx.constraints.add(ctx.mkEq(conditionDB.get(n).get(h), ctx.mkTrue()));
+						}
+					});
+				}
+				
 				List<FunctionalTypes> tmp = h.getSupportedVNF().stream().map(s -> s.getFunctionalType()).collect(Collectors.toList());
 				for(FunctionalTypes f: FunctionalTypes.values()){
 					BoolExpr c = ctx.mkBoolConst(h.getName()+"_composition_"+f);
@@ -684,14 +696,16 @@ public class VerifooProxy {
 		}
 		/**
 		 * Checks if the client node and the server node in a graph are reachable satisfying all the imposed conditions
-		 * @param propertyDefinition 
+		 * @param prop 
 		 * @return
 		 */
-		public IsolationResult checkNFFGProperty(PropertyDefinition propertyDefinition){
-			propertyDefinition.getProperty().forEach(p ->{
+		public IsolationResult checkNFFGProperty(List<Property> prop){
+			prop.forEach(p ->{
 				String src = p.getSrc(), dst = p.getDst();
-	            Node source = nodes.stream().filter(n -> {return n.getName().equals(src);}).findFirst().get();
-				Node dest = nodes.stream().filter(n -> {return n.getName().equals(dst);}).findFirst().get();
+	            Node source = nodes.stream().filter(n -> {return n.getName().equals(src);}).findFirst().orElse(null);
+				Node dest = nodes.stream().filter(n -> {return n.getName().equals(dst);}).findFirst().orElse(null);
+				if(source == null || dest == null)
+					throw new BadGraphError("Error in the property definition", EType.INVALID_PROPERTY_DEFINITION);
 				logger.debug("Adding check on "+ p.getName() + " from " + source.getName() + " to "+ dest.getName());
 				switch (p.getName()) {
 				case ISOLATION_PROPERTY: 

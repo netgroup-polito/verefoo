@@ -3,6 +3,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -44,7 +47,8 @@ public class Main {
                 NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg4nodes5host.xml" ) );
                 for(Graph g:root.getGraphs().getGraph()){
                 	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
-                	IsolationResult res=test.checkNFFGProperty(root.getPropertyDefinition());
+                	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
+                	IsolationResult res=test.checkNFFGProperty(prop);
                 	if(res.result != Status.UNSATISFIABLE){
                 		System.out.println("SAT");
                 		new Translator(res.model.toString(),root).convert();

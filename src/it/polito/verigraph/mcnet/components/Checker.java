@@ -247,7 +247,7 @@ public class Checker {
 		for (Entry<String, Handle> handle : nctx.handles.entrySet()) {
 			temp = handle.getValue();
 		}
-		if (temp!=null)System.out.println(temp.getValue());
+		//if (temp!=null)System.out.println(temp.getValue());
 		
 		model = null;
 		assertions = null;

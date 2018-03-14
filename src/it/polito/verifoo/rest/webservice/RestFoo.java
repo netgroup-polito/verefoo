@@ -1,7 +1,9 @@
 package it.polito.verifoo.rest.webservice;
 
 import java.net.MalformedURLException;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -54,8 +56,9 @@ public class RestFoo {
 						throw new BadGraphError("No property defined for the Graph "+g.getId(),EType.INVALID_PROPERTY_DEFINITION);
 					}
 	            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints());
-                	IsolationResult res=test.checkNFFGProperty(root.getPropertyDefinition());
-	            	if(res.result != Status.UNSATISFIABLE){
+	            	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
+                	IsolationResult res=test.checkNFFGProperty(prop);
+                	if(res.result != Status.UNSATISFIABLE){
 	            		z3model=z3model.concat(res.model.toString());
 	            	}
                 	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 

@@ -3,6 +3,7 @@ package it.polito.verifoo.rest.common;
 import org.apache.logging.log4j.LogManager;
 
 import it.polito.verifoo.rest.jaxb.*;
+import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 /**
  * This class implements a parser for verifoo output for find on witch host verifoo deploy a node 
  */
@@ -39,9 +40,21 @@ public class Translator {
 						NodeRefType nr=new NodeRefType();
 						nr.setNode(node.getName());
 						host.getNodeRef().add(nr);
+						allocateResources(host, node.getName());
 					}
 				}
 		));
+	}
+	
+	public void allocateResources(Host h, String nodeName){
+		NodeMetrics reqResources = nfv.getConstraints().getNodeConstraints()
+										.getNodeMetrics().stream()
+										.filter(nm -> nm.getNode().equals(nodeName))
+										.findFirst().orElse(null);
+		h.setMaxVNF(h.getMaxVNF()-1);
+		if(reqResources == null) return;
+		h.setDiskStorage(h.getDiskStorage()-reqResources.getReqStorage());
+		h.setMemory(h.getMemory()-reqResources.getMemory());
 	}
 	
 }

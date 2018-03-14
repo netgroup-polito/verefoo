@@ -41,18 +41,6 @@
 		</xsd:unique>
 	    
 	    
-	    <xsd:keyref name="NodeMetricsRef" refer="keyNode">
-	      <xsd:selector xpath="Constraints/NodeConstraints/NodeMetrics" />
-	      <xsd:field xpath="@node" />
-	    </xsd:keyref>
-	    <xsd:keyref name="BandwidthSrcRef" refer="keyNode">
-	      <xsd:selector xpath="Constraints/BandwidthConstraints/BandwidthMetrics" />
-	      <xsd:field xpath="@src" />
-	    </xsd:keyref>
-	    <xsd:keyref name="BandwidthDstRef" refer="keyNode">
-	      <xsd:selector xpath="Constraints/BandwidthConstraints/BandwidthMetrics" />
-	      <xsd:field xpath="@dst" />
-	    </xsd:keyref>
 	    
 	    <xsd:unique name="BandwidthUniqueness">
 		    <xsd:selector xpath="Constraints/BandwidthConstraints/BandwidthMetrics"/>
@@ -60,10 +48,6 @@
 		    <xsd:field xpath="@dst"/>
 		</xsd:unique>
 	    
-	    <xsd:keyref name="fixedEndpointRef" refer="keyNode">
-	      <xsd:selector xpath="Hosts/Host" />
-	      <xsd:field xpath="@fixedEndpoint" />
-	    </xsd:keyref>
 	    <xsd:key name="keyGraph">
             <xsd:selector xpath="graphs/graph" />
             <xsd:field xpath="@id" />

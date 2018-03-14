@@ -7,6 +7,9 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -82,7 +85,8 @@ public class TestProxy {
         	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
         	long endVP=System.currentTimeMillis();
             System.out.println("Graph " + g.getId() + ": creating condition -> " + (endVP-beginVP)+"ms" );
-        	IsolationResult res=test.checkNFFGProperty(root.getPropertyDefinition());
+            List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
+        	IsolationResult res=test.checkNFFGProperty(prop);
         	long endCheck=System.currentTimeMillis();
             System.out.println(g.getId() + ": checking property -> " + (endCheck-endVP)+"ms" );
         	if(res.result != Status.UNSATISFIABLE)
