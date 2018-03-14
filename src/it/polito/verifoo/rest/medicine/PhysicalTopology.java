@@ -37,7 +37,13 @@ public class PhysicalTopology {
 		
 		//Create a data center for each host
 		for(Host h:hosts){
-			fileBody+= "\t"+h.getName() +"  = net.addDatacenter(\""+ h.getName() +"\")\n";
+			fileBody+= "\t"+h.getName() +"  = net.addDatacenter(\""+ h.getName() +"\", metadata={"
+																	+ "\"cores\"=\"" + h.getCores() +"\""
+																	+ ", \"cpu\"=\"" + h.getCpu() +"\""
+																	+ ", \"memory\"=\"" + h.getMemory() +"\""
+																	+ ", \"diskStorage\"=\"" + h.getMaxVNF() +"\""
+																	+ ", \"type\"=\"" + h.getType() +"\""
+																	+ "})\n";
 		}
 		//Connect the data center in the same way as the hosts
 		 for(Connection c:connections){

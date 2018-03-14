@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +13,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -23,16 +20,17 @@ import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Link;
 import it.polito.verifoo.rest.common.LinkCreator;
+import it.polito.verifoo.rest.common.ResourceModel;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Host;
+import it.polito.verifoo.rest.jaxb.Hosts;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 
-public class MedicineSimulator {
+public class MedicineSimulator implements ResourceModel {
 	
 	private Logger logger = LogManager.getLogger("mylog");
 	private String target = "http://127.0.0.1:5001/restapi";
@@ -91,9 +89,9 @@ public class MedicineSimulator {
 		sd = new ServiceDescriptor(nodes, links, vnfds, nExternal);
 
 		try {
-			createIN();
+			setPhysicalTopology();
 			deployVNF();
-			if(containernet != null){
+			/*if(containernet != null){
 				String line = "";
 		        OutputStreamWriter output= new OutputStreamWriter(containernet.getOutputStream());
 				BufferedReader input = new BufferedReader(new InputStreamReader(containernet.getInputStream()));
@@ -127,7 +125,7 @@ public class MedicineSimulator {
 				logger.debug("Testing complete");
 				containernet.destroy();
 				//containernet.waitFor();
-			}
+			}*/
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -137,8 +135,8 @@ public class MedicineSimulator {
 		}
 		logger.debug("-------------------------------------------");
 	}
-	
-	private void createIN() throws InterruptedException {
+	@Override
+	public void setPhysicalTopology() {
 		try {
 			topologyFile = "topology.py";
 			printInFile(topologyFile, phy.getTopologyDescription());
@@ -173,6 +171,9 @@ public class MedicineSimulator {
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("The MeDICINE simulation can be run only on linux machines");
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 	}
@@ -239,7 +240,7 @@ public class MedicineSimulator {
 		commands.add(new String[] {"/bin/bash", "-c", "son-access push --upload " + serviceName + ".son 2>&1"});		
 		commands.add(new String[] {"/bin/bash", "-c", "son-access push --deploy latest 2>&1"});	
 		commands.add(new String[] {"/bin/bash", "-c", "rm -r " + serviceName + "/ 2>&1"});
-		commands.add(new String[] {"/bin/bash", "-c", "rm -r " + serviceName + ".son 2>&1"});
+		//commands.add(new String[] {"/bin/bash", "-c", "rm -r " + serviceName + ".son 2>&1"});
 		commands.add(new String[] {"/bin/bash", "-c", "chmod +x networkBuild.sh 2>&1"});
 		commands.add(new String[] {"/bin/bash", "-c", "./networkBuild.sh 2>&1"});
 		commands.add(new String[] {"/bin/bash", "-c", "rm build.sh 2>&1"});
@@ -260,4 +261,49 @@ public class MedicineSimulator {
         logger.debug("Service Chain deployed");
         System.out.println("Service Chain deployed");
 	}
+
+	@Override
+	public Hosts getPhysicalTopology() {
+		if(!containernet.isAlive()) return null;
+		List<Host> medicineHosts = new ArrayList<>();
+		for(Host host:hosts){
+			Response res = client.path("/datacenter/"+host.getName())
+								.request(MediaType.APPLICATION_JSON)
+								.get();
+			if(res.getStatus() != 200) return null;
+			
+			
+			//JSON deserializing
+			
+			String line = null;
+            while ((line) != null) {
+                System.out.println(line);
+                if(line.contains("metadata")){
+                	Host h = new Host();
+                	h.setCores(0);
+                	h.setCpu(0);
+                	h.setDiskStorage(0);
+                	h.setMaxVNF(0);
+                	h.setMemory(0);
+                	h.setType(null);
+                	//h.setFixedEndpoint(value);
+                	medicineHosts.add(h);
+                }
+            } 
+			logger.debug("Physical Topology Retrived");
+		    System.out.println("Physical Topology Retrived");
+
+			Hosts topology = new Hosts();
+			topology.getHost().addAll(medicineHosts);
+			return topology;
+		}
+		return null;
+	}
+	public void stopSimulation() {
+		if(containernet != null){
+			containernet.destroy();
+		}
+	}
+
+
 }
