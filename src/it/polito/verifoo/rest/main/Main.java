@@ -41,7 +41,7 @@ public class Main {
                 Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
                 u.setSchema(schema);
                 // unmarshal a document into a tree of Java content objects
-                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sgTestDiffEndpoints.xml" ) );
+                NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg4nodes5host.xml" ) );
                 for(Graph g:root.getGraphs().getGraph()){
                 	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
                 	IsolationResult res=test.checkNFFGProperty(root.getPropertyDefinition());
@@ -61,6 +61,7 @@ public class Main {
                 m.marshal( root, System.out ); 
                 //MedicineSimulator sim = new MedicineSimulator(root);
                 //sim.printAll();
+                //sim.stopSimulation();
             } catch( JAXBException je ) {
             	logger.error("Error while unmarshalling or marshalling");
                 logger.error(je);

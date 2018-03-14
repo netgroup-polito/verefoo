@@ -96,6 +96,14 @@ MAX checking property when SAT -> 12858ms
 AVG total time -> 5460ms
 MAX total time -> 12894ms
 =====================================
+===========FILE ./testfile/Performance/bgInternet2_6Nodes.xml===========
+AVG creating condition -> 39ms
+MAX creating condition -> 4431ms
+AVG checking property when SAT -> 123420ms
+MAX checking property when SAT -> 312931ms
+AVG total time -> 123481ms
+MAX total time -> 312999ms
+=====================================
 ===========FILE ./testfile/Performance/sgInternet2.xml 5 Nodes===========
 AVG creating condition -> 20ms
 MAX creating condition -> 2235ms

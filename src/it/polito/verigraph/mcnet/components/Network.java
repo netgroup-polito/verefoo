@@ -30,6 +30,7 @@ import com.microsoft.z3.Z3Exception;
 import it.polito.verifoo.components.RoutingTable;
 import it.polito.verifoo.rest.jaxb.BandwidthConstraints;
 import it.polito.verifoo.rest.jaxb.BandwidthConstraints.BandwidthMetrics;
+import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verigraph.mcnet.components.Core;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.NetworkObject;
@@ -405,7 +406,7 @@ public class Network extends Core {
 		HashMap<String, ArrayList<BoolExpr>> collected = new HashMap<String, ArrayList<BoolExpr>>();
 		HashMap<String, NetworkObject> node_dict = new HashMap<String, NetworkObject>();
 		HashMap<String, HashMap<String, Tuple<Integer, BoolExpr>>> latency = new HashMap<>();
-		//System.out.println("==========NEW ROUTING TABLE==========");
+		System.out.println("==========NEW ROUTING TABLE for " + node.getZ3Node() + "==========");
 		BoolExpr predicates = null;
 		//Collect some information in order to build the conditions in the next step
 		ArrayList<BoolExpr> alb = new ArrayList<BoolExpr>();
@@ -470,7 +471,7 @@ public class Network extends Core {
 				BoolExpr forTheKey = temp.getValue()._2;
 				Integer latency_val = -temp.getValue()._1;
 				assert(latency_val <= 0);
-				//System.out.println(initial + " => " + forTheKey);
+				System.out.println(initial + " => " + forTheKey);
 				BoolExpr mkImplies = ctx.mkImplies( initial,forTheKey);
 				softConstraints.put(forTheKey, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
 				routes.add(nctx.bool_to_int(mkImplies));

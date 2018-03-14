@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,7 +40,7 @@ public class VerifooProxy {
 		private Logger logger = LogManager.getLogger("mylog");
 		private List<List<String>> savedChain = new ArrayList<>();
 		private List<List<String>> savedNodeChain = new ArrayList<>();
-		HashMap<Node, HashMap<Node, List<Tuple<Node, Integer>>>> routingRule = new HashMap<>();
+		HashMap<Node, HashMap<Node, List<Node>>> routingRule = new HashMap<>();
 		private List<Node> nodes;
 		private List<Link> links = new ArrayList<>();
 		private List<Host> hosts;
@@ -408,37 +409,24 @@ public class VerifooProxy {
 	            			continue;
 	            		}
 	            		int distance = iDst - iSrc;
-	            		
+	            		Node nextHop = nodes.stream().filter(n1 -> n1.getName().equals(chain.get(iSrc+(distance/Math.abs(distance))))).findFirst().orElse(null);
+        				assert(nextHop != null);
+	            		/*if(clients.contains(nextHop) || servers.contains(nextHop)){
+	            			continue;
+	            		}*/
 	            		if(!routingRule.get(src).containsKey(dst)){
 	            			//System.out.println("From " + src.getName() + " (index="+iSrc+") to "+ dst.getName() + " (index="+iDst+") -> " + distance);
-	            			Node n = nodes.stream().filter(n1 -> n1.getName().equals(chain.get(iSrc+(distance/Math.abs(distance))))).findFirst().orElse(null);
-            				assert(n != null);
-            				Tuple<Node, Integer> nextHop = new Tuple<>(n, Math.abs(distance));
-	            			List<Tuple<Node, Integer>> newRules = new ArrayList<>();
+	            			List<Node> newRules = new ArrayList<>();
 	            			newRules.add(nextHop);
 	            			routingRule.get(src).put(dst, newRules);
 	            			//logger.debug("From " + src.getName() + " to "+ dst.getName() + " -> NextHop: " + chain.get(iSrc+(distance/Math.abs(distance))) + " dist: " + distance);
 	            		}else{
-	            			List<Tuple<Node, Integer>> rules = routingRule.get(src).get(dst);
-	            			Tuple<Node, Integer> currNextHop = rules.get(0);
-	            			if(rules.stream().map(r -> r._1).filter(n -> chain.get(iSrc+(distance/Math.abs(distance))).equals(n.getName())).count() > 0) continue;
-	            			if(currNextHop._2 == Math.abs(distance)){
-	            				Node n = nodes.stream().filter(n1 -> n1.getName().equals(chain.get(iSrc+(distance/Math.abs(distance))))).findFirst().orElse(null);
-	            				assert(n != null);
-	            				Tuple<Node, Integer> newNextHop =new Tuple<>(n, Math.abs(distance));
-            					rules.add(newNextHop);
-            					//routingRule.get(src).put(dst, rules);
-            					//logger.debug("Rule ADDED: From " + src.getName() + " to "+ dst.getName() + " -> NextHop: " + chain.get(iSrc+(distance/Math.abs(distance))) + " dist: " + distance);
-            				}
-	            			if(currNextHop._2 > Math.abs(distance)){
-	            				Node n = nodes.stream().filter(n1 -> n1.getName().equals(chain.get(iSrc+(distance/Math.abs(distance))))).findFirst().orElse(null);
-	            				assert(n != null);
-	            				Tuple<Node, Integer> newNextHop =new Tuple<>(n, Math.abs(distance));
-            					rules.clear();
-            					rules.add(newNextHop);
-            					//routingRule.get(src).put(dst, rules);
-            					//logger.debug("Rule CHANGED: From " + src.getName() + " to "+ dst.getName() + " -> NextHop: " + chain.get(iSrc+(distance/Math.abs(distance))) + " dist: " + distance);
-            				}		            					            			
+	            			List<Node> rules = routingRule.get(src).get(dst);
+            				if(!rules.contains(nextHop))
+        						rules.add(nextHop);
+        					//routingRule.get(src).put(dst, rules);
+        					//logger.debug("Rule ADDED: From " + src.getName() + " to "+ dst.getName() + " -> NextHop: " + chain.get(iSrc+(distance/Math.abs(distance))) + " dist: " + distance);
+        					            					            			
 	            		}
 	            			
 	            	}
@@ -448,8 +436,8 @@ public class VerifooProxy {
             	logger.debug("From " + src.getName() + " -> ");
             	rules.forEach((dst, rule) ->{
             		logger.debug("\tto " + dst.getName());
-            		rule.forEach(t ->{
-                		logger.debug("\t\t\t\t-> (" + t._1.getName() + " , " + t._2 + ")");
+            		rule.forEach(nextHop ->{
+                		logger.debug("\t\t\t\t-> " + nextHop.getName());
                 	});
             	});
             	
@@ -569,17 +557,25 @@ public class VerifooProxy {
 						}
 						
 					}
-					logger.debug("Adding ("+ c +"), from "+ n.getName() +" next hop is " + next.getName() + " with latency " + latency);
+					//logger.debug("Adding ("+ c +"), from "+ n.getName() +" to " + server.getName() + " next hop is " + next.getName() + " with latency " + latency);
 					rt.add(new RoutingTable(nctx.am.get(server.getName()), netobjs.get(next), nctx.addLatency(latency), c));
-					Node tmp = next;
-					if(routingRule.containsKey(n)){
-						List<DatatypeExpr> listtmp = routingRule.get(n).entrySet().stream()
-														.filter(e -> {return e.getValue().stream().filter(t -> {return t._1==tmp;}).count() > 0;})
-														.map(e -> nctx.am.get(e.getKey().getName()))
-														.collect(Collectors.toList());
-						if(listtmp.size() > 0)
-							destinations.put(tmp.getName(), listtmp);
+					for(Entry<Node, List<Node>> rule : routingRule.get(n).entrySet()){
+						for(Node nextHop : rule.getValue()){
+							if(nextHop.getName().equals(next.getName())){
+								//logger.debug("Adding ("+ c +"), from "+ n.getName() +" to " + rule.getKey().getName() + " next hop is " + nextHop.getName() + " with latency " + latency);
+								rt.add(new RoutingTable(nctx.am.get(rule.getKey().getName()), netobjs.get(nextHop), nctx.addLatency(latency), c));
+							}
+						}
 					}
+					/*// for backwards paths
+					for(Entry<Node, List<Node>> rule : routingRule.get(next).entrySet()){
+						for(Node nextHop : rule.getValue()){
+							if(nextHop.getName().equals(n.getName())){
+								logger.debug("Adding ("+ c +"), from "+ next.getName() +" to " + rule.getKey().getName() + " next hop is " + nextHop.getName() + " with latency " + latency);
+								rt.add(new RoutingTable(nctx.am.get(rule.getKey().getName()), netobjs.get(nextHop), nctx.addLatency(latency), c));
+							}
+						}
+					}*/
 				}
 				List<BandwidthMetrics> bConstraints = bandwidthMetrics.stream().filter(b -> b.getSrc().equals(n.getName())).collect(Collectors.toList());
 				
