@@ -43,6 +43,8 @@ public class PhysicalTopology {
 																	+ ", \"memory\"=\"" + h.getMemory() +"\""
 																	+ ", \"diskStorage\"=\"" + h.getMaxVNF() +"\""
 																	+ ", \"type\"=\"" + h.getType() +"\""
+																	+ h.getFixedEndpoint()==null?"":", \"fixedEndpoint\"=\"" + h.getFixedEndpoint() +"\""
+																	+ ", \"supported_vnfs\"=\"" + h.getSupportedVNF() +"\""
 																	+ "})\n";
 		}
 		//Connect the data center in the same way as the hosts

@@ -178,6 +178,45 @@ public class MedicineSimulator implements PhyResourceModel {
 		
 	}
 
+	@Override
+	public Hosts getPhysicalTopology() {
+		if(!containernet.isAlive()) return null;
+		List<Host> medicineHosts = new ArrayList<>();
+		for(Host host:hosts){
+			Response res = client.path("/datacenter/"+host.getName())
+								.request(MediaType.APPLICATION_JSON)
+								.get();
+			if(res.getStatus() != 200) return null;
+			
+			
+			//JSON deserializing
+			
+			String line = null;
+            while ((line) != null) {
+                System.out.println(line);
+                if(line.contains("metadata")){
+                	Host h = new Host();
+                	h.setCores(0);
+                	h.setCpu(0);
+                	h.setDiskStorage(0);
+                	h.setMaxVNF(0);
+                	h.setMemory(0);
+                	h.setType(null);
+                	h.setFixedEndpoint("");
+                	h.getSupportedVNF().addAll(null);
+                	medicineHosts.add(h);
+                }
+            } 
+			logger.debug("Physical Topology Retrived");
+		    System.out.println("Physical Topology Retrived");
+
+			Hosts topology = new Hosts();
+			topology.getHost().addAll(medicineHosts);
+			return topology;
+		}
+		return null;
+	}
+	
 	public void printTopology(){
 		System.out.println(phy.getTopologyDescription());
 	}
@@ -262,43 +301,6 @@ public class MedicineSimulator implements PhyResourceModel {
         System.out.println("Service Chain deployed");
 	}
 
-	@Override
-	public Hosts getPhysicalTopology() {
-		if(!containernet.isAlive()) return null;
-		List<Host> medicineHosts = new ArrayList<>();
-		for(Host host:hosts){
-			Response res = client.path("/datacenter/"+host.getName())
-								.request(MediaType.APPLICATION_JSON)
-								.get();
-			if(res.getStatus() != 200) return null;
-			
-			
-			//JSON deserializing
-			
-			String line = null;
-            while ((line) != null) {
-                System.out.println(line);
-                if(line.contains("metadata")){
-                	Host h = new Host();
-                	h.setCores(0);
-                	h.setCpu(0);
-                	h.setDiskStorage(0);
-                	h.setMaxVNF(0);
-                	h.setMemory(0);
-                	h.setType(null);
-                	//h.setFixedEndpoint(value);
-                	medicineHosts.add(h);
-                }
-            } 
-			logger.debug("Physical Topology Retrived");
-		    System.out.println("Physical Topology Retrived");
-
-			Hosts topology = new Hosts();
-			topology.getHost().addAll(medicineHosts);
-			return topology;
-		}
-		return null;
-	}
 	public void stopSimulation() {
 		if(containernet != null){
 			containernet.destroy();
