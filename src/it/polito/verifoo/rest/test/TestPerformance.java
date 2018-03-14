@@ -201,13 +201,21 @@ public class TestPerformance {
 			//files.add("./testfile/Performance/bgGEANT_5Nodes.xml");
 			//files.add("./testfile/Performance/bgUNIV1_5Nodes.xml");
 			
+			files.add("./testfile/Performance/bgInternet2_6Nodes.xml");
+			files.add("./testfile/Performance/bgGEANT_6Nodes.xml");
+			
 			//files.add("./testfile/Performance/sgInternet2.xml");
 			//files.add("./testfile/Performance/sgInternet2WithConstraints.xml");
 			//files.add("./testfile/Performance/sgGEANT.xml");
 			//files.add("./testfile/Performance/sgGEANTWithConstraints.xml");
 			//files.add("./testfile/Performance/sgUNIV1.xml");
-			files.add("./testfile/Performance/sgUNIV1WithConstraints.xml");
+			//files.add("./testfile/Performance/sgUNIV1WithConstraints.xml");
 
+			files.add("./testfile/Performance/sgInternet2_6Nodes.xml");
+			files.add("./testfile/Performance/sgGEANT_6Nodes.xml");
+			files.add("./testfile/Performance/sgInternet2_7Nodes.xml");
+			files.add("./testfile/Performance/sgGEANT_7Nodes.xml");
+			
 			//files.add("./testfile/Performance/bgAS.xml");
 			//files.add("./testfile/Performance/bgASWithConstraints.xml");
 			//files.add("./testfile/Performance/bgBiggest.xml");
