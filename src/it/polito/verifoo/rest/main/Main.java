@@ -62,10 +62,11 @@ public class Main {
                 Marshaller m = jc.createMarshaller();
                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                 m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                m.marshal( root, System.out ); 
-                //MedicineSimulator sim = new MedicineSimulator(root);
+                //m.marshal( root, System.out ); 
+                MedicineSimulator sim = new MedicineSimulator(root);
                 //sim.printAll();
-                //sim.stopSimulation();
+                m.marshal( sim.getPhysicalTopology(), System.out );
+                sim.stopSimulation();
             } catch( JAXBException je ) {
             	logger.error("Error while unmarshalling or marshalling");
                 logger.error(je);

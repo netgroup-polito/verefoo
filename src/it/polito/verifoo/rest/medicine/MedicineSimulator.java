@@ -9,7 +9,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Map;import java.util.Set;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.client.ClientBuilder;
@@ -19,6 +20,9 @@ import javax.ws.rs.core.Response;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import it.polito.verifoo.rest.common.Link;
 import it.polito.verifoo.rest.common.LinkCreator;
@@ -183,19 +187,40 @@ public class MedicineSimulator implements PhyResourceModel {
 		if(!containernet.isAlive()) return null;
 		List<Host> medicineHosts = new ArrayList<>();
 		for(Host host:hosts){
+			//System.out.println("Requesting for " + host.getName());
 			Response res = client.path("/datacenter/"+host.getName())
 								.request(MediaType.APPLICATION_JSON)
 								.get();
 			if(res.getStatus() != 200) return null;
 			
-			
-			//JSON deserializing
-			
-			String line = null;
-            while ((line) != null) {
-                System.out.println(line);
-                if(line.contains("metadata")){
-                	Host h = new Host();
+			//System.out.println(res.readEntity(String.class));
+			String body = res.readEntity(String.class);
+			String[] lines = body.split(", \"");
+			Map<String,String> data = new HashMap<String, String>();
+
+			ObjectMapper objectMapperAll = new ObjectMapper();
+			try {
+				data = (HashMap<String, String>)objectMapperAll.readValue(body, HashMap.class);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			System.out.println("Map is: "+data);
+			for(String line:lines){
+            	//System.out.println(line);
+               if(line.contains("metadata\"")){
+                	System.out.println(line);
+            		//convert json string to object
+                    Host h = new Host();
+                    String metadata = line.substring(line.indexOf('{'), line.lastIndexOf('}')+1).replace("\\\"","\"");
+                	//System.out.println(metadata);
+                	ObjectMapper objectMapper = new ObjectMapper();
+                	try {
+						h = (Host) objectMapper.readValue(metadata, Host.class);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}/*
                 	h.setCores(0);
                 	h.setCpu(0);
                 	h.setDiskStorage(0);
@@ -203,18 +228,17 @@ public class MedicineSimulator implements PhyResourceModel {
                 	h.setMemory(0);
                 	h.setType(null);
                 	h.setFixedEndpoint("");
-                	h.getSupportedVNF().addAll(null);
+                	//h.getSupportedVNF().addAll(null);*/
                 	medicineHosts.add(h);
                 }
             } 
-			logger.debug("Physical Topology Retrived");
-		    System.out.println("Physical Topology Retrived");
-
-			Hosts topology = new Hosts();
-			topology.getHost().addAll(medicineHosts);
-			return topology;
 		}
-		return null;
+		logger.debug("Physical Topology Retrived");
+	    System.out.println("Physical Topology Retrived");
+
+		Hosts topology = new Hosts();
+		topology.getHost().addAll(medicineHosts);
+		return topology;
 	}
 	
 	public void printTopology(){
@@ -284,7 +308,7 @@ public class MedicineSimulator implements PhyResourceModel {
 		commands.add(new String[] {"/bin/bash", "-c", "./networkBuild.sh 2>&1"});
 		commands.add(new String[] {"/bin/bash", "-c", "rm build.sh 2>&1"});
 		commands.add(new String[] {"/bin/bash", "-c", "rm networkBuild.sh 2>&1"});
-		commands.add(new String[] {"/bin/bash", "-c", "rm " + topologyFile + " 2>&1"});
+		//commands.add(new String[] {"/bin/bash", "-c", "rm " + topologyFile + " 2>&1"});
         for(String[] c : commands){
         	logger.debug("Executing command -> " + c[2]);
             executeCommands = new ProcessBuilder(c).start();
@@ -297,12 +321,14 @@ public class MedicineSimulator implements PhyResourceModel {
                 }
             executeCommands.waitFor();   
         }
-        logger.debug("Service Chain deployed");
-        System.out.println("Service Chain deployed");
+        logger.debug("Service deployed");
+        System.out.println("Service deployed");
 	}
 
 	public void stopSimulation() {
 		if(containernet != null){
+			logger.debug("Simulation stopped");
+	        System.out.println("Simulation stopped");
 			containernet.destroy();
 		}
 	}

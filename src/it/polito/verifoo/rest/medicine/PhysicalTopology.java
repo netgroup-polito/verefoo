@@ -1,9 +1,16 @@
 package it.polito.verifoo.rest.medicine;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import it.polito.verifoo.rest.jaxb.Connection;
 import it.polito.verifoo.rest.jaxb.Host;
+import it.polito.verifoo.rest.jaxb.SupportedVNFType;
 
 public class PhysicalTopology {
 	
@@ -37,19 +44,30 @@ public class PhysicalTopology {
 		
 		//Create a data center for each host
 		for(Host h:hosts){
-			fileBody+= "\t"+h.getName() +"  = net.addDatacenter(\""+ h.getName() +"\", metadata={"
-																	+ "\"cores\"=\"" + h.getCores() +"\""
-																	+ ", \"cpu\"=\"" + h.getCpu() +"\""
-																	+ ", \"memory\"=\"" + h.getMemory() +"\""
-																	+ ", \"diskStorage\"=\"" + h.getMaxVNF() +"\""
-																	+ ", \"type\"=\"" + h.getType() +"\""
-																	+ h.getFixedEndpoint()==null?"":", \"fixedEndpoint\"=\"" + h.getFixedEndpoint() +"\""
-																	+ ", \"supported_vnfs\"=\"" + h.getSupportedVNF() +"\""
-																	+ "})\n";
+			fileBody+= "\t"+h.getName() +"  = net.addDatacenter(\""+ h.getName() +"\", metadata=\"{"
+																	+ "\\\"name\\\":\\\"" + h.getName() +"\\\""
+																	+ ", \\\"cores\\\":\\\"" + h.getCores() +"\\\""
+																	+ ", \\\"cpu\\\":\\\"" + h.getCpu() +"\\\""
+																	+ ", \\\"memory\\\":\\\"" + h.getMemory() +"\\\""
+																	+ ", \\\"diskStorage\\\":\\\"" + h.getDiskStorage() +"\\\""
+																	+ ", \\\"maxVNF\\\":\\\"" + h.getMaxVNF() +"\\\""
+																	+ ", \\\"type\\\":\\\"" + h.getType() +"\\\"";
+			
+			if(h.getFixedEndpoint()!=null)
+				fileBody+=", \\\"fixedEndpoint\\\":\\\"" + h.getFixedEndpoint() +"\\\"";	
+			
+			fileBody += ", \\\"supportedVNF\\\":[";
+			int i = 0;
+			for(SupportedVNFType svnf : h.getSupportedVNF()){
+				if(i != 0) fileBody += ",";
+				fileBody += "{ \\\"functionalType\\\": \\\""+svnf.getFunctionalType()+"\\\"}";
+				i++;
+			}
+			fileBody += "]}\")\n";
 		}
 		//Connect the data center in the same way as the hosts
 		 for(Connection c:connections){
-			 fileBody+= "\tnet.addLink("+c.getSourceHost()+", "+c.getDestHost()+", delay=\""+(-c.getAvgLatency())+"ms\")\n";
+			 fileBody+= "\tnet.addLink("+c.getSourceHost()+", "+c.getDestHost()+", delay=\""+c.getAvgLatency()+"ms\")\n";
 		 }
 		 //Add RestAPI
 		fileBody+= "\trapi1 = RestApiEndpoint(\"0.0.0.0\", 5001)\n"
