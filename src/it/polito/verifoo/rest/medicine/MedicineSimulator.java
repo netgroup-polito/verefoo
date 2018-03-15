@@ -205,11 +205,11 @@ public class MedicineSimulator implements PhyResourceModel {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			System.out.println("Map is: "+data);
+			//System.out.println("Map is: "+data);
 			for(String line:lines){
             	//System.out.println(line);
                if(line.contains("metadata\"")){
-                	System.out.println(line);
+                	//System.out.println(line);
             		//convert json string to object
                     Host h = new Host();
                     String metadata = line.substring(line.indexOf('{'), line.lastIndexOf('}')+1).replace("\\\"","\"");
@@ -325,7 +325,7 @@ public class MedicineSimulator implements PhyResourceModel {
         System.out.println("Service deployed");
 	}
 
-	public void stopSimulation() {
+	public void removePhysicalTopology() {
 		if(containernet != null){
 			logger.debug("Simulation stopped");
 	        System.out.println("Simulation stopped");

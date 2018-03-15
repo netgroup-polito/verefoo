@@ -6,5 +6,6 @@ public interface PhyResourceModel {
 	
 	public Hosts getPhysicalTopology();
 	public void setPhysicalTopology();
+	public void removePhysicalTopology();
 	
 }

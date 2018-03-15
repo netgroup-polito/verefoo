@@ -36,7 +36,7 @@ public final class JniFinder {
 		        String javaLibPath = System.getProperty("java.library.path");
 		        System.out.println(javaLibPath);
 		        if(!javaLibPath.contains(fullPath)){
-		        	setJavaLibPath(javaLibPath+";"+fullPath);
+		        	setJavaLibPath(javaLibPath+":"+fullPath);
 		        }
 			} catch (IOException | InterruptedException e) {
 				// Probably Windows :D
