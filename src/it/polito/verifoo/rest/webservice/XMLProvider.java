@@ -51,9 +51,9 @@ public class XMLProvider implements MessageBodyReader<Object>, MessageBodyWriter
             		m = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb").createMarshaller();
             	}
                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-                m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"https://raw.githubusercontent.com/netgroup-polito/verifoo/rest-service/xsd/nfvInfo.xsd");
+                m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"https://raw.githubusercontent.com/netgroup-polito/verifoo/rest-service/xsd/nfvSchema.xsd");
     			SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);    
-    			Schema schema = sf.newSchema( new URL("https://raw.githubusercontent.com/netgroup-polito/verifoo/rest-service/xsd/nfvInfo.xsd"));
+    			Schema schema = sf.newSchema( new URL("https://raw.githubusercontent.com/netgroup-polito/verifoo/rest-service/xsd/nfvSchema.xsd"));
     			m.setSchema(schema);
                 m.marshal(object, entityStream);
             } catch(JAXBException e) {
@@ -81,7 +81,7 @@ public class XMLProvider implements MessageBodyReader<Object>, MessageBodyWriter
         		u = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb").createUnmarshaller();
         	}
         	SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);    
-    		Schema schema = sf.newSchema( new URL("https://raw.githubusercontent.com/netgroup-polito/verifoo/rest-service/xsd/nfvInfo.xsd"));
+    		Schema schema = sf.newSchema( new URL("https://raw.githubusercontent.com/netgroup-polito/verifoo/rest-service/xsd/nfvSchema.xsd"));
     		u.setSchema(schema);
             return (NFV)u.unmarshal(entityStream);
         } catch(JAXBException e) {

@@ -31,7 +31,7 @@ import it.polito.verifoo.rest.medicine.MedicineSimulator;
 @Api("/simulation")
 public class RestMeD {
 		MedicineDB db = new MedicineDB();
-		
+		@Path("/new")
 	    @POST
 	    @ApiOperation(value = "Deploys the network model in the MeDICINE topology simulator", notes = "",
 	    response=Integer.class)	    
