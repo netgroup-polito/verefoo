@@ -4,7 +4,7 @@ import java.util.Random;
 
 import it.polito.verigraph.model.Node;
 
-class PolicyGen {
+public class PolicyGen {
 
     private String name;
     private GraphGen graph;
@@ -14,8 +14,7 @@ class PolicyGen {
 
     public enum PolicyType {
         REACHABILITY,
-        ISOLATION,
-        TRAVERSAL
+        ISOLATION
     }
     private PolicyType type;
 

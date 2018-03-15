@@ -28,7 +28,7 @@ class GraphGen extends Graph {
     private FunctionalTypes serverTypes[]={FunctionalTypes.MAILSERVER,FunctionalTypes.WEBSERVER};
     private FunctionalTypes middleTypes[]={FunctionalTypes.ANTISPAM,FunctionalTypes.CACHE,FunctionalTypes.DPI, FunctionalTypes.FIELDMODIFIER, FunctionalTypes.FIREWALL,FunctionalTypes.NAT};
 
-    private PolicyGen.PolicyType types[]={PolicyType.REACHABILITY, PolicyType.ISOLATION,PolicyType.TRAVERSAL};
+    private PolicyGen.PolicyType types[]={PolicyType.REACHABILITY, PolicyType.ISOLATION};
 
     private static int count=0;
 
@@ -44,9 +44,9 @@ class GraphGen extends Graph {
         policies = new HashMap<String,PolicyGen>();
 
         // create nodes
-        clientNodes = createNodeSubset(clientTypes, random, 10);
-        serverNodes = createNodeSubset(serverTypes, random, 10);
-        middleNodes = createNodeSubset(middleTypes, random, 20);
+        clientNodes = createNodeSubset(clientTypes, random, 2);
+        serverNodes = createNodeSubset(serverTypes, random, 2);
+        middleNodes = createNodeSubset(middleTypes, random, 6);
 
         // create links
         createLinks(random);
@@ -56,7 +56,26 @@ class GraphGen extends Graph {
 
     }
 
-    /**
+    public GraphGen(Random random, int i, int maxClients, int maxServers, int maxInternalNodes) {
+    	super(count);
+        count++;
+
+        // create policies hash map
+        policies = new HashMap<String,PolicyGen>();
+
+        // create nodes
+        clientNodes = createNodeSubset(clientTypes, random, maxClients);
+        serverNodes = createNodeSubset(serverTypes, random, maxServers);
+        middleNodes = createNodeSubset(middleTypes, random, maxInternalNodes);
+
+        // create links
+        createLinks(random);
+
+        // create policies for this nffg
+        createPolicies(random);
+	}
+
+	/**
      * Creates a random set of new nodes with types taken from a specified list of types
      * The new nodes are added to the instance nodes set
      * The nodes set is assumed to be already existing (not null)
@@ -85,22 +104,22 @@ class GraphGen extends Graph {
             else type = chooseType(types,random);
             String name =(type.toString().replace("_", ""))+i;
 
-            Configuration conf = createConfiguration(name,type.toString(), random.nextBoolean()); //TODO
-            nodeSubset.add(i, new Node(existingnode+i,name,type.toString().toLowerCase(), conf)); //No configuration yet
+            //Configuration conf = createConfiguration(name,type.toString(), random.nextBoolean()); //TODO
+            nodeSubset.add(i, new Node(existingnode+i,name,type.toString(), null)); //No configuration yet
             nodes.put(nodeSubset.get(i).getId(), nodeSubset.get(i));
 
             if(type == FunctionalTypes.VPNACCESS){
                 i++;
                 name = (FunctionalTypes.VPNEXIT.toString().replace("_", ""))+i;
-                conf= createConfiguration(name, FunctionalTypes.VPNEXIT.toString(), true);
-                nodeSubset.add(i, new Node(i,name,FunctionalTypes.VPNEXIT.toString().toLowerCase(), conf));
+                //conf= createConfiguration(name, FunctionalTypes.VPNEXIT.toString(), true);
+                nodeSubset.add(i, new Node(i,name,FunctionalTypes.VPNEXIT.toString(), null));
                 nodes.put(nodeSubset.get(i).getId(), nodeSubset.get(i));
                 //numNodes -=1;
             } else if (type == FunctionalTypes.VPNEXIT) {
                 i++;
                 name = (FunctionalTypes.VPNACCESS.toString().replace("_", ""))+i;
-                conf= createConfiguration(name, FunctionalTypes.VPNACCESS.toString(), true);
-                nodeSubset.add(i,new Node(i,name,FunctionalTypes.VPNACCESS.toString().toLowerCase(), conf));
+                //conf= createConfiguration(name, FunctionalTypes.VPNACCESS.toString(), true);
+                nodeSubset.add(i,new Node(i,name,FunctionalTypes.VPNACCESS.toString(), null));
                 nodes.put(nodeSubset.get(i).getId(), nodeSubset.get(i));
                 numNodes-=1;
             }

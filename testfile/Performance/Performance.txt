@@ -97,12 +97,14 @@ AVG total time -> 5460ms
 MAX total time -> 12894ms
 =====================================
 ===========FILE ./testfile/Performance/bgInternet2_6Nodes.xml===========
-AVG creating condition -> 39ms
-MAX creating condition -> 4431ms
-AVG checking property when SAT -> 123420ms
-MAX checking property when SAT -> 312931ms
-AVG total time -> 123481ms
-MAX total time -> 312999ms
+AVG creating condition -> 54ms
+MAX creating condition -> 5515ms
+AVG checking property when SAT -> 126701ms
+MAX checking property when SAT -> 211652ms
+AVG checking property when UNSAT-> 21ms
+MAX checking property when UNSAT-> 44ms
+AVG total time -> 82825ms
+MAX total time -> 211734ms
 =====================================
 ===========FILE ./testfile/Performance/sgInternet2.xml 5 Nodes===========
 AVG creating condition -> 20ms
@@ -212,26 +214,6 @@ MAX checking property when SAT -> 24338ms
 AVG total time -> 6919ms
 MAX total time -> 24402ms
 =====================================
-===========FILE ./testfile/Performance/sgGEANT.xml 8 Nodes===========
-AVG creating condition -> 341ms
-MAX creating condition -> 143700ms
-AVG checking property when SAT -> 14944ms
-MAX checking property when SAT -> 117518ms
-AVG checking property when UNSAT-> 14ms
-MAX checking property when UNSAT-> 86ms
-AVG total time -> 15327ms
-MAX total time -> 117879ms
-=====================================
-===========FILE ./testfile/Performance/sgGEANT.xml 6 Nodes===========
-AVG creating condition -> 64ms
-MAX creating condition -> 27088ms
-AVG checking property when SAT -> 8051ms
-MAX checking property when SAT -> 168654ms
-AVG checking property when UNSAT-> 4ms
-MAX checking property when UNSAT-> 44ms
-AVG total time -> 8134ms
-MAX total time -> 168762ms
-=====================================
 ===========FILE ./testfile/Performance/sgGEANT.xml 5 Nodes===========
 AVG creating condition -> 33ms
 MAX creating condition -> 13911ms
@@ -241,6 +223,46 @@ AVG checking property when UNSAT-> 3ms
 MAX checking property when UNSAT-> 20ms
 AVG total time -> 3995ms
 MAX total time -> 22238ms
+=====================================
+===========FILE ./testfile/Performance/sgGEANT_6Nodes.xml ===========
+AVG creating condition -> 64ms
+MAX creating condition -> 27088ms
+AVG checking property when SAT -> 8051ms
+MAX checking property when SAT -> 168654ms
+AVG checking property when UNSAT-> 4ms
+MAX checking property when UNSAT-> 44ms
+AVG total time -> 8134ms
+MAX total time -> 168762ms
+=====================================
+===========FILE ./testfile/Performance/sgGEANT_6Nodes.xml===========
+AVG creating condition -> 80ms
+MAX creating condition -> 33844ms
+AVG checking property when SAT -> 11275ms
+MAX checking property when SAT -> 26296ms
+AVG checking property when UNSAT-> 21ms
+MAX checking property when UNSAT-> 62ms
+AVG total time -> 11398ms
+MAX total time -> 26367ms
+=====================================
+===========FILE ./testfile/Performance/sgGEANT_7Nodes.xml===========
+AVG creating condition -> 97ms
+MAX creating condition -> 41149ms
+AVG checking property when SAT -> 6143ms
+MAX checking property when SAT -> 14669ms
+AVG checking property when UNSAT-> 27ms
+MAX checking property when UNSAT-> 2481ms
+AVG total time -> 6302ms
+MAX total time -> 14795ms
+=====================================
+===========FILE ./testfile/Performance/sgGEANT.xml 8 Nodes===========
+AVG creating condition -> 341ms
+MAX creating condition -> 143700ms
+AVG checking property when SAT -> 14944ms
+MAX checking property when SAT -> 117518ms
+AVG checking property when UNSAT-> 14ms
+MAX checking property when UNSAT-> 86ms
+AVG total time -> 15327ms
+MAX total time -> 117879ms
 =====================================
 ===========FILE ./testfile/Performance/sgGEANTWithConstraints.xml 5 Nodes===========
 AVG creating condition -> 33ms
@@ -392,3 +414,33 @@ MAX total time -> 3685690ms
 =====================================
 
 
+===========FILE ./testfile/Performance/bgGEANT_6Nodes.xml===========
+AVG creating condition -> 518ms
+MAX creating condition -> 50307ms
+AVG checking property when SAT -> 2326667ms
+MAX checking property when SAT -> 387308ms
+AVG checking property when UNSAT-> 43ms
+MAX checking property when UNSAT-> 85ms
+AVG total time -> 209356ms
+MAX total time -> 387491ms
+=====================================
+===========FILE ./testfile/Performance/sgInternet2_6Nodes.xml===========
+AVG creating condition -> 23ms
+MAX creating condition -> 2385ms
+AVG checking property when SAT -> 3359ms
+MAX checking property when SAT -> 4547ms
+AVG checking property when UNSAT-> 12ms
+MAX checking property when UNSAT-> 21ms
+AVG total time -> 1941ms
+MAX total time -> 3061ms
+=====================================
+===========FILE ./testfile/Performance/sgInternet2_7Nodes.xml===========
+AVG creating condition -> 31ms
+MAX creating condition -> 3208ms
+AVG checking property when SAT -> 5932ms
+MAX checking property when SAT -> 14784ms
+AVG checking property when UNSAT-> 15ms
+MAX checking property when UNSAT-> 27ms
+AVG total time -> 2100ms
+MAX total time -> 3459ms
+=====================================
