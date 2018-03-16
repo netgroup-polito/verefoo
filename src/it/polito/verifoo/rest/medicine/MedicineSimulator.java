@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.util.JSONPObject;
 import it.polito.verifoo.rest.common.Link;
 import it.polito.verifoo.rest.common.LinkCreator;
 import it.polito.verifoo.rest.common.PhyResourceModel;
+import it.polito.verifoo.rest.common.ResourceModelException;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Host;
 import it.polito.verifoo.rest.jaxb.Hosts;
@@ -63,8 +64,12 @@ public class MedicineSimulator implements PhyResourceModel {
 	Process executeCommands;
 	
 	
-	
-	public MedicineSimulator(NFV root){
+	/**
+	 * Public constructor for the MeDICINE simulator
+	 * @param root the NFV object recived as output by Verifoo
+	 * @throws MedicineSimulationException
+	 */
+	public MedicineSimulator(NFV root) throws MedicineSimulationException{
 		logger.debug("------------MEDICINE SIMULATION------------");
 		hosts = root.getHosts().getHost();
 		nodes = root.getGraphs().getGraph().stream().flatMap(g -> g.getNode().stream()).collect(Collectors.toList());
@@ -130,17 +135,17 @@ public class MedicineSimulator implements PhyResourceModel {
 				containernet.destroy();
 				//containernet.waitFor();
 			}*/
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+		} catch (InterruptedException | IOException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MedicineSimulationException("Error during the simulation initializing");
 		}
 		logger.debug("-------------------------------------------");
 	}
+	/**
+	 * Starts containernet with the desired topology
+	 */
 	@Override
-	public void setPhysicalTopology() {
+	public void setPhysicalTopology() throws MedicineSimulationException {
 		try {
 			topologyFile = "topology.py";
 			printInFile(topologyFile, phy.getTopologyDescription());
@@ -173,17 +178,18 @@ public class MedicineSimulator implements PhyResourceModel {
 	            }
 	        }
 		} catch (IOException e) {
-			e.printStackTrace();
 			System.out.println("The MeDICINE simulation can be run only on linux machines");
+			throw new MedicineSimulationException("The MeDICINE simulation can be run only on linux machines");
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MedicineSimulationException("Error during containernet initializing");
 		}
 		
 	}
-
+	/**
+	 * Retrives the host's resource model
+	 */
 	@Override
-	public Hosts getPhysicalTopology() {
+	public Hosts getPhysicalTopology() throws MedicineSimulationException {
 		if(!containernet.isAlive()) return null;
 		List<Host> medicineHosts = new ArrayList<>();
 		for(Host host:hosts){
@@ -191,20 +197,11 @@ public class MedicineSimulator implements PhyResourceModel {
 			Response res = client.path("/datacenter/"+host.getName())
 								.request(MediaType.APPLICATION_JSON)
 								.get();
-			if(res.getStatus() != 200) return null;
+			if(res.getStatus() != 200) throw new MedicineSimulationException("Error retrieving information");
 			
 			//System.out.println(res.readEntity(String.class));
 			String body = res.readEntity(String.class);
 			String[] lines = body.split(", \"");
-			Map<String,String> data = new HashMap<String, String>();
-
-			ObjectMapper objectMapperAll = new ObjectMapper();
-			try {
-				data = (HashMap<String, String>)objectMapperAll.readValue(body, HashMap.class);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			//System.out.println("Map is: "+data);
 			for(String line:lines){
             	//System.out.println(line);
@@ -218,8 +215,7 @@ public class MedicineSimulator implements PhyResourceModel {
                 	try {
 						h = (Host) objectMapper.readValue(metadata, Host.class);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new MedicineSimulationException("Error during the Json deserializing");
 					}/*
                 	h.setCores(0);
                 	h.setCpu(0);
@@ -240,13 +236,21 @@ public class MedicineSimulator implements PhyResourceModel {
 		topology.getHost().addAll(medicineHosts);
 		return topology;
 	}
-	
+	/**
+	 * Prints the topology descriptor file as it is given to containernet
+	 */
 	public void printTopology(){
 		System.out.println(phy.getTopologyDescription());
 	}
+	/**
+	 * Prints the custom placement file that will be considered by the dummy Gatekeeper 
+	 */
 	public void printPlacement(){
 		System.out.println(d.getPlacementDescription());
 	}
+	/**
+	 * Prints all the VNF descriptors that will be deployed
+	 */
 	public void printVNFDescriptors(){
 		vnfds.forEach((n,v) ->{
 			System.out.println("-------"+n+"-------");
@@ -254,24 +258,35 @@ public class MedicineSimulator implements PhyResourceModel {
 			System.out.println("-------------------");
 		});
 	}
+	/**
+	 * Prints the service descriptor that tells how the VNF are connected
+	 */
 	public void printServiceDescriptor(){
 		System.out.println(sd.getServiceDescriptor());
 	}
+	/**
+	 * Prints all the useful information regarding the MeDICINE simlation
+	 */
 	public void printAll(){
 		this.printTopology();
 		this.printPlacement();
 		this.printVNFDescriptors();
 		this.printServiceDescriptor();
 	}
-	public void printInFile(String fileName, String content){
+	/**
+	 * Prints a string in a file
+	 * @param fileName
+	 * @param content
+	 * @throws MedicineSimulationException
+	 */
+	public void printInFile(String fileName, String content) throws MedicineSimulationException{
 		try (PrintWriter out = new PrintWriter(fileName)) {
 		    out.println(content);
 		}catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new MedicineSimulationException("Error with file " + fileName);
 		}
 	}
-	private void deployVNF() throws IOException, InterruptedException{
+	private void deployVNF() throws IOException, InterruptedException, MedicineSimulationException{
 		String serviceName = "service";
 		System.out.println("Deploying son-emu project...");
         //System.out.println("Current dir:" +projDir);
@@ -324,7 +339,9 @@ public class MedicineSimulator implements PhyResourceModel {
         logger.debug("Service deployed");
         System.out.println("Service deployed");
 	}
-
+	/**
+	 * Stops containernet
+	 */
 	public void removePhysicalTopology() {
 		if(containernet != null){
 			logger.debug("Simulation stopped");

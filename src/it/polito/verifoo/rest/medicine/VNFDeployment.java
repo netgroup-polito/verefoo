@@ -9,7 +9,10 @@ import it.polito.verifoo.rest.jaxb.NodeRefType;
 public class VNFDeployment {
 	String placement;
 	private List<Host> hosts;
-	
+	/**
+	 * Create the custom placement based on the output of Verifoo
+	 * @param hosts
+	 */
 	public VNFDeployment(List<Host> hosts) {
 		this.hosts = hosts;
 		CreatePlacement();

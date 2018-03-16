@@ -6,16 +6,17 @@ import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 
 public class VNFDescriptor {
 	
-	private Node node;
-	private NodeMetrics nMetrics;
 	private String fileHeader = "descriptor_version: \"vnfd-schema-01\"\n"
 								+"vendor: \"eu.sonata-nfv\"\n";
-	private int inLinks, outLinks, freeInInterface, freeOutInterface;	
+	private int freeInInterface, freeOutInterface;	
+	/**
+	 * Public constructor that creates for a specific node a VNF descriptor
+	 * @param node 
+	 * @param nMetrics Contraints on the node
+	 * @param inLinks Number of incoming links
+	 * @param outLinks Number of outgoing links
+	 */
 	public VNFDescriptor(Node node, NodeMetrics nMetrics, int inLinks, int outLinks) {
-		this.node = node;
-		this.nMetrics = nMetrics;
-		this.inLinks = inLinks;
-		this.outLinks = outLinks;
 		int cores, reqStor, mem;
 		boolean additional = false;
 		if(nMetrics == null){
@@ -106,24 +107,40 @@ public class VNFDescriptor {
 						+ "    type: \"external\"\n";
 		}
 	} 
-    
+    /**
+     * Get the number of incoming interfaces still not connected
+     * @return
+     */
 	public int getFreeInInterface() {
 		return freeInInterface;
 	}
-
+	/**
+     * Get the number of outgoing interfaces still not connected
+     * @return
+     */
 	public int getFreeOutInterface() {
 		return freeOutInterface;
 	}
+	/**
+     * Use up an incoming interface because it has been connected
+     * @return
+     */
 	public int bookInInterface() {
 		freeInInterface--;
 		return freeInInterface;
 	}
-
+	/**
+     * Use up an outgoing interface because it has been connected
+     * @return
+     */
 	public int bookOutInterface() {
 		freeOutInterface--;
 		return freeOutInterface;
 	}
-
+	/**
+	 * Get the VNF descriptor
+	 * @return
+	 */
 	public String getVNFDescriptor(){
 		return fileHeader;
 	}

@@ -37,7 +37,12 @@ public class PhysicalTopology {
 								+"if __name__ == '__main__':\n"
 								+"\tmain()\n";
 	private String fileBody = "";
-			
+	/**
+	 * Public contructor for the physical topology. It creates the python file that represents the topology that
+	 * will be simulated via containernet		
+	 * @param hosts
+	 * @param connections
+	 */
 	public PhysicalTopology(List<Host> hosts, List<Connection> connections) {
 		this.hosts = hosts;
 		this.connections = connections;
@@ -83,7 +88,11 @@ public class PhysicalTopology {
 		}
 		fileBody+="\tsdkg1.start()\n";
 	}
-
+	/**
+	 * Gets the python file that represents the topology that
+	 * will be simulated via containernet
+	 * @return
+	 */
 	public String getTopologyDescription() {
 		return fileHeader+fileBody+fileFooter;
 	}

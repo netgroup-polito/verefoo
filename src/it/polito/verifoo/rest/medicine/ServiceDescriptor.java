@@ -10,8 +10,6 @@ import it.polito.verifoo.rest.jaxb.Node;
 
 public class ServiceDescriptor {
 	
-	private List<Node> nodes;
-	private List<Link> links;
 	private String file = "descriptor_version: \"1.0\"\n"
 						+ "vendor: \"eu.sonata-nfv\"\n"
 						+ "name: \"sonata-service\"\n"
@@ -19,10 +17,15 @@ public class ServiceDescriptor {
 						+ "network_functions:\n";
 	private String networkBuild = "#!/bin/sh\n";
 	private List<String> testCommands = new ArrayList<>();
+	/**
+	 * Public constructor that creates the file that describes the service graph
+	 * @param nodes List of all the nodes in the service graph
+	 * @param links List all the links between the nodes
+	 * @param vnfds Map that contains for each VNF, its descriptor
+	 * @param nExternal Number of clients and server in the service graph
+	 */
 	public ServiceDescriptor(List<Node> nodes, List<Link> links, Map<String, VNFDescriptor> vnfds, long nExternal) {
-		this.nodes = nodes;
-		this.links = links;
-		
+
 		nodes.forEach(n ->{
 			file += "   - vnf_id: \""+n.getName().toLowerCase()+"\"\n"
 				  + "     vnf_vendor: \"eu.sonata-nfv\"\n"
@@ -71,12 +74,24 @@ public class ServiceDescriptor {
 			testCommands.add(l.getSourceNode().toLowerCase()+" ping -c1 "+l.getDestNode().toLowerCase()); 
 		});
 	} 
+	/**
+	 * Get the service descriptor content that will be needed by MeDICINE
+	 * @return
+	 */
 	public String getServiceDescriptor(){
 		return file;
 	}
+	/**
+	 * Gets the commands to connect the nodes
+	 * @return
+	 */
 	public String getNetworkBuild(){
 		return networkBuild;
 	}
+	/**
+	 * Gets the commands that should be used to test if the nodes are connected and reachable
+	 * @return
+	 */
 	public List<String> getTestCommands() {
 		return testCommands;
 	}

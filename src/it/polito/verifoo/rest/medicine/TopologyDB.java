@@ -1,29 +1,51 @@
 package it.polito.verifoo.rest.medicine;
 
 import it.polito.verifoo.rest.common.PhyResourceModel;
-
+import it.polito.verifoo.rest.common.ResourceModelException;
+import it.polito.verifoo.rest.jaxb.Hosts;
+/**
+ * Singleton to store the information about the physical topology. At the moment it handles only one 
+ * topology at a time
+ * @author Antonio
+ *
+ */
 public class TopologyDB {
 	private static TopologyDB db = null;
-	private PhyResourceModel simulation = null;
+	private PhyResourceModel model = null;
 	private TopologyDB() {}
-	// Metodo della classe impiegato per accedere al singleton
+	/**
+	 * Retrieve the topology database needed to interact with this class
+	 * @return
+	 */
     public static synchronized TopologyDB getMedicineDB() {
         if (db == null) {
             db = new TopologyDB();
         }
         return db;
     }
-	public void setSimulation(PhyResourceModel s){
+    /**
+     * Add a new resource model to the database 
+     * @param s
+     */
+	public void setResourceModel(PhyResourceModel m){
 		System.out.println("New simulation created");
-		simulation = s;
+		model = m;
 		return;
 	}
-	
-	public PhyResourceModel getSimulation(){
-		return simulation;
+	/**
+	 * Get the hosts in the topology
+	 * @return
+	 * @throws ResourceModelException 
+	 */
+	public Hosts getResourceModel() throws ResourceModelException{
+		if(model == null) return null;
+		return model.getPhysicalTopology();
 	}
-	
-	public void removeSimulation() {
-		simulation.removePhysicalTopology();
+	/**
+	 * Remove the resource model from the database
+	 * @throws ResourceModelException
+	 */
+	public void removeResourceModel() throws ResourceModelException {
+		model.removePhysicalTopology();
 	}
 }
