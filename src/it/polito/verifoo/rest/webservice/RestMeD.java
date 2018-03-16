@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 import io.swagger.annotations.*;
 import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.PhyResourceModel;
+import it.polito.verifoo.rest.common.ResourceModelException;
 import it.polito.verifoo.rest.jaxb.ApplicationError;
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Hosts;
@@ -45,9 +46,9 @@ public class RestMeD {
 				if(root.getPropertyDefinition().getProperty().stream().filter(p->!p.isIsSat()).count() > 0)
 					throw new BadGraphError("Properties are not satisfied",EType.INVALID_PROPERTY_DEFINITION);
 				try{
-					if(db.getSimulation() == null){
+					if(db.getResourceModel() == null){
 						MedicineSimulator s = new MedicineSimulator(root);
-						db.setSimulation(s);	
+						db.setResourceModel(s);	
 						return Response.ok().build();
 					}
 					return Response.serverError().entity("Simulation already running").build();
@@ -67,9 +68,13 @@ public class RestMeD {
 	    @Produces(MediaType.APPLICATION_XML)
 	    public Response get(){ 
 	    	
-	        PhyResourceModel s = db.getSimulation();
-	        Hosts hosts = s.getPhysicalTopology();
-	        return Response.ok(hosts, MediaType.APPLICATION_XML).build();
+			try {
+				Hosts hosts = db.getResourceModel();
+				return Response.ok(hosts, MediaType.APPLICATION_XML).build();
+			} catch (ResourceModelException e) {
+				return Response.serverError().entity("Error retrieving informations").build();
+			}
+	        
 	    }
 	    @DELETE
 	    @ApiOperation(value = "Stops the MeDICINE simulation", notes = "")	    
@@ -80,7 +85,12 @@ public class RestMeD {
 	    	    		@ApiResponse(code = 500, message = "Something wrong with server", response=ApplicationError.class),
 	    				@ApiResponse(code = 503, message = "Service temporarily unavailable")})
 	    public Response delete(){
-	    	db.removeSimulation();
-	    	return Response.ok().build();
+	    	try {
+				db.removeResourceModel();
+				return Response.ok().build();
+			} catch (ResourceModelException e) {
+				return Response.serverError().entity("Error removing information").build();
+			}
+	    	
 	    }
 }

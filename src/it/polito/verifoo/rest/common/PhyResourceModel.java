@@ -10,8 +10,8 @@ import it.polito.verifoo.rest.jaxb.Hosts;
  */
 public interface PhyResourceModel {
 	
-	public Hosts getPhysicalTopology();
-	public void setPhysicalTopology();
-	public void removePhysicalTopology();
+	public Hosts getPhysicalTopology() throws ResourceModelException;
+	public void setPhysicalTopology() throws ResourceModelException;
+	public void removePhysicalTopology() throws ResourceModelException;
 	
 }
