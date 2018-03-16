@@ -52,7 +52,7 @@ public class Main {
                 while(!exit){
                 	try{
                 		//System.out.println("New execution");
-                		int maxClients = 1, maxServers = 1, maxInternalNodes = 6, maxProperty = 1, maxHosts = 10;
+                		int maxClients = 1, maxServers = 1, maxInternalNodes = 6, maxProperty = 1, maxHosts = 20;
                     	r = new RandomInputGenerator(maxClients, maxServers, maxInternalNodes, maxProperty, maxHosts);
                         NFV root = r.getRandomInput();
                         OutputStream out = new FileOutputStream("./testfile/Random/current.xml");

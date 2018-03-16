@@ -89,10 +89,7 @@ class GraphGen extends Graph {
         if (types == null || types.length == 0)
             return new Node[0];
 
-        int numNodes = random.nextInt(maxNum); // at least 1 node
-        if((numNodes%2)==0)
-            numNodes +=2;
-        else numNodes +=1;
+        int numNodes = random.nextInt(maxNum)+1; // at least 1 node
         int existingnode = nodes.size();
         Vector<Node> nodeSubset = new Vector<Node>();
 
@@ -238,7 +235,7 @@ class GraphGen extends Graph {
             int maxNumLinks = (middleNodes.length%4)+1;
             for (int i=0; i<maxNumLinks; i++) {
                 int j = random.nextInt(maxNumLinks);
-                if (j != m) {
+                if (j < m) {
                     node = new Neighbour(middleNodes[j].getId(), middleNodes[j].getName());
                     neighbourfromnode.put(node.getId(), node);
                 }
@@ -259,7 +256,7 @@ class GraphGen extends Graph {
             int maxNumLinks = (middleNodes.length%4)+1;
             for (int i=0; i<maxNumLinks; i++) {
                 int j = random.nextInt(maxNumLinks);
-                if (j != m) {
+                if (j < m) {
                     node = new Neighbour(middleNodes[j].getId(), middleNodes[j].getName());
                     neighbourfromnode.put(node.getId(), node);
                 }

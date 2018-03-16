@@ -38,6 +38,7 @@ public class RandomTopology {
 		List<Host> middleboxes = getMiddles();
 		int n = 0;
 		for(Host c : getClients()){
+			n = 0;
 			for(Host next : middleboxes){
 				if(random.nextBoolean()){
 					Connection conn = new Connection();
@@ -57,8 +58,9 @@ public class RandomTopology {
 				randomConnections.add(conn);
 			}
 		}
-		n = 0;
+		
 		for(Host s : getServers()){
+			n = 0;
 			for(Host next : middleboxes){
 				if(random.nextBoolean()){
 					Connection conn = new Connection();
@@ -72,12 +74,13 @@ public class RandomTopology {
 			if(n == 0){
 				//at least one connection must be present
 				Connection conn = new Connection();
-				conn.setSourceHost(s.getName());
-				conn.setDestHost(middleboxes.get(random.nextInt(nMiddle)).getName());
+				conn.setSourceHost(middleboxes.get(random.nextInt(nMiddle)).getName());
+				conn.setDestHost(s.getName());
 				conn.setAvgLatency(random.nextInt(1000)+1);
 				randomConnections.add(conn);
 			}
 		}
+		n = 0;
 		for(Host src : middleboxes){
 			for(Host dst : middleboxes){
 				if(src == dst) continue;
@@ -89,6 +92,14 @@ public class RandomTopology {
 					n++;
 					randomConnections.add(conn);
 				}
+			}
+			if(n == 0){
+				//at least one connection must be present
+				Connection conn = new Connection();
+				conn.setSourceHost(src.getName());
+				conn.setDestHost(middleboxes.get(random.nextInt(nMiddle)).getName());
+				conn.setAvgLatency(random.nextInt(1000)+1);
+				randomConnections.add(conn);
 			}
 		}
 		connections.getConnection().addAll(randomConnections);
