@@ -52,7 +52,8 @@ public class Main {
                 while(!exit){
                 	try{
                 		//System.out.println("New execution");
-                    	r = new RandomInputGenerator(2, 2, 10, 1, 20);
+                		int maxClients = 1, maxServers = 1, maxInternalNodes = 6, maxProperty = 1, maxHosts = 10;
+                    	r = new RandomInputGenerator(maxClients, maxServers, maxInternalNodes, maxProperty, maxHosts);
                         NFV root = r.getRandomInput();
                         OutputStream out = new FileOutputStream("./testfile/Random/current.xml");
                      // create a Marshaller and marshal to output
@@ -88,7 +89,7 @@ public class Main {
                         //sim.printAll();
                         //m.marshal( sim.getPhysicalTopology(), System.out );
                         //sim.stopSimulation();*/
-                    } catch (BadGraphError | ArrayIndexOutOfBoundsException | FileNotFoundException e) {
+                    } catch (BadGraphError | FileNotFoundException e) {
             			//logger.error("Graph semantically incorrect");
             			//System.out.println("Graph semantically incorrect");
                     	//logger.error(e);
