@@ -90,7 +90,7 @@ public class TestProxy {
         	long endCheck=System.currentTimeMillis();
             System.out.println(g.getId() + ": checking property -> " + (endCheck-endVP)+"ms" );
         	if(res.result != Status.UNSATISFIABLE)
-        		new Translator(res.model.toString(),root).convert();
+        		new Translator(res.model.toString(),root,g).convert();
         	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
         	long endT=System.currentTimeMillis();
             System.out.println(g.getId() + ": translating model -> " + (endT-endCheck)+"ms" );

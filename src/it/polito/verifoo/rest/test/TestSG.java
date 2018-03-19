@@ -87,7 +87,7 @@ public class TestSG {
         	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
         	IsolationResult res=test.checkNFFGProperty(prop);
         	if(res.result != Status.UNSATISFIABLE)
-        		new Translator(res.model.toString(),root).convert();
+        		new Translator(res.model.toString(),root,g).convert();
         	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
         }
 		return root;

@@ -51,7 +51,7 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
 public class TestPerformance {
 	private long condTime = 0, checkTimeSAT = 0, checkTimeUNSAT = 0, totTime = 0;
 	private long maxCondTime = 0, maxCheckTimeSAT = 0, maxCheckTimeUNSAT = 0, maxTotTime = 0;
-	private int nSAT = 0, nUNSAT = 0, i = 0, err = 0;;
+	private int nSAT = 0, nUNSAT = 0, i = 0, err = 0, nrOfConditions = 0, maxNrOfConditions = 0;
 	NFV root;
 	private List<Host> pastClients = new ArrayList<>(), pastServers = new ArrayList<>();
 	private Logger logger = LogManager.getLogger("mylog");
@@ -94,12 +94,14 @@ public class TestPerformance {
             //System.out.println("Graph " + g.getId() + ": creating condition -> " + ((endVP-beginVP)) + "ms");
         	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
         	IsolationResult res=test.checkNFFGProperty(prop);
+        	nrOfConditions += test.getNrOfConditions();
+        	maxNrOfConditions = maxNrOfConditions<test.getNrOfConditions()? test.getNrOfConditions() : maxNrOfConditions;
         	long endCheck=System.currentTimeMillis();
             //System.out.println("Graph " + g.getId() + ": checking property -> " + ((endCheck-endVP)) + "ms");
         	if(res.result != Status.UNSATISFIABLE){
             	checkTimeSAT += (endCheck-endVP);
             	maxCheckTimeSAT = maxCheckTimeSAT<(endCheck-endVP)? (endCheck-endVP) : maxCheckTimeSAT;
-        		new Translator(res.model.toString(),root).convert();
+        		new Translator(res.model.toString(),root,g).convert();
         	}
         	else{
         		checkTimeUNSAT += (endCheck-endVP);
@@ -201,8 +203,12 @@ public class TestPerformance {
 			//files.add("./testfile/Performance/bgGEANT_5Nodes.xml");
 			//files.add("./testfile/Performance/bgUNIV1_5Nodes.xml");
 			
-			files.add("./testfile/Performance/bgInternet2_6Nodes.xml");
-			files.add("./testfile/Performance/bgGEANT_6Nodes.xml");
+			//files.add("./testfile/Performance/bgInternet2_6Nodes.xml");
+			//files.add("./testfile/Performance/bgGEANT_6Nodes.xml");
+			
+			files.add("./testfile/Performance/bgInternet2_DualChain.xml");
+			files.add("./testfile/Performance/bgGEANT_DualChain.xml");
+			files.add("./testfile/Performance/bgUNIV1_DualChain.xml");
 			
 			//files.add("./testfile/Performance/sgInternet2.xml");
 			//files.add("./testfile/Performance/sgInternet2WithConstraints.xml");
@@ -211,10 +217,10 @@ public class TestPerformance {
 			//files.add("./testfile/Performance/sgUNIV1.xml");
 			//files.add("./testfile/Performance/sgUNIV1WithConstraints.xml");
 
-			files.add("./testfile/Performance/sgInternet2_6Nodes.xml");
-			files.add("./testfile/Performance/sgGEANT_6Nodes.xml");
-			files.add("./testfile/Performance/sgInternet2_7Nodes.xml");
-			files.add("./testfile/Performance/sgGEANT_7Nodes.xml");
+			//files.add("./testfile/Performance/sgInternet2_6Nodes.xml");
+			//files.add("./testfile/Performance/sgGEANT_6Nodes.xml");
+			//files.add("./testfile/Performance/sgInternet2_7Nodes.xml");
+			//files.add("./testfile/Performance/sgGEANT_7Nodes.xml");
 			
 			//files.add("./testfile/Performance/bgAS.xml");
 			//files.add("./testfile/Performance/bgASWithConstraints.xml");
@@ -290,6 +296,8 @@ public class TestPerformance {
 				}while(changeEndpoints(root.getHosts().getHost(), clientName, serverName) != null);
 				
 				System.out.println("Simulations -> " + i + " / Errors -> " + err);
+				logger.debug("Simulations -> " + i + " / Errors -> " + err);
+				System.out.println("AVG Nr of Conditions -> " + (nrOfConditions/(nSAT)) + " / MAX Nr Of Conditions -> " + maxNrOfConditions);
 				logger.debug("Simulations -> " + i + " / Errors -> " + err);
 				System.out.println("AVG creating condition -> " + (condTime/(i-err)) + "ms");
 				System.out.println("MAX creating condition -> " + (maxCondTime) + "ms");

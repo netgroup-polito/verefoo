@@ -30,14 +30,18 @@ public class LinkCreator {
 	public List<Link> getLinks(){
 		List<Node> clients = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).collect(Collectors.toList());
         List<Node> servers = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).collect(Collectors.toList());
-        //if(client.getNeighbour().size() != 1 || server.getNeighbour().size() != 1) throw new BadGraphError("Nodes must have 1 client and 1 server",EType.INVALID_NODE_CHAIN);
         for(Node client:clients){
 			for(Node server:servers){
-				String nextName = client.getNeighbour().stream().filter(n -> !(n.getName().equals(client.getName()))).findFirst().get().getName();
-		        Node next = nodes.stream().filter(n -> n.getName().equals(nextName)).findFirst().get();
-		        //logger.debug("Creating path from client " + client.getName() + " to server "+server.getName());
-				createLink(client, next, client, server, new ArrayList<>(), new ArrayList<>());
-				//logger.debug("New Link from " + client.getName() + " to "+ next.getName() +" towards server "+server.getName());
+				List<String> neighbours = client.getNeighbour().stream()
+												.map(n -> n.getName())
+												.collect(Collectors.toList());
+				//logger.debug("Found neighbours of " + client.getName() + " ("+ neighbours + ")");
+		        for(String neighbour : neighbours){
+		        	Node next = nodes.stream().filter(n -> n.getName().equals(neighbour)).findFirst().get();
+		        	//logger.debug("Creating path from client " + client.getName() + " to "+ next.getName() +" towards server "+server.getName());
+		        	createLink(client, next, client, server, new ArrayList<>(), new ArrayList<>());
+		        	//logger.debug("New Link from " + client.getName() + " to "+ next.getName() +" towards server "+server.getName());
+		        }
 				//links.add(new Link(client.getName(), next.getName()));
 			}
 		}
@@ -75,7 +79,6 @@ public class LinkCreator {
 			return true;
 		}
 		
-		//if(current.getNeighbour().size() > 2) throw new BadGraphError("Nodes must be in a chain",EType.INVALID_NODE_CHAIN);
 		boolean found = false;
 			List<String> neighbours = current.getNeighbour().stream()
 											.filter(n -> !(n.getName().equals(prec.getName())))

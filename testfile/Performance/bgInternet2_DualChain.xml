@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
+  <graphs>
+  <graph id="0">
+     <node functional_type="ENDHOST" name="nodeA">
+        <neighbour name="node1"/>
+        <configuration description="A simple description" name="confA">
+          <endhost body="nodeB"/>
+        </configuration>
+      </node>
+      <node functional_type="FIREWALL" name="node1">
+        <neighbour name="nodeA"/>
+        <neighbour name="node2"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall>
+            <elements>
+              <source>nodeC</source>
+              <destination>nodeD</destination>
+            </elements>
+          </firewall>
+        </configuration>
+      </node>
+      <node functional_type="DPI" name="node2">
+        <neighbour name="node1"/>
+        <neighbour name="node3"/>
+        <configuration description="A simple description" name="conf2">
+          <dpi>
+          	<notAllowed>nodeC</notAllowed>
+          </dpi>
+        </configuration>
+      </node>
+      <node functional_type="CACHE" name="node3">
+        <neighbour name="node2"/>
+        <neighbour name="node4"/>
+        <configuration description="A simple description" name="conf3">
+          <cache>
+          	<resource>nodeA</resource>
+          	<resource>node1</resource>
+          	<resource>node2</resource>
+          </cache>
+        </configuration>
+      </node>
+	  <node functional_type="NAT" name="node4">
+        <neighbour name="node3"/>
+        <neighbour name="nodeB"/>
+        <configuration description="A simple description" name="conf4">
+         <nat>
+          		<source>nodeA</source>
+          </nat>
+        </configuration>
+      </node>
+      <node functional_type="WEBSERVER" name="nodeB">
+        <neighbour name="node4"/>
+        <configuration description="A simple description" name="confB">
+          <webserver>
+          	<name>nodeB</name>
+          </webserver>
+        </configuration>
+      </node>
+    </graph>
+    <graph id="1">
+     <node functional_type="WEBCLIENT" name="nodeA">
+        <neighbour name="node1"/>
+        <configuration description="A simple description" name="confA">
+          <webclient nameWebServer="nodeB"/>
+        </configuration>
+      </node>
+      <node functional_type="FIREWALL" name="node1">
+        <neighbour name="nodeA"/>
+        <neighbour name="node5"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall>
+            <elements>
+              <source>nodeC</source>
+              <destination>nodeD</destination>
+            </elements>
+          </firewall>
+        </configuration>
+      </node>
+      <node functional_type="DPI" name="node5">
+        <neighbour name="node1"/>
+        <neighbour name="node4"/>
+        <configuration description="A simple description" name="conf2">
+          <dpi>
+          	<notAllowed>nodeC</notAllowed>
+          </dpi>
+        </configuration>
+      </node>
+      <node functional_type="CACHE" name="node4">
+        <neighbour name="node5"/>
+        <neighbour name="nodeB"/>
+        <configuration description="A simple description" name="conf3">
+          <cache>
+          	<resource>nodeA</resource>
+          	<resource>node1</resource>
+          	<resource>node2</resource>
+          </cache>
+        </configuration>
+      </node>
+      <node functional_type="WEBSERVER" name="nodeB">
+        <neighbour name="node4"/>
+        <configuration description="A simple description" name="confB">
+          <webserver>
+          	<name>nodeB</name>
+          </webserver>
+        </configuration>
+      </node>
+    </graph>
+  </graphs>
+   <Constraints>
+	  <NodeConstraints/>
+	  <BandwidthConstraints/>
+  </Constraints>
+  <PropertyDefinition>
+  		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 		
+  </PropertyDefinition>
+    <Hosts>
+        <Host name="ATLAM5" cpu="2" cores="2" memory="4" maxVNF="8" fixedEndpoint="nodeA" diskStorage="108" type="CLIENT">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="ATLAng" cpu="4" cores="4" memory="16" maxVNF="8" diskStorage="122" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="CHINng" cpu="4" cores="4" memory="16" maxVNF="8" diskStorage="116" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="DNVRng" cpu="4" cores="4" memory="16" maxVNF="8" diskStorage="125" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="HSTNng" cpu="4" cores="4" memory="16" maxVNF="8" diskStorage="100" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="IPLSng" cpu="4" cores="4" memory="16" maxVNF="8" diskStorage="124" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="KSCYng" cpu="4" cores="4" memory="16" maxVNF="8" diskStorage="141" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="LOSAng" cpu="4" cores="4" memory="16" maxVNF="8" diskStorage="116" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="NYCMng" cpu="4" cores="4" memory="16" maxVNF="8" diskStorage="127" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="SNVAng" cpu="4" cores="4" memory="16" maxVNF="8" diskStorage="120" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="STTLng" cpu="4" cores="4" memory="16" maxVNF="8" diskStorage="130" type="MIDDLEBOX">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+        <Host name="WASHng" cpu="2" cores="2" memory="4" maxVNF="8" fixedEndpoint="nodeB" diskStorage="116" type="SERVER">
+			<SupportedVNF functional_type="FIREWALL"/>
+			<SupportedVNF functional_type="CACHE"/>
+			<SupportedVNF functional_type="ANTISPAM"/>
+			<SupportedVNF functional_type="DPI"/>
+			<SupportedVNF functional_type="NAT"/>
+			<SupportedVNF functional_type="FIELDMODIFIER"/>
+		</Host>
+    </Hosts>
+    <Connections>
+        <Connection sourceHost="ATLAng" destHost="ATLAM5" avgLatency="133"/>
+        <Connection sourceHost="ATLAM5" destHost="ATLAng" avgLatency="133"/>
+        <Connection sourceHost="HSTNng" destHost="ATLAng" avgLatency="1081"/>
+        <Connection sourceHost="ATLAng" destHost="HSTNng" avgLatency="1081"/>
+        <Connection sourceHost="IPLSng" destHost="ATLAng" avgLatency="591"/>
+        <Connection sourceHost="ATLAng" destHost="IPLSng" avgLatency="591"/>
+        <Connection sourceHost="WASHng" destHost="ATLAng" avgLatency="901"/>
+        <Connection sourceHost="ATLAng" destHost="WASHng" avgLatency="901"/>
+        <Connection sourceHost="IPLSng" destHost="CHINng" avgLatency="260"/>
+        <Connection sourceHost="CHINng" destHost="IPLSng" avgLatency="260"/>
+        <Connection sourceHost="NYCMng" destHost="CHINng" avgLatency="1147"/>
+        <Connection sourceHost="CHINng" destHost="NYCMng" avgLatency="1147"/>
+        <Connection sourceHost="KSCYng" destHost="DNVRng" avgLatency="745"/>
+        <Connection sourceHost="DNVRng" destHost="KSCYng" avgLatency="745"/>
+        <Connection sourceHost="SNVAng" destHost="DNVRng" avgLatency="1516"/>
+        <Connection sourceHost="DNVRng" destHost="SNVAng" avgLatency="1516"/>
+        <Connection sourceHost="STTLng" destHost="DNVRng" avgLatency="1573"/>
+        <Connection sourceHost="DNVRng" destHost="STTLng" avgLatency="1573"/>
+        <Connection sourceHost="KSCYng" destHost="HSTNng" avgLatency="1028"/>
+        <Connection sourceHost="HSTNng" destHost="KSCYng" avgLatency="1028"/>
+        <Connection sourceHost="LOSAng" destHost="HSTNng" avgLatency="2196"/>
+        <Connection sourceHost="HSTNng" destHost="LOSAng" avgLatency="2196"/>
+        <Connection sourceHost="KSCYng" destHost="IPLSng" avgLatency="903"/>
+        <Connection sourceHost="IPLSng" destHost="KSCYng" avgLatency="903"/>
+        <Connection sourceHost="SNVAng" destHost="LOSAng" avgLatency="505"/>
+        <Connection sourceHost="LOSAng" destHost="SNVAng" avgLatency="505"/>
+        <Connection sourceHost="WASHng" destHost="NYCMng" avgLatency="336"/>
+        <Connection sourceHost="NYCMng" destHost="WASHng" avgLatency="336"/>
+        <Connection sourceHost="STTLng" destHost="SNVAng" avgLatency="1138"/>
+        <Connection sourceHost="SNVAng" destHost="STTLng" avgLatency="1138"/>
+    </Connections>
+  <ParsingString></ParsingString>
+</NFV>

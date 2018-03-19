@@ -62,10 +62,10 @@ public class RestFoo {
 	            		z3model=z3model.concat(res.model.toString());
 	            	}
                 	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
-	            	            
-	            }
-				if(!z3model.isEmpty()){
-		            new Translator(z3model,root).convert();				}
+
+    				if(!z3model.isEmpty()){
+    		            new Translator(z3model,root,g).convert();				}
+				}
 				if(complete!=true) {
 					root.getHosts().getHost().removeIf((h)->!h.isActive());
 					root.getConnections().getConnection().removeIf((c)->{

@@ -49,21 +49,24 @@ public class Main {
                 u.setSchema(schema);
                 RandomInputGenerator r = null;
                 boolean exit = false;
+                int sat = 0;
                 while(!exit){
                 	try{
-                		//System.out.println("New execution");
-                		int maxClients = 1, maxServers = 1, maxInternalNodes = 6, maxProperty = 1, maxHosts = 20;
+                		Marshaller m = jc.createMarshaller();
+                        m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
+                        m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
+                		/*int maxClients = 1, maxServers = 1, maxInternalNodes = 10, maxProperty = 1, maxHosts = 20;
                     	r = new RandomInputGenerator(maxClients, maxServers, maxInternalNodes, maxProperty, maxHosts);
                         NFV root = r.getRandomInput();
                         OutputStream out = new FileOutputStream("./testfile/Random/current.xml");
                      // create a Marshaller and marshal to output
-                        Marshaller m = jc.createMarshaller();
-                        m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-                        m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                        m.marshal( root, out ); 
-                        // unmarshal a document into a tree of Java content objects
-                       
-                        //NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/ServiceGraphs/sg4nodes5host.xml" ) );/*
+                         m.marshal( root, out ); 
+                        
+                        // unmarshal a document into a tree of Java content objects*/
+                        NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Performance/bgGEANT_DualChain.xml" ) );
+                        
+                        //root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/current.xml" ) );
+                        //NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/bug1.xml" ) );
                         for(Graph g:root.getGraphs().getGraph()){
                         	System.out.println("Creating conditions");
                         	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
@@ -72,8 +75,10 @@ public class Main {
                         	IsolationResult res=test.checkNFFGProperty(prop);
                         	if(res.result != Status.UNSATISFIABLE){
                         		System.out.println("SAT");
-                        		new Translator(res.model.toString(),root).convert();
-                        		exit = true;
+                        		new Translator(res.model.toString(),root, g).convert();
+                        		sat++;
+                        		if(sat > 0)
+                        			exit = true;
                         		// create a Marshaller and marshal to output
                                 m = jc.createMarshaller();
                                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
@@ -82,6 +87,7 @@ public class Main {
                         	}
                         	else{
                         		System.out.println("UNSAT");
+                        		if(r == null) exit = true;
                         	}
                         	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
                         }
@@ -92,7 +98,7 @@ public class Main {
                     } catch (BadGraphError | FileNotFoundException e) {
             			//logger.error("Graph semantically incorrect");
             			//System.out.println("Graph semantically incorrect");
-                    	//logger.error(e);
+                    	logger.error(e);
                     	if(r == null) exit = true;
                     }
                 }
