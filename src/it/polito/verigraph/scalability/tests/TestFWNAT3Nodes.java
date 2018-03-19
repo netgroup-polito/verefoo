@@ -24,14 +24,14 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
-import it.polito.verigraph.mcnet.components.Quattro;
 import it.polito.verigraph.mcnet.components.Tuple;
 import it.polito.verigraph.mcnet.netobjs.PolitoEndHost;
 import it.polito.verigraph.mcnet.netobjs.PolitoNat;
-import it.polito.verigraph.mcnet.netobjs.AclFirewall;
 import it.polito.verigraph.mcnet.netobjs.AclFirewallAuto;
-import it.polito.verigraph.mcnet.netobjs.PolitoCache;
+import it.polito.verigraph.mcnet.netobjs.PacketModel;
 
+
+//| a,c | ---- | FW1 | ---- | NAT | ---- | FW2 | ---- | b |		<p/>
 public class TestFWNAT3Nodes {
 
     public Checker check;
@@ -119,15 +119,18 @@ public class TestFWNAT3Nodes {
         ArrayList<DatatypeExpr> ia = new ArrayList<DatatypeExpr>();
 	    ia.add(nctx.am.get("ip_a"));
 	    ia.add(nctx.am.get("ip_c"));
-	   // ia.add(nctx.am.get("ip_fw1"));
 	    nat.natModel(nctx.am.get("ip_nat"));
 	    nat.setInternalAddress(ia);
 	    
-	    ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
-        fw2.addAcls(acl);
-        
-        ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl2 = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
-        fw1.addAcls(acl2);
+	    PacketModel packet1  = new PacketModel();
+	    PacketModel packet2  = new PacketModel();
+	    //packet1.setProto(100);
+	    //packet2.setProto(101);
+	    a.installEndHost(packet1);
+	    
+	    c.installEndHost(packet2);
+	    b.installEndHost(null);
+	    
         
         check = new Checker(ctx,nctx,net);
 }
@@ -163,7 +166,7 @@ public class TestFWNAT3Nodes {
         model.resetZ3();
         
         //IsolationResult ret =model.check.checkRealIsolationProperty(model.a,model.b);
-        model.check.propertyAdd(model.a, model.b, Prop.ISOLATION);
+        model.check.propertyAdd(model.a, model.b, Prop.REACHABILITY);
         model.check.propertyAdd(model.c, model.b, Prop.ISOLATION);
         IsolationResult ret= model.check.propertyCheck();
         if (ret.result == Status.UNSATISFIABLE){
