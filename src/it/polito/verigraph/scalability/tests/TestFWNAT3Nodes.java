@@ -166,7 +166,7 @@ public class TestFWNAT3Nodes {
         model.resetZ3();
         
         //IsolationResult ret =model.check.checkRealIsolationProperty(model.a,model.b);
-        model.check.propertyAdd(model.a, model.b, Prop.REACHABILITY);
+        model.check.propertyAdd(model.a, model.b, Prop.ISOLATION);
         model.check.propertyAdd(model.c, model.b, Prop.ISOLATION);
         IsolationResult ret= model.check.propertyCheck();
         if (ret.result == Status.UNSATISFIABLE){
