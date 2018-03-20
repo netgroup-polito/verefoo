@@ -91,9 +91,40 @@ public class PolitoIDS extends NetworkObject {
                     null, null, null, null));
         }*/
 
+        
+        constraints.add(
+            	ctx.mkForall(new Expr[]{n_0, p_0}, 
+    	            ctx.mkImplies(
+    	            		ctx.mkAnd( (BoolExpr)nctx.send.apply(politoIDS, n_0, p_0),
+            				  		ctx.mkOr(ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.HTTP_RESPONSE))
+            				  				,ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.HTTP_RESPONSE))
+            				  				 )),
+    	            	
+    	            			ctx.mkAnd(
+    	            						ctx.mkExists(new Expr[]{n_1}, 
+    	            								nctx.recv.apply(n_1, politoIDS, p_0),1,null,null,null,null), 
+    	            						ctx.mkNot((BoolExpr)isInBlacklist.apply(nctx.pf.get("body").apply(p_0))
+    	            								))),1,null,null,null,null));
+
+	  
+  	  //Constraint2 obliges this VNF to send the packets that have been received
+  	  constraints.add(
+	            	ctx.mkForall(new Expr[]{n_0, p_0},
+	            			ctx.mkImplies(	
+	            					ctx.mkAnd( (BoolExpr)nctx.recv.apply(n_0, politoIDS, p_0)
+	            								,ctx.mkNot((BoolExpr)isInBlacklist.apply(nctx.pf.get("body").apply(p_0)))
+	            							),
+	            						ctx.mkAnd(ctx.mkExists(new Expr[]{n_1}, (BoolExpr)nctx.send.apply(new Expr[]{ politoIDS, n_1, p_0}),1,null,null,null,null)
+	            								)
+	            						
+	    	    	            	)
+	            			,1,null,null,null,null));
+        
+        
+  	/* OLD Constraints, they didn't work        
         //Constraint2 send(politoIDS, n_0, p, t_0) && (p.proto(HTTP_RESPONSE) || p.proto(HTTP_REQUEST)) ->
         //(exist  n_1,t_1 : (recv(n_1, politoIDS, p, t_1) && t_1 < t_0)) && !isInBlackList(p.body)
-
+	
         this.constraints.add(ctx.mkForall(new Expr[]{n_0, p_0},
                 ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.send.apply(politoIDS, n_0, p_0)),
                         ctx.mkAnd(ctx.mkExists(new Expr[]{n_1},

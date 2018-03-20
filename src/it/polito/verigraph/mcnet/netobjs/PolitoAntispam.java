@@ -72,11 +72,38 @@ public class PolitoAntispam extends NetworkObject{
          
           isInBlacklist = ctx.mkFuncDecl(politoAntispam+"_isInBlacklist", ctx.mkIntSort(), ctx.mkBoolSort());
           addBlackList(blackList);
+          constraints.add(
+	            	ctx.mkForall(new Expr[]{n_0, p_0}, 
+	    	            ctx.mkImplies(
+	    	            		ctx.mkAnd( (BoolExpr)nctx.send.apply(politoAntispam, n_0, p_0),
+                				  		ctx.mkOr(ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_REQUEST))
+                				  				,ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_RESPONSE))
+                				  				 )),
+	    	            	
+	    	            			ctx.mkAnd(
+	    	            						ctx.mkExists(new Expr[]{n_1}, 
+	    	            								nctx.recv.apply(n_1, politoAntispam, p_0),1,null,null,null,null), 
+	    	            						ctx.mkNot((BoolExpr)isInBlacklist.apply(nctx.pf.get("emailFrom").apply(p_0))
+	    	            								))),1,null,null,null,null));
 
+  	  
+	  	  //Constraint2 obliges this VNF to send the packets that have been received
+	  	  constraints.add(
+		            	ctx.mkForall(new Expr[]{n_0, p_0},
+		            			ctx.mkImplies(	
+		            					ctx.mkAnd( (BoolExpr)nctx.recv.apply(n_0, politoAntispam, p_0)
+		            								,ctx.mkNot((BoolExpr)isInBlacklist.apply(nctx.pf.get("emailFrom").apply(p_0)))
+		            							),
+		            						ctx.mkAnd(ctx.mkExists(new Expr[]{n_1}, (BoolExpr)nctx.send.apply(new Expr[]{ politoAntispam, n_1, p_0}),1,null,null,null,null)
+		            								)
+		            						
+		    	    	            	)
+		            			,1,null,null,null,null));
+  	  /* OLD constraints, they didn't work
           constraints.add(
                   ctx.mkForall(new Expr[]{n_0, p_0}, 
                           ctx.mkImplies(
-                        		  ctx.mkAnd( (BoolExpr)nctx.send.apply(new Expr[]{ politoAntispam, n_0, p_0}),
+                        		  ctx.mkAnd( (BoolExpr)nctx.send.apply(politoAntispam, n_0, p_0),
                         				  		ctx.mkOr(ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_REQUEST))
                         				  				,ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_RESPONSE))
                         				  				 )),
@@ -87,10 +114,7 @@ public class PolitoAntispam extends NetworkObject{
                   ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.send.apply(politoAntispam, n_0, p_0)),
                           ctx.mkAnd(ctx.mkExists(new Expr[]{n_1},
                                   ctx.mkAnd((BoolExpr)nctx.recv.apply(n_1, politoAntispam, p_0)),1,null,null,null,null)
-                                  )),1,null,null,null,null));
-      
-         
-          
+                                  )),1,null,null,null,null));*/          
     }
 
     public void addBlackList(int[] list){
@@ -106,7 +130,6 @@ public class PolitoAntispam extends NetworkObject{
         for(int y=0;y<blacklist.length;y++){
             blacklist_map[y] = ctx.mkOr(ctx.mkEq(a_0,ctx.mkInt(blacklist[y])));
         }
-
         solver.Add(ctx.mkForall(new Expr[]{a_0},
                 ctx.mkEq( 
                         isInBlacklist.apply(a_0),
