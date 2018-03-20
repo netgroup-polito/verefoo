@@ -41,14 +41,11 @@ public class TestFWNAT3Nodes {
     public PolitoNat nat;
     
     public  BoolExpr y1;
-    public  BoolExpr y2;
    	
    	
    	public  BoolExpr x11;
    	public  BoolExpr x21;
    	public  BoolExpr x31;
-   	public  BoolExpr x41;
-   	public  BoolExpr x51;
 
     public  TestFWNAT3Nodes(){
         ctx = new Context();
@@ -87,32 +84,30 @@ public class TestFWNAT3Nodes {
 
         
         ArrayList<RoutingTable> rta = new ArrayList<RoutingTable>();
-        rta.add(new RoutingTable(nctx.am.get("ip_b"), fw1,10,y1));
-        rta.add(new RoutingTable(nctx.am.get("ip_b"), nat,10,ctx.mkNot(y1)));
-        net.routingTable2(a, rta);
+        rta.add(new RoutingTable(nctx.am.get("ip_b"), fw1,10,x11));
+        //rta.add(new RoutingTable(nctx.am.get("ip_b"), nat,10,ctx.mkAnd(x21,ctx.mkNot(x11))));
+        net.routingOptimization(a, rta);
         
         ArrayList<RoutingTable> rtfw1 = new ArrayList<RoutingTable>();
-        rtfw1.add(new RoutingTable(nctx.am.get("ip_b"), nat,10,y1));
-        rtfw1.add(new RoutingTable(nctx.am.get("ip_b"), fw1,10,ctx.mkNot(y1)));
-        net.routingTable2(fw1, rtfw1);
+        rtfw1.add(new RoutingTable(nctx.am.get("ip_b"), nat,0,ctx.mkAnd(x11,x21)));
+        net.routingOptimization(fw1, rtfw1);
 
         ArrayList<RoutingTable> rtnat = new ArrayList<RoutingTable>();
-        rtnat.add(new RoutingTable(nctx.am.get("ip_b"), fw2,10,y2));
-        rtnat.add(new RoutingTable(nctx.am.get("ip_b"), b,10,ctx.mkNot(y2)));
-        net.routingTable2(nat, rtnat);
+        rtnat.add(new RoutingTable(nctx.am.get("ip_b"), fw2,0,ctx.mkAnd(x31,x21)));
+        //rtnat.add(new RoutingTable(nctx.am.get("ip_b"), b,10,ctx.mkAnd(x21,ctx.mkNot(x31))));
+        net.routingOptimization(nat, rtnat);
         
         ArrayList<RoutingTable> rtfw2 = new ArrayList<RoutingTable>();
-        rtfw2.add(new RoutingTable(nctx.am.get("ip_b"), b,10,y2));
-        rtfw2.add(new RoutingTable(nctx.am.get("ip_b"), fw2,10,ctx.mkNot(y2)));
-        net.routingTable2(fw2, rtfw2);       
+        rtfw2.add(new RoutingTable(nctx.am.get("ip_b"), b,10,ctx.mkAnd(x31,x21)));
+        net.routingOptimization(fw2, rtfw2);       
         
         ArrayList<RoutingTable> rtc = new ArrayList<RoutingTable>();
-        rtc.add(new RoutingTable(nctx.am.get("ip_b"), fw1,10,y1));
-        rtc.add(new RoutingTable(nctx.am.get("ip_b"), nat,10,ctx.mkNot(y1))); 
-        net.routingTable2(c, rtc); 
+        rtc.add(new RoutingTable(nctx.am.get("ip_b"), fw1,10,x11));
+        //rtc.add(new RoutingTable(nctx.am.get("ip_b"), nat,10,ctx.mkAnd(x21,ctx.mkNot(x11)))); 
+        net.routingOptimization(c, rtc); 
         
         ArrayList<RoutingTable> rtb = new ArrayList<RoutingTable>();
-        net.routingTable2(b, rtb); 
+        net.routingOptimization(b, rtb); 
         
         net.attach(a, b,c, nat,fw2,fw1);
         
@@ -124,10 +119,7 @@ public class TestFWNAT3Nodes {
 	    
 	    PacketModel packet1  = new PacketModel();
 	    PacketModel packet2  = new PacketModel();
-	    //packet1.setProto(100);
-	    //packet2.setProto(101);
 	    a.installEndHost(packet1);
-	    
 	    c.installEndHost(packet2);
 	    b.installEndHost(null);
 	    
@@ -178,17 +170,13 @@ public class TestFWNAT3Nodes {
     }
     private void setConditions(Context ctx, NetContext nctx) {
 	  	y1 = ctx.mkBoolConst("y1");
-	  	y2 = ctx.mkBoolConst("y2");
 		
 		nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y1), "servers"));
-		nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkNot(y2), "servers"));
 		
 	  
     	int capacity_x1 = 10;
     	int capacity_x2 = 10;
     	int capacity_x3 = 10;
-    	int capacity_x4 = 10;
-    	int capacity_x5 = 10;
     	
     	int capacity_y1 = 1000;
     
@@ -196,26 +184,22 @@ public class TestFWNAT3Nodes {
 		x11 = ctx.mkBoolConst("x11");
 		x21 = ctx.mkBoolConst("x21");
 		x31 = ctx.mkBoolConst("x31");
-		x41 = ctx.mkBoolConst("x41");
-		x51 = ctx.mkBoolConst("x51");
 
 		y1 = ctx.mkBoolConst("y1");
 
-		nctx.constraints.add(ctx.mkEq(nctx.bool_to_int(x11), ctx.mkInt(1)));
+		//nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq(nctx.bool_to_int(x11), ctx.mkInt(1)), "servers1"));
+		//nctx.constraints.add(ctx.mkEq(nctx.bool_to_int(x11), ctx.mkInt(0)));
 		nctx.constraints.add(ctx.mkEq(nctx.bool_to_int(x21), ctx.mkInt(1)));
-		nctx.constraints.add(ctx.mkEq(nctx.bool_to_int(x31), ctx.mkInt(1)));
-		nctx.constraints.add(ctx.mkEq(nctx.bool_to_int(x41), ctx.mkInt(1)));
-		nctx.constraints.add(ctx.mkEq(nctx.bool_to_int(x51), ctx.mkInt(1)));
+		//nctx.constraints.add(ctx.mkEq(nctx.bool_to_int(x31), ctx.mkInt(0)));
+		//nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq(nctx.bool_to_int(x31), ctx.mkInt(1)), "servers1"));
 		
-		nctx.constraints.add(ctx.mkOr(ctx.mkImplies(y1, x11),ctx.mkImplies(y1, x21),ctx.mkImplies(y1, x31),ctx.mkImplies(y1, x41),ctx.mkImplies(y1, x51)));
+		nctx.constraints.add(ctx.mkOr(ctx.mkImplies(y1, x11),ctx.mkImplies(y1, x21),ctx.mkImplies(y1, x31)));
 		
 	
 		ArithExpr leftSide = 
 			ctx.mkAdd(ctx.mkMul(ctx.mkInt(capacity_x1), nctx.bool_to_int(x11)),
 					ctx.mkMul(ctx.mkInt(capacity_x2), nctx.bool_to_int(x21)),
-					ctx.mkMul(ctx.mkInt(capacity_x3), nctx.bool_to_int(x31)),
-					ctx.mkMul(ctx.mkInt(capacity_x4), nctx.bool_to_int(x41)),
-					ctx.mkMul(ctx.mkInt(capacity_x5), nctx.bool_to_int(x51))
+					ctx.mkMul(ctx.mkInt(capacity_x3), nctx.bool_to_int(x31))
 					);
 		nctx.constraints.add(ctx.mkLe(leftSide, ctx.mkMul(ctx.mkInt(capacity_y1), nctx.bool_to_int(y1))));
 	}

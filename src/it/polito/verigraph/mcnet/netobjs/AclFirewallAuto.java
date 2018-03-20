@@ -83,6 +83,8 @@ public class AclFirewallAuto extends NetworkObject {
 		aclConstraints(solver);
 	}
 
+	///minimize number of rules
+	// cost of the fw1 100$    fw2 50$
 	private void firewallSendRules() {
 		Expr p_0 = ctx.mkConst(fw + "_firewall_send_p_0", nctx.packet);
 		Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
@@ -119,6 +121,8 @@ public class AclFirewallAuto extends NetworkObject {
 		Expr srcp_5 = ctx.mkConst(fw + "_srcp_5", ctx.mkIntSort());
 		Expr dstp_5 = ctx.mkConst(fw + "_dstp_5", ctx.mkIntSort());
 		
+		//5 rule table max
+		
 		
 		
 		
@@ -133,6 +137,8 @@ public class AclFirewallAuto extends NetworkObject {
 		nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( dst_3, this.nctx.am.get("null")),"fw"));
 		nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( dst_4, this.nctx.am.get("null")),"fw"));
 		nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( dst_5, this.nctx.am.get("null")),"fw"));
+		
+		
 		
 		nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto_1, ctx.mkInt(0)),"fw"));
 		nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto_2, ctx.mkInt(0)),"fw"));
