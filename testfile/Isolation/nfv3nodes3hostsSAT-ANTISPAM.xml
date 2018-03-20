@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvSchema.xsd">
   <graphs>
     <graph id="0">
-     <node functional_type="WEBCLIENT" name="nodeA">
+     <node functional_type="ENDHOST" name="nodeAs">
         <neighbour name="node1"/>
         <configuration description="A simple description" name="confA">
-          <webclient nameWebServer="nodeB"/>
+          <endhost email_from="3" protocol = "POP3_REQUEST"/>
         </configuration>
       </node>
       <node functional_type="FIREWALL" name="node1">
-        <neighbour name="nodeA"/>
+        <neighbour name="nodeAs"/>
         <neighbour name="node2"/>
         <configuration description="A simple description" name="conf1">
           <firewall>
@@ -20,26 +20,28 @@
           </firewall>
         </configuration>
       </node>
-      <node functional_type="NAT" name="node2">
+      <node functional_type="ANTISPAM" name="node2">
         <neighbour name="node1"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf2">
-          <nat>
-          	<source>nodeC</source>
-          </nat>
+          <antispam>
+          	<source>1</source>
+          	<source>2</source>
+          	<source>3</source>
+          </antispam>
         </configuration>
       </node>
-      <node functional_type="WEBSERVER" name="nodeB">
+      <node functional_type="MAILSERVER" name="nodeB">
         <neighbour name="node2"/>
         <configuration description="A simple description" name="confB">
-          <webserver>
+          <mailserver>
           	<name>nodeB</name>
-          </webserver>
+          </mailserver>
         </configuration>
       </node>
     </graph>
   </graphs>
-  <Constraints>
+   <Constraints>
 	  <NodeConstraints>
 			<NodeMetrics node="node1" reqStorage="10"/>
 			<NodeMetrics node="node2" reqStorage="10"/>
@@ -47,29 +49,26 @@
 	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 		
+  		<Property graph="0" name="IsolationProperty" src="nodeAs" dst="nodeB"/> 		
   </PropertyDefinition>
- <Hosts>
-  	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
-  	<Host name="host1" cpu="1" cores="4" memory="4" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
+   <Hosts>
+  	<Host name="hostA" cpu="2" cores="2" memory="16" diskStorage="10" type="CLIENT" fixedEndpoint="nodeAs"/>
+  	<Host name="host1" cpu="1" cores="4" memory="16" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
-		<SupportedVNF functional_type="FIELDMODIFIER"/>
-		<SupportedVNF functional_type="NAT"/>
+		<SupportedVNF functional_type="ANTISPAM"/>
 	</Host>
-  	<Host name="host2" cpu="3" cores="8" memory="4" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
+  	<Host name="host2" cpu="3" cores="8" memory="16" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
-		<SupportedVNF functional_type="FIELDMODIFIER"/>
-		<SupportedVNF functional_type="NAT"/>
+		<SupportedVNF functional_type="ANTISPAM"/>
 	</Host>
-  	<Host name="host3" cpu="4" cores="4" memory="4" diskStorage="20" maxVNF="4" type="MIDDLEBOX">
+  	<Host name="host3" cpu="4" cores="4" memory="16" diskStorage="20" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
-		<SupportedVNF functional_type="FIELDMODIFIER"/>
-		<SupportedVNF functional_type="NAT"/>
+		<SupportedVNF functional_type="ANTISPAM"/>
 	</Host>
-  	<Host name="hostB" cpu="2" cores="2" memory="4" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
+  	<Host name="hostB" cpu="2" cores="2" memory="16" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
   </Hosts>
   <Connections>
   	<Connection sourceHost="hostA" destHost="host1" avgLatency ="1"/>

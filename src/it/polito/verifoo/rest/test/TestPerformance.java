@@ -87,13 +87,13 @@ public class TestPerformance {
 		
         for(Graph g:root.getGraphs().getGraph()){
         	long beginVP=System.currentTimeMillis();
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
+        	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
+        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints(), prop);
         	long endVP=System.currentTimeMillis();
         	condTime += (endVP-beginVP);
         	maxCondTime = maxCondTime<(endVP-beginVP)? (endVP-beginVP) : condTime;
             //System.out.println("Graph " + g.getId() + ": creating condition -> " + ((endVP-beginVP)) + "ms");
-        	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
-        	IsolationResult res=test.checkNFFGProperty(prop);
+        	IsolationResult res=test.checkNFFGProperty();
         	nrOfConditions += test.getNrOfConditions();
         	maxNrOfConditions = maxNrOfConditions<test.getNrOfConditions()? test.getNrOfConditions() : maxNrOfConditions;
         	long endCheck=System.currentTimeMillis();

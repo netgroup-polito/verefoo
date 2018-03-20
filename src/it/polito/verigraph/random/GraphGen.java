@@ -232,10 +232,10 @@ class GraphGen extends Graph {
             neighbourfromnode.put(node.getId(), node);
 
             // create the other possible links for this client
-            int maxNumLinks = (middleNodes.length%4)+1;
+            int maxNumLinks = random.nextInt(middleNodes.length);
             for (int i=0; i<maxNumLinks; i++) {
-                int j = random.nextInt(maxNumLinks);
-                if (j < m) {
+                int j = random.nextInt(middleNodes.length);
+                if (j != m) {
                     node = new Neighbour(middleNodes[j].getId(), middleNodes[j].getName());
                     neighbourfromnode.put(node.getId(), node);
                 }
@@ -253,10 +253,10 @@ class GraphGen extends Graph {
             neighbourfromnode.put(middleNodes[m].getId(), node);
 
             // create the other possible links for this server
-            int maxNumLinks = (middleNodes.length%4)+1;
+            int maxNumLinks = random.nextInt(middleNodes.length);
             for (int i=0; i<maxNumLinks; i++) {
-                int j = random.nextInt(maxNumLinks);
-                if (j < m) {
+                int j = random.nextInt(middleNodes.length);
+                if (j != m) {
                     node = new Neighbour(middleNodes[j].getId(), middleNodes[j].getName());
                     neighbourfromnode.put(node.getId(), node);
                 }
@@ -267,8 +267,8 @@ class GraphGen extends Graph {
         // create possible links for middleboxes
         for (int i=0; i<middleNodes.length; i++) {
             neighbourfromnode= new HashMap<Long,Neighbour>();
-            for (int j=0; j<middleNodes.length/4; j++) {
-                if (i != j){
+            for (int j=0; j<middleNodes.length/4+1; j++) {
+                if (i != j && random.nextBoolean()){
                     node = new Neighbour(middleNodes[j].getId(), middleNodes[j].getName());
                     neighbourfromnode.put(middleNodes[j].getId(), node);
                 }

@@ -138,14 +138,14 @@
     <xsd:element name="firewall">
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:element ref="elements" maxOccurs="unbounded" />
+                <xsd:element ref="elements" minOccurs="0" maxOccurs="unbounded" />
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="elements">
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:element name="source" type="xsd:string" />
+                <xsd:element name="source" type="xsd:string"/>
                 <xsd:element name="destination" type="xsd:string" />
             </xsd:sequence>
         </xsd:complexType>

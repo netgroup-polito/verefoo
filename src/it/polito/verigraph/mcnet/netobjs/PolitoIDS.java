@@ -91,7 +91,7 @@ public class PolitoIDS extends NetworkObject {
                     null, null, null, null));
         }*/
 
-        
+        /*
         constraints.add(
             	ctx.mkForall(new Expr[]{n_0, p_0}, 
     	            ctx.mkImplies(
@@ -121,7 +121,7 @@ public class PolitoIDS extends NetworkObject {
 	            			,1,null,null,null,null));
         
         
-  	/* OLD Constraints, they didn't work        
+  	/* OLD Constraints, they didn't work     */   
         //Constraint2 send(politoIDS, n_0, p, t_0) && (p.proto(HTTP_RESPONSE) || p.proto(HTTP_REQUEST)) ->
         //(exist  n_1,t_1 : (recv(n_1, politoIDS, p, t_1) && t_1 < t_0)) && !isInBlackList(p.body)
 	

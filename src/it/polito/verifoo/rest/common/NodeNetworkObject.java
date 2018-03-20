@@ -15,6 +15,7 @@ import com.microsoft.z3.DatatypeExpr;
 
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
+import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
@@ -33,6 +34,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	private Context ctx;
     private NetContext nctx;
     private Network net;
+	private int nRules;
 	/**
      * This class is an helper to generate network object
      * @param ctx Z3 Context
@@ -40,11 +42,12 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
      * @param net Network
      * @param nodes List of nodes from that we will generate NetworkObject
      */
-    public NodeNetworkObject(Context ctx, NetContext nctx, Network net, List<it.polito.verifoo.rest.jaxb.Node> nodes) {
+    public NodeNetworkObject(Context ctx, NetContext nctx, Network net, List<it.polito.verifoo.rest.jaxb.Node> nodes, int nRules) {
 		super();
 		this.ctx = ctx;
 		this.nctx = nctx;
 		this.net = net;
+		this.nRules = nRules;
 		nodes.forEach(this::generateNetObj);
 	}
 
@@ -55,47 +58,39 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 		this.forEach((n,netobjs)->net.attach(netobjs));
 	}
 	/**
-	 * Generates Acl for firewall network objects by processing the configuration
-	 * Please note that invalid configuration will result in a discarded firewall acl (we don't trown an exeption)
+	 * Generates Acl by processing the firewall configuration
+	 * Please note that invalid configuration will result in a discarded firewall acl (we don't throw an exeption)
+	 * @param fw 
 	 */
-	public void generateAcl(){
-		this.forEach(
-				(n,netobjs)->{
-					if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
-						n.getConfiguration().getFirewall().getElements().forEach((e)->{
-							ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
-								if(nctx.am.get(e.getSource())!=null&&nctx.am.get(e.getDestination())!=null){
-								    Tuple<DatatypeExpr,DatatypeExpr> rule=new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(e.getSource()),nctx.am.get(e.getDestination()));
-								    acl.add(rule);
-								    logger.debug("Adding blocking rule " + acl);
-								    ((AclFirewall)netobjs).addAcls(acl);
-								    logger.debug("Added acl:"+ rule.toString() +" to "+n.getName());
-								}
-						});
-						
+	public void generateAcl(Node n, AclFirewall fw){
+		if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
+			n.getConfiguration().getFirewall().getElements().forEach((e)->{
+				ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+					if(nctx.am.get(e.getSource())!=null&&nctx.am.get(e.getDestination())!=null){
+					    Tuple<DatatypeExpr,DatatypeExpr> rule=new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(e.getSource()),nctx.am.get(e.getDestination()));
+					    acl.add(rule);
+					    logger.debug("Adding blocking rule " + acl);
 					}
-				}
-		);
+				    fw.addAcls(acl);
+				    //logger.debug("Added acl:"+ rule.toString() +" to "+n.getName());
+				});
+		}
+		
 	}
 	/**
-	 * Generates Cache internal node for cache network objects from cache resources configuration
+	 * Generates Cache internal node from cache resources configuration
 	 */
-	public void generateCache(){
-		this.forEach(
-				(n,netobjs)->{
-					if(n.getFunctionalType().equals(FunctionalTypes.CACHE)){
-						PolitoCache c=(PolitoCache) netobjs;
-						List<String> resource = n.getConfiguration().getCache().getResource();
-						NetworkObject[] internalNodes = {};
-						internalNodes=this.entrySet().stream().filter(obj->resource.contains(obj.getKey().getName())).map(obj->obj.getValue()).collect(Collectors.toList()).toArray(internalNodes);
-						for(NetworkObject no:internalNodes)
-							logger.debug("Install cache with resources "+no.toString());
-						if(internalNodes.length > 0)
-							c.installCache(internalNodes);			
-						
-					}
-				}
-		);
+	public void generateCache(Node n, PolitoCache c){
+		if(n.getFunctionalType().equals(FunctionalTypes.CACHE)){
+			List<String> resource = n.getConfiguration().getCache().getResource();
+			NetworkObject[] internalNodes = {};
+			internalNodes=this.entrySet().stream().filter(obj->resource.contains(obj.getKey().getName())).map(obj->obj.getValue()).collect(Collectors.toList()).toArray(internalNodes);
+			/*for(NetworkObject no:internalNodes)
+				logger.debug("Install cache with resources "+no.toString());*/
+			if(internalNodes.length > 0)
+				c.installCache(internalNodes);			
+				
+			}
 	}
 	
 	/**
@@ -140,15 +135,23 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	 */
 	public void generateNetObj(Node n){
 			FunctionalTypes ftype;
-			//synchronized(n.getFunctionalType()){
-				ftype=n.getFunctionalType();
-			//}
+			ftype=n.getFunctionalType();
 			switch (ftype) {
 				case FIREWALL:{
 					if(n.getConfiguration().getFirewall()==null){
 						throw new BadGraphError("You have specified a FIREWALL Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					this.put(n,new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
+					AclFirewall fw;
+					if(n.getConfiguration().getFirewall().getElements().isEmpty()){
+						//AclFirewallAuto fw = new AclFirewallAuto(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
+						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
+						this.put(n, fw);
+					}
+					else{
+						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+						generateAcl(n, fw);
+					}
+					this.put(n, fw);
 					break;
 				}
 				case FIELDMODIFIER:{	
@@ -184,7 +187,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(n.getConfiguration().getCache()==null){
 						throw new BadGraphError("You have specified a CACHE Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					this.put(n,new PolitoCache(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx}));
+					PolitoCache c = new PolitoCache(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					this.put(n, c);
+					generateCache(n, c);
 					break;
 				}
 				case DPI:{

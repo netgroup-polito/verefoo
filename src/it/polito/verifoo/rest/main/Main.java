@@ -63,19 +63,13 @@ public class Main {
                          m.marshal( root, out ); 
                         
                         // unmarshal a document into a tree of Java content objects*/
-                        NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Performance/bgGEANT_DualChain.xml" ) );
+                        NFV root = (NFV) u.unmarshal( new FileInputStream(  "./testfile/nfv3nodes3hostsSAT-NAT.xml" ) );
                         
                         //root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/current.xml" ) );
                         //NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/bug1.xml" ) );
-                        for(Graph g:root.getGraphs().getGraph()){
-                        	System.out.println("Creating conditions");
-                        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
-                        	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
-                        	System.out.println("Checking Property");
-                        	IsolationResult res=test.checkNFFGProperty(prop);
-                        	if(res.result != Status.UNSATISFIABLE){
+                        VerifooSerializer test = new VerifooSerializer(root);
+                        if(test.isSat()){
                         		System.out.println("SAT");
-                        		new Translator(res.model.toString(),root, g).convert();
                         		sat++;
                         		if(sat > 0)
                         			exit = true;
@@ -84,13 +78,11 @@ public class Main {
                                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                                 m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
                                 m.marshal( root, System.out ); 
-                        	}
-                        	else{
-                        		System.out.println("UNSAT");
-                        		if(r == null) exit = true;
-                        	}
-                        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
-                        }
+                    	}
+                    	else{
+                    		System.out.println("UNSAT");
+                    		if(r == null) exit = true;
+                    	}
                         //MedicineSimulator sim = new MedicineSimulator(root);
                         //sim.printAll();
                         //m.marshal( sim.getPhysicalTopology(), System.out );

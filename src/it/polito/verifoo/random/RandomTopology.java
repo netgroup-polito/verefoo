@@ -7,9 +7,11 @@ import java.util.stream.Collectors;
 
 import it.polito.verifoo.rest.jaxb.Connection;
 import it.polito.verifoo.rest.jaxb.Connections;
+import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Host;
 import it.polito.verifoo.rest.jaxb.Hosts;
 import it.polito.verifoo.rest.jaxb.Node;
+import it.polito.verifoo.rest.jaxb.SupportedVNFType;
 import it.polito.verifoo.rest.jaxb.TypeOfHost;
 
 public class RandomTopology {
@@ -135,6 +137,15 @@ public class RandomTopology {
 			Host h = randomHost();
 			h.setType(TypeOfHost.MIDDLEBOX);
 			h.setName("host"+i);
+			List<SupportedVNFType> vnfs = new ArrayList<>();
+			for(FunctionalTypes vnf : FunctionalTypes.values()){
+				if(random.nextBoolean()){
+					SupportedVNFType s = new SupportedVNFType();
+					s.setFunctionalType(vnf);
+					vnfs.add(s);
+				}
+			}
+			h.getSupportedVNF().addAll(vnfs);
 			i++;
 			randomHosts.add(h);
 		}

@@ -20,6 +20,7 @@ import io.swagger.annotations.*;
 import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
+import it.polito.verifoo.rest.common.VerifooSerializer;
 import it.polito.verifoo.rest.jaxb.ApplicationError;
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Graph;
@@ -49,23 +50,7 @@ public class RestFoo {
 		@Produces(MediaType.APPLICATION_XML)
 	    public NFV put(@Context HttpServletRequest req,@ApiParam(value = "Complete or Tiny Response")@DefaultValue("true")@QueryParam("complete") Boolean complete,@ApiParam(value = "Network Schema", required = true) NFV root) throws MalformedURLException {
 				String z3model = new String();
-				for(Graph g:root.getGraphs().getGraph()){
-					try {
-						root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).findFirst().get();
-					} catch (NoSuchElementException e) {
-						throw new BadGraphError("No property defined for the Graph "+g.getId(),EType.INVALID_PROPERTY_DEFINITION);
-					}
-	            	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints());
-	            	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
-                	IsolationResult res=test.checkNFFGProperty(prop);
-                	if(res.result != Status.UNSATISFIABLE){
-	            		z3model=z3model.concat(res.model.toString());
-	            	}
-                	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
-
-    				if(!z3model.isEmpty()){
-    		            new Translator(z3model,root,g).convert();				}
-				}
+				VerifooSerializer test = new VerifooSerializer(root);
 				if(complete!=true) {
 					root.getHosts().getHost().removeIf((h)->!h.isActive());
 					root.getConnections().getConnection().removeIf((c)->{

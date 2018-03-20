@@ -39,6 +39,7 @@ public class AclFirewall extends NetworkObject{
 	NetContext nctx;
 	FuncDecl acl_func;
 	FuncDecl acl_func22;
+	private boolean autoconf;
 	
 	
 	public AclFirewall(Context ctx, Object[]... args) {
@@ -56,9 +57,17 @@ public class AclFirewall extends NetworkObject{
 	    net = (Network)args[0][1];
 	    nctx = (NetContext)args[0][2];
 	    net.saneSend(this);
-		firewallSendRules();
+	    if(args[0].length > 3 && ((Integer) args[0][3]) != 0){
+			autoconf = true; 
+			firewallSendRules((Integer) args[0][3]);
+	    }
+		else{
+			autoconf = false;
+			firewallSendRules();
+		}
 	}
 	
+
 	/**
 	 * Wrap add acls	
 	 * @param policy
@@ -68,7 +77,8 @@ public class AclFirewall extends NetworkObject{
 	}
 	
 	public void addAcls(ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acls){
-		this.acls.addAll(acls);
+		if(!autoconf) // not an autoconfiguration firewall
+			this.acls.addAll(acls);
 	}
 	
 	@Override
@@ -122,6 +132,55 @@ public class AclFirewall extends NetworkObject{
     	  
     }
 
+    
+    // for an autoconfiguration firewall
+ 	private void firewallSendRules(Integer nRules) {
+ 		Expr p_0 = ctx.mkConst(fw + "_firewall_send_p_0", nctx.packet);
+ 		Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
+ 		Expr n_1 = ctx.mkConst(fw + "_firewall_send_n_1", nctx.node);
+ 		List<BoolExpr> rules = new ArrayList<>();
+ 		for(int i = 0; i < nRules; i++){
+ 			Expr src = ctx.mkConst(fw + "_auto_src_"+i, nctx.address);
+ 			Expr dst = ctx.mkConst(fw + "_auto_dst_"+i, nctx.address);
+ 			Expr proto = ctx.mkConst(fw + "_auto_proto_"+i, ctx.mkIntSort());
+ 			Expr srcp = ctx.mkConst(fw + "_auto_srcp_"+i, ctx.mkIntSort());
+ 			Expr dstp = ctx.mkConst(fw + "_auto_dstp_"+i, ctx.mkIntSort());
+ 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( src, this.nctx.am.get("null")),"fw"));
+ 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( dst, this.nctx.am.get("null")),"fw"));
+ 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw"));
+ 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( srcp, ctx.mkInt(0)),"fw"));
+ 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( dstp, ctx.mkInt(0)),"fw"));
+ 			rules.add(ctx.mkAnd(
+ 					ctx.mkEq(nctx.pf.get("src").apply(p_0), src),
+ 					ctx.mkEq(nctx.pf.get("dest").apply(p_0), dst)
+ 					,ctx.mkEq(nctx.pf.get("proto").apply(p_0), proto)
+ 					,ctx.mkEq((IntExpr)nctx.src_port.apply(p_0), srcp),
+ 					ctx.mkEq((IntExpr)nctx.dest_port.apply(p_0), dstp)
+ 					));
+ 		}
+ 		
+ 		acl_func = ctx.mkFuncDecl(fw + "_acl_func", new Sort[] { nctx.address, nctx.address }, ctx.mkBoolSort());
+ 		BoolExpr[] tmp = new BoolExpr[rules.size()];
+ 		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 }, ctx.mkImplies(
+ 				(BoolExpr) nctx.send.apply(new Expr[] { fw, n_0, p_0 }),
+ 				ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, nctx.recv.apply(n_1, fw, p_0), 1, null, null, null, null),
+ 						  ctx.mkNot(
+ 								  ctx.mkOr(
+ 										  rules.toArray(tmp)
+ 										  )		
+ 								  ))), 1, null, null, null, null));
+ 		BoolExpr[] tmp2 = new BoolExpr[rules.size()];
+ 		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 },
+ 				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, fw, p_0),
+ 						ctx.mkNot(
+ 									ctx.mkOr(
+ 											rules.toArray(tmp2)
+ 									   )
+ 						)), ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, (BoolExpr) nctx.send.apply(new Expr[] { fw, n_1, p_0 }), 1, null, null, null, null))), 1, null, null, null, null));
+
+ 	}
+    
+    
     private void aclConstraints(Optimize solver){
     	 Expr a_0 = ctx.mkConst(fw+"_firewall_acl_a_0", nctx.address);
          Expr a_1 = ctx.mkConst(fw+"_firewall_acl_a_1", nctx.address);

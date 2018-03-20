@@ -8,67 +8,17 @@
           <webclient nameWebServer="nodeB"/>
         </configuration>
       </node>
-      <node functional_type="FIREWALL" name="node1">
+      <node functional_type="CACHE" name="node1">
         <neighbour name="nodeA"/>
-        <neighbour name="node2"/>
-        <configuration description="A simple description" name="conf1">
-          <firewall>
-            <elements>
-              <source>nodeA</source>
-              <destination>nodeB</destination>
-            </elements>
-          </firewall>
-        </configuration>
-      </node>
-      <node functional_type="FIREWALL" name="node2">
-        <neighbour name="node1"/>
-        <neighbour name="node3"/>
-        <configuration description="A simple description" name="conf2">
-           <firewall>
-            <elements>
-              <source>node1</source>
-              <destination>node5</destination>
-            </elements>
-          </firewall>
-        </configuration>
-      </node>
-      <node functional_type="CACHE" name="node3">
-        <neighbour name="node2"/>
-        <neighbour name="node4"/>
+        <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf3">
           <cache>
-          	<resource>nodeA</resource>
-          	<resource>node1</resource>
-          	<resource>node2</resource>
+          	<resource>nodeC</resource>
           </cache>
         </configuration>
       </node>
-	  <node functional_type="FIREWALL" name="node4">
-        <neighbour name="node3"/>
-        <neighbour name="node5"/>
-        <configuration description="A simple description" name="conf4">
-         <firewall>
-            <elements>
-              <source>node1</source>
-              <destination>node2</destination>
-            </elements>
-          </firewall>
-        </configuration>
-      </node>
-      <node functional_type="FIREWALL" name="node5">
-        <neighbour name="node4"/>
-        <neighbour name="nodeB"/>
-        <configuration description="A simple description" name="conf5">
-         <firewall>
-            <elements>
-              <source>node1</source>
-              <destination>node2</destination>
-            </elements>
-          </firewall>
-        </configuration>
-      </node>
       <node functional_type="WEBSERVER" name="nodeB">
-        <neighbour name="node5"/>
+        <neighbour name="node1"/>
         <configuration description="A simple description" name="confB">
           <webserver>
           	<name>nodeB</name>
@@ -78,19 +28,11 @@
     </graph>
   </graphs>
   <Constraints>
-	  <NodeConstraints>
-			<NodeMetrics node="node1" reqStorage="10"/>
-			<NodeMetrics node="node2" reqStorage="10"/>
-			<NodeMetrics node="node3" reqStorage="10"/>
-			<NodeMetrics node="node4" reqStorage="10"/>
-			<NodeMetrics node="node5" reqStorage="10"/>
-	  </NodeConstraints>
-	  <BandwidthConstraints>
-			<BandwidthMetrics src="node4" dst="node2" reqLatency="10"/>
-	  </BandwidthConstraints>
+	  <NodeConstraints/>
+	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="ReachabilityProperty" src="node1" dst="node5"/> 		
+  		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
   </PropertyDefinition>
   <Hosts>
   	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
@@ -170,4 +112,5 @@
   	<Connection sourceHost="host6" destHost="host7" avgLatency ="1"/>
   	<Connection sourceHost="host7" destHost="hostB" avgLatency ="1"/>
   </Connections>
+  <ParsingString></ParsingString>
 </NFV>

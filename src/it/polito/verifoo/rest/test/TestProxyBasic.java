@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -26,6 +27,7 @@ import com.microsoft.z3.Status;
 import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
+import it.polito.verifoo.rest.common.VerifooSerializer;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.PName;
@@ -36,7 +38,7 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
  * This class runs some tests in order to check the correctness of the VerifooProxy class 
  *
  */
-public class TestProxy {
+public class TestProxyBasic {
 
 	/**
 	 * @throws java.lang.Exception
@@ -80,21 +82,13 @@ public class TestProxy {
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
 		//long endU=System.currentTimeMillis();
         //System.out.println("Unmarshalling -> " + ((endU-beginAll)/1000) );
-        for(Graph g:root.getGraphs().getGraph()){
-        	long beginVP=System.currentTimeMillis();
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
-        	long endVP=System.currentTimeMillis();
-            System.out.println("Graph " + g.getId() + ": creating condition -> " + (endVP-beginVP)+"ms" );
-            List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
-        	IsolationResult res=test.checkNFFGProperty(prop);
-        	long endCheck=System.currentTimeMillis();
-            System.out.println(g.getId() + ": checking property -> " + (endCheck-endVP)+"ms" );
-        	if(res.result != Status.UNSATISFIABLE)
-        		new Translator(res.model.toString(),root,g).convert();
-        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
-        	long endT=System.currentTimeMillis();
-            System.out.println(g.getId() + ": translating model -> " + (endT-endCheck)+"ms" );
-        }
+        VerifooSerializer test = new VerifooSerializer(root);
+        if(test.isSat()){
+        		System.out.println("SAT");
+    	}
+    	else{
+    		System.out.println("UNSAT");
+    	}
 		long endAll=System.currentTimeMillis();
         System.out.println("Total time -> " + (endAll-beginAll)+"ms" );
         root.getPropertyDefinition().getProperty().forEach(p ->{
@@ -108,48 +102,7 @@ public class TestProxy {
 		test( "./testfile/nfv5nodes7hostsUNSAT-WEB.xml", false); //Working
 		fail("Exception not thrown");
 	}
-	@Test
-	public void testFW_UNSAT(){
-		try {
-			test( "./testfile/nfv5nodes7hostsUNSAT-FW.xml", false); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testCACHE_SAT(){
-		
-		try {
-			test( "./testfile/nfv5nodes7hostsSAT-CACHE.xml", true); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		} 
-	}
 	
-	@Test
-	public void testNAT_SAT() {
-		try {
-			test( "./testfile/nfv3nodes3hostsSAT-NAT.xml", true); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
-	@Test
-	public void testANTISPAM_SAT() {
-		try {
-			test( "./testfile/nfv5nodes7hostsSAT-ANTISPAM.xml", true); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
-	@Test
-	public void testMAIL_SAT() {
-		try {
-			test( "./testfile/nfv3nodes3hostsSAT-MAIL.xml", true); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
 	@Test
 	public void testAS_SAT() {
 		try {

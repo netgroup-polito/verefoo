@@ -31,6 +31,7 @@ import com.microsoft.z3.Status;
 import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
+import it.polito.verifoo.rest.common.VerifooSerializer;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.NodeRefType;
@@ -82,14 +83,7 @@ public class TestSG {
         u.setSchema(schema);
         // unmarshal a document into a tree of Java content objects
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
-        for(Graph g:root.getGraphs().getGraph()){
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints());
-        	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
-        	IsolationResult res=test.checkNFFGProperty(prop);
-        	if(res.result != Status.UNSATISFIABLE)
-        		new Translator(res.model.toString(),root,g).convert();
-        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
-        }
+        VerifooSerializer test = new VerifooSerializer(root);
 		return root;
 		
 	}

@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.jaxb.Antispam;
 import it.polito.verifoo.rest.jaxb.Cache;
 import it.polito.verifoo.rest.jaxb.Configuration;
 import it.polito.verifoo.rest.jaxb.Dpi;
+import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Elements;
 import it.polito.verifoo.rest.jaxb.Endhost;
 import it.polito.verifoo.rest.jaxb.Fieldmodifier;
@@ -49,7 +51,7 @@ public class RandomGraph {
 		for(PolicyGen policy : randG.getPolicies()){
 			if(nprop >= maxProperty) break;
 			Property p = new Property();
-			p.setGraph(0);
+			p.setGraph(graph.getId());
 			p.setSrc(policy.getNodesrc().getName());
 			p.setDst(policy.getNodedst().getName());
 			switch(policy.getPolicyType()){
@@ -66,6 +68,17 @@ public class RandomGraph {
 				default:
 					continue;
 			}
+			properties.getProperty().add(p);
+		}
+		if(properties.getProperty().size() == 0){
+			//at least one property
+			Node c = getClients().get(0);
+			Node s = getServers().get(0);
+			Property p = new Property();
+			p.setGraph(graph.getId());
+			p.setSrc(c.getName());
+			p.setDst(s.getName());
+			p.setName(PName.REACHABILITY_PROPERTY);
 			properties.getProperty().add(p);
 		}
 		
@@ -159,6 +172,12 @@ public class RandomGraph {
 	                	fw.getElements().add(e);
 	                }
 	            }
+	        }
+	        else{
+	        	Elements e = new Elements();
+             	e.setSource("nobody");
+             	e.setDestination("no_one_else");
+             	fw.getElements().add(e);
 	        }
 	        conf.setFirewall(fw);
 	        break;
