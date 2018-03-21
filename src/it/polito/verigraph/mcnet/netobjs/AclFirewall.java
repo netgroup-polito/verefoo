@@ -145,11 +145,11 @@ public class AclFirewall extends NetworkObject{
  			Expr proto = ctx.mkConst(fw + "_auto_proto_"+i, ctx.mkIntSort());
  			Expr srcp = ctx.mkConst(fw + "_auto_srcp_"+i, ctx.mkIntSort());
  			Expr dstp = ctx.mkConst(fw + "_auto_dstp_"+i, ctx.mkIntSort());
- 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( src, this.nctx.am.get("null")),"fw"));
- 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( dst, this.nctx.am.get("null")),"fw"));
- 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw"));
- 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( srcp, ctx.mkInt(0)),"fw"));
- 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( dstp, ctx.mkInt(0)),"fw"));
+ 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( src, this.nctx.am.get("null")),"fw"));
+ 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( dst, this.nctx.am.get("null")),"fw"));
+ 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw"));
+ 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( srcp, ctx.mkInt(0)),"fw"));
+ 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( dstp, ctx.mkInt(0)),"fw"));
  			rules.add(ctx.mkAnd(
  					ctx.mkEq(nctx.pf.get("src").apply(p_0), src),
  					ctx.mkEq(nctx.pf.get("dest").apply(p_0), dst),

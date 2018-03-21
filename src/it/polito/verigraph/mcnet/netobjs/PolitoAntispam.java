@@ -135,7 +135,7 @@ public class PolitoAntispam extends NetworkObject{
         List<BoolExpr> rules = new ArrayList<>();
  		for(int i = 0; i < nRules; i++){
  			Expr emailFrom = ctx.mkConst(politoAntispam + "_auto_emailFrom_"+i, ctx.mkIntSort());
- 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( emailFrom, ctx.mkInt(0) ),"politoAntispam"));
+ 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( emailFrom, ctx.mkInt(0) ),"politoAntispam"));
  			rules.add(
  						ctx.mkEq((IntExpr)nctx.pf.get("emailFrom").apply(p_0), emailFrom)
  					);

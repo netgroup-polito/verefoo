@@ -171,7 +171,7 @@ public class PolitoIDS extends NetworkObject {
         List<BoolExpr> rules = new ArrayList<>();
  		for(int i = 0; i < nRules; i++){
  			Expr notAllowed = ctx.mkConst(politoIDS + "_auto_notAllowed_"+i, ctx.mkIntSort());
- 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( notAllowed, ctx.mkInt(0) ),"politoIDS"));
+ 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( notAllowed, ctx.mkInt(0) ),"politoIDS"));
  			rules.add(
  						ctx.mkEq((IntExpr)nctx.pf.get("body").apply(p_0), notAllowed)
  					);

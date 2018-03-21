@@ -47,6 +47,7 @@ public class NetContext extends Core{
 
     public List<BoolExpr> constraints;
     public List<Tuple<BoolExpr, String>> softConstraints;
+    public List<Tuple<BoolExpr, String>> softConstrAutoConf;
     List<Core> policies;
 
     public HashMap<String,NetworkObject> nm; //list of nodes, callable by node name
@@ -87,6 +88,7 @@ public class NetContext extends Core{
 
         constraints = new ArrayList<BoolExpr>();
         softConstraints = new ArrayList<>();
+        softConstrAutoConf = new ArrayList<>();
         policies = new ArrayList<Core>();
         
         //variable true that is always true
@@ -134,9 +136,13 @@ public class NetContext extends Core{
         for (Core policy : policies){
             policy.addConstraints(solver);
         }
+        //the order indicates the priority
+        for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
+			solver.AssertSoft(t._1, 100, t._2);
+		} 
         for (Tuple<BoolExpr, String> t : softConstraints) {
 			solver.AssertSoft(t._1, 100, t._2);
-		}  
+		}
     }
 
     private void mkTypes (String[] nodes, String[] addresses){
