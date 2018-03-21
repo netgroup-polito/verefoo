@@ -40,12 +40,13 @@
 	   <node functional_type="FIREWALL" name="node3">
         <neighbour name="node3"/>
         <neighbour name="nodeB"/>
-        <configuration description="A simple description" name="conf1">
+        <configuration description="A simple description" name="conf3">
           <firewall/>
         </configuration>
       </node>
       <node functional_type="WEBSERVER" name="nodeB">
-        <neighbour name="node1"/>
+        <neighbour name="node2"/>
+		<neighbour name="node3"/>
         <configuration description="A simple description" name="confB">
           <webserver>
           	<name>nodeB</name>
@@ -60,7 +61,7 @@
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="ReachabilityProperty" src="nodeC" dst="nodeB"/> 
-		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 				
+		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 				
   </PropertyDefinition>
   <Hosts>
   	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>

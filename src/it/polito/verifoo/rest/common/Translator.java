@@ -5,12 +5,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.NotAllowedException;
+
 import org.apache.logging.log4j.LogManager;
 
 import it.polito.verifoo.rest.jaxb.*;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 /**
- * This class implements a parser for verifoo output for find on witch host verifoo deploy a node 
+ * This class implements a parser for verifoo output (the z3 model), in order to translate it into a the correct XML 
  */
 public class Translator {
 	private String model;
@@ -33,11 +35,19 @@ public class Translator {
 	 */
 	public void convert(){
 		nfv.getHosts().getHost().forEach(this::searchHost);
+		setAutoConfig();
+	}
+	/**
+	 * Wraps the translation for all the VNFs that can be auto configurated by Verifoo
+	 */
+	public void setAutoConfig() {
 		setFirewallAutoConfig();
+		setDPIAutoConfig();
+		setAntispamAutoConfig();
 	}
 	/**
 	 * For each host we search for all possible configuration of nodes(at)host and check if Int value is 1
-	 * Then we set the element in the schema accordingly.
+	 * Then we set the element in the XML accordingly.
 	 * @param host Physical Host
 	 */
 	public void searchHost(Host host){
@@ -57,7 +67,9 @@ public class Translator {
 				});
 	}
 	
-	
+	/**
+	 * Set the firewall auto-configurated rules in the XML according to the verifoo output
+	 */
 	public void setFirewallAutoConfig(){
 		List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.FIREWALL) && n.getConfiguration().getFirewall().getElements().isEmpty()).collect(Collectors.toList());
 		
@@ -90,7 +102,70 @@ public class Translator {
 		});
 	}
 	/**
-	 * Reduce the host resources according to the node metrics
+	 * Set the DPI auto-configurated rules in the XML according to the verifoo output
+	 */
+	public void setDPIAutoConfig(){
+		List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.DPI) && n.getConfiguration().getDpi().getNotAllowed().isEmpty())
+												   .collect(Collectors.toList());
+		List<String> bodies = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.ENDHOST))
+												.map(e -> e.getConfiguration().getEndhost().getBody())
+												.collect(Collectors.toList());
+		autoNodes.forEach(n -> {
+			String tosearch="define-fun "+n.getName()+"_auto_notAllowed_.* Int\n .*";
+			Pattern pattern = Pattern.compile(tosearch);
+			Matcher matcher = pattern.matcher(model);
+			while (matcher.find()) {
+				String match = matcher.group();
+			    String hashCode = match.substring(match.lastIndexOf("\n")+3, match.lastIndexOf(")")); //+3 because the pattern it's like "\n  hashCode"
+				String notAllowed = null;
+			    for(String body : bodies){
+					//System.out.println("BodyHashCode: " + String.valueOf(body).hashCode() + " RuleHashCode:" + Integer.parseInt(hashCode));
+					if(String.valueOf(body).hashCode() == Integer.parseInt(hashCode)){
+						notAllowed = body;
+						break;
+					}
+				}
+			    if(notAllowed != null){
+			    	n.getConfiguration().getDpi().getNotAllowed().add(notAllowed);
+			    }
+		    }
+			
+		});
+	}
+	/**
+	 * Set the antispam auto-configurated rules in the XML according to the verifoo output
+	 */
+	public void setAntispamAutoConfig() {
+		List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.ANTISPAM) && n.getConfiguration().getAntispam().getSource().isEmpty())
+				   .collect(Collectors.toList());
+		List<String> emailFroms = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.ENDHOST))
+						.map(e -> e.getConfiguration().getEndhost().getEmailFrom())
+						.collect(Collectors.toList());
+		autoNodes.forEach(n -> {
+			String tosearch="define-fun "+n.getName()+"_auto_emailFrom_.* Int\n .*";
+			Pattern pattern = Pattern.compile(tosearch);
+			Matcher matcher = pattern.matcher(model);
+			while (matcher.find()) {
+				String match = matcher.group();
+				String hashCode = match.substring(match.lastIndexOf("\n")+3, match.lastIndexOf(")")); //+3 because the pattern it's like "\n  hashCode"
+				String emailFrom = null;
+				for(String e : emailFroms){
+					//System.out.println("BodyHashCode: " + String.valueOf(body).hashCode() + " RuleHashCode:" + Integer.parseInt(hashCode));
+					if(String.valueOf(e).hashCode() == Integer.parseInt(hashCode)){
+						emailFrom = e;
+						break;
+					}
+				}
+				if(emailFrom != null){
+					n.getConfiguration().getAntispam().getSource().add(emailFrom);
+				}
+			}
+		
+		});
+		return;		
+	}
+	/**
+	 * Reduces the host resources according to the node metrics
 	 * @param h host
 	 * @param nodeName
 	 */

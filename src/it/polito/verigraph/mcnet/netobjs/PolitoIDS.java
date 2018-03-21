@@ -21,6 +21,7 @@ import com.microsoft.z3.Solver;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
+import it.polito.verigraph.mcnet.components.Tuple;
 
 public class PolitoIDS extends NetworkObject {
 
@@ -33,6 +34,7 @@ public class PolitoIDS extends NetworkObject {
     Network net;
     NetContext nctx;
     FuncDecl isInBlacklist;
+	private boolean autoconf;
 
 
     public PolitoIDS(Context ctx, Object[]...args){
@@ -52,6 +54,13 @@ public class PolitoIDS extends NetworkObject {
         this.politoIDS = this.z3Node = ((NetworkObject)args[0][0]).getZ3Node();
         this.net = (Network)args[0][1];
         this.nctx = (NetContext)args[0][2];
+        if(args[0].length > 3 && ((Integer) args[0][3]) != 0){
+			autoconf = true; 
+			//installIDS((Integer) args[0][3]);
+	    }
+		else{
+			autoconf = false;
+		}
 
     }
 
@@ -151,6 +160,50 @@ public class PolitoIDS extends NetworkObject {
                 		,ctx.mkNot((BoolExpr)isInBlacklist.apply(nctx.pf.get("body").apply(p_0)))))
                 		
                 ,1,null, null, null, null));*/
+    }
+    
+    // for an autoconfiguration IDS
+    public void installIDS(int nRules){
+        Expr n_0 = ctx.mkConst(politoIDS + "_n_0", nctx.node);
+        Expr n_1 = ctx.mkConst(politoIDS + "_n_1", nctx.node);
+        Expr p_0 = ctx.mkConst(politoIDS + "_p_0", nctx.packet);
+        Expr b_0 = ctx.mkIntConst(politoIDS + "_b_0");
+        List<BoolExpr> rules = new ArrayList<>();
+ 		for(int i = 0; i < nRules; i++){
+ 			Expr notAllowed = ctx.mkConst(politoIDS + "_auto_notAllowed_"+i, ctx.mkIntSort());
+ 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( notAllowed, ctx.mkInt(0) ),"politoIDS"));
+ 			rules.add(
+ 						ctx.mkEq((IntExpr)nctx.pf.get("body").apply(p_0), notAllowed)
+ 					);
+ 		}
+        isInBlacklist = ctx.mkFuncDecl(politoIDS + "_isInBlacklist", ctx.mkIntSort(), ctx.mkBoolSort());
+        constraints.add(ctx.mkForall(new Expr[]{b_0},
+                							ctx.mkEq((BoolExpr)isInBlacklist.apply(b_0), ctx.mkBool(false)),
+                			1, null, null, null, null));
+        BoolExpr[] tmp = new BoolExpr[rules.size()];
+        //Constraint2 send(politoIDS, n_0, p, t_0) && (p.proto(HTTP_RESPONSE) || p.proto(HTTP_REQUEST)) ->
+        //(exist  n_1 : (recv(n_1, politoIDS, p, t_1) )) && !isInBlackList(p.body)
+	
+        this.constraints.add(ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.send.apply(politoIDS, n_0, p_0)),
+                        ctx.mkAnd(ctx.mkExists(new Expr[]{n_1},
+                                				ctx.mkAnd((BoolExpr)nctx.recv.apply(n_1,politoIDS,p_0)),
+                                				1, null, null, null, null),
+                                ctx.mkNot(
+                                		ctx.mkOr(
+										  rules.toArray(tmp)
+										  )	
+                                		))), 1, null, null, null, null));
+
+        this.constraints.add(ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies(ctx.mkAnd((BoolExpr)nctx.recv.apply(n_0, politoIDS,  p_0),
+				                		ctx.mkNot(
+				                				ctx.mkOr(
+												  rules.toArray(tmp)
+												  )	
+				                				)),
+                		ctx.mkExists(new Expr[]{n_1},((BoolExpr)nctx.send.apply(politoIDS,n_1,p_0)),1,null, null, null, null))
+                ,1,null, null, null, null));
     }
 
 }

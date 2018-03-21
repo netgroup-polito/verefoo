@@ -172,7 +172,7 @@
     <xsd:element name="antispam">
         <xsd:complexType>
             <xsd:sequence minOccurs="1" maxOccurs="unbounded">
-                <xsd:element name="source" type="xsd:string" />
+                <xsd:element name="source" type="xsd:string" minOccurs="0"/>
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
@@ -186,7 +186,7 @@
     <xsd:element name="dpi">
         <xsd:complexType>
             <xsd:sequence minOccurs="1" maxOccurs="unbounded">
-                <xsd:element name="notAllowed" type="xsd:string" />
+                <xsd:element name="notAllowed" type="xsd:string" minOccurs="0"/>
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>

@@ -145,7 +145,6 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(n.getConfiguration().getFirewall().getElements().isEmpty()){
 						//AclFirewallAuto fw = new AclFirewallAuto(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
 						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
-						this.put(n, fw);
 					}
 					else{
 						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
@@ -177,10 +176,16 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(n.getConfiguration().getAntispam()==null){
 						throw new BadGraphError("You have specified a ANTISPAM Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					PolitoAntispam spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
-					this.put(n,spam);
-					int[] blacklist=listToIntArguments(n.getConfiguration().getAntispam().getSource());
-					spam.installAntispam(blacklist);
+					PolitoAntispam spam;
+					if(n.getConfiguration().getAntispam().getSource().isEmpty()){
+						spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
+					}
+					else{
+						spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+						int[] blacklist=listToIntArguments(n.getConfiguration().getAntispam().getSource());
+						spam.installAntispam(blacklist);
+					}
+					this.put(n, spam);					
 					break;
 				}
 				case CACHE:{
@@ -196,9 +201,16 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(n.getConfiguration().getDpi()==null){
 						throw new BadGraphError("You have specified a DPI Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					PolitoIDS ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
-					int[] blacklist=listToIntArguments(n.getConfiguration().getDpi().getNotAllowed());
-					ids.installIDS(blacklist);
+					PolitoIDS ids;
+					if(n.getConfiguration().getDpi().getNotAllowed().isEmpty()){
+						ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
+						ids.installIDS(nRules);
+					}
+					else{
+						ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+						int[] blacklist=listToIntArguments(n.getConfiguration().getDpi().getNotAllowed());
+						ids.installIDS(blacklist);
+					}
 					this.put(n,ids);
 					break;
 				}
@@ -296,7 +308,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 			}
 	}
 	/**
-	 * Transform a list of string in array of number
+	 * Transform a list of string in array of numbers
 	 * @param arg List of String
 	 * @return Array of int
 	 */

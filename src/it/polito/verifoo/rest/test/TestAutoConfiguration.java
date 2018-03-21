@@ -70,8 +70,19 @@ public class TestAutoConfiguration {
 	@After
 	public void tearDown() throws Exception {
 	}
-	
-	private List<Node> test(String file, boolean sat) throws Exception{
+	private boolean selectCond(Node n, FunctionalTypes ft){
+        if(ft.equals(FunctionalTypes.FIREWALL)){
+        	return (n.getConfiguration().getFirewall().getElements().size() > 0);
+        }
+        if(ft.equals(FunctionalTypes.DPI)){
+        	return (n.getConfiguration().getDpi().getNotAllowed().size() > 0);
+        }
+        if(ft.equals(FunctionalTypes.ANTISPAM)){
+        	return (n.getConfiguration().getAntispam().getSource().size() > 0);
+        }
+        return false;
+	}
+	private List<Node> test(String file, boolean sat, FunctionalTypes ft) throws Exception{
 		List<Node> tmp = new ArrayList<>();
 		// create a JAXBContext capable of handling the generated classes
         System.out.println("===========FILE " + file + "===========");
@@ -87,9 +98,11 @@ public class TestAutoConfiguration {
 		//long endU=System.currentTimeMillis();
         //System.out.println("Unmarshalling -> " + ((endU-beginAll)/1000) );
         VerifooSerializer test = new VerifooSerializer(root);
+        
+        	
         tmp.addAll(
         		root.getGraphs().getGraph().stream().flatMap(g -> g.getNode().stream())
-        		.filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL) && n.getConfiguration().getFirewall().getElements().size() > 0)
+        		.filter(n -> n.getFunctionalType().equals(ft) && selectCond(n, ft))
         		.collect(Collectors.toList())
         		);
         if(test.isSat()){
@@ -109,7 +122,7 @@ public class TestAutoConfiguration {
 	@Test
 	public void testAutoFW_RR(){
 		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-RR-FW.xml", true); //Working
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-FW-RR.xml", true, FunctionalTypes.FIREWALL); //Working
 			assertTrue(autoNodes.size() == 0);
 		} catch (Exception e) {
 			fail(e.toString());
@@ -118,7 +131,7 @@ public class TestAutoConfiguration {
 	@Test
 	public void testAutoFW_RI(){
 		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-RI-FW.xml", true); //Working
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-FW-RI.xml", true, FunctionalTypes.FIREWALL); //Working
 			assertTrue(autoNodes.size() == 1);
 			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
 			assertTrue(e.size() == 1);
@@ -130,7 +143,7 @@ public class TestAutoConfiguration {
 	@Test
 	public void testAutoFW_IR(){
 		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-IR-FW.xml", true); //Working
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-FW-IR.xml", true, FunctionalTypes.FIREWALL); //Working
 			assertTrue(autoNodes.size() == 1);
 			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
 			assertTrue(e.size() == 1);
@@ -142,7 +155,7 @@ public class TestAutoConfiguration {
 	@Test
 	public void testAutoFW_II(){
 		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-II-FW.xml", true); //Working
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-FW-II.xml", true, FunctionalTypes.FIREWALL); //Working
 			assertTrue(autoNodes.size() == 1);
 			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
 			assertTrue(e.size() == 1);
@@ -151,5 +164,100 @@ public class TestAutoConfiguration {
 			fail(e.toString());
 		}
 	}
+	
+	
+	@Test
+	public void testAutoDPI_RR(){
+		try {
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-DPI-RR.xml", true, FunctionalTypes.DPI); //Working
+			assertTrue(autoNodes.size() == 0);
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	@Test
+	public void testAutoDPI_RI(){
+		try {
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-DPI-RI.xml", true, FunctionalTypes.DPI); //Working
+			assertTrue(autoNodes.size() == 1);
+			List<String> e = autoNodes.get(0).getConfiguration().getDpi().getNotAllowed();
+			assertTrue(e.size() == 1);
+			assertTrue(e.get(0).equals("weapons"));
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	@Test
+	public void testAutoDPI_IR(){
+		try {
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-DPI-IR.xml", true, FunctionalTypes.DPI); //Working
+			assertTrue(autoNodes.size() == 1);
+			List<String> e = autoNodes.get(0).getConfiguration().getDpi().getNotAllowed();
+			assertTrue(e.size() == 1);
+			assertTrue(e.get(0).equals("cats"));
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	@Test
+	public void testAutoDPI_II(){
+		try {
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-DPI-II.xml", true, FunctionalTypes.DPI); //Working
+			assertTrue(autoNodes.size() == 1);
+			List<String> e = autoNodes.get(0).getConfiguration().getDpi().getNotAllowed();
+			assertTrue(e.size() == 2);
+			assertTrue( (e.get(0).equals("weapons") && e.get(1).equals("cats")) || (e.get(0).equals("cats") && e.get(1).equals("weapons")) );
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	
+	@Test
+	public void testAutoAntispam_RR(){
+		try {
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-Antispam-RR.xml", true, FunctionalTypes.ANTISPAM); //Working
+			assertTrue(autoNodes.size() == 0);
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	@Test
+	public void testAutoAntispam_RI(){
+		try {
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-Antispam-RI.xml", true, FunctionalTypes.ANTISPAM); //Working
+			assertTrue(autoNodes.size() == 1);
+			List<String> e = autoNodes.get(0).getConfiguration().getAntispam().getSource();
+			assertTrue(e.size() == 1);
+			assertTrue(e.get(0).equals("2"));
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	@Test
+	public void testAutoAntispam_IR(){
+		try {
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-Antispam-IR.xml", true, FunctionalTypes.ANTISPAM); //Working
+			assertTrue(autoNodes.size() == 1);
+			List<String> e = autoNodes.get(0).getConfiguration().getAntispam().getSource();
+			assertTrue(e.size() == 1);
+			assertTrue(e.get(0).equals("1"));
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	@Test
+	public void testAutoAntispam_II(){
+		try {
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-Antispam-II.xml", true, FunctionalTypes.ANTISPAM); //Working
+			assertTrue(autoNodes.size() == 1);
+			List<String> e = autoNodes.get(0).getConfiguration().getAntispam().getSource();
+			assertTrue(e.size() == 2);
+			assertTrue((e.get(0).equals("1") && e.get(1).equals("2")) || (e.get(0).equals("2") && e.get(1).equals("1")));
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
 	
 }

@@ -2,26 +2,26 @@
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
   <graphs>
     <graph id="0">
-     <node functional_type="WEBCLIENT" name="nodeA">
+     <node functional_type="ENDHOST" name="nodeA">
         <neighbour name="node1"/>
-		<neighbour name="node2"/>
+        <neighbour name="node2"/>
         <configuration description="A simple description" name="confA">
-          <webclient nameWebServer="nodeB"/>
+         <endhost email_from="1" protocol = "POP3_REQUEST"/>
         </configuration>
       </node>
-	  <node functional_type="WEBCLIENT" name="nodeC">
+	  <node functional_type="ENDHOST" name="nodeC">
         <neighbour name="node1"/>
-		<neighbour name="node2"/>
+        <neighbour name="node2"/>
         <configuration description="A simple description" name="confA">
-          <webclient nameWebServer="nodeB"/>
+         <endhost email_from="2" protocol = "POP3_REQUEST"/>
         </configuration>
       </node>
-      <node functional_type="FIREWALL" name="node1">
+      <node functional_type="ANTISPAM" name="node1">
         <neighbour name="nodeA"/>
         <neighbour name="nodeC"/>
 		<neighbour name="node2"/>
         <configuration description="A simple description" name="conf1">
-          <firewall/>
+          <antispam/>
         </configuration>
       </node>
 	   <node functional_type="NAT" name="node2">
@@ -37,15 +37,16 @@
           </nat>
         </configuration>
       </node>
-	   <node functional_type="FIREWALL" name="node3">
+	   <node functional_type="ANTISPAM" name="node3">
         <neighbour name="node3"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf1">
-          <firewall/>
+          <antispam/>
         </configuration>
       </node>
       <node functional_type="WEBSERVER" name="nodeB">
-        <neighbour name="node1"/>
+        <neighbour name="node2"/>
+		<neighbour name="node3"/>
         <configuration description="A simple description" name="confB">
           <webserver>
           	<name>nodeB</name>
@@ -59,8 +60,8 @@
 	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="ReachabilityProperty" src="nodeC" dst="nodeB"/> 
-		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 				
+		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 
+  		<Property graph="0" name="IsolationProperty" src="nodeC" dst="nodeB"/> 				
   </PropertyDefinition>
   <Hosts>
   	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>

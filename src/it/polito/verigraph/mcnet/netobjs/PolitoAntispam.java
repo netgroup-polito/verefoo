@@ -18,9 +18,12 @@ import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
+import com.microsoft.z3.Sort;
+
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
+import it.polito.verigraph.mcnet.components.Tuple;
 
 /**
  * Model of an anti-spam node
@@ -35,6 +38,7 @@ public class PolitoAntispam extends NetworkObject{
     NetContext nctx;
     FuncDecl isInBlacklist;
     int[] blacklist;
+	private boolean autoconf;
     public PolitoAntispam(Context ctx, Object[]... args) {
         super(ctx, args);
     }
@@ -49,6 +53,13 @@ public class PolitoAntispam extends NetworkObject{
         net = (Network)args[0][1];
         nctx = (NetContext)args[0][2];
         net.saneSend(this);
+        if(args[0].length > 3 && ((Integer) args[0][3]) != 0){
+			autoconf = true; 
+			installAntispam((Integer) args[0][3]);
+	    }
+		else{
+			autoconf = false;
+		}
     }
 
     @Override
@@ -116,16 +127,68 @@ public class PolitoAntispam extends NetworkObject{
                                   ctx.mkAnd((BoolExpr)nctx.recv.apply(n_1, politoAntispam, p_0)),1,null,null,null,null)
                                   )),1,null,null,null,null));*/          
     }
-
+    
+    public void installAntispam (int nRules){
+  	    Expr n_0 = ctx.mkConst(politoAntispam+"_n_0", nctx.node);
+        Expr n_1 = ctx.mkConst(politoAntispam+"_n_1", nctx.node);
+        Expr p_0 = ctx.mkConst(politoAntispam+"_p_0", nctx.packet);
+        List<BoolExpr> rules = new ArrayList<>();
+ 		for(int i = 0; i < nRules; i++){
+ 			Expr emailFrom = ctx.mkConst(politoAntispam + "_auto_emailFrom_"+i, ctx.mkIntSort());
+ 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( emailFrom, ctx.mkInt(0) ),"politoAntispam"));
+ 			rules.add(
+ 						ctx.mkEq((IntExpr)nctx.pf.get("emailFrom").apply(p_0), emailFrom)
+ 					);
+ 		}
+ 		
+ 		isInBlacklist = ctx.mkFuncDecl(politoAntispam+"_isInBlacklist", ctx.mkIntSort(), ctx.mkBoolSort());
+ 		BoolExpr[] tmp = new BoolExpr[rules.size()];
+  	  
+ 		this.constraints.add(
+ 				ctx.mkForall(new Expr[] { n_0, p_0 }, 
+	 				ctx.mkImplies(
+	 						ctx.mkAnd( (BoolExpr)nctx.send.apply(politoAntispam, n_0, p_0),
+            				  		ctx.mkOr(ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_REQUEST))
+            				  				,ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_RESPONSE))
+            				  				 )),
+			 				ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, 
+			 								nctx.recv.apply(n_1, politoAntispam, p_0), 1, null, null, null, null),
+					 						  ctx.mkNot(
+					 								  ctx.mkOr(
+					 										  rules.toArray(tmp)
+					 										  )		
+					 								  ))), 1, null, null, null, null));
+ 		BoolExpr[] tmp2 = new BoolExpr[rules.size()];
+ 		constraints.add(
+ 				ctx.mkForall(new Expr[] { n_0, p_0 },
+		 				ctx.mkImplies(
+		 						ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, politoAntispam, p_0),
+					 						ctx.mkNot(
+					 									ctx.mkOr(
+					 											rules.toArray(tmp2)
+					 									   )
+					 						)), 
+		 						ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, (BoolExpr) nctx.send.apply(new Expr[] { politoAntispam, n_1, p_0 }), 1, null, null, null, null))),
+		 				1, null, null, null, null));
+					
+					 	      
+  }
     public void addBlackList(int[] list){
         this.blacklist = list;
     }
 
     //Constraint2 isInBlacklist(a_0) == or(foreach emailFrom in blacklist (a_0 == emailFrom))
     private void blacklistConstraints(Optimize  solver){
-        if (blacklist.length == 0)
-            return;
         Expr a_0 = ctx.mkConst(politoAntispam+"_blacklist_a_0", ctx.getIntSort());
+
+        if (blacklist == null || blacklist.length == 0){
+        	//If the size of the blacklist is empty then by default isInBlacklist must be false
+   		 	solver.Add(ctx.mkForall(new Expr[]{a_0},
+							ctx.mkEq( 
+									isInBlacklist.apply(a_0), ctx.mkFalse()),
+						1,null,null,null,null));
+        	return;
+        }
         BoolExpr[] blacklist_map = new BoolExpr[blacklist.length];
         for(int y=0;y<blacklist.length;y++){
             blacklist_map[y] = ctx.mkOr(ctx.mkEq(a_0,ctx.mkInt(blacklist[y])));
