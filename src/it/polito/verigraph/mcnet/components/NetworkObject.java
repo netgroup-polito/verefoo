@@ -8,6 +8,7 @@
  *******************************************************************************/
 package it.polito.verigraph.mcnet.components;
 
+import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 
@@ -25,6 +26,7 @@ public abstract class NetworkObject extends Core{
 
     protected DatatypeExpr z3Node;
     protected boolean isEndHost;
+    protected BoolExpr used;
     /**
      * Get a reference to the z3 node this class wraps around
      * @return
@@ -39,6 +41,9 @@ public abstract class NetworkObject extends Core{
     /*public int hashCode(){
         return z3Node.hashCode();
 }*/
+    public BoolExpr isUsed(){
+    	return used;
+    }
 
     /**
      * A simple way to determine the set of endhosts

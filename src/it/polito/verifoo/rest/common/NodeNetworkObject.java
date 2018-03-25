@@ -33,19 +33,22 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	private Logger logger = LogManager.getLogger("mylog");
 	private Context ctx;
     private NetContext nctx;
+	private AutoContext autoctx;
     private Network net;
 	private int nRules;
 	/**
      * This class is an helper to generate network object
      * @param ctx Z3 Context
      * @param nctx NetworkContext
+	 * @param autoctx 
      * @param net Network
      * @param nodes List of nodes from that we will generate NetworkObject
      */
-    public NodeNetworkObject(Context ctx, NetContext nctx, Network net, List<it.polito.verifoo.rest.jaxb.Node> nodes, int nRules) {
+    public NodeNetworkObject(Context ctx, NetContext nctx, AutoContext autoctx, Network net, List<it.polito.verifoo.rest.jaxb.Node> nodes, int nRules) {
 		super();
 		this.ctx = ctx;
 		this.nctx = nctx;
+		this.autoctx = autoctx;
 		this.net = net;
 		this.nRules = nRules;
 		nodes.forEach(this::generateNetObj);
@@ -144,7 +147,8 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					AclFirewall fw;
 					if(n.getConfiguration().getFirewall().getElements().isEmpty()){
 						//AclFirewallAuto fw = new AclFirewallAuto(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
-						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
+						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules, autoctx});
+						autoctx.addOptionalNode(n, fw);
 					}
 					else{
 						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});

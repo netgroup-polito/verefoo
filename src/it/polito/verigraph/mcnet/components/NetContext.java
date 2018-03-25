@@ -48,6 +48,7 @@ public class NetContext extends Core{
     public List<BoolExpr> constraints;
     public List<Tuple<BoolExpr, String>> softConstraints;
     public List<Tuple<BoolExpr, String>> softConstrAutoConf;
+    public List<Tuple<BoolExpr, String>> softConstrAutoPlace;
     List<Core> policies;
 
     public HashMap<String,NetworkObject> nm; //list of nodes, callable by node name
@@ -89,6 +90,7 @@ public class NetContext extends Core{
         constraints = new ArrayList<BoolExpr>();
         softConstraints = new ArrayList<>();
         softConstrAutoConf = new ArrayList<>();
+        softConstrAutoPlace = new ArrayList<>();
         policies = new ArrayList<Core>();
         
         //variable true that is always true
@@ -132,17 +134,34 @@ public class NetContext extends Core{
     @Override
     protected void addConstraints(Optimize solver) {
         BoolExpr[] constr = new BoolExpr[constraints.size()];
+        /*System.out.println("======NET CONTEXT HARD CONSTRAINTS====== ");
+		constraints.forEach(c -> {
+			System.out.println(c);
+		});*/
         solver.Add(constraints.toArray(constr));
         for (Core policy : policies){
             policy.addConstraints(solver);
         }
-        //the order indicates the priority
-        for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
-			solver.AssertSoft(t._1, 100, t._2);
-		} 
+        //the order indicates the priority for the soft constraints
+        //System.out.println("======NET CONTEXT SOFT CONSTRAINTS====== ");
+       
+        //System.out.println("Soft Constraints");
         for (Tuple<BoolExpr, String> t : softConstraints) {
+        	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
 			solver.AssertSoft(t._1, 100, t._2);
 		}
+        //System.out.println("AutoConfiguration Constraints");
+        for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
+        	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, 100, t._2);
+		}
+        
+        //System.out.println("AutoPlacement Constraints");
+        for (Tuple<BoolExpr, String> t : softConstrAutoPlace) {
+        	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, 100, t._2);
+		}
+        
     }
 
     private void mkTypes (String[] nodes, String[] addresses){
