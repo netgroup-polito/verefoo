@@ -24,6 +24,8 @@ import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Optimize.Handle;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
+
+import it.polito.verifoo.rest.common.AutoContext;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
@@ -39,6 +41,7 @@ public class Checker {
 	Context ctx;
 	Network net;
 	NetContext nctx;
+	AutoContext autoctx = null;
 	Optimize solver;
 	ArrayList<BoolExpr> constraints;
 	public BoolExpr[] assertions;
@@ -260,6 +263,9 @@ public class Checker {
 	
 
 	public void addConstraints() {
+		if(autoctx != null){
+			autoctx.addConstraints(solver);
+		}
 		net.addConstraints(solver);
 		nctx.addConstraints(solver);
 		for (NetworkObject el : net.elements)
@@ -277,5 +283,12 @@ public class Checker {
 			el.addConstraints(l);
 		// return Arrays.asList(l.getAssertions());
 		return Arrays.asList();
+	}
+
+	/**
+	 * @param autoctx the autoctx to set
+	 */
+	public void setAutoctx(AutoContext autoctx) {
+		this.autoctx = autoctx;
 	}
 }

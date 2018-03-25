@@ -1,0 +1,140 @@
+package it.polito.verifoo.rest.common;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.microsoft.z3.BoolExpr;
+import com.microsoft.z3.Context;
+import com.microsoft.z3.Expr;
+import com.microsoft.z3.Optimize;
+
+import it.polito.verifoo.rest.jaxb.*;
+import it.polito.verigraph.mcnet.components.Core;
+import it.polito.verigraph.mcnet.components.NetworkObject;
+import it.polito.verigraph.mcnet.components.Tuple;
+/**
+ * This class handles all the information about the auto-placement
+ * @author Antonio
+ *
+ */
+public class AutoContext extends Core{
+	private Logger logger = LogManager.getLogger("mylog");
+	Context ctx;
+	public List<BoolExpr> constraints;
+	public List<Tuple<BoolExpr, String>> softConstrAutoPlace;
+	public List<Tuple<BoolExpr, String>> softConstrAutoConf;
+	
+	private Map<String, List<NetworkObject>> optionalPlacement;
+	private HashMap<Node, NetworkObject> optionalNodes;
+	private Map<Node, List<BoolExpr>> optionalConditions;
+	/**
+	 * Public constructor for the auto context class
+	 */
+	public AutoContext(Context ctx,Object[]... args ) {
+		super(ctx, args);
+	} 
+	
+	@Override
+	protected void init(Context ctx, Object[]... args) {
+		this.ctx = ctx;
+		optionalPlacement = new HashMap<>();
+		optionalNodes = new HashMap<>();
+		optionalConditions = new HashMap<>();
+		constraints = new ArrayList<>();
+		softConstrAutoPlace = new ArrayList<>();
+		softConstrAutoConf = new ArrayList<>();
+	}
+	
+	@Override
+	public void addConstraints(Optimize solver) {
+		BoolExpr[] constr = new BoolExpr[constraints.size()];
+		/*System.out.println("======AUTO CONTEXT HARD CONSTRAINTS====== ");
+		constraints.forEach(c -> {
+			System.out.println(c);
+		});*/
+        solver.Add(constraints.toArray(constr));
+        //the order indicates the priority for the soft constraints
+        //System.out.println("======AUTO CONTEXT SOFT CONSTRAINTS====== ");
+        //System.out.println("AutoConfiguration Constraints");
+        for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
+        	//System.out.println(t._1 + "\n with value " + 2000 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, 2000, t._2);
+		}
+        //System.out.println("AutoPlacement Constraints");
+        for (Tuple<BoolExpr, String> t : softConstrAutoPlace) {
+        	//System.out.println(t._1 + "\n with value " + 1000 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, 1000, t._2);
+		}
+	}
+	
+	public void addOptionalPlacement(NetworkObject previous, NetworkObject next, NetworkObject optional){
+		String key = previous+"__"+next;
+		if(!optionalPlacement.containsKey(key)){
+			optionalPlacement.put(key, new ArrayList<>());
+		}
+		if(!optionalPlacement.get(key).contains(optional)){
+			logger.debug("Between " + previous + " and " + next + " there is an optional node: "+optional);
+			optionalPlacement.get(key).add(optional);
+		}
+		
+	}
+	public void addOptionalCondition(Node optional, BoolExpr c){
+		if(!optionalConditions.containsKey(optional)){
+			optionalConditions.put(optional, new ArrayList<>());
+		}
+		for(BoolExpr e : optionalConditions.get(optional)){
+			if(e.toString().equals(c.toString())){
+				//logger.debug("Found duplicate condition for optional node " + optional.getName() + ": " + c);
+				return;
+			}
+		}
+		logger.debug("Set optional " + optional.getName() + " condition " + c);
+		optionalConditions.get(optional).add(c);
+	}
+
+	public List<NetworkObject> hasOptionalNodes(NetworkObject previous, NetworkObject next){
+		List<NetworkObject> res = optionalPlacement.get(previous+"__"+next);
+		/*if(res != null && res.size() > 0){
+			logger.debug("Between " + previous + " and " + next + " found these optional nodes: ");
+			res.forEach(o -> logger.debug("\t"+o));
+		}*/
+		return res;
+	}
+	
+	public BoolExpr fromOptionalNodeToCondition(Node optional){
+		List<BoolExpr> conditions = optionalConditions.get(optional);
+		if(conditions == null)
+			throw new BadGraphError("Autoplacement condition not set for " + optional.getName(), EType.INVALID_NODE_CONFIGURATION);
+		BoolExpr[] tmp = new BoolExpr[conditions.size()];
+		BoolExpr result = ctx.mkOr(conditions.toArray(tmp));
+		//logger.debug("From optional node " + optional.getName() + " to condition " + result);
+		return result;
+	}
+	
+	public void addOptionalNode(Node n, NetworkObject no){
+		if(!optionalNodes.keySet().contains(n)){
+			logger.debug("Added optional node: " + n.getName() +" with condition " + no.isUsed());
+			optionalNodes.put(n, no);
+		}
+	}
+	
+	public boolean nodeIsOptional(Node n){
+		return optionalNodes.keySet().contains(n);
+	}
+
+	public BoolExpr getOptionalDeploymentCondition(Node n){
+		return optionalNodes.get(n).isUsed();
+	}
+
+	public boolean networkObjectIsOptional(NetworkObject no) {
+		return optionalNodes.values().contains(no);
+	}
+
+	
+}
