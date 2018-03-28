@@ -133,6 +133,7 @@ public class TestAutoConfiguration {
 		try {
 			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-FW-RI.xml", true, FunctionalTypes.FIREWALL); //Working
 			assertTrue(autoNodes.size() == 1);
+			assertTrue(autoNodes.get(0).getName().equals("node1"));
 			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
 			assertTrue(e.size() == 1);
 			assertTrue(e.get(0).getSource().equals("nodeC") && e.get(0).getDestination().equals("nodeB"));
@@ -145,6 +146,7 @@ public class TestAutoConfiguration {
 		try {
 			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-FW-IR.xml", true, FunctionalTypes.FIREWALL); //Working
 			assertTrue(autoNodes.size() == 1);
+			assertTrue(autoNodes.get(0).getName().equals("node1"));
 			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
 			assertTrue(e.size() == 1);
 			assertTrue(e.get(0).getSource().equals("nodeA") && e.get(0).getDestination().equals("nodeB"));
@@ -157,6 +159,7 @@ public class TestAutoConfiguration {
 		try {
 			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-FW-II.xml", true, FunctionalTypes.FIREWALL); //Working
 			assertTrue(autoNodes.size() == 1);
+			assertTrue(autoNodes.get(0).getName().equals("node3"));
 			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
 			assertTrue(e.size() == 1);
 			assertTrue(e.get(0).getSource().equals("node2") && e.get(0).getDestination().equals("nodeB"));

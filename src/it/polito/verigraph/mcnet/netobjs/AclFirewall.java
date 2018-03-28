@@ -56,12 +56,12 @@ public class AclFirewall extends NetworkObject{
    		acls = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
    		z3Node = ((NetworkObject)args[0][0]).getZ3Node();
         fw = z3Node;
-		used = ctx.mkBoolConst(fw+"_used");
 	    net = (Network)args[0][1];
 	    nctx = (NetContext)args[0][2];
 	    net.saneSend(this);
 	    if(args[0].length > 3 && ((Integer) args[0][3]) != 0){
 	    	if(args[0].length > 4 && args[0][4] != null){
+	    		used = ctx.mkBoolConst(fw+"_used");
 				autoplace = true;
 				autoctx = (AutoContext) args[0][4];
 			}
@@ -88,7 +88,7 @@ public class AclFirewall extends NetworkObject{
 	}
 	
 	public void addAcls(ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acls){
-		if(!autoconf) // not an autoconfiguration firewall
+		if(!autoconf) // if not an autoconfiguration firewall
 			this.acls.addAll(acls);
 	}
 	
@@ -161,15 +161,19 @@ public class AclFirewall extends NetworkObject{
  			if(autoplace){
  	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( src, this.nctx.am.get("null")),"fw_auto_conf"));
  	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( dst, this.nctx.am.get("null")),"fw_auto_conf"));
- 	 			//autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
- 	 			//autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( srcp, ctx.mkInt(0)),"fw_auto_conf"));
- 	 			//autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( dstp, ctx.mkInt(0)),"fw_auto_conf"));
+ 	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
+ 	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( srcp, ctx.mkInt(0)),"fw_auto_conf"));
+ 	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( dstp, ctx.mkInt(0)),"fw_auto_conf"));
+				implications1.add(ctx.mkAnd(ctx.mkNot(ctx.mkEq( src, this.nctx.am.get("null"))),
+											ctx.mkNot(ctx.mkEq( dst, this.nctx.am.get("null")))));
+				implications2.add(ctx.mkAnd(ctx.mkEq( src, this.nctx.am.get("null")),
+											ctx.mkEq( dst, this.nctx.am.get("null"))));
  			}else{
  	 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( src, this.nctx.am.get("null")),"fw_auto_conf"));
  	 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( dst, this.nctx.am.get("null")),"fw_auto_conf"));
- 	 			//nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
- 	 			//nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( srcp, ctx.mkInt(0)),"fw_auto_conf"));
- 	 			//nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( dstp, ctx.mkInt(0)),"fw_auto_conf"));
+ 	 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
+ 	 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( srcp, ctx.mkInt(0)),"fw_auto_conf"));
+ 	 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( dstp, ctx.mkInt(0)),"fw_auto_conf"));
  			}
  			rules.add(ctx.mkAnd(
  					ctx.mkEq(nctx.pf.get("src").apply(p_0), src),
@@ -177,54 +181,38 @@ public class AclFirewall extends NetworkObject{
  					//ctx.mkEq(nctx.pf.get("proto").apply(p_0), proto),
  					//ctx.mkEq((IntExpr)nctx.src_port.apply(p_0), srcp),
  					//ctx.mkEq((IntExpr)nctx.dest_port.apply(p_0), dstp)
- 					));
-			/*BoolExpr zeroImplication = ctx.mkImplies(ctx.mkAnd(ctx.mkNot(ctx.mkEq( src, this.nctx.am.get("null"))),
-															   ctx.mkNot(ctx.mkEq( dst, this.nctx.am.get("null")))),used);
-															   //System.out.println("Adding to fw constraints: " + firstImplication);
-			constraints.add(zeroImplication);*/
-			implications1.add(ctx.mkAnd(ctx.mkNot(ctx.mkEq( src, this.nctx.am.get("null"))),
-										ctx.mkNot(ctx.mkEq( dst, this.nctx.am.get("null")))));
- 			/*BoolExpr firstImplication = ctx.mkImplies(ctx.mkEq( src, this.nctx.am.get("null")),
-													  ctx.mkEq( dst, this.nctx.am.get("null"))
-											 		    );
-			//System.out.println("Adding to fw constraints: " + firstImplication);
-			//constraints.add(firstImplication);
-			BoolExpr firstImplicationReverse = ctx.mkImplies(ctx.mkEq( dst, this.nctx.am.get("null")),
-														     ctx.mkEq( src, this.nctx.am.get("null"))
-										 					   );		
-			//System.out.println("Adding to fw constraints: " + firstImplicationReverse);
-			constraints.add(firstImplicationReverse);*/
-			BoolExpr secondImplication = ctx.mkAnd(ctx.mkEq( src, this.nctx.am.get("null")),
-													ctx.mkEq( dst, this.nctx.am.get("null")));
-			implications2.add(secondImplication);
+ 					));			
  		}
  		
  		acl_func = ctx.mkFuncDecl(fw + "_acl_func", new Sort[] { nctx.address, nctx.address }, ctx.mkBoolSort());
  		BoolExpr[] tmp = new BoolExpr[rules.size()];
- 		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 }, ctx.mkImplies(
- 				(BoolExpr) nctx.send.apply(new Expr[] { fw, n_0, p_0 }),
- 				ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, nctx.recv.apply(n_1, fw, p_0), 1, null, null, null, null),
- 						  ctx.mkNot(
- 								  ctx.mkOr(
- 										  rules.toArray(tmp)
- 										  )		
- 								  ),used)), 1, null, null, null, null));
- 		BoolExpr[] tmp2 = new BoolExpr[rules.size()];
- 		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 },
- 				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, fw, p_0),
- 						ctx.mkNot(
- 									ctx.mkOr(
- 											rules.toArray(tmp2)
- 									   )
- 						)), ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, (BoolExpr) nctx.send.apply(new Expr[] { fw, n_1, p_0 }), 1, null, null, null, null))), 
- 				1, null, null, null, null));
- 		BoolExpr[] tmp3 = new BoolExpr[implications1.size()];
-		//System.out.println("Adding to fw constraints: " + ctx.mkImplies(ctx.mkAnd(implications1.toArray(tmp3)), used));
-		constraints.add(     ctx.mkImplies(ctx.mkOr(implications1.toArray(tmp3)),used)    );
+		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 }, ctx.mkImplies(
+				(BoolExpr) nctx.send.apply(new Expr[] { fw, n_0, p_0 }),
+				ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, nctx.recv.apply(n_1, fw, p_0), 1, null, null, null, null),
+						  ctx.mkNot(
+								  ctx.mkOr(
+										  rules.toArray(tmp)
+										  )		
+								  ))), 1, null, null, null, null));
+		BoolExpr[] tmp2 = new BoolExpr[rules.size()];
+		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 },
+				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, fw, p_0),
+						ctx.mkNot(
+									ctx.mkOr(
+											rules.toArray(tmp2)
+									   )
+						)), ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, (BoolExpr) nctx.send.apply(new Expr[] { fw, n_1, p_0 }), 1, null, null, null, null))), 
+				1, null, null, null, null));
 
- 		BoolExpr[] tmp4 = new BoolExpr[implications2.size()];
-		//System.out.println("Adding to fw constraints: " + ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4))));
-		constraints.add(     ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4)))    );
+ 		if(autoplace){
+ 			BoolExpr[] tmp3 = new BoolExpr[implications1.size()];
+ 			//System.out.println("Adding to fw constraints: " + ctx.mkImplies(ctx.mkAnd(implications1.toArray(tmp3)), used));
+ 			constraints.add(     ctx.mkImplies(ctx.mkOr(implications1.toArray(tmp3)),used)    );
+
+ 	 		BoolExpr[] tmp4 = new BoolExpr[implications2.size()];
+ 			//System.out.println("Adding to fw constraints: " + ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4))));
+ 			constraints.add(     ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4)))    );
+ 		}
 
  	}
     

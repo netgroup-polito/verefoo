@@ -18,6 +18,8 @@ import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
+
+import it.polito.verifoo.rest.common.AutoContext;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
@@ -34,7 +36,9 @@ public class PolitoIDS extends NetworkObject {
     Network net;
     NetContext nctx;
     FuncDecl isInBlacklist;
-	private boolean autoconf;
+    int nRules;
+	private boolean autoconf,autoplace;
+	private AutoContext autoctx;
 
 
     public PolitoIDS(Context ctx, Object[]...args){
@@ -55,13 +59,21 @@ public class PolitoIDS extends NetworkObject {
         this.net = (Network)args[0][1];
         this.nctx = (NetContext)args[0][2];
         if(args[0].length > 3 && ((Integer) args[0][3]) != 0){
+	    	if(args[0].length > 4 && args[0][4] != null){
+	    		used = ctx.mkBoolConst(politoIDS+"_used");
+				autoplace = true;
+				autoctx = (AutoContext) args[0][4];
+			}
+			else{
+				autoplace = false;
+			}
 			autoconf = true; 
-			//installIDS((Integer) args[0][3]);
+			nRules = (Integer) args[0][3];
 	    }
 		else{
+			autoplace = false;
 			autoconf = false;
 		}
-
     }
 
     @Override
@@ -169,9 +181,17 @@ public class PolitoIDS extends NetworkObject {
         Expr p_0 = ctx.mkConst(politoIDS + "_p_0", nctx.packet);
         Expr b_0 = ctx.mkIntConst(politoIDS + "_b_0");
         List<BoolExpr> rules = new ArrayList<>();
+ 		List<BoolExpr> implications1 = new ArrayList<BoolExpr>();
+ 		List<BoolExpr> implications2 = new ArrayList<BoolExpr>();
  		for(int i = 0; i < nRules; i++){
  			Expr notAllowed = ctx.mkConst(politoIDS + "_auto_notAllowed_"+i, ctx.mkIntSort());
- 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( notAllowed, ctx.mkInt(0) ),"politoIDS"));
+ 			if(autoplace){
+ 	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( notAllowed, ctx.mkInt(0) ),"politoAntispam"));
+				implications1.add(ctx.mkNot(ctx.mkEq( notAllowed, ctx.mkInt(0))));
+				implications2.add(ctx.mkEq( notAllowed, ctx.mkInt(0)));
+ 			}else{
+ 				nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( notAllowed, ctx.mkInt(0) ),"politoIDS"));
+ 			}
  			rules.add(
  						ctx.mkEq((IntExpr)nctx.pf.get("body").apply(p_0), notAllowed)
  					);
@@ -204,6 +224,15 @@ public class PolitoIDS extends NetworkObject {
 				                				)),
                 		ctx.mkExists(new Expr[]{n_1},((BoolExpr)nctx.send.apply(politoIDS,n_1,p_0)),1,null, null, null, null))
                 ,1,null, null, null, null));
+        if(autoplace){
+ 			BoolExpr[] tmp3 = new BoolExpr[implications1.size()];
+ 			//System.out.println("Adding to antispam constraints: " + ctx.mkImplies(ctx.mkAnd(implications1.toArray(tmp3)), used));
+ 			constraints.add(     ctx.mkImplies(ctx.mkOr(implications1.toArray(tmp3)),used)    );
+
+ 	 		BoolExpr[] tmp4 = new BoolExpr[implications2.size()];
+ 			//System.out.println("Adding to antispam constraints: " + ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4))));
+ 			constraints.add(     ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4)))    );
+ 		}	
     }
 
 }

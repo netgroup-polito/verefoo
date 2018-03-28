@@ -17,6 +17,7 @@ import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Node;
+import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
@@ -36,6 +37,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	private AutoContext autoctx;
     private Network net;
 	private int nRules;
+	private List<NodeMetrics> nodeMetrics;
 	/**
      * This class is an helper to generate network object
      * @param ctx Z3 Context
@@ -43,14 +45,17 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	 * @param autoctx 
      * @param net Network
      * @param nodes List of nodes from that we will generate NetworkObject
+	 * @param nodeMetrics 
      */
-    public NodeNetworkObject(Context ctx, NetContext nctx, AutoContext autoctx, Network net, List<it.polito.verifoo.rest.jaxb.Node> nodes, int nRules) {
+    public NodeNetworkObject(Context ctx, NetContext nctx, AutoContext autoctx, Network net, 
+    		List<it.polito.verifoo.rest.jaxb.Node> nodes, int nRules, List<NodeMetrics> nodeMetrics) {
 		super();
 		this.ctx = ctx;
 		this.nctx = nctx;
 		this.autoctx = autoctx;
 		this.net = net;
 		this.nRules = nRules;
+		this.nodeMetrics = nodeMetrics;
 		nodes.forEach(this::generateNetObj);
 	}
 
@@ -139,6 +144,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	public void generateNetObj(Node n){
 			FunctionalTypes ftype;
 			ftype=n.getFunctionalType();
+			boolean optional = nodeMetrics.stream().filter( c -> c.getNode().equals(n.getName())).map(c -> c.isOptional()).findFirst().orElse(false);
 			switch (ftype) {
 				case FIREWALL:{
 					if(n.getConfiguration().getFirewall()==null){
@@ -146,9 +152,15 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					}
 					AclFirewall fw;
 					if(n.getConfiguration().getFirewall().getElements().isEmpty()){
-						//AclFirewallAuto fw = new AclFirewallAuto(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
-						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules, autoctx});
-						autoctx.addOptionalNode(n, fw);
+						if(optional){
+							System.out.println("Autoplacement for " + n.getName());
+							fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules, autoctx});
+							autoctx.addOptionalNode(n, fw);
+						}
+						else{
+							System.out.println("Autoconfiguration for " + n.getName());
+							fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
+						}
 					}
 					else{
 						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
@@ -182,7 +194,15 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					}
 					PolitoAntispam spam;
 					if(n.getConfiguration().getAntispam().getSource().isEmpty()){
-						spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
+						if(optional){
+							System.out.println("Autoplacement for " + n.getName());
+							spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules,autoctx});
+							autoctx.addOptionalNode(n, spam);
+						}
+						else{
+							System.out.println("Autoconfiguration for " + n.getName());
+							spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
+						}
 					}
 					else{
 						spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
@@ -207,7 +227,15 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					}
 					PolitoIDS ids;
 					if(n.getConfiguration().getDpi().getNotAllowed().isEmpty()){
-						ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
+						if(optional){
+							System.out.println("Autoplacement for " + n.getName());
+							ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules,autoctx});
+							autoctx.addOptionalNode(n, ids);
+						}
+						else{
+							System.out.println("Autoconfiguration for " + n.getName());
+							ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
+						}
 						ids.installIDS(nRules);
 					}
 					else{

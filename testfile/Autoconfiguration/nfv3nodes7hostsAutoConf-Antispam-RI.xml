@@ -4,12 +4,14 @@
     <graph id="0">
      <node functional_type="ENDHOST" name="nodeA">
         <neighbour name="node1"/>
+        <neighbour name="node2"/>
         <configuration description="A simple description" name="confA">
           <endhost email_from="3" protocol = "POP3_REQUEST"/>
         </configuration>
       </node>
 	  <node functional_type="ENDHOST" name="nodeC">
         <neighbour name="node1"/>
+        <neighbour name="node2"/>
         <configuration description="A simple description" name="confA">
           <endhost email_from="2" protocol = "POP3_REQUEST"/>
         </configuration>
@@ -64,7 +66,7 @@
   <Hosts>
   	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
   	<Host name="hostC" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeC"/>
-  	<Host name="host1" cpu="1" cores="4" memory="16" diskStorage="50" maxVNF="1" type="MIDDLEBOX">
+  	<Host name="host1" cpu="1" cores="4" memory="16" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="ANTISPAM"/>

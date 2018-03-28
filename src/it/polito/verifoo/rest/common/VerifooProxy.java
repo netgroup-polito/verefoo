@@ -77,7 +77,7 @@ public class VerifooProxy {
 			autoctx = new AutoContext(ctx);
 			net = new Network (ctx,new Object[]{nctx});
 			/* Generate the different network object and map it to XML Node */
-			netobjs=new NodeNetworkObject(ctx, nctx, autoctx, net,nodes, prop.size());
+			netobjs=new NodeNetworkObject(ctx, nctx, autoctx, net,nodes, prop.size(), nodeMetrics);
 			
 			AddressMapping adm = new AddressMapping(netobjs, nctx, net);
 			adm.setAddressMappings(nodes);
@@ -111,7 +111,7 @@ public class VerifooProxy {
 	     * @throws BadGraphError
 	     */
 		private void setConditions() throws BadGraphError{
-			
+			Map<String, List<Tuple<BoolExpr, BoolExpr>>> dependencies = autoctx.getDependencies();
 			for(Node n:conditionDB.keySet()){
 				for(String h:conditionDB.get(n).keySet()){
 					if(countConditions.get(n.getName()+"_"+h) < clientServerCombinations){
@@ -123,6 +123,17 @@ public class VerifooProxy {
 			
 			logger.debug("----CONDITION DB----");
 			conditionDB.entrySet().forEach(e -> {
+				e.getValue().forEach((h,c) -> {
+					List<Tuple<BoolExpr, BoolExpr>> list = dependencies.get(e.getKey().getName()+"@"+h);
+					if(list != null){
+						List<BoolExpr> dep = list.stream().map(t -> t._2).collect(Collectors.toList());
+						logger.debug("Dependencies for " + e.getKey().getName()+ "@" + h + ": " + dep);
+						BoolExpr tmp[] = new BoolExpr[dep.size()];
+						BoolExpr exp = ctx.mkImplies(c, ctx.mkOr(dep.toArray(tmp)));
+						//System.out.println("Adding " + exp);
+						nctx.constraints.add(exp);
+					}
+				});
 				logger.debug(e.getKey().getName() + " -> " + e.getValue());
 			});
 			logger.debug("--------------------");
@@ -162,6 +173,7 @@ public class VerifooProxy {
 			conditionDB.entrySet().forEach(e -> {
 				List<IntExpr> univocity = new ArrayList<>();
 				Map<ArithExpr, ArithExpr> cpuRequirements = new HashMap<>();
+				Node nodeCond = e.getKey();
 				e.getValue().entrySet().stream()
 										.map(pair -> pair.getValue())
 										.collect(Collectors.toList())
@@ -194,6 +206,8 @@ public class VerifooProxy {
 						logger.debug(e.getKey().getName() + " adding OPTIONAL univocity: " + ctx.mkEq(ctx.mkAdd(uniqueNodeConstraint, nctx.bool_to_int(ctx.mkNot(no.isUsed()))), ctx.mkInt(1)));
 						autoctx.constraints.add(ctx.mkEq(ctx.mkAdd(uniqueNodeConstraint, nctx.bool_to_int(ctx.mkNot(no.isUsed()))), ctx.mkInt(1)));
 						autoctx.softConstrAutoPlace.add(new Tuple<BoolExpr, String>(ctx.mkEq(nctx.bool_to_int(ctx.mkNot(no.isUsed())), ctx.mkInt(1)), "optionalPlacement"));
+						//nctx.constraints.add(ctx.mkEq(ctx.mkAdd(uniqueNodeConstraint, nctx.bool_to_int(ctx.mkNot(no.isUsed()))), ctx.mkInt(1)));
+						//nctx.softConstrAutoPlace.add(new Tuple<BoolExpr, String>(ctx.mkEq(nctx.bool_to_int(ctx.mkNot(no.isUsed())), ctx.mkInt(1)), "optionalPlacement"));
 					}else{
 						logger.debug(e.getKey().getName() + " adding univocity: " + ctx.mkEq(uniqueNodeConstraint, ctx.mkInt(1)));
 						nctx.constraints.add(ctx.mkEq(uniqueNodeConstraint, ctx.mkInt(1)));

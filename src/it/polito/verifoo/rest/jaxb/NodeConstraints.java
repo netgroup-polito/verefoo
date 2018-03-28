@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.03.20 alle 12:47:13 PM CET 
+// Generato il: 2018.03.27 alle 04:13:36 PM CEST 
 //
 
 
@@ -38,6 +38,7 @@ import javax.xml.bind.annotation.XmlType;
  *                 &lt;attribute name="reqStorage" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
  *                 &lt;attribute name="cores" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
  *                 &lt;attribute name="memory" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
+ *                 &lt;attribute name="optional" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
@@ -105,6 +106,7 @@ public class NodeConstraints {
      *       &lt;attribute name="reqStorage" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
      *       &lt;attribute name="cores" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
      *       &lt;attribute name="memory" type="{http://www.w3.org/2001/XMLSchema}int" default="0" />
+     *       &lt;attribute name="optional" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" />
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>
@@ -128,6 +130,8 @@ public class NodeConstraints {
         protected Integer cores;
         @XmlAttribute(name = "memory")
         protected Integer memory;
+        @XmlAttribute(name = "optional")
+        protected Boolean optional;
 
         /**
          * Recupera il valore della proprietà node.
@@ -283,6 +287,34 @@ public class NodeConstraints {
          */
         public void setMemory(Integer value) {
             this.memory = value;
+        }
+
+        /**
+         * Recupera il valore della proprietà optional.
+         * 
+         * @return
+         *     possible object is
+         *     {@link Boolean }
+         *     
+         */
+        public boolean isOptional() {
+            if (optional == null) {
+                return false;
+            } else {
+                return optional;
+            }
+        }
+
+        /**
+         * Imposta il valore della proprietà optional.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link Boolean }
+         *     
+         */
+        public void setOptional(Boolean value) {
+            this.optional = value;
         }
 
     }

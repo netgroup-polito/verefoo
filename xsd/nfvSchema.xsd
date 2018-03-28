@@ -83,6 +83,7 @@
 			            <xsd:attribute name="reqStorage" type="xsd:int" use="optional" default="0"/>
 			            <xsd:attribute name="cores" type="xsd:int" use="optional" default="0"/>
 			            <xsd:attribute name="memory" type="xsd:int" use="optional" default="0"/>
+			            <xsd:attribute name="optional" type="xsd:boolean" use="optional" default="false"/>
 			        </xsd:complexType>
        	 		</xsd:element>
 			</xsd:sequence>

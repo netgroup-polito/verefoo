@@ -33,6 +33,8 @@ public class AutoContext extends Core{
 	private Map<String, List<NetworkObject>> optionalPlacement;
 	private HashMap<Node, NetworkObject> optionalNodes;
 	private Map<Node, List<BoolExpr>> optionalConditions;
+	private Map<String, Tuple<BoolExpr, BoolExpr>> dependencies;
+	private List<String> unnecessaryDependency;
 	/**
 	 * Public constructor for the auto context class
 	 */
@@ -46,6 +48,8 @@ public class AutoContext extends Core{
 		optionalPlacement = new HashMap<>();
 		optionalNodes = new HashMap<>();
 		optionalConditions = new HashMap<>();
+		dependencies = new HashMap<>();
+		unnecessaryDependency = new ArrayList<>();
 		constraints = new ArrayList<>();
 		softConstrAutoPlace = new ArrayList<>();
 		softConstrAutoConf = new ArrayList<>();
@@ -63,13 +67,13 @@ public class AutoContext extends Core{
         //System.out.println("======AUTO CONTEXT SOFT CONSTRAINTS====== ");
         //System.out.println("AutoConfiguration Constraints");
         for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
-        	//System.out.println(t._1 + "\n with value " + 2000 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, 2000, t._2);
+        	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, 1000, t._2);
 		}
         //System.out.println("AutoPlacement Constraints");
         for (Tuple<BoolExpr, String> t : softConstrAutoPlace) {
-        	//System.out.println(t._1 + "\n with value " + 1000 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, 1000, t._2);
+        	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, 100, t._2);
 		}
 	}
 	
@@ -106,7 +110,25 @@ public class AutoContext extends Core{
 		}*/
 		return res;
 	}
-	
+	public List<Node> hasOptionalNodes(Node previous, Node next){
+		List<NetworkObject> tmp = optionalPlacement.get(previous.getName()+"__"+next.getName());
+		List<Node> res = new ArrayList<>();
+		if(tmp == null || tmp.isEmpty()) return res;
+		tmp.forEach(no -> {
+			//res.add(optionalNodes.entrySet().stream().filter(e -> e.getValue().equals(no)).map(e -> e.getKey()).findFirst().get());
+			res.add(optionalNodes.entrySet().stream().filter(e -> e.getValue().equals(no)).map(e -> e.getKey()).findFirst().get());
+		});
+		return res;
+	}
+	public BoolExpr optionalConditionBetween(Node previous, Node next){
+		List<NetworkObject> dependency = optionalPlacement.get(previous.getName()+"__"+next.getName());
+		BoolExpr res = null;
+		if(dependency == null || dependency.size() == 0) return res;
+		BoolExpr[] tmp = new BoolExpr[dependency.size()];
+		res = ctx.mkOr(dependency.stream().map(no -> no.isUsed()).collect(Collectors.toList()).toArray(tmp));
+		return res;
+		
+	}
 	public BoolExpr fromOptionalNodeToCondition(Node optional){
 		List<BoolExpr> conditions = optionalConditions.get(optional);
 		if(conditions == null)
@@ -135,6 +157,27 @@ public class AutoContext extends Core{
 	public boolean networkObjectIsOptional(NetworkObject no) {
 		return optionalNodes.values().contains(no);
 	}
-
+	public void addDependency(String node, String host, String dependantNode, BoolExpr statement, BoolExpr dependency){
+		dependencies.put(node+"@"+host+"@"+dependantNode, new Tuple<BoolExpr, BoolExpr>(statement, dependency));
+	}
+	public void removeDependency(String node, String host, String dependantNode){
+		unnecessaryDependency.add(node+"@"+host+"@"+dependantNode);
+	}
 	
+	public Map<String, List<Tuple<BoolExpr, BoolExpr>>> getDependencies(){
+		Map<String, Tuple<BoolExpr, BoolExpr>> tmp = new HashMap<>(dependencies);
+		unnecessaryDependency.forEach(d -> {
+			tmp.remove(d);
+		});
+		Map<String, List<Tuple<BoolExpr, BoolExpr>>> res = new HashMap<>();
+		tmp.forEach((k,v) -> {
+			String newKey = k.substring(0, k.lastIndexOf("@"));
+			if(!res.containsKey(newKey))
+				res.put(newKey, new ArrayList<>());
+			res.get(newKey).add(v);
+		});
+		//System.out.println("Final Dependencies" + res);
+		logger.debug("Final Dependencies" + res);
+		return res;
+	}
 }

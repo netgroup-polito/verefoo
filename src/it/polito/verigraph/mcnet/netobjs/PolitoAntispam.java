@@ -20,6 +20,7 @@ import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Sort;
 
+import it.polito.verifoo.rest.common.AutoContext;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
@@ -38,7 +39,9 @@ public class PolitoAntispam extends NetworkObject{
     NetContext nctx;
     FuncDecl isInBlacklist;
     int[] blacklist;
-	private boolean autoconf;
+    int nRules;
+	private boolean autoconf,autoplace;
+	private AutoContext autoctx;
     public PolitoAntispam(Context ctx, Object[]... args) {
         super(ctx, args);
     }
@@ -54,10 +57,20 @@ public class PolitoAntispam extends NetworkObject{
         nctx = (NetContext)args[0][2];
         net.saneSend(this);
         if(args[0].length > 3 && ((Integer) args[0][3]) != 0){
+	    	if(args[0].length > 4 && args[0][4] != null){
+	    		used = ctx.mkBoolConst(politoAntispam+"_used");
+				autoplace = true;
+				autoctx = (AutoContext) args[0][4];
+			}
+			else{
+				autoplace = false;
+			}
 			autoconf = true; 
-			installAntispam((Integer) args[0][3]);
+			nRules = (Integer) args[0][3];
+			installAntispam(nRules);
 	    }
 		else{
+			autoplace = false;
 			autoconf = false;
 		}
     }
@@ -133,9 +146,17 @@ public class PolitoAntispam extends NetworkObject{
         Expr n_1 = ctx.mkConst(politoAntispam+"_n_1", nctx.node);
         Expr p_0 = ctx.mkConst(politoAntispam+"_p_0", nctx.packet);
         List<BoolExpr> rules = new ArrayList<>();
+ 		List<BoolExpr> implications1 = new ArrayList<BoolExpr>();
+ 		List<BoolExpr> implications2 = new ArrayList<BoolExpr>();
  		for(int i = 0; i < nRules; i++){
  			Expr emailFrom = ctx.mkConst(politoAntispam + "_auto_emailFrom_"+i, ctx.mkIntSort());
- 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( emailFrom, ctx.mkInt(0) ),"politoAntispam"));
+ 			if(autoplace){
+ 	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( emailFrom, ctx.mkInt(0) ),"politoAntispam"));
+				implications1.add(ctx.mkNot(ctx.mkEq( emailFrom, ctx.mkInt(0))));
+				implications2.add(ctx.mkEq( emailFrom, ctx.mkInt(0)));
+ 			}else{
+ 	 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( emailFrom, ctx.mkInt(0) ),"politoAntispam"));
+ 			}
  			rules.add(
  						ctx.mkEq((IntExpr)nctx.pf.get("emailFrom").apply(p_0), emailFrom)
  					);
@@ -170,7 +191,15 @@ public class PolitoAntispam extends NetworkObject{
 					 						)), 
 		 						ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, (BoolExpr) nctx.send.apply(new Expr[] { politoAntispam, n_1, p_0 }), 1, null, null, null, null))),
 		 				1, null, null, null, null));
-					
+ 		if(autoplace){
+ 			BoolExpr[] tmp3 = new BoolExpr[implications1.size()];
+ 			//System.out.println("Adding to antispam constraints: " + ctx.mkImplies(ctx.mkAnd(implications1.toArray(tmp3)), used));
+ 			constraints.add(     ctx.mkImplies(ctx.mkOr(implications1.toArray(tmp3)),used)    );
+
+ 	 		BoolExpr[] tmp4 = new BoolExpr[implications2.size()];
+ 			//System.out.println("Adding to antispam constraints: " + ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4))));
+ 			constraints.add(     ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4)))    );
+ 		}			
 					 	      
   }
     public void addBlackList(int[] list){

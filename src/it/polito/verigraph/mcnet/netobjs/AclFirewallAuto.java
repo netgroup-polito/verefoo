@@ -117,25 +117,6 @@ public class AclFirewallAuto extends NetworkObject {
 					//ctx.mkEq((IntExpr)nctx.dest_port.apply(p_0), dstp)
 					);
 			rules.add(rule);
-			BoolExpr firstImplication = ctx.mkImplies(fwUsed, ctx.mkAnd(ctx.mkNot(ctx.mkEq( src, this.nctx.am.get("null"))),
-												      ctx.mkNot(ctx.mkEq( dst, this.nctx.am.get("null"))))
-													);
-			
-			BoolExpr firstImplicationReverse = ctx.mkImplies(ctx.mkAnd(ctx.mkNot(ctx.mkEq( src, this.nctx.am.get("null"))),
-														      ctx.mkNot(ctx.mkEq( dst, this.nctx.am.get("null"))))
-															,fwUsed );
-			System.out.println("Adding to fw constraints: " + firstImplication);
-			System.out.println("Adding to fw constraints: " + firstImplicationReverse);
-			//constraints.add(firstImplication);
-			
-			BoolExpr secondImplication = ctx.mkImplies(ctx.mkNot(fwUsed), ctx.mkOr(ctx.mkEq( src, this.nctx.am.get("null")),
-															    ctx.mkEq( dst, this.nctx.am.get("null")))
-														);
-			//System.out.println("Adding to fw constraints: " + secondImplication);
-			constraints.add(secondImplication);
-			/*implications1.add(ctx.mkAnd(ctx.mkNot(ctx.mkEq( src, this.nctx.am.get("null"))),
-										ctx.mkNot(ctx.mkEq( dst, this.nctx.am.get("null")))));
-			//implications2.add();*/
 			
 		}
 		acl_func = ctx.mkFuncDecl(fw + "_acl_func", new Sort[] { nctx.address, nctx.address }, ctx.mkBoolSort());
@@ -157,12 +138,6 @@ public class AclFirewallAuto extends NetworkObject {
 									   )
 						)), ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, (BoolExpr) nctx.send.apply(new Expr[] { fw, n_1, p_0 }), 1, null, null, null, null))), 1, null, null, null, null));
 
-		/*BoolExpr[] tmp3 = new BoolExpr[implications1.size()];
-		System.out.println("Adding to fw constraints: " + ctx.mkImplies(ctx.mkOr(implications1.toArray(tmp3))
-																		, fwUsed));
-		constraints.add(     ctx.mkImplies(ctx.mkOr(implications1.toArray(tmp3)), fwUsed)     );*/
-			
-	
 	}
 
 	private void aclConstraints(Optimize solver) {

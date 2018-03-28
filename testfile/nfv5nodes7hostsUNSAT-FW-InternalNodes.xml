@@ -94,7 +94,7 @@
   </PropertyDefinition>
   <Hosts>
   	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
-  	<Host name="host1" cpu="1" cores="4" memory="16" diskStorage="50" maxVNF="1" type="MIDDLEBOX">
+  	<Host name="host1" cpu="1" cores="4" memory="16" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="ANTISPAM"/>

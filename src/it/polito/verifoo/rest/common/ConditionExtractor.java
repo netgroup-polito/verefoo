@@ -12,6 +12,7 @@ import com.microsoft.z3.Context;
 
 import it.polito.verifoo.rest.jaxb.Connection;
 import it.polito.verifoo.rest.jaxb.Node;
+import it.polito.verigraph.mcnet.components.NetworkObject;
 
 public class ConditionExtractor {
 	private Logger logger = LogManager.getLogger("mylog");
@@ -48,23 +49,32 @@ public class ConditionExtractor {
 					.findFirst().get().getAvgLatency();
 		}
 		BoolExpr firstCond, secondCond;
-		if(autoctx.nodeIsOptional(n)){
-			firstCond = ctx.mkOr(ctx.mkBoolConst(first), ctx.mkNot(autoctx.getOptionalDeploymentCondition(n)));
-		}else{
-			firstCond = ctx.mkBoolConst(first);
-		}
+		
 		next = nodes.stream().filter(node -> node.getName().equals(secondNode)  ).findFirst().get();
 		if(autoctx.nodeIsOptional(next)){
 			secondCond = ctx.mkOr(ctx.mkBoolConst(second), ctx.mkNot(autoctx.getOptionalDeploymentCondition(next)));
 		}else{
 			secondCond = ctx.mkBoolConst(second);
 		}
+		
+		if(autoctx.nodeIsOptional(n)){
+			firstCond = ctx.mkOr(ctx.mkBoolConst(first), ctx.mkNot(autoctx.getOptionalDeploymentCondition(n)));
+			BoolExpr dependency = autoctx.getOptionalDeploymentCondition(n);// autoctx.optionalConditionBetween(n, next);
+			//logger.debug(secondCond + " depends from " + dependency);
+			//System.out.println(secondCond + " depends from " + dependency);
+			autoctx.addDependency(secondNode, secondHost, n.getName(), secondCond, dependency);
+		}else{
+			firstCond = ctx.mkBoolConst(first);
+		}
+		
 		BoolExpr c = ctx.mkAnd(firstCond, secondCond);
 		if(n.getName().equals(firstNode)){
 			if(autoctx.nodeIsOptional(n)){
 				autoctx.addOptionalCondition(n, firstCond);
 				conditionDB.get(n).put(firstHost, ctx.mkBoolConst(first));
 				stageConditions.get(n).put(firstHost, ctx.mkBoolConst(first));
+				//conditionDB.get(n).put(firstHost, firstCond);
+				//stageConditions.get(n).put(firstHost, firstCond);
 			}else{
 				conditionDB.get(n).put(firstHost, firstCond);
 				stageConditions.get(n).put(firstHost, firstCond);
@@ -80,33 +90,42 @@ public class ConditionExtractor {
 			latency = connections.stream()
 					.filter(con -> con.getSourceHost().equals(hostClient) && con.getDestHost().equals(host))
 					.findFirst().get().getAvgLatency();
+			next = nodes.stream().filter(no -> no.getName().equals(node) ).findFirst().get();
 		}
 		else{
 			//logger.debug("Finding latency between " + host + " and " + hostServer);
 			latency = connections.stream()
 					.filter(con -> con.getSourceHost().equals(host) && con.getDestHost().equals(hostServer))
 					.findFirst().get().getAvgLatency();
-		}
-		//Link l = links.stream().filter(li -> li.getSourceNode().equals(n.getName())).findFirst().get();
-		if(n.getName().equals(client.getName())){
-			next = nodes.stream().filter(no -> no.getName().equals(node) ).findFirst().get();
-		}else{
+
 			next = nodes.stream().filter(no -> no.getName().equals(server.getName()) ).findFirst().get();
 		}
+		
 		BoolExpr c;
 		if(autoctx.nodeIsOptional(n)){
-			c = ctx.mkOr(ctx.mkBoolConst(s), ctx.mkNot(autoctx.getOptionalDeploymentCondition(n)));
+			c = ctx.mkOr(ctx.mkBoolConst(s), ctx.mkNot(autoctx.getOptionalDeploymentCondition(n)));			
+			
 		}else if(n.getName().equals(client.getName()) && autoctx.nodeIsOptional(next)){
 			c = ctx.mkOr(ctx.mkBoolConst(s), ctx.mkNot(autoctx.getOptionalDeploymentCondition(next)));
 		}else{
 			c = ctx.mkBoolConst(s);
 		}
-		logger.debug("Checking optional placement for " + n.getName() + " gave condition " + c);
+		List<Node> dependency = autoctx.hasOptionalNodes(n, next);
+		if(!dependency.isEmpty()){
+			dependency.forEach(d -> {
+				//System.out.println(c + " doesn't depend anymore from " + d.getName());
+				//logger.debug(c + " doesn't depend anymore from " + d.getName());
+				autoctx.removeDependency(node, host, d.getName());
+			});
+		}
+		//logger.debug("Checking optional placement for " + n.getName() + " gave condition " + c);
 		if(n != client && n!= server){
 			if(autoctx.nodeIsOptional(n)){
 				autoctx.addOptionalCondition(n, c);
 				conditionDB.get(n).put(host, ctx.mkBoolConst(s));
 				stageConditions.get(n).put(host, ctx.mkBoolConst(s));
+				//conditionDB.get(n).put(host, c);
+				//stageConditions.get(n).put(host, c);
 			}else{
 				conditionDB.get(n).put(host, c);
 				stageConditions.get(n).put(host, c);
@@ -125,21 +144,15 @@ public class ConditionExtractor {
 		}
 		return c;
 	}
-	/*
+	
 	public BoolExpr computeOptional(BoolExpr c){
-		List<Node> optionals = autoctx.hasOptionalNodes(n, next);
-		if(optionals != null && optionals.size() > 0){
-			List<BoolExpr> optCond = new ArrayList<>();
-			optionals.forEach(o -> {
-				logger.debug("Searching optional condition for "+ o.getName());
-				optCond.add(autoctx.fromOptionalNodeToCondition(o));
-			});
-			BoolExpr[] tmp = new BoolExpr[optCond.size()];
-			BoolExpr result = ctx.mkOr(optCond.toArray(tmp));
-			c = ctx.mkAnd(c,ctx.mkNot(result));
+		BoolExpr optionals = autoctx.optionalConditionBetween(n, next);
+		System.out.println("List of Optional: " + optionals);
+		if(optionals != null){
+			c = ctx.mkAnd(c,ctx.mkNot(optionals));
 		}
 		return c;
-	}*/
+	}
 
 	/**
 	 * @return the next

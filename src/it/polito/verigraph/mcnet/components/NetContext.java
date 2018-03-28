@@ -142,24 +142,21 @@ public class NetContext extends Core{
         for (Core policy : policies){
             policy.addConstraints(solver);
         }
-        //the order indicates the priority for the soft constraints
         //System.out.println("======NET CONTEXT SOFT CONSTRAINTS====== ");
-       
-        //System.out.println("Soft Constraints");
-        for (Tuple<BoolExpr, String> t : softConstraints) {
-        	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, 100, t._2);
-		}
         //System.out.println("AutoConfiguration Constraints");
         for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
-        	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, 100, t._2);
+        	//System.out.println(t._1 + "\n with value " + 1000 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, 1000, t._2);
 		}
-        
         //System.out.println("AutoPlacement Constraints");
         for (Tuple<BoolExpr, String> t : softConstrAutoPlace) {
         	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
 			solver.AssertSoft(t._1, 100, t._2);
+		}
+        //System.out.println("Soft Constraints");
+        for (Tuple<BoolExpr, String> t : softConstraints) {
+        	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, 10, t._2);
 		}
         
     }
