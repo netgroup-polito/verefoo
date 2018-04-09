@@ -123,6 +123,8 @@ public class PolitoAntispam extends NetworkObject{
 		            						
 		    	    	            	)
 		            			,1,null,null,null,null));
+    	  
+	  	 
   	  /* OLD constraints, they didn't work
           constraints.add(
                   ctx.mkForall(new Expr[]{n_0, p_0}, 
@@ -199,6 +201,11 @@ public class PolitoAntispam extends NetworkObject{
  	 		BoolExpr[] tmp4 = new BoolExpr[implications2.size()];
  			//System.out.println("Adding to antispam constraints: " + ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4))));
  			constraints.add(     ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4)))    );
+ 			//Constraint3 set a constraint to decide if a firewall is being used
+ 		  	constraints.add(
+ 		            	ctx.mkForall(new Expr[]{n_0, p_0},
+ 		            				ctx.mkImplies(	 (BoolExpr)nctx.recv.apply(n_0, politoAntispam, p_0), used  )
+ 		            			,1,null,null,null,null));
  		}			
 					 	      
   }

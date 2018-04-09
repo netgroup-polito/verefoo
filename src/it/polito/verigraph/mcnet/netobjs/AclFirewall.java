@@ -212,6 +212,11 @@ public class AclFirewall extends NetworkObject{
  	 		BoolExpr[] tmp4 = new BoolExpr[implications2.size()];
  			//System.out.println("Adding to fw constraints: " + ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4))));
  			constraints.add(     ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4)))    );
+ 			//Constraint3 set a constraint to decide if a firewall is being used
+ 	    	constraints.add(
+ 		            	ctx.mkForall(new Expr[]{n_0, p_0},
+ 		            				ctx.mkImplies(	 (BoolExpr)nctx.recv.apply(n_0, fw, p_0), used  )
+ 		            			,1,null,null,null,null));
  		}
 
  	}
