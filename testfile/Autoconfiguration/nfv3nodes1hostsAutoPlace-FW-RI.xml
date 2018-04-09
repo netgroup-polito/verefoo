@@ -56,7 +56,10 @@
     </graph>
   </graphs>
   <Constraints>
-	  <NodeConstraints/>
+	  <NodeConstraints>
+		<NodeMetrics node="node1" optional="true"/>
+		<NodeMetrics node="node3" optional="true"/>
+	  </NodeConstraints>
 	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>

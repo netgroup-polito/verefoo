@@ -172,7 +172,7 @@ public class TestAutoPlacement {
 	@Test
 	public void testAutoDPI_RR(){
 		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-DPI-RR.xml", true, FunctionalTypes.DPI); //Working
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-DPI-RR.xml", true, FunctionalTypes.DPI); //Working
 			assertTrue(autoNodes.size() == 0);
 		} catch (Exception e) {
 			fail(e.toString());
@@ -181,7 +181,7 @@ public class TestAutoPlacement {
 	@Test
 	public void testAutoDPI_RI(){
 		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-DPI-RI.xml", true, FunctionalTypes.DPI); //Working
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-DPI-RI.xml", true, FunctionalTypes.DPI); //Working
 			assertTrue(autoNodes.size() == 1);
 			List<String> e = autoNodes.get(0).getConfiguration().getDpi().getNotAllowed();
 			assertTrue(e.size() == 1);
@@ -193,7 +193,7 @@ public class TestAutoPlacement {
 	@Test
 	public void testAutoDPI_IR(){
 		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-DPI-IR.xml", true, FunctionalTypes.DPI); //Working
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-DPI-IR.xml", true, FunctionalTypes.DPI); //Working
 			assertTrue(autoNodes.size() == 1);
 			List<String> e = autoNodes.get(0).getConfiguration().getDpi().getNotAllowed();
 			assertTrue(e.size() == 1);
@@ -205,7 +205,7 @@ public class TestAutoPlacement {
 	@Test
 	public void testAutoDPI_II(){
 		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-DPI-II.xml", true, FunctionalTypes.DPI); //Working
+			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-DPI-II.xml", true, FunctionalTypes.DPI); //Working
 			assertTrue(autoNodes.size() == 1);
 			List<String> e = autoNodes.get(0).getConfiguration().getDpi().getNotAllowed();
 			assertTrue(e.size() == 2);
