@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="DP2 Project" default="compile" basedir=".">
+<project name="Verifoo Project" default="compile" basedir=".">
 
   <!-- set global properties for this build -->
   <property name="src.dir" location="src"/>
@@ -14,6 +14,9 @@
   <property name="PORT" value="8080"/>
   <property name="URL" value="http://localhost:${PORT}/verifoo/rest"/>
   <property name="URL_j2ee" value="http://localhost:${PORT}/verifoo_j2ee/rest"/>
+  <property name="neo4jURL" value="bolt://127.0.0.1:7687"/>
+  <property name="neo4jUsername" value="neo4j"/>
+  <property name="neo4jPassword" value="password"/>
 <path id="class.path">
     <fileset dir="${lib.dir}">
        <include name="**/*.jar" />
@@ -277,4 +280,18 @@
   	<delete file="${target.dir}/verifoo.war"/>
 </target>
 
+    <!-- Target for executing the main with some defined properties -->
+<target name="main" description="Run main">
+		<java classname="it.polito.verifoo.rest.main.Main" failonerror="true" fork="yes">
+			<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jURL" value="${neo4jURL}"/>
+			<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jUsername" value="${neo4jUsername}"/>
+			<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jPassword" value="${neo4jPassword}"/>
+			<classpath>
+				<pathelement path="${build.dir}"/>
+				<pathelement path="lib/lib4j/*"/>
+				<pathelement path="lib/neo4j/*"/>
+				<pathelement path="lib/*"/>
+			</classpath>
+		</java>
+	</target>
 </project>

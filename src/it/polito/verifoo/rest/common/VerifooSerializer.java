@@ -16,6 +16,7 @@ import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Property;
+import it.polito.verifoo.rest.neo4j.Neo4jClient;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 
 /**
@@ -29,6 +30,31 @@ public class VerifooSerializer {
 	private Logger logger = LogManager.getLogger("mylog");
 	public VerifooSerializer(NFV root) {
 		this.nfv = root;
+		String neo4jURL, neo4jUsername, neo4jPassword;
+		if(System.getProperty("it.polito.verifoo.rest.neo4j.neo4jURL") != null){
+			neo4jURL = System.getProperty("it.polito.verifoo.rest.neo4j.neo4jURL");
+		}else{
+			neo4jURL = "bolt://127.0.0.1:7687";
+		}
+		if(System.getProperty("it.polito.verifoo.rest.neo4j.neo4jUsername") != null){
+			neo4jUsername = System.getProperty("it.polito.verifoo.rest.neo4j.neo4jUsername");
+		}else{
+			neo4jUsername = "neo4j";
+		}
+		if(System.getProperty("it.polito.verifoo.rest.neo4j.neo4jPassword") != null){
+			neo4jPassword = System.getProperty("it.polito.verifoo.rest.neo4j.neo4jPassword");
+			
+		}else{
+			neo4jPassword =  "password";
+		}
+		try{
+			Neo4jClient client = new Neo4jClient(neo4jURL, neo4jUsername, neo4jPassword);
+	        client.storeGraph(root);
+	        client.close();
+		}catch(Exception e){
+			logger.debug("Neo4j deployment FAILED: " + e.getMessage());
+			System.out.println("Neo4j deployment FAILED: " + e.getMessage());
+		}
 		try{
 			for(Graph g:root.getGraphs().getGraph()){
 	        	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());

@@ -18,7 +18,7 @@ import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 public class Neo4jServer {
 	private static enum RelTypes implements RelationshipType
 	{
-		CONNECTED_WITH
+		CONNECTED_WITH, CONTAINS
 	}
 	GraphDatabaseService graphDb;
 	public Neo4jServer( String pathToFile)
