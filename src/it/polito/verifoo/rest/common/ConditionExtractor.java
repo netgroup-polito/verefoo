@@ -96,7 +96,8 @@ public class ConditionExtractor {
 			//logger.debug("Finding latency between " + host + " and " + hostServer);
 			latency = connections.stream()
 					.filter(con -> con.getSourceHost().equals(host) && con.getDestHost().equals(hostServer))
-					.findFirst().get().getAvgLatency();
+					.map(c -> c.getAvgLatency())
+					.findFirst().orElse(0);
 
 			next = nodes.stream().filter(no -> no.getName().equals(server.getName()) ).findFirst().get();
 		}
@@ -119,7 +120,7 @@ public class ConditionExtractor {
 			});
 		}
 		//logger.debug("Checking optional placement for " + n.getName() + " gave condition " + c);
-		if(n != client && n!= server){
+		if(n != client){
 			if(autoctx.nodeIsOptional(n)){
 				autoctx.addOptionalCondition(n, c);
 				conditionDB.get(n).put(host, ctx.mkBoolConst(s));

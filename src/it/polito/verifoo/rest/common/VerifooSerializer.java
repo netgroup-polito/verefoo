@@ -1,10 +1,10 @@
 package it.polito.verifoo.rest.common;
 
-import java.io.FileNotFoundException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,8 +12,10 @@ import org.apache.logging.log4j.Logger;
 
 import com.microsoft.z3.Status;
 
+import it.polito.verifoo.rest.jaxb.Connection;
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Graph;
+import it.polito.verifoo.rest.jaxb.Host;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verifoo.rest.neo4j.Neo4jClient;
@@ -30,7 +32,7 @@ public class VerifooSerializer {
 	private Logger logger = LogManager.getLogger("mylog");
 	public VerifooSerializer(NFV root) {
 		this.nfv = root;
-		String neo4jURL, neo4jUsername, neo4jPassword;
+		/*String neo4jURL, neo4jUsername, neo4jPassword;
 		if(System.getProperty("it.polito.verifoo.rest.neo4j.neo4jURL") != null){
 			neo4jURL = System.getProperty("it.polito.verifoo.rest.neo4j.neo4jURL");
 		}else{
@@ -54,8 +56,16 @@ public class VerifooSerializer {
 		}catch(Exception e){
 			logger.debug("Neo4j deployment FAILED: " + e.getMessage());
 			System.out.println("Neo4j deployment FAILED: " + e.getMessage());
-		}
+		}*/
 		try{
+			if(root.getConnections().getConnection().size() == 0){
+				createFullMesh(root);
+				JAXBContext jc= JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
+				Marshaller m = jc.createMarshaller();
+	            m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
+	            m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
+	            m.marshal( root.getConnections(), System.out ); 
+			}
 			for(Graph g:root.getGraphs().getGraph()){
 	        	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
 	        	if(prop.size() == 0)
@@ -76,10 +86,28 @@ public class VerifooSerializer {
 			//System.out.println("Graph semantically incorrect");
 	    	logger.error(e);
 	    	throw e;
-	    }
+	    } catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
+	private void createFullMesh(NFV root){
+		List<Host> hosts = root.getHosts().getHost();
+		List<Connection> connections = root.getConnections().getConnection();
+		for(Host h1 : hosts){
+			for(Host h2 : hosts){
+				if(h1.getName().equals(h2.getName())) continue;
+				Connection c = new Connection();
+				c.setSourceHost(h1.getName());
+				c.setDestHost(h2.getName());
+				c.setAvgLatency(1);
+				connections.add(c);
+			}
+		}
+	}
 
+	
 	/**
 	 * @return the nfv object
 	 */

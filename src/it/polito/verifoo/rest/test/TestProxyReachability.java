@@ -162,4 +162,28 @@ public class TestProxyReachability {
 			fail(e.toString());
 		}		
 	}
+	@Test
+	public void testFullMesh() {
+		try {
+			test( "./testfile/nfv5nodes7hostsSAT-FullMesh.xml", true); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testNoFixedServer() {
+		try {
+			test( "./testfile/nfv5nodes7hostsSAT-NoFixedServer.xml", true); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testFullMeshNoFixedServer() {
+		try {
+			test( "./testfile/nfv5nodes7hostsSAT-FullMeshNoFixedServer.xml", true); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
 }

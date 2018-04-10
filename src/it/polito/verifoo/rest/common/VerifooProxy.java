@@ -163,10 +163,25 @@ public class VerifooProxy {
 						nctx.constraints.add(ctx.mkEq(c, ctx.mkTrue()));
 					}
 					else{
-						nctx.constraints.add(ctx.mkEq(c, ctx.mkFalse()));
+						if(h.getType().equals(TypeOfHost.SERVER) && (f.equals(FunctionalTypes.WEBSERVER) || f.equals(FunctionalTypes.MAILSERVER))){
+							logger.debug(h.getName() + " supports " + f + " -> " + ctx.mkEq(c, ctx.mkTrue()));
+							nctx.constraints.add(ctx.mkEq(c, ctx.mkTrue()));
+						}else{
+							nctx.constraints.add(ctx.mkEq(c, ctx.mkFalse()));
+						}
 					}
 					hostSupportedVNF.put(h.getName()+"_composition_"+f, c);
 				}
+				/*if(h.getType().equals(TypeOfHost.SERVER)){
+					BoolExpr c = ctx.mkBoolConst(h.getName()+"_composition_"+FunctionalTypes.WEBSERVER);
+					logger.debug(h.getName() + " supports " + FunctionalTypes.WEBSERVER + " -> " + ctx.mkEq(c, ctx.mkTrue()));
+					hostSupportedVNF.put(h.getName()+"_composition_"+FunctionalTypes.WEBSERVER, c);
+					c = ctx.mkBoolConst(h.getName()+"_composition_"+FunctionalTypes.MAILSERVER);
+					nctx.constraints.add(ctx.mkEq(c, ctx.mkTrue()));
+					logger.debug(h.getName() + " supports " + FunctionalTypes.MAILSERVER + " -> " + ctx.mkEq(c, ctx.mkTrue()));
+					hostSupportedVNF.put(h.getName()+"_composition_"+FunctionalTypes.MAILSERVER, c);
+					nctx.constraints.add(ctx.mkEq(hostCondition.get(h.getName()), ctx.mkTrue()));
+				}*/
 				
 			});
 			//logger.debug("Host constraint: " + hostCondition);
@@ -232,14 +247,14 @@ public class VerifooProxy {
 										String node = i.toString().substring(i.toString().indexOf(" ")+1, i.toString().lastIndexOf('@'));
 										FunctionalTypes f = nodes.stream().filter(n1 -> n1.getName().equals(node)).findFirst().get().getFunctionalType();
 										implications.add(ctx.mkImplies(hostCondition.get(h.getName()), i));
-										//logger.debug(i + " => " + hostSupportedVNF.get(h.getName()+"_composition_"+f));
+										logger.debug(i + " => " + hostSupportedVNF.get(h.getName()+"_composition_"+f));
 										nctx.constraints.add(ctx.mkImplies(i, hostSupportedVNF.get(h.getName()+"_composition_"+f)));
 									});
 				//System.out.println(h.getName() + " implication: " + implications);
 				if(implications.size() > 0){
 					BoolExpr[] tmp = new BoolExpr[implications.size()];
 					BoolExpr hostImpliesNodeConstraint = ctx.mkOr(implications.toArray(tmp));
-					//logger.debug(h.getName() + " implication: " + hostImpliesNodeConstraint);
+					logger.debug(h.getName() + " implication: " + hostImpliesNodeConstraint);
 					nctx.constraints.add(hostImpliesNodeConstraint);
 				}
 			});
@@ -310,15 +325,23 @@ public class VerifooProxy {
 	            	 .filter((h) -> {return h.getType() == TypeOfHost.MIDDLEBOX;})
 	            	 .count();
             if(nMiddle == 0) throw new BadGraphError("At least one middle host has to be defined",EType.NO_MIDDLE_HOST_DEFINED);
-            
+            boolean fixedServer = true;
             List<String> clients = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.CLIENT;}).map(h -> h.getName()).collect(Collectors.toList());
             List<String> servers = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.SERVER;}).map(h -> h.getName()).collect(Collectors.toList());
+            if(servers.size() == 0){
+            	//the nodeServer can be deployed on a middlebox
+            	servers = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.MIDDLEBOX;}).map(h -> h.getName()).collect(Collectors.toList());
+            	fixedServer = false;
+            }
            try{
 		        for(String hostClient: clients){
 		        	for(String hostServer: servers){
 		        		//logger.debug("Calculating host chain between " + hostClient + " and " + hostServer + " composed by max " + (nodes.size()-clients.size()-servers.size()+2) + " hosts"); 
-		        		savedChain.addAll(ChainExtractor.createHostChain(hostClient, hostServer, connections, nodes.size()-clients.size()-servers.size()+2));
-		                if(savedChain.size() == 0) throw new BadGraphError("Host client and host server are not connected",EType.INVALID_PHY_SERVER_CLIENT_CONF);
+		        		if(fixedServer)
+		        			savedChain.addAll(ChainExtractor.createHostChain(hostClient, hostServer, connections, nodes.size()-clients.size()-servers.size()+2));
+		        		else
+		        			savedChain.addAll(ChainExtractor.createHostChain(hostClient, hostServer, connections, nodes.size()-clients.size()-1+2));
+		                if(savedChain.size() == 0) throw new BadGraphError("Host client " + hostClient + " and host " + hostServer +" are not connected",EType.INVALID_PHY_SERVER_CLIENT_CONF);
 		            }
 		        }
            }catch(StackOverflowError e) {
@@ -355,13 +378,26 @@ public class VerifooProxy {
 							throw new BadGraphError("The position of the endpoint "+ c.getName() + " is not specified",EType.INVALID_PHY_SERVER_CLIENT_CONF);
 						}
 						if(fixedHostServer == null){
-							throw new BadGraphError("The position of the endpoint "+ s.getName() + " is not specified",EType.INVALID_PHY_SERVER_CLIENT_CONF);
+							validChain = savedChain.stream()
+									.filter(list -> list.contains(fixedHostClient))
+									.collect(Collectors.toList());
+							logger.debug(">>>>Valid Chain found -> " + validChain.size() +" ==>  "+ validChain);
+							Map<String, List<List<String>>> currentSubSet = validChain.stream()
+																						.collect(Collectors.groupingBy(chain -> chain.get(chain.size()-1), Collectors.toList()));
+
+							logger.debug(">>>>Valid SubSet found -> " + currentSubSet.size() +" ==>  "+ currentSubSet);
+							for(Entry<String, List<List<String>>> entry : currentSubSet.entrySet()){
+								logger.debug(">>>>Valid sub set from " + fixedHostClient +" to " + entry.getKey() +" found -> " + entry.getValue().size() +" ==>  "+ entry.getValue());
+								createRoutingConditions(c, s, entry.getValue(), fixedHostClient, entry.getKey());
+							}
 						}
-						validChain = savedChain.stream()
-												.filter(list -> list.contains(fixedHostClient) && list.contains(fixedHostServer))
-												.collect(Collectors.toList());
-						logger.debug(">>>>Valid Chain found -> " + validChain.size());
-						createRoutingConditions(c, s, validChain, fixedHostClient, fixedHostServer);
+						else{
+							validChain = savedChain.stream()
+													.filter(list -> list.contains(fixedHostClient) && list.contains(fixedHostServer))
+													.collect(Collectors.toList());
+							logger.debug(">>>>Valid Chain found -> " + validChain.size());
+							createRoutingConditions(c, s, validChain, fixedHostClient, fixedHostServer);
+						}
 						nodes.forEach(n -> {
 							for(String h:stageConditions.get(n).keySet()){
 								if(!countConditions.containsKey(n.getName()+"_"+h)){
@@ -510,8 +546,10 @@ public class VerifooProxy {
 						BoolExpr c = ce.DeploymentConditionFromString(s, client, server, nodes, hostClient, hostServer);
 						next = ce.getNext();
 						int latency = ce.getLatency();
-						logger.debug("Adding ("+ c +"), from "+ n.getName() +" to " + server.getName() + " next hop is " + next.getName() + " with latency " + latency);
-						rt.add(new RoutingTable(nctx.am.get(server.getName()), netobjs.get(next), nctx.addLatency(latency), c));
+						if(!nodeIsServer(n)){
+							logger.debug("Adding ("+ c +"), from "+ n.getName() +" to " + server.getName() + " next hop is " + next.getName() + " with latency " + latency);
+							rt.add(new RoutingTable(nctx.am.get(server.getName()), netobjs.get(next), nctx.addLatency(latency), c));
+						}
 						/* needed for internal routing
 						for(Entry<Node, List<Node>> rule : routingRule.get(n).entrySet()){
 							for(Node nextHop : rule.getValue()){
@@ -582,6 +620,7 @@ public class VerifooProxy {
 			if(source.getName().equals(server.getName())){
 				if(currentHost.equals(hostServer)){
 					//logger.debug("Route from SERVER " + source.getName() + " to " + nctx.am.get(server.getName())  + " -> next hop: DESTINATION REACHED" + " CurrentHost: " + currentHost);
+					rawConditions.get(source).add(cb.buildConditionString(source, currentHost));
 					//logger.debug("Found path from lv " + level + " of chain " +nChain );
 					return true;
 				}
@@ -590,7 +629,7 @@ public class VerifooProxy {
 					return false;
 				}
 			}
-			if(currentHost.equals(hostServer)){
+			if(currentHost.equals(hostServer) && !nodeIsServer(source)){
 				//logger.debug("Only server node can be deployed on server host -> tried to deploy " + source.getName() + " on " +currentHost );
 				return false;
 			}
@@ -633,6 +672,7 @@ public class VerifooProxy {
 						//logger.debug("From " + currentHost + " to " + nextHost);
 						//logger.debug("On RT("+source.getName()+") ");
 						if(nextHost.equals(hostServer)){
+							//logger.debug("Route from SERVER " + source.getName() + " to " + nctx.am.get(server.getName())  + " -> next hop: DESTINATION REACHED" + " CurrentHost: " + currentHost);
 							rawConditions.get(source).add(cb.buildConditionString(source, currentHost));
 						}
 						else{
