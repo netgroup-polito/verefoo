@@ -17,6 +17,7 @@ import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.Host;
 import it.polito.verifoo.rest.jaxb.NFV;
+import it.polito.verifoo.rest.jaxb.Path;
 import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verifoo.rest.neo4j.Neo4jClient;
 import it.polito.verigraph.mcnet.components.IsolationResult;
@@ -66,11 +67,14 @@ public class VerifooSerializer {
 	            m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
 	            m.marshal( root.getConnections(), System.out ); 
 			}
+			List<Path> paths = null;
+			if(root.getNetworkForwardingPaths() != null)
+				paths = root.getNetworkForwardingPaths().getPath();
 			for(Graph g:root.getGraphs().getGraph()){
 	        	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
 	        	if(prop.size() == 0)
 					throw new BadGraphError("No property defined for the Graph "+g.getId(),EType.INVALID_PROPERTY_DEFINITION);
-	        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(), prop);
+	        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(), prop, paths);
 	        	IsolationResult res=test.checkNFFGProperty();
 	        	if(res.result != Status.UNSATISFIABLE){
 	        		new Translator(res.model.toString(),root, g).convert();

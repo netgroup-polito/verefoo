@@ -38,15 +38,15 @@
           </cache>
         </configuration>
       </node>
-	   <node functional_type="FIELDMODIFIER" name="node3">
+	   <node functional_type="DPI" name="node3">
 		<neighbour name="nodeC"/>
         <neighbour name="node1"/>
         <neighbour name="node2"/>
 		<neighbour name="nodeD"/>
         <configuration description="A simple description" name="conf3">
-         <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
+         <dpi>
+          	<notAllowed>name</notAllowed>
+         </dpi>
         </configuration>
       </node>
 	  <node functional_type="WEBSERVER" name="nodeB">
@@ -68,39 +68,49 @@
     </graph>
   </graphs>
   <Constraints>
-	  <NodeConstraints>
-			<NodeMetrics node="node1" nrOfOperations="1000" reqStorage="10" cores="1"/>
-			<NodeMetrics node="node2" nrOfOperations="2000" reqStorage="5" cores="2"/>
-	  </NodeConstraints>
-	  <BandwidthConstraints>
-			<BandwidthMetrics src="node1" dst="node2" reqLatency="10"/>
-	  </BandwidthConstraints>
+	  <NodeConstraints/>
+	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB" src_port="5000" dst_port="80">
-  			<HTTPDefinition body="weapons"/>
-  		</Property> 	
-  		<Property graph="0" name="ReachabilityProperty" src="nodeC" dst="nodeD" src_port="3000" dst_port="110">
-  			<POP3Definition email_from="polito" body="weapons"/>
-  		</Property> 	
+  		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/>
+  		<Property graph="0" name="ReachabilityProperty" src="nodeC" dst="nodeD"/>
   </PropertyDefinition>
   <Hosts>
   	<Host name="hostA" cpu="1000" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
-  	<Host name="host1" cpu="3000" cores="16" memory="16" diskStorage="50" maxVNF="1" type="MIDDLEBOX">
+  	<Host name="hostC" cpu="1000" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeC"/>
+  	<Host name="host1" cpu="3000" cores="16" memory="16" diskStorage="50" maxVNF="3" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="DPI"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
-  	<Host name="host2" cpu="4000" cores="4" memory="16" diskStorage="20" maxVNF="2" type="MIDDLEBOX">
+  	<Host name="host2" cpu="4000" cores="4" memory="16" diskStorage="20" maxVNF="3" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
+		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="DPI"/>
+		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
   	<Host name="host3" cpu="3000" cores="8" memory="16" diskStorage="10" maxVNF="3" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="DPI"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
   	<Host name="hostB" cpu="1000" cores="2" memory="2" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>
+  	<Host name="hostD" cpu="1000" cores="2" memory="2" diskStorage="10" type="SERVER" fixedEndpoint="nodeD"/>
   </Hosts>
-  <Connections/>
+  <Connections>
+  	<Connection sourceHost="hostA" destHost="host1" avgLatency ="1"/>
+  	<Connection sourceHost="hostC" destHost="host3" avgLatency ="1"/>
+  	<Connection sourceHost="host1" destHost="host2" avgLatency ="1"/>
+  	<Connection sourceHost="host2" destHost="host1" avgLatency ="1"/>
+  	<Connection sourceHost="host1" destHost="host3" avgLatency ="1"/>
+  	<Connection sourceHost="host3" destHost="host1" avgLatency ="1"/>
+  	<Connection sourceHost="host2" destHost="hostB" avgLatency ="1"/>
+  	<Connection sourceHost="host3" destHost="host2" avgLatency ="1"/>
+  	<Connection sourceHost="host2" destHost="host3" avgLatency ="1"/>
+  	<Connection sourceHost="host3" destHost="hostD" avgLatency ="1"/>
+  </Connections>
   
 <!-- 
 

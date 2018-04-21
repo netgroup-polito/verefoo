@@ -40,6 +40,7 @@ import it.polito.verifoo.rest.jaxb.Host;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.NodeRefType;
 import it.polito.verifoo.rest.jaxb.PName;
+import it.polito.verifoo.rest.jaxb.Path;
 import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verifoo.rest.jaxb.TypeOfHost;
 import it.polito.verigraph.mcnet.components.IsolationResult;
@@ -84,11 +85,13 @@ public class TestPerformance {
 	}
 	
 	private NFV init(NFV root) throws JAXBException, SAXException, FileNotFoundException{
-		
+		List<Path> paths = null;
+		if(root.getNetworkForwardingPaths() != null)
+			paths = root.getNetworkForwardingPaths().getPath();
         for(Graph g:root.getGraphs().getGraph()){
         	long beginVP=System.currentTimeMillis();
         	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints(), prop);
+        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints(), prop, paths);
         	long endVP=System.currentTimeMillis();
         	condTime += (endVP-beginVP);
         	maxCondTime = maxCondTime<(endVP-beginVP)? (endVP-beginVP) : condTime;

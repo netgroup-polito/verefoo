@@ -3,6 +3,7 @@ package it.polito.verifoo.rest.common;
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Endhost;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
+import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verifoo.rest.jaxb.ProtocolTypes;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.netobjs.PacketModel;
@@ -49,6 +50,30 @@ public class PacketWrapper extends PacketModel {
 				e.printStackTrace();
 				throw new BadGraphError(e.getMessage(),EType.INVALID_NODE_CONFIGURATION);
 			}
+		}
+	}
+
+	public void setProperties(Property prop, NetContext nctx) {
+		if(prop.getHTTPDefinition() != null){
+			String body = prop.getHTTPDefinition().getBody();
+			String options = prop.getHTTPDefinition().getOptions();
+			String url = prop.getHTTPDefinition().getUrl();
+			this.setBody(body.hashCode());
+			if(options != null){
+				this.setOptions(options.hashCode());
+			}
+			if(url != null){
+				this.setUrl(url.hashCode());
+			}
+			this.setProto(nctx.HTTP_REQUEST);
+		}
+		if(prop.getPOP3Definition() != null){
+			String body = prop.getPOP3Definition().getBody();
+			String email_from = prop.getPOP3Definition().getEmailFrom();
+			System.out.println("Packet>> " + email_from.hashCode());
+			this.setBody(body.hashCode());
+			this.setEmailFrom(email_from.hashCode());
+			this.setProto(nctx.POP3_REQUEST);
 		}
 	}
 

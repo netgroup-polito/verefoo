@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.03.27 alle 04:13:36 PM CEST 
+// Generato il: 2018.04.21 alle 10:13:57 AM CEST 
 //
 
 
@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{}PropertyDefinition"/>
  *         &lt;element ref="{}Hosts"/>
  *         &lt;element ref="{}Connections"/>
+ *         &lt;element ref="{}NetworkForwardingPaths" minOccurs="0"/>
  *         &lt;element name="ParsingString" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
@@ -46,6 +47,7 @@ import javax.xml.bind.annotation.XmlType;
     "propertyDefinition",
     "hosts",
     "connections",
+    "networkForwardingPaths",
     "parsingString"
 })
 @XmlRootElement(name = "NFV")
@@ -61,6 +63,8 @@ public class NFV {
     protected Hosts hosts;
     @XmlElement(name = "Connections", required = true)
     protected Connections connections;
+    @XmlElement(name = "NetworkForwardingPaths")
+    protected NetworkForwardingPaths networkForwardingPaths;
     @XmlElement(name = "ParsingString")
     protected String parsingString;
 
@@ -182,6 +186,30 @@ public class NFV {
      */
     public void setConnections(Connections value) {
         this.connections = value;
+    }
+
+    /**
+     * Recupera il valore della proprietà networkForwardingPaths.
+     * 
+     * @return
+     *     possible object is
+     *     {@link NetworkForwardingPaths }
+     *     
+     */
+    public NetworkForwardingPaths getNetworkForwardingPaths() {
+        return networkForwardingPaths;
+    }
+
+    /**
+     * Imposta il valore della proprietà networkForwardingPaths.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link NetworkForwardingPaths }
+     *     
+     */
+    public void setNetworkForwardingPaths(NetworkForwardingPaths value) {
+        this.networkForwardingPaths = value;
     }
 
     /**

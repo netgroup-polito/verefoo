@@ -32,13 +32,15 @@ forward packets other than HTTP. That is why this test was unsat.
          </antispam>
         </configuration>
       </node>
-      <node functional_type="FIELDMODIFIER" name="node3">
+      <node functional_type="CACHE" name="node3">
         <neighbour name="node2"/>
         <neighbour name="node4"/>
         <configuration description="A simple description" name="conf3">
-         <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
+          <cache>
+          	<resource>nodeA</resource>
+          	<resource>node1</resource>
+          	<resource>node2</resource>
+          </cache>
         </configuration>
       </node>
 	  <node functional_type="FIELDMODIFIER" name="node4">
@@ -77,14 +79,18 @@ forward packets other than HTTP. That is why this test was unsat.
 			<NodeMetrics node="node4" reqStorage="10"/>
 			<NodeMetrics node="node5" reqStorage="10"/>
 	  </NodeConstraints>
-	  <BandwidthConstraints/>
+	  <BandwidthConstraints>
+			<BandwidthMetrics src="node4" dst="node2" reqLatency="10"/>
+	  </BandwidthConstraints>
   </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/>
+  		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB" src_port="10" dst_port="110">
+  			<POP3Definition email_from="polito" body="weapons"/>
+  		</Property> 		
   </PropertyDefinition>
   <Hosts>
   	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
-  	<Host name="host1" cpu="1" cores="4" memory="16" diskStorage="50" maxVNF="4" type="MIDDLEBOX">
+  	<Host name="host1" cpu="1" cores="4" memory="16" diskStorage="50" maxVNF="1" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
 		<SupportedVNF functional_type="ANTISPAM"/>

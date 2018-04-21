@@ -80,7 +80,9 @@ forward packets other than HTTP. That is why this test was unsat.
 	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/>
+  		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB" src_port="10" dst_port="110">
+  			<POP3Definition email_from="foo" body="weapons"/>
+  		</Property> 		
   </PropertyDefinition>
   <Hosts>
   	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>

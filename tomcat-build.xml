@@ -6,7 +6,7 @@
 	</description>
 	
 	<property environment="env"/>
-	<condition property="serverloc" value="${env.CATALINA_HOME}" else="/opt/tomcat">
+	<condition property="serverloc" value="${env.CATALINA_HOME}" else="C:\Tomcat">
 	    <isset property="env.CATALINA_HOME" />
 	</condition>
 	<property name="tomcatUsername" value="admin" />

@@ -163,6 +163,38 @@ public class TestProxyReachability {
 		}		
 	}
 	@Test
+	public void testMAIL_PropertySpec_SAT() {
+		try {
+			test( "./testfile/nfv5nodes7hostsSAT-MAIL-PropertySpec.xml", true); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testWEB_PropertySpec_SAT() {
+		try {
+			test( "./testfile/nfv5nodes7hostsSAT-WEB-PropertySpec.xml", true); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testMAIL_PropertySpec_UNSAT() {
+		try {
+			test( "./testfile/nfv5nodes7hostsUNSAT-MAIL-PropertySpec.xml", false); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testWEB_PropertySpec_UNSAT() {
+		try {
+			test( "./testfile/nfv5nodes7hostsUNSAT-WEB-PropertySpec.xml", false); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
 	public void testFullMesh() {
 		try {
 			test( "./testfile/nfv5nodes7hostsSAT-FullMesh.xml", true); //Working
@@ -182,6 +214,14 @@ public class TestProxyReachability {
 	public void testFullMeshNoFixedServer() {
 		try {
 			test( "./testfile/nfv5nodes7hostsSAT-FullMeshNoFixedServer.xml", true); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testPaths() {
+		try {
+			test( "./testfile/nfv3nodes3hosts2Paths-SAT.xml", true); //Working
 		} catch (Exception e) {
 			fail(e.toString());
 		}		

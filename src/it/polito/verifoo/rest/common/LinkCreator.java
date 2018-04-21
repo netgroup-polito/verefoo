@@ -1,8 +1,11 @@
 package it.polito.verifoo.rest.common;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import static java.util.Comparator.*;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -11,6 +14,8 @@ import org.apache.logging.log4j.Logger;
 
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Node;
+import it.polito.verifoo.rest.jaxb.Path;
+import it.polito.verifoo.rest.jaxb.Path.PathNode;
 /**
  * Creates the link from the node's neighbours
  *
@@ -19,10 +24,27 @@ public class LinkCreator {
 	private Logger logger = LogManager.getLogger("mylog");
 	private List<Link> links = new ArrayList<>();
 	private List<Node> nodes;
+	private List<Path> paths;
+	private Map<Integer, List<Link>> pathMap = new HashMap<>();
 
 	public LinkCreator(List<Node> ns){
 		nodes = ns;
 	}
+	
+	public LinkCreator(List<Node> ns, List<Path> ps){
+		nodes = ns;
+		paths = ps;
+//		for(Path p : ps){
+//			List<Link> links = new ArrayList<>();
+//			List<PathNode> pathNodes = p.getPathNode();
+//			for(int i = 1; i < pathNodes.size(); i++){
+//				Link l = new Link(pathNodes.get(i-1).getName(), pathNodes.get(i).getName());
+//				links.add(l);
+//			}
+//			pathMap.put(p.getId(), links);
+//		}
+	}
+	
 	/**
 	 * Retrives the links of the service graph
 	 * @return

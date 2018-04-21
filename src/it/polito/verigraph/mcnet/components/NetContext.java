@@ -25,6 +25,7 @@ import com.microsoft.z3.EnumSort;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
+import com.microsoft.z3.IntSort;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Sort;
@@ -53,12 +54,16 @@ public class NetContext extends Core{
 
     public HashMap<String,NetworkObject> nm; //list of nodes, callable by node name
     public HashMap<String,DatatypeExpr> am; // list of addresses, callable by address name
+    public HashMap<String,DatatypeExpr> ipm; // list of ip addresses, callable by name
     public HashMap<String,FuncDecl> pf;
     Context ctx;
     public EnumSort node,address;
     public FuncDecl src_port,dest_port,nodeHasAddr,addrToNode,send,recv;
     public DatatypeSort packet;
+    
 
+    public DatatypeSort ipAddress;
+    public HashMap<String,FuncDecl> ip_functions;
     /*   Constants definition
         - used in the packet proto field */
     public final int HTTP_REQUEST    = 1;
@@ -83,11 +88,12 @@ public class NetContext extends Core{
         this.ctx = ctx;
         nm = new HashMap<String,NetworkObject>(); //list of nodes, callable by node name
         am = new HashMap<String,DatatypeExpr>(); // list of addresses, callable by address name
+        ipm= new HashMap<>();  // list of ip addresses, callable by name
         pf= new HashMap<String,FuncDecl>() ;
-
+        ip_functions = new HashMap<String,FuncDecl>();
+        constraints = new ArrayList<BoolExpr>();
         mkTypes((String[])args[0],(String[])args[1]);
 
-        constraints = new ArrayList<BoolExpr>();
         softConstraints = new ArrayList<>();
         softConstrAutoConf = new ArrayList<>();
         softConstrAutoPlace = new ArrayList<>();
@@ -161,6 +167,16 @@ public class NetContext extends Core{
         
     }
 
+    public int[] getIpFromString(String ipString){
+    	int[] res = new int[4];
+    	String[] decimalNotation = ipString.split("\\.");
+    	int i = 0;
+    	for(String s : decimalNotation){
+    		res[i] = Integer.parseInt(s);
+    		i++;
+    	}
+    	return res;
+    }
     private void mkTypes (String[] nodes, String[] addresses){
         //Nodes in a network
         node = ctx.mkEnumSort("Node", nodes);
@@ -173,19 +189,45 @@ public class NetContext extends Core{
         }
 
         //Addresses for this network
+        String[] ipfieldNames = new String[]{"ipAddr_1","ipAddr_2","ipAddr_3","ipAddr_4"};
+        Sort[] sort = new Sort[]{ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort()};
+        Constructor ipCon = ctx.mkConstructor("ip_constructor", "is_ip", ipfieldNames, sort, null);
+        ipAddress = ctx.mkDatatypeSort("IP", new Constructor[] {ipCon});
+        for(int i=0;i<ipfieldNames.length;i++){
+        	ip_functions.put(ipfieldNames[i], ipAddress.getAccessors()[0][i]); // ip_functions to get ip's function declarations by name
+        }
+        int[][] ips = new int[addresses.length+1][];
+        String tmp[] = new String[ips.length];
+        for(int k = 0; k < addresses.length; k++){
+            ips[k] = getIpFromString("10.0.0."+k);
+            tmp[k] = ips[k][0]+".";
+            for(int i = 1; i < ips[k].length; i++){
+            	tmp[k] += ips[k][i];
+            	if(i < 3)
+            		tmp[k] += ".";
+            }
+            //System.out.print(tmp[k]);
+            //System.out.println("");
+            DatatypeExpr fd = (DatatypeExpr) ctx.mkConst(tmp[k], ipAddress);
+            constraints.add(equalIpToIntArray(fd, ips[k]));
+            ipm.put(tmp[k], fd);
+            
+        }
+        tmp[tmp.length-1] = "null";
+        
+        
+        
         String[] new_addr = new String[addresses.length+1];
         for(int k=0;k<addresses.length;k++)
             new_addr[k] = addresses[k];
 
         new_addr[new_addr.length-1] = "null";
-        address = ctx.mkEnumSort("Address", new_addr);
+        address = ctx.mkEnumSort("Address", new_addr);        
         for(int i=0;i<address.getConsts().length;i++){
             DatatypeExpr fd  = (DatatypeExpr)address.getConst(i);
-
-
             am.put(fd.toString(),fd);
         }
-
+        
         // Type for packets, contains (some of these are currently represented as relations):
         // -   src: Source address
         // -   dest: Destination address
@@ -197,7 +239,7 @@ public class NetContext extends Core{
         String[] fieldNames = new String[]{
                 "src","dest","inner_src","inner_dest","origin","orig_body","body","seq","proto","emailFrom","url","options","encrypted"};
         Sort[] srt = new Sort[]{
-                address,address,address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),
+        		address,address,address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),
                 ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkBoolSort()};
         Constructor packetcon = ctx.mkConstructor("packet", "is_packet", fieldNames, srt, null);
         packet = ctx.mkDatatypeSort("packet",  new Constructor[] {packetcon});
@@ -356,7 +398,28 @@ public class NetContext extends Core{
 
 
     }
+    
+    /**
+     * Two ip addresses are equals
+     * @param p1
+     * @param p2
+     * @return
+     */
+    public BoolExpr equalIp(Expr ip1, Expr ip2){
+        return ctx.mkAnd(new BoolExpr[]{
+                ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip1), ip_functions.get("ipAddr_1").apply(ip2)),
+                ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip1), ip_functions.get("ipAddr_2").apply(ip2)),
+                ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip1), ip_functions.get("ipAddr_3").apply(ip2)),
+                ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(ip2))});
+    }
 
+    public BoolExpr equalIpToIntArray(Expr ip_expr, int[] array){
+        return ctx.mkAnd(new BoolExpr[]{
+                ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip_expr), ctx.mkInt(array[0])),
+                ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip_expr), ctx.mkInt(array[1])),
+                ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip_expr), ctx.mkInt(array[2])),
+                ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip_expr), ctx.mkInt(array[3]))});
+    }
     /**
      * Two packets have equal headers
      * @param p1

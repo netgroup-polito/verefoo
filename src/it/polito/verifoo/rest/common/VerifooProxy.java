@@ -43,10 +43,12 @@ public class VerifooProxy {
 		private List<List<String>> savedNodeChain = new ArrayList<>();
 		private HashMap<Node, HashMap<Node, List<Node>>> routingRule = new HashMap<>();
 		private List<Node> nodes;
-		private List<Link> links = new ArrayList<>();
+		//private List<Link> links = new ArrayList<>();
+		private LinkProvider linkProvider;
 		private List<Host> hosts;
 		private List<Connection> connections;
 		private Graph graph;
+		private List<Path> paths;
 		int clientServerCombinations = 0;
 		private List<NodeMetrics> nodeMetrics;
 		private List<BandwidthMetrics> bandwidthMetrics;
@@ -58,10 +60,11 @@ public class VerifooProxy {
 		 * @param graph The graph that will be deployed on the network
 		 * @param hosts The list of hosts in the network
 		 * @param conns The connections between hosts
+		 * @param paths 
 		 * @param capacityDefinition The list of the capacity for each node that will be deployed
 		 * @throws BadGraphError
 		 */
-	    public VerifooProxy(Graph graph,Hosts hosts,Connections conns, Constraints constraints, List<Property> prop) throws BadGraphError{
+	    public VerifooProxy(Graph graph,Hosts hosts,Connections conns, Constraints constraints, List<Property> prop, List<Path> paths) throws BadGraphError{
 	    	//System.loadLibrary("z3");
         	//System.loadLibrary("z3java");
 	    	HashMap<String, String> cfg = new HashMap<String, String>();
@@ -73,11 +76,12 @@ public class VerifooProxy {
 		    this.graph=graph;
 		    this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
 		    this.bandwidthMetrics = constraints.getBandwidthConstraints().getBandwidthMetrics();
+		    this.paths = paths;
 			nctx = NetContextGenerator.generate(ctx,nodes);
 			autoctx = new AutoContext(ctx);
 			net = new Network (ctx,new Object[]{nctx});
 			/* Generate the different network object and map it to XML Node */
-			netobjs=new NodeNetworkObject(ctx, nctx, autoctx, net,nodes, prop.size(), nodeMetrics);
+			netobjs=new NodeNetworkObject(ctx, nctx, autoctx, net,nodes, prop.size(), nodeMetrics, prop);
 			
 			AddressMapping adm = new AddressMapping(netobjs, nctx, net);
 			adm.setAddressMappings(nodes);
@@ -114,7 +118,7 @@ public class VerifooProxy {
 			Map<String, List<Tuple<BoolExpr, BoolExpr>>> dependencies = autoctx.getDependencies();
 			for(Node n:conditionDB.keySet()){
 				for(String h:conditionDB.get(n).keySet()){
-					if(countConditions.get(n.getName()+"_"+h) < clientServerCombinations){
+					if(countConditions.get(n.getName()+"_"+h) < clientServerCombinations && !ChainExtractor.hostIsServer(h)){
 						logger.debug("Found condition that is not valid for all the client/server combinations " + conditionDB.get(n).get(h) +" -> making it false");
 						nctx.constraints.add(ctx.mkEq(conditionDB.get(n).get(h), ctx.mkFalse()));
 					}
@@ -338,9 +342,9 @@ public class VerifooProxy {
 		        	for(String hostServer: servers){
 		        		//logger.debug("Calculating host chain between " + hostClient + " and " + hostServer + " composed by max " + (nodes.size()-clients.size()-servers.size()+2) + " hosts"); 
 		        		if(fixedServer)
-		        			savedChain.addAll(ChainExtractor.createHostChain(hostClient, hostServer, connections, nodes.size()-clients.size()-servers.size()+2));
+		        			savedChain.addAll(ChainExtractor.createHostChain(hostClient, hostServer, hosts, connections, nodes.size()-clients.size()-servers.size()+2));
 		        		else
-		        			savedChain.addAll(ChainExtractor.createHostChain(hostClient, hostServer, connections, nodes.size()-clients.size()-1+2));
+		        			savedChain.addAll(ChainExtractor.createHostChain(hostClient, hostServer, hosts, connections, nodes.size()-clients.size()-1+2));
 		                if(savedChain.size() == 0) throw new BadGraphError("Host client " + hostClient + " and host " + hostServer +" are not connected",EType.INVALID_PHY_SERVER_CLIENT_CONF);
 		            }
 		        }
@@ -358,12 +362,17 @@ public class VerifooProxy {
             List<Node> servers = nodes.stream().filter(n -> {return nodeIsServer(n);}).collect(Collectors.toList());
     
             try{
-				links = (new LinkCreator(nodes)).getLinks();
+				//links = (new LinkCreator(nodes)).getLinks();
+            	linkProvider = new LinkProvider(nodes, paths);
 				//logger.debug("Links created");
 				//createInternalRouting(clients, servers);
 				List<List<String>> validChain = new ArrayList<>();
 				for(Node c:clients){
 					for(Node s:servers){
+						if(!linkProvider.existsPath(c, s)){
+							System.out.println("No path found between "+ c.getName() + " and "+ s.getName());
+							continue;
+						}
 						clientServerCombinations++;
 						logger.debug(">>>>NEW client/server combination (total: " + clientServerCombinations + ") -> " + c.getName() + " to " + s.getName());
 						String fixedHostClient = hosts.stream()
@@ -381,7 +390,7 @@ public class VerifooProxy {
 							validChain = savedChain.stream()
 									.filter(list -> list.contains(fixedHostClient))
 									.collect(Collectors.toList());
-							logger.debug(">>>>Valid Chain found -> " + validChain.size() +" ==>  "+ validChain);
+							logger.debug(">>>>Valid Chain found -> " + validChain.size() /*+" ==>  "+ validChain*/);
 							Map<String, List<List<String>>> currentSubSet = validChain.stream()
 																						.collect(Collectors.groupingBy(chain -> chain.get(chain.size()-1), Collectors.toList()));
 
@@ -395,7 +404,7 @@ public class VerifooProxy {
 							validChain = savedChain.stream()
 													.filter(list -> list.contains(fixedHostClient) && list.contains(fixedHostServer))
 													.collect(Collectors.toList());
-							logger.debug(">>>>Valid Chain found -> " + validChain.size());
+							logger.debug(">>>>Valid Chain found -> " + validChain.size() + " " + validChain);
 							createRoutingConditions(c, s, validChain, fixedHostClient, fixedHostServer);
 						}
 						nodes.forEach(n -> {
@@ -431,7 +440,7 @@ public class VerifooProxy {
 			try{
 		        for(Node nodeClient: clients){
 		        	for(Node nodeServer: servers){
-		        		savedNodeChain.addAll(ChainExtractor.createNodeChain(nodeClient.getName(), nodeServer.getName(), links));
+		        		savedNodeChain.addAll(ChainExtractor.createNodeChain(nodeClient.getName(), nodeServer.getName(), linkProvider.getAllLinks()));
 		                if(savedNodeChain.size() == 0) throw new BadGraphError("Node client and node server are not connected",EType.INVALID_SERVICE_GRAPH);
 		            }
 		        }
@@ -507,7 +516,9 @@ public class VerifooProxy {
 		private void createRoutingConditions(Node client, Node server, List<List<String>> validChain, String hostClient, String hostServer) throws BadGraphError{
 			
 			//System.out.println("Searching next hop for " + client.getName() + " towards " + server.getName());
-			List<Link> nextLinks = links.stream().filter(l -> l.getSourceNode().equals(client.getName())).collect(Collectors.toList());
+			
+			//List<Link> nextLinks = links.stream().filter(l -> l.getSourceNode().equals(client.getName())).collect(Collectors.toList());
+			List<Link> nextLinks = linkProvider.getLinksFrom(client, 0);
 			if(nextLinks.size() == 0){
 				logger.error("Route: From CLIENT " + client.getName() 
 									+ " to " + nctx.am.get(server.getName()) 
@@ -524,7 +535,7 @@ public class VerifooProxy {
 				for(int i = 0; i < validChain.size(); i++){
 					String host = validChain.get(i).get(1);
 					//System.out.println("Chain -> " + savedChain.get(i));
-					if(setNextHop(client, next, server, i, 1, validChain, hostServer, new HashMap<>())){
+					if(setNextHop(client, next, server, 1, i, 1, validChain, hostServer, new HashMap<>())){
 						/*System.out.println("Route from " + client.getName() 
 						+ " to " + nctx.am.get(server.getIp()) 
 						+ " -> next hop: " + netobjs.get(next));
@@ -607,14 +618,15 @@ public class VerifooProxy {
 		 * Explores recursively all the possible solution for setting a next hop condition
 		 * @param source the node from which is exploring the solutions
 		 * @param server the node server
+		 * @param nodeRecursionLevel the current level of the recursion
 		 * @param nChain number of the host chain on which it is trying to deploy all the nodes
-		 * @param level on which host in the host chain it is trying to deploy the remaining nodes
+		 * @param level on which host in the host chain, it is trying to deploy the remaining nodes
 		 * @param validChain 
 		 * @param hostServer
 		 * @return true if the last node has been deployed on the host server (good path), false otherwise
 		 * @throws BadGraphError
 		 */
-		private boolean setNextHop(Node prec, Node source, Node server, int nChain, int level, List<List<String>> validChain, String hostServer, HashMap<Node, List<String>> visited) throws BadGraphError{
+		private boolean setNextHop(Node prec, Node source, Node server, int nodeRecursionLevel, int nChain, int level, List<List<String>> validChain, String hostServer, HashMap<Node, List<String>> visited) throws BadGraphError{
 			String currentHost = validChain.get(nChain).get(level);
 			//logger.debug("Searching next hop for " + source.getName() + " towards " + server.getName());
 			if(source.getName().equals(server.getName())){
@@ -634,7 +646,8 @@ public class VerifooProxy {
 				return false;
 			}
 			
-			List<String> nextDest = links.stream().filter(l -> l.getSourceNode().equals(source.getName())).map(l -> l.getDestNode() ).collect(Collectors.toList());
+			//List<String> nextDest = links.stream().filter(l -> l.getSourceNode().equals(source.getName())).map(l -> l.getDestNode() ).collect(Collectors.toList());
+			List<String> nextDest = linkProvider.getLinksFrom(source, nodeRecursionLevel).stream().map(l -> l.getDestNode()).collect(Collectors.toList());
 			if(nextDest.size() == 0){
 				/*logger.debug("Route: From " + source.getName() 
 									+ " to " + nctx.am.get(server.getName()) 
@@ -665,7 +678,7 @@ public class VerifooProxy {
 				for(int i = level; i < validChain.get(nChain).size() && i <= level+1; i++){
 					String nextHost = validChain.get(nChain).get(i);
 					//logger.debug("RECURSION -> Deploying " + next.getName() +" on lv " + i + " of chain " +nChain +"("+nextHost+")");
-					if(setNextHop(source, next, server, nChain, i, validChain, hostServer, visited)){
+					if(setNextHop(source, next, server, nodeRecursionLevel+1, nChain, i, validChain, hostServer, visited)){
 						if(autoctx.nodeIsOptional(source)){
 							autoctx.addOptionalPlacement(netobjs.get(prec), netobjs.get(next), netobjs.get(source));
 						}
@@ -698,10 +711,10 @@ public class VerifooProxy {
 				logger.debug("Adding check on "+ p.getName() + " from " + source.getName() + " to "+ dest.getName());
 				switch (p.getName()) {
 				case ISOLATION_PROPERTY: 
-						check.propertyAdd(netobjs.get(source), netobjs.get(dest), Prop.ISOLATION);
+						check.propertyAdd(netobjs.get(source), netobjs.get(dest), Prop.ISOLATION, p);
 						break;
 				case REACHABILITY_PROPERTY: 
-						check.propertyAdd(netobjs.get(source), netobjs.get(dest), Prop.REACHABILITY);
+						check.propertyAdd(netobjs.get(source), netobjs.get(dest), Prop.REACHABILITY, p);
 					break;
 				default:
 					throw new BadGraphError("Error in the property definition", EType.INVALID_PROPERTY_DEFINITION);

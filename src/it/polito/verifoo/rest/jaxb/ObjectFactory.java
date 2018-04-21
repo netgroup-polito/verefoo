@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.03.27 alle 04:13:36 PM CEST 
+// Generato il: 2018.04.21 alle 10:13:57 AM CEST 
 //
 
 
@@ -34,6 +34,14 @@ public class ObjectFactory {
      * 
      */
     public ObjectFactory() {
+    }
+
+    /**
+     * Create an instance of {@link Path }
+     * 
+     */
+    public Path createPath() {
+        return new Path();
     }
 
     /**
@@ -245,6 +253,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link NetworkForwardingPaths }
+     * 
+     */
+    public NetworkForwardingPaths createNetworkForwardingPaths() {
+        return new NetworkForwardingPaths();
+    }
+
+    /**
+     * Create an instance of {@link Path.PathNode }
+     * 
+     */
+    public Path.PathNode createPathPathNode() {
+        return new Path.PathNode();
+    }
+
+    /**
      * Create an instance of {@link Graphs }
      * 
      */
@@ -338,6 +362,22 @@ public class ObjectFactory {
      */
     public Paths createPaths() {
         return new Paths();
+    }
+
+    /**
+     * Create an instance of {@link HTTPDefinition }
+     * 
+     */
+    public HTTPDefinition createHTTPDefinition() {
+        return new HTTPDefinition();
+    }
+
+    /**
+     * Create an instance of {@link POP3Definition }
+     * 
+     */
+    public POP3Definition createPOP3Definition() {
+        return new POP3Definition();
     }
 
 }

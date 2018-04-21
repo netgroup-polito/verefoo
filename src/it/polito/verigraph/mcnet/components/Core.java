@@ -18,7 +18,7 @@ import com.microsoft.z3.Solver;
  */
 public abstract class Core{
 
-    final int MAX_PORT = 512;
+    final int MAX_PORT = 65535;
 
     /**
      * Base class for all objects in the modeling framework

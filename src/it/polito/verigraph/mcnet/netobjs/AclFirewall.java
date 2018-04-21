@@ -36,10 +36,11 @@ public class AclFirewall extends NetworkObject{
 	Context ctx;
 	DatatypeExpr fw;
 	ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acls;
+	private ArrayList<Tuple<int[],int[]>> ipAcls;
 	Network net;
 	NetContext nctx;
 	FuncDecl acl_func;
-	FuncDecl acl_func22;
+	FuncDecl acl_func_new;
 	private boolean autoconf, autoplace;
 	private AutoContext autoctx;
 	
@@ -54,6 +55,7 @@ public class AclFirewall extends NetworkObject{
 		isEndHost=false;
    		constraints = new ArrayList<BoolExpr>();
    		acls = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+   		ipAcls = new ArrayList<>();
    		z3Node = ((NetworkObject)args[0][0]).getZ3Node();
         fw = z3Node;
 	    net = (Network)args[0][1];
@@ -75,6 +77,7 @@ public class AclFirewall extends NetworkObject{
 			autoplace = false;
 			autoconf = false;
 			firewallSendRules();
+			//firewallSendIpRules();
 		}
 	}
 	
@@ -92,6 +95,11 @@ public class AclFirewall extends NetworkObject{
 			this.acls.addAll(acls);
 	}
 	
+	public void addIpAcls(ArrayList<Tuple<int[],int[]>> acls){
+		if(!autoconf) // if not an autoconfiguration firewall
+			this.ipAcls.addAll(acls);
+	}
+	
 	@Override
 	public DatatypeExpr getZ3Node() {
 		return fw;
@@ -103,6 +111,7 @@ public class AclFirewall extends NetworkObject{
 			BoolExpr[] constr = new BoolExpr[constraints.size()];
 		    solver.Add(constraints.toArray(constr));
 		    aclConstraints(solver);
+		    //aclNewConstraints(solver);
 	}
 
     private void firewallSendRules (){
@@ -112,7 +121,6 @@ public class AclFirewall extends NetworkObject{
     	//IntExpr t_0 = ctx.mkIntConst(fw+"_firewall_send_t_0");
     	//IntExpr t_1 = ctx.mkIntConst(fw+"_firewall_send_t_1");
     	acl_func = ctx.mkFuncDecl(fw+"_acl_func", new Sort[]{nctx.address, nctx.address},ctx.mkBoolSort());
-
     	//Constraint1		send(fw, n_0, p, t_0)  -> (exist n_1,t_1 : (recv(n_1, fw, p, t_1) && 
     	//    				t_1 < t_0 && !acl_func(p.src,p.dest))
     	  constraints.add(
@@ -143,6 +151,44 @@ public class AclFirewall extends NetworkObject{
     	  
     }
 
+    
+    private void firewallSendIpRules (){
+    	Expr p_0 = ctx.mkConst(fw+"_firewall_send_p_0", nctx.packet);
+    	Expr n_0 = ctx.mkConst(fw+"_firewall_send_n_0", nctx.node);
+    	Expr n_1 = ctx.mkConst(fw+"_firewall_send_n_1", nctx.node);
+    	//IntExpr t_0 = ctx.mkIntConst(fw+"_firewall_send_t_0");
+    	//IntExpr t_1 = ctx.mkIntConst(fw+"_firewall_send_t_1");
+    	acl_func_new = ctx.mkFuncDecl(fw+"_acl_new_func", new Sort[]{nctx.ipAddress, nctx.ipAddress},ctx.mkBoolSort());
+    	//Constraint1		send(fw, n_0, p, t_0)  -> (exist n_1,t_1 : (recv(n_1, fw, p, t_1) && 
+    	//    				t_1 < t_0 && !acl_func(p.src,p.dest))
+    	  constraints.add(
+	            	ctx.mkForall(new Expr[]{n_0, p_0}, 
+	    	            ctx.mkImplies(
+	    	            	(BoolExpr)nctx.send.apply(new Expr[]{ fw, n_0, p_0}),
+	    	            	
+	    	            			ctx.mkAnd(
+	    	            						ctx.mkExists(new Expr[]{n_1}, 
+	    	            								nctx.recv.apply(n_1, fw, p_0),1,null,null,null,null), 
+	    	            						ctx.mkNot((BoolExpr)acl_func_new.apply(nctx.ipm.get("10.0.0.1"),nctx.ipm.get("10.0.0.2"))
+	    	            								))),1,null,null,null,null));
+
+    	  /*
+    	  //Constraint2 obliges this VNF to send the packets that have been received
+    	  constraints.add(
+	            	ctx.mkForall(new Expr[]{n_0, p_0},
+	            			ctx.mkImplies(	
+	            					ctx.mkAnd( (BoolExpr)nctx.recv.apply(n_0, fw, p_0)
+	            								,ctx.mkNot((BoolExpr)acl_func_new.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0)))
+	            							),
+	            						ctx.mkAnd(ctx.mkExists(new Expr[]{n_1}, (BoolExpr)nctx.send.apply(new Expr[]{ fw, n_1, p_0}),1,null,null,null,null)
+	            								//,ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0)))
+	            								)
+	            						
+	    	    	            	)
+	            			,1,null,null,null,null));*/
+    	  
+    }
+    
     
     // for an autoconfiguration firewall
  	private void firewallSendRules(Integer nRules) {
@@ -223,8 +269,8 @@ public class AclFirewall extends NetworkObject{
     
     
     private void aclConstraints(Optimize solver){
-    	 Expr a_0 = ctx.mkConst(fw+"_firewall_acl_a_0", nctx.address);
-         Expr a_1 = ctx.mkConst(fw+"_firewall_acl_a_1", nctx.address);
+    	Expr a_0 = ctx.mkConst(fw+"_firewall_acl_a_0", nctx.address);
+        Expr a_1 = ctx.mkConst(fw+"_firewall_acl_a_1", nctx.address);
     	if (acls.size() == 0){
     		//If the size of the ACL list is empty then by default acl_func must be false
     		 solver.Add(ctx.mkForall(new Expr[]{a_0, a_1},
@@ -243,6 +289,33 @@ public class AclFirewall extends NetworkObject{
         solver.Add(ctx.mkForall(new Expr[]{a_0, a_1},
         						ctx.mkEq( 
         								acl_func.apply(a_0, a_1),
+        								ctx.mkOr(acl_map)),1,null,null,null,null));
+    }
+    private void aclNewConstraints(Optimize solver){
+    	Expr ip_0 = ctx.mkConst(fw+"_firewall_acl_ip_0", nctx.ipAddress);
+        Expr ip_1 = ctx.mkConst(fw+"_firewall_acl_ip_1", nctx.ipAddress);
+    	if (ipAcls.size() == 0){
+    		//If the size of the ACL list is empty then by default acl_func must be false
+    		 solver.Add(ctx.mkForall(new Expr[]{ip_0, ip_1},
+						ctx.mkEq( 
+								acl_func_new.apply(ip_0, ip_1), ctx.mkFalse()),1,null,null,null,null));
+    		return;
+    	}
+        
+        BoolExpr[] acl_map = new BoolExpr[ipAcls.size()];
+        for(int y=0;y<ipAcls.size();y++){
+        	Tuple<int[],int[]> tp = ipAcls.get(y);
+        	/*for(int i = 0; i < 4; i++){
+        		solver.Add(ctx.mkEq(nctx.ip_functions.get("ipAddr_"+(i+1)).apply(ip_0), ctx.mkInt(tp._1[i])));
+        		solver.Add(ctx.mkEq(nctx.ip_functions.get("ipAddr_"+(i+1)).apply(ip_1), ctx.mkInt(tp._2[i])));
+        	}*/
+        	acl_map[y] = ctx.mkOr(ctx.mkAnd(nctx.equalIpToIntArray(ip_0,tp._1),nctx.equalIpToIntArray(ip_1,tp._2)), 
+        							ctx.mkAnd(nctx.equalIpToIntArray(ip_0,tp._2),nctx.equalIpToIntArray(ip_1,tp._1)));
+        }
+        //Constraint2		acl_func(a_0,a_1) == or(foreach ip1,ip2 in acl_map ((a_0 == ip1 && a_1 == ip2)||(a_0 == ip2 && a_1 == ip1)))
+        solver.Add(ctx.mkForall(new Expr[]{ip_0, ip_1},
+        						ctx.mkEq( 
+        								acl_func_new.apply(ip_0, ip_1),
         								ctx.mkOr(acl_map)),1,null,null,null,null));
     }
 }

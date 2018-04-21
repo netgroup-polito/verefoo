@@ -25,42 +25,15 @@ forward packets other than HTTP. That is why this test was unsat.
       </node>
       <node functional_type="ANTISPAM" name="node2">
         <neighbour name="node1"/>
-        <neighbour name="node3"/>
+        <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf2">
          <antispam>
-          	<source>polito</source>
+          	<source>a@b.it</source>
          </antispam>
         </configuration>
       </node>
-      <node functional_type="FIELDMODIFIER" name="node3">
-        <neighbour name="node2"/>
-        <neighbour name="node4"/>
-        <configuration description="A simple description" name="conf3">
-         <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
-        </configuration>
-      </node>
-	  <node functional_type="FIELDMODIFIER" name="node4">
-        <neighbour name="node3"/>
-        <neighbour name="node5"/>
-        <configuration description="A simple description" name="conf4">
-         <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
-        </configuration>
-      </node>
-      <node functional_type="FIELDMODIFIER" name="node5">
-        <neighbour name="node4"/>
-        <neighbour name="nodeB"/>
-        <configuration description="A simple description" name="conf5">
-         <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
-        </configuration>
-      </node>
       <node functional_type="MAILSERVER" name="nodeB">
-        <neighbour name="node5"/>
+        <neighbour name="node2"/>
         <configuration description="A simple description" name="confB">
          <mailserver>
           	<name>nodeB</name>
@@ -73,14 +46,13 @@ forward packets other than HTTP. That is why this test was unsat.
 	  <NodeConstraints>
 			<NodeMetrics node="node1" reqStorage="10"/>
 			<NodeMetrics node="node2" reqStorage="10"/>
-			<NodeMetrics node="node3" reqStorage="10"/>
-			<NodeMetrics node="node4" reqStorage="10"/>
-			<NodeMetrics node="node5" reqStorage="10"/>
 	  </NodeConstraints>
 	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/>
+  		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB" src_port="10" dst_port="110">
+  			<POP3Definition email_from="a@c.it" body="weapons"/>
+  		</Property> 		
   </PropertyDefinition>
   <Hosts>
   	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>

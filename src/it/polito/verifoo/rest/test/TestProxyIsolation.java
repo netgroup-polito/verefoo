@@ -153,5 +153,36 @@ public class TestProxyIsolation {
 			fail(e.toString());
 		}		
 	}
-	
+	@Test
+	public void testMAIL_PropertySpec_SAT() {
+		try {
+			test( "./testfile/Isolation/nfv5nodes7hostsSAT-MAIL-PropertySpec.xml", true); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testWEB_PropertySpec_SAT() {
+		try {
+			test( "./testfile/Isolation/nfv5nodes7hostsSAT-WEB-PropertySpec.xml", true); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testMAIL_PropertySpec_UNSAT() {
+		try {
+			test( "./testfile/Isolation/nfv2nodes7hostsUNSAT-MAIL-PropertySpec.xml", false); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testWEB_PropertySpec_UNSAT() {
+		try {
+			test( "./testfile/Isolation/nfv5nodes7hostsUNSAT-WEB-PropertySpec.xml", false); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
 }

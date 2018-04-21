@@ -654,7 +654,7 @@ public class Network extends Core {
 																			ctx.mkAnd(ctx.mkOr(nextHopsWithOptional.toArray(tmpWithOptional))   )//   , ctx.mkAnd(optionalInBetweenTmp.toArray(tmp2)))
 																	)
 													,1, null, null, null, null);
-						System.out.println("Special with optional conditions: " + initialWithOptional);
+						//System.out.println("Special with optional conditions: " + initialWithOptional);
 					}else{
 						BoolExpr[] tmpWithOptional = new BoolExpr[nextHopsWithOptional.size()];
 						initialWithOptional = ctx.mkForall(new Expr[] { n_0,p_0 },
@@ -662,7 +662,7 @@ public class Network extends Core {
 														ctx.mkOr(nextHopsWithOptional.toArray(tmpWithOptional))
 												)
 								,1, null, null, null, null);
-						System.out.println("Optional conditions: " + initialWithOptional);
+						//System.out.println("Optional conditions: " + initialWithOptional);
 					}
 				}
 			}
@@ -682,7 +682,7 @@ public class Network extends Core {
 																			ctx.mkAnd(ctx.mkOr(nextHopsWithoutOptional.toArray(tmpWithoutOptional))   )//   , ctx.mkAnd(optionalInBetweenTmp.toArray(tmp2)))
 																	)
 													,1, null, null, null, null);
-						System.out.println("Special without optional conditions: " + initialWithoutOptional);
+						//System.out.println("Special without optional conditions: " + initialWithoutOptional);
 					}
 				}else{
 					BoolExpr[] tmpWithoutOptional = new BoolExpr[nextHopsWithoutOptional.size()];
@@ -691,7 +691,7 @@ public class Network extends Core {
 																		ctx.mkOr(nextHopsWithoutOptional.toArray(tmpWithoutOptional))
 																)
 												,1, null, null, null, null);
-					System.out.println("No optional conditions: " + initialWithoutOptional);
+					//System.out.println("No optional conditions: " + initialWithoutOptional);
 				}
 			}
 			

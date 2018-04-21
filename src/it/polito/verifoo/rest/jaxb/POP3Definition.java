@@ -10,24 +10,21 @@ package it.polito.verifoo.rest.jaxb;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Classe Java per anonymous complex type.
+ * <p>Classe Java per POP3Definition complex type.
  * 
  * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
  * 
  * <pre>
- * &lt;complexType>
+ * &lt;complexType name="POP3Definition">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="source" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="destination" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *       &lt;/sequence>
+ *       &lt;attribute name="email_from" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="body" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -36,64 +33,60 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "source",
-    "destination"
-})
-@XmlRootElement(name = "elements")
-public class Elements {
+@XmlType(name = "POP3Definition")
+public class POP3Definition {
 
-    @XmlElement(required = true)
-    protected String source;
-    @XmlElement(required = true)
-    protected String destination;
+    @XmlAttribute(name = "email_from", required = true)
+    protected String emailFrom;
+    @XmlAttribute(name = "body", required = true)
+    protected String body;
 
     /**
-     * Recupera il valore della proprietà source.
+     * Recupera il valore della proprietà emailFrom.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getSource() {
-        return source;
+    public String getEmailFrom() {
+        return emailFrom;
     }
 
     /**
-     * Imposta il valore della proprietà source.
+     * Imposta il valore della proprietà emailFrom.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setSource(String value) {
-        this.source = value;
+    public void setEmailFrom(String value) {
+        this.emailFrom = value;
     }
 
     /**
-     * Recupera il valore della proprietà destination.
+     * Recupera il valore della proprietà body.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getDestination() {
-        return destination;
+    public String getBody() {
+        return body;
     }
 
     /**
-     * Imposta il valore della proprietà destination.
+     * Imposta il valore della proprietà body.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setDestination(String value) {
-        this.destination = value;
+    public void setBody(String value) {
+        this.body = value;
     }
 
 }

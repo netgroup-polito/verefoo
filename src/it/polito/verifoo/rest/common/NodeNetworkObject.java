@@ -18,6 +18,7 @@ import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
+import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
@@ -38,6 +39,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
     private Network net;
 	private int nRules;
 	private List<NodeMetrics> nodeMetrics;
+	private List<Property> properties;
 	/**
      * This class is an helper to generate network object
      * @param ctx Z3 Context
@@ -48,7 +50,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	 * @param nodeMetrics 
      */
     public NodeNetworkObject(Context ctx, NetContext nctx, AutoContext autoctx, Network net, 
-    		List<it.polito.verifoo.rest.jaxb.Node> nodes, int nRules, List<NodeMetrics> nodeMetrics) {
+    		List<it.polito.verifoo.rest.jaxb.Node> nodes, int nRules, List<NodeMetrics> nodeMetrics, List<Property> properties) {
 		super();
 		this.ctx = ctx;
 		this.nctx = nctx;
@@ -56,6 +58,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 		this.net = net;
 		this.nRules = nRules;
 		this.nodeMetrics = nodeMetrics;
+		this.properties = properties;
 		nodes.forEach(this::generateNetObj);
 	}
 
@@ -73,14 +76,23 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	public void generateAcl(Node n, AclFirewall fw){
 		if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
 			n.getConfiguration().getFirewall().getElements().forEach((e)->{
-				ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+					ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
 					if(nctx.am.get(e.getSource())!=null&&nctx.am.get(e.getDestination())!=null){
 					    Tuple<DatatypeExpr,DatatypeExpr> rule=new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(e.getSource()),nctx.am.get(e.getDestination()));
 					    acl.add(rule);
 					    logger.debug("Adding blocking rule " + acl);
 					}
 				    fw.addAcls(acl);
-				    //logger.debug("Added acl:"+ rule.toString() +" to "+n.getName());
+				    //logger.debug("Added acl:"+ rule.toString() +" to "+n.getName());*/
+				    /*ArrayList<Tuple<int[],int[]>> ip_acl = new ArrayList<>();
+				    if(e.getSource()!=null&&e.getDestination()!=null){
+				    	Tuple<int[],int[]> rule=new Tuple<int[],int[]>(nctx.getIpFromString(e.getSource()),nctx.getIpFromString(e.getDestination()));
+				    	ip_acl.add(rule);
+					    logger.debug("Adding blocking rule " + rule._1[0]+"."+rule._1[1]+"."+rule._1[2]+"." +rule._1[3] 
+					    							+ " - " + rule._2[0]+"."+rule._2[1]+"."+rule._2[2]+"." +rule._2[3]);
+					}
+				    fw.addIpAcls(ip_acl);
+				    logger.debug("Added acl:"+ ip_acl.toString() +" to "+n.getName());*/
 				});
 		}
 		
@@ -145,6 +157,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 			FunctionalTypes ftype;
 			ftype=n.getFunctionalType();
 			boolean optional = nodeMetrics.stream().filter( c -> c.getNode().equals(n.getName())).map(c -> c.isOptional()).findFirst().orElse(false);
+			Property prop = properties.stream().filter(p -> p.getSrc().equals(n.getName())).findFirst().orElse(null);
 			switch (ftype) {
 				case FIREWALL:{
 					if(n.getConfiguration().getFirewall()==null){
@@ -185,7 +198,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					}
 					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);
-					eh.installEndHost(new PacketWrapper(n.getConfiguration().getEndhost(), nctx));
+					PacketWrapper p = new PacketWrapper(n.getConfiguration().getEndhost(), nctx);
+					if(prop != null){ p.setProperties(prop, nctx);}
+					eh.installEndHost(p);
 					break;
 				}
 				case ANTISPAM:{
@@ -254,7 +269,8 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					/*PolitoMailClient eh=new PolitoMailClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getMailclient().getMailserver())});
 					this.put(n,eh);*/
 					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
-					PacketModel p = new PacketModel();
+					PacketWrapper p = new PacketWrapper(n.getConfiguration().getEndhost(), nctx);
+					if(prop != null){ p.setProperties(prop, nctx);}
 					this.put(n,eh);
 					eh.installAsPOP3MailClient(nctx.am.get(n.getConfiguration().getMailclient().getMailserver()), p);
 					break;
@@ -316,7 +332,8 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					/*PolitoWebClient eh=new PolitoWebClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer())});
 					this.put(n,eh);*/
 					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
-					PacketModel p = new PacketModel();
+					PacketWrapper p = new PacketWrapper(n.getConfiguration().getEndhost(), nctx);
+					if(prop != null){ p.setProperties(prop, nctx);}
 					this.put(n,eh);
 					eh.installAsWebClient(nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer()), p);
 					break;
@@ -349,6 +366,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
         for(int i=0; i<arg.size(); i++){
             if(arg.get(i)!=null)
                 o[i]= String.valueOf(arg.get(i)).hashCode();
+            	//System.out.println("Argument " + o[i]);
         }
         return o;
     }

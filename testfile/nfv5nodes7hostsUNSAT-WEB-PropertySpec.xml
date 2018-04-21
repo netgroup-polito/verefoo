@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
-<!-- In this example there was a DPI and CACHE VNFs which will work on the HTTP traffic and will not
-forward packets other than HTTP. That is why this test was unsat.
--->
   <graphs>
     <graph id="0">
-     <node functional_type="MAILCLIENT" name="nodeA">
+     <node functional_type="WEBCLIENT" name="nodeA">
         <neighbour name="node1"/>
         <configuration description="A simple description" name="confA">
-          <mailclient mailserver="nodeB"/>
+          <webclient nameWebServer="nodeB"/>
         </configuration>
       </node>
       <node functional_type="FIREWALL" name="node1">
@@ -23,22 +20,24 @@ forward packets other than HTTP. That is why this test was unsat.
           </firewall>
         </configuration>
       </node>
-      <node functional_type="ANTISPAM" name="node2">
+      <node functional_type="DPI" name="node2">
         <neighbour name="node1"/>
         <neighbour name="node3"/>
         <configuration description="A simple description" name="conf2">
-         <antispam>
-          	<source>polito</source>
-         </antispam>
+          <dpi>
+          	<notAllowed>weapons</notAllowed>
+          </dpi>
         </configuration>
       </node>
-      <node functional_type="FIELDMODIFIER" name="node3">
+      <node functional_type="CACHE" name="node3">
         <neighbour name="node2"/>
         <neighbour name="node4"/>
         <configuration description="A simple description" name="conf3">
-         <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
+          <cache>
+          	<resource>nodeA</resource>
+          	<resource>node1</resource>
+          	<resource>node2</resource>
+          </cache>
         </configuration>
       </node>
 	  <node functional_type="FIELDMODIFIER" name="node4">
@@ -59,12 +58,12 @@ forward packets other than HTTP. That is why this test was unsat.
          </fieldmodifier>
         </configuration>
       </node>
-      <node functional_type="MAILSERVER" name="nodeB">
+      <node functional_type="WEBSERVER" name="nodeB">
         <neighbour name="node5"/>
         <configuration description="A simple description" name="confB">
-         <mailserver>
+          <webserver>
           	<name>nodeB</name>
-          </mailserver>
+          </webserver>
         </configuration>
       </node>
     </graph>
@@ -77,10 +76,14 @@ forward packets other than HTTP. That is why this test was unsat.
 			<NodeMetrics node="node4" reqStorage="10"/>
 			<NodeMetrics node="node5" reqStorage="10"/>
 	  </NodeConstraints>
-	  <BandwidthConstraints/>
+	  <BandwidthConstraints>
+			<BandwidthMetrics src="node4" dst="node2" reqLatency="10"/>
+	  </BandwidthConstraints>
   </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/>
+  		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB" src_port="10" dst_port="80">
+  			<HTTPDefinition body="weapons"/>
+  		</Property> 		
   </PropertyDefinition>
   <Hosts>
   	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>

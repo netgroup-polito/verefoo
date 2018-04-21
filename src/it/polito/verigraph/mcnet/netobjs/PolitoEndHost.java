@@ -137,7 +137,6 @@ public class PolitoEndHost extends NetworkObject {
 
         //IntExpr t_0 = ctx.mkIntConst("PolitoEndHost_"+politoEndHost+"_t_0");
         BoolExpr predicatesOnPktFields = ctx.mkTrue();
-
         if(packet!=null){
         	if(packet.getIp_dest() != null)
                 predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("dest").apply(p_0), packet.getIp_dest()));

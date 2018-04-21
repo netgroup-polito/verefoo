@@ -11,22 +11,21 @@ package it.polito.verifoo.rest.jaxb;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Classe Java per anonymous complex type.
+ * <p>Classe Java per HTTPDefinition complex type.
  * 
  * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
  * 
  * <pre>
- * &lt;complexType>
+ * &lt;complexType name="HTTPDefinition">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="sourceHost" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="destHost" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="avgLatency" type="{http://www.w3.org/2001/XMLSchema}int" />
+ *       &lt;attribute name="url" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="body" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="options" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -35,87 +34,86 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "")
-@XmlRootElement(name = "Connection")
-public class Connection {
+@XmlType(name = "HTTPDefinition")
+public class HTTPDefinition {
 
-    @XmlAttribute(name = "sourceHost", required = true)
-    protected String sourceHost;
-    @XmlAttribute(name = "destHost", required = true)
-    protected String destHost;
-    @XmlAttribute(name = "avgLatency")
-    protected Integer avgLatency;
+    @XmlAttribute(name = "url")
+    protected String url;
+    @XmlAttribute(name = "body", required = true)
+    protected String body;
+    @XmlAttribute(name = "options")
+    protected String options;
 
     /**
-     * Recupera il valore della proprietà sourceHost.
+     * Recupera il valore della proprietà url.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getSourceHost() {
-        return sourceHost;
+    public String getUrl() {
+        return url;
     }
 
     /**
-     * Imposta il valore della proprietà sourceHost.
+     * Imposta il valore della proprietà url.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setSourceHost(String value) {
-        this.sourceHost = value;
+    public void setUrl(String value) {
+        this.url = value;
     }
 
     /**
-     * Recupera il valore della proprietà destHost.
+     * Recupera il valore della proprietà body.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getDestHost() {
-        return destHost;
+    public String getBody() {
+        return body;
     }
 
     /**
-     * Imposta il valore della proprietà destHost.
+     * Imposta il valore della proprietà body.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setDestHost(String value) {
-        this.destHost = value;
+    public void setBody(String value) {
+        this.body = value;
     }
 
     /**
-     * Recupera il valore della proprietà avgLatency.
+     * Recupera il valore della proprietà options.
      * 
      * @return
      *     possible object is
-     *     {@link Integer }
+     *     {@link String }
      *     
      */
-    public Integer getAvgLatency() {
-        return avgLatency;
+    public String getOptions() {
+        return options;
     }
 
     /**
-     * Imposta il valore della proprietà avgLatency.
+     * Imposta il valore della proprietà options.
      * 
      * @param value
      *     allowed object is
-     *     {@link Integer }
+     *     {@link String }
      *     
      */
-    public void setAvgLatency(Integer value) {
-        this.avgLatency = value;
+    public void setOptions(String value) {
+        this.options = value;
     }
 
 }
