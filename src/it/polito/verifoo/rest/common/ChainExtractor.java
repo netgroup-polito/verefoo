@@ -12,6 +12,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import it.polito.verifoo.rest.jaxb.Connection;
+import it.polito.verifoo.rest.jaxb.FunctionalTypes;
+import it.polito.verifoo.rest.jaxb.Host;
+import it.polito.verifoo.rest.jaxb.Node;
+import it.polito.verifoo.rest.jaxb.TypeOfHost;
 
 /**
  * This is the class that extract all the possible chain from a physical network
@@ -22,20 +26,22 @@ public class ChainExtractor {
 
 	private static Logger logger = LogManager.getLogger("mylog");
 	private static List<List<String>> savedChain;
+	private static List<Host> hosts;
 	/**
 	 * Calculates all the possible paths from the host client to the host server
 	 * @param hostClient
 	 * @param hostServer
+	 * @param hosts 
 	 * @return 
 	 */
-	public static List<List<String>> createHostChain(String hostClient, String hostServer, List<Connection> connections, int maxSize){
+	public static List<List<String>> createHostChain(String hostClient, String hostServer, List<Host> hs, List<Connection> connections, int maxSize){
 		List<String> hostChain = new ArrayList<>();
 		savedChain = new ArrayList<>();
-		
+		hosts = hs;
 		hostChain.add(hostClient);
 		
 		List<String> destinations = connections.stream()
-								.filter(c -> c.getSourceHost().equals(hostClient))
+								.filter(c -> c.getSourceHost().equals(hostClient) && !hostIsClient(c.getDestHost()) && !hostIsServer(c.getDestHost()))
 								.map(c -> c.getDestHost())
 								.collect(Collectors.toList());
 		for(String dest:destinations){
@@ -61,12 +67,12 @@ public class ChainExtractor {
 			savedChain.add(new ArrayList<>(hostChain));
 			return true;
 		}
-		if(hostChain.size() >= maxSize){ 
+		if(hostChain.size() >= maxSize || hostIsServer(lastHost)){ 
 			//logger.debug("Chain MAX Size reached");
 			return false;
 		}
 		List<String> destinations = connections.stream()
-								.filter(c -> c.getSourceHost().equals(lastHost))
+								.filter(c -> c.getSourceHost().equals(lastHost) && !hostIsClient(c.getDestHost()))
 								.map(c -> c.getDestHost())
 								.collect(Collectors.toList());
 		if(!visited.containsKey(lastHost)){
@@ -98,6 +104,22 @@ public class ChainExtractor {
 		
 		return true;
 		
+	}
+	/**
+	 * Returns if the name of the host passed as argument is associated to a client host
+	 * @param hostName
+	 * @return
+	 */
+	public static boolean hostIsClient(String hostName){
+		return hosts.stream().filter(h -> h.getName().equals(hostName) && h.getType().equals(TypeOfHost.CLIENT)).count() > 0;
+	}
+	/**
+	 * Returns if the name of the host passed as argument is associated to a server host
+	 * @param hostName
+	 * @return
+	 */
+	public static boolean hostIsServer(String hostName){
+		return hosts.stream().filter(h -> h.getName().equals(hostName) && h.getType().equals(TypeOfHost.SERVER)).count() > 0;
 	}
 	
 	/**

@@ -60,14 +60,14 @@
           </firewall>
         </configuration>
       </node>
-	  <node functional_type="FIELDMODIFIER" name="node4">
+	  <node functional_type="DPI" name="node4">
 		<neighbour name="node3"/>
         <neighbour name="node2"/>
         <neighbour name="nodeD"/>
         <configuration description="A simple description" name="conf3">
-         <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
+         <dpi>
+          	<notAllowed>name</notAllowed>
+         </dpi>
         </configuration>
       </node>
 	  <node functional_type="WEBSERVER" name="nodeB">
@@ -107,16 +107,19 @@
   	<Host name="host1" cpu="2" cores="4" memory="16" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="DPI"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
   	<Host name="host2" cpu="3" cores="8" memory="16" diskStorage="30" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="DPI"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
   	<Host name="host3" cpu="4" cores="4" memory="16" diskStorage="20" maxVNF="4" type="MIDDLEBOX">
 		<SupportedVNF functional_type="FIREWALL"/>
 		<SupportedVNF functional_type="CACHE"/>
+		<SupportedVNF functional_type="DPI"/>
 		<SupportedVNF functional_type="FIELDMODIFIER"/>
 	</Host>
   	<Host name="hostB" cpu="2" cores="2" memory="4" diskStorage="10" type="SERVER" fixedEndpoint="nodeB"/>

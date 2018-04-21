@@ -60,14 +60,14 @@
           </firewall>
         </configuration>
       </node>
-	  <node functional_type="FIELDMODIFIER" name="node4">
+	  <node functional_type="DPI" name="node4">
 		<neighbour name="node3"/>
         <neighbour name="node2"/>
         <neighbour name="nodeD"/>
         <configuration description="A simple description" name="conf3">
-         <fieldmodifier>
-          	<name>name</name>
-         </fieldmodifier>
+         <dpi>
+          	<notAllowed>name</notAllowed>
+         </dpi>
         </configuration>
       </node>
 	  <node functional_type="WEBSERVER" name="nodeB">

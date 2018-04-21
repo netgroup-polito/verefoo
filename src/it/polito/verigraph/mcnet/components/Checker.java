@@ -26,10 +26,12 @@ import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 
 import it.polito.verifoo.rest.common.AutoContext;
+import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
+import it.polito.verigraph.mcnet.netobjs.PacketModel;
 
 /**
  * Various checks for specific properties in the network.
@@ -223,15 +225,28 @@ public class Checker {
 		
 		
 	}
+	public void propertyAdd(NetworkObject src, NetworkObject dest, Prop property, Property otherConstr) {
+		propertyAdd(src, dest, property);
+		Expr p_0 = ctx.mkConst("check_reach_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
+		Expr n_0 = ctx.mkConst("check_reach_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
+		if(otherConstr.getSrcPort() != null){
+			constraintList.add(ctx.mkEq(nctx.src_port.apply(p_0), (IntExpr)ctx.mkInt(otherConstr.getSrcPort())));
+		}
+		if(otherConstr.getDstPort() != null){
+			constraintList.add(ctx.mkEq(nctx.dest_port.apply(p_0), (IntExpr)ctx.mkInt(otherConstr.getDstPort())));
+		}
+	}
 	private void addReachabilityProperty(NetworkObject src, NetworkObject dest) {
 		
 		Expr p0 = ctx.mkConst("check_reach_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
 		Expr p1 = ctx.mkConst("check_reach_p1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
 		Expr n_0 = ctx.mkConst("check_reach_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
+		Expr n_1 = ctx.mkConst("check_reach_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
 
 		// Constraint1recv(n_0,destNode,p0,t_0)
 		constraintList.add((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0));
-
+		// Constraint send(srcNode,n_1,p0,t_0)
+		constraintList.add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p0));
 		// Constraint4p1.origin == srcNode
 		constraintList.add(ctx.mkEq(nctx.pf.get("origin").apply(p0), src.getZ3Node()));
 
