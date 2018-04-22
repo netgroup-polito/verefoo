@@ -84,7 +84,7 @@ public class PolitoEndHost extends NetworkObject {
                 ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0,politoEndHost, p_0),
                         ctx.mkAnd( ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.HTTP_RESPONSE)),
                                 ctx.mkExists(new Expr[]{p_1},
-                                        ctx.mkAnd( (BoolExpr)nctx.send.apply(politoEndHost, n_0, p_1),
+                                        ctx.mkAnd( (BoolExpr)nctx.send.apply(politoEndHost, n_0, p_1), ctx.mkEq(nctx.pf.get("src").apply(p_0), ipServer),
                                                 ctx.mkEq(nctx.pf.get("dest").apply(p_1), nctx.pf.get("src").apply(p_0))),1,null,null,null,null)
                                 )
                         ),1,null,null,null,null));
@@ -119,11 +119,20 @@ public class PolitoEndHost extends NetworkObject {
     }
     public  void installAsPOP3MailClient(DatatypeExpr ipServer,PacketModel packet){
         installEndHost(packet);
+        Expr p_1 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_p_1", nctx.packet);
+        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
+                ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0,politoEndHost, p_0),
+                        ctx.mkAnd( ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_RESPONSE)),
+                                ctx.mkExists(new Expr[]{p_1},
+                                        ctx.mkAnd( (BoolExpr)nctx.send.apply(politoEndHost, n_0, p_1), ctx.mkEq(nctx.pf.get("src").apply(p_0), ipServer),
+                                                ctx.mkEq(nctx.pf.get("dest").apply(p_1), nctx.pf.get("src").apply(p_0))),1,null,null,null,null)
+                                )
+                        ),1,null,null,null,null));/*
         constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
                 ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0,politoEndHost, p_0),
                         ctx.mkAnd( ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_RESPONSE)),
                                 ctx.mkEq(nctx.pf.get("src").apply(p_0), ipServer))
-                        ),1,null,null,null,null));
+                        ),1,null,null,null,null));*/
     }
 
 

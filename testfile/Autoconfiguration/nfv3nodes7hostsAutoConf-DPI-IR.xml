@@ -4,14 +4,12 @@
     <graph id="0">
      <node functional_type="ENDHOST" name="nodeA">
         <neighbour name="node1"/>
-        <neighbour name="node2"/>
         <configuration description="A simple description" name="confA">
           <endhost body="cats"/>
         </configuration>
       </node>
 	  <node functional_type="ENDHOST" name="nodeC">
         <neighbour name="node1"/>
-        <neighbour name="node2"/>
         <configuration description="A simple description" name="confA">
           <endhost body="weapons"/>
         </configuration>
@@ -25,11 +23,8 @@
         </configuration>
       </node>
 	   <node functional_type="NAT" name="node2">
-	    <neighbour name="nodeA"/>
-	    <neighbour name="nodeC"/>
         <neighbour name="node1"/>
         <neighbour name="node3"/>
-		<neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf2">
           <nat>
 			<source>nodeA</source>
@@ -38,14 +33,13 @@
         </configuration>
       </node>
 	   <node functional_type="DPI" name="node3">
-        <neighbour name="node3"/>
+        <neighbour name="node2"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf1">
           <dpi/>
         </configuration>
       </node>
       <node functional_type="WEBSERVER" name="nodeB">
-        <neighbour name="node2"/>
 		<neighbour name="node3"/>
         <configuration description="A simple description" name="confB">
           <webserver>

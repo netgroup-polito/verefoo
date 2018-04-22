@@ -651,7 +651,7 @@ public class Network extends Core {
 						BoolExpr[] tmpWithOptional = new BoolExpr[nextHopsWithOptional.size()];
 						initialWithOptional = ctx.mkForall(new Expr[] { n_0,p_0 },
 													ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(node.getZ3Node(), n_0, p_0),predicates),
-																			ctx.mkAnd(ctx.mkOr(nextHopsWithOptional.toArray(tmpWithOptional))   )//   , ctx.mkAnd(optionalInBetweenTmp.toArray(tmp2)))
+																			ctx.mkAnd(ctx.mkOr(nextHopsWithOptional.toArray(tmpWithOptional))    , ctx.mkAnd(optionalInBetweenTmp.toArray(tmp2)))
 																	)
 													,1, null, null, null, null);
 						//System.out.println("Special with optional conditions: " + initialWithOptional);
@@ -679,7 +679,7 @@ public class Network extends Core {
 						BoolExpr[] tmpWithoutOptional = new BoolExpr[nextHopsWithoutOptional.size()];
 						initialWithoutOptional = ctx.mkForall(new Expr[] { n_0,p_0 },
 													ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(node.getZ3Node(), n_0, p_0),predicates),
-																			ctx.mkAnd(ctx.mkOr(nextHopsWithoutOptional.toArray(tmpWithoutOptional))   )//   , ctx.mkAnd(optionalInBetweenTmp.toArray(tmp2)))
+																			ctx.mkAnd(ctx.mkOr(nextHopsWithoutOptional.toArray(tmpWithoutOptional))  , ctx.mkAnd(optionalInBetweenTmp.toArray(tmp2)))
 																	)
 													,1, null, null, null, null);
 						//System.out.println("Special without optional conditions: " + initialWithoutOptional);

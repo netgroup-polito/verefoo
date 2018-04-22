@@ -50,6 +50,7 @@ public class NetContext extends Core{
     public List<Tuple<BoolExpr, String>> softConstraints;
     public List<Tuple<BoolExpr, String>> softConstrAutoConf;
     public List<Tuple<BoolExpr, String>> softConstrAutoPlace;
+    public List<Tuple<BoolExpr, String>> softConstrWildcard;
     List<Core> policies;
 
     public HashMap<String,NetworkObject> nm; //list of nodes, callable by node name
@@ -57,7 +58,8 @@ public class NetContext extends Core{
     public HashMap<String,DatatypeExpr> ipm; // list of ip addresses, callable by name
     public HashMap<String,FuncDecl> pf;
     Context ctx;
-    public EnumSort node,address;
+    public EnumSort node;
+	public DatatypeSort address;
     public FuncDecl src_port,dest_port,nodeHasAddr,addrToNode,send,recv;
     public DatatypeSort packet;
     
@@ -97,6 +99,7 @@ public class NetContext extends Core{
         softConstraints = new ArrayList<>();
         softConstrAutoConf = new ArrayList<>();
         softConstrAutoPlace = new ArrayList<>();
+        softConstrWildcard = new ArrayList<>(); 
         policies = new ArrayList<Core>();
         
         //variable true that is always true
@@ -164,12 +167,18 @@ public class NetContext extends Core{
         	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
 			solver.AssertSoft(t._1, 10, t._2);
 		}
+      //System.out.println("Wildcards Constraints");
+        for (Tuple<BoolExpr, String> t : softConstrWildcard) {
+        	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, -10, t._2);
+		}
         
     }
 
-    public int[] getIpFromString(String ipString){
+    public int[] getIpFromString(String ipString) {
     	int[] res = new int[4];
     	String[] decimalNotation = ipString.split("\\.");
+    	if(decimalNotation.length > 4) throw new NumberFormatException();
     	int i = 0;
     	for(String s : decimalNotation){
     		res[i] = Integer.parseInt(s);
@@ -185,47 +194,49 @@ public class NetContext extends Core{
             DatatypeExpr fd  = (DatatypeExpr)node.getConst(i);    
             DumbNode dn =new DumbNode(ctx,new Object[]{fd});
 
-            nm.put(fd.toString(),dn);
+            nm.put(fd.toString().replace("|", ""),dn);
         }
 
-        //Addresses for this network
-        String[] ipfieldNames = new String[]{"ipAddr_1","ipAddr_2","ipAddr_3","ipAddr_4"};
-        Sort[] sort = new Sort[]{ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort()};
-        Constructor ipCon = ctx.mkConstructor("ip_constructor", "is_ip", ipfieldNames, sort, null);
-        ipAddress = ctx.mkDatatypeSort("IP", new Constructor[] {ipCon});
-        for(int i=0;i<ipfieldNames.length;i++){
-        	ip_functions.put(ipfieldNames[i], ipAddress.getAccessors()[0][i]); // ip_functions to get ip's function declarations by name
-        }
-        int[][] ips = new int[addresses.length+1][];
-        String tmp[] = new String[ips.length];
-        for(int k = 0; k < addresses.length; k++){
-            ips[k] = getIpFromString("10.0.0."+k);
-            tmp[k] = ips[k][0]+".";
-            for(int i = 1; i < ips[k].length; i++){
-            	tmp[k] += ips[k][i];
-            	if(i < 3)
-            		tmp[k] += ".";
-            }
-            //System.out.print(tmp[k]);
-            //System.out.println("");
-            DatatypeExpr fd = (DatatypeExpr) ctx.mkConst(tmp[k], ipAddress);
-            constraints.add(equalIpToIntArray(fd, ips[k]));
-            ipm.put(tmp[k], fd);
-            
-        }
-        tmp[tmp.length-1] = "null";
-        
-        
-        
-        String[] new_addr = new String[addresses.length+1];
+        //Addresses for this network         
+        String[] new_addr = new String[addresses.length+2];
         for(int k=0;k<addresses.length;k++)
             new_addr[k] = addresses[k];
 
-        new_addr[new_addr.length-1] = "null";
-        address = ctx.mkEnumSort("Address", new_addr);        
-        for(int i=0;i<address.getConsts().length;i++){
-            DatatypeExpr fd  = (DatatypeExpr)address.getConst(i);
-            am.put(fd.toString(),fd);
+        new_addr[new_addr.length-2] = "null";
+        new_addr[new_addr.length-1] = "wildcard";
+        //address = ctx.mkEnumSort("Address", new_addr);  
+        String[] ipfieldNames = new String[]{"ipAddr_1","ipAddr_2","ipAddr_3","ipAddr_4"};
+        Sort[] sort = new Sort[]{ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort()};
+        Constructor ipCon = ctx.mkConstructor("ip_constructor", "is_ip", ipfieldNames, sort, null);
+        address = ctx.mkDatatypeSort("Address", new Constructor[] {ipCon});
+        for(int i=0;i<ipfieldNames.length;i++){
+        	ip_functions.put(ipfieldNames[i], address.getAccessors()[0][i]); // ip_functions to get ip's function declarations by name
+        }
+        
+        for(int i=0;i<new_addr.length;i++){
+            //DatatypeExpr fd  = (DatatypeExpr)address.getConst(i);
+        	DatatypeExpr fd = (DatatypeExpr) ctx.mkConst(new_addr[i], address);
+            //System.out.println(fd.toString().replace("|", ""));
+            am.put(fd.toString().replace("|", ""),fd);
+            try{
+            	constraints.add(equalIpToIntArray(fd, getIpFromString(new_addr[i])));
+            }catch(NumberFormatException e){
+            	if(new_addr[i].equals("null")){
+            		constraints.add(equalIpToIntArray(fd, getIpFromString("0.0.0.0")));
+            	}
+            	else if(new_addr[i].equals("wildcard")){
+            		constraints.add(equalIpToIntArray(fd, getIpFromString("-1.-1.-1.-1")));
+            	} else{
+            		//251 is a prime number, to reduce collisions
+            		constraints.add(equalIpToIntArray(fd, getIpFromString(
+												            				(new_addr[i].hashCode()%251)+"."+
+												            				(new_addr[i].hashCode()%251)+"."+ 
+												            				(new_addr[i].hashCode()%251)+"."+ 
+												            				(new_addr[i].hashCode()%251)           						
+												            				)));
+            	}
+            	//System.out.println(new_addr[i] + " is not a valid ip address, using it as a label");
+            }
         }
         
         // Type for packets, contains (some of these are currently represented as relations):
@@ -395,6 +406,29 @@ public class NetContext extends Core{
                                         ctx.mkEq(this.pf.get("url").apply(p_1), this.pf.get("url").apply(p_0)),
                                         ctx.mkEq(this.pf.get("options").apply(p_1), this.pf.get("options").apply(p_0)))),1,null,null,null,null)
                 );
+		constraints.add(ctx.mkForall(new Expr[]{n_0, n_1, p_0},
+                                	ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
+                                				ctx.mkAnd( 
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_1").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_1").apply(pf.get("src").apply(p_0)),(IntExpr) ctx.mkInt(255)),
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_2").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_2").apply(pf.get("src").apply(p_0)),(IntExpr) ctx.mkInt(255)),
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_3").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_3").apply(pf.get("src").apply(p_0)),(IntExpr) ctx.mkInt(255)),
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_4").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_4").apply(pf.get("src").apply(p_0)),(IntExpr) ctx.mkInt(255)),
+						                                ctx.mkGe((IntExpr)ip_functions.get("ipAddr_1").apply(pf.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_1").apply(pf.get("dest").apply(p_0)),(IntExpr) ctx.mkInt(255)),
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_2").apply(pf.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_2").apply(pf.get("dest").apply(p_0)),(IntExpr) ctx.mkInt(255)),
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_3").apply(pf.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_3").apply(pf.get("dest").apply(p_0)),(IntExpr) ctx.mkInt(255)),
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_4").apply(pf.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_4").apply(pf.get("dest").apply(p_0)),(IntExpr) ctx.mkInt(255))
+							                              )
+                                				 )
+                
+        ,1,null,null,null,null));
 
 
     }
@@ -407,10 +441,26 @@ public class NetContext extends Core{
      */
     public BoolExpr equalIp(Expr ip1, Expr ip2){
         return ctx.mkAnd(new BoolExpr[]{
-                ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip1), ip_functions.get("ipAddr_1").apply(ip2)),
-                ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip1), ip_functions.get("ipAddr_2").apply(ip2)),
-                ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip1), ip_functions.get("ipAddr_3").apply(ip2)),
-                ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(ip2))});
+                ctx.mkOr(
+                		ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip1), ip_functions.get("ipAddr_1").apply(ip2)),
+                		ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip1), ip_functions.get("ipAddr_1").apply(am.get("wildcard"))),
+                		ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip2), ip_functions.get("ipAddr_1").apply(am.get("wildcard")))
+                		),
+                ctx.mkOr(
+                		ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip1), ip_functions.get("ipAddr_2").apply(ip2)),
+                		ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip1), ip_functions.get("ipAddr_2").apply(am.get("wildcard"))),
+                		ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip2), ip_functions.get("ipAddr_2").apply(am.get("wildcard")))
+                		),
+                ctx.mkOr(
+                		ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip1), ip_functions.get("ipAddr_3").apply(ip2)),
+                		ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip1), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
+                		ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip2), ip_functions.get("ipAddr_3").apply(am.get("wildcard")))
+                		),
+                ctx.mkOr(
+                		ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(ip2)),
+                		ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(am.get("wildcard"))),
+                		ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip2), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))
+                		)});
     }
 
     public BoolExpr equalIpToIntArray(Expr ip_expr, int[] array){

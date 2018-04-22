@@ -150,51 +150,15 @@ public class AclFirewall extends NetworkObject{
 	            			,1,null,null,null,null));
     	  
     }
-
-    
-    private void firewallSendIpRules (){
-    	Expr p_0 = ctx.mkConst(fw+"_firewall_send_p_0", nctx.packet);
-    	Expr n_0 = ctx.mkConst(fw+"_firewall_send_n_0", nctx.node);
-    	Expr n_1 = ctx.mkConst(fw+"_firewall_send_n_1", nctx.node);
-    	//IntExpr t_0 = ctx.mkIntConst(fw+"_firewall_send_t_0");
-    	//IntExpr t_1 = ctx.mkIntConst(fw+"_firewall_send_t_1");
-    	acl_func_new = ctx.mkFuncDecl(fw+"_acl_new_func", new Sort[]{nctx.ipAddress, nctx.ipAddress},ctx.mkBoolSort());
-    	//Constraint1		send(fw, n_0, p, t_0)  -> (exist n_1,t_1 : (recv(n_1, fw, p, t_1) && 
-    	//    				t_1 < t_0 && !acl_func(p.src,p.dest))
-    	  constraints.add(
-	            	ctx.mkForall(new Expr[]{n_0, p_0}, 
-	    	            ctx.mkImplies(
-	    	            	(BoolExpr)nctx.send.apply(new Expr[]{ fw, n_0, p_0}),
-	    	            	
-	    	            			ctx.mkAnd(
-	    	            						ctx.mkExists(new Expr[]{n_1}, 
-	    	            								nctx.recv.apply(n_1, fw, p_0),1,null,null,null,null), 
-	    	            						ctx.mkNot((BoolExpr)acl_func_new.apply(nctx.ipm.get("10.0.0.1"),nctx.ipm.get("10.0.0.2"))
-	    	            								))),1,null,null,null,null));
-
-    	  /*
-    	  //Constraint2 obliges this VNF to send the packets that have been received
-    	  constraints.add(
-	            	ctx.mkForall(new Expr[]{n_0, p_0},
-	            			ctx.mkImplies(	
-	            					ctx.mkAnd( (BoolExpr)nctx.recv.apply(n_0, fw, p_0)
-	            								,ctx.mkNot((BoolExpr)acl_func_new.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0)))
-	            							),
-	            						ctx.mkAnd(ctx.mkExists(new Expr[]{n_1}, (BoolExpr)nctx.send.apply(new Expr[]{ fw, n_1, p_0}),1,null,null,null,null)
-	            								//,ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0)))
-	            								)
-	            						
-	    	    	            	)
-	            			,1,null,null,null,null));*/
-    	  
-    }
-    
     
     // for an autoconfiguration firewall
  	private void firewallSendRules(Integer nRules) {
  		Expr p_0 = ctx.mkConst(fw + "_firewall_send_p_0", nctx.packet);
  		Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
  		Expr n_1 = ctx.mkConst(fw + "_firewall_send_n_1", nctx.node);
+ 		Expr a_0 = ctx.mkConst(fw+"_firewall_acl_a_0", nctx.address);
+        Expr a_1 = ctx.mkConst(fw+"_firewall_acl_a_1", nctx.address);
+        acl_func = ctx.mkFuncDecl(fw + "_acl_func", new Sort[] { nctx.address, nctx.address }, ctx.mkBoolSort());
  		List<BoolExpr> rules = new ArrayList<>();
  		List<BoolExpr> implications1 = new ArrayList<BoolExpr>();
  		List<BoolExpr> implications2 = new ArrayList<BoolExpr>();
@@ -204,9 +168,44 @@ public class AclFirewall extends NetworkObject{
  			Expr proto = ctx.mkConst(fw + "_auto_proto_"+i, ctx.mkIntSort());
  			Expr srcp = ctx.mkConst(fw + "_auto_srcp_"+i, ctx.mkIntSort());
  			Expr dstp = ctx.mkConst(fw + "_auto_dstp_"+i, ctx.mkIntSort());
+ 			IntExpr srcAuto1 = ctx.mkIntConst(fw + "_auto_src_ip_1_"+i);
+ 			IntExpr srcAuto2 = ctx.mkIntConst(fw + "_auto_src_ip_2_"+i);
+ 			IntExpr srcAuto3 = ctx.mkIntConst(fw + "_auto_src_ip_3_"+i);
+ 			IntExpr srcAuto4 = ctx.mkIntConst(fw + "_auto_src_ip_4_"+i);
+ 			IntExpr dstAuto1 = ctx.mkIntConst(fw + "_auto_dst_ip_1_"+i);
+ 			IntExpr dstAuto2 = ctx.mkIntConst(fw + "_auto_dst_ip_2_"+i);
+ 			IntExpr dstAuto3 = ctx.mkIntConst(fw + "_auto_dst_ip_3_"+i);
+ 			IntExpr dstAuto4 = ctx.mkIntConst(fw + "_auto_dst_ip_4_"+i);
+ 			constraints.add(ctx.mkAnd(
+ 									ctx.mkEq(nctx.ip_functions.get("ipAddr_1").apply(src), srcAuto1),
+ 									ctx.mkEq(nctx.ip_functions.get("ipAddr_2").apply(src), srcAuto2),
+ 									ctx.mkEq(nctx.ip_functions.get("ipAddr_3").apply(src), srcAuto3),
+ 									ctx.mkEq(nctx.ip_functions.get("ipAddr_4").apply(src), srcAuto4),
+ 									ctx.mkEq(nctx.ip_functions.get("ipAddr_1").apply(dst), dstAuto1),
+ 									ctx.mkEq(nctx.ip_functions.get("ipAddr_2").apply(dst), dstAuto2),
+ 									ctx.mkEq(nctx.ip_functions.get("ipAddr_3").apply(dst), dstAuto3),
+ 									ctx.mkEq(nctx.ip_functions.get("ipAddr_4").apply(dst), dstAuto4)
+ 									)
+ 							);
  			if(autoplace){
- 	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( src, this.nctx.am.get("null")),"fw_auto_conf"));
- 	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( dst, this.nctx.am.get("null")),"fw_auto_conf"));
+ 	 			//autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( src, this.nctx.am.get("null")),"fw_auto_conf"));
+ 	 			//autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( dst, this.nctx.am.get("null")),"fw_auto_conf"));
+ 				autoctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_1").apply(nctx.am.get("wildcard")),srcAuto1), "fw_auto_conf"));
+ 				autoctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_2").apply(nctx.am.get("wildcard")),srcAuto2), "fw_auto_conf"));
+ 				autoctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_3").apply(nctx.am.get("wildcard")),srcAuto3), "fw_auto_conf"));
+ 				autoctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_4").apply(nctx.am.get("wildcard")),srcAuto4), "fw_auto_conf"));
+ 				autoctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_1").apply(nctx.am.get("wildcard")),dstAuto1), "fw_auto_conf"));
+ 				autoctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_2").apply(nctx.am.get("wildcard")),dstAuto2), "fw_auto_conf"));
+ 				autoctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_3").apply(nctx.am.get("wildcard")),dstAuto3), "fw_auto_conf"));
+ 				autoctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_4").apply(nctx.am.get("wildcard")),dstAuto4), "fw_auto_conf"));
+ 				autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_1").apply(nctx.am.get("null")),srcAuto1), "fw_auto_conf"));
+ 				autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_2").apply(nctx.am.get("null")),srcAuto2), "fw_auto_conf"));
+ 				autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_3").apply(nctx.am.get("null")),srcAuto3), "fw_auto_conf"));
+ 				autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_4").apply(nctx.am.get("null")),srcAuto4), "fw_auto_conf"));
+ 				autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_1").apply(nctx.am.get("null")),dstAuto1), "fw_auto_conf"));
+ 				autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_2").apply(nctx.am.get("null")),dstAuto2), "fw_auto_conf"));
+ 				autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_3").apply(nctx.am.get("null")),dstAuto3), "fw_auto_conf"));
+ 				autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_4").apply(nctx.am.get("null")),dstAuto4), "fw_auto_conf"));
  	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
  	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( srcp, ctx.mkInt(0)),"fw_auto_conf"));
  	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( dstp, ctx.mkInt(0)),"fw_auto_conf"));
@@ -215,22 +214,45 @@ public class AclFirewall extends NetworkObject{
 				implications2.add(ctx.mkAnd(ctx.mkEq( src, this.nctx.am.get("null")),
 											ctx.mkEq( dst, this.nctx.am.get("null"))));
  			}else{
- 	 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( src, this.nctx.am.get("null")),"fw_auto_conf"));
- 	 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( dst, this.nctx.am.get("null")),"fw_auto_conf"));
- 	 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
+ 	 			/*nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( src, this.nctx.am.get("null")),"fw_auto_conf"));
+ 	 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( dst, this.nctx.am.get("null")),"fw_auto_conf"));*/
+ 				nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_1").apply(nctx.am.get("wildcard")),srcAuto1), "fw_auto_conf"));
+ 				nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_2").apply(nctx.am.get("wildcard")),srcAuto2), "fw_auto_conf"));
+ 				nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_3").apply(nctx.am.get("wildcard")),srcAuto3), "fw_auto_conf"));
+ 				nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_4").apply(nctx.am.get("wildcard")),srcAuto4), "fw_auto_conf"));
+ 				nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_1").apply(nctx.am.get("wildcard")),dstAuto1), "fw_auto_conf"));
+ 				nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_2").apply(nctx.am.get("wildcard")),dstAuto2), "fw_auto_conf"));
+ 				nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_3").apply(nctx.am.get("wildcard")),dstAuto3), "fw_auto_conf"));
+ 				nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_4").apply(nctx.am.get("wildcard")),dstAuto4), "fw_auto_conf"));
+ 				nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_1").apply(nctx.am.get("null")),srcAuto1), "fw_auto_conf"));
+ 				nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_2").apply(nctx.am.get("null")),srcAuto2), "fw_auto_conf"));
+ 				nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_3").apply(nctx.am.get("null")),srcAuto3), "fw_auto_conf"));
+ 				nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_4").apply(nctx.am.get("null")),srcAuto4), "fw_auto_conf"));
+ 				nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_1").apply(nctx.am.get("null")),dstAuto1), "fw_auto_conf"));
+ 				nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_2").apply(nctx.am.get("null")),dstAuto2), "fw_auto_conf"));
+ 				nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_3").apply(nctx.am.get("null")),dstAuto3), "fw_auto_conf"));
+ 				nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_4").apply(nctx.am.get("null")),dstAuto4), "fw_auto_conf"));
+ 				nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
  	 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( srcp, ctx.mkInt(0)),"fw_auto_conf"));
  	 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( dstp, ctx.mkInt(0)),"fw_auto_conf"));
  			}
  			rules.add(ctx.mkAnd(
+			 					nctx.equalIp(nctx.pf.get("src").apply(p_0), src),
+			 					nctx.equalIp(nctx.pf.get("dest").apply(p_0), dst)
+			 					//ctx.mkEq(nctx.pf.get("proto").apply(p_0), proto),
+			 					//ctx.mkEq((IntExpr)nctx.src_port.apply(p_0), srcp),
+			 					//ctx.mkEq((IntExpr)nctx.dest_port.apply(p_0), dstp)
+			 					));
+ 			/*rules.add(ctx.mkAnd(
  					ctx.mkEq(nctx.pf.get("src").apply(p_0), src),
  					ctx.mkEq(nctx.pf.get("dest").apply(p_0), dst)
  					//ctx.mkEq(nctx.pf.get("proto").apply(p_0), proto),
  					//ctx.mkEq((IntExpr)nctx.src_port.apply(p_0), srcp),
  					//ctx.mkEq((IntExpr)nctx.dest_port.apply(p_0), dstp)
- 					));			
+ 					));		*/
  		}
+ 		//System.out.println(rules);
  		
- 		acl_func = ctx.mkFuncDecl(fw + "_acl_func", new Sort[] { nctx.address, nctx.address }, ctx.mkBoolSort());
  		BoolExpr[] tmp = new BoolExpr[rules.size()];
 		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 }, ctx.mkImplies(
 				(BoolExpr) nctx.send.apply(new Expr[] { fw, n_0, p_0 }),
@@ -259,10 +281,10 @@ public class AclFirewall extends NetworkObject{
  			//System.out.println("Adding to fw constraints: " + ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4))));
  			constraints.add(     ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4)))    );
  			//Constraint3 set a constraint to decide if a firewall is being used
- 	    	constraints.add(
+ 	    	/*constraints.add(
  		            	ctx.mkForall(new Expr[]{n_0, p_0},
  		            				ctx.mkImplies(	 (BoolExpr)nctx.recv.apply(n_0, fw, p_0), used  )
- 		            			,1,null,null,null,null));
+ 		            			,1,null,null,null,null));*/
  		}
 
  	}
@@ -283,39 +305,13 @@ public class AclFirewall extends NetworkObject{
         BoolExpr[] acl_map = new BoolExpr[acls.size()];
         for(int y=0;y<acls.size();y++){
         	Tuple<DatatypeExpr,DatatypeExpr> tp = acls.get(y);
-        	acl_map[y] = ctx.mkOr(ctx.mkAnd(ctx.mkEq(a_0,tp._1),ctx.mkEq(a_1,tp._2)), ctx.mkAnd(ctx.mkEq(a_0,tp._2),ctx.mkEq(a_1,tp._1)));
+        	//acl_map[y] = ctx.mkOr(ctx.mkAnd(ctx.mkEq(a_0,tp._1),ctx.mkEq(a_1,tp._2)), ctx.mkAnd(ctx.mkEq(a_0,tp._2),ctx.mkEq(a_1,tp._1)));
+        	acl_map[y] = ctx.mkOr(ctx.mkAnd(nctx.equalIp(a_0,tp._1),nctx.equalIp(a_1,tp._2)), ctx.mkAnd(nctx.equalIp(a_0,tp._2),nctx.equalIp(a_1,tp._1)));
         }
         //Constraint2		acl_func(a_0,a_1) == or(foreach ip1,ip2 in acl_map ((a_0 == ip1 && a_1 == ip2)||(a_0 == ip2 && a_1 == ip1)))
         solver.Add(ctx.mkForall(new Expr[]{a_0, a_1},
         						ctx.mkEq( 
         								acl_func.apply(a_0, a_1),
-        								ctx.mkOr(acl_map)),1,null,null,null,null));
-    }
-    private void aclNewConstraints(Optimize solver){
-    	Expr ip_0 = ctx.mkConst(fw+"_firewall_acl_ip_0", nctx.ipAddress);
-        Expr ip_1 = ctx.mkConst(fw+"_firewall_acl_ip_1", nctx.ipAddress);
-    	if (ipAcls.size() == 0){
-    		//If the size of the ACL list is empty then by default acl_func must be false
-    		 solver.Add(ctx.mkForall(new Expr[]{ip_0, ip_1},
-						ctx.mkEq( 
-								acl_func_new.apply(ip_0, ip_1), ctx.mkFalse()),1,null,null,null,null));
-    		return;
-    	}
-        
-        BoolExpr[] acl_map = new BoolExpr[ipAcls.size()];
-        for(int y=0;y<ipAcls.size();y++){
-        	Tuple<int[],int[]> tp = ipAcls.get(y);
-        	/*for(int i = 0; i < 4; i++){
-        		solver.Add(ctx.mkEq(nctx.ip_functions.get("ipAddr_"+(i+1)).apply(ip_0), ctx.mkInt(tp._1[i])));
-        		solver.Add(ctx.mkEq(nctx.ip_functions.get("ipAddr_"+(i+1)).apply(ip_1), ctx.mkInt(tp._2[i])));
-        	}*/
-        	acl_map[y] = ctx.mkOr(ctx.mkAnd(nctx.equalIpToIntArray(ip_0,tp._1),nctx.equalIpToIntArray(ip_1,tp._2)), 
-        							ctx.mkAnd(nctx.equalIpToIntArray(ip_0,tp._2),nctx.equalIpToIntArray(ip_1,tp._1)));
-        }
-        //Constraint2		acl_func(a_0,a_1) == or(foreach ip1,ip2 in acl_map ((a_0 == ip1 && a_1 == ip2)||(a_0 == ip2 && a_1 == ip1)))
-        solver.Add(ctx.mkForall(new Expr[]{ip_0, ip_1},
-        						ctx.mkEq( 
-        								acl_func_new.apply(ip_0, ip_1),
         								ctx.mkOr(acl_map)),1,null,null,null,null));
     }
 }

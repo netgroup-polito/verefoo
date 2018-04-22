@@ -29,6 +29,7 @@ public class AutoContext extends Core{
 	public List<BoolExpr> constraints;
 	public List<Tuple<BoolExpr, String>> softConstrAutoPlace;
 	public List<Tuple<BoolExpr, String>> softConstrAutoConf;
+	public List<Tuple<BoolExpr, String>> softConstrWildcard;
 	
 	private Map<String, List<NetworkObject>> optionalPlacement;
 	private HashMap<Node, NetworkObject> optionalNodes;
@@ -53,6 +54,7 @@ public class AutoContext extends Core{
 		constraints = new ArrayList<>();
 		softConstrAutoPlace = new ArrayList<>();
 		softConstrAutoConf = new ArrayList<>();
+		softConstrWildcard = new ArrayList<>();
 	}
 	
 	@Override
@@ -74,6 +76,11 @@ public class AutoContext extends Core{
         for (Tuple<BoolExpr, String> t : softConstrAutoPlace) {
         	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
 			solver.AssertSoft(t._1, 100, t._2);
+		}
+        //System.out.println("Wildcards Constraints");
+        for (Tuple<BoolExpr, String> t : softConstrWildcard) {
+        	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, -10, t._2);
 		}
 	}
 	

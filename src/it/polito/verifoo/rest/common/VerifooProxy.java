@@ -248,7 +248,8 @@ public class VerifooProxy {
 									.map(e -> e.getValue())
 									.collect(Collectors.toList())
 									.forEach(i -> {
-										String node = i.toString().substring(i.toString().indexOf(" ")+1, i.toString().lastIndexOf('@'));
+										String cond = i.toString().replace("|", "");
+										String node = cond.substring(cond.indexOf(" ")+1, cond.lastIndexOf('@'));
 										FunctionalTypes f = nodes.stream().filter(n1 -> n1.getName().equals(node)).findFirst().get().getFunctionalType();
 										implications.add(ctx.mkImplies(hostCondition.get(h.getName()), i));
 										logger.debug(i + " => " + hostSupportedVNF.get(h.getName()+"_composition_"+f));
@@ -390,7 +391,7 @@ public class VerifooProxy {
 							validChain = savedChain.stream()
 									.filter(list -> list.contains(fixedHostClient))
 									.collect(Collectors.toList());
-							logger.debug(">>>>Valid Chain found -> " + validChain.size() /*+" ==>  "+ validChain*/);
+							logger.debug(">>>>Valid Chain found -> " + validChain.size() +" ==>  "+ validChain);
 							Map<String, List<List<String>>> currentSubSet = validChain.stream()
 																						.collect(Collectors.groupingBy(chain -> chain.get(chain.size()-1), Collectors.toList()));
 
@@ -404,7 +405,7 @@ public class VerifooProxy {
 							validChain = savedChain.stream()
 													.filter(list -> list.contains(fixedHostClient) && list.contains(fixedHostServer))
 													.collect(Collectors.toList());
-							logger.debug(">>>>Valid Chain found -> " + validChain.size() + " " + validChain);
+							logger.debug(">>>>Valid Chain found -> " + validChain.size() /*+ " ==> " + validChain*/);
 							createRoutingConditions(c, s, validChain, fixedHostClient, fixedHostServer);
 						}
 						nodes.forEach(n -> {

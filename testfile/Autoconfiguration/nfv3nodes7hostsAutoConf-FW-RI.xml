@@ -25,11 +25,8 @@
         </configuration>
       </node>
 	   <node functional_type="NAT" name="node2">
-	    <neighbour name="nodeA"/>
-	    <neighbour name="nodeC"/>
         <neighbour name="node1"/>
         <neighbour name="node3"/>
-		<neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf2">
           <nat>
 			<source>nodeA</source>
@@ -38,14 +35,13 @@
         </configuration>
       </node>
 	   <node functional_type="FIREWALL" name="node3">
-        <neighbour name="node3"/>
+        <neighbour name="node2"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf1">
           <firewall/>
         </configuration>
       </node>
       <node functional_type="WEBSERVER" name="nodeB">
-        <neighbour name="node2"/>
 		<neighbour name="node3"/>
         <configuration description="A simple description" name="confB">
           <webserver>

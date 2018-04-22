@@ -12,7 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import it.polito.verifoo.rest.jaxb.*;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 /**
- * This class implements a parser for verifoo output (the z3 model), in order to translate it into a the correct XML 
+ * This class implements a parser for verifoo output (the z3 model), in order to translate it into the correct XML 
  */
 public class Translator {
 	private String model;
@@ -20,7 +20,7 @@ public class Translator {
 	private org.apache.logging.log4j.Logger logger = LogManager.getLogger("mylog");
 	private Graph g;
 	/**
-	 * Costructor
+	 * Constructor
 	 * @param model The Verifoo output.
 	 * @param nfv The NFV model to complete.
 	 * @param g 
@@ -53,7 +53,19 @@ public class Translator {
 	public void searchHost(Host host){
 		List<String> nodesAlreadyDeployed = host.getNodeRef().stream().map(nr -> nr.getNode()).collect(Collectors.toList());
 		g.getNode().forEach((node)->{
-					String tosearch="define-fun integer_"+node.getName()+"@"+host.getName()+" () Int\n  1)";
+					String tosearch="define-fun .*integer_.*"+node.getName()+"@"+host.getName()+".* \\(\\) Int\n  1\\)";
+					Pattern pattern = Pattern.compile(tosearch);
+					Matcher matcher = pattern.matcher(model);
+					while (matcher.find()) {
+						logger.debug(tosearch);
+						host.setActive(true);
+						NodeRefType nr=new NodeRefType();
+						nr.setNode(node.getName());
+						if(!nodesAlreadyDeployed.contains(node.getName())){
+							host.getNodeRef().add(nr);
+							allocateResources(host, node.getName());
+						}
+					}/*
 					if(model.contains(tosearch)){
 						logger.debug(tosearch);
 						host.setActive(true);
@@ -63,7 +75,7 @@ public class Translator {
 							host.getNodeRef().add(nr);
 							allocateResources(host, node.getName());
 						}
-					}
+					}*/
 				});
 	}
 	
@@ -72,30 +84,78 @@ public class Translator {
 	 */
 	public void setFirewallAutoConfig(){
 		List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.FIREWALL) && n.getConfiguration().getFirewall().getElements().isEmpty()).collect(Collectors.toList());
-		
+		List<String> nodes = g.getNode().stream().map(n -> n.getName()).collect(Collectors.toList());
 		autoNodes.forEach(n -> {
-			String tosearch="define-fun "+n.getName()+"_auto_src.* Address\n .*";
+			String tosearch="define-fun .*"+n.getName()+".*_auto_src.* Address\n  \\(ip_constructor .*\\)\\)";
 			Pattern pattern = Pattern.compile(tosearch);
 			Matcher matcher = pattern.matcher(model);
 			while (matcher.find()) {
 				Elements e = new Elements();
 				e.setSource("");
 				e.setDestination("");
-		        String match = matcher.group();
-		        String scrRule = match.substring(match.lastIndexOf("\n")+3, match.lastIndexOf(")")); //+3 because the pattern it's like "\n  node1"
-		        e.setSource(scrRule);
-		        String nrOfRule = match.substring(match.lastIndexOf("_src_")+5, match.lastIndexOf(" () Address"));
-		        tosearch="define-fun "+n.getName()+"_auto_dst_"+nrOfRule+".* Address\n .*";
+		        String matchSrc = matcher.group();
+		        String srcRule = matchSrc.substring(matchSrc.lastIndexOf("ip_constructor ")+15, matchSrc.lastIndexOf("))"));
+		        tosearch="define-fun .* Address\n  \\(ip_constructor "+srcRule+"\\)\\)";
+				Pattern patternNodeScr = Pattern.compile(tosearch);
+				Matcher matcherNodeScr = patternNodeScr.matcher(model);
+				String nodeSrcName = "";
+				boolean srcFound = false;
+				while(matcherNodeScr.find()) {
+			        String match = matcherNodeScr.group();
+			        String nodeSrc = match.substring(match.lastIndexOf("define-fun ")+11, match.lastIndexOf(" () Address"));
+			        nodeSrc = nodeSrc.replace("|", "");
+			        if(nodes.contains(nodeSrc)){
+			        	//System.out.println("Found source node " + nodeSrc + " with address " + srcRule);
+			        	nodeSrcName = nodeSrc;
+			        	srcFound = true;
+			        	break;
+			        }
+			    }
+		        if(!srcFound){
+		        	//System.out.println("Source Node with address " + srcRule + " not found");
+		        	nodeSrcName = srcRule;
+		        }
+				nodeSrcName = nodeSrcName.replace("(", "").replace(")", "").replace("- ", "-").replace(" ", ".");
+		        //System.out.println(nodeSrcName);
+		        e.setSource(nodeSrcName);
+		        String nrOfRule = matchSrc.substring(matchSrc.lastIndexOf("_src_")+5, matchSrc.lastIndexOf(" () Address"));
+		        nrOfRule = nrOfRule.replace("|", "");
+		        //System.out.println("Nr Of Rule: " + nrOfRule);
+		        tosearch="define-fun .*"+n.getName()+".*_auto_dst_"+nrOfRule+".* Address\n  \\(ip_constructor .*\\)\\)";
 				Pattern patternDst = Pattern.compile(tosearch);
 				Matcher matcherDst = patternDst.matcher(model);
 				while (matcherDst.find()) {
-			        match = matcherDst.group();
-			        String dstRule = match.substring(match.lastIndexOf("\n")+3, match.lastIndexOf(")")); //+3 because the pattern it's like "\n  node1"
-			        e.setDestination(dstRule);
+			        String matchDst = matcherDst.group();
+			        String dstRule = matchDst.substring(matchDst.lastIndexOf("ip_constructor ")+15, matchDst.lastIndexOf("))"));
+			        //System.out.println("///DstRule " + dstRule + "////");
+			        tosearch="define-fun .* Address\n  \\(ip_constructor "+dstRule+"\\)\\)";
+					Pattern patternNodeDst = Pattern.compile(tosearch);
+					Matcher matcherNodeDst = patternNodeDst.matcher(model);
+					String nodeDstName = "";
+					boolean dstFound = false;
+					while(matcherNodeDst.find()) {
+				        String match = matcherNodeDst.group();
+				        String nodeDst = match.substring(match.lastIndexOf("define-fun ")+11, match.lastIndexOf(" () Address"));
+				        nodeDst = nodeDst.replace("|", "");
+				        if(nodes.contains(nodeDst)){
+				        	//System.out.println("Found dest node " + nodeDst + " with address " + dstRule);
+				        	nodeDstName = nodeDst;
+				        	dstFound = true;
+				        	break;
+				        }
+				    }
+			        if(!dstFound){
+			        	//System.out.println("Dest Node with address " + dstRule + " not found");
+			        	nodeDstName = dstRule;
+			        }
+			        
+					nodeDstName = nodeDstName.replace("(", "").replace(")", "").replace("- ", "-").replace(" ", ".");
+			        //System.out.println(nodeDstName);
+			        e.setDestination(nodeDstName);
 			    }
-				if(!e.getSource().equals("null") && !e.getDestination().equals("null")){
-					System.out.println("Auto rule for " + n.getName() + " -> src: " + e.getSource()+" dst: "+e.getDestination());
-					n.getConfiguration().getFirewall().getElements().add(e);
+				if(!e.getSource().equals("0.0.0.0") && !e.getDestination().equals("0.0.0.0")){
+						System.out.println("Auto rule for " + n.getName() + " -> src: " + e.getSource()+" dst: "+e.getDestination());
+						n.getConfiguration().getFirewall().getElements().add(e);
 				}
 		    }
 			
@@ -111,7 +171,7 @@ public class Translator {
 												.map(e -> e.getConfiguration().getEndhost().getBody())
 												.collect(Collectors.toList());
 		autoNodes.forEach(n -> {
-			String tosearch="define-fun "+n.getName()+"_auto_notAllowed_.* Int\n .*";
+			String tosearch="define-fun .*"+n.getName()+".*_auto_notAllowed_.* Int\n .*";
 			Pattern pattern = Pattern.compile(tosearch);
 			Matcher matcher = pattern.matcher(model);
 			while (matcher.find()) {
@@ -126,6 +186,7 @@ public class Translator {
 					}
 				}
 			    if(notAllowed != null){
+					System.out.println("Auto rule for " + n.getName() + " -> notAllowed: " + notAllowed);
 			    	n.getConfiguration().getDpi().getNotAllowed().add(notAllowed);
 			    }
 		    }
@@ -142,7 +203,7 @@ public class Translator {
 						.map(e -> e.getConfiguration().getEndhost().getEmailFrom())
 						.collect(Collectors.toList());
 		autoNodes.forEach(n -> {
-			String tosearch="define-fun "+n.getName()+"_auto_emailFrom_.* Int\n .*";
+			String tosearch="define-fun .*"+n.getName()+".*_auto_emailFrom_.* Int\n .*";
 			Pattern pattern = Pattern.compile(tosearch);
 			Matcher matcher = pattern.matcher(model);
 			while (matcher.find()) {
@@ -157,6 +218,7 @@ public class Translator {
 					}
 				}
 				if(emailFrom != null){
+					System.out.println("Auto rule for " + n.getName() + " -> emailFrom: " + emailFrom);
 					n.getConfiguration().getAntispam().getSource().add(emailFrom);
 				}
 			}

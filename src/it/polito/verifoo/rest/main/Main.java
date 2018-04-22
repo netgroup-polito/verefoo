@@ -63,7 +63,7 @@ public class Main {
                          m.marshal( root, out ); 
                         
                         // unmarshal a document into a tree of Java content objects*/
-                        NFV root = (NFV) u.unmarshal( new FileInputStream(   "./testfile/NetworkForwardingPaths/nfv3nodes3hosts2Paths-SAT.xml" ) );
+                        NFV root = (NFV) u.unmarshal( new FileInputStream(   "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-FW-II.xml"  ) );
                         
                         //root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/current.xml" ) );
                         //NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/bug1.xml" ) );
@@ -77,7 +77,7 @@ public class Main {
                                 m = jc.createMarshaller();
                                 m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                                 m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                                m.marshal( root, System.out ); 
+                                //m.marshal( root, System.out ); 
                     	}
                     	else{
                     		System.out.println("UNSAT");

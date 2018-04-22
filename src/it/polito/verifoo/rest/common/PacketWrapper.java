@@ -70,7 +70,6 @@ public class PacketWrapper extends PacketModel {
 		if(prop.getPOP3Definition() != null){
 			String body = prop.getPOP3Definition().getBody();
 			String email_from = prop.getPOP3Definition().getEmailFrom();
-			System.out.println("Packet>> " + email_from.hashCode());
 			this.setBody(body.hashCode());
 			this.setEmailFrom(email_from.hashCode());
 			this.setProto(nctx.POP3_REQUEST);
