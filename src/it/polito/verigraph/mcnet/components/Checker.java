@@ -229,12 +229,12 @@ public class Checker {
 		propertyAdd(src, dest, property);
 		Expr p_0 = ctx.mkConst("check_reach_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
 		Expr n_0 = ctx.mkConst("check_reach_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
-		if(otherConstr.getSrcPort() != null){
-			constraintList.add(ctx.mkEq(nctx.src_port.apply(p_0), (IntExpr)ctx.mkInt(otherConstr.getSrcPort())));
-		}
-		if(otherConstr.getDstPort() != null){
-			constraintList.add(ctx.mkEq(nctx.dest_port.apply(p_0), (IntExpr)ctx.mkInt(otherConstr.getDstPort())));
-		}
+		int src_port = otherConstr.getSrcPort() != null ? otherConstr.getSrcPort() : 0,
+				dst_port = otherConstr.getDstPort() != null ? otherConstr.getDstPort() : 0;
+		constraintList.add(ctx.mkForall(new Expr[]{n_0, p_0},
+				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(src.getZ3Node(), n_0, p_0)),
+						ctx.mkAnd(ctx.mkEq(nctx.pf.get("src_port").apply(p_0), (IntExpr)ctx.mkInt(src_port)),
+									ctx.mkEq(nctx.pf.get("dest_port").apply(p_0), (IntExpr)ctx.mkInt(dst_port)))),1,null,null,null,null));
 	}
 	private void addReachabilityProperty(NetworkObject src, NetworkObject dest) {
 		

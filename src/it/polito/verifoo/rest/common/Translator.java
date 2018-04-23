@@ -79,6 +79,65 @@ public class Translator {
 				});
 	}
 	
+	private String firewallAutoConfigSearchDst(Node n, String nrOfRule){
+		List<String> nodes = g.getNode().stream().map(no -> no.getName()).collect(Collectors.toList());
+		String tosearch="define-fun .*"+n.getName()+".*_auto_dst_"+nrOfRule+".* Address\n  \\(ip_constructor .*\\)\\)";
+		Pattern patternDst = Pattern.compile(tosearch);
+		Matcher matcherDst = patternDst.matcher(model);
+		String nodeDstName = "";
+		while (matcherDst.find()) {
+	        String matchDst = matcherDst.group();
+	        String dstRule = matchDst.substring(matchDst.lastIndexOf("ip_constructor ")+15, matchDst.lastIndexOf("))"));
+	        //System.out.println("///DstRule " + dstRule + "////");
+	        tosearch="define-fun .* Address\n  \\(ip_constructor "+dstRule+"\\)\\)";
+			Pattern patternNodeDst = Pattern.compile(tosearch);
+			Matcher matcherNodeDst = patternNodeDst.matcher(model);
+			
+			boolean dstFound = false;
+			while(matcherNodeDst.find()) {
+		        String match = matcherNodeDst.group();
+		        String nodeDst = match.substring(match.lastIndexOf("define-fun ")+11, match.lastIndexOf(" () Address"));
+		        nodeDst = nodeDst.replace("|", "");
+		        if(nodes.contains(nodeDst)){
+		        	//System.out.println("Found dest node " + nodeDst + " with address " + dstRule);
+		        	nodeDstName = nodeDst;
+		        	dstFound = true;
+		        	break;
+		        }
+		    }
+	        if(!dstFound){
+	        	//System.out.println("Dest Node with address " + dstRule + " not found");
+	        	nodeDstName = dstRule;
+	        }
+	        
+			nodeDstName = nodeDstName.replace("(", "").replace(")", "").replace("- ", "-").replace(" ", ".");
+		}
+		return nodeDstName;
+	}
+	private String firewallAutoConfigSearchSrcPort(Node n, String nrOfRule){
+		String tosearch="define-fun .*"+n.getName()+".*_auto_srcp_"+nrOfRule+".* Int\n  .*\\)";
+		Pattern pattern = Pattern.compile(tosearch);
+		Matcher matcher = pattern.matcher(model);
+		String src_portRule = "null";
+		while (matcher.find()) {
+	        String matchSrcp = matcher.group();
+	        src_portRule = matchSrcp.substring(matchSrcp.lastIndexOf("\n  ")+3, matchSrcp.lastIndexOf(")"));
+	        //System.out.println("///SrcPRule " + dstRule + "////");
+		}
+		return src_portRule;
+	}
+	private String firewallAutoConfigSearchDstPort(Node n, String nrOfRule){
+		String tosearch="define-fun .*"+n.getName()+".*_auto_dstp_"+nrOfRule+".* Int\n  .*\\)";
+		Pattern pattern = Pattern.compile(tosearch);
+		Matcher matcher = pattern.matcher(model);
+		String dst_portRule = "null";
+		while (matcher.find()) {
+	        String matchDstp = matcher.group();
+	        dst_portRule = matchDstp.substring(matchDstp.lastIndexOf("\n  ")+3, matchDstp.lastIndexOf(")"));
+	        //System.out.println("///DstPRule " + dstRule + "////");
+		}
+		return dst_portRule;
+	}
 	/**
 	 * Set the firewall auto-configurated rules in the XML according to the verifoo output
 	 */
@@ -121,40 +180,20 @@ public class Translator {
 		        String nrOfRule = matchSrc.substring(matchSrc.lastIndexOf("_src_")+5, matchSrc.lastIndexOf(" () Address"));
 		        nrOfRule = nrOfRule.replace("|", "");
 		        //System.out.println("Nr Of Rule: " + nrOfRule);
-		        tosearch="define-fun .*"+n.getName()+".*_auto_dst_"+nrOfRule+".* Address\n  \\(ip_constructor .*\\)\\)";
-				Pattern patternDst = Pattern.compile(tosearch);
-				Matcher matcherDst = patternDst.matcher(model);
-				while (matcherDst.find()) {
-			        String matchDst = matcherDst.group();
-			        String dstRule = matchDst.substring(matchDst.lastIndexOf("ip_constructor ")+15, matchDst.lastIndexOf("))"));
-			        //System.out.println("///DstRule " + dstRule + "////");
-			        tosearch="define-fun .* Address\n  \\(ip_constructor "+dstRule+"\\)\\)";
-					Pattern patternNodeDst = Pattern.compile(tosearch);
-					Matcher matcherNodeDst = patternNodeDst.matcher(model);
-					String nodeDstName = "";
-					boolean dstFound = false;
-					while(matcherNodeDst.find()) {
-				        String match = matcherNodeDst.group();
-				        String nodeDst = match.substring(match.lastIndexOf("define-fun ")+11, match.lastIndexOf(" () Address"));
-				        nodeDst = nodeDst.replace("|", "");
-				        if(nodes.contains(nodeDst)){
-				        	//System.out.println("Found dest node " + nodeDst + " with address " + dstRule);
-				        	nodeDstName = nodeDst;
-				        	dstFound = true;
-				        	break;
-				        }
-				    }
-			        if(!dstFound){
-			        	//System.out.println("Dest Node with address " + dstRule + " not found");
-			        	nodeDstName = dstRule;
-			        }
-			        
-					nodeDstName = nodeDstName.replace("(", "").replace(")", "").replace("- ", "-").replace(" ", ".");
-			        //System.out.println(nodeDstName);
-			        e.setDestination(nodeDstName);
-			    }
+		        String nodeDstName = firewallAutoConfigSearchDst(n, nrOfRule);
+		        //System.out.println(nodeDstName);
+		        e.setDestination(nodeDstName);
+		        String src_port = firewallAutoConfigSearchSrcPort(n, nrOfRule);
+		        //System.out.println(src_port);
+		        e.setSrcPort(Integer.parseInt(src_port));
+		        String dst_port = firewallAutoConfigSearchDstPort(n, nrOfRule);
+		        //System.out.println(dst_port);
+		        e.setDstPort(Integer.parseInt(dst_port));
 				if(!e.getSource().equals("0.0.0.0") && !e.getDestination().equals("0.0.0.0")){
-						System.out.println("Auto rule for " + n.getName() + " -> src: " + e.getSource()+" dst: "+e.getDestination());
+						System.out.println("Auto rule for " + n.getName() + " -> src: " + e.getSource() +
+																				" dst: "+e.getDestination() + 
+																				" src_p: " + e.getSrcPort() + 
+																				" dst_p: " + e.getDstPort());
 						n.getConfiguration().getFirewall().getElements().add(e);
 				}
 		    }

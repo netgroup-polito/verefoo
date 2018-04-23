@@ -55,12 +55,11 @@ public class NetContext extends Core{
 
     public HashMap<String,NetworkObject> nm; //list of nodes, callable by node name
     public HashMap<String,DatatypeExpr> am; // list of addresses, callable by address name
-    public HashMap<String,DatatypeExpr> ipm; // list of ip addresses, callable by name
     public HashMap<String,FuncDecl> pf;
     Context ctx;
     public EnumSort node;
 	public DatatypeSort address;
-    public FuncDecl src_port,dest_port,nodeHasAddr,addrToNode,send,recv;
+    public FuncDecl /*src_port,dest_port,*/nodeHasAddr,addrToNode,send,recv;
     public DatatypeSort packet;
     
 
@@ -90,7 +89,6 @@ public class NetContext extends Core{
         this.ctx = ctx;
         nm = new HashMap<String,NetworkObject>(); //list of nodes, callable by node name
         am = new HashMap<String,DatatypeExpr>(); // list of addresses, callable by address name
-        ipm= new HashMap<>();  // list of ip addresses, callable by name
         pf= new HashMap<String,FuncDecl>() ;
         ip_functions = new HashMap<String,FuncDecl>();
         constraints = new ArrayList<BoolExpr>();
@@ -228,14 +226,11 @@ public class NetContext extends Core{
             		constraints.add(equalIpToIntArray(fd, getIpFromString("-1.-1.-1.-1")));
             	} else{
             		//251 is a prime number, to reduce collisions
-            		constraints.add(equalIpToIntArray(fd, getIpFromString(
-												            				(new_addr[i].hashCode()%251)+"."+
-												            				(new_addr[i].hashCode()%251)+"."+ 
-												            				(new_addr[i].hashCode()%251)+"."+ 
-												            				(new_addr[i].hashCode()%251)           						
-												            				)));
+            		int symbolicAddr = Math.abs(new_addr[i].hashCode()%251);
+            		constraints.add(equalIpToIntArray(fd, getIpFromString(symbolicAddr + "." + symbolicAddr + "." + symbolicAddr + "." + symbolicAddr)));
+            		System.out.println(new_addr[i] + " is not a valid ip address, using it as a label with fake address " + symbolicAddr);
             	}
-            	//System.out.println(new_addr[i] + " is not a valid ip address, using it as a label");
+            	
             }
         }
         
@@ -248,9 +243,9 @@ public class NetContext extends Core{
         // -   options: A representation for IP options. (Integer)
 
         String[] fieldNames = new String[]{
-                "src","dest","inner_src","inner_dest","origin","orig_body","body","seq","proto","emailFrom","url","options","encrypted"};
+                "src","dest","inner_src","inner_dest","origin","orig_body","body","seq","proto","src_port", "dest_port", "emailFrom","url","options","encrypted"};
         Sort[] srt = new Sort[]{
-        		address,address,address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),
+        		address,address,address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),
                 ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkBoolSort()};
         Constructor packetcon = ctx.mkConstructor("packet", "is_packet", fieldNames, srt, null);
         packet = ctx.mkDatatypeSort("packet",  new Constructor[] {packetcon});
@@ -261,8 +256,8 @@ public class NetContext extends Core{
         }
 
 
-        src_port = ctx.mkFuncDecl("sport", packet, ctx.mkIntSort());
-        dest_port = ctx.mkFuncDecl("dport", packet, ctx.mkIntSort());
+        //src_port = ctx.mkFuncDecl("sport", packet, ctx.mkIntSort());
+        //dest_port = ctx.mkFuncDecl("dport", packet, ctx.mkIntSort());
 
    
         nodeHasAddr = ctx.mkFuncDecl("nodeHasAddr", new Sort[]{node, address},ctx.mkBoolSort());
@@ -331,15 +326,15 @@ public class NetContext extends Core{
         constraints.add(
                 ctx.mkForall(new Expr[]{n_0, n_1, p_0 },
                         ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0 ),
-                                ctx.mkAnd( ctx.mkGe((IntExpr)src_port.apply(p_0),(IntExpr)ctx.mkInt(0)),
-                                        ctx.mkLt((IntExpr)src_port.apply(p_0),(IntExpr) ctx.mkInt(MAX_PORT)))),1,null,null,null,null));
+                                ctx.mkAnd( ctx.mkGe((IntExpr)pf.get("src_port").apply(p_0),(IntExpr)ctx.mkInt(0)),
+                                        ctx.mkLt((IntExpr)pf.get("src_port").apply(p_0),(IntExpr) ctx.mkInt(MAX_PORT)))),1,null,null,null,null));
 
         // Constraint7 recv(n_0, n_1, p, t_0) -> p.src_port > 0 && p.dest_port < MAX_PORT
         constraints.add(
                 ctx.mkForall(new Expr[]{n_0, n_1, p_0},
                         ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
-                                ctx.mkAnd( ctx.mkGe((IntExpr)dest_port.apply(p_0),(IntExpr)ctx.mkInt(0)),
-                                        ctx.mkLt((IntExpr)dest_port.apply(p_0),(IntExpr) ctx.mkInt(MAX_PORT)))),1,null,null,null,null));
+                                ctx.mkAnd( ctx.mkGe((IntExpr)pf.get("dest_port").apply(p_0),(IntExpr)ctx.mkInt(0)),
+                                        ctx.mkLt((IntExpr)pf.get("dest_port").apply(p_0),(IntExpr) ctx.mkInt(MAX_PORT)))),1,null,null,null,null));
 
 
         // Extra constriants for supporting the VPN gateway
@@ -402,6 +397,8 @@ public class NetContext extends Core{
                                         ctx.mkEq(this.pf.get("body").apply(p_1), this.pf.get("body").apply(p_0)),
                                         ctx.mkEq(this.pf.get("seq").apply(p_1), this.pf.get("seq").apply(p_0)),
                                         ctx.mkEq(this.pf.get("proto").apply(p_1), this.pf.get("proto").apply(p_0)),
+                                        ctx.mkEq(this.pf.get("src_port").apply(p_1), this.pf.get("src_port").apply(p_0)),
+                                        ctx.mkEq(this.pf.get("dest_port").apply(p_1), this.pf.get("dest_port").apply(p_0)),
                                         ctx.mkEq(this.pf.get("emailFrom").apply(p_1), this.pf.get("emailFrom").apply(p_0)),
                                         ctx.mkEq(this.pf.get("url").apply(p_1), this.pf.get("url").apply(p_0)),
                                         ctx.mkEq(this.pf.get("options").apply(p_1), this.pf.get("options").apply(p_0)))),1,null,null,null,null)
@@ -482,8 +479,8 @@ public class NetContext extends Core{
                 ctx.mkEq(pf.get("dest").apply(p1), pf.get("dest").apply(p2)),
                 ctx.mkEq(pf.get("origin").apply(p1), pf.get("origin").apply(p2)),
                 ctx.mkEq(pf.get("seq").apply(p1), pf.get("seq").apply(p2)),
-                ctx.mkEq(src_port.apply(p1),src_port.apply(p2)),
-                ctx.mkEq(dest_port.apply(p1), dest_port.apply(p2)),
+                ctx.mkEq(pf.get("src_port").apply(p1),pf.get("src_port").apply(p2)),
+                ctx.mkEq(pf.get("dest_port").apply(p1), pf.get("dest_port").apply(p2)),
                 ctx.mkEq(pf.get("options").apply(p1),pf.get("options").apply(p2))});
     }
 

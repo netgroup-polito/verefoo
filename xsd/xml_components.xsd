@@ -147,6 +147,8 @@
             <xsd:sequence>
                 <xsd:element name="source" type="xsd:string"/>
                 <xsd:element name="destination" type="xsd:string" />
+                <xsd:element name="src_port" type="xsd:int" minOccurs="0"/>
+                <xsd:element name="dst_port" type="xsd:int" minOccurs="0"/>
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>

@@ -17,6 +17,7 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
+import com.microsoft.z3.IntNum;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Sort;
@@ -25,6 +26,7 @@ import it.polito.verifoo.rest.common.AutoContext;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
+import it.polito.verigraph.mcnet.components.Quattro;
 import it.polito.verigraph.mcnet.components.Tuple;
 
 /** Represents a Firewall with the associated Access Control List
@@ -35,7 +37,7 @@ public class AclFirewall extends NetworkObject{
 	List<BoolExpr> constraints; 
 	Context ctx;
 	DatatypeExpr fw;
-	ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acls;
+	ArrayList<Quattro<DatatypeExpr,DatatypeExpr,IntNum,IntNum>> acls;
 	private ArrayList<Tuple<int[],int[]>> ipAcls;
 	Network net;
 	NetContext nctx;
@@ -54,7 +56,7 @@ public class AclFirewall extends NetworkObject{
 		this.ctx = ctx;
 		isEndHost=false;
    		constraints = new ArrayList<BoolExpr>();
-   		acls = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+   		acls = new ArrayList<>();
    		ipAcls = new ArrayList<>();
    		z3Node = ((NetworkObject)args[0][0]).getZ3Node();
         fw = z3Node;
@@ -91,13 +93,20 @@ public class AclFirewall extends NetworkObject{
 	}
 	
 	public void addAcls(ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acls){
-		if(!autoconf) // if not an autoconfiguration firewall
-			this.acls.addAll(acls);
+		if(!autoconf){	// if not an autoconfiguration firewall
+			for(Tuple<DatatypeExpr, DatatypeExpr> acl : acls){
+				Quattro<DatatypeExpr, DatatypeExpr, IntNum, IntNum> rule = new Quattro<>(acl._1, acl._2, ctx.mkInt(0), ctx.mkInt(0));
+				this.acls.add(rule);
+			}
+		}
+			
 	}
 	
-	public void addIpAcls(ArrayList<Tuple<int[],int[]>> acls){
-		if(!autoconf) // if not an autoconfiguration firewall
-			this.ipAcls.addAll(acls);
+	public void addCompleteAcls(ArrayList<Quattro<DatatypeExpr,DatatypeExpr,IntNum,IntNum>> acls){
+		if(!autoconf){	// if not an autoconfiguration firewall
+				this.acls.addAll(acls);
+		}
+			
 	}
 	
 	@Override
@@ -120,7 +129,7 @@ public class AclFirewall extends NetworkObject{
     	Expr n_1 = ctx.mkConst(fw+"_firewall_send_n_1", nctx.node);
     	//IntExpr t_0 = ctx.mkIntConst(fw+"_firewall_send_t_0");
     	//IntExpr t_1 = ctx.mkIntConst(fw+"_firewall_send_t_1");
-    	acl_func = ctx.mkFuncDecl(fw+"_acl_func", new Sort[]{nctx.address, nctx.address},ctx.mkBoolSort());
+    	acl_func = ctx.mkFuncDecl(fw+"_acl_func", new Sort[]{nctx.address, nctx.address , ctx.mkIntSort(), ctx.mkIntSort() },ctx.mkBoolSort());
     	//Constraint1		send(fw, n_0, p, t_0)  -> (exist n_1,t_1 : (recv(n_1, fw, p, t_1) && 
     	//    				t_1 < t_0 && !acl_func(p.src,p.dest))
     	  constraints.add(
@@ -131,7 +140,10 @@ public class AclFirewall extends NetworkObject{
 	    	            			ctx.mkAnd(
 	    	            						ctx.mkExists(new Expr[]{n_1}, 
 	    	            								nctx.recv.apply(n_1, fw, p_0),1,null,null,null,null), 
-	    	            						ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0))
+	    	            						ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), 
+	    	            															nctx.pf.get("dest").apply(p_0),
+	    	            															nctx.pf.get("src_port").apply(p_0), 
+	    	            															nctx.pf.get("dest_port").apply(p_0))
 	    	            								))),1,null,null,null,null));
 
     	  
@@ -140,7 +152,10 @@ public class AclFirewall extends NetworkObject{
 	            	ctx.mkForall(new Expr[]{n_0, p_0},
 	            			ctx.mkImplies(	
 	            					ctx.mkAnd( (BoolExpr)nctx.recv.apply(n_0, fw, p_0)
-	            								,ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0)))
+	            								,ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), 
+																					nctx.pf.get("dest").apply(p_0),
+																					nctx.pf.get("src_port").apply(p_0), 
+																					nctx.pf.get("dest_port").apply(p_0)))
 	            							),
 	            						ctx.mkAnd(ctx.mkExists(new Expr[]{n_1}, (BoolExpr)nctx.send.apply(new Expr[]{ fw, n_1, p_0}),1,null,null,null,null)
 	            								//,ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0)))
@@ -158,7 +173,7 @@ public class AclFirewall extends NetworkObject{
  		Expr n_1 = ctx.mkConst(fw + "_firewall_send_n_1", nctx.node);
  		Expr a_0 = ctx.mkConst(fw+"_firewall_acl_a_0", nctx.address);
         Expr a_1 = ctx.mkConst(fw+"_firewall_acl_a_1", nctx.address);
-        acl_func = ctx.mkFuncDecl(fw + "_acl_func", new Sort[] { nctx.address, nctx.address }, ctx.mkBoolSort());
+        acl_func = ctx.mkFuncDecl(fw + "_acl_func", new Sort[] { nctx.address, nctx.address , ctx.mkIntSort(), ctx.mkIntSort()}, ctx.mkBoolSort());
  		List<BoolExpr> rules = new ArrayList<>();
  		List<BoolExpr> implications1 = new ArrayList<BoolExpr>();
  		List<BoolExpr> implications2 = new ArrayList<BoolExpr>();
@@ -238,10 +253,10 @@ public class AclFirewall extends NetworkObject{
  			}
  			rules.add(ctx.mkAnd(
 			 					nctx.equalIp(nctx.pf.get("src").apply(p_0), src),
-			 					nctx.equalIp(nctx.pf.get("dest").apply(p_0), dst)
-			 					//ctx.mkEq(nctx.pf.get("proto").apply(p_0), proto),
-			 					//ctx.mkEq((IntExpr)nctx.src_port.apply(p_0), srcp),
-			 					//ctx.mkEq((IntExpr)nctx.dest_port.apply(p_0), dstp)
+			 					nctx.equalIp(nctx.pf.get("dest").apply(p_0), dst),
+			 					ctx.mkEq(nctx.pf.get("proto").apply(p_0), proto),
+			 					ctx.mkEq((IntExpr)nctx.pf.get("src_port").apply(p_0), srcp),
+			 					ctx.mkEq((IntExpr)nctx.pf.get("dest_port").apply(p_0), dstp)
 			 					));
  			/*rules.add(ctx.mkAnd(
  					ctx.mkEq(nctx.pf.get("src").apply(p_0), src),
@@ -289,8 +304,38 @@ public class AclFirewall extends NetworkObject{
 
  	}
     
-    
-    private void aclConstraints(Optimize solver){
+ 	private void aclConstraints(Optimize solver){
+ 		Expr p_0 = ctx.mkConst(fw+"_firewall_acl_p_1", nctx.packet);
+    	if (acls.size() == 0){
+    		//If the size of the ACL list is empty then by default acl_func must be false
+    		 solver.Add(ctx.mkForall(new Expr[]{p_0},
+						ctx.mkEq( 
+								acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0),
+												nctx.pf.get("src_port").apply(p_0),nctx.pf.get("dest_port").apply(p_0)), ctx.mkFalse()),1,null,null,null,null));
+    		return;
+    	}
+            
+       
+        BoolExpr[] acl_map = new BoolExpr[acls.size()];
+        for(int y=0;y<acls.size();y++){
+        	Quattro<DatatypeExpr,DatatypeExpr,IntNum,IntNum> tp = acls.get(y);
+        	//acl_map[y] = ctx.mkOr(ctx.mkAnd(ctx.mkEq(a_0,tp._1),ctx.mkEq(a_1,tp._2)), ctx.mkAnd(ctx.mkEq(a_0,tp._2),ctx.mkEq(a_1,tp._1)));
+        	acl_map[y] = ctx.mkOr(
+        							ctx.mkAnd(nctx.equalIp(nctx.pf.get("src").apply(p_0),tp._1),nctx.equalIp(nctx.pf.get("dest").apply(p_0),tp._2),
+        										//ctx.mkEq(nctx.pf.get("src").apply(p_0),tp._1),ctx.mkEq(nctx.pf.get("dest").apply(p_0),tp._2),
+        										ctx.mkEq(nctx.pf.get("src_port").apply(p_0),tp._3),
+        										ctx.mkEq(nctx.pf.get("dest_port").apply(p_0),tp._4)
+        										)
+        							);
+        }
+        //Constraint2		acl_func(a_0,a_1) == or(foreach ip1,ip2 in acl_map ((a_0 == ip1 && a_1 == ip2)||(a_0 == ip2 && a_1 == ip1)))
+        solver.Add(ctx.mkForall(new Expr[]{p_0},
+        						ctx.mkEq( 
+        								acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0), nctx.pf.get("src_port").apply(p_0), nctx.pf.get("dest_port").apply(p_0)),
+        								ctx.mkOr(acl_map)),1,null,null,null,null));
+    }
+    /*
+ 	private void aclConstraints(Optimize solver){
     	Expr a_0 = ctx.mkConst(fw+"_firewall_acl_a_0", nctx.address);
         Expr a_1 = ctx.mkConst(fw+"_firewall_acl_a_1", nctx.address);
     	if (acls.size() == 0){
@@ -304,7 +349,7 @@ public class AclFirewall extends NetworkObject{
        
         BoolExpr[] acl_map = new BoolExpr[acls.size()];
         for(int y=0;y<acls.size();y++){
-        	Tuple<DatatypeExpr,DatatypeExpr> tp = acls.get(y);
+        	Quattro<DatatypeExpr,DatatypeExpr,IntNum,IntNum> tp = acls.get(y);
         	//acl_map[y] = ctx.mkOr(ctx.mkAnd(ctx.mkEq(a_0,tp._1),ctx.mkEq(a_1,tp._2)), ctx.mkAnd(ctx.mkEq(a_0,tp._2),ctx.mkEq(a_1,tp._1)));
         	acl_map[y] = ctx.mkOr(ctx.mkAnd(nctx.equalIp(a_0,tp._1),nctx.equalIp(a_1,tp._2)), ctx.mkAnd(nctx.equalIp(a_0,tp._2),nctx.equalIp(a_1,tp._1)));
         }
@@ -313,5 +358,5 @@ public class AclFirewall extends NetworkObject{
         						ctx.mkEq( 
         								acl_func.apply(a_0, a_1),
         								ctx.mkOr(acl_map)),1,null,null,null,null));
-    }
+    }*/
 }

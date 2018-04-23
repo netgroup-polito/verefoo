@@ -4,12 +4,14 @@
     <graph id="0">
      <node functional_type="WEBCLIENT" name="nodeA">
         <neighbour name="node1"/>
+		<neighbour name="node2"/>
         <configuration description="A simple description" name="confA">
           <webclient nameWebServer="nodeB"/>
         </configuration>
       </node>
 	  <node functional_type="WEBCLIENT" name="nodeC">
         <neighbour name="node1"/>
+		<neighbour name="node2"/>
         <configuration description="A simple description" name="confA">
           <webclient nameWebServer="nodeB"/>
         </configuration>
@@ -23,8 +25,11 @@
         </configuration>
       </node>
 	   <node functional_type="NAT" name="node2">
+	    <neighbour name="nodeA"/>
+	    <neighbour name="nodeC"/>
         <neighbour name="node1"/>
         <neighbour name="node3"/>
+		<neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf2">
           <nat>
 			<source>nodeA</source>
@@ -33,13 +38,14 @@
         </configuration>
       </node>
 	   <node functional_type="FIREWALL" name="node3">
-        <neighbour name="node2"/>
+        <neighbour name="node3"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf1">
           <firewall/>
         </configuration>
       </node>
       <node functional_type="WEBSERVER" name="nodeB">
+        <neighbour name="node2"/>
 		<neighbour name="node3"/>
         <configuration description="A simple description" name="confB">
           <webserver>

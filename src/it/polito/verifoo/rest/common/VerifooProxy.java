@@ -14,7 +14,9 @@ import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
+import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Status;
+import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 
 import it.polito.verifoo.components.RoutingTable;
 import it.polito.verifoo.rest.jaxb.*;
@@ -729,6 +731,10 @@ public class VerifooProxy {
 		 */
 		public IsolationResult checkNFFGProperty(){
 			
+			/*System.out.println(ctx.getNumSMTLIBFormulas());
+			for(BoolExpr f : ctx.getSMTLIBFormulas()){
+				System.out.println(f);
+			}*/
 			IsolationResult ret = this.check.propertyCheck();
 			nrOfConditions = (int) conditionDB.entrySet().stream().flatMap(e -> e.getValue().values().stream()).count();
 			logger.debug("Nr of Conditions: " + nrOfConditions);

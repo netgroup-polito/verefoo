@@ -27,6 +27,7 @@ import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
 import it.polito.verifoo.rest.common.VerifooSerializer;
+import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.PName;
@@ -67,7 +68,7 @@ public class TestProxyIsolation {
 	public void tearDown() throws Exception {
 	}
 	
-	private void test(String file, boolean sat) throws Exception{
+	private NFV test(String file, boolean sat) throws Exception{
 		// create a JAXBContext capable of handling the generated classes
         System.out.println("===========FILE " + file + "===========");
 		long beginAll=System.currentTimeMillis();
@@ -93,7 +94,7 @@ public class TestProxyIsolation {
         root.getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(sat, p.isIsSat());
         });
-        return;
+        return root;
 	}
 	
 	@Test
@@ -181,6 +182,21 @@ public class TestProxyIsolation {
 	public void testWEB_PropertySpec_UNSAT() {
 		try {
 			test( "./testfile/Isolation/nfv5nodes7hostsUNSAT-WEB-PropertySpec.xml", false); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}		
+	}
+	@Test
+	public void testWildcards_SAT() {
+		try {
+			NFV root = test( "./testfile/Isolation/nfv5nodes7hostsSAT-Wildcards-II.xml", true); //Working
+			List<String> firewallsRule = root.getGraphs().getGraph().get(0).getNode().stream()
+													.filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL))
+													.flatMap(n -> n.getConfiguration().getFirewall().getElements().stream())
+													.map(e -> e.getSource())
+													.collect(Collectors.toList());
+			assertTrue(firewallsRule.contains("10.0.0.-1"));
+			
 		} catch (Exception e) {
 			fail(e.toString());
 		}		

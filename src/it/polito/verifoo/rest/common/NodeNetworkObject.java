@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
+import com.microsoft.z3.IntNum;
 
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
@@ -23,6 +24,7 @@ import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 import it.polito.verigraph.mcnet.components.Tuple;
+import it.polito.verigraph.mcnet.components.Quattro;
 import it.polito.verigraph.mcnet.netobjs.*;
 import java.util.Optional;
 /**
@@ -76,23 +78,29 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	public void generateAcl(Node n, AclFirewall fw){
 		if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
 			n.getConfiguration().getFirewall().getElements().forEach((e)->{
-					ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
-					if(nctx.am.get(e.getSource())!=null&&nctx.am.get(e.getDestination())!=null){
-					    Tuple<DatatypeExpr,DatatypeExpr> rule=new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(e.getSource()),nctx.am.get(e.getDestination()));
-					    acl.add(rule);
-					    logger.debug("Adding blocking rule " + acl);
+					if(e.getSrcPort() != null || e.getDstPort() != null){
+						ArrayList<Quattro<DatatypeExpr,DatatypeExpr,IntNum, IntNum>> acl = new ArrayList<>();
+						if(nctx.am.get(e.getSource())!=null&&nctx.am.get(e.getDestination())!=null){
+							int src_port = e.getSrcPort()!=null? e.getSrcPort():0;
+							int dst_port = e.getDstPort()!=null? e.getDstPort():0;
+							Quattro<DatatypeExpr,DatatypeExpr,IntNum, IntNum> rule=new Quattro<>(nctx.am.get(e.getSource()),
+																									nctx.am.get(e.getDestination()),
+																									ctx.mkInt(src_port),
+																									ctx.mkInt(dst_port));
+						    acl.add(rule);
+						    logger.debug("Adding blocking rule " + acl);
+						}
+					    fw.addCompleteAcls(acl);
+					}else{
+						ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+						if(nctx.am.get(e.getSource())!=null&&nctx.am.get(e.getDestination())!=null){
+							
+						    Tuple<DatatypeExpr,DatatypeExpr> rule=new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(e.getSource()),nctx.am.get(e.getDestination()));
+						    acl.add(rule);
+						    logger.debug("Adding blocking rule " + acl);
+						}
+					    fw.addAcls(acl);
 					}
-				    fw.addAcls(acl);
-				    //logger.debug("Added acl:"+ rule.toString() +" to "+n.getName());*/
-				    /*ArrayList<Tuple<int[],int[]>> ip_acl = new ArrayList<>();
-				    if(e.getSource()!=null&&e.getDestination()!=null){
-				    	Tuple<int[],int[]> rule=new Tuple<int[],int[]>(nctx.getIpFromString(e.getSource()),nctx.getIpFromString(e.getDestination()));
-				    	ip_acl.add(rule);
-					    logger.debug("Adding blocking rule " + rule._1[0]+"."+rule._1[1]+"."+rule._1[2]+"." +rule._1[3] 
-					    							+ " - " + rule._2[0]+"."+rule._2[1]+"."+rule._2[2]+"." +rule._2[3]);
-					}
-				    fw.addIpAcls(ip_acl);
-				    logger.debug("Added acl:"+ ip_acl.toString() +" to "+n.getName());*/
 				});
 		}
 		

@@ -130,7 +130,7 @@ public class TestProxyReachability {
 			fail(e.toString());
 		}		
 	}
-	@Test
+	//@Test
 	public void testANTISPAM_SAT() {
 		try {
 			test( "./testfile/nfv5nodes7hostsSAT-ANTISPAM.xml", true); //Working

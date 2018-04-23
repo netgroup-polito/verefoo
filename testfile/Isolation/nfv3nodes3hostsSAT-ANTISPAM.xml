@@ -42,10 +42,7 @@
     </graph>
   </graphs>
    <Constraints>
-	  <NodeConstraints>
-			<NodeMetrics node="node1" reqStorage="10"/>
-			<NodeMetrics node="node2" reqStorage="10"/>
-	  </NodeConstraints>
+	  <NodeConstraints/>
 	  <BandwidthConstraints/>
   </Constraints>
   <PropertyDefinition>

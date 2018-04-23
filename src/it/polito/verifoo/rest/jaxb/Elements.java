@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.04.21 alle 10:13:57 AM CEST 
+// Generato il: 2018.04.23 alle 03:30:02 PM CEST 
 //
 
 
@@ -27,6 +27,8 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence>
  *         &lt;element name="source" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="destination" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="src_port" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
+ *         &lt;element name="dst_port" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -38,7 +40,9 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "source",
-    "destination"
+    "destination",
+    "srcPort",
+    "dstPort"
 })
 @XmlRootElement(name = "elements")
 public class Elements {
@@ -47,6 +51,10 @@ public class Elements {
     protected String source;
     @XmlElement(required = true)
     protected String destination;
+    @XmlElement(name = "src_port")
+    protected Integer srcPort;
+    @XmlElement(name = "dst_port")
+    protected Integer dstPort;
 
     /**
      * Recupera il valore della proprietà source.
@@ -94,6 +102,54 @@ public class Elements {
      */
     public void setDestination(String value) {
         this.destination = value;
+    }
+
+    /**
+     * Recupera il valore della proprietà srcPort.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *     
+     */
+    public Integer getSrcPort() {
+        return srcPort;
+    }
+
+    /**
+     * Imposta il valore della proprietà srcPort.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     *     
+     */
+    public void setSrcPort(Integer value) {
+        this.srcPort = value;
+    }
+
+    /**
+     * Recupera il valore della proprietà dstPort.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *     
+     */
+    public Integer getDstPort() {
+        return dstPort;
+    }
+
+    /**
+     * Imposta il valore della proprietà dstPort.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     *     
+     */
+    public void setDstPort(Integer value) {
+        this.dstPort = value;
     }
 
 }
