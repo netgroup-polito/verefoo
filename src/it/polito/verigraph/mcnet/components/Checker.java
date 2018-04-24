@@ -260,12 +260,12 @@ public class Checker {
 		addConstraints();
 		
 		result = this.solver.Check();
-		
-		Handle temp = null;
+		/*Handle temp = null;
 		for (Entry<String, Handle> handle : nctx.handles.entrySet()) {
 			temp = handle.getValue();
 		}
-		//if (temp!=null)System.out.println(temp.getValue());
+		if(temp!=null) System.out.println(nctx.latencyAll+Integer.parseInt(temp.getValue()+""));
+		if(temp!=null) System.out.println("Weight of falsified constraints:"+temp.getValue());*/
 		
 		model = null;
 		assertions = null;

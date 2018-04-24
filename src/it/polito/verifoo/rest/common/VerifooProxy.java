@@ -562,6 +562,7 @@ public class VerifooProxy {
 						int latency = ce.getLatency();
 						if(!nodeIsServer(n)){
 							logger.debug("Adding ("+ c +"), from "+ n.getName() +" to " + server.getName() + " next hop is " + next.getName() + " with latency " + latency);
+							//System.out.println("Adding ("+ c +"), from "+ n.getName() +" to " + server.getName() + " next hop is " + next.getName() + " with latency " + latency);
 							rt.add(new RoutingTable(nctx.am.get(server.getName()), netobjs.get(next), nctx.addLatency(latency), c));
 						}
 						/* needed for internal routing

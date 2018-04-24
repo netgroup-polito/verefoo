@@ -110,6 +110,7 @@ public class NetContext extends Core{
     
     public int addLatency(int latencyAll){
     	this.latencyAll=this.latencyAll+latencyAll;
+    	//System.out.println("Latency added -> total: " + this.latencyAll);
     	return latencyAll;
     }
     
@@ -228,7 +229,7 @@ public class NetContext extends Core{
             		//251 is a prime number, to reduce collisions
             		int symbolicAddr = Math.abs(new_addr[i].hashCode()%251);
             		constraints.add(equalIpToIntArray(fd, getIpFromString(symbolicAddr + "." + symbolicAddr + "." + symbolicAddr + "." + symbolicAddr)));
-            		System.out.println(new_addr[i] + " is not a valid ip address, using it as a label with fake address " + symbolicAddr);
+            		//System.out.println(new_addr[i] + " is not a valid ip address, using it as a label with fake address " + symbolicAddr);
             	}
             	
             }

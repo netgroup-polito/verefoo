@@ -70,6 +70,9 @@ public class MedicineSimulator implements PhyResourceModel {
 	 * @throws MedicineSimulationException
 	 */
 	public MedicineSimulator(NFV root) throws MedicineSimulationException{
+		if(System.getProperty("it.polito.verifoo.rest.sonata.rootDirectory") != null){
+			sonEmuDir = System.getProperty("it.polito.verifoo.rest.sonata.rootDirectory");
+		}
 		logger.debug("------------MEDICINE SIMULATION------------");
 		hosts = root.getHosts().getHost();
 		nodes = root.getGraphs().getGraph().stream().flatMap(g -> g.getNode().stream()).collect(Collectors.toList());
