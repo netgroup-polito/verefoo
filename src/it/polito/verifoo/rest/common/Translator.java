@@ -56,7 +56,7 @@ public class Translator {
 					String tosearch="define-fun .*integer_.*"+node.getName()+"@"+host.getName()+".* \\(\\) Int\n  1\\)";
 					Pattern pattern = Pattern.compile(tosearch);
 					Matcher matcher = pattern.matcher(model);
-					while (matcher.find()) {
+					if (matcher.find()) {
 						logger.debug(tosearch);
 						host.setActive(true);
 						NodeRefType nr=new NodeRefType();

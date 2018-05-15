@@ -70,6 +70,7 @@ public class RestMeD {
 	    	
 			try {
 				Hosts hosts = db.getResourceModel();
+				if(hosts == null) return Response.serverError().entity("No simulation is running").build();
 				return Response.ok(hosts, MediaType.APPLICATION_XML).build();
 			} catch (ResourceModelException e) {
 				return Response.serverError().entity("Error retrieving informations").build();

@@ -31,7 +31,23 @@ MAX checking property when SAT -> 6574ms
 AVG total time -> 2857ms
 MAX total time -> 6598ms
 =====================================
+===========FILE ./testfile/Performance/bgInternet2_2Nodes.xml===========
+AVG Nr of Conditions -> 4 / MAX Nr Of Conditions -> 6
+AVG creating condition -> 56ms
+MAX creating condition -> 2098ms
+AVG checking property when SAT -> 1120ms
+MAX checking property when SAT -> 6476ms
+AVG checking property when UNSAT-> 22ms
+MAX checking property when UNSAT-> 31ms
+AVG total time -> 1197ms
+MAX total time -> 6564ms
+=====================================
 ===========FILE ./testfile/Performance/bgInternet2_3Nodes.xml===========
+Nr of deployment conditions: 6
+Nr of network hard constraint 21
+Nr of network soft constraint 8
+Nr of net context hard constraint 300
+Nr of net context soft constraint 12
 AVG creating condition -> 10ms
 MAX creating condition -> 1085ms
 AVG checking property when SAT -> 958ms
@@ -40,6 +56,11 @@ AVG total time -> 973ms
 MAX total time -> 2178ms
 =====================================
 ===========FILE ./testfile/Performance/bgInternet2.xml===========
+Nr of deployment conditions: 11
+Nr of network hard constraint 26
+Nr of network soft constraint 18
+Nr of net context hard constraint 381
+Nr of net context soft constraint 12
 AVG creating condition -> 15ms
 MAX creating condition -> 1722ms
 AVG checking property when SAT -> 2853ms
@@ -48,6 +69,11 @@ AVG total time -> 2876ms
 MAX total time -> 6816ms
 =====================================
 ===========FILE ./testfile/Performance/bgInternet2With1Constraint.xml===========
+Nr of deployment conditions: 11
+Nr of network hard constraint 26
+Nr of network soft constraint 18
+Nr of net context hard constraint 561
+Nr of net context soft constraint 12
 AVG creating condition -> 16ms
 MAX creating condition -> 1813ms
 AVG checking property when SAT -> 3496ms
@@ -88,6 +114,11 @@ AVG total time -> 3421ms
 MAX total time -> 7570ms
 =====================================
 ===========FILE ./testfile/Performance/bgInternet2_5Nodes.xml===========
+Nr of deployment conditions: 18
+Nr of network hard constraint 31
+Nr of network soft constraint 36
+Nr of net context hard constraint 488
+Nr of net context soft constraint 12
 AVG creating condition -> 26ms
 MAX creating condition -> 2887ms
 AVG checking property when SAT -> 5425ms
@@ -96,6 +127,11 @@ AVG total time -> 5460ms
 MAX total time -> 12894ms
 =====================================
 ===========FILE ./testfile/Performance/bgInternet2_6Nodes.xml===========
+Nr of deployment conditions: 25
+Nr of network hard constraint 36
+Nr of network soft constraint 56
+Nr of net context hard constraint 583
+Nr of net context soft constraint 12
 AVG creating condition -> 58ms
 MAX creating condition -> 5950ms
 AVG checking property when SAT -> 93997ms
@@ -117,6 +153,11 @@ AVG total time -> 3308ms
 MAX total time -> 6733ms
 =====================================
 ===========FILE ./testfile/Performance/sgInternet2.xml 5 Nodes===========
+Nr of deployment conditions: 14
+Nr of network hard constraint 28
+Nr of network soft constraint 24
+Nr of net context hard constraint 426
+Nr of net context soft constraint 12
 AVG creating condition -> 20ms
 MAX creating condition -> 2235ms
 AVG checking property when SAT -> 2403ms
@@ -125,6 +166,11 @@ AVG total time -> 2429ms
 MAX total time -> 12932ms
 =====================================
 ===========FILE ./testfile/Performance/sgInternet2_6Nodes.xml===========
+Nr of deployment conditions: 24
+Nr of network hard constraint 30
+Nr of network soft constraint 24
+Nr of net context hard constraint 588
+Nr of net context soft constraint 12
 AVG creating condition -> 23ms
 MAX creating condition -> 2385ms
 AVG checking property when SAT -> 3359ms
@@ -135,6 +181,11 @@ AVG total time -> 1941ms
 MAX total time -> 3061ms
 =====================================
 ===========FILE ./testfile/Performance/sgInternet2_7Nodes.xml===========
+Nr of deployment conditions: 28
+Nr of network hard constraint 34
+Nr of network soft constraint 33
+Nr of net context hard constraint 644
+Nr of net context soft constraint 12
 AVG creating condition -> 31ms
 MAX creating condition -> 3208ms
 AVG checking property when SAT -> 5932ms
@@ -145,6 +196,11 @@ AVG total time -> 5963ms
 MAX total time -> 14784ms
 =====================================
 ===========FILE ./testfile/Performance/sgInternet2WithConstraints.xml 5 Nodes===========
+Nr of deployment conditions: 14
+Nr of network hard constraint 32
+Nr of network soft constraint 24
+Nr of net context hard constraint 661
+Nr of net context soft constraint 12
 AVG creating condition -> 26ms
 MAX creating condition -> 2901ms
 AVG checking property when SAT -> 2675ms
@@ -171,7 +227,23 @@ MAX checking property when SAT -> 16622ms
 AVG total time -> 5256ms
 MAX total time -> 16673ms
 =====================================
+===========FILE ./testfile/Performance/bgGEANT_2Nodes.xml===========
+AVG Nr of Conditions -> 4 / MAX Nr Of Conditions -> 11
+AVG creating condition -> 19ms
+MAX creating condition -> 5582ms
+AVG checking property when SAT -> 1621ms
+MAX checking property when SAT -> 8032ms
+AVG checking property when UNSAT-> 20ms
+MAX checking property when UNSAT-> 32ms
+AVG total time -> 1702ms
+MAX total time -> 8159ms
+=====================================
 ===========FILE ./testfile/Performance/bgGEANT_3Nodes.xml===========
+Nr of deployment conditions: 16
+Nr of network hard constraint 21
+Nr of network soft constraint 26
+Nr of net context hard constraint 594
+Nr of net context soft constraint 22
 AVG creating condition -> 9ms
 MAX creating condition -> 4554ms
 AVG checking property when SAT -> 1729ms
@@ -180,6 +252,11 @@ AVG total time -> 1747ms
 MAX total time -> 5151ms
 =====================================
 ===========FILE ./testfile/Performance/bgGEANT.xml===========
+Nr of deployment conditions: 32
+Nr of network hard constraint 26
+Nr of network soft constraint 68
+Nr of net context hard constraint 860
+Nr of net context soft constraint 22
 AVG creating condition -> 28ms
 MAX creating condition -> 12030ms
 AVG checking property when SAT -> 5064ms
@@ -188,6 +265,11 @@ AVG total time -> 5103ms
 MAX total time -> 15781ms
 =====================================
 ===========FILE ./testfile/Performance/bgGEANTWith1Constraint.xml===========
+Nr of deployment conditions: 32
+Nr of network hard constraint 26
+Nr of network soft constraint 68
+Nr of net context hard constraint 1423
+Nr of net context soft constraint 22
 AVG creating condition -> 25ms
 MAX creating condition -> 10742ms
 AVG checking property when SAT -> 6222ms
@@ -220,6 +302,11 @@ AVG total time -> 6599ms
 MAX total time -> 22603ms
 =====================================
 ===========FILE ./testfile/Performance/bgGEANT_5Nodes.xml===========
+Nr of deployment conditions: 50
+Nr of network hard constraint 31
+Nr of network soft constraint 125
+Nr of net context hard constraint 1110
+Nr of net context soft constraint 22
 AVG creating condition -> 38ms
 MAX creating condition -> 20456ms
 AVG checking property when SAT -> 10556ms
@@ -228,6 +315,11 @@ AVG total time -> 10618ms
 MAX total time -> 35920ms
 =====================================
 ===========FILE ./testfile/Performance/bgGEANT_6Nodes.xml===========
+Nr of deployment conditions: 68
+Nr of network hard constraint 36
+Nr of network soft constraint 188
+Nr of net context hard constraint 1348
+Nr of net context soft constraint 22
 AVG creating condition -> 518ms
 MAX creating condition -> 50307ms
 AVG checking property when SAT -> 2326667ms
@@ -238,6 +330,11 @@ AVG total time -> 209356ms
 MAX total time -> 387491ms
 =====================================
 ===========FILE ./testfile/Performance/bgGEANTWithConstraints.xml===========
+Nr of deployment conditions: 32
+Nr of network hard constraint 85
+Nr of network soft constraint 68
+Nr of net context hard constraint 1659
+Nr of net context soft constraint 22
 AVG creating condition -> 29ms
 MAX creating condition -> 12514ms
 AVG checking property when SAT -> 6879ms
@@ -265,6 +362,11 @@ AVG total time -> 3995ms
 MAX total time -> 22238ms
 =====================================
 ===========FILE ./testfile/Performance/sgGEANT_6Nodes.xml ===========
+Nr of deployment conditions: 57
+Nr of network hard constraint 32
+Nr of network soft constraint 143
+Nr of net context hard constraint 1207
+Nr of net context soft constraint 22
 AVG creating condition -> 64ms
 MAX creating condition -> 27088ms
 AVG checking property when SAT -> 8051ms
@@ -275,6 +377,11 @@ AVG total time -> 8134ms
 MAX total time -> 168762ms
 =====================================
 ===========FILE ./testfile/Performance/sgGEANT_7Nodes.xml===========
+Nr of deployment conditions: 74
+Nr of network hard constraint 34
+Nr of network soft constraint 127
+Nr of net context hard constraint 1442
+Nr of net context soft constraint 22
 AVG creating condition -> 89ms
 MAX creating condition -> 37647ms
 AVG checking property when SAT -> 8911ms
@@ -285,6 +392,11 @@ AVG total time -> 9067ms
 MAX total time -> 28477ms
 =====================================
 ===========FILE ./testfile/Performance/sgGEANT_7Nodes.xml===========
+Nr of deployment conditions: 74
+Nr of network hard constraint 34
+Nr of network soft constraint 127
+Nr of net context hard constraint 1442
+Nr of net context soft constraint 22
 AVG creating condition -> 97ms
 MAX creating condition -> 41149ms
 AVG checking property when SAT -> 6143ms
@@ -305,6 +417,11 @@ AVG total time -> 15327ms
 MAX total time -> 117879ms
 =====================================
 ===========FILE ./testfile/Performance/sgGEANTWithConstraints.xml 5 Nodes===========
+Nr of deployment conditions: 39
+Nr of network hard constraint 45
+Nr of network soft constraint 86
+Nr of net context hard constraint 1679
+Nr of net context soft constraint 22
 AVG creating condition -> 33ms
 MAX creating condition -> 13992ms
 AVG checking property when SAT -> 4389ms
@@ -315,6 +432,11 @@ AVG total time -> 4436ms
 MAX total time -> 17829ms
 =====================================
 ===========FILE ./testfile/Performance/sgGEANTWithConstraints.xml 5 Nodes===========
+Nr of deployment conditions: 39
+Nr of network hard constraint 45
+Nr of network soft constraint 86
+Nr of net context hard constraint 1679
+Nr of net context soft constraint 22
 AVG creating condition -> 35ms
 MAX creating condition -> 14754ms
 AVG checking property when SAT -> 4333ms
@@ -346,6 +468,11 @@ AVG total time -> 10625ms
 MAX total time -> 55583ms
 =====================================
 ===========FILE ./testfile/Performance/bgUNIV1_3Nodes.xml===========
+Nr of deployment conditions: 12
+Nr of network hard constraint 21
+Nr of network soft constraint 24
+Nr of net context hard constraint 570
+Nr of net context soft constraint 24
 AVG creating condition -> 8ms
 MAX creating condition -> 8467ms
 AVG checking property when SAT -> 3241ms
@@ -354,6 +481,11 @@ AVG total time -> 3265ms
 MAX total time -> 11301ms
 =====================================
 ===========FILE ./testfile/Performance/bgUNIV1.xml===========
+Nr of deployment conditions: 23
+Nr of network hard constraint 26
+Nr of network soft constraint 60
+Nr of net context hard constraint 741
+Nr of net context soft constraint 24
 AVG creating condition -> 43ms
 MAX creating condition -> 22250ms
 AVG checking property when SAT -> 10460ms
@@ -362,6 +494,11 @@ AVG total time -> 10515ms
 MAX total time -> 44967ms
 =====================================
 ===========FILE ./testfile/Performance/bgUNIV1With1Constraint.xml===========
+Nr of deployment conditions: 23
+Nr of network hard constraint 26
+Nr of network soft constraint 60
+Nr of net context hard constraint 1137
+Nr of net context soft constraint 24
 AVG creating condition -> 42ms
 MAX creating condition -> 21575ms
 AVG checking property when SAT -> 11801ms
@@ -410,6 +547,11 @@ AVG total time -> 11621ms
 MAX total time -> 57363ms
 =====================================
 ===========FILE ./testfile/Performance/bgUNIV1_5Nodes.xml===========
+Nr of deployment conditions: 42
+Nr of network hard constraint 31
+Nr of network soft constraint 129
+Nr of net context hard constraint 1040
+Nr of net context soft constraint 24
 AVG creating condition -> 42ms
 MAX creating condition -> 44576ms
 AVG checking property when SAT -> 22199ms
@@ -427,6 +569,11 @@ AVG total time -> 11092ms
 MAX total time -> 43428ms
 =====================================
 ===========FILE ./testfile/Performance/sgUNIV1.xml 5 Nodes===========
+Nr of deployment conditions: 29
+Nr of network hard constraint 28
+Nr of network soft constraint 79
+Nr of net context hard constraint 825
+Nr of net context soft constraint 24
 AVG creating condition -> 62ms
 MAX creating condition -> 31806ms
 AVG checking property when SAT -> 9149ms
@@ -443,6 +590,11 @@ AVG total time -> 38066ms
 MAX total time -> 1283162ms
 =====================================
 ===========FILE ./testfile/Performance/sgUNIV1WithConstraints.xml 5 Nodes===========
+Nr of deployment conditions: 29
+Nr of network hard constraint 77
+Nr of network soft constraint 79
+Nr of net context hard constraint 719
+Nr of net context soft constraint 24
 AVG creating condition -> 64ms
 MAX creating condition -> 32907ms
 AVG checking property when SAT -> 11527ms

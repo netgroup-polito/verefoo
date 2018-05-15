@@ -104,11 +104,13 @@ public class TestPerformance {
         	if(res.result != Status.UNSATISFIABLE){
             	checkTimeSAT += (endCheck-endVP);
             	maxCheckTimeSAT = maxCheckTimeSAT<(endCheck-endVP)? (endCheck-endVP) : maxCheckTimeSAT;
+        		nSAT++;
         		new Translator(res.model.toString(),root,g).convert();
         	}
         	else{
         		checkTimeUNSAT += (endCheck-endVP);
         		maxCheckTimeUNSAT = maxCheckTimeUNSAT<(endCheck-endVP)? (endCheck-endVP) : maxCheckTimeUNSAT;
+        		nUNSAT++;
         	}
         	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
         	//long endT=System.currentTimeMillis();
@@ -129,10 +131,6 @@ public class TestPerformance {
 				maxTotTime = maxTotTime<(endAll-beginAll)? (endAll-beginAll) : maxTotTime;
 				System.out.print("time: " + (endAll-beginAll) + "ms;");
 				totTime += (endAll-beginAll);
-        		nSAT++;
-        	}
-        	else{
-        		nUNSAT++;
         	}
         });
         return;
@@ -198,6 +196,11 @@ public class TestPerformance {
 			//files.add("./testfile/Performance/bgUNIV1With4Constraints.xml");
 			//files.add("./testfile/Performance/bgUNIV1WithConstraints.xml");
 			
+
+			files.add("./testfile/Performance/bgInternet2_2Nodes.xml");
+			//files.add("./testfile/Performance/bgGEANT_2Nodes.xml");
+			//files.add("./testfile/Performance/bgUNIV1_2Nodes.xml");
+			
 			//files.add("./testfile/Performance/bgInternet2_3Nodes.xml");
 			//files.add("./testfile/Performance/bgGEANT_3Nodes.xml");
 			//files.add("./testfile/Performance/bgUNIV1_3Nodes.xml");
@@ -209,9 +212,9 @@ public class TestPerformance {
 			//files.add("./testfile/Performance/bgInternet2_6Nodes.xml");
 			//files.add("./testfile/Performance/bgGEANT_6Nodes.xml");
 			
-			files.add("./testfile/Performance/bgInternet2_DualChain.xml");
-			files.add("./testfile/Performance/bgGEANT_DualChain.xml");
-			files.add("./testfile/Performance/bgUNIV1_DualChain.xml");
+			//files.add("./testfile/Performance/bgInternet2_DualChain.xml");
+			//files.add("./testfile/Performance/bgGEANT_DualChain.xml");
+			//files.add("./testfile/Performance/bgUNIV1_DualChain.xml");
 			
 			//files.add("./testfile/Performance/sgInternet2.xml");
 			//files.add("./testfile/Performance/sgInternet2WithConstraints.xml");
@@ -270,38 +273,32 @@ public class TestPerformance {
 		        
 				do{
 					System.out.print("Simulation nr " + i+" ");
-					try{
-						Thread t = new Thread(){
-							public void run(){
-								try {
-									test(root);
-									i++;
-									if(i%50 == 0) System.out.println("");
-								} catch (Exception e) {
-									// TODO Auto-generated catch block
-									err++;
-								}
+					Thread t = new Thread(){
+						public void run(){
+							try {
+								test(root);
+								i++;
+								if(i%50 == 0) System.out.println("");
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								err++;
 							}
-						};
-						t.start();
-						//avoid deadlock
-						t.join(6000000);
-						if(t.isAlive()){
-							Host currClient = root.getHosts().getHost().stream().filter(h -> h.getType().equals(TypeOfHost.CLIENT)).findAny().orElse(null);
-							Host currServer = root.getHosts().getHost().stream().filter(h -> h.getType().equals(TypeOfHost.SERVER)).findAny().orElse(null);
-							System.out.println("Simulation " + i + " has deadlock with client on " + currClient.getName() + " and server on " + currServer.getName());
-							throw new BadGraphError();
 						}
-						
-					}catch(BadGraphError e){
-						err++;
+					};
+					t.start();
+					//avoid deadlock
+					t.join(6000000);
+					if(t.isAlive()){
+						Host currClient = root.getHosts().getHost().stream().filter(h -> h.getType().equals(TypeOfHost.CLIENT)).findAny().orElse(null);
+						Host currServer = root.getHosts().getHost().stream().filter(h -> h.getType().equals(TypeOfHost.SERVER)).findAny().orElse(null);
+						System.out.println("Simulation " + i + " has deadlock with client on " + currClient.getName() + " and server on " + currServer.getName());
+						throw new BadGraphError();
 					}
 				}while(changeEndpoints(root.getHosts().getHost(), clientName, serverName) != null);
 				
 				System.out.println("Simulations -> " + i + " / Errors -> " + err);
 				logger.debug("Simulations -> " + i + " / Errors -> " + err);
-				System.out.println("AVG Nr of Conditions -> " + (nrOfConditions/(nSAT)) + " / MAX Nr Of Conditions -> " + maxNrOfConditions);
-				logger.debug("Simulations -> " + i + " / Errors -> " + err);
+				System.out.println("AVG Nr of Conditions -> " + (nrOfConditions/(i)) + " / MAX Nr Of Conditions -> " + maxNrOfConditions);
 				System.out.println("AVG creating condition -> " + (condTime/(i-err)) + "ms");
 				System.out.println("MAX creating condition -> " + (maxCondTime) + "ms");
 				logger.debug("AVG creating condition -> " + (condTime/(i-err)) + "ms");

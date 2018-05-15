@@ -29,6 +29,7 @@ import com.microsoft.z3.IntSort;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Sort;
+import com.microsoft.z3.Statistics.Entry;
 import com.microsoft.z3.Optimize.Handle;
 
 import it.polito.verigraph.mcnet.netobjs.DumbNode;
@@ -142,6 +143,7 @@ public class NetContext extends Core{
     @Override
     protected void addConstraints(Optimize solver) {
         BoolExpr[] constr = new BoolExpr[constraints.size()];
+		//System.out.println("Nr of net context hard constraint " + constraints.stream().distinct().count());
         /*System.out.println("======NET CONTEXT HARD CONSTRAINTS====== ");
 		constraints.forEach(c -> {
 			System.out.println(c);
@@ -151,27 +153,26 @@ public class NetContext extends Core{
             policy.addConstraints(solver);
         }
         //System.out.println("======NET CONTEXT SOFT CONSTRAINTS====== ");
-        //System.out.println("AutoConfiguration Constraints");
+		//System.out.println("Nr of net context autoconfiguration soft constraint " + softConstrAutoConf.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
         	//System.out.println(t._1 + "\n with value " + 1000 + ". Node is " + t._2);
 			solver.AssertSoft(t._1, 1000, t._2);
 		}
-        //System.out.println("AutoPlacement Constraints");
+		//System.out.println("Nr of net context autoplacement soft constraint " + softConstrAutoPlace.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrAutoPlace) {
         	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
 			solver.AssertSoft(t._1, 100, t._2);
 		}
-        //System.out.println("Soft Constraints");
+		//System.out.println("Nr of net context soft constraint " + softConstraints.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstraints) {
         	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
 			solver.AssertSoft(t._1, 10, t._2);
 		}
-      //System.out.println("Wildcards Constraints");
+		//System.out.println("Nr of net context wildcards soft constraint " + softConstrWildcard.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrWildcard) {
         	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
 			solver.AssertSoft(t._1, -10, t._2);
 		}
-        
     }
 
     public int[] getIpFromString(String ipString) {
@@ -437,6 +438,25 @@ public class NetContext extends Core{
      * @param p2
      * @return
      */
+    public BoolExpr equalPacketIpToFwIpRule(Expr packet_ip, Expr fwIpRule){
+        return ctx.mkAnd(new BoolExpr[]{
+                ctx.mkOr(
+                		ctx.mkEq(ip_functions.get("ipAddr_1").apply(packet_ip), ip_functions.get("ipAddr_1").apply(fwIpRule)),
+                		ctx.mkEq(ip_functions.get("ipAddr_1").apply(fwIpRule), ip_functions.get("ipAddr_1").apply(am.get("wildcard")))
+                		),
+                ctx.mkOr(
+                		ctx.mkEq(ip_functions.get("ipAddr_2").apply(packet_ip), ip_functions.get("ipAddr_2").apply(fwIpRule)),
+                		ctx.mkEq(ip_functions.get("ipAddr_2").apply(fwIpRule), ip_functions.get("ipAddr_2").apply(am.get("wildcard")))
+                		),
+                ctx.mkOr(
+                		ctx.mkEq(ip_functions.get("ipAddr_3").apply(packet_ip), ip_functions.get("ipAddr_3").apply(fwIpRule)),
+                		ctx.mkEq(ip_functions.get("ipAddr_3").apply(fwIpRule), ip_functions.get("ipAddr_3").apply(am.get("wildcard")))
+                		),
+                ctx.mkOr(
+                		ctx.mkEq(ip_functions.get("ipAddr_4").apply(packet_ip), ip_functions.get("ipAddr_4").apply(fwIpRule)),
+                		ctx.mkEq(ip_functions.get("ipAddr_4").apply(fwIpRule), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))
+                		)});
+    }
     public BoolExpr equalIp(Expr ip1, Expr ip2){
         return ctx.mkAnd(new BoolExpr[]{
                 ctx.mkOr(

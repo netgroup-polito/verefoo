@@ -14,6 +14,7 @@ import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
+import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Status;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
@@ -163,32 +164,21 @@ public class VerifooProxy {
 				
 				List<FunctionalTypes> tmp = h.getSupportedVNF().stream().map(s -> s.getFunctionalType()).collect(Collectors.toList());
 				for(FunctionalTypes f: FunctionalTypes.values()){
-					BoolExpr c = ctx.mkBoolConst(h.getName()+"_composition_"+f);
+					BoolExpr c = ctx.mkBoolConst(h.getName()+"_supports_"+f);
 					if(tmp.contains(f)){
 						//logger.debug(h.getName() + " supports " + f + " -> " + ctx.mkEq(c, ctx.mkTrue()));
 						nctx.constraints.add(ctx.mkEq(c, ctx.mkTrue()));
 					}
 					else{
 						if(h.getType().equals(TypeOfHost.SERVER) && (f.equals(FunctionalTypes.WEBSERVER) || f.equals(FunctionalTypes.MAILSERVER))){
-							logger.debug(h.getName() + " supports " + f + " -> " + ctx.mkEq(c, ctx.mkTrue()));
+							//logger.debug(h.getName() + " supports " + f + " -> " + ctx.mkEq(c, ctx.mkTrue()));
 							nctx.constraints.add(ctx.mkEq(c, ctx.mkTrue()));
 						}else{
 							nctx.constraints.add(ctx.mkEq(c, ctx.mkFalse()));
 						}
 					}
-					hostSupportedVNF.put(h.getName()+"_composition_"+f, c);
-				}
-				/*if(h.getType().equals(TypeOfHost.SERVER)){
-					BoolExpr c = ctx.mkBoolConst(h.getName()+"_composition_"+FunctionalTypes.WEBSERVER);
-					logger.debug(h.getName() + " supports " + FunctionalTypes.WEBSERVER + " -> " + ctx.mkEq(c, ctx.mkTrue()));
-					hostSupportedVNF.put(h.getName()+"_composition_"+FunctionalTypes.WEBSERVER, c);
-					c = ctx.mkBoolConst(h.getName()+"_composition_"+FunctionalTypes.MAILSERVER);
-					nctx.constraints.add(ctx.mkEq(c, ctx.mkTrue()));
-					logger.debug(h.getName() + " supports " + FunctionalTypes.MAILSERVER + " -> " + ctx.mkEq(c, ctx.mkTrue()));
-					hostSupportedVNF.put(h.getName()+"_composition_"+FunctionalTypes.MAILSERVER, c);
-					nctx.constraints.add(ctx.mkEq(hostCondition.get(h.getName()), ctx.mkTrue()));
-				}*/
-				
+					hostSupportedVNF.put(h.getName()+"_supports_"+f, c);
+				}				
 			});
 			//logger.debug("Host constraint: " + hostCondition);
 			conditionDB.entrySet().forEach(e -> {
@@ -237,11 +227,12 @@ public class VerifooProxy {
 				}
 				if(cpuRequirements.size() > 0){
 					cpuRequirements.forEach((k,v) -> {
-						//logger.debug("Cpu requirements: " + ctx.mkLe(k, v));
+						logger.debug("Cpu requirements: " + ctx.mkLe(k, v));
 						nctx.constraints.add(ctx.mkLe(k, v));
 					});
 				}
 			});
+			
 			hosts.forEach(h -> {
 				List<BoolExpr> implications = new ArrayList<>();
 				conditionDB.entrySet().stream()
@@ -254,8 +245,9 @@ public class VerifooProxy {
 										String node = cond.substring(cond.indexOf(" ")+1, cond.lastIndexOf('@'));
 										FunctionalTypes f = nodes.stream().filter(n1 -> n1.getName().equals(node)).findFirst().get().getFunctionalType();
 										implications.add(ctx.mkImplies(hostCondition.get(h.getName()), i));
-										logger.debug(i + " => " + hostSupportedVNF.get(h.getName()+"_composition_"+f));
-										nctx.constraints.add(ctx.mkImplies(i, hostSupportedVNF.get(h.getName()+"_composition_"+f)));
+										//implications.add(i);
+										logger.debug(i + " => " + hostSupportedVNF.get(h.getName()+"_supports_"+f));
+										nctx.constraints.add(ctx.mkImplies(i, hostSupportedVNF.get(h.getName()+"_supports_"+f)));
 									});
 				//System.out.println(h.getName() + " implication: " + implications);
 				if(implications.size() > 0){
@@ -263,6 +255,11 @@ public class VerifooProxy {
 					BoolExpr hostImpliesNodeConstraint = ctx.mkOr(implications.toArray(tmp));
 					logger.debug(h.getName() + " implication: " + hostImpliesNodeConstraint);
 					nctx.constraints.add(hostImpliesNodeConstraint);
+					/*
+					BoolExpr[] tmp = new BoolExpr[implications.size()];
+					BoolExpr hostImpliesNodeConstraint = ctx.mkOr(implications.toArray(tmp));
+					logger.debug(h.getName() + " implication: " + ctx.mkImplies(hostImpliesNodeConstraint, hostCondition.get(h.getName())));
+					nctx.constraints.add(ctx.mkImplies(hostImpliesNodeConstraint, hostCondition.get(h.getName())));*/
 				}
 			});
 			
@@ -281,9 +278,13 @@ public class VerifooProxy {
 										NodeMetrics n = nodeMetrics.stream().filter(n1 -> n1.getNode().equals(node)).findFirst().orElse(null);
 										if(n != null)
 											diskRequirements.add(ctx.mkMul(ctx.mkInt(n.getReqStorage()), nctx.bool_to_int(i)));
-										maxVNFRequirements.add(nctx.bool_to_int(i));
-										if(n != null)
-											coreRequirements.add(ctx.mkMul(ctx.mkInt(n.getCores()),nctx.bool_to_int(i)));
+										Expr ex = ctx.mkConst(i+"_vnf", ctx.mkIntSort());
+										nctx.constraints.add(ctx.mkEq(ex, ctx.mkMul(ctx.mkInt(1),nctx.bool_to_int(i))));
+										maxVNFRequirements.add(ctx.mkMul(ctx.mkInt(1),nctx.bool_to_int(i)));
+										if(n != null){
+											logger.debug(h.getName() + " core requirements: " + ctx.mkLe(ctx.mkMul(ctx.mkInt(n.getCores()),nctx.bool_to_int(i)), ctx.mkMul(ctx.mkInt(h.getCores()), nctx.bool_to_int(hostCondition.get(h.getName())))));
+											nctx.constraints.add(ctx.mkLe(ctx.mkMul(ctx.mkInt(n.getCores()),nctx.bool_to_int(i)), ctx.mkMul(ctx.mkInt(h.getCores()), nctx.bool_to_int(hostCondition.get(h.getName())))) );
+										}
 										if(n != null)
 											memoryRequirements.add(ctx.mkMul(ctx.mkInt(n.getMemory()), nctx.bool_to_int(i)));
 										
@@ -293,7 +294,7 @@ public class VerifooProxy {
 					ArithExpr[] tmp = new ArithExpr[diskRequirements.size()];
 					ArithExpr diskConstraint = ctx.mkAdd(diskRequirements.toArray(tmp));
 					//logger.debug(h.getName() + " left side: " + diskConstraint);
-					//logger.debug(h.getName() + " disk requirements: " + ctx.mkLe(diskConstraint, ctx.mkMul(ctx.mkInt(h.getDiskStorage()), nctx.bool_to_int(hostCondition.get(h.getName())))));
+					logger.debug(h.getName() + " disk requirements: " + ctx.mkLe(diskConstraint, ctx.mkMul(ctx.mkInt(h.getDiskStorage()), nctx.bool_to_int(hostCondition.get(h.getName())))));
 					nctx.constraints.add(ctx.mkLe(diskConstraint, ctx.mkMul(ctx.mkInt(h.getDiskStorage()), nctx.bool_to_int(hostCondition.get(h.getName())))));
 				}
 				if(maxVNFRequirements.size() > 0){
@@ -301,22 +302,15 @@ public class VerifooProxy {
 					ArithExpr maxVNFConstraint = ctx.mkAdd(maxVNFRequirements.toArray(tmp));
 					//logger.debug(h.getName() + " left side: " + diskConstraint);
 					if(h.getMaxVNF() != null){
-						//logger.debug(h.getName() + " max VNF requirements: " + ctx.mkLe(maxVNFConstraint, ctx.mkMul(ctx.mkInt(h.getMaxVNF()), nctx.bool_to_int(hostCondition.get(h.getName())))));
+						logger.debug(h.getName() + " max VNF requirements: " + ctx.mkLe(maxVNFConstraint, ctx.mkMul(ctx.mkInt(h.getMaxVNF()), nctx.bool_to_int(hostCondition.get(h.getName())))));
 						nctx.constraints.add(ctx.mkLe(maxVNFConstraint, ctx.mkMul(ctx.mkInt(h.getMaxVNF()), nctx.bool_to_int(hostCondition.get(h.getName())))));
 					}
-				}
-				if(coreRequirements.size() > 0){
-					ArithExpr[] tmp = new ArithExpr[coreRequirements.size()];
-					ArithExpr coreConstraint = ctx.mkAdd(coreRequirements.toArray(tmp));
-					//logger.debug(h.getName() + " left side: " + diskConstraint);
-					//logger.debug(h.getName() + " core requirements: " + ctx.mkLe(coreConstraint, ctx.mkMul(ctx.mkInt(h.getCores()), nctx.bool_to_int(hostCondition.get(h.getName())))));
-					nctx.constraints.add(ctx.mkLe(coreConstraint, ctx.mkMul(ctx.mkInt(h.getCores()), nctx.bool_to_int(hostCondition.get(h.getName())))));
 				}
 				if(memoryRequirements.size() > 0){
 					ArithExpr[] tmp = new ArithExpr[memoryRequirements.size()];
 					ArithExpr memoryConstraint = ctx.mkAdd(memoryRequirements.toArray(tmp));
 					//logger.debug(h.getName() + " left side: " + diskConstraint);
-					//logger.debug(h.getName() + " disk requirements: " + ctx.mkLe(memoryConstraint, ctx.mkMul(ctx.mkInt(h.getMemory()), nctx.bool_to_int(hostCondition.get(h.getName())))));
+					logger.debug(h.getName() + " memory requirements: " + ctx.mkLe(memoryConstraint, ctx.mkMul(ctx.mkInt(h.getMemory()), nctx.bool_to_int(hostCondition.get(h.getName())))));
 					nctx.constraints.add(ctx.mkLe(memoryConstraint, ctx.mkMul(ctx.mkInt(h.getMemory()), nctx.bool_to_int(hostCondition.get(h.getName())))));
 				}
 			});			
@@ -736,17 +730,17 @@ public class VerifooProxy {
 			for(BoolExpr f : ctx.getSMTLIBFormulas()){
 				System.out.println(f);
 			}*/
-			IsolationResult ret = this.check.propertyCheck();
 			nrOfConditions = (int) conditionDB.entrySet().stream().flatMap(e -> e.getValue().values().stream()).count();
-			logger.debug("Nr of Conditions: " + nrOfConditions);
-			System.out.println("Nr of Conditions: " + nrOfConditions);
+			logger.debug("Nr of deployment conditions: " + nrOfConditions);
+			//System.out.println("Nr of deployment conditions: " + nrOfConditions);
+			IsolationResult ret = this.check.propertyCheck();
 			if(nrOfConditions == 0) ret.result = Status.UNSATISFIABLE;
 			if (ret.result == Status.UNSATISFIABLE){
 				 	logger.debug("UNSAT"); // Nodes a and b are isolated
 				 	
 		    }else{
 		    	 	logger.debug("SAT ");
-		     		logger.debug( ""+ret.model); //p.printModel(ret.model);
+		     		//logger.debug( ""+ret.model); //p.printModel(ret.model);
 		     		
 		    }
 			return ret;

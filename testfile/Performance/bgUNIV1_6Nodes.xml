@@ -54,6 +54,18 @@
       </node>
        <node functional_type="FIREWALL" name="node5">
         <neighbour name="node4"/>
+        <neighbour name="node6"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall>
+            <elements>
+              <source>nodeC</source>
+              <destination>nodeD</destination>
+            </elements>
+          </firewall>
+        </configuration>
+      </node>
+	  <node functional_type="FIREWALL" name="node6">
+        <neighbour name="node5"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf1">
           <firewall>

@@ -14,8 +14,10 @@
         <configuration description="A simple description" name="conf1">
           <firewall>
             <elements>
-              <source>nodeC</source>
-              <destination>nodeD</destination>
+              <source>nodeA</source>
+              <destination>nodeB</destination>
+              <src_port>10</src_port>
+              <dst_port>80</dst_port>
             </elements>
           </firewall>
         </configuration>
@@ -49,7 +51,10 @@
   <PropertyDefinition>
   		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB" src_port="10" dst_port="80">
   			<HTTPDefinition body="cats"/>
-  		</Property> 		
+  		</Property>
+		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB" src_port="60" dst_port="80">
+  			<HTTPDefinition body="cats"/>
+  		</Property>  		
   </PropertyDefinition>
   <Hosts>
   	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>

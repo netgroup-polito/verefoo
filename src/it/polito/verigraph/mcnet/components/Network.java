@@ -82,11 +82,12 @@ public class Network extends Core {
 		try {
 
 			BoolExpr[] constr = new BoolExpr[constraints.size()];
-			
+			//System.out.println("Nr of network hard constraint " + constraints.stream().distinct().count());
 			/*constraints.forEach(c -> {
 				System.out.println("======adding hard constraint " + c);
 			});*/
 			solver.Add(constraints.toArray(constr));
+			//System.out.println("Nr of network soft constraint " + softConstraints.keySet().stream().distinct().count());
 			for (Entry<BoolExpr, Tuple<Integer, String>> entry : softConstraints.entrySet()) {
 				// String key = entry.getKey();
 				//System.out.println("======adding soft for " + entry.getKey() + "\n with value " + entry.getValue()._1 + ". Node is " + entry.getValue()._2 + " ====== ");
@@ -664,6 +665,14 @@ public class Network extends Core {
 								,1, null, null, null, null);
 						//System.out.println("Optional conditions: " + initialWithOptional);
 					}
+				}else{
+					BoolExpr[] tmpWithOptional = new BoolExpr[nextHopsWithOptional.size()];
+					initialWithOptional = ctx.mkForall(new Expr[] { n_0,p_0 },
+							ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(node.getZ3Node(), n_0, p_0),predicates),
+													ctx.mkOr(nextHopsWithOptional.toArray(tmpWithOptional))
+											)
+							,1, null, null, null, null);
+					//System.out.println("Optional conditions: " + initialWithOptional);
 				}
 			}
 			if(nextHopsWithoutOptional.size() > 0){

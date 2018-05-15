@@ -270,28 +270,28 @@
 		<echo>*** All Tests PASSED  ***</echo>
 		<antcall target="stop-tomcat"/>
 	 </target>
-<target name="clean" description="clean up">
-    <!-- Delete the ${build} and ${dist} directories -->
-    <delete dir="${build.dir}"/>
-    <delete dir="${dist.dir}"/>
-    <delete>
-      <fileset dir="${report.dir}" includes="**/*.txt,**/*.xml"/>
-    </delete>
-  	<delete file="${target.dir}/verifoo.war"/>
-</target>
+	<target name="clean" description="clean up">
+		<!-- Delete the ${build} and ${dist} directories -->
+		<delete dir="${build.dir}"/>
+		<delete dir="${dist.dir}"/>
+		<delete>
+		  <fileset dir="${report.dir}" includes="**/*.txt,**/*.xml"/>
+		</delete>
+		<delete file="${target.dir}/verifoo.war"/>
+	</target>
 
-    <!-- Target for executing the main with some defined properties -->
-<target name="main" description="Run main">
-		<java classname="it.polito.verifoo.rest.main.Main" failonerror="true" fork="yes">
-			<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jURL" value="${neo4jURL}"/>
-			<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jUsername" value="${neo4jUsername}"/>
-			<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jPassword" value="${neo4jPassword}"/>
-			<classpath>
-				<pathelement path="${build.dir}"/>
-				<pathelement path="lib/lib4j/*"/>
-				<pathelement path="lib/neo4j/*"/>
-				<pathelement path="lib/*"/>
-			</classpath>
-		</java>
+		<!-- Target for executing the main with some defined properties -->
+	<target name="main" description="Run main">
+			<java classname="it.polito.verifoo.rest.main.Main" failonerror="true" fork="yes">
+				<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jURL" value="${neo4jURL}"/>
+				<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jUsername" value="${neo4jUsername}"/>
+				<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jPassword" value="${neo4jPassword}"/>
+				<classpath>
+					<pathelement path="${build.dir}"/>
+					<pathelement path="lib/lib4j/*"/>
+					<pathelement path="lib/neo4j/*"/>
+					<pathelement path="lib/*"/>
+				</classpath>
+			</java>
 	</target>
 </project>

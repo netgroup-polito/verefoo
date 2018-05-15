@@ -35,7 +35,7 @@ public class VerifooSerializer {
 		this.nfv = root;
 		/*String neo4jURL, neo4jUsername, neo4jPassword;
 		if(System.getProperty("it.polito.verifoo.rest.neo4j.neo4jURL") != null){
-			neo4jURL = System.getProperty("it.polito.verifoo.rest.neo4j.neo4jURL");
+			neo4jURL = "bolt://"+System.getProperty("it.polito.verifoo.rest.neo4j.neo4jURL");
 		}else{
 			neo4jURL = "bolt://127.0.0.1:7687";
 		}
@@ -83,7 +83,7 @@ public class VerifooSerializer {
 	        	else{
 	        		sat = false;
 	        	}
-	        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
+	        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE));
 	        }
 	    } catch (BadGraphError e) {
 			//logger.error("Graph semantically incorrect");
