@@ -38,11 +38,12 @@ public class AclFirewall extends NetworkObject{
 	Context ctx;
 	DatatypeExpr fw;
 	ArrayList<Quattro<DatatypeExpr,DatatypeExpr,IntNum,IntNum>> acls;
+	ArrayList<Quattro<DatatypeExpr,DatatypeExpr,IntNum,IntNum>> whiteAcls;
 	private ArrayList<Tuple<int[],int[]>> ipAcls;
 	Network net;
 	NetContext nctx;
 	FuncDecl acl_func;
-	FuncDecl acl_func_new;
+	FuncDecl acl_func_white;
 	private boolean autoconf, autoplace;
 	private AutoContext autoctx;
 	
@@ -57,6 +58,7 @@ public class AclFirewall extends NetworkObject{
 		isEndHost=false;
    		constraints = new ArrayList<BoolExpr>();
    		acls = new ArrayList<>();
+   		whiteAcls = new ArrayList<>();
    		ipAcls = new ArrayList<>();
    		z3Node = ((NetworkObject)args[0][0]).getZ3Node();
         fw = z3Node;
@@ -102,11 +104,19 @@ public class AclFirewall extends NetworkObject{
 			
 	}
 	
+	public void addWhiteListAcls(ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acls){
+		if(!autoconf){	// if not an autoconfiguration firewall
+			for(Tuple<DatatypeExpr, DatatypeExpr> acl : acls){
+				Quattro<DatatypeExpr, DatatypeExpr, IntNum, IntNum> rule = new Quattro<>(acl._1, acl._2, ctx.mkInt(0), ctx.mkInt(0));
+				this.whiteAcls.add(rule);
+			}
+		}
+	}
+	
 	public void addCompleteAcls(ArrayList<Quattro<DatatypeExpr,DatatypeExpr,IntNum,IntNum>> acls){
 		if(!autoconf){	// if not an autoconfiguration firewall
 				this.acls.addAll(acls);
-		}
-			
+		}	
 	}
 	
 	@Override
@@ -130,6 +140,7 @@ public class AclFirewall extends NetworkObject{
     	//IntExpr t_0 = ctx.mkIntConst(fw+"_firewall_send_t_0");
     	//IntExpr t_1 = ctx.mkIntConst(fw+"_firewall_send_t_1");
     	acl_func = ctx.mkFuncDecl(fw+"_acl_func", new Sort[]{nctx.address, nctx.address , ctx.mkIntSort(), ctx.mkIntSort() },ctx.mkBoolSort());
+    	acl_func_white = ctx.mkFuncDecl(fw+"_acl_func_white", new Sort[]{nctx.address, nctx.address , ctx.mkIntSort(), ctx.mkIntSort()},ctx.mkBoolSort());
     	//Constraint1		send(fw, n_0, p, t_0)  -> (exist n_1,t_1 : (recv(n_1, fw, p, t_1) && 
     	//    				t_1 < t_0 && !acl_func(p.src,p.dest))
     	  constraints.add(
@@ -141,21 +152,31 @@ public class AclFirewall extends NetworkObject{
 	    	            						ctx.mkExists(new Expr[]{n_1}, 
 	    	            								nctx.recv.apply(n_1, fw, p_0),1,null,null,null,null), 
 	    	            						ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), 
-	    	            															nctx.pf.get("dest").apply(p_0),
-	    	            															nctx.pf.get("src_port").apply(p_0), 
-	    	            															nctx.pf.get("dest_port").apply(p_0))
-	    	            								))),1,null,null,null,null));
+	    	            														nctx.pf.get("dest").apply(p_0),
+    	            															nctx.pf.get("src_port").apply(p_0), 
+    	            															nctx.pf.get("dest_port").apply(p_0))),
+	    	            							    	            								
+	    	            						((BoolExpr)acl_func_white.apply(nctx.pf.get("src").apply(p_0), 
+							    	            								nctx.pf.get("dest").apply(p_0),
+																				nctx.pf.get("src_port").apply(p_0), 
+																				nctx.pf.get("dest_port").apply(p_0)))
+	    	            							    	            						
+	    	            							    	            								)),1,null,null,null,null));
 
     	  
     	  //Constraint2 obliges this VNF to send the packets that have been received
     	  constraints.add(
 	            	ctx.mkForall(new Expr[]{n_0, p_0},
 	            			ctx.mkImplies(	
-	            					ctx.mkAnd( (BoolExpr)nctx.recv.apply(n_0, fw, p_0)
-	            								,ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), 
+	            					ctx.mkAnd( (BoolExpr)nctx.recv.apply(n_0, fw, p_0),
+		            							ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), 
 																					nctx.pf.get("dest").apply(p_0),
 																					nctx.pf.get("src_port").apply(p_0), 
-																					nctx.pf.get("dest_port").apply(p_0)))
+																					nctx.pf.get("dest_port").apply(p_0))),
+		            							((BoolExpr)acl_func_white.apply(nctx.pf.get("src").apply(p_0), 
+							    	            								nctx.pf.get("dest").apply(p_0),
+																				nctx.pf.get("src_port").apply(p_0), 
+																				nctx.pf.get("dest_port").apply(p_0)))
 	            							),
 	            						ctx.mkAnd(ctx.mkExists(new Expr[]{n_1}, (BoolExpr)nctx.send.apply(new Expr[]{ fw, n_1, p_0}),1,null,null,null,null)
 	            								//,ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0)))
@@ -171,10 +192,9 @@ public class AclFirewall extends NetworkObject{
  		Expr p_0 = ctx.mkConst(fw + "_firewall_send_p_0", nctx.packet);
  		Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
  		Expr n_1 = ctx.mkConst(fw + "_firewall_send_n_1", nctx.node);
- 		Expr a_0 = ctx.mkConst(fw+"_firewall_acl_a_0", nctx.address);
-        Expr a_1 = ctx.mkConst(fw+"_firewall_acl_a_1", nctx.address);
         acl_func = ctx.mkFuncDecl(fw + "_acl_func", new Sort[] { nctx.address, nctx.address , ctx.mkIntSort(), ctx.mkIntSort()}, ctx.mkBoolSort());
- 		List<BoolExpr> rules = new ArrayList<>();
+        acl_func_white = ctx.mkFuncDecl(fw + "_acl_func", new Sort[] { nctx.address, nctx.address , ctx.mkIntSort(), ctx.mkIntSort() }, ctx.mkBoolSort());
+        List<BoolExpr> rules = new ArrayList<>();
  		List<BoolExpr> implications1 = new ArrayList<BoolExpr>();
  		List<BoolExpr> implications2 = new ArrayList<BoolExpr>();
  		for(int i = 0; i < nRules; i++){
@@ -252,8 +272,8 @@ public class AclFirewall extends NetworkObject{
  	 			nctx.softConstraints.add(new Tuple<BoolExpr, String>(ctx.mkEq( dstp, ctx.mkInt(0)),"fw_auto_conf"));
  			}
  			rules.add(ctx.mkAnd(
-			 					nctx.equalIp(nctx.pf.get("src").apply(p_0), src),
-			 					nctx.equalIp(nctx.pf.get("dest").apply(p_0), dst),
+			 					nctx.equalPacketIpToFwIpRule(nctx.pf.get("src").apply(p_0), src),
+			 					nctx.equalPacketIpToFwIpRule(nctx.pf.get("dest").apply(p_0), dst),
 			 					ctx.mkEq(nctx.pf.get("proto").apply(p_0), proto),
 			 					ctx.mkEq((IntExpr)nctx.pf.get("src_port").apply(p_0), srcp),
 			 					ctx.mkEq((IntExpr)nctx.pf.get("dest_port").apply(p_0), dstp)
@@ -312,51 +332,94 @@ public class AclFirewall extends NetworkObject{
 						ctx.mkEq( 
 								acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0),
 												nctx.pf.get("src_port").apply(p_0),nctx.pf.get("dest_port").apply(p_0)), ctx.mkFalse()),1,null,null,null,null));
-    		return;
+    	}else{
+    		 BoolExpr[] acl_map = new BoolExpr[acls.size()];
+    	        for(int y=0;y<acls.size();y++){
+    	        	Quattro<DatatypeExpr,DatatypeExpr,IntNum,IntNum> tp = acls.get(y);
+    	        	System.out.println("Added rule: DROP from " + tp._1 + " to " + tp._2);
+    	        	//acl_map[y] = ctx.mkOr(ctx.mkAnd(ctx.mkEq(a_0,tp._1),ctx.mkEq(a_1,tp._2)), ctx.mkAnd(ctx.mkEq(a_0,tp._2),ctx.mkEq(a_1,tp._1)));
+    	        	acl_map[y] = ctx.mkOr(
+    	        							ctx.mkAnd(nctx.equalPacketIpToFwIpRule(nctx.pf.get("src").apply(p_0),tp._1),nctx.equalPacketIpToFwIpRule(nctx.pf.get("dest").apply(p_0),tp._2),
+    	        										//ctx.mkEq(nctx.pf.get("src").apply(p_0),tp._1),ctx.mkEq(nctx.pf.get("dest").apply(p_0),tp._2),
+    	        										ctx.mkEq(nctx.pf.get("src_port").apply(p_0),tp._3),
+    	        										ctx.mkEq(nctx.pf.get("dest_port").apply(p_0),tp._4)
+    	        										)
+    	        							);
+    	        }
+    	        //Constraint2		acl_func(a_0,a_1) == or(foreach ip1,ip2 in acl_map ((a_0 == ip1 && a_1 == ip2)||(a_0 == ip2 && a_1 == ip1)))
+    	        solver.Add(ctx.mkForall(new Expr[]{p_0},
+    	        						ctx.mkEq( 
+    	        								acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0), nctx.pf.get("src_port").apply(p_0), nctx.pf.get("dest_port").apply(p_0)),
+    	        								ctx.mkOr(acl_map)),1,null,null,null,null));
+    	    
     	}
+    	if (whiteAcls.size() == 0){
+       		//If the size of the ACL list is empty then by default acl_func must be false
+       		 solver.Add(ctx.mkForall(new Expr[]{p_0},
+    						ctx.mkEq( 
+    								acl_func_white.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0),
+														nctx.pf.get("src_port").apply(p_0),nctx.pf.get("dest_port").apply(p_0)), 
+    								ctx.mkTrue()),1,null,null,null,null));
+       	}else{
+       		BoolExpr[] acl_map_white = new BoolExpr[whiteAcls.size()];
+               for(int y=0;y<whiteAcls.size();y++){
+            	   Quattro<DatatypeExpr,DatatypeExpr,IntNum,IntNum> tp = whiteAcls.get(y);
+               		acl_map_white[y] = ctx.mkOr(
+											ctx.mkAnd(nctx.equalPacketIpToFwIpRule(nctx.pf.get("src").apply(p_0),tp._1),nctx.equalPacketIpToFwIpRule(nctx.pf.get("dest").apply(p_0),tp._2),
+													//ctx.mkEq(nctx.pf.get("src").apply(p_0),tp._1),ctx.mkEq(nctx.pf.get("dest").apply(p_0),tp._2),
+													ctx.mkEq(nctx.pf.get("src_port").apply(p_0),tp._3),
+													ctx.mkEq(nctx.pf.get("dest_port").apply(p_0),tp._4)
+													)
+										);
+               }
+               //Constraint2		acl_func(a_0,a_1) == or(foreach ip1,ip2 in acl_map ((a_0 == ip1 && a_1 == ip2)||(a_0 == ip2 && a_1 == ip1)))
+               solver.Add(ctx.mkForall(new Expr[]{p_0},
+               						ctx.mkEq( 
+               								acl_func_white.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0), nctx.pf.get("src_port").apply(p_0), nctx.pf.get("dest_port").apply(p_0)),
+               								ctx.mkOr(acl_map_white)),1,null,null,null,null));
+       	}
             
        
-        BoolExpr[] acl_map = new BoolExpr[acls.size()];
-        for(int y=0;y<acls.size();y++){
-        	Quattro<DatatypeExpr,DatatypeExpr,IntNum,IntNum> tp = acls.get(y);
-        	//acl_map[y] = ctx.mkOr(ctx.mkAnd(ctx.mkEq(a_0,tp._1),ctx.mkEq(a_1,tp._2)), ctx.mkAnd(ctx.mkEq(a_0,tp._2),ctx.mkEq(a_1,tp._1)));
-        	acl_map[y] = ctx.mkOr(
-        							ctx.mkAnd(nctx.equalIp(nctx.pf.get("src").apply(p_0),tp._1),nctx.equalIp(nctx.pf.get("dest").apply(p_0),tp._2),
-        										//ctx.mkEq(nctx.pf.get("src").apply(p_0),tp._1),ctx.mkEq(nctx.pf.get("dest").apply(p_0),tp._2),
-        										ctx.mkEq(nctx.pf.get("src_port").apply(p_0),tp._3),
-        										ctx.mkEq(nctx.pf.get("dest_port").apply(p_0),tp._4)
-        										)
-        							);
-        }
-        //Constraint2		acl_func(a_0,a_1) == or(foreach ip1,ip2 in acl_map ((a_0 == ip1 && a_1 == ip2)||(a_0 == ip2 && a_1 == ip1)))
-        solver.Add(ctx.mkForall(new Expr[]{p_0},
-        						ctx.mkEq( 
-        								acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0), nctx.pf.get("src_port").apply(p_0), nctx.pf.get("dest_port").apply(p_0)),
-        								ctx.mkOr(acl_map)),1,null,null,null,null));
     }
-    /*
+ 	/*
  	private void aclConstraints(Optimize solver){
-    	Expr a_0 = ctx.mkConst(fw+"_firewall_acl_a_0", nctx.address);
+   	 	Expr a_0 = ctx.mkConst(fw+"_firewall_acl_a_0", nctx.address);
         Expr a_1 = ctx.mkConst(fw+"_firewall_acl_a_1", nctx.address);
-    	if (acls.size() == 0){
-    		//If the size of the ACL list is empty then by default acl_func must be false
-    		 solver.Add(ctx.mkForall(new Expr[]{a_0, a_1},
+	   	if (acls.size() == 0){
+	   		//If the size of the ACL list is empty then by default acl_func must be false
+	   		 solver.Add(ctx.mkForall(new Expr[]{a_0, a_1},
+							ctx.mkEq( 
+									acl_func.apply(a_0, a_1), ctx.mkFalse()),1,null,null,null,null));
+	   		 
+	   	}else{
+	   		 BoolExpr[] acl_map = new BoolExpr[acls.size()];
+	   	        for(int y=0;y<acls.size();y++){
+	   	        	Tuple<DatatypeExpr,DatatypeExpr> tp = acls.get(y);
+	   	        	acl_map[y] = ctx.mkOr(ctx.mkAnd(ctx.mkEq(a_0,tp._1),ctx.mkEq(a_1,tp._2)), ctx.mkAnd(ctx.mkEq(a_0,tp._2),ctx.mkEq(a_1,tp._1)));
+	   	        }
+	   	        //Constraint2		acl_func(a_0,a_1) == or(foreach ip1,ip2 in acl_map ((a_0 == ip1 && a_1 == ip2)||(a_0 == ip2 && a_1 == ip1)))
+	   	        solver.Add(ctx.mkForall(new Expr[]{a_0, a_1},
+	   	        						ctx.mkEq( 
+	   	        								acl_func.apply(a_0, a_1),
+	   	        								ctx.mkOr(acl_map)),1,null,null,null,null));
+	   	}
+       //doing the same for the white list
+       if (whiteAcls.size() == 0){
+   		//If the size of the ACL list is empty then by default acl_func must be false
+   		 solver.Add(ctx.mkForall(new Expr[]{a_0, a_1},
 						ctx.mkEq( 
-								acl_func.apply(a_0, a_1), ctx.mkFalse()),1,null,null,null,null));
-    		return;
-    	}
-            
-       
-        BoolExpr[] acl_map = new BoolExpr[acls.size()];
-        for(int y=0;y<acls.size();y++){
-        	Quattro<DatatypeExpr,DatatypeExpr,IntNum,IntNum> tp = acls.get(y);
-        	//acl_map[y] = ctx.mkOr(ctx.mkAnd(ctx.mkEq(a_0,tp._1),ctx.mkEq(a_1,tp._2)), ctx.mkAnd(ctx.mkEq(a_0,tp._2),ctx.mkEq(a_1,tp._1)));
-        	acl_map[y] = ctx.mkOr(ctx.mkAnd(nctx.equalIp(a_0,tp._1),nctx.equalIp(a_1,tp._2)), ctx.mkAnd(nctx.equalIp(a_0,tp._2),nctx.equalIp(a_1,tp._1)));
-        }
-        //Constraint2		acl_func(a_0,a_1) == or(foreach ip1,ip2 in acl_map ((a_0 == ip1 && a_1 == ip2)||(a_0 == ip2 && a_1 == ip1)))
-        solver.Add(ctx.mkForall(new Expr[]{a_0, a_1},
-        						ctx.mkEq( 
-        								acl_func.apply(a_0, a_1),
-        								ctx.mkOr(acl_map)),1,null,null,null,null));
-    }*/
+								acl_func_white.apply(a_0, a_1), ctx.mkTrue()),1,null,null,null,null));
+	   	}else{
+	   		BoolExpr[] acl_map_white = new BoolExpr[whiteAcls.size()];
+	           for(int y=0;y<whiteAcls.size();y++){
+	           	Tuple<DatatypeExpr,DatatypeExpr> tp = whiteAcls.get(y);
+	           	acl_map_white[y] = ctx.mkOr(ctx.mkAnd(ctx.mkEq(a_0,tp._1),ctx.mkEq(a_1,tp._2)), ctx.mkAnd(ctx.mkEq(a_0,tp._2),ctx.mkEq(a_1,tp._1)));
+	           }
+	           //Constraint2		acl_func(a_0,a_1) == or(foreach ip1,ip2 in acl_map ((a_0 == ip1 && a_1 == ip2)||(a_0 == ip2 && a_1 == ip1)))
+	           solver.Add(ctx.mkForall(new Expr[]{a_0, a_1},
+	           						ctx.mkEq( 
+	           								acl_func_white.apply(a_0, a_1),
+	           								ctx.mkOr(acl_map_white)),1,null,null,null,null));
+	   	}       
+   }*/
 }

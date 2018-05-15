@@ -30,6 +30,7 @@ import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
 
 import it.polito.verigraph.mcnet.components.IsolationResult;
+import it.polito.verigraph.mcnet.components.Checker.Prop;
 /**
  * 
  * @author Giacomo Costantini
@@ -71,15 +72,16 @@ public class Polito_Multipath{
     	
     	p.resetZ3(); 	
     	//PolitoMultipathTest model = new PolitoMultipathTest(p.ctx);
-    	//Polito3nodes3hosts model = new Polito3nodes3hosts(p.ctx);
-    	Polito5nodes1hostSG model = new Polito5nodes1hostSG(p.ctx);
+    	Polito3nodes3hosts model = new Polito3nodes3hosts(p.ctx);
+    	//Polito5nodes1hostSG model = new Polito5nodes1hostSG(p.ctx);
     	
     	
 //    	ret = model.check.CheckIsolationProperty(model.politoErrFunction, model.politoMailClient);
 //    	ret = model.check.CheckIsolationProperty(model.politoMailClient, model.politoMailServer);
 //    	ret = model.check.CheckIsolationProperty(model.politoMailServer, model.politoErrFunction);
     	long startTime = System.currentTimeMillis();
-    	ret = model.check.checkIsolationProperty(model.a,model.b );
+    	model.check.propertyAdd(model.a,model.b, Prop.REACHABILITY, null );
+    	ret = model.check.propertyCheck();
 		long endTime = System.currentTimeMillis();
 		long totalTime = (endTime - startTime);
 		System.out.println("Total execution time: " + totalTime + " ms");

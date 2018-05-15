@@ -152,12 +152,20 @@ public class Polito3nodes3hosts {
 	    	net.routingOptimization(x3, rtX3);
 	    	net.routingOptimization(b, rtb);
 	    	
+	    	//here we add the items to the blacklist as usual
 	    	ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+	    	//acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_a"),nctx.am.get("ip_b")));
 	        x1.addAcls(acl);
-	        x2.addAcls(acl);
-	        x3.addAcls(acl);
-	        acl.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_a"),nctx.am.get("ip_b")));
 	        
+	        //here we add the items to the whitelist similarly
+	        ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl2 = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
+	        acl2.add(new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get("ip_a"),nctx.am.get("ip_b")));
+	        x2.addWhiteListAcls(acl2);
+	        x3.addAcls(acl);
+	        
+	        
+	        a.installEndHost(null);
+	        b.installEndHost(null);
 		    net.attach(a, b, x1,x2,x3);
 		    
 		  
