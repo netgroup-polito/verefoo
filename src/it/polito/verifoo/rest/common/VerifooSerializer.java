@@ -59,13 +59,13 @@ public class VerifooSerializer {
 			System.out.println("Neo4j deployment FAILED: " + e.getMessage());
 		}*/
 		try{
-			if(root.getConnections().getConnection().size() == 0){
+			if(root.getHosts() != null && (root.getConnections() == null || root.getConnections().getConnection().size() == 0)){
 				createFullMesh(root);
 				JAXBContext jc= JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
 				Marshaller m = jc.createMarshaller();
 	            m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 	            m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-	            //m.marshal( root.getConnections(), System.out ); 
+	            m.marshal( root.getConnections(), System.out ); 
 			}
 			List<Path> paths = null;
 			if(root.getNetworkForwardingPaths() != null)
