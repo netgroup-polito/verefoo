@@ -14,12 +14,16 @@ import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.IntNum;
 
+import it.polito.verifoo.rest.jaxb.ActionTypes;
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
+import it.polito.verifoo.rest.jaxb.PName;
 import it.polito.verifoo.rest.jaxb.Property;
+import it.polito.verifoo.rest.jaxb.ProtocolTypes;
+import it.polito.verigraph.mcnet.components.AclFirewallRule;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
@@ -39,7 +43,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
     private NetContext nctx;
 	private AutoContext autoctx;
     private Network net;
-	private int nRules;
+	private int nRules, nIsolationProp, nReachabilityProp;
 	private List<NodeMetrics> nodeMetrics;
 	private List<Property> properties;
 	/**
@@ -61,6 +65,8 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 		this.nRules = nRules;
 		this.nodeMetrics = nodeMetrics;
 		this.properties = properties;
+		nIsolationProp = (int) properties.stream().filter(p -> p.getName().equals(PName.ISOLATION_PROPERTY)).count();
+		nReachabilityProp = (int) properties.stream().filter(p -> p.getName().equals(PName.REACHABILITY_PROPERTY)).count();
 		nodes.forEach(this::generateNetObj);
 	}
 
@@ -77,30 +83,39 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	 */
 	public void generateAcl(Node n, AclFirewall fw){
 		if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
-			n.getConfiguration().getFirewall().getElements().forEach((e)->{
-					if(e.getSrcPort() != null || e.getDstPort() != null){
-						ArrayList<Quattro<DatatypeExpr,DatatypeExpr,IntNum, IntNum>> acl = new ArrayList<>();
+				n.getConfiguration().getFirewall().getElements().forEach((e)->{
+						ArrayList<AclFirewallRule> acl = new ArrayList<>();
 						if(nctx.am.get(e.getSource())!=null&&nctx.am.get(e.getDestination())!=null){
-							int src_port = e.getSrcPort()!=null? e.getSrcPort():0;
-							int dst_port = e.getDstPort()!=null? e.getDstPort():0;
-							Quattro<DatatypeExpr,DatatypeExpr,IntNum, IntNum> rule=new Quattro<>(nctx.am.get(e.getSource()),
-																									nctx.am.get(e.getDestination()),
-																									ctx.mkInt(src_port),
-																									ctx.mkInt(dst_port));
-						    acl.add(rule);
-						    logger.debug("Adding blocking rule " + acl);
+							String src_port = e.getSrcPort()!=null? e.getSrcPort():"*";
+							String dst_port = e.getDstPort()!=null? e.getDstPort():"*";
+							boolean directional = e.isDirectional()!=null? e.isDirectional():true;
+							int protocol = e.getProtocol()!=null? e.getProtocol().ordinal():0;
+							boolean action;
+							if(e.getAction() != null){
+								if(e.getAction().equals(ActionTypes.ALLOW))
+									action = true;
+								else
+									action = false;
+							}else{
+								//if not specified the action of the rule is the opposite of the default behaviour otherwise the rule would not be necessary
+								if(n.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW))
+									action = false;
+								else
+									action = true;
+							}
+							try{
+								AclFirewallRule rule=new AclFirewallRule(nctx, ctx, action, nctx.am.get(e.getSource()),nctx.am.get(e.getDestination()),
+																			src_port,dst_port, protocol, directional);
+								acl.add(rule);
+							    logger.debug("Adding blocking rule " + acl);
+							}catch(NumberFormatException ex){
+								throw new BadGraphError(n.getName()+" has invalid configuration: "+ex.getMessage(), EType.INVALID_NODE_CONFIGURATION);
+							}
+							fw.addCompleteAcls(acl);
+						}else{
+							//throw new BadGraphError("You must specify a correct address in "+ n.getName()+ " configuration", EType.INVALID_NODE_CONFIGURATION);
 						}
-					    fw.addCompleteAcls(acl);
-					}else{
-						ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acl = new ArrayList<Tuple<DatatypeExpr,DatatypeExpr>>();
-						if(nctx.am.get(e.getSource())!=null&&nctx.am.get(e.getDestination())!=null){
-							
-						    Tuple<DatatypeExpr,DatatypeExpr> rule=new Tuple<DatatypeExpr,DatatypeExpr>(nctx.am.get(e.getSource()),nctx.am.get(e.getDestination()));
-						    acl.add(rule);
-						    logger.debug("Adding blocking rule " + acl);
-						}
-					    fw.addAcls(acl);
-					}
+					    
 				});
 		}
 		
@@ -171,20 +186,39 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(n.getConfiguration().getFirewall()==null){
 						throw new BadGraphError("You have specified a FIREWALL Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
+					
 					AclFirewall fw;
 					if(n.getConfiguration().getFirewall().getElements().isEmpty()){
+						//set default action based on nIsolation and nReachability
+						boolean defaultAction;
+						if(n.getConfiguration().getFirewall().getDefaultAction() == null){
+							if(nIsolationProp == 0){
+								defaultAction = true;
+							}
+							else if(nReachabilityProp == 0){
+								defaultAction = false;
+							}else{
+								//with this, the behaviour is compliant with the previous version of Verifoo fw model
+								defaultAction = true;
+							}
+						}else{
+							defaultAction = n.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW);
+						}
+						
+						
 						if(optional){
 							System.out.println("Autoplacement for " + n.getName());
-							fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules, autoctx});
+							fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,defaultAction,nRules, autoctx});
 							autoctx.addOptionalNode(n, fw);
 						}
 						else{
 							System.out.println("Autoconfiguration for " + n.getName());
-							fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
+							fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,defaultAction,nRules});
 						}
+						
 					}
 					else{
-						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,n.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)});
 						generateAcl(n, fw);
 					}
 					this.put(n, fw);

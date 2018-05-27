@@ -1,6 +1,9 @@
 package it.polito.verifoo.rest.common;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -11,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 
 import it.polito.verifoo.rest.jaxb.*;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
+import it.polito.verigraph.mcnet.components.Tuple;
 /**
  * This class implements a parser for verifoo output (the z3 model), in order to translate it into the correct XML 
  */
@@ -34,7 +38,8 @@ public class Translator {
 	 * Conversion function
 	 */
 	public void convert(){
-		nfv.getHosts().getHost().forEach(this::searchHost);
+		if(nfv.getHosts() != null) 
+			nfv.getHosts().getHost().forEach(this::searchHost);
 		setAutoConfig();
 	}
 	/**
@@ -114,29 +119,29 @@ public class Translator {
 		}
 		return nodeDstName;
 	}
-	private String firewallAutoConfigSearchSrcPort(Node n, String nrOfRule){
-		String tosearch="define-fun .*"+n.getName()+".*_auto_srcp_"+nrOfRule+".* Int\n  .*\\)";
+	
+	private String stringToSearchProtocol(Node n, String nrOfRule){
+		return "define-fun .*"+n.getName()+".*_auto_proto_"+nrOfRule+".* Int\n  .*\\)";
+	}	
+	private String stringToSearchAction(Node n, String defAction){
+		return "define-fun .*"+n.getName()+".*_auto_"+defAction+".* Bool\n  .*\\)";
+	}
+	private String stringToSearchPort(Node n, String nrOfRule, String srcOrDest){
+		return "define-fun .*"+n.getName()+".*_auto_"+srcOrDest+"p_"+nrOfRule+".* Int\n  .*\\)";
+	}
+	private String stringToSearchPort(Node n, String nrOfRule, String startOrEnd, String srcOrDest){
+		return "define-fun .*"+n.getName()+".*_auto_"+startOrEnd+"_"+srcOrDest+"p_"+nrOfRule+".* Int\n  .*\\)";
+	}
+	private String firewallAutoConfigSearchAttribute(String tosearch){
 		Pattern pattern = Pattern.compile(tosearch);
 		Matcher matcher = pattern.matcher(model);
-		String src_portRule = "null";
+		String attribute = "null";
 		while (matcher.find()) {
-	        String matchSrcp = matcher.group();
-	        src_portRule = matchSrcp.substring(matchSrcp.lastIndexOf("\n  ")+3, matchSrcp.lastIndexOf(")"));
+	        String matchp = matcher.group();
+	        attribute = matchp.substring(matchp.lastIndexOf("\n  ")+3, matchp.lastIndexOf(")"));
 	        //System.out.println("///SrcPRule " + dstRule + "////");
 		}
-		return src_portRule;
-	}
-	private String firewallAutoConfigSearchDstPort(Node n, String nrOfRule){
-		String tosearch="define-fun .*"+n.getName()+".*_auto_dstp_"+nrOfRule+".* Int\n  .*\\)";
-		Pattern pattern = Pattern.compile(tosearch);
-		Matcher matcher = pattern.matcher(model);
-		String dst_portRule = "null";
-		while (matcher.find()) {
-	        String matchDstp = matcher.group();
-	        dst_portRule = matchDstp.substring(matchDstp.lastIndexOf("\n  ")+3, matchDstp.lastIndexOf(")"));
-	        //System.out.println("///DstPRule " + dstRule + "////");
-		}
-		return dst_portRule;
+		return attribute;
 	}
 	/**
 	 * Set the firewall auto-configurated rules in the XML according to the verifoo output
@@ -144,7 +149,13 @@ public class Translator {
 	public void setFirewallAutoConfig(){
 		List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.FIREWALL) && n.getConfiguration().getFirewall().getElements().isEmpty()).collect(Collectors.toList());
 		List<String> nodes = g.getNode().stream().map(n -> n.getName()).collect(Collectors.toList());
+		List<Elements> listOfRules = new ArrayList<>();
 		autoNodes.forEach(n -> {
+	        String defAction = firewallAutoConfigSearchAttribute(stringToSearchAction(n, "default_action"));
+	        ActionTypes da = defAction.equals("true")? ActionTypes.ALLOW : ActionTypes.DENY;
+			n.getConfiguration().getFirewall().setDefaultAction(da);
+			System.out.println("Auto DEFAULT ACTION for " + n.getName() + " -> " + da);
+			
 			String tosearch="define-fun .*"+n.getName()+".*_auto_src.* Address\n  \\(ip_constructor .*\\)\\)";
 			Pattern pattern = Pattern.compile(tosearch);
 			Matcher matcher = pattern.matcher(model);
@@ -183,22 +194,121 @@ public class Translator {
 		        String nodeDstName = firewallAutoConfigSearchDst(n, nrOfRule);
 		        //System.out.println(nodeDstName);
 		        e.setDestination(nodeDstName);
-		        String src_port = firewallAutoConfigSearchSrcPort(n, nrOfRule);
-		        //System.out.println(src_port);
-		        e.setSrcPort(Integer.parseInt(src_port));
-		        String dst_port = firewallAutoConfigSearchDstPort(n, nrOfRule);
-		        //System.out.println(dst_port);
-		        e.setDstPort(Integer.parseInt(dst_port));
+		        
+		        String start_src_port = firewallAutoConfigSearchAttribute(stringToSearchPort(n, nrOfRule, "start", "src"));
+		        String end_src_port = firewallAutoConfigSearchAttribute(stringToSearchPort(n, nrOfRule, "end", "src"));
+		        String src_port = translateFWRule(start_src_port, end_src_port);
+		        if(!src_port.equals("*"))
+		        	e.setSrcPort(src_port);
+		        //System.out.println(e.getSrcPort());
+		        
+		        String start_dst_port = firewallAutoConfigSearchAttribute(stringToSearchPort(n, nrOfRule, "start", "dst"));
+		        String end_dst_port = firewallAutoConfigSearchAttribute(stringToSearchPort(n, nrOfRule, "end", "dst"));
+		        String dst_port = translateFWRule(start_dst_port,end_dst_port);
+		        if(!dst_port.equals("*"))
+		        	e.setDstPort(dst_port);
+		        //System.out.println(e.getDstPort());
+		        
+		        String action = firewallAutoConfigSearchAttribute(stringToSearchAction(n, "action"));
+		        ActionTypes a = action.equals("true")? ActionTypes.ALLOW : ActionTypes.DENY;
+		        e.setAction(a);
+		        //System.out.println(e.getAction());
+		        
+		        String protocol = firewallAutoConfigSearchAttribute(stringToSearchProtocol(n, nrOfRule));
+		        if(!L4ProtocolTypes.values()[Integer.parseInt(protocol)].equals(L4ProtocolTypes.ANY))
+		        	e.setProtocol(L4ProtocolTypes.values()[Integer.parseInt(protocol)]);
+		        //System.out.println(e.getAction());
 				if(!e.getSource().equals("0.0.0.0") && !e.getDestination().equals("0.0.0.0")){
-						System.out.println("Auto rule for " + n.getName() + " -> src: " + e.getSource() +
-																				" dst: "+e.getDestination() + 
-																				" src_p: " + e.getSrcPort() + 
-																				" dst_p: " + e.getDstPort());
+						System.out.println("Auto rule for " + n.getName() + " -> action: " + e.getAction() +
+																				" "+e.getProtocol()+"["+
+																			    "src: " + e.getSource() +
+																				":" + e.getSrcPort() +
+																			    " dst: "+e.getDestination() + 
+																				":" + e.getDstPort()+"]");
 						n.getConfiguration().getFirewall().getElements().add(e);
 				}
 		    }
-			
+			//List<Elements> finalRules = groupRules(listOfRules);
+			//n.getConfiguration().getFirewall().getElements().addAll(finalRules);
 		});
+		
+	}
+	private List<Elements> groupRules(List<Elements> listOfRules) {
+		Elements e1 = new Elements();
+		e1.setAction(ActionTypes.DENY);
+		e1.setSource("a");
+		e1.setDestination("b");
+		e1.setSrcPort("10");
+		e1.setDstPort("80");
+		e1.setProtocol(L4ProtocolTypes.TCP);
+		
+		Elements e2 = new Elements();
+		e2.setAction(ActionTypes.DENY);
+		e2.setSource("a");
+		e2.setDestination("b");
+		e2.setSrcPort("15");
+		e2.setDstPort("70");
+		e2.setProtocol(L4ProtocolTypes.UDP);
+		
+		Elements e3 = new Elements();
+		e3.setAction(ActionTypes.DENY);
+		e3.setSource("c");
+		e3.setDestination("b");
+		e3.setSrcPort("15");
+		e3.setDstPort("87");
+		e3.setProtocol(L4ProtocolTypes.TCP);
+		
+		listOfRules.clear();
+		listOfRules.add(e1);
+		listOfRules.add(e2);
+		listOfRules.add(e3);
+		HashMap<String, List<Elements>> finalrules = (HashMap<String, List<Elements>>) listOfRules.stream()
+														.collect( Collectors.groupingBy(e -> e.getSource()+"_"+e.getDestination(), Collectors.toList()));
+		for(Entry<String, List<Elements>> rule : finalrules.entrySet()){
+			String src = rule.getKey().substring(0, rule.getKey().indexOf("_"));
+			String dst = rule.getKey().substring(rule.getKey().indexOf("_")+1);
+			boolean sameAction = true, sameProtocol = true;
+			int minSrc = 65535, maxSrc = 0, minDst = 65535, maxDst = 0;
+			ActionTypes a = rule.getValue().get(0).getAction();
+			L4ProtocolTypes proto = rule.getValue().get(0).getProtocol();
+			for(Elements e : rule.getValue()){
+				sameAction = sameAction & a.equals(e.getAction());
+				if(!sameAction) break;
+				minSrc = Math.min(minSrc, Integer.parseInt(e.getSrcPort()));
+				maxSrc = Math.max(maxSrc, Integer.parseInt(e.getSrcPort()));
+				minDst = Math.min(minDst, Integer.parseInt(e.getDstPort()));
+				maxDst = Math.max(maxDst, Integer.parseInt(e.getDstPort()));
+				sameProtocol = sameProtocol & proto.equals(e.getProtocol());
+			}
+			if(sameAction){
+				System.out.print("new rule => ");
+				Elements newRule = new Elements();
+				newRule.setSource(src);
+				newRule.setDestination(dst);
+				newRule.setSrcPort(minSrc+"-"+maxSrc);
+				newRule.setDstPort(minDst+"-"+maxDst);
+				if(sameProtocol)
+					newRule.setProtocol(proto);
+				else
+					newRule.setProtocol(L4ProtocolTypes.ANY);
+				rule.getValue().clear();
+				rule.getValue().add(newRule);
+				System.out.println(newRule.getProtocol() + "["+ src+":" + newRule.getSrcPort() +  " to " + dst + ": "+ newRule.getDstPort()+"]");
+			}
+			
+		}
+		
+		
+		return listOfRules;
+	}
+	
+	private String translateFWRule(String start_src_port, String end_src_port){
+		int start_src_portInt = Integer.parseInt(start_src_port), end_src_portInt = Integer.parseInt(end_src_port);
+		if(start_src_portInt == 0 && end_src_portInt == 65535)
+			return "*";
+		if(start_src_portInt == end_src_portInt)
+			return String.valueOf(start_src_portInt);
+		return start_src_portInt+"-"+end_src_portInt;
 	}
 	/**
 	 * Set the DPI auto-configurated rules in the XML according to the verifoo output

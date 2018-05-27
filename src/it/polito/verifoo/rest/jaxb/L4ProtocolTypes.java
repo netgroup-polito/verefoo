@@ -13,34 +13,36 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Classe Java per TypeOfHost.
+ * <p>Classe Java per L4ProtocolTypes.
  * 
  * <p>Il seguente frammento di schema specifica il contenuto previsto contenuto in questa classe.
  * <p>
  * <pre>
- * &lt;simpleType name="TypeOfHost">
+ * &lt;simpleType name="L4ProtocolTypes">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="CLIENT"/>
- *     &lt;enumeration value="SERVER"/>
- *     &lt;enumeration value="MIDDLEBOX"/>
+ *     &lt;enumeration value="ANY"/>
+ *     &lt;enumeration value="TCP"/>
+ *     &lt;enumeration value="UDP"/>
+ *     &lt;enumeration value="OTHER"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
  * 
  */
-@XmlType(name = "TypeOfHost")
+@XmlType(name = "L4ProtocolTypes")
 @XmlEnum
-public enum TypeOfHost {
+public enum L4ProtocolTypes {
 
-    CLIENT,
-    SERVER,
-    MIDDLEBOX;
+    ANY,
+    TCP,
+    UDP,
+    OTHER;
 
     public String value() {
         return name();
     }
 
-    public static TypeOfHost fromValue(String v) {
+    public static L4ProtocolTypes fromValue(String v) {
         return valueOf(v);
     }
 

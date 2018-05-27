@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.04.23 alle 03:30:02 PM CEST 
+// Generato il: 2018.05.27 alle 03:34:03 PM CEST 
 //
 
 
@@ -28,8 +28,8 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{}graphs"/>
  *         &lt;element ref="{}Constraints" minOccurs="0"/>
  *         &lt;element ref="{}PropertyDefinition"/>
- *         &lt;element ref="{}Hosts"/>
- *         &lt;element ref="{}Connections"/>
+ *         &lt;element ref="{}Hosts" minOccurs="0"/>
+ *         &lt;element ref="{}Connections" minOccurs="0"/>
  *         &lt;element ref="{}NetworkForwardingPaths" minOccurs="0"/>
  *         &lt;element name="ParsingString" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
@@ -59,9 +59,9 @@ public class NFV {
     protected Constraints constraints;
     @XmlElement(name = "PropertyDefinition", required = true)
     protected PropertyDefinition propertyDefinition;
-    @XmlElement(name = "Hosts", required = true)
+    @XmlElement(name = "Hosts")
     protected Hosts hosts;
-    @XmlElement(name = "Connections", required = true)
+    @XmlElement(name = "Connections")
     protected Connections connections;
     @XmlElement(name = "NetworkForwardingPaths")
     protected NetworkForwardingPaths networkForwardingPaths;

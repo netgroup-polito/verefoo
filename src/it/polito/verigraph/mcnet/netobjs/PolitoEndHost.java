@@ -161,7 +161,8 @@ public class PolitoEndHost extends NetworkObject {
                 predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("seq").apply(p_0), ctx.mkInt(packet.getSeq())));
             if(packet.getUrl() != null)
                 predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("url").apply(p_0), ctx.mkInt(packet.getUrl())));
-
+            /*if(packet.getProto() != null)
+                predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.pf.get("lv4proto").apply(p_0), ctx.mkInt(packet.getL4proto())));*/
         }
         
         //Constraint1 send(politoEndHost, n_0, p) ->

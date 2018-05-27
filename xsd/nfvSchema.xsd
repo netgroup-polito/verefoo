@@ -16,8 +16,8 @@
 				<xsd:element ref="graphs" minOccurs="1" maxOccurs="1"/>
 				<xsd:element ref="Constraints" minOccurs="0" maxOccurs="1"/>
 				<xsd:element ref="PropertyDefinition" minOccurs="1" maxOccurs="1"/>
-				<xsd:element ref="Hosts"/>
-				<xsd:element ref="Connections"/>
+				<xsd:element ref="Hosts" minOccurs="0"/>
+				<xsd:element ref="Connections" minOccurs="0"/>
 				<xsd:element ref="NetworkForwardingPaths" minOccurs="0" maxOccurs="1"/>
 				<xsd:element name="ParsingString" type="xsd:string" minOccurs="0" maxOccurs="1"/>
 			</xsd:sequence>
@@ -196,6 +196,7 @@
 				<xsd:attribute name="graph" type="xsd:long" use="required"/>
 				<xsd:attribute name="src" type="xsd:string" use="required"/>
 				<xsd:attribute name="dst" type="xsd:string" use="required"/>
+				<xsd:attribute name="lv4proto" type="L4ProtocolTypes" default="ANY"/>
 				<xsd:attribute name="src_port" type="xsd:int"/>
 				<xsd:attribute name="dst_port" type="xsd:int"/>
 				<xsd:attribute name="isSat" type="xsd:boolean"/>

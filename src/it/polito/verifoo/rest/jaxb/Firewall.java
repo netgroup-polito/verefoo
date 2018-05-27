@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.04.23 alle 03:30:02 PM CEST 
+// Generato il: 2018.05.27 alle 03:34:03 PM CEST 
 //
 
 
@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -28,6 +29,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence>
  *         &lt;element ref="{}elements" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
+ *       &lt;attribute name="defaultAction" type="{}ActionTypes" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -43,6 +45,8 @@ import javax.xml.bind.annotation.XmlType;
 public class Firewall {
 
     protected List<Elements> elements;
+    @XmlAttribute(name = "defaultAction")
+    protected ActionTypes defaultAction;
 
     /**
      * Gets the value of the elements property.
@@ -71,6 +75,30 @@ public class Firewall {
             elements = new ArrayList<Elements>();
         }
         return this.elements;
+    }
+
+    /**
+     * Recupera il valore della proprietà defaultAction.
+     * 
+     * @return
+     *     possible object is
+     *     {@link ActionTypes }
+     *     
+     */
+    public ActionTypes getDefaultAction() {
+        return defaultAction;
+    }
+
+    /**
+     * Imposta il valore della proprietà defaultAction.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ActionTypes }
+     *     
+     */
+    public void setDefaultAction(ActionTypes value) {
+        this.defaultAction = value;
     }
 
 }

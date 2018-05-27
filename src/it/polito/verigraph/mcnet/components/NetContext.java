@@ -52,6 +52,7 @@ public class NetContext extends Core{
     public List<Tuple<BoolExpr, String>> softConstrAutoConf;
     public List<Tuple<BoolExpr, String>> softConstrAutoPlace;
     public List<Tuple<BoolExpr, String>> softConstrWildcard;
+    public List<Tuple<BoolExpr, String>> softConstrPorts;
     List<Core> policies;
 
     public HashMap<String,NetworkObject> nm; //list of nodes, callable by node name
@@ -99,6 +100,7 @@ public class NetContext extends Core{
         softConstrAutoConf = new ArrayList<>();
         softConstrAutoPlace = new ArrayList<>();
         softConstrWildcard = new ArrayList<>(); 
+        softConstrPorts = new ArrayList<>(); 
         policies = new ArrayList<Core>();
         
         //variable true that is always true
@@ -173,6 +175,11 @@ public class NetContext extends Core{
         	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
 			solver.AssertSoft(t._1, -10, t._2);
 		}
+        //System.out.println("Nr of net context ports soft constraint " + softConstrPorts.stream().distinct().count());
+        for (Tuple<BoolExpr, String> t : softConstrPorts) {
+        	//System.out.println(t._1 + "\n with value " + 1 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, 1, t._2);
+		}
     }
 
     public int[] getIpFromString(String ipString) {
@@ -245,9 +252,9 @@ public class NetContext extends Core{
         // -   options: A representation for IP options. (Integer)
 
         String[] fieldNames = new String[]{
-                "src","dest","inner_src","inner_dest","origin","orig_body","body","seq","proto","src_port", "dest_port", "emailFrom","url","options","encrypted"};
+                "src","dest","inner_src","inner_dest","origin","orig_body","body","seq", "lv4proto", "src_port", "dest_port", "proto", "emailFrom","url","options","encrypted"};
         Sort[] srt = new Sort[]{
-        		address,address,address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),
+        		address,address,address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),
                 ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkBoolSort()};
         Constructor packetcon = ctx.mkConstructor("packet", "is_packet", fieldNames, srt, null);
         packet = ctx.mkDatatypeSort("packet",  new Constructor[] {packetcon});

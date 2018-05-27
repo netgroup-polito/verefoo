@@ -63,7 +63,7 @@ public class Main {
                          m.marshal( root, out ); 
                         
                         // unmarshal a document into a tree of Java content objects*/
-                        NFV root = (NFV) u.unmarshal( new FileInputStream(   "./testfile/Performance/bgInternet2_2Nodes.xml"  ) );
+                        NFV root = (NFV) u.unmarshal( new FileInputStream(   "./testfile/Isolation/nfv5nodes7hostsSAT-Wildcards-II.xml"  ) );
                         
                         //root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/current.xml" ) );
                         //NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/bug1.xml" ) );

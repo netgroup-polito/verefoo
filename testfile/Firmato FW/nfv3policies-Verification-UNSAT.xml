@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
+  <graphs>
+    <graph id="0">
+     <node functional_type="WEBCLIENT" name="nodeA">
+        <neighbour name="node1"/>
+        <configuration description="A simple description" name="confA">
+          <webclient nameWebServer="nodeB"/>
+        </configuration>
+      </node>
+	  <node functional_type="WEBCLIENT" name="nodeC">
+        <neighbour name="node1"/>
+        <configuration description="A simple description" name="confA">
+          <webclient nameWebServer="nodeB"/>
+        </configuration>
+      </node>
+	  <node functional_type="WEBCLIENT" name="nodeE">
+        <neighbour name="node1"/>
+        <configuration description="A simple description" name="confA">
+          <webclient nameWebServer="nodeB"/>
+        </configuration>
+      </node>
+      <node functional_type="FIREWALL" name="node1">
+        <neighbour name="nodeA"/>
+        <neighbour name="nodeC"/>
+        <neighbour name="nodeE"/>
+		<neighbour name="node3"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall defaultAction="DENY">
+            <elements>
+				 <action>ALLOW</action>
+             	 <source>nodeA</source>
+             	 <destination>nodeB</destination>
+				 <src_port>9-90</src_port>
+				 <dst_port>80</dst_port>
+            </elements>
+			<elements>
+				 <action>ALLOW</action>
+             	 <source>nodeC</source>
+             	 <destination>nodeB</destination>
+            </elements>
+          </firewall>
+        </configuration>
+      </node>
+	   <node functional_type="FIREWALL" name="node3">
+        <neighbour name="node1"/>
+        <neighbour name="nodeB"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall>
+            <elements>
+             	 <source>nodeC</source>
+             	 <destination>nodeB</destination>
+				 <src_port>2-90</src_port>
+				 <dst_port>80</dst_port>
+            </elements>
+			<elements>
+             	 <source>nodeE</source>
+             	 <destination>nodeB</destination>
+            </elements>
+          </firewall>
+        </configuration>
+      </node>
+      <node functional_type="WEBSERVER" name="nodeB">
+		<neighbour name="node3"/>
+        <configuration description="A simple description" name="confB">
+          <webserver>
+          	<name>nodeB</name>
+          </webserver>
+        </configuration>
+      </node>
+    </graph>
+  </graphs>
+  <Constraints>
+	  <NodeConstraints/>
+	  <BandwidthConstraints/>
+  </Constraints>
+  <PropertyDefinition>
+		<Property graph="0" name="IsolationProperty" src="nodeC" dst="nodeB" src_port="10" dst_port="80"/> 	
+  		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB" src_port="11" dst_port="80"/> 			
+  		<Property graph="0" name="ReachabilityProperty" src="nodeE" dst="nodeB" src_port="15" dst_port="80"/> 			
+  </PropertyDefinition>
+  <Hosts>
+  	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeA"/>
+  	<Host name="hostC" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeC"/>
+  	<Host name="hostE" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="nodeE"/>
+  	<Host name="host1" cpu="1" cores="4" memory="16" diskStorage="50" maxVNF="5" type="MIDDLEBOX">
+		<SupportedVNF functional_type="FIREWALL"/>
+	</Host>
+  	<Host name="hostB" cpu="2" cores="2" memory="4" diskStorage="50" type="SERVER" fixedEndpoint="nodeB"/>
+  </Hosts>
+   <Connections>
+  	<Connection sourceHost="hostA" destHost="host1" avgLatency ="1"/>
+  	<Connection sourceHost="hostC" destHost="host1" avgLatency ="1"/>
+  	<Connection sourceHost="hostE" destHost="host1" avgLatency ="1"/>
+  	<Connection sourceHost="host1" destHost="hostB" avgLatency ="1"/>
+  </Connections>
+  <ParsingString></ParsingString>
+</NFV>

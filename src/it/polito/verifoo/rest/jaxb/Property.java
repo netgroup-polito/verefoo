@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.04.23 alle 03:30:02 PM CEST 
+// Generato il: 2018.05.27 alle 03:34:03 PM CEST 
 //
 
 
@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="graph" use="required" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="src" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="dst" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="lv4proto" type="{}L4ProtocolTypes" default="ANY" />
  *       &lt;attribute name="src_port" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="dst_port" type="{http://www.w3.org/2001/XMLSchema}int" />
  *       &lt;attribute name="isSat" type="{http://www.w3.org/2001/XMLSchema}boolean" />
@@ -61,6 +62,8 @@ public class Property {
     protected String src;
     @XmlAttribute(name = "dst", required = true)
     protected String dst;
+    @XmlAttribute(name = "lv4proto")
+    protected L4ProtocolTypes lv4Proto;
     @XmlAttribute(name = "src_port")
     protected Integer srcPort;
     @XmlAttribute(name = "dst_port")
@@ -202,6 +205,34 @@ public class Property {
      */
     public void setDst(String value) {
         this.dst = value;
+    }
+
+    /**
+     * Recupera il valore della proprietà lv4Proto.
+     * 
+     * @return
+     *     possible object is
+     *     {@link L4ProtocolTypes }
+     *     
+     */
+    public L4ProtocolTypes getLv4Proto() {
+        if (lv4Proto == null) {
+            return L4ProtocolTypes.ANY;
+        } else {
+            return lv4Proto;
+        }
+    }
+
+    /**
+     * Imposta il valore della proprietà lv4Proto.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link L4ProtocolTypes }
+     *     
+     */
+    public void setLv4Proto(L4ProtocolTypes value) {
+        this.lv4Proto = value;
     }
 
     /**

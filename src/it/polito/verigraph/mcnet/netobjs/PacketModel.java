@@ -18,6 +18,7 @@ public class PacketModel {
     private DatatypeExpr ip_dest;
     private Integer body;
     private Integer seq;
+    private Integer l4proto;
     private Integer proto;
     private Integer emailFrom;
     private Integer url;
@@ -65,5 +66,11 @@ public class PacketModel {
     public void setOptions(Integer options) {
         this.options = options;
     }
+	public Integer getL4proto() {
+		return l4proto;
+	}
+	public void setL4proto(Integer l4proto) {
+		this.l4proto = l4proto;
+	}
 
 }

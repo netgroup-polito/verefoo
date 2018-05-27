@@ -54,6 +54,7 @@ public class PacketWrapper extends PacketModel {
 	}
 
 	public void setProperties(Property prop, NetContext nctx) {
+		
 		if(prop.getHTTPDefinition() != null){
 			String body = prop.getHTTPDefinition().getBody();
 			String options = prop.getHTTPDefinition().getOptions();
