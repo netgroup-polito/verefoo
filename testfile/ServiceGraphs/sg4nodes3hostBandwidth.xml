@@ -70,9 +70,9 @@
 			<NodeMetrics node="node3" reqStorage="10"/>
 			<NodeMetrics node="node4" reqStorage="10"/>
 	  </NodeConstraints>
-	  <BandwidthConstraints>
-			<BandwidthMetrics src="node4" dst="node2" reqLatency="10"/>
-	  </BandwidthConstraints>
+	  <LinkConstraints>
+			<LinkMetrics src="node4" dst="node2" reqLatency="10"/>
+	  </LinkConstraints>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		

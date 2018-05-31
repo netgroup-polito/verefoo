@@ -65,9 +65,9 @@
   </graphs>
   <Constraints>
 	  <NodeConstraints/>
-	  <BandwidthConstraints>
-			<BandwidthMetrics src="node4" dst="node2" reqLatency="10"/>
-	  </BandwidthConstraints>
+	  <LinkConstraints>
+			<LinkMetrics src="node4" dst="node2" reqLatency="10"/>
+	  </LinkConstraints>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 		

@@ -70,7 +70,7 @@
 			<NodeMetrics node="node3" reqStorage="10"/>
 			<NodeMetrics node="node4" reqStorage="10"/>
 	  </NodeConstraints>
-	  <BandwidthConstraints/>
+	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 		

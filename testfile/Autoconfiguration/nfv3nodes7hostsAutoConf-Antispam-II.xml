@@ -51,7 +51,7 @@
   </graphs>
   <Constraints>
 	  <NodeConstraints/>
-	  <BandwidthConstraints/>
+	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
 		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 

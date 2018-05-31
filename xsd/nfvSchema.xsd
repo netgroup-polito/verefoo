@@ -77,7 +77,7 @@
 		<xsd:complexType>
 			<xsd:sequence>
 				<xsd:element ref="NodeConstraints" maxOccurs="1"/>
-				<xsd:element ref="BandwidthConstraints" maxOccurs="1"/>
+				<xsd:element ref="LinkConstraints" maxOccurs="1"/>
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
@@ -98,10 +98,10 @@
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:element name="BandwidthConstraints">
+	<xsd:element name="LinkConstraints">
 		<xsd:complexType>
 			<xsd:sequence>
-       	 		<xsd:element name="BandwidthMetrics" minOccurs="0" maxOccurs="unbounded">
+       	 		<xsd:element name="LinkMetrics" minOccurs="0" maxOccurs="unbounded">
 					<xsd:complexType>
 			            <xsd:attribute name="src" type="xsd:string" use="required" />
 			            <xsd:attribute name="dst" type="xsd:string" use="required" />

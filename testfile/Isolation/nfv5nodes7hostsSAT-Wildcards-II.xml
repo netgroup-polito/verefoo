@@ -34,7 +34,7 @@
   </graphs>
   <Constraints>
 	  <NodeConstraints/>
-	  <BandwidthConstraints/>
+	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="IsolationProperty" src="10.0.0.0" dst="30.0.5.2"/> 		

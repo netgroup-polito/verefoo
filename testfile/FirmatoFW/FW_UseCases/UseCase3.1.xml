@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
+  <graphs>
+    <graph id="0">
+     <node functional_type="WEBCLIENT" name="a">
+        <neighbour name="fw1"/>
+        <configuration description="A simple description" name="confA">
+          <webclient nameWebServer="s1"/>
+        </configuration>
+      </node>
+     <node functional_type="WEBCLIENT" name="b">
+        <neighbour name="fw1"/>
+        <configuration description="A simple description" name="confC">
+          <webclient nameWebServer="s1"/>
+        </configuration>
+      </node>
+     <node functional_type="WEBCLIENT" name="c">
+        <neighbour name="fw1"/>
+        <configuration description="A simple description" name="confC">
+          <webclient nameWebServer="s2"/>
+        </configuration>
+      </node>
+      <node functional_type="FIREWALL" name="fw1">
+        <neighbour name="a"/>
+        <neighbour name="b"/>
+        <neighbour name="c"/>
+		<neighbour name="s1"/>
+		<neighbour name="s2"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall/>
+        </configuration>
+      </node>
+      <node functional_type="WEBSERVER" name="s1">
+		<neighbour name="fw1"/>
+        <configuration description="A simple description" name="confB">
+          <webserver>
+          	<name>s1</name>
+          </webserver>
+        </configuration>
+      </node>
+      <node functional_type="WEBSERVER" name="s2">
+		<neighbour name="fw1"/>
+        <configuration description="A simple description" name="confB">
+          <webserver>
+          	<name>s2</name>
+          </webserver>
+        </configuration>
+      </node>
+    </graph>
+  </graphs>
+  <Constraints>
+	  <NodeConstraints/>
+	  <LinkConstraints/>
+  </Constraints>
+  <PropertyDefinition>
+		<Property graph="0" name="ReachabilityProperty" src="a" dst="s1" src_port="10" dst_port="90"/> 					
+		<Property graph="0" name="ReachabilityProperty" src="b" dst="s1" src_port="8" dst_port="80"/> 				
+		<Property graph="0" name="IsolationProperty" src="c" dst="s2" src_port="9" dst_port="60"/> 				
+  </PropertyDefinition>
+  <ParsingString></ParsingString>
+</NFV>

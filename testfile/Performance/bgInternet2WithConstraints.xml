@@ -70,11 +70,11 @@
 			<NodeMetrics node="node3" nrOfOperations="4500" maxNodeLatency="10" memory="2" reqStorage="50" cores="1"/>
 			<NodeMetrics node="node4" nrOfOperations="1000" maxNodeLatency="10" memory="2" reqStorage="38" cores="2"/>
 	  </NodeConstraints>
-	  <BandwidthConstraints>
-			<BandwidthMetrics src="node1" dst="node2" reqLatency="10000"/>
-			<BandwidthMetrics src="node2" dst="node3" reqLatency="10000"/>
-			<BandwidthMetrics src="node3" dst="node4" reqLatency="10000"/>
-	  </BandwidthConstraints>
+	  <LinkConstraints>
+			<LinkMetrics src="node1" dst="node2" reqLatency="10000"/>
+			<LinkMetrics src="node2" dst="node3" reqLatency="10000"/>
+			<LinkMetrics src="node3" dst="node4" reqLatency="10000"/>
+	  </LinkConstraints>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 		

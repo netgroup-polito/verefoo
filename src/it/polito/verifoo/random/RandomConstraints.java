@@ -4,13 +4,13 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import it.polito.verifoo.rest.jaxb.*;
-import it.polito.verifoo.rest.jaxb.BandwidthConstraints.BandwidthMetrics;
+import it.polito.verifoo.rest.jaxb.LinkConstraints.LinkMetrics;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;;
 
 public class RandomConstraints {
 	Random random;
 	NodeConstraints nodeConstraints = new NodeConstraints();
-	BandwidthConstraints bandwidthConstraints = new BandwidthConstraints();
+	LinkConstraints linkConstraints = new LinkConstraints();
 	/**
 	 * Creates a totally random generated set of constraints for Verifoo
 	 * @param random a random number generator
@@ -34,7 +34,7 @@ public class RandomConstraints {
 			for(Node dst : g.getMiddle()){
 				if(src.getNeighbour().stream().map(nei -> nei.getName()).collect(Collectors.toList()).contains(dst.getName())){
 					if(random.nextBoolean())
-						bandwidthConstraints.getBandwidthMetrics().add(randomBandwidthMetrics(src,dst));
+						linkConstraints.getLinkMetrics().add(randomLinkMetrics(src,dst));
 				}
 			}
 		}
@@ -58,8 +58,8 @@ public class RandomConstraints {
 	
 
 
-	private BandwidthMetrics randomBandwidthMetrics(Node src, Node dst) {
-		BandwidthMetrics m = new BandwidthMetrics();
+	private LinkMetrics randomLinkMetrics(Node src, Node dst) {
+		LinkMetrics m = new LinkMetrics();
 		m.setSrc(src.getName());
 		m.setDst(dst.getName());
 		m.setReqLatency(random.nextInt(1000)+1);
@@ -77,8 +77,8 @@ public class RandomConstraints {
 	 * 
 	 * @return the bandwidth constraints
 	 */
-	public BandwidthConstraints getBandwidthConstraints() {
-		return bandwidthConstraints;
+	public LinkConstraints getBandwidthConstraints() {
+		return linkConstraints;
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class RandomConstraints {
 	public Constraints getConstraints(){
 		Constraints c = new Constraints();
 		c.setNodeConstraints(nodeConstraints);
-		c.setBandwidthConstraints(bandwidthConstraints);
+		c.setLinkConstraints(linkConstraints);
 		return c;
 	}
 

@@ -21,7 +21,7 @@ import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 
 import it.polito.verifoo.components.RoutingTable;
 import it.polito.verifoo.rest.jaxb.*;
-import it.polito.verifoo.rest.jaxb.BandwidthConstraints.BandwidthMetrics;
+import it.polito.verifoo.rest.jaxb.LinkConstraints.LinkMetrics;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verigraph.mcnet.components.*;
 import it.polito.verigraph.mcnet.components.Checker.Prop;
@@ -55,10 +55,10 @@ public class VerifooProxy {
 		private List<Path> paths;
 		int clientServerCombinations = 0;
 		private List<NodeMetrics> nodeMetrics;
-		private List<BandwidthMetrics> bandwidthMetrics;
+		private List<LinkMetrics> linkMetrics;
 		private int nrOfConditions;
 		private ConditionStringBuilder cb;
-		private HashMap<Node, Tuple<ArrayList<RoutingTable>, ArrayList<BandwidthMetrics>>> routingMap;
+		private HashMap<Node, Tuple<ArrayList<RoutingTable>, ArrayList<LinkMetrics>>> routingMap;
 		/**
 		 * Public constructor for the verifoo proxy service
 		 * @param graph The graph that will be deployed on the network
@@ -79,7 +79,7 @@ public class VerifooProxy {
 		    this.connections = conns!=null ? conns.getConnection() : new ArrayList<>();
 		    this.graph=graph;
 		    this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
-		    this.bandwidthMetrics = constraints.getBandwidthConstraints().getBandwidthMetrics();
+		    this.linkMetrics = constraints.getLinkConstraints().getLinkMetrics();
 		    this.paths = paths;
 			nctx = NetContextGenerator.generate(ctx,nodes);
 			autoctx = new AutoContext(ctx);
@@ -557,7 +557,7 @@ public class VerifooProxy {
 						//logger.debug("Adding to the routing map " + n.getName());
 						routingMap.put(n, new Tuple<>(new ArrayList<>(), new ArrayList<>()));
 					}
-					Tuple<ArrayList<RoutingTable>, ArrayList<BandwidthMetrics>> tuple = routingMap.get(n);
+					Tuple<ArrayList<RoutingTable>, ArrayList<LinkMetrics>> tuple = routingMap.get(n);
 					tuple._1.addAll(rt);
 				}
 			}
@@ -690,7 +690,7 @@ public class VerifooProxy {
 							}
 						}*/
 					}
-					List<BandwidthMetrics> bConstraints = bandwidthMetrics.stream().filter(b -> b.getSrc().equals(n.getName())).collect(Collectors.toList());
+					List<LinkMetrics> bConstraints = linkMetrics.stream().filter(b -> b.getSrc().equals(n.getName())).collect(Collectors.toList());
 					//logger.debug(n.getName() + " has this bandwidth constraints: " + bConstraints);
 					//logger.debug(n.getName() + " uses the previous next hop for the following destinations: " + destinations);
 					//net.internalRoutingOptimizationSG(netobjs.get(n), destinations, netobjs.get(next));
@@ -701,7 +701,7 @@ public class VerifooProxy {
 						//logger.debug("Adding to the routing map " + n.getName());
 						routingMap.put(n, new Tuple<>(new ArrayList<>(), new ArrayList<>()));
 					}
-					Tuple<ArrayList<RoutingTable>, ArrayList<BandwidthMetrics>> tuple = routingMap.get(n);
+					Tuple<ArrayList<RoutingTable>, ArrayList<LinkMetrics>> tuple = routingMap.get(n);
 					tuple._1.addAll(rt);
 					tuple._2.addAll(bConstraints);
 				}
@@ -819,6 +819,8 @@ public class VerifooProxy {
 				if(source == null || dest == null)
 					throw new BadGraphError("Error in the property definition", EType.INVALID_PROPERTY_DEFINITION);
 				logger.debug("Adding check on "+ p.getName() + " from " + source.getName() + " to "+ dest.getName());
+
+				System.out.println(p.getName() + "\t src: " + source.getName() + " dst: "+ dest.getName() + " protocol: "+ p.getLv4Proto()+ "["+p.getSrcPort()+":"+p.getDstPort()+"]");
 				switch (p.getName()) {
 				case ISOLATION_PROPERTY: 
 						check.propertyAdd(netobjs.get(source), netobjs.get(dest), Prop.ISOLATION, p);

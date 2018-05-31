@@ -44,9 +44,9 @@
 			<NodeMetrics node="node1" nrOfOperations="1000" maxNodeLatency="10" reqStorage="10" cores="1"/>
 			<NodeMetrics node="node2" nrOfOperations="1000" maxNodeLatency="20" reqStorage="10" cores="2"/>
 	  </NodeConstraints>
-	  <BandwidthConstraints>
-			<BandwidthMetrics src="node1" dst="node2" reqLatency="10"/>
-	  </BandwidthConstraints>
+	  <LinkConstraints>
+			<LinkMetrics src="node1" dst="node2" reqLatency="10"/>
+	  </LinkConstraints>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 		

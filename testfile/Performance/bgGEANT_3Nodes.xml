@@ -52,7 +52,7 @@
   </graphs>
   <Constraints>
 	  <NodeConstraints/>
-	  <BandwidthConstraints/>
+	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 		

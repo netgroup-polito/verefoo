@@ -79,9 +79,9 @@ forward packets other than HTTP. That is why this test was unsat.
 			<NodeMetrics node="node4" reqStorage="10"/>
 			<NodeMetrics node="node5" reqStorage="10"/>
 	  </NodeConstraints>
-	  <BandwidthConstraints>
-			<BandwidthMetrics src="node4" dst="node2" reqLatency="10"/>
-	  </BandwidthConstraints>
+	  <LinkConstraints>
+			<LinkMetrics src="node4" dst="node2" reqLatency="10"/>
+	  </LinkConstraints>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB" src_port="10" dst_port="110">

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
+  <graphs>
+    <graph id="0">
+     <node functional_type="WEBCLIENT" name="10.0.0.1">
+        <neighbour name="fw1"/>
+        <configuration description="A simple description" name="confA">
+          <webclient nameWebServer="100.100.100.100"/>
+        </configuration>
+      </node>
+     <node functional_type="WEBCLIENT" name="10.0.0.2">
+        <neighbour name="fw1"/>
+        <configuration description="A simple description" name="confC">
+          <webclient nameWebServer="100.100.100.100"/>
+        </configuration>
+      </node>
+     <node functional_type="WEBCLIENT" name="20.1.1.5">
+        <neighbour name="fw1"/>
+        <configuration description="A simple description" name="confC">
+          <webclient nameWebServer="100.100.100.200"/>
+        </configuration>
+      </node>
+      <node functional_type="FIREWALL" name="fw1">
+        <neighbour name="10.0.0.1"/>
+        <neighbour name="10.0.0.2"/>
+        <neighbour name="20.1.1.5"/>
+		<neighbour name="100.100.100.100"/>
+		<neighbour name="100.100.100.200"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall/>
+        </configuration>
+      </node>
+      <node functional_type="WEBSERVER" name="100.100.100.100">
+		<neighbour name="fw1"/>
+        <configuration description="A simple description" name="confB">
+          <webserver>
+          	<name>100.100.100.100</name>
+          </webserver>
+        </configuration>
+      </node>
+      <node functional_type="WEBSERVER" name="100.100.100.200">
+		<neighbour name="fw1"/>
+        <configuration description="A simple description" name="confB">
+          <webserver>
+          	<name>100.100.100.200</name>
+          </webserver>
+        </configuration>
+      </node>
+    </graph>
+  </graphs>
+  <Constraints>
+	  <NodeConstraints/>
+	  <LinkConstraints/>
+  </Constraints>
+  <PropertyDefinition>
+		<Property graph="0" name="IsolationProperty" src="10.0.0.1" dst="100.100.100.100" src_port="10" dst_port="90"/> 					
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.2" dst="100.100.100.100" src_port="20" dst_port="80"/> 				
+		<Property graph="0" name="IsolationProperty" src="20.1.1.5" dst="100.100.100.200" src_port="9" dst_port="60"/> 				
+  </PropertyDefinition>
+  <ParsingString></ParsingString>
+</NFV>

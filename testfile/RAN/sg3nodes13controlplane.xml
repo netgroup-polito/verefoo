@@ -140,15 +140,15 @@
 			<NodeMetrics node="MME" nrOfOperations="1"
 				maxNodeLatency="1" reqStorage="1" cores="1" />
 		</NodeConstraints>
-		<BandwidthConstraints>
-			<!-- <BandwidthMetrics src="MAC1" dst="RLC1" reqLatency="1"/> <BandwidthMetrics 
+		<LinkConstraints>
+			<!-- <LinkMetrics src="MAC1" dst="RLC1" reqLatency="1"/> <LinkMetrics 
 				src="MAC2" dst="RLC2" reqLatency="1"/> 
-				<BandwidthMetrics src="RLC2" dst="PDCP"	reqLatency="1"/> -->
-			<BandwidthMetrics src="MAC1" dst="RLC1" reqLatency="1"/> <BandwidthMetrics 
+				<LinkMetrics src="RLC2" dst="PDCP"	reqLatency="1"/> -->
+			<LinkMetrics src="MAC1" dst="RLC1" reqLatency="1"/> <LinkMetrics 
 				src="MAC2" dst="RLC2" reqLatency="1"/>
-			<!-- <BandwidthMetrics src="RLC1" dst="PDCP" reqLatency="1"/> <BandwidthMetrics 
+			<!-- <LinkMetrics src="RLC1" dst="PDCP" reqLatency="1"/> <LinkMetrics 
 				src="RLC2" dst="PDCP" reqLatency="1"/> -->
-		</BandwidthConstraints>
+		</LinkConstraints>
 	</Constraints>
 	<PropertyDefinition>
 		<Property graph="0" name="ReachabilityProperty" src="NR1"

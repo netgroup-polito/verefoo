@@ -95,8 +95,8 @@
 			<NodeMetrics node="node3" nrOfOperations="4500" maxNodeLatency="10" reqStorage="10" cores="1"/>
 			<NodeMetrics node="node4" nrOfOperations="1000" reqStorage="10" cores="2"/>
 	  </NodeConstraints>
-	  <BandwidthConstraints>
-	  </BandwidthConstraints>
+	  <LinkConstraints>
+	  </LinkConstraints>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeD"/> 		

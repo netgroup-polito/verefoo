@@ -60,7 +60,7 @@
 		<NodeMetrics node="node1" optional="true"/>
 		<NodeMetrics node="node3" optional="true"/>
 	  </NodeConstraints>
-	  <BandwidthConstraints/>
+	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="ReachabilityProperty" src="nodeC" dst="nodeB"/> 

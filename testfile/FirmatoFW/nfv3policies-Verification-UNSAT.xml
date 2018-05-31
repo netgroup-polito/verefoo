@@ -72,7 +72,7 @@
   </graphs>
   <Constraints>
 	  <NodeConstraints/>
-	  <BandwidthConstraints/>
+	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
 		<Property graph="0" name="IsolationProperty" src="nodeC" dst="nodeB" src_port="10" dst_port="80"/> 	

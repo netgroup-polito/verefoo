@@ -361,6 +361,8 @@ public class AclFirewall extends NetworkObject{
 			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq( start_dstp, ctx.mkInt(0)),"fw_auto_port"));
 			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq( end_srcp, ctx.mkInt(nctx.MAX_PORT)),"fw_auto_port"));
 			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq( end_dstp, ctx.mkInt(nctx.MAX_PORT)),"fw_auto_port"));
+			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( ctx.mkSub((ArithExpr)start_srcp, (ArithExpr)end_srcp) , ctx.mkInt(0)),"fw_auto_port"));
+			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( ctx.mkSub((ArithExpr)start_dstp, (ArithExpr)end_dstp) , ctx.mkInt(0)),"fw_auto_port"));
  			rules.add(ctx.mkAnd(
  								//ctx.mkEq(nctx.pf.get("src").apply(p_0), src),
  								//ctx.mkEq(nctx.pf.get("dest").apply(p_0), dst)//,

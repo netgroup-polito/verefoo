@@ -250,14 +250,14 @@
 			<NodeMetrics node="PGW3" nrOfOperations="1"
 				maxNodeLatency="1" reqStorage="1" cores="200" />
 		</NodeConstraints>
-		<BandwidthConstraints>
-			<!-- <BandwidthMetrics src="MAC1" dst="RLC1" reqLatency="1"/> <BandwidthMetrics 
-				src="MAC2" dst="RLC2" reqLatency="1"/> <BandwidthMetrics src="RLC2" dst="PDCP" 
+		<LinkConstraints>
+			<!-- <LinkMetrics src="MAC1" dst="RLC1" reqLatency="1"/> <LinkMetrics 
+				src="MAC2" dst="RLC2" reqLatency="1"/> <LinkMetrics src="RLC2" dst="PDCP" 
 				reqLatency="1"/> -->
-			<!-- <BandwidthMetrics src="MAC1" dst="RLC1" reqLatency="1"/> <BandwidthMetrics 
+			<!-- <LinkMetrics src="MAC1" dst="RLC1" reqLatency="1"/> <LinkMetrics 
 				src="MAC2" dst="RLC2" reqLatency="1"/> -->
-			<!-- <BandwidthMetrics src="RLC1" dst="PDCP1" reqLatency="1"/> -->
-		</BandwidthConstraints>
+			<!-- <LinkMetrics src="RLC1" dst="PDCP1" reqLatency="1"/> -->
+		</LinkConstraints>
 	</Constraints>
 	<PropertyDefinition>
 		<Property graph="0" name="ReachabilityProperty" src="NR1"

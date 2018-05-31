@@ -139,7 +139,6 @@ public class Translator {
 		while (matcher.find()) {
 	        String matchp = matcher.group();
 	        attribute = matchp.substring(matchp.lastIndexOf("\n  ")+3, matchp.lastIndexOf(")"));
-	        //System.out.println("///SrcPRule " + dstRule + "////");
 		}
 		return attribute;
 	}
@@ -198,14 +197,14 @@ public class Translator {
 		        String start_src_port = firewallAutoConfigSearchAttribute(stringToSearchPort(n, nrOfRule, "start", "src"));
 		        String end_src_port = firewallAutoConfigSearchAttribute(stringToSearchPort(n, nrOfRule, "end", "src"));
 		        String src_port = translateFWRule(start_src_port, end_src_port);
-		        if(!src_port.equals("*"))
+		        //if(!src_port.equals("null") && !src_port.equals("*"))
 		        	e.setSrcPort(src_port);
 		        //System.out.println(e.getSrcPort());
 		        
 		        String start_dst_port = firewallAutoConfigSearchAttribute(stringToSearchPort(n, nrOfRule, "start", "dst"));
 		        String end_dst_port = firewallAutoConfigSearchAttribute(stringToSearchPort(n, nrOfRule, "end", "dst"));
 		        String dst_port = translateFWRule(start_dst_port,end_dst_port);
-		        if(!dst_port.equals("*"))
+		        //if(!dst_port.equals("null") && !dst_port.equals("*"))
 		        	e.setDstPort(dst_port);
 		        //System.out.println(e.getDstPort());
 		        
@@ -215,15 +214,15 @@ public class Translator {
 		        //System.out.println(e.getAction());
 		        
 		        String protocol = firewallAutoConfigSearchAttribute(stringToSearchProtocol(n, nrOfRule));
-		        if(!L4ProtocolTypes.values()[Integer.parseInt(protocol)].equals(L4ProtocolTypes.ANY))
+		        //if(!protocol.equals("null") && !L4ProtocolTypes.values()[Integer.parseInt(protocol)].equals(L4ProtocolTypes.ANY))
 		        	e.setProtocol(L4ProtocolTypes.values()[Integer.parseInt(protocol)]);
 		        //System.out.println(e.getAction());
 				if(!e.getSource().equals("0.0.0.0") && !e.getDestination().equals("0.0.0.0")){
 						System.out.println("Auto rule for " + n.getName() + " -> action: " + e.getAction() +
-																				" "+e.getProtocol()+"["+
-																			    "src: " + e.getSource() +
-																				":" + e.getSrcPort() +
+																				" src: " + e.getSource() +
 																			    " dst: "+e.getDestination() + 
+																				" "+ e.getProtocol()+
+																				"["+ e.getSrcPort() +
 																				":" + e.getDstPort()+"]");
 						n.getConfiguration().getFirewall().getElements().add(e);
 				}

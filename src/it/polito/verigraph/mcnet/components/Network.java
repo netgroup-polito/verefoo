@@ -30,8 +30,7 @@ import com.microsoft.z3.Z3Exception;
 import it.polito.verifoo.components.RoutingTable;
 import it.polito.verifoo.rest.common.AutoContext;
 import it.polito.verifoo.rest.common.ConditionExtractor;
-import it.polito.verifoo.rest.jaxb.BandwidthConstraints;
-import it.polito.verifoo.rest.jaxb.BandwidthConstraints.BandwidthMetrics;
+import it.polito.verifoo.rest.jaxb.LinkConstraints.LinkMetrics;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verigraph.mcnet.components.Core;
 import it.polito.verigraph.mcnet.components.NetContext;
@@ -401,7 +400,7 @@ public class Network extends Core {
 		}
 	}
 
-	public void routingOptimizationSG(NetworkObject node, ArrayList<RoutingTable> rta, List<BandwidthMetrics> bConstraints) {
+	public void routingOptimizationSG(NetworkObject node, ArrayList<RoutingTable> rta, List<LinkMetrics> bConstraints) {
 		// Policy is of the form predicate -> node
 				Expr p_0 = ctx.mkConst(node + "_composition_p_0", nctx.packet);
 				Expr n_0 = ctx.mkConst(node + "_composition_n_0", nctx.node);
@@ -558,7 +557,7 @@ public class Network extends Core {
 				}
 	}
 	
-	public void routingOptimizationSGOptional(NetworkObject node, ArrayList<RoutingTable> rta, List<BandwidthMetrics> bConstraints, AutoContext autoctx) {
+	public void routingOptimizationSGOptional(NetworkObject node, ArrayList<RoutingTable> rta, List<LinkMetrics> bConstraints, AutoContext autoctx) {
 		// Policy is of the form predicate -> node
 		Expr p_0 = ctx.mkConst(node + "_composition_p_0", nctx.packet);
 		Expr n_0 = ctx.mkConst(node + "_composition_n_0", nctx.node);
@@ -655,7 +654,7 @@ public class Network extends Core {
 																			ctx.mkAnd(ctx.mkOr(nextHopsWithOptional.toArray(tmpWithOptional))    , ctx.mkAnd(optionalInBetweenTmp.toArray(tmp2)))
 																	)
 													,1, null, null, null, null);
-						//System.out.println("Special with optional conditions: " + initialWithOptional);
+						System.out.println("Special with optional conditions: " + initialWithOptional);
 					}else{
 						BoolExpr[] tmpWithOptional = new BoolExpr[nextHopsWithOptional.size()];
 						initialWithOptional = ctx.mkForall(new Expr[] { n_0,p_0 },
@@ -663,7 +662,7 @@ public class Network extends Core {
 														ctx.mkOr(nextHopsWithOptional.toArray(tmpWithOptional))
 												)
 								,1, null, null, null, null);
-						//System.out.println("Optional conditions: " + initialWithOptional);
+						System.out.println("Optional conditions: " + initialWithOptional);
 					}
 				}else{
 					BoolExpr[] tmpWithOptional = new BoolExpr[nextHopsWithOptional.size()];
@@ -672,7 +671,7 @@ public class Network extends Core {
 													ctx.mkOr(nextHopsWithOptional.toArray(tmpWithOptional))
 											)
 							,1, null, null, null, null);
-					//System.out.println("Optional conditions: " + initialWithOptional);
+					System.out.println("Optional conditions: " + initialWithOptional);
 				}
 			}
 			if(nextHopsWithoutOptional.size() > 0){
@@ -691,7 +690,7 @@ public class Network extends Core {
 																			ctx.mkAnd(ctx.mkOr(nextHopsWithoutOptional.toArray(tmpWithoutOptional))  , ctx.mkAnd(optionalInBetweenTmp.toArray(tmp2)))
 																	)
 													,1, null, null, null, null);
-						//System.out.println("Special without optional conditions: " + initialWithoutOptional);
+						System.out.println("Special without optional conditions: " + initialWithoutOptional);
 					}
 				}else{
 					BoolExpr[] tmpWithoutOptional = new BoolExpr[nextHopsWithoutOptional.size()];
@@ -700,7 +699,7 @@ public class Network extends Core {
 																		ctx.mkOr(nextHopsWithoutOptional.toArray(tmpWithoutOptional))
 																)
 												,1, null, null, null, null);
-					//System.out.println("No optional conditions: " + initialWithoutOptional);
+					System.out.println("No optional conditions: " + initialWithoutOptional);
 				}
 			}
 			
@@ -733,11 +732,11 @@ public class Network extends Core {
 			if(optional){
 				mkImplies = ctx.mkImplies( initialWithOptional,implication);
 				choosenInitial = initialWithOptional;
-				//System.out.println("Condition with optional: " + choosenInitial + " => " + implication);
+				System.out.println("Condition with optional: " + choosenInitial + " => " + implication);
 			}else{
 				mkImplies = ctx.mkImplies( initialWithoutOptional,implication);
 				choosenInitial = initialWithoutOptional;
-				//System.out.println("Condition without optional: " + choosenInitial + " => " + implication);
+				System.out.println("Condition without optional: " + choosenInitial + " => " + implication);
 			}
 			//BoolExpr initial = ctx.mkEq(n_0,node_dict.get(entry.getKey()).getZ3Node());
 			if(!initials.containsKey(entry.getKey())){
@@ -766,7 +765,7 @@ public class Network extends Core {
 		}
 	}
 
-	public void routingOptimizationSG2(NetworkObject node, ArrayList<RoutingTable> rta, List<BandwidthMetrics> bConstraints, Map<String, List<DatatypeExpr>> destinations) {
+	public void routingOptimizationSG2(NetworkObject node, ArrayList<RoutingTable> rta, List<LinkMetrics> bConstraints, Map<String, List<DatatypeExpr>> destinations) {
 		// Policy is of the form predicate -> node
 		Expr p_0 = ctx.mkConst(node + "_composition_p_0", nctx.packet);
 		Expr n_0 = ctx.mkConst(node + "_composition_n_0", nctx.node);

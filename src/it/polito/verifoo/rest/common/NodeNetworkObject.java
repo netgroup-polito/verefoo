@@ -192,15 +192,8 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 						//set default action based on nIsolation and nReachability
 						boolean defaultAction;
 						if(n.getConfiguration().getFirewall().getDefaultAction() == null){
-							if(nIsolationProp == 0){
-								defaultAction = true;
-							}
-							else if(nReachabilityProp == 0){
-								defaultAction = false;
-							}else{
-								//with this, the behaviour is compliant with the previous version of Verifoo fw model
-								defaultAction = true;
-							}
+							//more conservative approach
+							defaultAction = false;
 						}else{
 							defaultAction = n.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW);
 						}
@@ -218,7 +211,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 						
 					}
 					else{
-						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,n.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)});
+						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,(n.getConfiguration().getFirewall().getDefaultAction() == null || n.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW))});
 						generateAcl(n, fw);
 					}
 					this.put(n, fw);

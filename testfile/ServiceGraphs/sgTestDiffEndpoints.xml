@@ -112,8 +112,8 @@
   </graphs>
    <Constraints>
 	  <NodeConstraints/>
-	  <BandwidthConstraints>
-	  </BandwidthConstraints>
+	  <LinkConstraints>
+	  </LinkConstraints>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 		

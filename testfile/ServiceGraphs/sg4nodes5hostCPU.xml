@@ -70,9 +70,9 @@
 			<NodeMetrics node="node3" nrOfOperations="4500000000" maxNodeLatency="1" reqStorage="10" cores="1"/>
 			<NodeMetrics node="node4" nrOfOperations="1000" reqStorage="10" cores="2"/>
 	  </NodeConstraints>
-	  <BandwidthConstraints>
-			<BandwidthMetrics src="node1" dst="node2" reqLatency="10"/>
-	  </BandwidthConstraints>
+	  <LinkConstraints>
+			<LinkMetrics src="node1" dst="node2" reqLatency="10"/>
+	  </LinkConstraints>
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 		
