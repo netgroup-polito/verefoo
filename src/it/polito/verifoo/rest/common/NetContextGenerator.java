@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import com.microsoft.z3.Context;
 
 import it.polito.verifoo.rest.jaxb.Node;
+import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verigraph.mcnet.components.NetContext;
 
 /**
@@ -22,11 +23,15 @@ public final class NetContextGenerator{
 	 * @param nodes Node List
 	 * @return NetContext
 	 */
-	public static NetContext generate(Context ctx,List<Node> nodes){
+	public static NetContext generate(Context ctx,List<Node> nodes,List<Property> properties){
 		String[] nodesname={};
 		nodesname=nodes.stream().map((n)->n.getName()).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(nodesname);
 		//suppose nodename=nodeip;
 		String[] nodesip=nodesname;
-	    return new NetContext(ctx,nodesname,nodesip);
+		String[] src_portRange={};
+		src_portRange=properties.stream().map(p -> p.getSrcPort()).filter(p -> p!=null).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(src_portRange);
+		String[] dst_portRange={};
+		dst_portRange=properties.stream().map(p -> p.getDstPort()).filter(p -> p!=null).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(dst_portRange);
+	    return new NetContext(ctx,nodesname,nodesip,src_portRange, dst_portRange);
 	}
 }

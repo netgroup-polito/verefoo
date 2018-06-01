@@ -5,6 +5,7 @@ import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
+import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.IntNum;
 
 public class AclFirewallRule {
@@ -58,6 +59,24 @@ public class AclFirewallRule {
 		this.end_src_port = ctx.mkInt(end_src_port);
 		this.start_dst_port = ctx.mkInt(start_dst_port);
 		this.end_dst_port = ctx.mkInt(end_dst_port);
+		this.protocol = ctx.mkInt(protocol);
+		this.directional = directional;
+	}
+	public AclFirewallRule(NetContext nctx, Context ctx, boolean action, String source, String destination,
+			String string_src_port, String string_dst_port, int protocol, boolean directional) {
+		DatatypeExpr sourceExpr = nctx.createIpAddress(source);
+		DatatypeExpr destinationExpr = nctx.createIpAddress(destination);
+		this.nctx = nctx;
+		this.ctx = ctx;
+		this.action = action? ctx.mkTrue():ctx.mkFalse();
+		this.source = sourceExpr;
+		this.destination = destinationExpr;
+		PortInterval pS = new PortInterval(string_src_port);
+		PortInterval pD = new PortInterval(string_dst_port);
+		this.start_src_port = ctx.mkInt(pS.getStart());
+		this.end_src_port = ctx.mkInt(pS.getEnd());
+		this.start_dst_port = ctx.mkInt(pD.getStart());
+		this.end_dst_port = ctx.mkInt(pD.getEnd());
 		this.protocol = ctx.mkInt(protocol);
 		this.directional = directional;
 	}
@@ -201,9 +220,13 @@ public class AclFirewallRule {
 		}
 		//System.out.println(ipEqual);
 		return ctx.mkAnd(ipEqual,
+						ctx.mkGe((IntExpr)nctx.port_functions.get("start").apply(nctx.pf.get("src_port").apply(p0)),(IntExpr)this.start_src_port),
+		        		ctx.mkLe((IntExpr)nctx.port_functions.get("end").apply(nctx.pf.get("src_port").apply(p0)),(IntExpr)this.end_src_port),
+		        		ctx.mkGe((IntExpr)nctx.port_functions.get("start").apply(nctx.pf.get("dest_port").apply(p0)),(IntExpr)this.start_dst_port),
+		        		ctx.mkLe((IntExpr)nctx.port_functions.get("end").apply(nctx.pf.get("dest_port").apply(p0)),(IntExpr)this.end_dst_port)
 						//ctx.mkEq(nctx.pf.get("src").apply(p_0),tp._1),ctx.mkEq(nctx.pf.get("dest").apply(p_0),tp._2),
-						ctx.mkGe((ArithExpr) nctx.pf.get("src_port").apply(p0),this.start_src_port),ctx.mkLe((ArithExpr) nctx.pf.get("src_port").apply(p0),this.end_src_port),
-						ctx.mkGe((ArithExpr) nctx.pf.get("dest_port").apply(p0),this.start_dst_port),ctx.mkLe((ArithExpr) nctx.pf.get("dest_port").apply(p0),this.end_dst_port)
+						//ctx.mkGe((ArithExpr) nctx.pf.get("src_port").apply(p0),this.start_src_port),ctx.mkLe((ArithExpr) nctx.pf.get("src_port").apply(p0),this.end_src_port),
+						//ctx.mkGe((ArithExpr) nctx.pf.get("dest_port").apply(p0),this.start_dst_port),ctx.mkLe((ArithExpr) nctx.pf.get("dest_port").apply(p0),this.end_dst_port)
 						);
 						
 					

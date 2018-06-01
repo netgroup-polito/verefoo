@@ -10,12 +10,7 @@ package it.polito.verigraph.mcnet.components;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Constructor;
 import com.microsoft.z3.Context;
@@ -25,18 +20,11 @@ import com.microsoft.z3.EnumSort;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
-import com.microsoft.z3.IntSort;
 import com.microsoft.z3.Optimize;
-import com.microsoft.z3.Solver;
 import com.microsoft.z3.Sort;
-import com.microsoft.z3.Statistics.Entry;
 import com.microsoft.z3.Optimize.Handle;
 
 import it.polito.verigraph.mcnet.netobjs.DumbNode;
-import it.polito.verifoo.components.Host;
-
-import it.polito.verifoo.components.Node;
-import it.polito.verigraph.mcnet.components.Checker.Prop;
 import it.polito.verigraph.mcnet.components.Core;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 
@@ -57,10 +45,12 @@ public class NetContext extends Core{
 
     public HashMap<String,NetworkObject> nm; //list of nodes, callable by node name
     public HashMap<String,DatatypeExpr> am; // list of addresses, callable by address name
+    public HashMap<String,DatatypeExpr> pm; // list of port range, callable by string
     public HashMap<String,FuncDecl> pf;
     Context ctx;
     public EnumSort node;
-	public DatatypeSort address;
+	public DatatypeSort address, port_range;
+    public HashMap<String,FuncDecl> port_functions;
     public FuncDecl /*src_port,dest_port,*/nodeHasAddr,addrToNode,send,recv;
     public DatatypeSort packet;
     
@@ -91,10 +81,12 @@ public class NetContext extends Core{
         this.ctx = ctx;
         nm = new HashMap<String,NetworkObject>(); //list of nodes, callable by node name
         am = new HashMap<String,DatatypeExpr>(); // list of addresses, callable by address name
+        pm = new HashMap<String,DatatypeExpr>();
         pf= new HashMap<String,FuncDecl>() ;
         ip_functions = new HashMap<String,FuncDecl>();
+        port_functions = new HashMap<String,FuncDecl>();
         constraints = new ArrayList<BoolExpr>();
-        mkTypes((String[])args[0],(String[])args[1]);
+        mkTypes((String[])args[0],(String[])args[1], (String[])args[2], (String[])args[3]);
 
         softConstraints = new ArrayList<>();
         softConstrAutoConf = new ArrayList<>();
@@ -178,7 +170,7 @@ public class NetContext extends Core{
         //System.out.println("Nr of net context ports soft constraint " + softConstrPorts.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrPorts) {
         	//System.out.println(t._1 + "\n with value " + 1 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, 1, t._2);
+			solver.AssertSoft(t._1, -1, t._2);
 		}
     }
 
@@ -193,14 +185,58 @@ public class NetContext extends Core{
     	}
     	return res;
     }
-    private void mkTypes (String[] nodes, String[] addresses){
-        //Nodes in a network
+    
+    public DatatypeExpr createIpAddress(String ip){
+    	DatatypeExpr fd = (DatatypeExpr) ctx.mkConst(ip, address);
+    	try{
+        	constraints.add(equalIpToIntArray(fd, getIpFromString(ip)));
+        }catch(NumberFormatException e){
+    		//251 is a prime number, to reduce collisions
+    		int symbolicAddr = Math.abs(ip.hashCode()%251);
+    		constraints.add(equalIpToIntArray(fd, getIpFromString(symbolicAddr + "." + symbolicAddr + "." + symbolicAddr + "." + symbolicAddr)));
+    		//System.out.println(new_addr[i] + " is not a valid ip address, using it as a label with fake address " + symbolicAddr);            	
+        }
+    	return fd;
+    }
+    
+    private void mkTypes (String[] nodes, String[] addresses, String[] srcp_ranges, String[] dstp_ranges){
+    	//Port ranges for this network         
+        String[] new_port_ranges = new String[srcp_ranges.length+dstp_ranges.length+1];
+        for(int k=0;k<srcp_ranges.length;k++)
+        	new_port_ranges[k] = srcp_ranges[k];
+        for(int k=srcp_ranges.length;k<srcp_ranges.length+dstp_ranges.length;k++)
+        	new_port_ranges[k] = dstp_ranges[k-srcp_ranges.length];
+        new_port_ranges[new_port_ranges.length-1] = "null";
+        //port_range = ctx.mkEnumSort("Port Range", new_port_ranges);
+        String[] portRangeFieldNames = new String[]{"start","end"};
+        Sort[] sortPort = new Sort[]{ctx.mkIntSort(),ctx.mkIntSort()};
+        Constructor portRangeCon = ctx.mkConstructor("port_range_constructor", "is_portRange", portRangeFieldNames, sortPort, null);
+        port_range = ctx.mkDatatypeSort("PortRange", new Constructor[] {portRangeCon});
+        for(int i=0;i<portRangeFieldNames.length;i++){
+        	port_functions.put(portRangeFieldNames[i], port_range.getAccessors()[0][i]); // port_functions to get port's function declarations by name
+        }
+        
+        for(int i=0;i<new_port_ranges.length;i++){
+        	DatatypeExpr fd = (DatatypeExpr) ctx.mkConst(new_port_ranges[i], port_range);
+            //System.out.println(fd.toString().replace("|", ""));
+            pm.put(fd.toString().replace("|", ""),fd);
+            try{
+            	constraints.add(equalPortRangeToInterval(fd, new PortInterval(new_port_ranges[i])));
+            }catch(NumberFormatException e){
+            	if(new_port_ranges[i].equals("null")){
+            		constraints.add(equalPortRangeToInterval(fd,  new PortInterval("0-"+this.MAX_PORT)));
+            	}else{
+            		throw e;
+            	}
+            	
+            }
+        }
+        
+        //Nodes in this network
         node = ctx.mkEnumSort("Node", nodes);
-
         for(int i=0;i<node.getConsts().length;i++){
-            DatatypeExpr fd  = (DatatypeExpr)node.getConst(i);    
+            DatatypeExpr fd  = (DatatypeExpr)node.getConst(i);   
             DumbNode dn =new DumbNode(ctx,new Object[]{fd});
-
             nm.put(fd.toString().replace("|", ""),dn);
         }
 
@@ -254,7 +290,7 @@ public class NetContext extends Core{
         String[] fieldNames = new String[]{
                 "src","dest","inner_src","inner_dest","origin","orig_body","body","seq", "lv4proto", "src_port", "dest_port", "proto", "emailFrom","url","options","encrypted"};
         Sort[] srt = new Sort[]{
-        		address,address,address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),
+        		address,address,address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),  /*ctx.mkIntSort(),ctx.mkIntSort(),*/  port_range,port_range,
                 ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkBoolSort()};
         Constructor packetcon = ctx.mkConstructor("packet", "is_packet", fieldNames, srt, null);
         packet = ctx.mkDatatypeSort("packet",  new Constructor[] {packetcon});
@@ -330,7 +366,7 @@ public class NetContext extends Core{
                 ctx.mkForall(new Expr[]{n_0, n_1, p_0 },
                         ctx.mkImplies(ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0)
                                                 ),(BoolExpr)recv.apply(n_0, n_1, p_0 )),1,null,null,null,null));
-
+/*
         // Constraint6 send(n_0, n_1, p, t_0) -> p.src_port > 0 && p.dest_port < MAX_PORT
         constraints.add(
                 ctx.mkForall(new Expr[]{n_0, n_1, p_0 },
@@ -344,8 +380,8 @@ public class NetContext extends Core{
                         ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
                                 ctx.mkAnd( ctx.mkGe((IntExpr)pf.get("dest_port").apply(p_0),(IntExpr)ctx.mkInt(0)),
                                         ctx.mkLt((IntExpr)pf.get("dest_port").apply(p_0),(IntExpr) ctx.mkInt(MAX_PORT)))),1,null,null,null,null));
-
-
+         
+*/
         // Extra constriants for supporting the VPN gateway
         constraints.add(
                 ctx.mkForall(new Expr[]{n_0, n_1, p_0},
@@ -415,27 +451,36 @@ public class NetContext extends Core{
 		constraints.add(ctx.mkForall(new Expr[]{n_0, n_1, p_0},
                                 	ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
                                 				ctx.mkAnd( 
-						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_1").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_1").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
 						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_1").apply(pf.get("src").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_2").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_2").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
 						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_2").apply(pf.get("src").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_3").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_3").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
 						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_3").apply(pf.get("src").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_4").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_4").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
 						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_4").apply(pf.get("src").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                                ctx.mkGe((IntExpr)ip_functions.get("ipAddr_1").apply(pf.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                                ctx.mkGe((IntExpr)ip_functions.get("ipAddr_1").apply(pf.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
 						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_1").apply(pf.get("dest").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_2").apply(pf.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_2").apply(pf.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
 						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_2").apply(pf.get("dest").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_3").apply(pf.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_3").apply(pf.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
 						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_3").apply(pf.get("dest").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_4").apply(pf.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_4").apply(pf.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
 						                                ctx.mkLe((IntExpr)ip_functions.get("ipAddr_4").apply(pf.get("dest").apply(p_0)),(IntExpr) ctx.mkInt(255))
 							                              )
                                 				 )
                 
         ,1,null,null,null,null));
-
+		constraints.add(ctx.mkForall(new Expr[]{n_0, n_1, p_0},
+            	ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
+            				ctx.mkAnd( 
+	                        		ctx.mkGe((IntExpr)port_functions.get("start").apply(pf.get("src_port").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+	                        		ctx.mkLe((IntExpr)port_functions.get("end").apply(pf.get("src_port").apply(p_0)),(IntExpr)ctx.mkInt(this.MAX_PORT)),
+	                        		ctx.mkGe((IntExpr)port_functions.get("start").apply(pf.get("dest_port").apply(p_0)),(IntExpr)ctx.mkInt(0)),
+	                        		ctx.mkLe((IntExpr)port_functions.get("end").apply(pf.get("dest_port").apply(p_0)),(IntExpr)ctx.mkInt(this.MAX_PORT))
+		                              )
+            				 )
+            	,1,null,null,null,null));
 
     }
     
@@ -486,6 +531,12 @@ public class NetContext extends Core{
                 		ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(am.get("wildcard"))),
                 		ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip2), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))
                 		)});
+    }
+    
+    public BoolExpr equalPortRangeToInterval(Expr port_expr, PortInterval i){
+        return ctx.mkAnd(new BoolExpr[]{
+                ctx.mkEq(port_functions.get("start").apply(port_expr), ctx.mkInt(i.getStart())),
+                ctx.mkEq(port_functions.get("end").apply(port_expr), ctx.mkInt(i.getEnd()))});
     }
 
     public BoolExpr equalIpToIntArray(Expr ip_expr, int[] array){

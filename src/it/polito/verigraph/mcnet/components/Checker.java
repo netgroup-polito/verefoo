@@ -229,14 +229,14 @@ public class Checker {
 		propertyAdd(src, dest, property);
 		Expr p_0 = ctx.mkConst("check_reach_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
 		Expr n_0 = ctx.mkConst("check_reach_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
-		int src_port = (otherConstr == null || otherConstr.getSrcPort() == null) ? 0:otherConstr.getSrcPort(),
-				dst_port = (otherConstr == null || otherConstr.getDstPort() == null) ? 0:otherConstr.getDstPort(),
-				lv4proto = (otherConstr == null || otherConstr.getLv4Proto() == null) ? 0:otherConstr.getLv4Proto().ordinal();
+		String src_port = (otherConstr == null || otherConstr.getSrcPort() == null) ? "null":otherConstr.getSrcPort(),
+				dst_port = (otherConstr == null || otherConstr.getDstPort() == null) ? "null":otherConstr.getDstPort();
+		int lv4proto = (otherConstr == null || otherConstr.getLv4Proto() == null) ? 0:otherConstr.getLv4Proto().ordinal();
 		constraintList.add(ctx.mkForall(new Expr[]{n_0, p_0},
 				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(src.getZ3Node(), n_0, p_0)),
 						ctx.mkAnd(ctx.mkEq(nctx.pf.get("lv4proto").apply(p_0), (IntExpr)ctx.mkInt(lv4proto)),
-									ctx.mkEq(nctx.pf.get("src_port").apply(p_0), (IntExpr)ctx.mkInt(src_port)),
-									ctx.mkEq(nctx.pf.get("dest_port").apply(p_0), (IntExpr)ctx.mkInt(dst_port)))),1,null,null,null,null));
+									ctx.mkEq(nctx.pf.get("src_port").apply(p_0), nctx.pm.get(src_port)),
+									ctx.mkEq(nctx.pf.get("dest_port").apply(p_0), nctx.pm.get(dst_port)))),1,null,null,null,null));
 	}
 	public void addReachabilityProperty(NetworkObject src, NetworkObject dest) {
 		

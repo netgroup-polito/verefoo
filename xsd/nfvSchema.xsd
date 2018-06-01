@@ -197,8 +197,8 @@
 				<xsd:attribute name="src" type="xsd:string" use="required"/>
 				<xsd:attribute name="dst" type="xsd:string" use="required"/>
 				<xsd:attribute name="lv4proto" type="L4ProtocolTypes" default="ANY"/>
-				<xsd:attribute name="src_port" type="xsd:int"/>
-				<xsd:attribute name="dst_port" type="xsd:int"/>
+				<xsd:attribute name="src_port" type="xsd:string"/>
+				<xsd:attribute name="dst_port" type="xsd:string"/>
 				<xsd:attribute name="isSat" type="xsd:boolean"/>
 	</xsd:complexType>
 	<xsd:complexType name="HTTPDefinition">

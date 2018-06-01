@@ -15,10 +15,7 @@ import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
-import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Status;
-import com.microsoft.z3.enumerations.Z3_ast_print_mode;
-
 import it.polito.verifoo.components.RoutingTable;
 import it.polito.verifoo.rest.jaxb.*;
 import it.polito.verifoo.rest.jaxb.LinkConstraints.LinkMetrics;
@@ -81,7 +78,7 @@ public class VerifooProxy {
 		    this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
 		    this.linkMetrics = constraints.getLinkConstraints().getLinkMetrics();
 		    this.paths = paths;
-			nctx = NetContextGenerator.generate(ctx,nodes);
+			nctx = NetContextGenerator.generate(ctx,nodes,prop);
 			autoctx = new AutoContext(ctx);
 			net = new Network (ctx,new Object[]{nctx});
 			/* Generate the different network object and map it to XML Node */

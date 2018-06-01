@@ -63,7 +63,7 @@ public class Main {
                          m.marshal( root, out ); 
                         
                         // unmarshal a document into a tree of Java content objects*/
-                        NFV root = (NFV) u.unmarshal( new FileInputStream(   "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-DPI-RR.xml"  ) );
+                        NFV root = (NFV) u.unmarshal( new FileInputStream(   "./testfile/Random/nfv1nodeIPVerif.xml"  ) );
                         
                         //root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/current.xml" ) );
                         //NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/bug1.xml" ) );
@@ -98,11 +98,11 @@ public class Main {
             	logger.error("Error while unmarshalling or marshalling");
                 logger.error(je);
                 System.exit(1);
-            } catch( ClassCastException cce) {
+            /*} catch( ClassCastException cce) {
             	logger.error("Wrong data type found in XML document");
             	logger.error(cce);
                 System.exit(1);
-            } catch (BadGraphError e) {
+            */} catch (BadGraphError e) {
     			logger.error("Graph semantically incorrect");
             	logger.error(e);
                 System.exit(1);

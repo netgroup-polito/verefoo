@@ -85,24 +85,27 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 		if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
 				n.getConfiguration().getFirewall().getElements().forEach((e)->{
 						ArrayList<AclFirewallRule> acl = new ArrayList<>();
-						if(nctx.am.get(e.getSource())!=null&&nctx.am.get(e.getDestination())!=null){
-							String src_port = e.getSrcPort()!=null? e.getSrcPort():"*";
-							String dst_port = e.getDstPort()!=null? e.getDstPort():"*";
-							boolean directional = e.isDirectional()!=null? e.isDirectional():true;
-							int protocol = e.getProtocol()!=null? e.getProtocol().ordinal():0;
-							boolean action;
-							if(e.getAction() != null){
-								if(e.getAction().equals(ActionTypes.ALLOW))
-									action = true;
-								else
-									action = false;
-							}else{
-								//if not specified the action of the rule is the opposite of the default behaviour otherwise the rule would not be necessary
-								if(n.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW))
-									action = false;
-								else
-									action = true;
+						String src_port = e.getSrcPort()!=null? e.getSrcPort():"*";
+						String dst_port = e.getDstPort()!=null? e.getDstPort():"*";
+						boolean directional = e.isDirectional()!=null? e.isDirectional():true;
+						int protocol = e.getProtocol()!=null? e.getProtocol().ordinal():0;
+						boolean action;
+						if(e.getAction() != null){
+							if(e.getAction().equals(ActionTypes.ALLOW))
+								action = true;
+							else
+								action = false;
+						}else{
+							//if not specified the action of the rule is the opposite of the default behaviour otherwise the rule would not be necessary
+							if(n.getConfiguration().getFirewall().getDefaultAction() == null){
+								action = false;
 							}
+							else if(n.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW))
+								action = false;
+							else
+								action = true;
+						}
+						if(nctx.am.get(e.getSource())!=null&&nctx.am.get(e.getDestination())!=null){
 							try{
 								AclFirewallRule rule=new AclFirewallRule(nctx, ctx, action, nctx.am.get(e.getSource()),nctx.am.get(e.getDestination()),
 																			src_port,dst_port, protocol, directional);
@@ -111,11 +114,18 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 							}catch(NumberFormatException ex){
 								throw new BadGraphError(n.getName()+" has invalid configuration: "+ex.getMessage(), EType.INVALID_NODE_CONFIGURATION);
 							}
-							fw.addCompleteAcls(acl);
+							
 						}else{
-							//throw new BadGraphError("You must specify a correct address in "+ n.getName()+ " configuration", EType.INVALID_NODE_CONFIGURATION);
+							try{
+								AclFirewallRule rule=new AclFirewallRule(nctx, ctx, action, e.getSource(),e.getDestination(),
+																			src_port,dst_port, protocol, directional);
+								acl.add(rule);
+							    logger.debug("Adding blocking rule " + acl);
+							}catch(NumberFormatException ex){
+								throw new BadGraphError(n.getName()+" has invalid configuration: "+ex.getMessage(), EType.INVALID_NODE_CONFIGURATION);
+							}
 						}
-					    
+						fw.addCompleteAcls(acl);
 				});
 		}
 		

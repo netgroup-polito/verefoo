@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.05.31 alle 08:59:38 AM CEST 
+// Generato il: 2018.05.31 alle 08:25:09 PM CEST 
 //
 
 
@@ -33,8 +33,8 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="src" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="dst" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="lv4proto" type="{}L4ProtocolTypes" default="ANY" />
- *       &lt;attribute name="src_port" type="{http://www.w3.org/2001/XMLSchema}int" />
- *       &lt;attribute name="dst_port" type="{http://www.w3.org/2001/XMLSchema}int" />
+ *       &lt;attribute name="src_port" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="dst_port" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="isSat" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -65,9 +65,9 @@ public class Property {
     @XmlAttribute(name = "lv4proto")
     protected L4ProtocolTypes lv4Proto;
     @XmlAttribute(name = "src_port")
-    protected Integer srcPort;
+    protected String srcPort;
     @XmlAttribute(name = "dst_port")
-    protected Integer dstPort;
+    protected String dstPort;
     @XmlAttribute(name = "isSat")
     protected Boolean isSat;
 
@@ -240,10 +240,10 @@ public class Property {
      * 
      * @return
      *     possible object is
-     *     {@link Integer }
+     *     {@link String }
      *     
      */
-    public Integer getSrcPort() {
+    public String getSrcPort() {
         return srcPort;
     }
 
@@ -252,10 +252,10 @@ public class Property {
      * 
      * @param value
      *     allowed object is
-     *     {@link Integer }
+     *     {@link String }
      *     
      */
-    public void setSrcPort(Integer value) {
+    public void setSrcPort(String value) {
         this.srcPort = value;
     }
 
@@ -264,10 +264,10 @@ public class Property {
      * 
      * @return
      *     possible object is
-     *     {@link Integer }
+     *     {@link String }
      *     
      */
-    public Integer getDstPort() {
+    public String getDstPort() {
         return dstPort;
     }
 
@@ -276,10 +276,10 @@ public class Property {
      * 
      * @param value
      *     allowed object is
-     *     {@link Integer }
+     *     {@link String }
      *     
      */
-    public void setDstPort(Integer value) {
+    public void setDstPort(String value) {
         this.dstPort = value;
     }
 
