@@ -341,7 +341,7 @@ public class AclFirewall extends NetworkObject{
 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_2").apply(nctx.am.get("null")),dstAuto2), "fw_auto_conf"));
 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_3").apply(nctx.am.get("null")),dstAuto3), "fw_auto_conf"));
 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_4").apply(nctx.am.get("null")),dstAuto4), "fw_auto_conf"));
-			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
+			nctx.softConstrProtoWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
 			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(srcp, nctx.pm.get("null")),"fw_auto_port"));
 			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(dstp, nctx.pm.get("null")),"fw_auto_port"));
  			rules.add(ctx.mkAnd(
@@ -349,7 +349,8 @@ public class AclFirewall extends NetworkObject{
  								//ctx.mkEq(nctx.pf.get("dest").apply(p_0), dst)//,
  								nctx.equalPacketIpToFwIpRule(nctx.pf.get("src").apply(p_0), src),
  								nctx.equalPacketIpToFwIpRule(nctx.pf.get("dest").apply(p_0), dst),
-			 					ctx.mkEq(nctx.pf.get("lv4proto").apply(p_0), proto),
+ 								nctx.equalPacketLv4ProtoToFwPacketLv4Proto(nctx.pf.get("lv4proto").apply(p_0), proto),
+			 					//ctx.mkEq(nctx.pf.get("lv4proto").apply(p_0), proto),
 			 					ctx.mkEq(nctx.pf.get("src_port").apply(p_0), srcp),
 			 					ctx.mkEq(nctx.pf.get("dest_port").apply(p_0), dstp)
 			 					));
@@ -360,9 +361,7 @@ public class AclFirewall extends NetworkObject{
  		BoolExpr[] tmp = new BoolExpr[rules.size()];
  		BoolExpr behaviour;
  		if(this.defaultAction.equals(ctx.mkTrue())){
- 			behaviour = ctx.mkNot(
-							  		ctx.mkOr(rules.toArray(tmp))		
-							  	 );
+ 			behaviour = ctx.mkNot(ctx.mkOr(rules.toArray(tmp)));
  			constraints.add(ctx.mkEq(defaultAction, ctx.mkTrue()));
  			constraints.add(ctx.mkEq(ruleAction, ctx.mkFalse()));
  		}else{
@@ -378,7 +377,6 @@ public class AclFirewall extends NetworkObject{
 								ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, nctx.recv.apply(n_1, fw, p_0), 1, null, null, null, null),
 										behaviour)), 1, null, null, null, null));;
 
- 		BoolExpr[] tmp2 = new BoolExpr[rules.size()];
 		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 },
 										ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, fw, p_0),
 												behaviour), ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, (BoolExpr) nctx.send.apply(new Expr[] { fw, n_1, p_0 }), 1, null, null, null, null))), 

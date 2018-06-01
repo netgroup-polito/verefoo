@@ -97,6 +97,15 @@ public class TestProxyReachability {
 	}
 	
 	@Test
+	public void testNoHost_SAT(){
+		try {
+			test( "./testfile/nfv3nodes-NoHosts.xml", false); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	@Test
 	public void testFW_UNSAT(){
 		try {
 			test( "./testfile/nfv5nodes7hostsUNSAT-FW.xml", false); //Working

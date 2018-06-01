@@ -10,8 +10,6 @@ package it.polito.verigraph.mcnet.components;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -22,7 +20,6 @@ import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Model;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Optimize.Handle;
-import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 
 import it.polito.verifoo.rest.common.AutoContext;
@@ -31,7 +28,6 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
-import it.polito.verigraph.mcnet.netobjs.PacketModel;
 
 /**
  * Various checks for specific properties in the network.

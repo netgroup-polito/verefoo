@@ -49,7 +49,7 @@ public class PortInterval {
 	public boolean overlapsWith(PortInterval other){
 		//System.out.println("Checking overlapping between " + this + " and " + other);
 		if(this.single && other.single){
-			return this.getStart() == other.getStart();
+			return this.getStart() == other.getStart() || this.getStart()+1 == other.getStart();
 		}
 		if(this.single){
 			return this.start >= other.getStart()-1 && this.getEnd() <= other.getEnd()+1;

@@ -10,8 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.NotAllowedException;
-
 import org.apache.logging.log4j.LogManager;
 
 import it.polito.verifoo.rest.jaxb.*;
@@ -201,37 +199,37 @@ public class Translator {
 		        String nodeDstName = firewallAutoConfigSearchDst(n, nrOfRule);
 		        //System.out.println(nodeDstName);
 		        e.setDestination(nodeDstName);
-		        
-		        String src_port = firewallAutoConfigSearchComplexAttribute(z3Translator.stringToSearchFwPort(n, nrOfRule, "src"), z3Translator.Datatype.port_range_constructor);
-		        src_port = src_port.replace(" ", "-");
-		        //if(!src_port.equals("null") && !src_port.equals("*"))
-		        	e.setSrcPort((new PortInterval(src_port).toString()));
-		        //System.out.println(e.getSrcPort());
-		        
-		        String dst_port = firewallAutoConfigSearchComplexAttribute(z3Translator.stringToSearchFwPort(n, nrOfRule, "dst"), z3Translator.Datatype.port_range_constructor);
-		        dst_port = dst_port.replace(" ", "-");
-		        //if(!dst_port.equals("null") && !dst_port.equals("*"))
-		        	e.setDstPort((new PortInterval(dst_port).toString()));
-		        //System.out.println(e.getDstPort());
-		        
-		        String action = firewallAutoConfigSearchPlainAttribute(z3Translator.stringToSearchFwAction(n, "action"));
-		        ActionTypes a = action.equals("true")? ActionTypes.ALLOW : ActionTypes.DENY;
-		        e.setAction(a);
-		        //System.out.println(e.getAction());
-		        
-		        String protocol = firewallAutoConfigSearchPlainAttribute(z3Translator.stringToSearchFwProtocol(n, nrOfRule));
-		        //if(!protocol.equals("null") && !L4ProtocolTypes.values()[Integer.parseInt(protocol)].equals(L4ProtocolTypes.ANY))
-		        	e.setProtocol(L4ProtocolTypes.values()[Integer.parseInt(protocol)]);
-		        //System.out.println(e.getAction());
+
 				if(!e.getSource().equals("0.0.0.0") && !e.getDestination().equals("0.0.0.0")){
-						System.out.println("Auto rule for " + n.getName() + " -> action: " + e.getAction() +
-																				" src: " + e.getSource() +
-																			    " dst: "+e.getDestination() + 
-																				" "+ e.getProtocol()+
-																				"["+ e.getSrcPort() +
-																				":" + e.getDstPort()+"]");
-						listOfRules.add(e);
-						//n.getConfiguration().getFirewall().getElements().add(e);
+			        String src_port = firewallAutoConfigSearchComplexAttribute(z3Translator.stringToSearchFwPort(n, nrOfRule, "src"), z3Translator.Datatype.port_range_constructor);
+			        src_port = src_port.replace(" ", "-");
+			        //if(!src_port.equals("null") && !src_port.equals("*"))
+			        	e.setSrcPort((new PortInterval(src_port).toString()));
+			        //System.out.println(e.getSrcPort());
+			        
+			        String dst_port = firewallAutoConfigSearchComplexAttribute(z3Translator.stringToSearchFwPort(n, nrOfRule, "dst"), z3Translator.Datatype.port_range_constructor);
+			        dst_port = dst_port.replace(" ", "-");
+			        //if(!dst_port.equals("null") && !dst_port.equals("*"))
+			        	e.setDstPort((new PortInterval(dst_port).toString()));
+			        //System.out.println(e.getDstPort());
+			        
+			        String action = firewallAutoConfigSearchPlainAttribute(z3Translator.stringToSearchFwAction(n, "action"));
+			        ActionTypes a = action.equals("true")? ActionTypes.ALLOW : ActionTypes.DENY;
+			        e.setAction(a);
+			        //System.out.println(e.getAction());
+			        
+			        String protocol = firewallAutoConfigSearchPlainAttribute(z3Translator.stringToSearchFwProtocol(n, nrOfRule));
+			        //if(!protocol.equals("null") && !L4ProtocolTypes.values()[Integer.parseInt(protocol)].equals(L4ProtocolTypes.ANY))
+			        	e.setProtocol(L4ProtocolTypes.values()[Integer.parseInt(protocol)]);
+			        //System.out.println(e.getAction());
+					System.out.println("Auto rule for " + n.getName() + " -> action: " + e.getAction() +
+																			" src: " + e.getSource() +
+																		    " dst: "+e.getDestination() + 
+																			" "+ e.getProtocol()+
+																			"["+ e.getSrcPort() +
+																			":" + e.getDstPort()+"]");
+					listOfRules.add(e);
+					//n.getConfiguration().getFirewall().getElements().add(e);
 				}
 		    }
 			List<Elements> finalRules = mergeRules(listOfRules);
@@ -274,6 +272,16 @@ public class Translator {
 		listOfRules.add(e1);
 		listOfRules.add(e3);
 		listOfRules.add(e4);*/
+		/*System.out.println("--------Input Rules-------");
+		listOfRules.forEach(e -> {
+			System.out.println("Rule -> action: " + e.getAction() +
+					" src: " + e.getSource() +
+				    " dst: "+e.getDestination() + 
+					" "+ e.getProtocol()+
+					"["+ e.getSrcPort() +
+					":" + e.getDstPort()+"]");
+		});
+		System.out.println("------------------------");*/
 		HashMap<String, List<Elements>> rulesMapBySource = (HashMap<String, List<Elements>>) listOfRules.stream()
 														.map(e -> new Tuple<Elements,PortInterval>(e, new PortInterval(e.getSrcPort())))
 														.sorted(Comparator.comparing(t -> t._2.getEnd()))
@@ -320,14 +328,13 @@ public class Translator {
 			PortInterval intervalSrc = new PortInterval(last.getSrcPort()), intervalDst = new PortInterval(last.getDstPort());
 			int minSrc = intervalSrc.getStart(), maxSrc = intervalSrc.getEnd(), minDst = intervalDst.getStart(), maxDst = intervalDst.getEnd();
 			boolean overlap = false;
-			L4ProtocolTypes proto = rule.getValue().get(0).getProtocol();
 			for(int i = 1; i < rule.getValue().size(); i++){
 				Elements e = rule.getValue().get(i);
 				PortInterval lastSrcInterval = new PortInterval(last.getSrcPort()), currentSrcInterval = new PortInterval(e.getSrcPort());
 				overlap = lastSrcInterval.overlapsWith(currentSrcInterval);
 				if(!overlap){
-					/*System.out.println("No source overlapping");
-					System.out.println("Rule merged-> action: " + e.getAction() +
+					//System.out.println("No source overlapping");
+					/*System.out.println("Rule merged-> action: " + e.getAction() +
 							" src: " + last.getSource() +
 						    " dst: "+last.getDestination() + 
 							" "+ last.getProtocol()+
@@ -340,8 +347,21 @@ public class Translator {
 				PortInterval lastDstInterval = new PortInterval(last.getDstPort()), currentDstInterval = new PortInterval(e.getDstPort());
 				overlap &= lastDstInterval.overlapsWith(currentDstInterval);
 				if(!overlap){
-					/*System.out.println("No destination overlapping");
-					System.out.println("Rule merged-> action: " + last.getAction() +
+					//System.out.println("No destination overlapping");
+					/*System.out.println("Rule merged-> action: " + last.getAction() +
+							" src: " + last.getSource() +
+						    " dst: "+last.getDestination() + 
+							" "+ last.getProtocol()+
+							"["+ last.getSrcPort() +
+							":" + last.getDstPort()+"]");*/
+					finalRules.add(last);
+					last = e;
+					continue;
+				}
+				overlap &= (last.getProtocol().equals(e.getProtocol()) || last.getProtocol().equals(L4ProtocolTypes.ANY) || e.getProtocol().equals(L4ProtocolTypes.ANY));
+				if(!overlap){
+					System.out.println("No protocol overlapping");
+					/*System.out.println("Rule merged-> action: " + last.getAction() +
 							" src: " + last.getSource() +
 						    " dst: "+last.getDestination() + 
 							" "+ last.getProtocol()+
@@ -358,11 +378,17 @@ public class Translator {
 				maxDst = Math.max(lastDstInterval.getEnd(), currentDstInterval.getEnd());
 
 				Elements newRule = new Elements();
+				newRule.setAction(last.getAction());
 				newRule.setSource(src);
 				newRule.setDestination(dst);
-				newRule.setSrcPort(minSrc+"-"+maxSrc);
-				newRule.setDstPort(minDst+"-"+maxDst);
-				newRule.setProtocol(proto);
+				newRule.setSrcPort((new PortInterval(minSrc+"-"+maxSrc)).toString());
+				newRule.setDstPort((new PortInterval(minDst+"-"+maxDst)).toString());
+
+				if(last.getProtocol().equals(e.getProtocol())){
+					newRule.setProtocol(last.getProtocol());
+				}else{
+					newRule.setProtocol(L4ProtocolTypes.ANY);
+				}
 				//finalRules.add(newRule);
 				//System.out.print("new rule => ");
 				//System.out.println(newRule.getProtocol() + "["+ src+":" + newRule.getSrcPort() +  " to " + dst + ": "+ newRule.getDstPort()+"]");

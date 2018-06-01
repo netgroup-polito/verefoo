@@ -40,6 +40,7 @@ public class NetContext extends Core{
     public List<Tuple<BoolExpr, String>> softConstrAutoConf;
     public List<Tuple<BoolExpr, String>> softConstrAutoPlace;
     public List<Tuple<BoolExpr, String>> softConstrWildcard;
+    public List<Tuple<BoolExpr, String>> softConstrProtoWildcard;
     public List<Tuple<BoolExpr, String>> softConstrPorts;
     List<Core> policies;
 
@@ -92,6 +93,7 @@ public class NetContext extends Core{
         softConstrAutoConf = new ArrayList<>();
         softConstrAutoPlace = new ArrayList<>();
         softConstrWildcard = new ArrayList<>(); 
+        softConstrProtoWildcard = new ArrayList<>(); 
         softConstrPorts = new ArrayList<>(); 
         policies = new ArrayList<Core>();
         
@@ -147,6 +149,11 @@ public class NetContext extends Core{
             policy.addConstraints(solver);
         }
         //System.out.println("======NET CONTEXT SOFT CONSTRAINTS====== ");
+        //System.out.println("Nr of net context proto wildcard soft constraint " + softConstrProtoWildcard.stream().distinct().count());
+        for (Tuple<BoolExpr, String> t : softConstrProtoWildcard) {
+        	//System.out.println(t._1 + "\n with value " + 1000 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, -1000, t._2);
+		}
 		//System.out.println("Nr of net context autoconfiguration soft constraint " + softConstrAutoConf.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
         	//System.out.println(t._1 + "\n with value " + 1000 + ". Node is " + t._2);
@@ -165,7 +172,7 @@ public class NetContext extends Core{
 		//System.out.println("Nr of net context wildcards soft constraint " + softConstrWildcard.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrWildcard) {
         	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, -10, t._2);
+			solver.AssertSoft(t._1, -10000, t._2);
 		}
         //System.out.println("Nr of net context ports soft constraint " + softConstrPorts.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrPorts) {
@@ -481,6 +488,14 @@ public class NetContext extends Core{
 		                              )
             				 )
             	,1,null,null,null,null));
+		constraints.add(ctx.mkForall(new Expr[]{n_0, n_1, p_0},
+            	ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
+            				ctx.mkAnd( 
+	                        		ctx.mkGe((IntExpr)pf.get("lv4proto").apply(p_0),(IntExpr)ctx.mkInt(0)),
+	                        		ctx.mkLe((IntExpr)pf.get("lv4proto").apply(p_0),(IntExpr)ctx.mkInt(3))
+		                              )
+            				 )
+            	,1,null,null,null,null));
 
     }
     
@@ -531,6 +546,14 @@ public class NetContext extends Core{
                 		ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(am.get("wildcard"))),
                 		ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip2), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))
                 		)});
+    }
+    
+    public BoolExpr equalPacketLv4ProtoToFwPacketLv4Proto(Expr proto1, Expr proto2){
+    	return ctx.mkOr(
+	        		ctx.mkEq(proto1, proto2),
+	        		ctx.mkEq(proto2, ctx.mkInt(0))
+	        		);
+    	
     }
     
     public BoolExpr equalPortRangeToInterval(Expr port_expr, PortInterval i){
