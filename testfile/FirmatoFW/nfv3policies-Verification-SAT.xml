@@ -46,7 +46,7 @@
         <neighbour name="node1"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf1">
-          <firewall>
+          <firewall defaultAction="ALLOW">
             <elements>
              	 <source>nodeC</source>
              	 <destination>nodeB</destination>
