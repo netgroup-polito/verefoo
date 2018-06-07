@@ -112,8 +112,8 @@ public class TestFirmatoFW {
     		System.out.println("UNSAT");
     	}
 		long endAll=System.currentTimeMillis();
-        System.out.println("Total time -> " + (endAll-beginAll)+"ms" );
-        root.getPropertyDefinition().getProperty().forEach(p ->{
+        System.out.println("Total time -> " + (endAll-beginAll)+"ms" );	
+        test.getResult().getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(sat, p.isIsSat());
         });
         return tmp;
@@ -140,76 +140,18 @@ public class TestFirmatoFW {
 	public void testFW_UNSAT(){
 		try {
 			List<Node> autoNodes = test( "./testfile/FirmatoFW/nfv3policies-Verification-UNSAT.xml", false, FunctionalTypes.FIREWALL); //Working
-			assertTrue(autoNodes.size() == 1);
 		} catch (Exception e) {
 			fail(e.toString());
 		}
 	}
 	@Test
-	public void testAutoFW_1(){
+	public void testPreProcessingAndMerging(){
 		try {
-			List<Node> autoNodes = test( "./testfile/FirmatoFW/FW_UseCases/UseCase1.1.xml", true, FunctionalTypes.FIREWALL); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
-			assertTrue(e.size() == 2);
-			assertTrue(e.get(0).getSource().equals("A") && e.get(0).getDestination().equals("s1"));
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoFW_2(){
-		try {
-			List<Node> autoNodes = test( "./testfile/FirmatoFW/FW_UseCases/UseCase1.2.xml", true, FunctionalTypes.FIREWALL); //Working
+			List<Node> autoNodes = test( "./testfile/FirmatoFW/Pre-Processing&Merging.xml", true, FunctionalTypes.FIREWALL); //Working
 			assertTrue(autoNodes.size() == 1);
 			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
 			assertTrue(e.size() == 1);
-			assertTrue(e.get(0).getSource().equals("A") && e.get(0).getDestination().equals("s1"));
-			assertTrue(e.get(0).getSrcPort().equals("9-10") && e.get(0).getDstPort().equals("60-90"));
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoFW_3(){
-		try {
-			List<Node> autoNodes = test( "./testfile/FirmatoFW/FW_UseCases/UseCase1.3.xml", true, FunctionalTypes.FIREWALL); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
-			assertTrue(e.size() == 2);
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoFW_4(){
-		try {
-			List<Node> autoNodes = test( "./testfile/FirmatoFW/FW_UseCases/UseCase1.4.xml", true, FunctionalTypes.FIREWALL); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
-			assertTrue(e.size() == 1);
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoFW_5(){
-		try {
-			List<Node> autoNodes = test( "./testfile/FirmatoFW/FW_UseCases/UseCase1.5.xml", true, FunctionalTypes.FIREWALL); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
-			assertTrue(e.size() == 2);
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoFW_6(){
-		try {
-			List<Node> autoNodes = test( "./testfile/FirmatoFW/FW_UseCases/UseCase1.6.xml", true, FunctionalTypes.FIREWALL); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
-			assertTrue(e.size() == 1);
+			assertTrue(e.get(0).getSource().equals("10.0.0.-1"));
 		} catch (Exception e) {
 			fail(e.toString());
 		}

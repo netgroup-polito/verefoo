@@ -84,7 +84,7 @@ public class TestSG {
         // unmarshal a document into a tree of Java content objects
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
         VerifooSerializer test = new VerifooSerializer(root);
-		return root;
+		return test.getResult();
 		
 	}
 	

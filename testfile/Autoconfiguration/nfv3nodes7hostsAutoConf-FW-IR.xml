@@ -19,7 +19,7 @@
         <neighbour name="nodeC"/>
 		<neighbour name="node2"/>
         <configuration description="A simple description" name="conf1">
-          <firewall/>
+          <firewall defaultAction="ALLOW"/>
         </configuration>
       </node>
 	   <node functional_type="NAT" name="node2">
@@ -36,7 +36,7 @@
         <neighbour name="node2"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf3">
-          <firewall/>
+          <firewall defaultAction="ALLOW"/>
         </configuration>
       </node>
       <node functional_type="WEBSERVER" name="nodeB">

@@ -91,7 +91,7 @@ public class TestProxyIsolation {
     	}
 		long endAll=System.currentTimeMillis();
         System.out.println("Total time -> " + (endAll-beginAll)+"ms" );
-        root.getPropertyDefinition().getProperty().forEach(p ->{
+        test.getResult().getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(sat, p.isIsSat());
         });
         return root;
@@ -174,14 +174,6 @@ public class TestProxyIsolation {
 	public void testMAIL_PropertySpec_UNSAT() {
 		try {
 			test( "./testfile/Isolation/nfv2nodes7hostsUNSAT-MAIL-PropertySpec.xml", false); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
-	@Test
-	public void testWEB_PropertySpec_UNSAT() {
-		try {
-			test( "./testfile/Isolation/nfv5nodes7hostsUNSAT-WEB-PropertySpec.xml", false); //Working
 		} catch (Exception e) {
 			fail(e.toString());
 		}		

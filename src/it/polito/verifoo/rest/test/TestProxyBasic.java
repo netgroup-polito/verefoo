@@ -91,7 +91,7 @@ public class TestProxyBasic {
     	}
 		long endAll=System.currentTimeMillis();
         System.out.println("Total time -> " + (endAll-beginAll)+"ms" );
-        root.getPropertyDefinition().getProperty().forEach(p ->{
+        test.getResult().getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(sat, p.isIsSat());
         });
         return;

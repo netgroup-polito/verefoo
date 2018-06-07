@@ -90,7 +90,7 @@ public class TestProxyReachability {
     	}
 		long endAll=System.currentTimeMillis();
         System.out.println("Total time -> " + (endAll-beginAll)+"ms" );
-        root.getPropertyDefinition().getProperty().forEach(p ->{
+        test.getResult().getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(sat, p.isIsSat());
         });
         return;
@@ -99,7 +99,7 @@ public class TestProxyReachability {
 	@Test
 	public void testNoHost_SAT(){
 		try {
-			test( "./testfile/nfv3nodes-NoHosts.xml", false); //Working
+			test( "./testfile/nfv3nodes-NoHosts.xml", true); //Working
 		} catch (Exception e) {
 			fail(e.toString());
 		}
