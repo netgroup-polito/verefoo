@@ -21,9 +21,10 @@ import it.polito.verigraph.mcnet.components.Tuple;
  */
 public class Translator {
 	private String model;
-	private NFV nfv;
+	private NFV nfv, originalNfv;
 	private org.apache.logging.log4j.Logger logger = LogManager.getLogger("mylog");
 	private Graph g;
+	private VerifooNormalizer norm;
 	/**
 	 * Constructor
 	 * @param model The Verifoo output.
@@ -37,11 +38,14 @@ public class Translator {
 	}
 	/**
 	 * Conversion function
+	 * @return 
 	 */
-	public void convert(){
+	public NFV convert(){
 		if(nfv.getHosts() != null) 
 			nfv.getHosts().getHost().forEach(this::searchHost);
 		setAutoConfig();
+		originalNfv.setHosts(nfv.getHosts());
+		return originalNfv;
 	}
 	/**
 	 * Wraps the translation for all the VNFs that can be auto configurated by Verifoo
@@ -71,17 +75,7 @@ public class Translator {
 							host.getNodeRef().add(nr);
 							allocateResources(host, node.getName());
 						}
-					}/*
-					if(model.contains(tosearch)){
-						logger.debug(tosearch);
-						host.setActive(true);
-						NodeRefType nr=new NodeRefType();
-						nr.setNode(node.getName());
-						if(!nodesAlreadyDeployed.contains(node.getName())){
-							host.getNodeRef().add(nr);
-							allocateResources(host, node.getName());
-						}
-					}*/
+					}
 				});
 	}
 	
@@ -145,16 +139,33 @@ public class Translator {
 	 * Set the firewall auto-configurated rules in the XML according to the verifoo output
 	 */
 	public void setFirewallAutoConfig(){
-		List<Elements> listOfRules = new ArrayList<>();
-		List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.FIREWALL) && n.getConfiguration().getFirewall().getElements().isEmpty()).collect(Collectors.toList());
-		List<String> nodes = g.getNode().stream().map(n -> n.getName()).collect(Collectors.toList());
+		//List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.FIREWALL) && n.getConfiguration().getFirewall().getElements().isEmpty()).collect(Collectors.toList());
+		List<Node> autoNodes = originalNfv.getGraphs().getGraph().stream().filter(graph -> graph.getId() == g.getId())
+				.flatMap(graph -> graph.getNode().stream())
+				.filter(n ->n.getFunctionalType().equals(FunctionalTypes.FIREWALL) && n.getConfiguration().getFirewall().getElements().isEmpty())
+				.collect(Collectors.toList());List<String> nodes = g.getNode().stream().map(n -> n.getName()).collect(Collectors.toList());
+		/*List<Node> originalAutoNodes = originalNfv.getGraphs().getGraph().stream()
+						.flatMap(graph -> graph.getNode().stream())
+						.filter(n -> autoNodes.stream().map(auN -> auN.getName()).collect(Collectors.toList()).contains(n.getName()))
+						//.filter(n ->n.getFunctionalType().equals(FunctionalTypes.FIREWALL) && n.getConfiguration().getFirewall().getElements().isEmpty())
+						.collect(Collectors.toList());List<String> nodes = g.getNode().stream().map(n -> n.getName()).collect(Collectors.toList());
+		originalAutoNodes.forEach(n->{
+			System.out.println(n.getName());
+		});*/
 		Map<String,String> nameToGroup = new HashMap<>();
 		g.getNode().forEach(n -> {
-			if(n.getGroup() != null)
-				nameToGroup.put(n.getName(), n.getGroup());
+			String name = n.getName();
+			if(norm.getFlowGroups().containsKey(n.getName())){
+				name = norm.getFlowGroups().get(n.getName());
+				
+			}
+			if(norm.getNetworkGroups().containsKey(name))
+				name = norm.getNetworkGroups().get(name);
+			nameToGroup.put(n.getName(), name);
 		});
 		
 		autoNodes.forEach(n -> {
+			List<Elements> listOfRules = new ArrayList<>();
 	        String defAction = firewallAutoConfigSearchPlainAttribute(z3Translator.stringToSearchFwAction(n, "default_action"));
 	        ActionTypes da = defAction.equals("true")? ActionTypes.ALLOW : ActionTypes.DENY;
 			n.getConfiguration().getFirewall().setDefaultAction(da);
@@ -235,6 +246,8 @@ public class Translator {
 			List<Elements> finalRules = mergeRules(listOfRules);
 			n.getConfiguration().getFirewall().getElements().addAll(finalRules);
 		});
+		
+		
 		
 	}
 	private List<Elements> mergeRules(List<Elements> listOfRules) {
@@ -410,8 +423,12 @@ public class Translator {
 	 * Set the DPI auto-configurated rules in the XML according to the verifoo output
 	 */
 	public void setDPIAutoConfig(){
-		List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.DPI) && n.getConfiguration().getDpi().getNotAllowed().isEmpty())
-												   .collect(Collectors.toList());
+		//List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.DPI) && n.getConfiguration().getDpi().getNotAllowed().isEmpty()).collect(Collectors.toList());
+		List<Node> autoNodes = originalNfv.getGraphs().getGraph().stream().filter(graph -> graph.getId() == g.getId())
+				.flatMap(graph -> graph.getNode().stream())
+				.filter(n ->n.getFunctionalType().equals(FunctionalTypes.DPI) && n.getConfiguration().getDpi().getNotAllowed().isEmpty())
+				.collect(Collectors.toList());List<String> nodes = g.getNode().stream().map(n -> n.getName()).collect(Collectors.toList());
+		
 		List<String> bodies = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.ENDHOST))
 												.map(e -> e.getConfiguration().getEndhost().getBody())
 												.collect(Collectors.toList());
@@ -442,8 +459,11 @@ public class Translator {
 	 * Set the antispam auto-configurated rules in the XML according to the verifoo output
 	 */
 	public void setAntispamAutoConfig() {
-		List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.ANTISPAM) && n.getConfiguration().getAntispam().getSource().isEmpty())
-				   .collect(Collectors.toList());
+		//List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.ANTISPAM) && n.getConfiguration().getAntispam().getSource().isEmpty()).collect(Collectors.toList());
+		List<Node> autoNodes = originalNfv.getGraphs().getGraph().stream().filter(graph -> graph.getId() == g.getId())
+				.flatMap(graph -> graph.getNode().stream())
+				.filter(n ->n.getFunctionalType().equals(FunctionalTypes.ANTISPAM) && n.getConfiguration().getAntispam().getSource().isEmpty())
+				.collect(Collectors.toList());List<String> nodes = g.getNode().stream().map(n -> n.getName()).collect(Collectors.toList());
 		List<String> emailFroms = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.ENDHOST))
 						.map(e -> e.getConfiguration().getEndhost().getEmailFrom())
 						.collect(Collectors.toList());
@@ -486,6 +506,13 @@ public class Translator {
 		if(reqResources == null) return;
 		h.setDiskStorage(h.getDiskStorage()-reqResources.getReqStorage());
 		h.setMemory(h.getMemory()-reqResources.getMemory());
+	}
+	public VerifooNormalizer getNormalizer() {
+		return norm;
+	}
+	public void setNormalizer(VerifooNormalizer norm) {
+		this.norm = norm;
+		this.originalNfv = norm.getOriginalNfv();
 	}
 	
 }

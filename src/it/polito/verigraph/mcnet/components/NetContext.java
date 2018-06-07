@@ -154,6 +154,11 @@ public class NetContext extends Core{
         	//System.out.println(t._1 + "\n with value " + 1000 + ". Node is " + t._2);
 			solver.AssertSoft(t._1, -1000, t._2);
 		}
+		//System.out.println("Nr of net context wildcards soft constraint " + softConstrWildcard.stream().distinct().count());
+        for (Tuple<BoolExpr, String> t : softConstrWildcard) {
+        	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, -10000, t._2);
+		}
 		//System.out.println("Nr of net context autoconfiguration soft constraint " + softConstrAutoConf.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
         	//System.out.println(t._1 + "\n with value " + 1000 + ". Node is " + t._2);
@@ -168,11 +173,6 @@ public class NetContext extends Core{
         for (Tuple<BoolExpr, String> t : softConstraints) {
         	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
 			solver.AssertSoft(t._1, 10, t._2);
-		}
-		//System.out.println("Nr of net context wildcards soft constraint " + softConstrWildcard.stream().distinct().count());
-        for (Tuple<BoolExpr, String> t : softConstrWildcard) {
-        	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, -10000, t._2);
 		}
         //System.out.println("Nr of net context ports soft constraint " + softConstrPorts.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrPorts) {
@@ -448,6 +448,7 @@ public class NetContext extends Core{
                                         ctx.mkEq(this.pf.get("orig_body").apply(p_1), this.pf.get("orig_body").apply(p_0)),
                                         ctx.mkEq(this.pf.get("body").apply(p_1), this.pf.get("body").apply(p_0)),
                                         ctx.mkEq(this.pf.get("seq").apply(p_1), this.pf.get("seq").apply(p_0)),
+                                        ctx.mkEq(this.pf.get("lv4proto").apply(p_1), this.pf.get("lv4proto").apply(p_0)),
                                         ctx.mkEq(this.pf.get("proto").apply(p_1), this.pf.get("proto").apply(p_0)),
                                         ctx.mkEq(this.pf.get("src_port").apply(p_1), this.pf.get("src_port").apply(p_0)),
                                         ctx.mkEq(this.pf.get("dest_port").apply(p_1), this.pf.get("dest_port").apply(p_0)),
@@ -581,6 +582,7 @@ public class NetContext extends Core{
                 ctx.mkEq(pf.get("dest").apply(p1), pf.get("dest").apply(p2)),
                 ctx.mkEq(pf.get("origin").apply(p1), pf.get("origin").apply(p2)),
                 ctx.mkEq(pf.get("seq").apply(p1), pf.get("seq").apply(p2)),
+                ctx.mkEq(pf.get("lv4proto").apply(p1), pf.get("lv4proto").apply(p2)),
                 ctx.mkEq(pf.get("src_port").apply(p1),pf.get("src_port").apply(p2)),
                 ctx.mkEq(pf.get("dest_port").apply(p1), pf.get("dest_port").apply(p2)),
                 ctx.mkEq(pf.get("options").apply(p1),pf.get("options").apply(p2))});

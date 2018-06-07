@@ -2,13 +2,7 @@ package it.polito.verifoo.rest.main;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -19,10 +13,7 @@ import javax.xml.validation.SchemaFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
-import com.microsoft.z3.Status;
 import it.polito.verifoo.rest.jaxb.*;
-import it.polito.verifoo.rest.medicine.MedicineSimulator;
-import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verifoo.random.RandomInputGenerator;
 import it.polito.verifoo.rest.common.*;
 /**
@@ -63,24 +54,28 @@ public class Main {
                          m.marshal( root, out ); 
                         
                         // unmarshal a document into a tree of Java content objects*/
-                        NFV root = (NFV) u.unmarshal( new FileInputStream(   "./testfile/FirmatoFW/nfv2nodes3policiesAutoConf-NoStrict.xml"  ) );
+                        //NFV root = (NFV) u.unmarshal( new FileInputStream(   "./testfile/FirmatoFW/Pre-Processing.xml"  ) );
                         
                         //root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/current.xml" ) );
                         //NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/bug1.xml" ) );
-                        VerifooSerializer test = new VerifooSerializer(root);
+                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(   "./testfile/Isolation/nfv5nodes7hostsSAT-Wildcards-II.xml"  ) ));
+                        m = jc.createMarshaller();
+                        m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
+                        m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
                         if(test.isSat()){
                         		System.out.println("SAT");
                         		sat++;
                         		if(sat > 0)
                         			exit = true;
-                        		// create a Marshaller and marshal to output
-                                m = jc.createMarshaller();
-                                m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-                                m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                                //m.marshal( root, System.out ); 
+                        		/*System.out.println("----------------------OUTPUT----------------------");
+                                m.marshal( test.getResult(), System.out ); 
+                        		System.out.println("--------------------------------------------------");*/
                     	}
                     	else{
                     		System.out.println("UNSAT");
+                    		/*System.out.println("----------------------OUTPUT----------------------");
+                            m.marshal( test.getResult(), System.out ); 
+                    		System.out.println("--------------------------------------------------");*/
                     		if(r == null) exit = true;
                     	}
                         //MedicineSimulator sim = new MedicineSimulator(root);

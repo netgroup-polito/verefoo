@@ -215,9 +215,7 @@ public class AclFirewallRule {
 									)
 								);
 		}
-		if(this.protocol != ctx.mkInt(0)){
-			ipEqual = ctx.mkAnd(ipEqual,nctx.equalPacketLv4ProtoToFwPacketLv4Proto(nctx.pf.get("lv4proto").apply(p0),this.protocol));
-		}
+		ipEqual = ctx.mkAnd(ipEqual,nctx.equalPacketLv4ProtoToFwPacketLv4Proto(nctx.pf.get("lv4proto").apply(p0),this.protocol));
 		//System.out.println(ipEqual);
 		return ctx.mkAnd(ipEqual,
 						ctx.mkGe((IntExpr)nctx.port_functions.get("start").apply(nctx.pf.get("src_port").apply(p0)),(IntExpr)this.start_src_port),

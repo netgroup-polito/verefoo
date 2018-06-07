@@ -28,10 +28,10 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
  *
  */
 public class VerifooSerializer {
-	private NFV nfv;
+	private NFV nfv, result;
 	private boolean sat = false;
 	private Logger logger = LogManager.getLogger("mylog");
-	public VerifooSerializer(NFV root) {
+	public VerifooSerializer(NFV root){
 		this.nfv = root;
 		/*String neo4jURL, neo4jUsername, neo4jPassword;
 		if(System.getProperty("it.polito.verifoo.rest.neo4j.neo4jURL") != null){
@@ -58,6 +58,20 @@ public class VerifooSerializer {
 			logger.debug("Neo4j deployment FAILED: " + e.getMessage());
 			System.out.println("Neo4j deployment FAILED: " + e.getMessage());
 		}*/
+		VerifooNormalizer norm = new VerifooNormalizer(root);
+		root = norm.getRoot();
+		try {
+			JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
+			Marshaller m = jc.createMarshaller();
+	        m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
+	        m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
+			System.out.println("-----------------NORMALIZED INPUT-----------------");
+	        m.marshal( root, System.out ); 
+			System.out.println("--------------------------------------------------");
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		try{
 			if(root.getHosts() != null && (root.getConnections() == null || root.getConnections().getConnection().size() == 0)){
 				createFullMesh(root);
@@ -77,11 +91,15 @@ public class VerifooSerializer {
 	        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(), prop, paths);
 	        	IsolationResult res=test.checkNFFGProperty();
 	        	if(res.result != Status.UNSATISFIABLE){
-	        		new Translator(res.model.toString(),root, g).convert();
+	        		Translator t = new Translator(res.model.toString(),root, g);
+	        		t.setNormalizer(norm);
+	        		result = t.convert();
+	        		root = result;
 	        		sat = true;
 	        	}
 	        	else{
 	        		sat = false;
+	        		result = root;
 	        	}
 	        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE));
 	        }
@@ -90,9 +108,8 @@ public class VerifooSerializer {
 			//System.out.println("Graph semantically incorrect");
 	    	logger.error(e);
 	    	throw e;
-	    } catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	    }catch (JAXBException e) {
+	    	logger.error(e);
 		}
 	}
 	
@@ -119,6 +136,13 @@ public class VerifooSerializer {
 		return nfv;
 	}
 
+
+	/**
+	 * @return the result
+	 */
+	public NFV getResult() {
+		return result;
+	}
 
 	/**
 	 * @return if the z3 model is sat

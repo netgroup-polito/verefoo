@@ -388,7 +388,7 @@ public class AclFirewall extends NetworkObject{
  		Expr a_0 = ctx.mkConst(fw+"_rule_action_p_0", ctx.mkBoolSort());
  		Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
  		Expr n_1 = ctx.mkConst(fw + "_firewall_send_n_1", nctx.node);
- 		System.out.println(fw+" default action: " + (defaultAction.equals(ctx.mkTrue())? "ALLOW":"DENY"));
+ 		System.out.println("Firewall " +fw+" -> default action: " + (defaultAction.equals(ctx.mkTrue())? "ALLOW":"DENY"));
     	if (acls.size() == 0){
     		//If the size of the ACL list is empty then by default acl_func must be false
     		 solver.Add(ctx.mkForall(new Expr[]{p_0},
@@ -403,7 +403,8 @@ public class AclFirewall extends NetworkObject{
 */
     	        	rule_map[y] = rule.matchPacket(p_0);
 					solver.Add(ctx.mkForall(new Expr[]{p_0},
-											ctx.mkImplies(
+											// at this point we assume that the rules are conflict free -> the iff can be used
+											ctx.mkIff(
 														rule.matchPacket(p_0),
 														ctx.mkAnd(ctx.mkEq(
 																			acl_func.apply(p_0),

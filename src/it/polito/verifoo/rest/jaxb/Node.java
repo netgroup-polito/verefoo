@@ -2,7 +2,7 @@
 // Questo file è stato generato dall'architettura JavaTM per XML Binding (JAXB) Reference Implementation, v2.2.8-b130911.1802 
 // Vedere <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Qualsiasi modifica a questo file andrà persa durante la ricompilazione dello schema di origine. 
-// Generato il: 2018.05.31 alle 08:25:09 PM CEST 
+// Generato il: 2018.06.06 alle 11:59:55 AM CEST 
 //
 
 
@@ -33,7 +33,6 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;/sequence>
  *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="group" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="functional_type" use="required" type="{}functionalTypes" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -57,8 +56,6 @@ public class Node {
     protected Long id;
     @XmlAttribute(name = "name", required = true)
     protected String name;
-    @XmlAttribute(name = "group")
-    protected String group;
     @XmlAttribute(name = "functional_type", required = true)
     protected FunctionalTypes functionalType;
 
@@ -161,30 +158,6 @@ public class Node {
      */
     public void setName(String value) {
         this.name = value;
-    }
-
-    /**
-     * Recupera il valore della proprietà group.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getGroup() {
-        return group;
-    }
-
-    /**
-     * Imposta il valore della proprietà group.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setGroup(String value) {
-        this.group = value;
     }
 
     /**
