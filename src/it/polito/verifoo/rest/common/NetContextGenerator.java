@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.microsoft.z3.Context;
 
+import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verigraph.mcnet.components.NetContext;
@@ -24,6 +25,10 @@ public final class NetContextGenerator{
 	 * @return NetContext
 	 */
 	public static NetContext generate(Context ctx,List<Node> nodes,List<Property> properties){
+		for(Node n : nodes){
+			if(n.getName().contains("@"))
+				throw new BadGraphError("Invalid node name "+ n.getName() + ", it can't contain @", EType.INVALID_SERVICE_GRAPH);
+		}
 		String[] nodesname={};
 		nodesname=nodes.stream().map((n)->n.getName()).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(nodesname);
 		//suppose nodename=nodeip;

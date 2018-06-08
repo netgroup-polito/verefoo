@@ -52,6 +52,7 @@ public class VerifooNormalizer {
 			//this.root = root;
 			normalize();
 		}catch(Exception e){
+			e.printStackTrace();
 			throw new BadGraphError("Error during deserializing");
 		}
 	}
@@ -77,22 +78,44 @@ public class VerifooNormalizer {
 		List<Property> rootProperties = root.getPropertyDefinition().getProperty();
 		root.getGraphs().getGraph().forEach((g) -> {
 			List<Node> nodes = g.getNode();
-			Map<String,List<Property>> props = root.getPropertyDefinition().getProperty().stream()
-																			.filter(p -> p.getGraph() == g.getId() && p.getSrc().contains("-1"))
+			Map<String,List<Property>> propsSrc = root.getPropertyDefinition().getProperty().stream()
+																			.filter(p -> p.getGraph() == g.getId() && (p.getSrc().contains("-1")))
 																			.collect(groupingBy(p -> p.getSrc(),toList()));
-			props.entrySet().forEach(e -> {
-				List<Node> nodesInNetwork = nodes.stream()
+			propsSrc.entrySet().forEach(e -> {
+				List<Node> nodesInNetworkSrc = nodes.stream()
 												.filter(n -> inNetwork(e.getKey(),n.getName()) && 
 														(n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT) ||
 														 n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) ||
 														 n.getFunctionalType().equals(FunctionalTypes.ENDHOST)))
 												.collect(toList());
-				if(nodesInNetwork.isEmpty())
+				if(nodesInNetworkSrc.isEmpty())
 					throw new BadGraphError("You specified a network ("+e.getKey()+") in the property that contains none of the nodes declared in the service graph", EType.INVALID_PROPERTY_DEFINITION);
 				e.getValue().forEach(p -> {
-					nodesInNetwork.forEach(n -> {
+					nodesInNetworkSrc.forEach(n -> {
+							Property newP = copyProperty(p);
+							newP.setSrc(n.getName());
+							networkGroups.put(n.getName(), e.getKey());
+							rootProperties.add(newP);
+					});
+					rootProperties.remove(p);
+				});
+				
+			});
+			Map<String,List<Property>> propsDst = root.getPropertyDefinition().getProperty().stream()
+																			.filter(p -> p.getGraph() == g.getId() && p.getDst().contains("-1"))
+																			.collect(groupingBy(p -> p.getDst(),toList()));
+			propsDst.entrySet().forEach(e -> {
+				List<Node> nodesInNetworkDst = nodes.stream()
+													.filter(n -> inNetwork(e.getKey(),n.getName()) && 
+															(n.getFunctionalType().equals(FunctionalTypes.WEBSERVER) ||
+															 n.getFunctionalType().equals(FunctionalTypes.MAILSERVER)))
+													.collect(toList());
+				if(nodesInNetworkDst.isEmpty())
+					throw new BadGraphError("You specified a network ("+e.getKey()+") in the property that contains none of the nodes declared in the service graph", EType.INVALID_PROPERTY_DEFINITION);
+				e.getValue().forEach(p -> {
+					nodesInNetworkDst.forEach(n -> {
 						Property newP = copyProperty(p);
-						newP.setSrc(n.getName());
+						newP.setDst(n.getName());
 						networkGroups.put(n.getName(), e.getKey());
 						rootProperties.add(newP);
 					});
@@ -128,6 +151,10 @@ public class VerifooNormalizer {
 				if(e.getValue().size() > 1){
 					List<String> abstractNodes = new ArrayList<>();
 					Node src = nodes.stream().filter(n -> n.getName().equals(e.getValue().get(0).getSrc())).findFirst().get();
+					Host host = root.getHosts().getHost().stream().filter(h -> h.getFixedEndpoint().equals(src.getName())).findFirst().orElse(null);
+					List<Connection> connectionsSrc = root.getConnections().getConnection().stream().filter(c -> c.getSourceHost().equals(host.getName())).collect(toList());
+					List<Connection> connectionsDst = root.getConnections().getConnection().stream().filter(c -> c.getDestHost().equals(host.getName())).collect(toList());
+					List<Connection> newConnections = new ArrayList<>();
 					for(int i = 0; i < e.getValue().size(); i++){
 						Node abstractDuplicate = new Node();
 						abstractDuplicate.setName(src.getName()+"_"+i);
@@ -138,7 +165,27 @@ public class VerifooNormalizer {
 						g.getNode().add(abstractDuplicate);
 						e.getValue().get(i).setSrc(abstractDuplicate.getName());
 						abstractNodes.add(abstractDuplicate.getName());
+						if(host != null){
+							Host newH = copyHost(host);
+							newH.setName(newH.getName()+"_"+i);
+							newH.setFixedEndpoint(abstractDuplicate.getName());
+							root.getHosts().getHost().add(newH);
+							connectionsSrc.forEach(conn -> {
+								Connection newC = copyConnection(conn);
+								newC.setSourceHost(newH.getName());
+								newConnections.add(newC);
+							});
+							connectionsDst.forEach(conn -> {
+								Connection newC = copyConnection(conn);
+								newC.setSourceHost(newH.getName());
+								newConnections.add(newC);
+							});
+						}
 					}
+					root.getHosts().getHost().remove(host);
+					root.getConnections().getConnection().removeAll(connectionsSrc);
+					root.getConnections().getConnection().removeAll(connectionsDst);
+					root.getConnections().getConnection().addAll(newConnections);
 					nodes.forEach(n ->{
 						List<Neighbour> neighbours = n.getNeighbour();
 						List<Neighbour> addNeighbours = new ArrayList<>();
@@ -156,12 +203,33 @@ public class VerifooNormalizer {
 						neighbours.removeAll(removeNeighbours);
 						neighbours.addAll(addNeighbours);
 					});
+					
 					nodes.remove(src);
 				}
 			});
 		});
 	}
 	
+	private Connection copyConnection(Connection conn) {
+		Connection newC = new Connection();
+		newC.setDestHost(conn.getDestHost());
+		newC.setSourceHost(conn.getSourceHost());
+		newC.setAvgLatency(conn.getAvgLatency());
+		return newC;
+	}
+
+	private Host copyHost(Host host) {
+		Host newH = new Host();
+		newH.setCores(host.getCores());
+		newH.setCpu(host.getCpu());
+		newH.setDiskStorage(host.getDiskStorage());
+		newH.setMaxVNF(host.getMaxVNF());
+		newH.setMemory(host.getMemory());
+		newH.setName(host.getName());
+		newH.setType(host.getType());
+		return newH;
+	}
+
 	private boolean inNetwork(String network, String ip){
     	String[] decimalNotationIp = ip.split("\\.");
     	String[] decimalNotationNetwork = network.split("\\.");

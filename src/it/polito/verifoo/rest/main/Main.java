@@ -58,7 +58,7 @@ public class Main {
                         
                         //root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/current.xml" ) );
                         //NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/bug1.xml" ) );
-                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(   "./testfile/Isolation/nfv5nodes7hostsSAT-Wildcards-II.xml"  ) ));
+                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(   "./testfile/FirmatoFW/Pre-Processing&Merging.xml"  ) ));
                         m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
@@ -67,9 +67,9 @@ public class Main {
                         		sat++;
                         		if(sat > 0)
                         			exit = true;
-                        		/*System.out.println("----------------------OUTPUT----------------------");
+                        		System.out.println("----------------------OUTPUT----------------------");
                                 m.marshal( test.getResult(), System.out ); 
-                        		System.out.println("--------------------------------------------------");*/
+                        		System.out.println("--------------------------------------------------");
                     	}
                     	else{
                     		System.out.println("UNSAT");

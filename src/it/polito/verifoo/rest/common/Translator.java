@@ -41,10 +41,10 @@ public class Translator {
 	 * @return 
 	 */
 	public NFV convert(){
-		if(nfv.getHosts() != null) 
-			nfv.getHosts().getHost().forEach(this::searchHost);
+		if(originalNfv.getHosts() != null) 
+			originalNfv.getHosts().getHost().forEach(this::searchHost);
 		setAutoConfig();
-		originalNfv.setHosts(nfv.getHosts());
+		//originalNfv.setHosts(nfv.getHosts());
 		return originalNfv;
 	}
 	/**
@@ -209,6 +209,8 @@ public class Translator {
 		        //System.out.println("Nr Of Rule: " + nrOfRule);
 		        String nodeDstName = firewallAutoConfigSearchDst(n, nrOfRule);
 		        //System.out.println(nodeDstName);
+		        if(nameToGroup.containsKey(nodeDstName))
+		        	nodeDstName = nameToGroup.get(nodeDstName);
 		        e.setDestination(nodeDstName);
 
 				if(!e.getSource().equals("0.0.0.0") && !e.getDestination().equals("0.0.0.0")){
