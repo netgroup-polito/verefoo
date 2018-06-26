@@ -34,6 +34,7 @@ import com.microsoft.z3.Status;
 import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Translator;
 import it.polito.verifoo.rest.common.VerifooProxy;
+import it.polito.verifoo.rest.common.VerifooSerializer;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.Host;
@@ -120,19 +121,37 @@ public class TestPerformance {
 		
 	}
 	
+	private void testCoarse(NFV root) throws Exception{
+		//System.out.println("===========FILE " + file + "===========");
+		long beginAll=System.currentTimeMillis();
+		VerifooSerializer test = new VerifooSerializer(root);
+		long endAll=System.currentTimeMillis();
+		 if(test.isSat()){
+			nSAT++;
+			maxTotTime = maxTotTime<(endAll-beginAll)? (endAll-beginAll) : maxTotTime;
+			System.out.print("time: " + (endAll-beginAll) + "ms;");
+			totTime += (endAll-beginAll);
+		 }
+	 	else{
+	 		System.out.print("UNSAT");	
+			nUNSAT++;
+	 	}
+		
+        return;
+	}
+	
 	private void test(NFV root) throws Exception{
         //System.out.println("===========FILE " + file + "===========");
 		long beginAll=System.currentTimeMillis();
 		NFV rootTest = init(root);
 		long endAll=System.currentTimeMillis();
         //System.out.println("Total time -> " + ((endAll-beginAll)/1000) + "s");
-		rootTest.getPropertyDefinition().getProperty().forEach(p ->{
-        	if(p.isIsSat()){
-				maxTotTime = maxTotTime<(endAll-beginAll)? (endAll-beginAll) : maxTotTime;
-				System.out.print("time: " + (endAll-beginAll) + "ms;");
-				totTime += (endAll-beginAll);
-        	}
-        });
+		Property p = rootTest.getPropertyDefinition().getProperty().get(0);
+    	if(p.isIsSat()){
+			maxTotTime = maxTotTime<(endAll-beginAll)? (endAll-beginAll) : maxTotTime;
+			System.out.print("time: " + (endAll-beginAll) + "ms;");
+			totTime += (endAll-beginAll);
+    	}
         return;
 	}
 	
@@ -197,7 +216,7 @@ public class TestPerformance {
 			//files.add("./testfile/Performance/bgUNIV1WithConstraints.xml");
 			
 
-			files.add("./testfile/Performance/bgInternet2_2Nodes.xml");
+			//files.add("./testfile/Performance/bgInternet2_2Nodes.xml");
 			//files.add("./testfile/Performance/bgGEANT_2Nodes.xml");
 			//files.add("./testfile/Performance/bgUNIV1_2Nodes.xml");
 			
@@ -223,7 +242,7 @@ public class TestPerformance {
 			//files.add("./testfile/Performance/sgUNIV1.xml");
 			//files.add("./testfile/Performance/sgUNIV1WithConstraints.xml");
 
-			//files.add("./testfile/Performance/sgInternet2_6Nodes.xml");
+			//files.add("./testfile/PerformancegInternet2_6Nodes.xml");
 			//files.add("./testfile/Performance/sgGEANT_6Nodes.xml");
 			//files.add("./testfile/Performance/sgInternet2_7Nodes.xml");
 			//files.add("./testfile/Performance/sgGEANT_7Nodes.xml");
@@ -232,6 +251,23 @@ public class TestPerformance {
 			//files.add("./testfile/Performance/bgASWithConstraints.xml");
 			//files.add("./testfile/Performance/bgBiggest.xml");
 			//files.add("./testfile/Performance/bgBiggestWithConstraints.xml");
+			
+			files.add("./testfile/Performance/Refinement/refNoTopology-1FW1P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-1FW2P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-1FW3P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-1FW4P.xml");
+			//files.add("./testfile/Performance/Refinement/refNoTopology-2FW1P.xml");
+			//files.add("./testfile/Performance/Refinement/refNoTopology-2FW2P.xml");
+			//files.add("./testfile/Performance/Refinement/refNoTopology-2FW3P.xml");
+			//files.add("./testfile/Performance/Refinement/refNoTopology-2FW4P.xml");
+			//files.add("./testfile/Performance/Refinement/refNoTopology-3FW1P.xml");
+			//files.add("./testfile/Performance/Refinement/refNoTopology-3FW2P.xml");
+			//files.add("./testfile/Performance/Refinement/refNoTopology-3FW3P.xml");
+			//files.add("./testfile/Performance/Refinement/refNoTopology-3FW4P.xml");
+			//files.add("./testfile/Performance/Refinement/refInternet2-1FW.xml");
+			//files.add("./testfile/Performance/Refinement/refGEANT-1FW.xml");
+			//files.add("./testfile/Performance/Refinement/refUNIV1-1FW.xml");
+			
 			for(String f : files){
 				condTime = 0;
 				checkTimeSAT = 0;
@@ -276,11 +312,13 @@ public class TestPerformance {
 					Thread t = new Thread(){
 						public void run(){
 							try {
-								test(root);
+								root = (NFV) u.unmarshal( new FileInputStream( f ) );
+								testCoarse(root);
 								i++;
 								if(i%50 == 0) System.out.println("");
 							} catch (Exception e) {
 								// TODO Auto-generated catch block
+								e.printStackTrace();
 								err++;
 							}
 						}
@@ -294,8 +332,9 @@ public class TestPerformance {
 						System.out.println("Simulation " + i + " has deadlock with client on " + currClient.getName() + " and server on " + currServer.getName());
 						throw new BadGraphError();
 					}
-				}while(changeEndpoints(root.getHosts().getHost(), clientName, serverName) != null);
-				
+				//}while(changeEndpoints(root.getHosts().getHost(), clientName, serverName) != null);
+				}while(i<10000);
+				System.out.println("");
 				System.out.println("Simulations -> " + i + " / Errors -> " + err);
 				logger.debug("Simulations -> " + i + " / Errors -> " + err);
 				System.out.println("AVG Nr of Conditions -> " + (nrOfConditions/(i)) + " / MAX Nr Of Conditions -> " + maxNrOfConditions);
@@ -324,6 +363,7 @@ public class TestPerformance {
 
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			fail(e.toString());
 		}
 	}
