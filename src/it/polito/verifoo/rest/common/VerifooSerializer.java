@@ -93,7 +93,7 @@ public class VerifooSerializer {
 	        	if(res.result != Status.UNSATISFIABLE){
 	        		Translator t = new Translator(res.model.toString(),root, g);
 	        		t.setNormalizer(norm);
-	        		//result = t.convert();
+	        		result = t.convert();
 	        		root = result;
 	        		sat = true;
 	        	}
@@ -101,7 +101,7 @@ public class VerifooSerializer {
 	        		sat = false;
 	        		result = root;
 	        	}
-	        	//root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE));
+	        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE));
 	        }
 	    } catch (BadGraphError e) {
 			//logger.error("Graph semantically incorrect");
