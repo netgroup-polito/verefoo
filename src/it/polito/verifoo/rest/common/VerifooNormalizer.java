@@ -151,10 +151,22 @@ public class VerifooNormalizer {
 				if(e.getValue().size() > 1){
 					List<String> abstractNodes = new ArrayList<>();
 					Node src = nodes.stream().filter(n -> n.getName().equals(e.getValue().get(0).getSrc())).findFirst().get();
-					Host host = root.getHosts().getHost().stream().filter(h -> h.getFixedEndpoint().equals(src.getName())).findFirst().orElse(null);
-					List<Connection> connectionsSrc = root.getConnections().getConnection().stream().filter(c -> c.getSourceHost().equals(host.getName())).collect(toList());
-					List<Connection> connectionsDst = root.getConnections().getConnection().stream().filter(c -> c.getDestHost().equals(host.getName())).collect(toList());
-					List<Connection> newConnections = new ArrayList<>();
+					Host host;
+					List<Connection> connectionsSrc;
+					List<Connection> connectionsDst;
+					List<Connection> newConnections;
+					if(root.getHosts() != null){
+						host = root.getHosts().getHost().stream().filter(h -> h.getFixedEndpoint().equals(src.getName())).findFirst().orElse(null);
+						connectionsSrc = root.getConnections().getConnection().stream().filter(c -> c.getSourceHost().equals(host.getName())).collect(toList());
+						connectionsDst = root.getConnections().getConnection().stream().filter(c -> c.getDestHost().equals(host.getName())).collect(toList());
+						newConnections = new ArrayList<>();
+						
+					}else{
+						host = null;
+						connectionsSrc = null;
+						connectionsDst = null;
+						newConnections = null;
+					}
 					for(int i = 0; i < e.getValue().size(); i++){
 						Node abstractDuplicate = new Node();
 						abstractDuplicate.setName(src.getName()+"_"+i);
@@ -182,10 +194,12 @@ public class VerifooNormalizer {
 							});
 						}
 					}
-					root.getHosts().getHost().remove(host);
-					root.getConnections().getConnection().removeAll(connectionsSrc);
-					root.getConnections().getConnection().removeAll(connectionsDst);
-					root.getConnections().getConnection().addAll(newConnections);
+					if(host != null){
+						root.getHosts().getHost().remove(host);
+						root.getConnections().getConnection().removeAll(connectionsSrc);
+						root.getConnections().getConnection().removeAll(connectionsDst);
+						root.getConnections().getConnection().addAll(newConnections);
+					}
 					nodes.forEach(n ->{
 						List<Neighbour> neighbours = n.getNeighbour();
 						List<Neighbour> addNeighbours = new ArrayList<>();

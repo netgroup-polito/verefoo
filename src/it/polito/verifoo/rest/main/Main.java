@@ -40,7 +40,8 @@ public class Main {
                 u.setSchema(schema);
                 RandomInputGenerator r = null;
                 boolean exit = false;
-                int sat = 0;
+                int sat = 0; 
+                long beginAll=System.currentTimeMillis();
                 while(!exit){
                 	try{
                 		Marshaller m = jc.createMarshaller();
@@ -58,7 +59,7 @@ public class Main {
                         
                         //root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/current.xml" ) );
                         //NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/bug1.xml" ) );
-                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(   "./testfile/FirmatoFW/Pre-Processing&Merging.xml"  ) ));
+                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(   "./testfile/Random/test.xml"  ) ));
                         m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
@@ -67,9 +68,9 @@ public class Main {
                         		sat++;
                         		if(sat > 0)
                         			exit = true;
-                        		System.out.println("----------------------OUTPUT----------------------");
+                        		/*System.out.println("----------------------OUTPUT----------------------");
                                 m.marshal( test.getResult(), System.out ); 
-                        		System.out.println("--------------------------------------------------");
+                        		System.out.println("--------------------------------------------------");*/
                     	}
                     	else{
                     		System.out.println("UNSAT");
@@ -88,6 +89,8 @@ public class Main {
                     	logger.error(e);
                     	if(r == null) exit = true;
                     }
+            		long endAll=System.currentTimeMillis();
+            		System.out.print("time: " + (endAll-beginAll) + "ms;");
                 }
             } catch( JAXBException je ) {
             	logger.error("Error while unmarshalling or marshalling");

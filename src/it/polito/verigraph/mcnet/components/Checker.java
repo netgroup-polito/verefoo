@@ -189,12 +189,12 @@ public class Checker {
 		return new IsolationResult(ctx, result, p0, n_0, t_1, t_0, nctx, assertions, model);
 	}
 	private List<BoolExpr> constraintList;
-	private void addIsolationProperty(NetworkObject src, NetworkObject dest) {
+	private void addIsolationProperty(NetworkObject src, NetworkObject dest, int lv4proto, String src_port, String dst_port) {
 
-		Expr p0 = ctx.mkConst("check_isolation_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
-		Expr p1 = ctx.mkConst("check_isolation_p1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
-		Expr n_0 = ctx.mkConst("check_isolation_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
-		Expr n_1 = ctx.mkConst("check_isolation_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
+		Expr p0 = ctx.mkConst("check_isolation_p0_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
+		Expr p1 = ctx.mkConst("check_isolation_p1_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
+		Expr n_0 = ctx.mkConst("check_isolation_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
+		Expr n_1 = ctx.mkConst("check_isolation_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
 	
 		
 		
@@ -205,41 +205,59 @@ public class Checker {
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
 
 	}
-
+	
 	public void propertyAdd(NetworkObject src, NetworkObject dest, Prop property) {
 		assert (net.elements.contains(src));
 		assert (net.elements.contains(dest));
 		
 		switch (property) {
 			case ISOLATION: 
-					addIsolationProperty(src, dest);
+					addIsolationProperty(src, dest, 0, "0-"+nctx.MAX_PORT, "0-"+nctx.MAX_PORT);
 					break;
 			case REACHABILITY: 
-					addReachabilityProperty(src, dest);
+					addReachabilityProperty(src, dest, 0, "0-"+nctx.MAX_PORT, "0-"+nctx.MAX_PORT);
+					break;
+		}
+		
+		
+	}
+
+	public void propertyAdd(NetworkObject src, NetworkObject dest, Prop property, int lv4proto, String src_port, String dst_port) {
+		assert (net.elements.contains(src));
+		assert (net.elements.contains(dest));
+		
+		switch (property) {
+			case ISOLATION: 
+					addIsolationProperty(src, dest, lv4proto, src_port, dst_port);
+					break;
+			case REACHABILITY: 
+					addReachabilityProperty(src, dest, lv4proto, src_port, dst_port);
 					break;
 		}
 		
 		
 	}
 	public void propertyAdd(NetworkObject src, NetworkObject dest, Prop property, Property otherConstr) {
-		propertyAdd(src, dest, property);
-		Expr p_0 = ctx.mkConst("check_reach_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
-		Expr n_0 = ctx.mkConst("check_reach_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
+		
 		String src_port = (otherConstr == null || otherConstr.getSrcPort() == null) ? "null":otherConstr.getSrcPort(),
 				dst_port = (otherConstr == null || otherConstr.getDstPort() == null) ? "null":otherConstr.getDstPort();
 		int lv4proto = (otherConstr == null || otherConstr.getLv4Proto() == null) ? 0:otherConstr.getLv4Proto().ordinal();
+		propertyAdd(src, dest, property, lv4proto, src_port, dst_port);
+		Expr p_0 = ctx.mkConst("check_prop_p0_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
+		Expr n_0 = ctx.mkConst("check_prop_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
 		constraintList.add(ctx.mkForall(new Expr[]{n_0, p_0},
 				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(src.getZ3Node(), n_0, p_0)),
 						ctx.mkAnd(ctx.mkEq(nctx.pf.get("lv4proto").apply(p_0), (IntExpr)ctx.mkInt(lv4proto)),
 									ctx.mkEq(nctx.pf.get("src_port").apply(p_0), nctx.pm.get(src_port)),
 									ctx.mkEq(nctx.pf.get("dest_port").apply(p_0), nctx.pm.get(dst_port)))),1,null,null,null,null));
 	}
-	public void addReachabilityProperty(NetworkObject src, NetworkObject dest) {
+	
+	public void addReachabilityProperty(NetworkObject src, NetworkObject dest, int lv4proto, String src_port, String dst_port) {
 		
-		Expr p0 = ctx.mkConst("check_reach_p0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
-		Expr p1 = ctx.mkConst("check_reach_p1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.packet);
-		Expr n_0 = ctx.mkConst("check_reach_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
-		Expr n_1 = ctx.mkConst("check_reach_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node(), nctx.node);
+		Expr p0 = ctx.mkConst("check_reach_p0_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
+		Expr p1 = ctx.mkConst("check_reach_p1_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
+		Expr n_0 = ctx.mkConst("check_reach_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
+		Expr n_1 = ctx.mkConst("check_reach_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
 
 		// Constraint1recv(n_0,destNode,p0,t_0)
 		constraintList.add((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0));
@@ -279,13 +297,13 @@ public class Checker {
 		if(autoctx != null){
 			autoctx.addConstraints(solver);
 		}
-		net.addConstraints(solver);
-		nctx.addConstraints(solver);
 		for (NetworkObject el : net.elements)
 			el.addConstraints(solver);
 		for (BoolExpr boolExpr : constraintList) {
 			this.solver.Add(boolExpr);
 		}
+		net.addConstraints(solver);
+		nctx.addConstraints(solver);
 	}
 
 	public List<BoolExpr> getConstraints() {

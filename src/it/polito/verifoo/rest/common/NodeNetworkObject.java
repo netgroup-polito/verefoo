@@ -215,7 +215,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 							autoctx.addOptionalNode(n, fw);
 						}
 						else{
-							System.out.println("Autoconfiguration for " + n.getName());
+							//System.out.println("Autoconfiguration for " + n.getName());
 							fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,defaultAction,nRules});
 						}
 						
