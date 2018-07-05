@@ -47,11 +47,11 @@ public class NetContext extends Core{
 
     public HashMap<String,NetworkObject> nm; //list of nodes, callable by node name
     public HashMap<String,DatatypeExpr> am; // list of addresses, callable by address name
-    public HashMap<String,DatatypeExpr> pm; // list of port range, callable by string
+    //public HashMap<String,DatatypeExpr> pm; // list of port range, callable by string
     public HashMap<String,FuncDecl> pf;
     Context ctx;
     public EnumSort node;
-	public EnumSort address;
+	public DatatypeSort address;
 	public DatatypeSort port_range;
     public HashMap<String,FuncDecl> port_functions;
     public FuncDecl /*src_port,dest_port,*/nodeHasAddr,addrToNode,send,recv;
@@ -82,7 +82,7 @@ public class NetContext extends Core{
         this.ctx = ctx;
         nm = new HashMap<String,NetworkObject>(); //list of nodes, callable by node name
         am = new HashMap<String,DatatypeExpr>(); // list of addresses, callable by address name
-        pm = new HashMap<String,DatatypeExpr>();
+        //pm = new HashMap<String,DatatypeExpr>();
         pf= new HashMap<String,FuncDecl>() ;
         ip_functions = new HashMap<String,FuncDecl>();
         port_functions = new HashMap<String,FuncDecl>();
@@ -214,7 +214,7 @@ public class NetContext extends Core{
     
     private void mkTypes (String[] nodes, String[] addresses, String[] srcp_ranges, String[] dstp_ranges){
     	//Port ranges for this network         
-        String[] new_port_ranges = new String[srcp_ranges.length+dstp_ranges.length+1];
+        /*String[] new_port_ranges = new String[srcp_ranges.length+dstp_ranges.length+1];
         for(int k=0;k<srcp_ranges.length;k++)
         	new_port_ranges[k] = srcp_ranges[k];
         for(int k=srcp_ranges.length;k<srcp_ranges.length+dstp_ranges.length;k++)
@@ -244,7 +244,7 @@ public class NetContext extends Core{
             	
             }
         }
-        
+        */
         //Nodes in this network
         node = ctx.mkEnumSort("Node", nodes);
         for(int i=0;i<node.getConsts().length;i++){
@@ -254,7 +254,7 @@ public class NetContext extends Core{
         }
 
         //Addresses for this network         
-        /*String[] new_addr = new String[addresses.length+2];
+        String[] new_addr = new String[addresses.length+2];
         for(int k=0;k<addresses.length;k++)
             new_addr[k] = addresses[k];
 
@@ -290,9 +290,9 @@ public class NetContext extends Core{
             	}
             	
             }
-        }*/
+        }
         //OLD APPROACH
-        String[] new_addr = new String[addresses.length+1];
+        /*String[] new_addr = new String[addresses.length+1];
         for(int k=0;k<addresses.length;k++)
             new_addr[k] = addresses[k];
 
@@ -301,7 +301,7 @@ public class NetContext extends Core{
         for(int i=0;i<address.getConsts().length;i++){
             DatatypeExpr fd  = (DatatypeExpr)address.getConst(i);
             am.put(fd.toString().replace("|", ""),fd);
-        }
+        }*/
         
         
         
@@ -314,9 +314,9 @@ public class NetContext extends Core{
         // -   options: A representation for IP options. (Integer)
 
         String[] fieldNames = new String[]{
-                "src","dest","inner_src","inner_dest","origin","orig_body","body","seq", "lv4proto", "src_port", "dest_port", "proto", "emailFrom","url","options","encrypted"};
+                "src","dest","inner_src","inner_dest","origin","orig_body","body","seq", /*"lv4proto", "src_port", "dest_port",*/ "proto", "emailFrom","url","options","encrypted"};
         Sort[] srt = new Sort[]{
-        		address,address,address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),/*  ctx.mkIntSort(),ctx.mkIntSort(),*/ port_range,port_range,
+        		address,address,address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),/*ctx.mkIntSort(),  ctx.mkIntSort(),ctx.mkIntSort(),*/ /*port_range,port_range,*/
                ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkBoolSort()};
         Constructor packetcon = ctx.mkConstructor("packet", "is_packet", fieldNames, srt, null);
         packet = ctx.mkDatatypeSort("packet",  new Constructor[] {packetcon});

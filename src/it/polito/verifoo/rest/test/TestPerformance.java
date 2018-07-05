@@ -252,17 +252,17 @@ public class TestPerformance {
 			//files.add("./testfile/Performance/bgBiggest.xml");
 			//files.add("./testfile/Performance/bgBiggestWithConstraints.xml");
 			
-			//files.add("./testfile/Performance/Refinement/refNoTopology-1FW1P.xml");
-			//files.add("./testfile/Performance/Refinement/refNoTopology-1FW2P.xml");
-			//files.add("./testfile/Performance/Refinement/refNoTopology-1FW3P.xml");
-			//files.add("./testfile/Performance/Refinement/refNoTopology-1FW4P.xml");
-			//files.add("./testfile/Performance/Refinement/refNoTopology-2FW1P.xml");
-			//files.add("./testfile/Performance/Refinement/refNoTopology-2FW2P.xml");
-			//files.add("./testfile/Performance/Refinement/refNoTopology-2FW3P.xml");
-			//files.add("./testfile/Performance/Refinement/refNoTopology-2FW4P.xml");
-			//files.add("./testfile/Performance/Refinement/refNoTopology-3FW1P.xml");
-			//files.add("./testfile/Performance/Refinement/refNoTopology-3FW2P.xml");
-			//files.add("./testfile/Performance/Refinement/refNoTopology-3FW3P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-1FW1P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-1FW2P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-1FW3P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-1FW4P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-2FW1P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-2FW2P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-2FW3P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-2FW4P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-3FW1P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-3FW2P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-3FW3P.xml");
 			files.add("./testfile/Performance/Refinement/refNoTopology-3FW4P.xml");
 			//files.add("./testfile/Performance/Refinement/refNoTopology-5FW10P.xml");
 			//files.add("./testfile/Performance/Refinement/refInternet2-1FW.xml");
