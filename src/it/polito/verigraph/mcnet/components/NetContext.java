@@ -475,7 +475,7 @@ public class NetContext extends Core{
                                         ctx.mkEq(this.pf.get("url").apply(p_1), this.pf.get("url").apply(p_0)),
                                         ctx.mkEq(this.pf.get("options").apply(p_1), this.pf.get("options").apply(p_0)))),1,null,null,null,null)
                 );
-		/*constraints.add(ctx.mkForall(new Expr[]{n_0, n_1, p_0},
+		constraints.add(ctx.mkForall(new Expr[]{n_0, n_1, p_0},
                                 	ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
                                 				ctx.mkAnd( 
 						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_1").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
@@ -497,7 +497,7 @@ public class NetContext extends Core{
 							                              )
                                 				 )
                 
-        ,1,null,null,null,null));*/
+        ,1,null,null,null,null));
 		/*constraints.add(ctx.mkForall(new Expr[]{n_0, n_1, p_0},
             	ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
             				ctx.mkAnd( 
