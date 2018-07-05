@@ -51,7 +51,7 @@ public class Translator {
 	 * Wraps the translation for all the VNFs that can be auto configurated by Verifoo
 	 */
 	public void setAutoConfig() {
-		setFirewallAutoConfig();
+		//setFirewallAutoConfig();
 		setDPIAutoConfig();
 		setAntispamAutoConfig();
 	}
@@ -169,7 +169,7 @@ public class Translator {
 	        String defAction = firewallAutoConfigSearchPlainAttribute(z3Translator.stringToSearchFwAction(n, "default_action"));
 	        ActionTypes da = defAction.equals("true")? ActionTypes.ALLOW : ActionTypes.DENY;
 			n.getConfiguration().getFirewall().setDefaultAction(da);
-			System.out.println("Auto DEFAULT ACTION for " + n.getName() + " -> " + da);
+			//System.out.println("Auto DEFAULT ACTION for " + n.getName() + " -> " + da);
 			
 			String tosearch=z3Translator.stringToSearchNode(n);
 			Pattern pattern = Pattern.compile(tosearch);
@@ -235,12 +235,12 @@ public class Translator {
 			        //if(!protocol.equals("null") && !L4ProtocolTypes.values()[Integer.parseInt(protocol)].equals(L4ProtocolTypes.ANY))
 			        	e.setProtocol(L4ProtocolTypes.values()[Integer.parseInt(protocol)]);
 			        //System.out.println(e.getAction());
-					System.out.println("Auto rule for " + n.getName() + " -> action: " + e.getAction() +
+					/*System.out.println("Auto rule for " + n.getName() + " -> action: " + e.getAction() +
 																			" src: " + e.getSource() +
 																		    " dst: "+e.getDestination() + 
 																			" "+ e.getProtocol()+
 																			"["+ e.getSrcPort() +
-																			":" + e.getDstPort()+"]");
+																			":" + e.getDstPort()+"]");*/
 					listOfRules.add(e);
 					//n.getConfiguration().getFirewall().getElements().add(e);
 				}
@@ -321,7 +321,7 @@ public class Translator {
 														.map(t -> t._1)
 														.collect( Collectors.groupingBy(e -> e.getSource()+"_"+e.getDestination(), Collectors.toList()));
 		List<Elements> finalRulesByDest = mergeRulesByMap(rulesMapByDest);
-		System.out.println("------Rule After Merge------");
+		/*System.out.println("------Rule After Merge------");
 		finalRulesByDest.forEach(e -> {
 			System.out.println("Rule -> action: " + e.getAction() +
 					" src: " + e.getSource() +
@@ -330,7 +330,7 @@ public class Translator {
 					"["+ e.getSrcPort() +
 					":" + e.getDstPort()+"]");
 		});
-		System.out.println("----------------------------");
+		System.out.println("----------------------------");*/
 		return finalRulesByDest;
 	}
 	
@@ -450,7 +450,7 @@ public class Translator {
 					}
 				}
 			    if(notAllowed != null){
-					System.out.println("Auto rule for " + n.getName() + " -> notAllowed: " + notAllowed);
+					//System.out.println("Auto rule for " + n.getName() + " -> notAllowed: " + notAllowed);
 			    	n.getConfiguration().getDpi().getNotAllowed().add(notAllowed);
 			    }
 		    }
@@ -485,7 +485,7 @@ public class Translator {
 					}
 				}
 				if(emailFrom != null){
-					System.out.println("Auto rule for " + n.getName() + " -> emailFrom: " + emailFrom);
+					//System.out.println("Auto rule for " + n.getName() + " -> emailFrom: " + emailFrom);
 					n.getConfiguration().getAntispam().getSource().add(emailFrom);
 				}
 			}
