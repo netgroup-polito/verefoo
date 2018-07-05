@@ -817,7 +817,7 @@ public class VerifooProxy {
 					throw new BadGraphError("Error in the property definition", EType.INVALID_PROPERTY_DEFINITION);
 				logger.debug("Adding check on "+ p.getName() + " from " + source.getName() + " to "+ dest.getName());
 
-				System.out.println(p.getName() + "\t src: " + source.getName() + " dst: "+ dest.getName() + " protocol: "+ p.getLv4Proto()+ "["+p.getSrcPort()+":"+p.getDstPort()+"]");
+				//System.out.println(p.getName() + "\t src: " + source.getName() + " dst: "+ dest.getName() + " protocol: "+ p.getLv4Proto()+ "["+p.getSrcPort()+":"+p.getDstPort()+"]");
 				switch (p.getName()) {
 				case ISOLATION_PROPERTY: 
 						check.propertyAdd(netobjs.get(source), netobjs.get(dest), Prop.ISOLATION, p);

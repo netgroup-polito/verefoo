@@ -260,7 +260,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 							autoctx.addOptionalNode(n, spam);
 						}
 						else{
-							System.out.println("Autoconfiguration for " + n.getName());
+							//System.out.println("Autoconfiguration for " + n.getName());
 							spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
 						}
 					}
@@ -293,7 +293,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 							autoctx.addOptionalNode(n, ids);
 						}
 						else{
-							System.out.println("Autoconfiguration for " + n.getName());
+							//System.out.println("Autoconfiguration for " + n.getName());
 							ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
 						}
 						ids.installIDS(nRules);

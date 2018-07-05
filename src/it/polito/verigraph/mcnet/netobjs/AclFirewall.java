@@ -388,7 +388,7 @@ public class AclFirewall extends NetworkObject{
  		Expr a_0 = ctx.mkConst(fw+"_rule_action_p_0", ctx.mkBoolSort());
  		Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
  		Expr n_1 = ctx.mkConst(fw + "_firewall_send_n_1", nctx.node);
- 		System.out.println("Firewall " +fw+" -> default action: " + (defaultAction.equals(ctx.mkTrue())? "ALLOW":"DENY"));
+ 		//System.out.println("Firewall " +fw+" -> default action: " + (defaultAction.equals(ctx.mkTrue())? "ALLOW":"DENY"));
  		
     	if (acls.size() == 0){
     		//If the size of the ACL list is empty then by default acl_func must be false
@@ -416,10 +416,10 @@ public class AclFirewall extends NetworkObject{
 																	)
 													  )
 								, 1, null, null, null, null);
-					nctx.softConstrRuleOrder.add(new Tuple<BoolExpr, Integer>(ctx.mkEq(e,ctx.mkTrue()),acls.size()-y));
+					//nctx.softConstrRuleOrder.add(new Tuple<BoolExpr, Integer>(ctx.mkEq(e,ctx.mkTrue()),acls.size()-y));
 					//nctx.softConstraints.add(new Tuple<>(e, "fw_rule"));
-					IntExpr intE = nctx.bool_to_int(e);
-					rules.add(intE);
+					//IntExpr intE = nctx.bool_to_int(e);
+					//rules.add(intE);
     	        }
     	        //BoolExpr e=
     	        solver.Add(ctx.mkForall(new Expr[]{p_0},
@@ -436,13 +436,13 @@ public class AclFirewall extends NetworkObject{
 
     	        //nctx.softConstrRuleOrder.add(new Tuple<BoolExpr, Integer>(e, acls.size()));
     	        //rules.add(nctx.bool_to_int(e));
-    	        ArithExpr[] tmp = new ArithExpr[rules.size()];
+    	        /*ArithExpr[] tmp = new ArithExpr[rules.size()];
 				ArithExpr rulesOrderConstraint = ctx.mkAdd(rules.toArray(tmp));
 				System.out.println(rulesOrderConstraint);
 				if((""+fw).equals("node1"))
 					solver.Add(ctx.mkEq(rulesOrderConstraint, ctx.mkInt(1)));
 				else
-					solver.Add(ctx.mkEq(rulesOrderConstraint, ctx.mkInt(1)));
+					solver.Add(ctx.mkEq(rulesOrderConstraint, ctx.mkInt(1)));*/
     	}
         /*System.out.println("Nr of net context rule order soft constraint " + nctx.softConstrRuleOrder.stream().distinct().count());
     	for (Tuple<BoolExpr, Integer> t : nctx.softConstrRuleOrder) {

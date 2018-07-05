@@ -252,10 +252,10 @@ public class TestPerformance {
 			//files.add("./testfile/Performance/bgBiggest.xml");
 			//files.add("./testfile/Performance/bgBiggestWithConstraints.xml");
 			
-			files.add("./testfile/Performance/Refinement/refNoTopology-1FW1P.xml");
-			files.add("./testfile/Performance/Refinement/refNoTopology-1FW2P.xml");
-			files.add("./testfile/Performance/Refinement/refNoTopology-1FW3P.xml");
-			files.add("./testfile/Performance/Refinement/refNoTopology-1FW4P.xml");
+			//files.add("./testfile/Performance/Refinement/refNoTopology-1FW1P.xml");
+			//files.add("./testfile/Performance/Refinement/refNoTopology-1FW2P.xml");
+			//files.add("./testfile/Performance/Refinement/refNoTopology-1FW3P.xml");
+			//files.add("./testfile/Performance/Refinement/refNoTopology-1FW4P.xml");
 			//files.add("./testfile/Performance/Refinement/refNoTopology-2FW1P.xml");
 			//files.add("./testfile/Performance/Refinement/refNoTopology-2FW2P.xml");
 			//files.add("./testfile/Performance/Refinement/refNoTopology-2FW3P.xml");
@@ -263,10 +263,31 @@ public class TestPerformance {
 			//files.add("./testfile/Performance/Refinement/refNoTopology-3FW1P.xml");
 			//files.add("./testfile/Performance/Refinement/refNoTopology-3FW2P.xml");
 			//files.add("./testfile/Performance/Refinement/refNoTopology-3FW3P.xml");
-			//files.add("./testfile/Performance/Refinement/refNoTopology-3FW4P.xml");
+			files.add("./testfile/Performance/Refinement/refNoTopology-3FW4P.xml");
+			//files.add("./testfile/Performance/Refinement/refNoTopology-5FW10P.xml");
 			//files.add("./testfile/Performance/Refinement/refInternet2-1FW.xml");
 			//files.add("./testfile/Performance/Refinement/refGEANT-1FW.xml");
 			//files.add("./testfile/Performance/Refinement/refUNIV1-1FW.xml");
+			
+			
+			//files.add("./testfile/Performance/Refinement/DPI/refNoTopology-1DPI1P.xml");
+			//files.add("./testfile/Performance/Refinement/DPI/refNoTopology-1DPI2P.xml");
+			//files.add("./testfile/Performance/Refinement/DPI/refNoTopology-1DPI3P.xml");
+			//files.add("./testfile/Performance/Refinement/DPI/refNoTopology-1DPI4P.xml");
+			//files.add("./testfile/Performance/Refinement/DPI/refNoTopology-2DPI1P.xml");
+			//files.add("./testfile/Performance/Refinement/DPI/refNoTopology-2DPI2P.xml");
+			//files.add("./testfile/Performance/Refinement/DPI/refNoTopology-2DPI3P.xml");
+			//files.add("./testfile/Performance/Refinement/DPI/refNoTopology-2DPI4P.xml");
+			//files.add("./testfile/Performance/Refinement/DPI/refNoTopology-3DPI1P.xml");
+			//files.add("./testfile/Performance/Refinement/DPI/refNoTopology-3DPI2P.xml");
+			//files.add("./testfile/Performance/Refinement/DPI/refNoTopology-3DPI3P.xml");
+			//files.add("./testfile/Performance/Refinement/DPI/refNoTopology-3DPI4P.xml");
+			
+
+			//files.add("./testfile/Performance/Refinement/Antispam/refNoTopology-1Antispam1P.xml");
+			//files.add("./testfile/Performance/Refinement/Antispam/refNoTopology-1Antispam2P.xml");
+			//files.add("./testfile/Performance/Refinement/Antispam/refNoTopology-1Antispam3P.xml");
+			//files.add("./testfile/Performance/Refinement/Antispam/refNoTopology-1Antispam4P.xml");
 			
 			for(String f : files){
 				condTime = 0;
@@ -333,7 +354,7 @@ public class TestPerformance {
 						throw new BadGraphError();
 					}
 				//}while(changeEndpoints(root.getHosts().getHost(), clientName, serverName) != null);
-				}while(i<10000);
+				}while(i<100);
 				System.out.println("");
 				System.out.println("Simulations -> " + i + " / Errors -> " + err);
 				logger.debug("Simulations -> " + i + " / Errors -> " + err);

@@ -185,7 +185,7 @@ public class PolitoIDS extends NetworkObject {
  		for(int i = 0; i < nRules; i++){
  			Expr notAllowed = ctx.mkConst(politoIDS + "_auto_notAllowed_"+i, ctx.mkIntSort());
  			if(autoplace){
- 	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( notAllowed, ctx.mkInt(0) ),"politoAntispam"));
+ 	 			autoctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq( notAllowed, ctx.mkInt(0) ),"politoIDS"));
 				implications1.add(ctx.mkNot(ctx.mkEq( notAllowed, ctx.mkInt(0))));
 				implications2.add(ctx.mkEq( notAllowed, ctx.mkInt(0)));
  			}else{

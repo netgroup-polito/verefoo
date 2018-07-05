@@ -39,13 +39,12 @@
           <antispam/>
         </configuration>
       </node>
-      <node functional_type="WEBSERVER" name="nodeB">
-        <neighbour name="node2"/>
+      <node functional_type="MAILSERVER" name="nodeB">
 		<neighbour name="node3"/>
         <configuration description="A simple description" name="confB">
-          <webserver>
+          <mailserver>
           	<name>nodeB</name>
-          </webserver>
+          </mailserver>
         </configuration>
       </node>
     </graph>
