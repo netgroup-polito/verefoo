@@ -2,22 +2,22 @@
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
   <graphs>
     <graph id="0">
-     <node functional_type="WEBCLIENT" name="10.0.0.1">
+     <node functional_type="ENDHOST" name="10.0.0.1">
         <neighbour name="20.0.0.1"/>
         <configuration description="A simple description" name="confA">
-          <webclient nameWebServer="30.0.5.2"/>
+          <endhost body="cats"/>
         </configuration>
       </node>
-	  <node functional_type="WEBCLIENT" name="10.0.0.10">
+	  <node functional_type="ENDHOST" name="10.0.0.10">
         <neighbour name="20.0.0.1"/>
         <configuration description="A simple description" name="confA">
-          <webclient nameWebServer="30.0.5.2"/>
+          <endhost body="weapons"/>
         </configuration>
       </node>
-	  <node functional_type="WEBCLIENT" name="10.0.0.20">
+	  <node functional_type="ENDHOST" name="10.0.0.20">
         <neighbour name="20.0.0.1"/>
         <configuration description="A simple description" name="confA">
-          <webclient nameWebServer="30.0.5.2"/>
+          <endhost body="man"/>
         </configuration>
       </node>
       <node functional_type="DPI" name="20.0.0.1">

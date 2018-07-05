@@ -23,7 +23,7 @@
 	  <node functional_type="ENDHOST" name="10.0.0.30">
         <neighbour name="20.0.0.1"/>
         <configuration description="A simple description" name="confA">
-         <endhost email_from="3" protocol = "POP3_REQUEST"/>
+         <endhost email_from="4" protocol = "POP3_REQUEST"/>
         </configuration>
       </node>
       <node functional_type="DPI" name="20.0.0.1">
