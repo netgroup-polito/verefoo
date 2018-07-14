@@ -356,7 +356,7 @@ public class TestPerformance {
 						throw new BadGraphError();
 					}
 				//}while(changeEndpoints(root.getHosts().getHost(), clientName, serverName) != null);
-				}while(i<100);
+				}while(i<10);
 				System.out.println("");
 				System.out.println("Simulations -> " + i + " / Errors -> " + err);
 				logger.debug("Simulations -> " + i + " / Errors -> " + err);

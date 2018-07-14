@@ -163,7 +163,7 @@ public class NetContext extends Core{
 		//System.out.println("Nr of net context wildcards soft constraint " + softConstrWildcard.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrWildcard) {
         	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, -10000, t._2);
+			solver.AssertSoft(t._1, -100000, t._2);
 		}
 		//System.out.println("Nr of net context autoconfiguration soft constraint " + softConstrAutoConf.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
@@ -467,10 +467,10 @@ public class NetContext extends Core{
                                         ctx.mkEq(this.pf.get("orig_body").apply(p_1), this.pf.get("orig_body").apply(p_0)),
                                         ctx.mkEq(this.pf.get("body").apply(p_1), this.pf.get("body").apply(p_0)),
                                         ctx.mkEq(this.pf.get("seq").apply(p_1), this.pf.get("seq").apply(p_0)),
-                                        //ctx.mkEq(this.pf.get("lv4proto").apply(p_1), this.pf.get("lv4proto").apply(p_0)),
+                                        ctx.mkEq(this.pf.get("lv4proto").apply(p_1), this.pf.get("lv4proto").apply(p_0)),
                                         ctx.mkEq(this.pf.get("proto").apply(p_1), this.pf.get("proto").apply(p_0)),
-                                        //ctx.mkEq(this.pf.get("src_port").apply(p_1), this.pf.get("src_port").apply(p_0)),
-                                        //ctx.mkEq(this.pf.get("dest_port").apply(p_1), this.pf.get("dest_port").apply(p_0)),
+                                        ctx.mkEq(this.pf.get("src_port").apply(p_1), this.pf.get("src_port").apply(p_0)),
+                                        ctx.mkEq(this.pf.get("dest_port").apply(p_1), this.pf.get("dest_port").apply(p_0)),
                                         ctx.mkEq(this.pf.get("emailFrom").apply(p_1), this.pf.get("emailFrom").apply(p_0)),
                                         ctx.mkEq(this.pf.get("url").apply(p_1), this.pf.get("url").apply(p_0)),
                                         ctx.mkEq(this.pf.get("options").apply(p_1), this.pf.get("options").apply(p_0)))),1,null,null,null,null)

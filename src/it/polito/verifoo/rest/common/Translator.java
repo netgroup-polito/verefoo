@@ -51,7 +51,7 @@ public class Translator {
 	 * Wraps the translation for all the VNFs that can be auto configurated by Verifoo
 	 */
 	public void setAutoConfig() {
-		//setFirewallAutoConfig();
+		setFirewallAutoConfig();
 		setDPIAutoConfig();
 		setAntispamAutoConfig();
 	}

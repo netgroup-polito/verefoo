@@ -662,46 +662,43 @@ AVG total time -> 82784ms
 =====================================
 
 
-
-
 REFINEMENT NO WILDCARDS ONLY IP FIELDS
 ===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW1P.xml===========
-AVG total time -> 201ms
+AVG total time -> 148ms
 =====================================
 ===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW2P.xml===========
-AVG total time -> 553ms
+AVG total time -> 225ms
 =====================================
 ===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW3P.xml===========
-AVG total time -> 807ms
+AVG total time -> 585ms
 =====================================
 ===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW4P.xml===========
-AVG total time -> 1189ms
+AVG total time -> 879ms
 =====================================
 ===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW1P.xml===========
-AVG total time -> 483ms
+AVG total time -> 250ms
 =====================================
 ===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW2P.xml===========
-AVG total time -> 2684ms
+AVG total time -> 648ms
 =====================================
 ===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW3P.xml===========
-AVG total time -> 44053ms
+AVG total time -> 3098ms
 =====================================
 ===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW4P.xml===========
-AVG total time -> 8455ms
+AVG total time -> 36393ms
 =====================================
 ===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW1P.xml===========
-AVG total time -> 734ms
+AVG total time -> 355ms
 =====================================
 ===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW2P.xml===========
-AVG total time -> 2543ms
+AVG total time -> 1590ms
 =====================================
 ===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW3P.xml===========
-AVG total time -> 13849ms
-====================================
-===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW4P.xml===========
-AVG total time -> 20033ms
+AVG total time -> 23947ms
 =====================================
-
+===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW4P.xml===========
+AVG total time -> 9904ms
+=====================================
 
 
 REFINEMENT WITH WILDCARDS ONLY IP FIELDS
@@ -780,4 +777,128 @@ AVG total time -> 36588ms
 =====================================
 ===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW4P.xml===========
 AVG total time -> 64848ms
+=====================================
+
+
+
+REFINEMENT NO WILDCARDS ONLY PROTOCOL
+===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW1P.xml===========
+AVG total time -> 177ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW2P.xml===========
+AVG total time -> 245ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW3P.xml===========
+AVG total time -> 339ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW4P.xml===========
+AVG total time -> 756ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW1P.xml===========
+AVG total time -> 252ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW2P.xml===========
+AVG total time -> 324ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW3P.xml===========
+AVG total time -> 667ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW4P.xml===========
+AVG total time -> 952ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW1P.xml===========
+AVG total time -> 205ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW2P.xml===========
+AVG total time -> 1984ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW3P.xml===========
+AVG total time -> 874ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW4P.xml===========
+AVG total time -> 1266ms
+=====================================
+
+
+
+REFINEMENT NO SOFT CONSTRAINT
+===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW1P.xml===========
+AVG total time -> 163ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW2P.xml===========
+AVG total time -> 191ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW3P.xml===========
+AVG total time -> 458ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW4P.xml===========
+AVG total time -> 555ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW1P.xml===========
+AVG total time -> 161ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW2P.xml===========
+AVG total time -> 216ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW3P.xml===========
+AVG total time -> 486ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW4P.xml===========
+AVG total time -> 998ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW1P.xml===========
+AVG total time -> 175ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW2P.xml===========
+AVG total time -> 282ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW3P.xml===========
+AVG total time -> 477ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW4P.xml===========
+AVG total time -> 404ms
+=====================================
+
+
+
+
+
+
+
+REFINEMENT DPI
+===========FILE ./testfile/Performance/Refinement/DPI/refNoTopology-1DPI1P.xml===========
+AVG total time -> 152ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/DPI/refNoTopology-1DPI2P.xml===========
+AVG total time -> 199ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/DPI/refNoTopology-1DPI3P.xml===========
+AVG total time -> 2949ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/DPI/refNoTopology-1DPI4P.xml===========
+AVG total time -> 705ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/DPI/refNoTopology-2DPI1P.xml===========
+AVG total time -> 209ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/DPI/refNoTopology-2DPI2P.xml===========
+AVG total time -> 425ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/DPI/refNoTopology-2DPI3P.xml===========
+AVG total time -> 7110ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/DPI/refNoTopology-2DPI4P.xml===========
+AVG total time -> 18891ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/DPI/refNoTopology-3DPI1P.xml===========
+AVG total time -> 267ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/DPI/refNoTopology-3DPI2P.xml===========
+AVG total time -> 894ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/DPI/refNoTopology-3DPI3P.xml===========
+AVG total time -> 2856ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/DPI/refNoTopology-3DPI4P.xml===========
+AVG total time -> 4322ms
 =====================================

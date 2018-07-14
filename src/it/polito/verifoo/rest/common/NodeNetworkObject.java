@@ -46,6 +46,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	private int nRules, nIsolationProp, nReachabilityProp;
 	private List<NodeMetrics> nodeMetrics;
 	private List<Property> properties;
+	private List<Node> nodes;
 	/**
      * This class is an helper to generate network object
      * @param ctx Z3 Context
@@ -56,7 +57,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	 * @param nodeMetrics 
      */
     public NodeNetworkObject(Context ctx, NetContext nctx, AutoContext autoctx, Network net, 
-    		List<it.polito.verifoo.rest.jaxb.Node> nodes, int nRules, List<NodeMetrics> nodeMetrics, List<Property> properties) {
+    		List<Node> nodes, int nRules, List<NodeMetrics> nodeMetrics, List<Property> properties) {
 		super();
 		this.ctx = ctx;
 		this.nctx = nctx;
@@ -67,6 +68,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 		this.properties = properties;
 		nIsolationProp = (int) properties.stream().filter(p -> p.getName().equals(PName.ISOLATION_PROPERTY)).count();
 		nReachabilityProp = (int) properties.stream().filter(p -> p.getName().equals(PName.REACHABILITY_PROPERTY)).count();
+		this.nodes = nodes;
 		nodes.forEach(this::generateNetObj);
 	}
 
@@ -191,6 +193,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 			ftype=n.getFunctionalType();
 			boolean optional = nodeMetrics.stream().filter( c -> c.getNode().equals(n.getName())).map(c -> c.isOptional()).findFirst().orElse(false);
 			Property prop = properties.stream().filter(p -> p.getSrc().equals(n.getName())).findFirst().orElse(null);
+			List<NetworkObject> neighbours = n.getNeighbour().stream()
+					.map(neigh -> nctx.nm.get(neigh.getName()))
+					.collect(Collectors.toList());
 			switch (ftype) {
 				case FIREWALL:{
 					if(n.getConfiguration().getFirewall()==null){
@@ -208,20 +213,19 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 							defaultAction = n.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW);
 						}
 						
-						
 						if(optional){
 							System.out.println("Autoplacement for " + n.getName());
-							fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,defaultAction,nRules, autoctx});
+							fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,defaultAction,neighbours, nRules, autoctx});
 							autoctx.addOptionalNode(n, fw);
 						}
 						else{
 							//System.out.println("Autoconfiguration for " + n.getName());
-							fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,defaultAction,nRules});
+							fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,defaultAction,neighbours, nRules});
 						}
 						
 					}
 					else{
-						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,(n.getConfiguration().getFirewall().getDefaultAction() == null || n.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW))});
+						fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,(n.getConfiguration().getFirewall().getDefaultAction() == null || n.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)),neighbours});
 						generateAcl(n, fw);
 					}
 					this.put(n, fw);
@@ -241,7 +245,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(n.getConfiguration().getEndhost()==null){
 						throw new BadGraphError("You have specified a ENDHOST Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours});
 					this.put(n,eh);
 					PacketWrapper p = new PacketWrapper(n.getConfiguration().getEndhost(), nctx);
 					if(prop != null){ p.setProperties(prop, nctx);}
@@ -256,16 +260,16 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(n.getConfiguration().getAntispam().getSource().isEmpty()){
 						if(optional){
 							System.out.println("Autoplacement for " + n.getName());
-							spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules,autoctx});
+							spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours,nRules,autoctx});
 							autoctx.addOptionalNode(n, spam);
 						}
 						else{
 							//System.out.println("Autoconfiguration for " + n.getName());
-							spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
+							spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours,nRules});
 						}
 					}
 					else{
-						spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+						spam=new PolitoAntispam(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours});
 						int[] blacklist=listToIntArguments(n.getConfiguration().getAntispam().getSource());
 						spam.installAntispam(blacklist);
 					}
@@ -276,7 +280,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(n.getConfiguration().getCache()==null){
 						throw new BadGraphError("You have specified a CACHE Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					PolitoCache c = new PolitoCache(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoCache c = new PolitoCache(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours});
 					this.put(n, c);
 					generateCache(n, c);
 					break;
@@ -289,17 +293,17 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(n.getConfiguration().getDpi().getNotAllowed().isEmpty()){
 						if(optional){
 							System.out.println("Autoplacement for " + n.getName());
-							ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules,autoctx});
+							ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours,nRules,autoctx});
 							autoctx.addOptionalNode(n, ids);
 						}
 						else{
 							//System.out.println("Autoconfiguration for " + n.getName());
-							ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nRules});
+							ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours,nRules});
 						}
 						ids.installIDS(nRules);
 					}
 					else{
-						ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+						ids=new PolitoIDS(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours});
 						int[] blacklist=listToIntArguments(n.getConfiguration().getDpi().getNotAllowed());
 						ids.installIDS(blacklist);
 					}
@@ -313,7 +317,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(!(nctx.am.containsKey((n.getConfiguration().getMailclient().getMailserver())))) throw new BadGraphError("Mail server not present",EType.INVALID_NODE_CONFIGURATION);
 					/*PolitoMailClient eh=new PolitoMailClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getMailclient().getMailserver())});
 					this.put(n,eh);*/
-					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours});
 					PacketWrapper p = new PacketWrapper(n.getConfiguration().getEndhost(), nctx);
 					if(prop != null){ p.setProperties(prop, nctx);}
 					this.put(n,eh);
@@ -326,7 +330,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					}
 					/*PolitoMailServer eh=new PolitoMailServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);*/
-					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours});
 					PacketModel p = new PacketModel();
 					this.put(n,eh);
 					eh.installAsPOP3MailServer(p);
@@ -336,7 +340,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(n.getConfiguration().getNat()==null){
 						throw new BadGraphError("You have specified a NAT Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					PolitoNat nat=new PolitoNat(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoNat nat=new PolitoNat(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours});
 					this.put(n,nat);
 					ArrayList<DatatypeExpr> address = n.getConfiguration().getNat().getSource().stream()
 							.map((s)->nctx.am.get(s))
@@ -354,7 +358,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 						throw new BadGraphError("You have specified a VPNACCESS Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					if(!(nctx.am.containsKey((n.getConfiguration().getVpnaccess().getVpnexit())))) throw new BadGraphError("VPN Exit not present",EType.INVALID_NODE_CONFIGURATION);
-					PolitoVpnAccess vpn=new PolitoVpnAccess(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoVpnAccess vpn=new PolitoVpnAccess(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours});
 					logger.debug("VPN Access: " +n.getName() + " with exit " + n.getConfiguration().getVpnaccess().getVpnexit());
 					this.put(n,vpn);
 					break;
@@ -364,7 +368,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 						throw new BadGraphError("You have specified a VPNEXIT Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
 					if(!(nctx.am.containsKey((n.getConfiguration().getVpnexit().getVpnaccess())))) throw new BadGraphError("VPN Access not present",EType.INVALID_NODE_CONFIGURATION);
-					PolitoVpnExit vpn=new PolitoVpnExit(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoVpnExit vpn=new PolitoVpnExit(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours});
 					logger.debug("VPN Exit: " +n.getName() + " with access " + n.getConfiguration().getVpnexit().getVpnaccess());
 					this.put(n,vpn);
 					break;
@@ -376,7 +380,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(!(nctx.am.containsKey((n.getConfiguration().getWebclient().getNameWebServer())))) throw new BadGraphError("Web server not present",EType.INVALID_NODE_CONFIGURATION);
 					/*PolitoWebClient eh=new PolitoWebClient(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,nctx.am.get(n.getConfiguration().getWebclient().getNameWebServer())});
 					this.put(n,eh);*/
-					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours});
 					PacketWrapper p = new PacketWrapper(n.getConfiguration().getEndhost(), nctx);
 					if(prop != null){ p.setProperties(prop, nctx);}
 					this.put(n,eh);
@@ -389,7 +393,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					}
 					/*PolitoWebServer eh=new PolitoWebServer(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
 					this.put(n,eh);*/
-					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoEndHost eh=new PolitoEndHost(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,neighbours});
 					PacketModel p = new PacketModel();
 					this.put(n,eh);
 					eh.installAsWebServer(p);

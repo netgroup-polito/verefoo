@@ -10,6 +10,7 @@ package it.polito.verigraph.mcnet.netobjs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
@@ -45,6 +46,7 @@ public class AclFirewall extends NetworkObject{
 	NetContext nctx;
 	FuncDecl acl_func;
 	FuncDecl rule_func;
+	List<NetworkObject> neighbours;
 	//FuncDecl acl_func_white;
 	private boolean autoconf, autoplace;
 	private AutoContext autoctx;
@@ -67,17 +69,18 @@ public class AclFirewall extends NetworkObject{
 	    nctx = (NetContext)args[0][2];
 	    net.saneSend(this);
 	    defaultAction = ((boolean)args[0][3])? ctx.mkTrue() : ctx.mkFalse();
-	    if(args[0].length > 4 && ((Integer) args[0][4]) != 0){
-	    	if(args[0].length > 5 && args[0][5] != null){
+	    neighbours = ((ArrayList<NetworkObject>) args[0][4]);
+	    if(args[0].length > 5 && ((Integer) args[0][5]) != 0){
+	    	if(args[0].length > 6 && args[0][6] != null){
 	    		used = ctx.mkBoolConst(fw+"_used");
 				autoplace = true;
-				autoctx = (AutoContext) args[0][5];
+				autoctx = (AutoContext) args[0][6];
 			}
 			else{
 				autoplace = false;
 			}
 			autoconf = true; 
-			firewallSendRules((Integer) args[0][4]);
+			firewallSendRules((Integer) args[0][5]);
 	    }
 		else{
 			autoplace = false;
@@ -149,14 +152,20 @@ public class AclFirewall extends NetworkObject{
     	//acl_func_white = ctx.mkFuncDecl(fw+"_acl_func_white", new Sort[]{nctx.address, nctx.address , ctx.mkIntSort(), ctx.mkIntSort()},ctx.mkBoolSort());
     	//Constraint1		send(fw, n_0, p, t_0)  -> (exist n_1,t_1 : (recv(n_1, fw, p, t_1) && 
     	//    				t_1 < t_0 && !acl_func(p.src,p.dest))
+
+ 		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), fw, p_0)).collect(Collectors.toList());
+ 		BoolExpr[] tmp2 = new BoolExpr[recvNeighbours.size()];
+ 		BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp2));
+ 		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.send.apply(fw, n.getZ3Node(), p_0)).collect(Collectors.toList());
+		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
+		BoolExpr enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp3));
     	  constraints.add(
 	            	ctx.mkForall(new Expr[]{n_0, p_0}, 
 	    	            ctx.mkImplies(
-	    	            	(BoolExpr)nctx.send.apply(new Expr[]{ fw, n_0, p_0}),
+	    	            		enumerateSend,
 	    	            	
 	    	            			ctx.mkAnd(
-	    	            						ctx.mkExists(new Expr[]{n_1}, 
-	    	            								nctx.recv.apply(n_1, fw, p_0),1,null,null,null,null), 
+	    	            						enumerateRecv, 
 	    	            						(BoolExpr)acl_func.apply(p_0)
 	    	            							    	            								
 	    	            						/*((BoolExpr)acl_func_white.apply(nctx.pf.get("src").apply(p_0), 
@@ -169,16 +178,17 @@ public class AclFirewall extends NetworkObject{
     	  
     	  //Constraint2 obliges this VNF to send the packets that have been received
     	  constraints.add(
-	            	ctx.mkForall(new Expr[]{n_0, p_0},
+	            	ctx.mkForall(new Expr[]{p_0},
 	            			ctx.mkImplies(	
-	            					ctx.mkAnd( (BoolExpr)nctx.recv.apply(n_0, fw, p_0),
+	            					ctx.mkAnd( enumerateRecv,
 		            							(BoolExpr)acl_func.apply(p_0)
 		            							/*((BoolExpr)acl_func_white.apply(nctx.pf.get("src").apply(p_0), 
 							    	            								nctx.pf.get("dest").apply(p_0),
 																				nctx.pf.get("src_port").apply(p_0), 
 																				nctx.pf.get("dest_port").apply(p_0)))*/
 	            							),
-	            						ctx.mkAnd(ctx.mkExists(new Expr[]{n_1}, (BoolExpr)nctx.send.apply(new Expr[]{ fw, n_1, p_0}),1,null,null,null,null)
+	            						ctx.mkAnd(
+	            								enumerateSend
 	            								//,ctx.mkNot((BoolExpr)acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0)))
 	            								)
 	            						
@@ -293,8 +303,6 @@ public class AclFirewall extends NetworkObject{
     // for an autoconfiguration firewall
  	private void firewallSendRulesAutoConf(Integer nRules) {
  		Expr p_0 = ctx.mkConst(fw + "_firewall_send_p_0", nctx.packet);
- 		Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
- 		Expr n_1 = ctx.mkConst(fw + "_firewall_send_n_1", nctx.node);
         acl_func = ctx.mkFuncDecl(fw + "_acl_func", new Sort[] { nctx.packet}, ctx.mkBoolSort());
         //acl_func_white = ctx.mkFuncDecl(fw + "_acl_func", new Sort[] { nctx.address, nctx.address , ctx.mkIntSort(), ctx.mkIntSort() }, ctx.mkBoolSort());
         List<BoolExpr> rules = new ArrayList<>();
@@ -371,6 +379,37 @@ public class AclFirewall extends NetworkObject{
  		}
  		//System.out.println("Behaviour: "+ behaviour);
 
+ 		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), fw, p_0)).collect(Collectors.toList());
+ 		BoolExpr[] tmp2 = new BoolExpr[recvNeighbours.size()];
+ 		BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp2));
+ 		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.send.apply(fw, n.getZ3Node(), p_0)).collect(Collectors.toList());
+		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
+		BoolExpr enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp3));
+ 		
+		constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
+				ctx.mkImplies(enumerateSend,
+								ctx.mkAnd(enumerateRecv,
+										behaviour)), 1, null, null, null, null));
+		
+		constraints.add(ctx.mkForall(new Expr[] { p_0 },
+										ctx.mkImplies(ctx.mkAnd(enumerateRecv,
+												behaviour), ctx.mkAnd(enumerateSend)), 
+										1, null, null, null, null));
+		
+		/*Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
+		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 }, 
+				ctx.mkImplies(
+								(BoolExpr) nctx.send.apply(new Expr[] { fw, n_0, p_0 }),
+								ctx.mkAnd(enumerateRecv,
+										behaviour)), 1, null, null, null, null));;
+
+		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 },
+										ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, fw, p_0),
+												behaviour), ctx.mkAnd(enumerateSend)), 
+										1, null, null, null, null));*/
+
+ 		/*Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
+ 		Expr n_1 = ctx.mkConst(fw + "_firewall_send_n_1", nctx.node);
 		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 }, 
 				ctx.mkImplies(
 								(BoolExpr) nctx.send.apply(new Expr[] { fw, n_0, p_0 }),
@@ -381,6 +420,7 @@ public class AclFirewall extends NetworkObject{
 										ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, fw, p_0),
 												behaviour), ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, (BoolExpr) nctx.send.apply(new Expr[] { fw, n_1, p_0 }), 1, null, null, null, null))), 
 										1, null, null, null, null));
+		*/								
  	}
  	
  	private void aclConstraints(Optimize solver){
@@ -389,7 +429,12 @@ public class AclFirewall extends NetworkObject{
  		Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
  		Expr n_1 = ctx.mkConst(fw + "_firewall_send_n_1", nctx.node);
  		//System.out.println("Firewall " +fw+" -> default action: " + (defaultAction.equals(ctx.mkTrue())? "ALLOW":"DENY"));
- 		
+ 		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), fw, p_0)).collect(Collectors.toList());
+ 		BoolExpr[] tmp2 = new BoolExpr[recvNeighbours.size()];
+ 		BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp2));
+ 		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), fw, p_0)).collect(Collectors.toList());
+		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
+		BoolExpr enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp3));
     	if (acls.size() == 0){
     		//If the size of the ACL list is empty then by default acl_func must be false
     		 solver.Add(ctx.mkForall(new Expr[]{p_0},
@@ -401,31 +446,24 @@ public class AclFirewall extends NetworkObject{
     	        for(int y=0;y<acls.size();y++){
     	        	AclFirewallRule rule = acls.get(y);
     	        	/*System.out.println(fw + " rule: "+rule.getAction()+" from " + rule.getSource() + ":"+rule.getSrc_port() +
-    	        											" to " + rule.getDestination()+":"+rule.getDst_port());
-*/
-    	        	BoolExpr e;
+    	        											" to " + rule.getDestination()+":"+rule.getDst_port());*/
     	        	rule_map[y] = rule.matchPacket(p_0);
-					e = ctx.mkForall(new Expr[]{p_0},
+					solver.Add(ctx.mkForall(new Expr[]{p_0},
 											// at this point we assume that the rules are conflict free -> the iff can be used
-											ctx.mkIff(//ctx.mkAnd((BoolExpr) nctx.recv.apply(new Expr[] { n_0, fw, p_0 }),
-																			rule.matchPacket(p_0)//)
+											ctx.mkIff(ctx.mkAnd(enumerateRecv,
+																rule.matchPacket(p_0))
 														,ctx.mkAnd(ctx.mkEq(
 																			acl_func.apply(p_0),
 																			rule.getAction()
 																			)
 																	)
 													  )
-								, 1, null, null, null, null);
-					//nctx.softConstrRuleOrder.add(new Tuple<BoolExpr, Integer>(ctx.mkEq(e,ctx.mkTrue()),acls.size()-y));
-					//nctx.softConstraints.add(new Tuple<>(e, "fw_rule"));
-					//IntExpr intE = nctx.bool_to_int(e);
-					//rules.add(intE);
+								, 1, null, null, null, null));
     	        }
-    	        //BoolExpr e=
     	        solver.Add(ctx.mkForall(new Expr[]{p_0},
 										ctx.mkImplies(
 											//no rule matches the packet -> the acl must allow the default behaviour
-											ctx.mkAnd((BoolExpr) nctx.recv.apply(new Expr[] { n_0, fw, p_0 }),
+											ctx.mkAnd(enumerateRecv,
 													ctx.mkNot(ctx.mkOr(rule_map))
 													),
 											ctx.mkEq(
@@ -434,21 +472,7 @@ public class AclFirewall extends NetworkObject{
 													))
 								, 1, null, null, null, null));
 
-    	        //nctx.softConstrRuleOrder.add(new Tuple<BoolExpr, Integer>(e, acls.size()));
-    	        //rules.add(nctx.bool_to_int(e));
-    	        /*ArithExpr[] tmp = new ArithExpr[rules.size()];
-				ArithExpr rulesOrderConstraint = ctx.mkAdd(rules.toArray(tmp));
-				System.out.println(rulesOrderConstraint);
-				if((""+fw).equals("node1"))
-					solver.Add(ctx.mkEq(rulesOrderConstraint, ctx.mkInt(1)));
-				else
-					solver.Add(ctx.mkEq(rulesOrderConstraint, ctx.mkInt(1)));*/
     	}
-        /*System.out.println("Nr of net context rule order soft constraint " + nctx.softConstrRuleOrder.stream().distinct().count());
-    	for (Tuple<BoolExpr, Integer> t : nctx.softConstrRuleOrder) {
-        	System.out.println(t._1 + "\n with value " + t._2);
-			solver.AssertSoft(t._1, t._2, "fw_rule");
-		}*/
     }
     /*
     //Use blacklist and whitelist

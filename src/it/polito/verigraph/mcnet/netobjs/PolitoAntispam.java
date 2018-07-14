@@ -10,6 +10,8 @@ package it.polito.verigraph.mcnet.netobjs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
@@ -42,6 +44,8 @@ public class PolitoAntispam extends NetworkObject{
     int nRules;
 	private boolean autoconf,autoplace;
 	private AutoContext autoctx;
+	private BoolExpr enumerateRecv;
+	private BoolExpr enumerateSend;
     public PolitoAntispam(Context ctx, Object[]... args) {
         super(ctx, args);
     }
@@ -56,17 +60,27 @@ public class PolitoAntispam extends NetworkObject{
         net = (Network)args[0][1];
         nctx = (NetContext)args[0][2];
         net.saneSend(this);
-        if(args[0].length > 3 && ((Integer) args[0][3]) != 0){
-	    	if(args[0].length > 4 && args[0][4] != null){
+        
+        ArrayList<NetworkObject> neighbours = ((ArrayList<NetworkObject>) args[0][3]);
+        Expr p_0 = ctx.mkConst(politoAntispam+"_p_0", nctx.packet);
+   		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), politoAntispam, p_0)).collect(Collectors.toList());
+   		BoolExpr[] tmp2 = new BoolExpr[recvNeighbours.size()];
+   		enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp2));
+   		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.send.apply(politoAntispam, n.getZ3Node(), p_0)).collect(Collectors.toList());
+  		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
+  		enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp3));
+   		
+        if(args[0].length > 4 && ((Integer) args[0][4]) != 0){
+	    	if(args[0].length > 5 && args[0][5] != null){
 	    		used = ctx.mkBoolConst(politoAntispam+"_used");
 				autoplace = true;
-				autoctx = (AutoContext) args[0][4];
+				autoctx = (AutoContext) args[0][5];
 			}
 			else{
 				autoplace = false;
 			}
 			autoconf = true; 
-			nRules = (Integer) args[0][3];
+			nRules = (Integer) args[0][4];
 			installAntispam(nRules);
 	    }
 		else{
@@ -88,37 +102,33 @@ public class PolitoAntispam extends NetworkObject{
     }
 
     public void installAntispam (int[] blackList){
-    	  Expr n_0 = ctx.mkConst(politoAntispam+"_n_0", nctx.node);
-          Expr n_1 = ctx.mkConst(politoAntispam+"_n_1", nctx.node);
           Expr p_0 = ctx.mkConst(politoAntispam+"_p_0", nctx.packet);
           //IntExpr t_0 = ctx.mkIntConst(politoAntispam+"_t_0");
           //IntExpr t_1 = ctx.mkIntConst(politoAntispam+"_t_1");
-         
           isInBlacklist = ctx.mkFuncDecl(politoAntispam+"_isInBlacklist", ctx.mkIntSort(), ctx.mkBoolSort());
           addBlackList(blackList);
           constraints.add(
-	            	ctx.mkForall(new Expr[]{n_0, p_0}, 
+	            	ctx.mkForall(new Expr[]{p_0}, 
 	    	            ctx.mkImplies(
-	    	            		ctx.mkAnd( (BoolExpr)nctx.send.apply(politoAntispam, n_0, p_0),
+	    	            		ctx.mkAnd( enumerateSend,
                 				  		ctx.mkOr(ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_REQUEST))
                 				  				,ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_RESPONSE))
                 				  				 )),
 	    	            	
 	    	            			ctx.mkAnd(
-	    	            						ctx.mkExists(new Expr[]{n_1}, 
-	    	            								nctx.recv.apply(n_1, politoAntispam, p_0),1,null,null,null,null), 
+	    	            						enumerateRecv, 
 	    	            						ctx.mkNot((BoolExpr)isInBlacklist.apply(nctx.pf.get("emailFrom").apply(p_0))
 	    	            								))),1,null,null,null,null));
 
   	  
 	  	  //Constraint2 obliges this VNF to send the packets that have been received
 	  	  constraints.add(
-		            	ctx.mkForall(new Expr[]{n_0, p_0},
+		            	ctx.mkForall(new Expr[]{p_0},
 		            			ctx.mkImplies(	
-		            					ctx.mkAnd( (BoolExpr)nctx.recv.apply(n_0, politoAntispam, p_0)
+		            					ctx.mkAnd( enumerateRecv
 		            								,ctx.mkNot((BoolExpr)isInBlacklist.apply(nctx.pf.get("emailFrom").apply(p_0)))
 		            							),
-		            						ctx.mkAnd(ctx.mkExists(new Expr[]{n_1}, (BoolExpr)nctx.send.apply(new Expr[]{ politoAntispam, n_1, p_0}),1,null,null,null,null)
+		            						ctx.mkAnd(enumerateSend
 		            								)
 		            						
 		    	    	            	)
@@ -144,8 +154,6 @@ public class PolitoAntispam extends NetworkObject{
     }
     
     public void installAntispam (int nRules){
-  	    Expr n_0 = ctx.mkConst(politoAntispam+"_n_0", nctx.node);
-        Expr n_1 = ctx.mkConst(politoAntispam+"_n_1", nctx.node);
         Expr p_0 = ctx.mkConst(politoAntispam+"_p_0", nctx.packet);
         List<BoolExpr> rules = new ArrayList<>();
  		List<BoolExpr> implications1 = new ArrayList<BoolExpr>();
@@ -166,45 +174,43 @@ public class PolitoAntispam extends NetworkObject{
  		
  		isInBlacklist = ctx.mkFuncDecl(politoAntispam+"_isInBlacklist", ctx.mkIntSort(), ctx.mkBoolSort());
  		BoolExpr[] tmp = new BoolExpr[rules.size()];
-  	  
  		this.constraints.add(
- 				ctx.mkForall(new Expr[] { n_0, p_0 }, 
+ 				ctx.mkForall(new Expr[] { p_0 }, 
 	 				ctx.mkImplies(
-	 						ctx.mkAnd( (BoolExpr)nctx.send.apply(politoAntispam, n_0, p_0),
+	 						ctx.mkAnd( enumerateSend,
             				  		ctx.mkOr(ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_REQUEST))
             				  				,ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_RESPONSE))
             				  				 )),
-			 				ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, 
-			 								nctx.recv.apply(n_1, politoAntispam, p_0), 1, null, null, null, null),
+			 				ctx.mkAnd(enumerateRecv,
 					 						  ctx.mkNot(
 					 								  ctx.mkOr(
 					 										  rules.toArray(tmp)
 					 										  )		
 					 								  ))), 1, null, null, null, null));
- 		BoolExpr[] tmp2 = new BoolExpr[rules.size()];
+ 		BoolExpr[] tmp4 = new BoolExpr[rules.size()];
  		constraints.add(
- 				ctx.mkForall(new Expr[] { n_0, p_0 },
+ 				ctx.mkForall(new Expr[] { p_0 },
 		 				ctx.mkImplies(
-		 						ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, politoAntispam, p_0),
+		 						ctx.mkAnd(enumerateRecv,
 					 						ctx.mkNot(
 					 									ctx.mkOr(
-					 											rules.toArray(tmp2)
+					 											rules.toArray(tmp4)
 					 									   )
 					 						)), 
-		 						ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, (BoolExpr) nctx.send.apply(new Expr[] { politoAntispam, n_1, p_0 }), 1, null, null, null, null))),
+		 						ctx.mkAnd(enumerateSend)),
 		 				1, null, null, null, null));
  		if(autoplace){
- 			BoolExpr[] tmp3 = new BoolExpr[implications1.size()];
+ 			BoolExpr[] tmp5 = new BoolExpr[implications1.size()];
  			//System.out.println("Adding to antispam constraints: " + ctx.mkImplies(ctx.mkAnd(implications1.toArray(tmp3)), used));
- 			constraints.add(     ctx.mkImplies(ctx.mkOr(implications1.toArray(tmp3)),used)    );
+ 			constraints.add(     ctx.mkImplies(ctx.mkOr(implications1.toArray(tmp5)),used)    );
 
- 	 		BoolExpr[] tmp4 = new BoolExpr[implications2.size()];
+ 	 		BoolExpr[] tmp6 = new BoolExpr[implications2.size()];
  			//System.out.println("Adding to antispam constraints: " + ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4))));
- 			constraints.add(     ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp4)))    );
+ 			constraints.add(     ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(tmp6)))    );
  			//Constraint3 set a constraint to decide if a firewall is being used
  		  	constraints.add(
- 		            	ctx.mkForall(new Expr[]{n_0, p_0},
- 		            				ctx.mkImplies(	 (BoolExpr)nctx.recv.apply(n_0, politoAntispam, p_0), used  )
+ 		            	ctx.mkForall(new Expr[]{p_0},
+ 		            				ctx.mkImplies(	enumerateRecv , used  )
  		            			,1,null,null,null,null));
  		}			
 					 	      
