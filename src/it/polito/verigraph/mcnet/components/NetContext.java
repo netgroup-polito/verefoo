@@ -51,8 +51,8 @@ public class NetContext extends Core{
     public HashMap<String,FuncDecl> pf;
     Context ctx;
     public EnumSort node;
-	public DatatypeSort address;
-	public DatatypeSort port_range;
+	public EnumSort address;
+	//public DatatypeSort port_range;
     public HashMap<String,FuncDecl> port_functions;
     public FuncDecl /*src_port,dest_port,*/nodeHasAddr,addrToNode,send,recv;
     public DatatypeSort packet;
@@ -214,7 +214,7 @@ public class NetContext extends Core{
     
     private void mkTypes (String[] nodes, String[] addresses, String[] srcp_ranges, String[] dstp_ranges){
     	//Port ranges for this network         
-        String[] new_port_ranges = new String[srcp_ranges.length+dstp_ranges.length+1];
+        /*String[] new_port_ranges = new String[srcp_ranges.length+dstp_ranges.length+1];
         for(int k=0;k<srcp_ranges.length;k++)
         	new_port_ranges[k] = srcp_ranges[k];
         for(int k=srcp_ranges.length;k<srcp_ranges.length+dstp_ranges.length;k++)
@@ -243,7 +243,7 @@ public class NetContext extends Core{
             	}
             	
             }
-        }
+        }*/
         
         //Nodes in this network
         node = ctx.mkEnumSort("Node", nodes);
@@ -254,7 +254,7 @@ public class NetContext extends Core{
         }
 
         //Addresses for this network         
-        String[] new_addr = new String[addresses.length+2];
+       /* String[] new_addr = new String[addresses.length+2];
         for(int k=0;k<addresses.length;k++)
             new_addr[k] = addresses[k];
 
@@ -290,9 +290,9 @@ public class NetContext extends Core{
             	}
             	
             }
-        }
+        }*/
         //OLD APPROACH
-        /*String[] new_addr = new String[addresses.length+1];
+        String[] new_addr = new String[addresses.length+1];
         for(int k=0;k<addresses.length;k++)
             new_addr[k] = addresses[k];
 
@@ -301,8 +301,8 @@ public class NetContext extends Core{
         for(int i=0;i<address.getConsts().length;i++){
             DatatypeExpr fd  = (DatatypeExpr)address.getConst(i);
             am.put(fd.toString().replace("|", ""),fd);
-        }*/
-        
+        }
+       
         
         
         // Type for packets, contains (some of these are currently represented as relations):
@@ -314,9 +314,9 @@ public class NetContext extends Core{
         // -   options: A representation for IP options. (Integer)
 
         String[] fieldNames = new String[]{
-                "src","dest","inner_src","inner_dest","origin","orig_body","body","seq", "lv4proto", "src_port", "dest_port", "proto", "emailFrom","url","options","encrypted"};
+                "src","dest","inner_src","inner_dest","origin","orig_body","body","seq", /*"lv4proto", "src_port", "dest_port",*/ "proto", "emailFrom","url","options","encrypted"};
         Sort[] srt = new Sort[]{
-        		address,address,address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(), /* ctx.mkIntSort(),ctx.mkIntSort(),*/ port_range,port_range,
+        		address,address,address,address,node,ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),/*ctx.mkIntSort(), /* ctx.mkIntSort(),ctx.mkIntSort(),*//* port_range,port_range,*/
                ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkBoolSort()};
         Constructor packetcon = ctx.mkConstructor("packet", "is_packet", fieldNames, srt, null);
         packet = ctx.mkDatatypeSort("packet",  new Constructor[] {packetcon});
@@ -467,15 +467,15 @@ public class NetContext extends Core{
                                         ctx.mkEq(this.pf.get("orig_body").apply(p_1), this.pf.get("orig_body").apply(p_0)),
                                         ctx.mkEq(this.pf.get("body").apply(p_1), this.pf.get("body").apply(p_0)),
                                         ctx.mkEq(this.pf.get("seq").apply(p_1), this.pf.get("seq").apply(p_0)),
-                                        ctx.mkEq(this.pf.get("lv4proto").apply(p_1), this.pf.get("lv4proto").apply(p_0)),
+                                        //ctx.mkEq(this.pf.get("lv4proto").apply(p_1), this.pf.get("lv4proto").apply(p_0)),
                                         ctx.mkEq(this.pf.get("proto").apply(p_1), this.pf.get("proto").apply(p_0)),
-                                        ctx.mkEq(this.pf.get("src_port").apply(p_1), this.pf.get("src_port").apply(p_0)),
-                                        ctx.mkEq(this.pf.get("dest_port").apply(p_1), this.pf.get("dest_port").apply(p_0)),
+                                        //ctx.mkEq(this.pf.get("src_port").apply(p_1), this.pf.get("src_port").apply(p_0)),
+                                        //ctx.mkEq(this.pf.get("dest_port").apply(p_1), this.pf.get("dest_port").apply(p_0)),
                                         ctx.mkEq(this.pf.get("emailFrom").apply(p_1), this.pf.get("emailFrom").apply(p_0)),
                                         ctx.mkEq(this.pf.get("url").apply(p_1), this.pf.get("url").apply(p_0)),
                                         ctx.mkEq(this.pf.get("options").apply(p_1), this.pf.get("options").apply(p_0)))),1,null,null,null,null)
                 );
-		constraints.add(ctx.mkForall(new Expr[]{n_0, n_1, p_0},
+		/*constraints.add(ctx.mkForall(new Expr[]{n_0, n_1, p_0},
                                 	ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
                                 				ctx.mkAnd( 
 						                        		ctx.mkGe((IntExpr)ip_functions.get("ipAddr_1").apply(pf.get("src").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
@@ -515,7 +515,7 @@ public class NetContext extends Core{
 	                        		ctx.mkLe((IntExpr)pf.get("lv4proto").apply(p_0),(IntExpr)ctx.mkInt(3))
 		                              )
             				 )
-            	,1,null,null,null,null));
+            	,1,null,null,null,null));*/
 
     }
     

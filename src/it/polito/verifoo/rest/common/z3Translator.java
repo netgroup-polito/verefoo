@@ -35,6 +35,12 @@ public class z3Translator {
 	public static String stringToSearchDpiNotAllowed(Node n){
 		return "define-fun .*"+n.getName()+".*_auto_notAllowed_.* Int\n .*";
 	}
+	public static String stringToSearchNodeBasic(Node n){
+		return "define-fun .*"+n.getName()+".*_auto_src.* Address\n  .*\\)";
+	}
+	public static String stringToSearchFwDestinationBasic(Node n, String nrOfRule){
+		return "define-fun .*"+n.getName()+".*_auto_dst_"+nrOfRule+".* Address\n  .*\\)";
+	}
 	
 	
 	

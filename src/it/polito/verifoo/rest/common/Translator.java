@@ -20,11 +20,12 @@ import it.polito.verigraph.mcnet.components.Tuple;
  * This class implements a parser for verifoo output (the z3 model), in order to translate it into the correct XML 
  */
 public class Translator {
-	private String model;
-	private NFV nfv, originalNfv;
-	private org.apache.logging.log4j.Logger logger = LogManager.getLogger("mylog");
-	private Graph g;
-	private VerifooNormalizer norm;
+	protected String model;
+	protected NFV nfv;
+	protected NFV originalNfv;
+	protected org.apache.logging.log4j.Logger logger = LogManager.getLogger("mylog");
+	protected Graph g;
+	protected VerifooNormalizer norm;
 	/**
 	 * Constructor
 	 * @param model The Verifoo output.
@@ -114,7 +115,7 @@ public class Translator {
 		return nodeDstName;
 	}
 	
-	private String firewallAutoConfigSearchComplexAttribute(String tosearch, z3Translator.Datatype datatype){
+	protected String firewallAutoConfigSearchComplexAttribute(String tosearch, z3Translator.Datatype datatype){
 		Pattern pattern = Pattern.compile(tosearch);
 		Matcher matcher = pattern.matcher(model);
 		String attribute = "null";
@@ -125,7 +126,7 @@ public class Translator {
 		return attribute;
 	}
 	
-	private String firewallAutoConfigSearchPlainAttribute(String tosearch){
+	protected String firewallAutoConfigSearchPlainAttribute(String tosearch){
 		Pattern pattern = Pattern.compile(tosearch);
 		Matcher matcher = pattern.matcher(model);
 		String attribute = "null";
@@ -235,12 +236,12 @@ public class Translator {
 			        //if(!protocol.equals("null") && !L4ProtocolTypes.values()[Integer.parseInt(protocol)].equals(L4ProtocolTypes.ANY))
 			        	e.setProtocol(L4ProtocolTypes.values()[Integer.parseInt(protocol)]);
 			        //System.out.println(e.getAction());
-					/*System.out.println("Auto rule for " + n.getName() + " -> action: " + e.getAction() +
+					System.out.println("Auto rule for " + n.getName() + " -> action: " + e.getAction() +
 																			" src: " + e.getSource() +
 																		    " dst: "+e.getDestination() + 
 																			" "+ e.getProtocol()+
 																			"["+ e.getSrcPort() +
-																			":" + e.getDstPort()+"]");*/
+																			":" + e.getDstPort()+"]");
 					listOfRules.add(e);
 					//n.getConfiguration().getFirewall().getElements().add(e);
 				}

@@ -91,7 +91,7 @@ public class VerifooSerializer {
 	        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(), prop, paths);
 	        	IsolationResult res=test.checkNFFGProperty();
 	        	if(res.result != Status.UNSATISFIABLE){
-	        		Translator t = new Translator(res.model.toString(),root, g);
+	        		Translator t = new TranslatorBasic(res.model.toString(),root, g);
 	        		t.setNormalizer(norm);
 	        		result = t.convert();
 	        		root = result;
