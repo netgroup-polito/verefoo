@@ -107,7 +107,7 @@ public class TestPerformance {
             	checkTimeSAT += (endCheck-endVP);
             	maxCheckTimeSAT = maxCheckTimeSAT<(endCheck-endVP)? (endCheck-endVP) : maxCheckTimeSAT;
         		nSAT++;
-        		new TranslatorBasic(res.model.toString(),root,g).convert();
+        		new Translator(res.model.toString(),root,g).convert();
         	}
         	else{
         		checkTimeUNSAT += (endCheck-endVP);

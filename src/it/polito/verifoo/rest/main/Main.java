@@ -59,7 +59,7 @@ public class Main {
                         
                         //root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/current.xml" ) );
                         //NFV root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/bug1.xml" ) );
-                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(   "./testfile/Performance/Refinement/refNoTopology-1FW4P.xml"   )));
+                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(   "./testfile/Performance/Refinement/refNoTopology-1FW1P.xml"   )));
                         m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
