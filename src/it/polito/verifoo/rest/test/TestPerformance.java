@@ -33,6 +33,7 @@ import com.microsoft.z3.Status;
 
 import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.Translator;
+import it.polito.verifoo.rest.common.TranslatorBasic;
 import it.polito.verifoo.rest.common.VerifooProxy;
 import it.polito.verifoo.rest.common.VerifooSerializer;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
@@ -106,7 +107,7 @@ public class TestPerformance {
             	checkTimeSAT += (endCheck-endVP);
             	maxCheckTimeSAT = maxCheckTimeSAT<(endCheck-endVP)? (endCheck-endVP) : maxCheckTimeSAT;
         		nSAT++;
-        		new Translator(res.model.toString(),root,g).convert();
+        		new TranslatorBasic(res.model.toString(),root,g).convert();
         	}
         	else{
         		checkTimeUNSAT += (endCheck-endVP);
