@@ -235,7 +235,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 					if(n.getConfiguration().getFieldmodifier()==null){
 						throw new BadGraphError("You have specified a FIELDMODIFIER Type but you provide a configuration of another type",EType.INVALID_NODE_CONFIGURATION);
 					}
-					PolitoFieldModifier fm = new PolitoFieldModifier(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx});
+					PolitoFieldModifier fm = new PolitoFieldModifier(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx, neighbours});
 					fm.installFieldModifier(Optional.ofNullable(null));
 					// TODO: Field Modifier requires a packet model
 					this.put(n,fm);

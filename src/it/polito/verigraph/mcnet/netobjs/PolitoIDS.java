@@ -41,8 +41,6 @@ public class PolitoIDS extends NetworkObject {
     int nRules;
 	private boolean autoconf,autoplace;
 	private AutoContext autoctx;
-	private BoolExpr enumerateRecv;
-	private BoolExpr enumerateSend;
 
 
     public PolitoIDS(Context ctx, Object[]...args){
@@ -63,14 +61,14 @@ public class PolitoIDS extends NetworkObject {
         this.net = (Network)args[0][1];
         this.nctx = (NetContext)args[0][2];
 
-        ArrayList<NetworkObject> neighbours = ((ArrayList<NetworkObject>) args[0][3]);
+        neighbours = ((ArrayList<NetworkObject>) args[0][3]);
         Expr p_0 = ctx.mkConst(politoIDS+"_p_0", nctx.packet);
    		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), politoIDS, p_0)).collect(Collectors.toList());
    		BoolExpr[] tmp2 = new BoolExpr[recvNeighbours.size()];
-   		enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp2));
+   		enumerateRecvP0 = ctx.mkOr(recvNeighbours.toArray(tmp2));
    		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.send.apply(politoIDS, n.getZ3Node(), p_0)).collect(Collectors.toList());
   		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
-  		enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp3));
+  		enumerateSendP0 = ctx.mkOr(sendNeighbours.toArray(tmp3));
    		
         if(args[0].length > 4 && ((Integer) args[0][4]) != 0){
 	    	if(args[0].length > 5 && args[0][5] != null){
@@ -158,16 +156,16 @@ public class PolitoIDS extends NetworkObject {
         //(exist  n_1,t_1 : (recv(n_1, politoIDS, p, t_1) && t_1 < t_0)) && !isInBlackList(p.body)
 	
         this.constraints.add(ctx.mkForall(new Expr[]{p_0},
-                ctx.mkImplies(ctx.mkAnd(enumerateSend),
-                        ctx.mkAnd(enumerateRecv,
+                ctx.mkImplies(ctx.mkAnd(enumerateSendP0),
+                        ctx.mkAnd(enumerateRecvP0,
                                 ctx.mkNot((BoolExpr)isInBlacklist.apply(nctx.pf.get("body").apply(p_0))))),
                 1,
                 null, null, null, null));
 
         this.constraints.add(ctx.mkForall(new Expr[]{p_0},
-                ctx.mkImplies(ctx.mkAnd(enumerateRecv,
+                ctx.mkImplies(ctx.mkAnd(enumerateRecvP0,
                 						ctx.mkNot((BoolExpr)isInBlacklist.apply(nctx.pf.get("body").apply(p_0)))),
-                				enumerateSend)
+                				enumerateSendP0)
                 ,1,null, null, null, null));
 
   	  
@@ -241,7 +239,7 @@ public class PolitoIDS extends NetworkObject {
  			//Constraint3 set a constraint to decide if a firewall is being used
  	        this.constraints.add(
  	            	ctx.mkForall(new Expr[]{n_0, p_0},
- 	            				ctx.mkImplies(	 enumerateRecv, used  )
+ 	            				ctx.mkImplies(	 enumerateRecvP0, used  )
  	            			,1,null,null,null,null));
 
         }	

@@ -10,6 +10,8 @@ package it.polito.verigraph.mcnet.netobjs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
@@ -49,6 +51,22 @@ public class PolitoEndHost extends NetworkObject {
         net.saneSend(this);
         n_0 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_n_0", nctx.node);
         p_0 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_p_0", nctx.packet);
+
+        Expr p_1 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_p_1", nctx.packet);
+        neighbours = ((ArrayList<NetworkObject>) args[0][3]);
+		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), politoEndHost, p_0)).collect(Collectors.toList());
+		BoolExpr[] tmp2 = new BoolExpr[recvNeighbours.size()];
+		enumerateRecvP0 = ctx.mkOr(recvNeighbours.toArray(tmp2));
+		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.send.apply(politoEndHost, n.getZ3Node(), p_0)).collect(Collectors.toList());
+		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
+		enumerateSendP0 = ctx.mkOr(sendNeighbours.toArray(tmp3));
+		List<Expr> recvNeighbours2 = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), politoEndHost, p_1)).collect(Collectors.toList());
+		BoolExpr[] tmp4 = new BoolExpr[recvNeighbours2.size()];
+		enumerateRecvP1 = ctx.mkOr(recvNeighbours2.toArray(tmp4));
+		List<Expr> sendNeighbours2 = neighbours.stream().map(n -> nctx.send.apply(politoEndHost, n.getZ3Node(), p_1)).collect(Collectors.toList());
+		BoolExpr[] tmp5 = new BoolExpr[sendNeighbours2.size()];
+		enumerateSendP1 = ctx.mkOr(sendNeighbours2.toArray(tmp5));
+		
     }
 
     @Override
@@ -62,8 +80,8 @@ public class PolitoEndHost extends NetworkObject {
         installEndHost(packet);
         Expr p_1 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_p_1", nctx.packet);
 
-        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
-                ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0,politoEndHost, p_0),
+        constraints.add( ctx.mkForall(new Expr[]{p_0},
+                ctx.mkImplies(enumerateRecvP0,
                         ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.HTTP_REQUEST))
                         ),1,null,null,null,null));
 
@@ -98,7 +116,7 @@ public class PolitoEndHost extends NetworkObject {
 
         //constraint4 recv(n_0, politomailserver, p) -> nodehasaddr(politomailserver,p.dest)
         constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
-                ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0,politoEndHost, p_0),
+                ctx.mkImplies(enumerateRecvP0,
                         ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_REQUEST))
                         ),1,null,null,null,null));
 
@@ -123,7 +141,7 @@ public class PolitoEndHost extends NetworkObject {
         constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
                 ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0,politoEndHost, p_0),
                         ctx.mkAnd( ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_RESPONSE)),
-                                ctx.mkExists(new Expr[]{p_1},
+                                ctx.mkExists(new Expr[]{n_0, p_1},
                                         ctx.mkAnd( (BoolExpr)nctx.send.apply(politoEndHost, n_0, p_1), ctx.mkEq(nctx.pf.get("src").apply(p_0), ipServer),
                                                 ctx.mkEq(nctx.pf.get("dest").apply(p_1), nctx.pf.get("src").apply(p_0))),1,null,null,null,null)
                                 )
@@ -179,8 +197,8 @@ public class PolitoEndHost extends NetworkObject {
                                 )),1,null,null,null,null));
 
         //Constraint2 recv(n_0, politoEndHost, p) -> nodeHasAddr(politoEndHost,p.dest)
-        constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
-                ctx.mkImplies((BoolExpr)nctx.recv.apply(n_0,politoEndHost, p_0),
+        constraints.add( ctx.mkForall(new Expr[]{p_0},
+                ctx.mkImplies(enumerateRecvP0,
                         (BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.pf.get("dest").apply(p_0))),1,null,null,null,null));
 
         //System.out.println("Done.");

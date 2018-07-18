@@ -8,6 +8,8 @@
  *******************************************************************************/
 package it.polito.verigraph.mcnet.components;
 
+import java.util.ArrayList;
+
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
@@ -27,6 +29,11 @@ public abstract class NetworkObject extends Core{
     protected DatatypeExpr z3Node;
     protected boolean isEndHost;
     protected BoolExpr used;
+	public BoolExpr enumerateRecvP0;
+	public BoolExpr enumerateSendP0;
+	public BoolExpr enumerateRecvP1;
+	public BoolExpr enumerateSendP1;
+	public ArrayList<NetworkObject> neighbours;
     /**
      * Get a reference to the z3 node this class wraps around
      * @return

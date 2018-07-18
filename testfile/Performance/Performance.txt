@@ -860,6 +860,44 @@ AVG total time -> 404ms
 =====================================
 
 
+REFINEMENT NO WILDCARDS ONLY IP WITH IMPROVEMENTS
+===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW1P.xml===========
+AVG total time -> 146ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW2P.xml===========
+AVG total time -> 265ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW3P.xml===========
+AVG total time -> 630ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-1FW4P.xml===========
+AVG total time -> 1586ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW1P.xml===========
+AVG total time -> 388ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW2P.xml===========
+AVG total time -> 991ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW3P.xml===========
+AVG total time -> 2039ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-2FW4P.xml===========
+AVG total time -> 9286ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW1P.xml===========
+AVG total time -> 521ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW2P.xml===========
+AVG total time -> 3033ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW3P.xml===========
+AVG total time -> 5497ms
+=====================================
+===========FILE ./testfile/Performance/Refinement/refNoTopology-3FW4P.xml===========
+AVG total time -> 11457ms
+=====================================
+
 
 
 
@@ -902,3 +940,6 @@ AVG total time -> 2856ms
 ===========FILE ./testfile/Performance/Refinement/DPI/refNoTopology-3DPI4P.xml===========
 AVG total time -> 4322ms
 =====================================
+
+
+

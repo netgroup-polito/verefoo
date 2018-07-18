@@ -46,7 +46,6 @@ public class AclFirewall extends NetworkObject{
 	NetContext nctx;
 	FuncDecl acl_func;
 	FuncDecl rule_func;
-	List<NetworkObject> neighbours;
 	//FuncDecl acl_func_white;
 	private boolean autoconf, autoplace;
 	private AutoContext autoctx;
@@ -70,6 +69,13 @@ public class AclFirewall extends NetworkObject{
 	    net.saneSend(this);
 	    defaultAction = ((boolean)args[0][3])? ctx.mkTrue() : ctx.mkFalse();
 	    neighbours = ((ArrayList<NetworkObject>) args[0][4]);
+    	Expr p_0 = ctx.mkConst(fw+"_firewall_send_p_0", nctx.packet);
+ 		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), fw, p_0)).collect(Collectors.toList());
+ 		BoolExpr[] tmp2 = new BoolExpr[recvNeighbours.size()];
+ 		enumerateRecvP0 = ctx.mkOr(recvNeighbours.toArray(tmp2));
+ 		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.send.apply(fw, n.getZ3Node(), p_0)).collect(Collectors.toList());
+		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
+		enumerateSendP0 = ctx.mkOr(sendNeighbours.toArray(tmp3));
 	    if(args[0].length > 5 && ((Integer) args[0][5]) != 0){
 	    	if(args[0].length > 6 && args[0][6] != null){
 	    		used = ctx.mkBoolConst(fw+"_used");
@@ -396,19 +402,8 @@ public class AclFirewall extends NetworkObject{
 												behaviour), ctx.mkAnd(enumerateSend)), 
 										1, null, null, null, null));
 		
-		/*Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
-		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 }, 
-				ctx.mkImplies(
-								(BoolExpr) nctx.send.apply(new Expr[] { fw, n_0, p_0 }),
-								ctx.mkAnd(enumerateRecv,
-										behaviour)), 1, null, null, null, null));;
-
-		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 },
-										ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, fw, p_0),
-												behaviour), ctx.mkAnd(enumerateSend)), 
-										1, null, null, null, null));*/
-
- 		/*Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
+/*
+ 		Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
  		Expr n_1 = ctx.mkConst(fw + "_firewall_send_n_1", nctx.node);
 		constraints.add(ctx.mkForall(new Expr[] { n_0, p_0 }, 
 				ctx.mkImplies(
@@ -420,7 +415,7 @@ public class AclFirewall extends NetworkObject{
 										ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, fw, p_0),
 												behaviour), ctx.mkAnd(ctx.mkExists(new Expr[] { n_1 }, (BoolExpr) nctx.send.apply(new Expr[] { fw, n_1, p_0 }), 1, null, null, null, null))), 
 										1, null, null, null, null));
-		*/								
+									*/
  	}
  	
  	private void aclConstraints(Optimize solver){
@@ -432,9 +427,6 @@ public class AclFirewall extends NetworkObject{
  		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), fw, p_0)).collect(Collectors.toList());
  		BoolExpr[] tmp2 = new BoolExpr[recvNeighbours.size()];
  		BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp2));
- 		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), fw, p_0)).collect(Collectors.toList());
-		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
-		BoolExpr enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp3));
     	if (acls.size() == 0){
     		//If the size of the ACL list is empty then by default acl_func must be false
     		 solver.Add(ctx.mkForall(new Expr[]{p_0},

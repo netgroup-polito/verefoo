@@ -547,7 +547,7 @@ public class VerifooProxy {
 						if(!nodeIsServer(n)){
 							//logger.debug("Adding ("+ ctx.mkTrue() +"), from "+ n.getName() +" to " + server.getName() + " next hop is " + nextNode.getName() + " with latency " + 0);
 							//System.out.println("Adding ("+ c +"), from "+ n.getName() +" to " + server.getName() + " next hop is " + next.getName() + " with latency " + latency);
-							rt.add(new RoutingTable(nctx.am.get(server.getName()), netobjs.get(nextNode), nctx.addLatency(0), ctx.mkTrue()));
+							rt.add(new RoutingTable(nctx.am.get(server.getName()), netobjs.get(nextNode), nctx.addLatency(1), ctx.mkTrue()));
 						}
 					}
 					if(!routingMap.containsKey(n)){

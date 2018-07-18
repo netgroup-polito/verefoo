@@ -233,15 +233,15 @@ public class Translator {
 			        //System.out.println(e.getAction());
 			        
 			        String protocol = firewallAutoConfigSearchPlainAttribute(z3Translator.stringToSearchFwProtocol(n, nrOfRule));
-			        //if(!protocol.equals("null") && !L4ProtocolTypes.values()[Integer.parseInt(protocol)].equals(L4ProtocolTypes.ANY))
+			        if(!protocol.equals("null") && Integer.parseInt(protocol) < 4 && !L4ProtocolTypes.values()[Integer.parseInt(protocol)].equals(L4ProtocolTypes.ANY))
 			        	e.setProtocol(L4ProtocolTypes.values()[Integer.parseInt(protocol)]);
 			        //System.out.println(e.getAction());
-					/*System.out.println("Auto rule for " + n.getName() + " -> action: " + e.getAction() +
+					System.out.println("Auto rule for " + n.getName() + " -> action: " + e.getAction() +
 																			" src: " + e.getSource() +
 																		    " dst: "+e.getDestination() + 
 																			" "+ e.getProtocol()+
 																			"["+ e.getSrcPort() +
-																			":" + e.getDstPort()+"]");*/
+																			":" + e.getDstPort()+"]");
 					listOfRules.add(e);
 					//n.getConfiguration().getFirewall().getElements().add(e);
 				}

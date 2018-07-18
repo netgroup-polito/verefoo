@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -20,6 +21,7 @@ import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Model;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Optimize.Handle;
+import com.microsoft.z3.Params;
 import com.microsoft.z3.Status;
 
 import it.polito.verifoo.rest.common.AutoContext;
@@ -28,6 +30,7 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
+import it.polito.verigraph.mcnet.netobjs.PolitoEndHost;
 
 /**
  * Various checks for specific properties in the network.
@@ -244,9 +247,12 @@ public class Checker {
 		int lv4proto = (otherConstr == null || otherConstr.getLv4Proto() == null) ? 0:otherConstr.getLv4Proto().ordinal();
 		propertyAdd(src, dest, property, lv4proto, src_port, dst_port);
 		Expr p_0 = ctx.mkConst("check_prop_p0_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
-		Expr n_0 = ctx.mkConst("check_prop_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
-		constraintList.add(ctx.mkForall(new Expr[]{n_0, p_0},
-				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.send.apply(src.getZ3Node(), n_0, p_0)),
+
+		List<Expr> sendNeighbours = src.neighbours.stream().map(n -> nctx.send.apply(src.getZ3Node(), n.getZ3Node(), p_0)).collect(Collectors.toList());
+		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
+		BoolExpr enumerateSendP0 = ctx.mkOr(sendNeighbours.toArray(tmp3));
+		constraintList.add(ctx.mkForall(new Expr[]{p_0},
+				ctx.mkImplies(ctx.mkAnd(enumerateSendP0),
 						ctx.mkAnd(ctx.mkEq(nctx.pf.get("lv4proto").apply(p_0), (IntExpr)ctx.mkInt(lv4proto)),
 									ctx.mkEq(nctx.pf.get("src_port").apply(p_0), nctx.pm.get(src_port)),
 									ctx.mkEq(nctx.pf.get("dest_port").apply(p_0), nctx.pm.get(dst_port)))),1,null,null,null,null));
@@ -274,7 +280,11 @@ public class Checker {
 	public IsolationResult propertyCheck(){
 		solver.Push();
 		addConstraints();
-		
+		Params p = ctx.mkParams();
+		p.add("maxsat_engine", ctx.mkSymbol("wmax")  );
+		p.add("maxres.wmax", true  );
+		//p.add("maxres.add_upper_bound_block", true  );
+		solver.setParameters(p);
 		result = this.solver.Check();
 		/*Handle temp = null;
 		for (Entry<String, Handle> handle : nctx.handles.entrySet()) {

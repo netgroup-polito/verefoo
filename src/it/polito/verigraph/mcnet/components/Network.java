@@ -716,7 +716,8 @@ public class Network extends Core {
 				BoolExpr forTheKey = temp.getValue()._2;
 				Integer latency_val = -temp.getValue()._1;
 				assert(latency_val <= 0);
-				softConstraints.put(forTheKey, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
+				if(!forTheKey.equals(ctx.mkTrue()))
+					softConstraints.put(forTheKey, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
 				forTheKeys.add(forTheKey);
 				if(temp.getKey().indexOf("!") == 0){
 					optional = true;

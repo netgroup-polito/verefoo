@@ -56,6 +56,20 @@ public class PolitoNat extends NetworkObject {
 		private_addresses = new ArrayList<DatatypeExpr>();
 		private_node = new ArrayList<NetworkObject>();
 		net.saneSend(this);
+        Expr p_0 = ctx.mkConst("p_0", nctx.packet);
+        Expr p_1 = ctx.mkConst("p_1", nctx.packet);
+		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.send.apply(nat, n.getZ3Node(), p_0)).collect(Collectors.toList());
+		BoolExpr[] tmp2 = new BoolExpr[sendNeighbours.size()];
+		enumerateSendP0 = ctx.mkOr(sendNeighbours.toArray(tmp2));
+ 		List<Expr> recvNeighbours2 = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), nat, p_0)).collect(Collectors.toList());
+ 		BoolExpr[] tmp3 = new BoolExpr[recvNeighbours2.size()];
+ 		enumerateRecvP0 = ctx.mkOr(recvNeighbours2.toArray(tmp3));
+		List<Expr> sendNeighbours2 = neighbours.stream().map(n -> nctx.send.apply(nat, n.getZ3Node(), p_1)).collect(Collectors.toList());
+		BoolExpr[] tmp4 = new BoolExpr[sendNeighbours2.size()];
+		enumerateSendP1 = ctx.mkOr(sendNeighbours.toArray(tmp4));
+ 		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), nat, p_1)).collect(Collectors.toList());
+ 		BoolExpr[] tmp5 = new BoolExpr[recvNeighbours.size()];
+ 		enumerateRecvP1 = ctx.mkOr(recvNeighbours.toArray(tmp5));
 	}
 
 	@Override
@@ -95,15 +109,10 @@ public class PolitoNat extends NetworkObject {
 		// ctx.mkBoolSort());
 		private_addr_func = ctx.mkFuncDecl(nat + "_nat_func", nctx.address, ctx.mkBoolSort());
 
- 		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.send.apply(nat, n.getZ3Node(), p_0)).collect(Collectors.toList());
-		BoolExpr[] tmp2 = new BoolExpr[sendNeighbours.size()];
-		BoolExpr enumerateSendP0 = ctx.mkOr(sendNeighbours.toArray(tmp2));
- 		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), nat, p_1)).collect(Collectors.toList());
- 		BoolExpr[] tmp3 = new BoolExpr[recvNeighbours.size()];
- 		BoolExpr enumerateRecvP1 = ctx.mkOr(recvNeighbours.toArray(tmp3));
+ 		
 		List<Expr> recvNeighbours2 = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), nat, p_2)).collect(Collectors.toList());
  		BoolExpr[] tmp4 = new BoolExpr[recvNeighbours2.size()];
- 		BoolExpr enumerateRecvP2 = ctx.mkOr(recvNeighbours2.toArray(tmp2));
+ 		BoolExpr enumerateRecvP2 = ctx.mkOr(recvNeighbours2.toArray(tmp4));
  		
 		// Constraint1
 		// "send(nat, x, p_0) && !private_addr_func(p_0.dest) ->

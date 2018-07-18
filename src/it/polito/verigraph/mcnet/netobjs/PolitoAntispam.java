@@ -44,8 +44,6 @@ public class PolitoAntispam extends NetworkObject{
     int nRules;
 	private boolean autoconf,autoplace;
 	private AutoContext autoctx;
-	private BoolExpr enumerateRecv;
-	private BoolExpr enumerateSend;
     public PolitoAntispam(Context ctx, Object[]... args) {
         super(ctx, args);
     }
@@ -61,14 +59,14 @@ public class PolitoAntispam extends NetworkObject{
         nctx = (NetContext)args[0][2];
         net.saneSend(this);
         
-        ArrayList<NetworkObject> neighbours = ((ArrayList<NetworkObject>) args[0][3]);
+        neighbours = ((ArrayList<NetworkObject>) args[0][3]);
         Expr p_0 = ctx.mkConst(politoAntispam+"_p_0", nctx.packet);
    		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), politoAntispam, p_0)).collect(Collectors.toList());
    		BoolExpr[] tmp2 = new BoolExpr[recvNeighbours.size()];
-   		enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp2));
+   		enumerateRecvP0 = ctx.mkOr(recvNeighbours.toArray(tmp2));
    		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.send.apply(politoAntispam, n.getZ3Node(), p_0)).collect(Collectors.toList());
   		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
-  		enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp3));
+  		enumerateSendP0 = ctx.mkOr(sendNeighbours.toArray(tmp3));
    		
         if(args[0].length > 4 && ((Integer) args[0][4]) != 0){
 	    	if(args[0].length > 5 && args[0][5] != null){
@@ -110,13 +108,13 @@ public class PolitoAntispam extends NetworkObject{
           constraints.add(
 	            	ctx.mkForall(new Expr[]{p_0}, 
 	    	            ctx.mkImplies(
-	    	            		ctx.mkAnd( enumerateSend,
+	    	            		ctx.mkAnd( enumerateSendP0,
                 				  		ctx.mkOr(ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_REQUEST))
                 				  				,ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_RESPONSE))
                 				  				 )),
 	    	            	
 	    	            			ctx.mkAnd(
-	    	            						enumerateRecv, 
+	    	            						enumerateRecvP0, 
 	    	            						ctx.mkNot((BoolExpr)isInBlacklist.apply(nctx.pf.get("emailFrom").apply(p_0))
 	    	            								))),1,null,null,null,null));
 
@@ -125,10 +123,10 @@ public class PolitoAntispam extends NetworkObject{
 	  	  constraints.add(
 		            	ctx.mkForall(new Expr[]{p_0},
 		            			ctx.mkImplies(	
-		            					ctx.mkAnd( enumerateRecv
+		            					ctx.mkAnd( enumerateRecvP0
 		            								,ctx.mkNot((BoolExpr)isInBlacklist.apply(nctx.pf.get("emailFrom").apply(p_0)))
 		            							),
-		            						ctx.mkAnd(enumerateSend
+		            						ctx.mkAnd(enumerateSendP0
 		            								)
 		            						
 		    	    	            	)
@@ -177,11 +175,11 @@ public class PolitoAntispam extends NetworkObject{
  		this.constraints.add(
  				ctx.mkForall(new Expr[] { p_0 }, 
 	 				ctx.mkImplies(
-	 						ctx.mkAnd( enumerateSend,
+	 						ctx.mkAnd( enumerateSendP0,
             				  		ctx.mkOr(ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_REQUEST))
             				  				,ctx.mkEq(nctx.pf.get("proto").apply(p_0), ctx.mkInt(nctx.POP3_RESPONSE))
             				  				 )),
-			 				ctx.mkAnd(enumerateRecv,
+			 				ctx.mkAnd(enumerateRecvP0,
 					 						  ctx.mkNot(
 					 								  ctx.mkOr(
 					 										  rules.toArray(tmp)
@@ -191,13 +189,13 @@ public class PolitoAntispam extends NetworkObject{
  		constraints.add(
  				ctx.mkForall(new Expr[] { p_0 },
 		 				ctx.mkImplies(
-		 						ctx.mkAnd(enumerateRecv,
+		 						ctx.mkAnd(enumerateRecvP0,
 					 						ctx.mkNot(
 					 									ctx.mkOr(
 					 											rules.toArray(tmp4)
 					 									   )
 					 						)), 
-		 						ctx.mkAnd(enumerateSend)),
+		 						ctx.mkAnd(enumerateSendP0)),
 		 				1, null, null, null, null));
  		if(autoplace){
  			BoolExpr[] tmp5 = new BoolExpr[implications1.size()];
@@ -210,7 +208,7 @@ public class PolitoAntispam extends NetworkObject{
  			//Constraint3 set a constraint to decide if a firewall is being used
  		  	constraints.add(
  		            	ctx.mkForall(new Expr[]{p_0},
- 		            				ctx.mkImplies(	enumerateRecv , used  )
+ 		            				ctx.mkImplies(	enumerateRecvP0 , used  )
  		            			,1,null,null,null,null));
  		}			
 					 	      

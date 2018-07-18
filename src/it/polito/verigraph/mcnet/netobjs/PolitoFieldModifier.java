@@ -11,6 +11,7 @@ package it.polito.verigraph.mcnet.netobjs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -49,6 +50,14 @@ public class PolitoFieldModifier extends NetworkObject {
         politoFieldModifier = z3Node;
         net = (Network)args[0][1];
         nctx = (NetContext)args[0][2];
+	    neighbours = ((ArrayList<NetworkObject>) args[0][3]);
+ 		Expr p_0 = ctx.mkConst(politoFieldModifier+"_firewall_acl_p_0", nctx.packet);
+ 		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), politoFieldModifier, p_0)).collect(Collectors.toList());
+ 		BoolExpr[] tmp2 = new BoolExpr[recvNeighbours.size()];
+ 		enumerateRecvP0 = ctx.mkOr(recvNeighbours.toArray(tmp2));
+ 		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.send.apply(politoFieldModifier, n.getZ3Node(), p_0)).collect(Collectors.toList());
+		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
+		enumerateSendP0 = ctx.mkOr(sendNeighbours.toArray(tmp3));
     }
 
     @Override

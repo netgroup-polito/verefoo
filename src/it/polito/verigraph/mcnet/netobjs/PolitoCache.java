@@ -10,6 +10,7 @@ package it.polito.verigraph.mcnet.netobjs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -51,6 +52,20 @@ public class PolitoCache extends NetworkObject{
         net = (Network)args[0][1];
         nctx = (NetContext)args[0][2];
         //net.saneSend(this);
+        neighbours = ((ArrayList<NetworkObject>) args[0][3]);
+        Expr p_0 = ctx.mkConst(politoCache+"_p_0", nctx.packet);
+   		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), politoCache, p_0)).collect(Collectors.toList());
+   		BoolExpr[] tmp2 = new BoolExpr[recvNeighbours.size()];
+   		enumerateRecvP0 = ctx.mkOr(recvNeighbours.toArray(tmp2));
+   		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.send.apply(politoCache, n.getZ3Node(), p_0)).collect(Collectors.toList());
+  		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
+  		enumerateSendP0 = ctx.mkOr(sendNeighbours.toArray(tmp3));
+   		List<Expr> recvNeighbours2 = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), politoCache, p_0)).collect(Collectors.toList());
+   		BoolExpr[] tmp4 = new BoolExpr[recvNeighbours2.size()];
+   		enumerateRecvP1 = ctx.mkOr(recvNeighbours2.toArray(tmp4));
+   		List<Expr> sendNeighbours2 = neighbours.stream().map(n -> nctx.send.apply(politoCache, n.getZ3Node(), p_0)).collect(Collectors.toList());
+  		BoolExpr[] tmp5 = new BoolExpr[sendNeighbours2.size()];
+  		enumerateSendP1 = ctx.mkOr(sendNeighbours2.toArray(tmp5));
     }
 
     @Override
