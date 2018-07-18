@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./xsd/nfvSchema.xsd">
+    <graphs>
+        <graph id="0">
+            <node id="0" name="ENDHOST0" functional_type="ENDHOST">
+                <neighbour id="4" name="NAT0"/>
+                <neighbour id="5" name="FIREWALL1"/>
+                <neighbour id="6" name="NAT2"/>
+                <neighbour id="12" name="CACHE8"/>
+                <configuration name="conf_ENDHOST0">
+                    <endhost body="cats" email_from="verigraph@polito.it" url="www.facebook.com"/>
+                </configuration>
+            </node>
+            <node id="1" name="ENDHOST1" functional_type="ENDHOST">
+                <neighbour id="4" name="NAT0"/>
+                <neighbour id="5" name="FIREWALL1"/>
+                <neighbour id="10" name="FIELDMODIFIER6"/>
+                <configuration name="conf_ENDHOST1">
+                    <endhost body="cats" email_from="verigraph@polito.it" url="www.facebook.com"/>
+                </configuration>
+            </node>
+            <node id="2" name="MAILSERVER0" functional_type="MAILSERVER">
+                <neighbour id="4" name="NAT0"/>
+                <neighbour id="5" name="FIREWALL1"/>
+                <configuration name="conf_MAILSERVER0">
+                    <mailserver>
+                        <name>MAILSERVER0</name>
+                    </mailserver>
+                </configuration>
+            </node>
+            <node id="3" name="WEBSERVER1" functional_type="WEBSERVER">
+                <neighbour id="4" name="NAT0"/>
+                <neighbour id="5" name="FIREWALL1"/>
+                <neighbour id="12" name="CACHE8"/>
+                <configuration name="conf_WEBSERVER1">
+                    <webserver>
+                        <name>WEBSERVER1</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node id="4" name="NAT0" functional_type="NAT">
+                <neighbour id="1" name="ENDHOST1"/>
+                <neighbour id="3" name="WEBSERVER1"/>
+                <neighbour id="5" name="FIREWALL1"/>
+                <configuration name="conf_NAT0">
+                    <nat>
+                        <source>ENDHOST0</source>
+                        <source>ENDHOST1</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node id="5" name="FIREWALL1" functional_type="FIREWALL">
+                <neighbour id="1" name="ENDHOST1"/>
+                <neighbour id="3" name="WEBSERVER1"/>
+                <neighbour id="4" name="NAT0"/>
+                <configuration name="conf_FIREWALL1">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node id="6" name="NAT2" functional_type="NAT">
+                <neighbour id="1" name="ENDHOST1"/>
+                <neighbour id="2" name="MAILSERVER0"/>
+                <neighbour id="4" name="NAT0"/>
+                <neighbour id="5" name="FIREWALL1"/>
+                <configuration name="conf_NAT2">
+                    <nat>
+                        <source>ENDHOST0</source>
+                        <source>ENDHOST1</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node id="7" name="ANTISPAM3" functional_type="ANTISPAM">
+                <neighbour id="0" name="ENDHOST0"/>
+                <neighbour id="3" name="WEBSERVER1"/>
+                <neighbour id="4" name="NAT0"/>
+                <neighbour id="5" name="FIREWALL1"/>
+                <configuration name="conf_ANTISPAM3">
+                    <antispam>
+                        <source>spam@polito.it</source>
+                    </antispam>
+                </configuration>
+            </node>
+            <node id="8" name="ANTISPAM4" functional_type="ANTISPAM">
+                <neighbour id="0" name="ENDHOST0"/>
+                <neighbour id="2" name="MAILSERVER0"/>
+                <neighbour id="4" name="NAT0"/>
+                <neighbour id="5" name="FIREWALL1"/>
+                <configuration name="conf_ANTISPAM4">
+                    <antispam>
+                        <source>verigraph@polito.it</source>
+                    </antispam>
+                </configuration>
+            </node>
+            <node id="9" name="FIREWALL5" functional_type="FIREWALL">
+                <neighbour id="1" name="ENDHOST1"/>
+                <neighbour id="3" name="WEBSERVER1"/>
+                <neighbour id="4" name="NAT0"/>
+                <neighbour id="5" name="FIREWALL1"/>
+                <configuration name="conf_FIREWALL5">
+                    <firewall>
+                        <elements>
+                            <source>ENDHOST0</source>
+                            <destination>MAILSERVER0</destination>
+                        </elements>
+                        <elements>
+                            <source>ENDHOST0</source>
+                            <destination>WEBSERVER1</destination>
+                        </elements>
+                        <elements>
+                            <source>ENDHOST1</source>
+                            <destination>MAILSERVER0</destination>
+                        </elements>
+                        <elements>
+                            <source>ENDHOST1</source>
+                            <destination>WEBSERVER1</destination>
+                        </elements>
+                    </firewall>
+                </configuration>
+            </node>
+            <node id="10" name="FIELDMODIFIER6" functional_type="FIELDMODIFIER">
+                <neighbour id="0" name="ENDHOST0"/>
+                <neighbour id="3" name="WEBSERVER1"/>
+                <neighbour id="4" name="NAT0"/>
+                <neighbour id="5" name="FIREWALL1"/>
+                <configuration name="conf_FIELDMODIFIER6">
+                    <fieldmodifier>
+                        <name>name</name>
+                    </fieldmodifier>
+                </configuration>
+            </node>
+            <node id="11" name="NAT7" functional_type="NAT">
+                <neighbour id="0" name="ENDHOST0"/>
+                <neighbour id="2" name="MAILSERVER0"/>
+                <neighbour id="4" name="NAT0"/>
+                <neighbour id="5" name="FIREWALL1"/>
+                <configuration name="conf_NAT7">
+                    <nat>
+                        <source>ENDHOST0</source>
+                        <source>ENDHOST1</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node id="12" name="CACHE8" functional_type="CACHE">
+                <neighbour id="0" name="ENDHOST0"/>
+                <neighbour id="2" name="MAILSERVER0"/>
+                <neighbour id="4" name="NAT0"/>
+                <neighbour id="5" name="FIREWALL1"/>
+                <configuration name="conf_CACHE8">
+                    <cache>
+                        <resource>ENDHOST0</resource>
+                        <resource>ENDHOST1</resource>
+                    </cache>
+                </configuration>
+            </node>
+            <node id="13" name="CACHE9" functional_type="CACHE">
+                <neighbour id="0" name="ENDHOST0"/>
+                <neighbour id="2" name="MAILSERVER0"/>
+                <neighbour id="4" name="NAT0"/>
+                <neighbour id="5" name="FIREWALL1"/>
+                <configuration name="conf_CACHE9">
+                    <cache>
+                        <resource>ENDHOST0</resource>
+                        <resource>ENDHOST1</resource>
+                    </cache>
+                </configuration>
+            </node>
+        </graph>
+    </graphs>
+    <Constraints>
+        <NodeConstraints>
+            <NodeMetrics node="NAT0" nrOfOperations="90902" maxNodeLatency="290" cores="1"/>
+            <NodeMetrics node="ANTISPAM4" reqStorage="162" memory="13"/>
+            <NodeMetrics node="FIREWALL5"/>
+            <NodeMetrics node="FIELDMODIFIER6" reqStorage="155"/>
+            <NodeMetrics node="CACHE9" reqStorage="139" memory="53"/>
+        </NodeConstraints>
+        <LinkConstraints>
+            <LinkMetrics src="NAT0" dst="NAT0" reqLatency="549"/>
+            <LinkMetrics src="NAT0" dst="ANTISPAM3" reqLatency="789"/>
+            <LinkMetrics src="NAT0" dst="ANTISPAM4" reqLatency="234"/>
+            <LinkMetrics src="NAT0" dst="FIELDMODIFIER6" reqLatency="675"/>
+            <LinkMetrics src="NAT0" dst="CACHE8" reqLatency="843"/>
+            <LinkMetrics src="FIREWALL1" dst="NAT0" reqLatency="84"/>
+            <LinkMetrics src="FIREWALL1" dst="FIREWALL1" reqLatency="960"/>
+            <LinkMetrics src="FIREWALL1" dst="ANTISPAM4" reqLatency="798"/>
+            <LinkMetrics src="FIREWALL1" dst="CACHE9" reqLatency="190"/>
+            <LinkMetrics src="NAT2" dst="NAT0" reqLatency="408"/>
+            <LinkMetrics src="NAT2" dst="FIREWALL1" reqLatency="455"/>
+            <LinkMetrics src="NAT2" dst="NAT2" reqLatency="808"/>
+            <LinkMetrics src="NAT2" dst="ANTISPAM4" reqLatency="946"/>
+            <LinkMetrics src="NAT2" dst="FIREWALL5" reqLatency="201"/>
+            <LinkMetrics src="NAT2" dst="CACHE8" reqLatency="287"/>
+            <LinkMetrics src="NAT2" dst="CACHE9" reqLatency="106"/>
+            <LinkMetrics src="ANTISPAM3" dst="NAT0" reqLatency="113"/>
+            <LinkMetrics src="ANTISPAM3" dst="FIREWALL1" reqLatency="452"/>
+            <LinkMetrics src="ANTISPAM3" dst="ANTISPAM3" reqLatency="562"/>
+            <LinkMetrics src="ANTISPAM3" dst="ANTISPAM4" reqLatency="298"/>
+            <LinkMetrics src="ANTISPAM3" dst="FIREWALL5" reqLatency="413"/>
+            <LinkMetrics src="ANTISPAM3" dst="FIELDMODIFIER6" reqLatency="345"/>
+            <LinkMetrics src="ANTISPAM3" dst="CACHE8" reqLatency="907"/>
+            <LinkMetrics src="ANTISPAM4" dst="ANTISPAM3" reqLatency="339"/>
+            <LinkMetrics src="ANTISPAM4" dst="CACHE9" reqLatency="525"/>
+            <LinkMetrics src="FIREWALL5" dst="NAT0" reqLatency="661"/>
+            <LinkMetrics src="FIREWALL5" dst="FIREWALL1" reqLatency="506"/>
+            <LinkMetrics src="FIREWALL5" dst="ANTISPAM3" reqLatency="435"/>
+            <LinkMetrics src="FIREWALL5" dst="FIREWALL5" reqLatency="663"/>
+            <LinkMetrics src="FIREWALL5" dst="CACHE9" reqLatency="330"/>
+            <LinkMetrics src="FIELDMODIFIER6" dst="ANTISPAM4" reqLatency="965"/>
+            <LinkMetrics src="FIELDMODIFIER6" dst="FIREWALL5" reqLatency="659"/>
+            <LinkMetrics src="FIELDMODIFIER6" dst="CACHE8" reqLatency="572"/>
+            <LinkMetrics src="NAT7" dst="NAT0" reqLatency="951"/>
+            <LinkMetrics src="NAT7" dst="FIREWALL1" reqLatency="283"/>
+            <LinkMetrics src="NAT7" dst="NAT2" reqLatency="743"/>
+            <LinkMetrics src="NAT7" dst="FIELDMODIFIER6" reqLatency="2"/>
+            <LinkMetrics src="NAT7" dst="NAT7" reqLatency="171"/>
+            <LinkMetrics src="CACHE8" dst="NAT0" reqLatency="193"/>
+            <LinkMetrics src="CACHE8" dst="FIREWALL1" reqLatency="523"/>
+            <LinkMetrics src="CACHE8" dst="ANTISPAM4" reqLatency="572"/>
+            <LinkMetrics src="CACHE8" dst="FIELDMODIFIER6" reqLatency="352"/>
+            <LinkMetrics src="CACHE8" dst="CACHE8" reqLatency="687"/>
+            <LinkMetrics src="CACHE8" dst="CACHE9" reqLatency="218"/>
+            <LinkMetrics src="CACHE9" dst="NAT0" reqLatency="200"/>
+            <LinkMetrics src="CACHE9" dst="FIREWALL1" reqLatency="597"/>
+            <LinkMetrics src="CACHE9" dst="NAT2" reqLatency="805"/>
+            <LinkMetrics src="CACHE9" dst="ANTISPAM4" reqLatency="132"/>
+            <LinkMetrics src="CACHE9" dst="FIREWALL5" reqLatency="281"/>
+            <LinkMetrics src="CACHE9" dst="CACHE8" reqLatency="334"/>
+            <LinkMetrics src="CACHE9" dst="CACHE9" reqLatency="946"/>
+        </LinkConstraints>
+    </Constraints>
+    <PropertyDefinition>
+        <Property name="ReachabilityProperty" graph="0" src="ENDHOST1" dst="WEBSERVER1"/>
+    </PropertyDefinition>
+    <Hosts>
+        <Host name="host0" cpu="2" cores="6" diskStorage="67" memory="49" maxVNF="2" type="CLIENT" fixedEndpoint="ENDHOST0"/>
+        <Host name="host1" cpu="2" cores="5" diskStorage="178" memory="35" maxVNF="8" type="CLIENT" fixedEndpoint="ENDHOST1"/>
+        <Host name="host2" cpu="2" cores="7" diskStorage="54" memory="14" maxVNF="6" type="SERVER" fixedEndpoint="MAILSERVER0"/>
+        <Host name="host3" cpu="1" cores="2" diskStorage="139" memory="31" maxVNF="1" type="SERVER" fixedEndpoint="WEBSERVER1"/>
+        <Host name="host4" cpu="2" cores="5" diskStorage="48" memory="30" maxVNF="8" type="MIDDLEBOX"/>
+        <Host name="host5" cpu="1" cores="8" diskStorage="28" memory="63" maxVNF="9" type="MIDDLEBOX"/>
+        <Host name="host6" cpu="2" cores="2" diskStorage="164" memory="17" maxVNF="10" type="MIDDLEBOX"/>
+        <Host name="host7" cpu="1" cores="2" diskStorage="71" memory="40" maxVNF="7" type="MIDDLEBOX"/>
+        <Host name="host8" cpu="1" cores="4" diskStorage="69" memory="22" maxVNF="8" type="MIDDLEBOX"/>
+        <Host name="host9" cpu="1" cores="8" diskStorage="86" memory="48" maxVNF="2" type="MIDDLEBOX"/>
+        <Host name="host10" cpu="1" cores="8" diskStorage="53" memory="15" maxVNF="7" type="MIDDLEBOX"/>
+        <Host name="host11" cpu="1" cores="2" diskStorage="107" memory="39" maxVNF="5" type="MIDDLEBOX"/>
+        <Host name="host12" cpu="1" cores="2" diskStorage="106" memory="28" maxVNF="9" type="MIDDLEBOX"/>
+        <Host name="host13" cpu="2" cores="8" diskStorage="41" memory="25" maxVNF="9" type="MIDDLEBOX"/>
+        <Host name="host14" cpu="2" cores="2" diskStorage="20" memory="18" maxVNF="7" type="MIDDLEBOX"/>
+        <Host name="host15" cpu="2" cores="7" diskStorage="176" memory="19" maxVNF="2" type="MIDDLEBOX"/>
+        <Host name="host16" cpu="1" cores="6" diskStorage="8" memory="26" maxVNF="5" type="MIDDLEBOX"/>
+        <Host name="host17" cpu="1" cores="7" diskStorage="188" memory="61" maxVNF="8" type="MIDDLEBOX"/>
+    </Hosts>
+    <Connections>
+        <Connection sourceHost="host0" destHost="host7" avgLatency="119"/>
+        <Connection sourceHost="host0" destHost="host8" avgLatency="702"/>
+        <Connection sourceHost="host0" destHost="host11" avgLatency="514"/>
+        <Connection sourceHost="host0" destHost="host12" avgLatency="977"/>
+        <Connection sourceHost="host0" destHost="host13" avgLatency="264"/>
+        <Connection sourceHost="host0" destHost="host14" avgLatency="361"/>
+        <Connection sourceHost="host0" destHost="host17" avgLatency="735"/>
+        <Connection sourceHost="host1" destHost="host7" avgLatency="753"/>
+        <Connection sourceHost="host1" destHost="host9" avgLatency="714"/>
+        <Connection sourceHost="host1" destHost="host11" avgLatency="132"/>
+        <Connection sourceHost="host1" destHost="host13" avgLatency="828"/>
+        <Connection sourceHost="host1" destHost="host14" avgLatency="560"/>
+        <Connection sourceHost="host1" destHost="host15" avgLatency="353"/>
+        <Connection sourceHost="host1" destHost="host16" avgLatency="587"/>
+        <Connection sourceHost="host1" destHost="host17" avgLatency="43"/>
+        <Connection sourceHost="host5" destHost="host2" avgLatency="9"/>
+        <Connection sourceHost="host6" destHost="host2" avgLatency="358"/>
+        <Connection sourceHost="host12" destHost="host2" avgLatency="522"/>
+        <Connection sourceHost="host13" destHost="host2" avgLatency="56"/>
+        <Connection sourceHost="host15" destHost="host2" avgLatency="753"/>
+        <Connection sourceHost="host16" destHost="host2" avgLatency="356"/>
+        <Connection sourceHost="host6" destHost="host3" avgLatency="819"/>
+        <Connection sourceHost="host10" destHost="host3" avgLatency="828"/>
+        <Connection sourceHost="host15" destHost="host3" avgLatency="592"/>
+        <Connection sourceHost="host4" destHost="host5" avgLatency="906"/>
+        <Connection sourceHost="host4" destHost="host8" avgLatency="153"/>
+        <Connection sourceHost="host4" destHost="host9" avgLatency="286"/>
+        <Connection sourceHost="host4" destHost="host11" avgLatency="884"/>
+        <Connection sourceHost="host4" destHost="host13" avgLatency="698"/>
+        <Connection sourceHost="host5" destHost="host8" avgLatency="456"/>
+        <Connection sourceHost="host5" destHost="host15" avgLatency="519"/>
+        <Connection sourceHost="host5" destHost="host17" avgLatency="862"/>
+        <Connection sourceHost="host6" destHost="host9" avgLatency="737"/>
+        <Connection sourceHost="host6" destHost="host11" avgLatency="128"/>
+        <Connection sourceHost="host6" destHost="host13" avgLatency="402"/>
+        <Connection sourceHost="host6" destHost="host14" avgLatency="534"/>
+        <Connection sourceHost="host7" destHost="host6" avgLatency="451"/>
+        <Connection sourceHost="host7" destHost="host8" avgLatency="180"/>
+        <Connection sourceHost="host7" destHost="host10" avgLatency="525"/>
+        <Connection sourceHost="host7" destHost="host12" avgLatency="142"/>
+        <Connection sourceHost="host7" destHost="host14" avgLatency="62"/>
+        <Connection sourceHost="host7" destHost="host17" avgLatency="494"/>
+        <Connection sourceHost="host8" destHost="host5" avgLatency="340"/>
+        <Connection sourceHost="host8" destHost="host9" avgLatency="209"/>
+        <Connection sourceHost="host8" destHost="host10" avgLatency="776"/>
+        <Connection sourceHost="host8" destHost="host11" avgLatency="132"/>
+        <Connection sourceHost="host8" destHost="host15" avgLatency="197"/>
+        <Connection sourceHost="host9" destHost="host11" avgLatency="301"/>
+        <Connection sourceHost="host9" destHost="host15" avgLatency="980"/>
+        <Connection sourceHost="host9" destHost="host16" avgLatency="760"/>
+        <Connection sourceHost="host9" destHost="host17" avgLatency="752"/>
+        <Connection sourceHost="host10" destHost="host6" avgLatency="754"/>
+        <Connection sourceHost="host10" destHost="host7" avgLatency="673"/>
+        <Connection sourceHost="host10" destHost="host8" avgLatency="974"/>
+        <Connection sourceHost="host10" destHost="host9" avgLatency="229"/>
+        <Connection sourceHost="host10" destHost="host11" avgLatency="273"/>
+        <Connection sourceHost="host10" destHost="host14" avgLatency="954"/>
+        <Connection sourceHost="host10" destHost="host16" avgLatency="516"/>
+        <Connection sourceHost="host10" destHost="host17" avgLatency="31"/>
+        <Connection sourceHost="host11" destHost="host5" avgLatency="98"/>
+        <Connection sourceHost="host11" destHost="host6" avgLatency="663"/>
+        <Connection sourceHost="host11" destHost="host7" avgLatency="254"/>
+        <Connection sourceHost="host11" destHost="host14" avgLatency="7"/>
+        <Connection sourceHost="host11" destHost="host15" avgLatency="986"/>
+        <Connection sourceHost="host11" destHost="host17" avgLatency="74"/>
+        <Connection sourceHost="host12" destHost="host5" avgLatency="480"/>
+        <Connection sourceHost="host12" destHost="host7" avgLatency="811"/>
+        <Connection sourceHost="host12" destHost="host8" avgLatency="524"/>
+        <Connection sourceHost="host12" destHost="host9" avgLatency="912"/>
+        <Connection sourceHost="host12" destHost="host10" avgLatency="833"/>
+        <Connection sourceHost="host13" destHost="host4" avgLatency="151"/>
+        <Connection sourceHost="host13" destHost="host6" avgLatency="289"/>
+        <Connection sourceHost="host13" destHost="host8" avgLatency="415"/>
+        <Connection sourceHost="host13" destHost="host14" avgLatency="579"/>
+        <Connection sourceHost="host13" destHost="host16" avgLatency="405"/>
+        <Connection sourceHost="host13" destHost="host17" avgLatency="273"/>
+        <Connection sourceHost="host14" destHost="host5" avgLatency="168"/>
+        <Connection sourceHost="host14" destHost="host6" avgLatency="646"/>
+        <Connection sourceHost="host14" destHost="host7" avgLatency="516"/>
+        <Connection sourceHost="host14" destHost="host8" avgLatency="804"/>
+        <Connection sourceHost="host14" destHost="host10" avgLatency="158"/>
+        <Connection sourceHost="host14" destHost="host11" avgLatency="42"/>
+        <Connection sourceHost="host14" destHost="host12" avgLatency="861"/>
+        <Connection sourceHost="host14" destHost="host17" avgLatency="889"/>
+        <Connection sourceHost="host15" destHost="host4" avgLatency="947"/>
+        <Connection sourceHost="host15" destHost="host6" avgLatency="784"/>
+        <Connection sourceHost="host15" destHost="host7" avgLatency="700"/>
+        <Connection sourceHost="host15" destHost="host8" avgLatency="820"/>
+        <Connection sourceHost="host15" destHost="host9" avgLatency="159"/>
+        <Connection sourceHost="host15" destHost="host10" avgLatency="785"/>
+        <Connection sourceHost="host15" destHost="host12" avgLatency="771"/>
+        <Connection sourceHost="host16" destHost="host4" avgLatency="87"/>
+        <Connection sourceHost="host16" destHost="host7" avgLatency="816"/>
+        <Connection sourceHost="host16" destHost="host8" avgLatency="988"/>
+        <Connection sourceHost="host16" destHost="host9" avgLatency="67"/>
+        <Connection sourceHost="host16" destHost="host11" avgLatency="235"/>
+        <Connection sourceHost="host16" destHost="host17" avgLatency="970"/>
+        <Connection sourceHost="host17" destHost="host4" avgLatency="423"/>
+        <Connection sourceHost="host17" destHost="host6" avgLatency="494"/>
+        <Connection sourceHost="host17" destHost="host7" avgLatency="455"/>
+        <Connection sourceHost="host17" destHost="host8" avgLatency="689"/>
+        <Connection sourceHost="host17" destHost="host9" avgLatency="975"/>
+        <Connection sourceHost="host17" destHost="host10" avgLatency="788"/>
+        <Connection sourceHost="host17" destHost="host11" avgLatency="796"/>
+        <Connection sourceHost="host17" destHost="host13" avgLatency="27"/>
+        <Connection sourceHost="host17" destHost="host14" avgLatency="32"/>
+        <Connection sourceHost="host17" destHost="host15" avgLatency="365"/>
+    </Connections>
+</NFV>
