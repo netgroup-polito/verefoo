@@ -1,6 +1,5 @@
 package it.polito.verifoo.rest.common;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,8 +11,11 @@ import com.microsoft.z3.Context;
 
 import it.polito.verifoo.rest.jaxb.Connection;
 import it.polito.verifoo.rest.jaxb.Node;
-import it.polito.verigraph.mcnet.components.NetworkObject;
-
+/**
+ * This class is needed to create the boolean expression that express a deployment constraint from a string formatted in a specific way considering a certain number of complexities
+ * @author Antonio
+ *
+ */
 public class ConditionExtractor {
 	private Logger logger = LogManager.getLogger("mylog");
 	private Context ctx;
@@ -23,7 +25,15 @@ public class ConditionExtractor {
 	HashMap<Node, HashMap<String, BoolExpr>> conditionDB;
 	HashMap<Node, HashMap<String, BoolExpr>> stageConditions;
 	private int latency;
-	
+	/**
+	 * Sets up the enviroment to retrieve the information to return the right boolean expression from a string (it also saves it in a specific data structure)
+	 * @param ctx
+	 * @param autoctx
+	 * @param n
+	 * @param connections
+	 * @param conditionDB the reference to the external data structure that contains all the deployemnt conditions
+	 * @param stageConditions the reference to the external data structure that contains only a part of the deployemnt conditions
+	 */
 	public ConditionExtractor(Context ctx, AutoContext autoctx, Node n, List<Connection> connections, HashMap<Node, HashMap<String, BoolExpr>> conditionDB, HashMap<Node, HashMap<String, BoolExpr>> stageConditions) {
 		this.ctx = ctx;
 		this.autoctx = autoctx;
@@ -32,7 +42,12 @@ public class ConditionExtractor {
 		this.conditionDB = conditionDB;
 		this.stageConditions = stageConditions;
 	}
-	
+	/**
+	 * Builds the boolean expression that represent the deployment from a string like "n1@h1/n2@h2" where the "/" is translated into an AND
+	 * @param s
+	 * @param nodes
+	 * @return
+	 */
 	private BoolExpr DeploymentConditionFromDualString(String s, List<Node> nodes){
 		String first = s.substring(0, s.lastIndexOf('/'));
 		String second = s.substring(s.lastIndexOf('/')+1);
@@ -51,12 +66,13 @@ public class ConditionExtractor {
 		BoolExpr firstCond, secondCond;
 		
 		next = nodes.stream().filter(node -> node.getName().equals(secondNode)  ).findFirst().get();
+		//if the nexthop is optional, add this information in the final boolean expression
 		if(autoctx.nodeIsOptional(next)){
 			secondCond = ctx.mkOr(ctx.mkBoolConst(second), ctx.mkNot(autoctx.getOptionalDeploymentCondition(next)));
 		}else{
 			secondCond = ctx.mkBoolConst(second);
 		}
-		
+		//if the current node is optional, add this information in the final boolean expression
 		if(autoctx.nodeIsOptional(n)){
 			firstCond = ctx.mkOr(ctx.mkBoolConst(first), ctx.mkNot(autoctx.getOptionalDeploymentCondition(n)));
 			BoolExpr dependency = autoctx.getOptionalDeploymentCondition(n);// autoctx.optionalConditionBetween(n, next);
@@ -66,7 +82,7 @@ public class ConditionExtractor {
 		}else{
 			firstCond = ctx.mkBoolConst(first);
 		}
-		
+		// build the final condition and saves the various information
 		BoolExpr c = ctx.mkAnd(firstCond, secondCond);
 		if(n.getName().equals(firstNode)){
 			if(autoctx.nodeIsOptional(n)){
@@ -82,7 +98,16 @@ public class ConditionExtractor {
 		}	
 		return c;
 	}
-	
+	/**
+	 * Builds the boolean expression that represent the deployment from a string like "n1@h1"
+	 * @param s a string in a form like "n1@h1"
+	 * @param client
+	 * @param server
+	 * @param nodes
+	 * @param hostClient
+	 * @param hostServer
+	 * @return
+	 */
 	private BoolExpr DeploymentConditionFromSingleString(String s, Node client, Node server, List<Node> nodes, String hostClient, String hostServer){
 		String node = s.substring(0,s.lastIndexOf('@'));
 		String host = s.substring(s.lastIndexOf('@')+1);
@@ -104,9 +129,11 @@ public class ConditionExtractor {
 		
 		BoolExpr c;
 		if(autoctx.nodeIsOptional(n)){
+			//if the current node is optional, add this information in the final boolean expression
 			c = ctx.mkOr(ctx.mkBoolConst(s), ctx.mkNot(autoctx.getOptionalDeploymentCondition(n)));			
 			
 		}else if(n.getName().equals(client.getName()) && autoctx.nodeIsOptional(next)){
+			//if the current node is the client and the nexthop is optional, add this information in the final boolean expression
 			c = ctx.mkOr(ctx.mkBoolConst(s), ctx.mkNot(autoctx.getOptionalDeploymentCondition(next)));
 		}else{
 			c = ctx.mkBoolConst(s);
@@ -134,7 +161,16 @@ public class ConditionExtractor {
 		}
 		return c;
 	}
-	
+	/**
+	 * Public method that receives a string that represents a deployment and returns the correspondent boolean expression
+	 * @param s
+	 * @param client
+	 * @param server
+	 * @param nodes
+	 * @param hostClient
+	 * @param hostServer
+	 * @return
+	 */
 	public BoolExpr DeploymentConditionFromString(String s, Node client, Node server, List<Node> nodes, String hostClient, String hostServer){
 		BoolExpr c;
 		if(s.lastIndexOf('/') != -1){
@@ -145,7 +181,11 @@ public class ConditionExtractor {
 		}
 		return c;
 	}
-	
+	/**
+	 * Add to a condition c, the information about the presence of optional nodes
+	 * @param c
+	 * @return
+	 */
 	public BoolExpr computeOptional(BoolExpr c){
 		BoolExpr optionals = autoctx.optionalConditionBetween(n, next);
 		System.out.println("List of Optional: " + optionals);

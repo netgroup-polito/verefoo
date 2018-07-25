@@ -5,36 +5,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.ProcessingException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
-import com.microsoft.z3.IntNum;
-
 import it.polito.verifoo.rest.jaxb.ActionTypes;
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
-import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verifoo.rest.jaxb.PName;
 import it.polito.verifoo.rest.jaxb.Property;
-import it.polito.verifoo.rest.jaxb.ProtocolTypes;
 import it.polito.verigraph.mcnet.components.AclFirewallRule;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
-import it.polito.verigraph.mcnet.components.Tuple;
-import it.polito.verigraph.mcnet.components.Quattro;
 import it.polito.verigraph.mcnet.netobjs.*;
 import java.util.Optional;
 /**
  * This class generates a Map of a new network object and associated node.
- * The network object are generated inside this class by extracting from the schema the type and by processing the configuration.
- * It also provide methods for Acl Attaching (for firewall object) and resource Attaching(for cache object)
+ * The network object are generated inside this class by extracting from the schema the functional type and by processing the configurations.
  */
 public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	private static final long serialVersionUID = 8001920385236985297L;
@@ -80,7 +71,6 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	}
 	/**
 	 * Generates Acl by processing the firewall configuration
-	 * Please note that invalid configuration will result in a discarded firewall acl (we don't throw an exeption)
 	 * @param fw 
 	 */
 	public void generateAcl(Node n, AclFirewall fw){
@@ -182,11 +172,9 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	}
 	
 	/**
-	 * @param Node n
-	 * @throws BadGraphError 
-	 * @description This function process the node and generate a network object according to functional type, 
+	 * This function process the node and generate a network object according to functional type, 
 	 * it also generate the configuration according to the type.
-	 * @throws ProcessingException if it can't process the network object.
+	 * @param n
 	 */
 	public void generateNetObj(Node n){
 			FunctionalTypes ftype;

@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.Path;
-import it.polito.verifoo.rest.jaxb.Path.PathNode;
 /**
  * Wraps the choice of the outgoing links from a certain node
  * @author Antonio

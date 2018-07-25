@@ -17,7 +17,11 @@ import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Neighbour;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
-
+/**
+ * This class interact with a Neo4j DB through the Cypher Query Language to store the service graph information
+ * @author Antonio
+ *
+ */
 public class Neo4jClient implements AutoCloseable{
 
     private final Driver driver;

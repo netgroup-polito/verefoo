@@ -34,7 +34,11 @@ import it.polito.verifoo.rest.jaxb.Hosts;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
-
+/**
+ * This class runs the SONATA simulation for a physical topology. The used version of the SONATA module is the v3.0
+ * @author Antonio
+ *
+ */
 public class MedicineSimulator implements PhyResourceModel {
 	
 	private Logger logger = LogManager.getLogger("mylog");

@@ -15,16 +15,18 @@ import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verigraph.mcnet.components.NetContext;
 
 /**
- * This class generates the nework context (the link between nodenames and node ip in z3)
+ * This class generates the nework context (the link between nodenames and node IPs in z3)
  */
 public final class NetContextGenerator{
 	/**
-	 * This method generates the nework context (the link between nodenames and node ip in z3)
+	 * This method generates the nework context (the link between nodenames and node IPs in z3)
 	 * @param ctx Z3 Context
 	 * @param nodes Node List
+	 * @param properties the list of properties
 	 * @return NetContext
 	 */
 	public static NetContext generate(Context ctx,List<Node> nodes,List<Property> properties){
+		//the @ is used internally as a special symbol
 		for(Node n : nodes){
 			if(n.getName().contains("@"))
 				throw new BadGraphError("Invalid node name "+ n.getName() + ", it can't contain @", EType.INVALID_SERVICE_GRAPH);

@@ -1,6 +1,4 @@
 package it.polito.verifoo.rest.common;
-
-import it.polito.verifoo.rest.jaxb.EType;
 /**
  * Exception thrown by the modules that implement a resource model.
  * @author Antonio

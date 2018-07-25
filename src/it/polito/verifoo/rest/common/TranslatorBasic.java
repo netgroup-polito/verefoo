@@ -1,23 +1,16 @@
 package it.polito.verifoo.rest.common;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-
 import it.polito.verifoo.rest.jaxb.*;
-import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
-import it.polito.verigraph.mcnet.components.PortInterval;
-import it.polito.verigraph.mcnet.components.Tuple;
 /**
- * This class implements a parser for verifoo output (the z3 model), in order to translate it into the correct XML 
+ * This class implements a parser for verifoo output (the z3 model), in order to translate it into the correct XML. This extension is needed to parse a model that include the BASIC autoconfiguraion 
  */
 public class TranslatorBasic extends Translator {
 	private VerifooNormalizer norm;

@@ -11,7 +11,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
-import com.microsoft.z3.Expr;
 import com.microsoft.z3.Optimize;
 
 import it.polito.verifoo.rest.jaxb.*;
@@ -38,7 +37,7 @@ public class AutoContext extends Core{
 	private Map<String, Tuple<BoolExpr, BoolExpr>> dependencies;
 	private List<String> unnecessaryDependency;
 	/**
-	 * Public constructor for the auto context class
+	 * Public constructor for the auto context class, it needs only the context as argument
 	 */
 	public AutoContext(Context ctx,Object[]... args ) {
 		super(ctx, args);
@@ -92,7 +91,12 @@ public class AutoContext extends Core{
 			solver.AssertSoft(t._1, -100, t._2);
 		}
 	}
-	
+	/**
+	 * Save that there is an optional node between two nodes
+	 * @param previous
+	 * @param next
+	 * @param optional
+	 */
 	public void addOptionalPlacement(NetworkObject previous, NetworkObject next, NetworkObject optional){
 		String key = previous+"__"+next;
 		if(!optionalPlacement.containsKey(key)){
@@ -104,6 +108,11 @@ public class AutoContext extends Core{
 		}
 		
 	}
+	/**
+	 * Sets the specific boolean expression for an optional condition
+	 * @param optional
+	 * @param c
+	 */
 	public void addOptionalCondition(Node optional, BoolExpr c){
 		if(!optionalConditions.containsKey(optional)){
 			optionalConditions.put(optional, new ArrayList<>());
@@ -117,7 +126,12 @@ public class AutoContext extends Core{
 		logger.debug("Set optional " + optional.getName() + " condition " + c);
 		optionalConditions.get(optional).add(c);
 	}
-
+	/**
+	 * Checks if between the two nodes, an optional node has been registered
+	 * @param previous
+	 * @param next
+	 * @return the list of the optional nodes in the NetworkObject form
+	 */
 	public List<NetworkObject> hasOptionalNodes(NetworkObject previous, NetworkObject next){
 		List<NetworkObject> res = optionalPlacement.get(previous+"__"+next);
 		/*if(res != null && res.size() > 0){
@@ -126,6 +140,13 @@ public class AutoContext extends Core{
 		}*/
 		return res;
 	}
+
+	/**
+	 * Checks if between the two nodes, an optional node has been registered
+	 * @param previous
+	 * @param next
+	 * @return a list of the optional nodes in the Node form
+	 */
 	public List<Node> hasOptionalNodes(Node previous, Node next){
 		List<NetworkObject> tmp = optionalPlacement.get(previous.getName()+"__"+next.getName());
 		List<Node> res = new ArrayList<>();
@@ -136,6 +157,13 @@ public class AutoContext extends Core{
 		});
 		return res;
 	}
+
+	/**
+	 * Checks if between the two nodes, optional nodes have been registered and it returns the OR of their isUsed boolean expression
+	 * @param previous
+	 * @param next
+	 * @return the OR of the isUsed boolean expression of the optional nodes between previous and next
+	 */
 	public BoolExpr optionalConditionBetween(Node previous, Node next){
 		List<NetworkObject> dependency = optionalPlacement.get(previous.getName()+"__"+next.getName());
 		BoolExpr res = null;
@@ -145,6 +173,11 @@ public class AutoContext extends Core{
 		return res;
 		
 	}
+	/**
+	 * Gets the correspondent boolean expression from an optional node
+	 * @param optional
+	 * @return
+	 */
 	public BoolExpr fromOptionalNodeToCondition(Node optional){
 		List<BoolExpr> conditions = optionalConditions.get(optional);
 		if(conditions == null)
@@ -154,18 +187,30 @@ public class AutoContext extends Core{
 		//logger.debug("From optional node " + optional.getName() + " to condition " + result);
 		return result;
 	}
-	
+	/**
+	 * Add the correspondence between an optional node and its NetworkObject reference 
+	 * @param n
+	 * @param no
+	 */
 	public void addOptionalNode(Node n, NetworkObject no){
 		if(!optionalNodes.keySet().contains(n)){
 			logger.debug("Added optional node: " + n.getName() +" with condition " + no.isUsed());
 			optionalNodes.put(n, no);
 		}
 	}
-	
+	/**
+	 * Checks if the node has been registered as optional
+	 * @param n
+	 * @return
+	 */
 	public boolean nodeIsOptional(Node n){
 		return optionalNodes.keySet().contains(n);
 	}
-
+	/**
+	 * Returns the boolean expression isUsed of a node
+	 * @param n
+	 * @return
+	 */
 	public BoolExpr getOptionalDeploymentCondition(Node n){
 		return optionalNodes.get(n).isUsed();
 	}
@@ -173,13 +218,30 @@ public class AutoContext extends Core{
 	public boolean networkObjectIsOptional(NetworkObject no) {
 		return optionalNodes.values().contains(no);
 	}
+	/**
+	 * Registers that the deployment of the node on the host is possible if the dependantNode (which should be an optional node) is deployed
+	 * @param node
+	 * @param host
+	 * @param dependantNode
+	 * @param statement the constraint that states that node can be deployed on host 
+	 * @param dependency the isUsed expression of the optional node from which depends the deployment
+	 */
 	public void addDependency(String node, String host, String dependantNode, BoolExpr statement, BoolExpr dependency){
 		dependencies.put(node+"@"+host+"@"+dependantNode, new Tuple<BoolExpr, BoolExpr>(statement, dependency));
 	}
+	/**
+	 * Builds a list of dependency that are discovered to be no more valid during the graph exploration
+	 * @param node
+	 * @param host
+	 * @param dependantNode
+	 */
 	public void removeDependency(String node, String host, String dependantNode){
 		unnecessaryDependency.add(node+"@"+host+"@"+dependantNode);
 	}
-	
+	/**
+	 * Returns the list of the dependencies
+	 * @return
+	 */
 	public Map<String, List<Tuple<BoolExpr, BoolExpr>>> getDependencies(){
 		Map<String, Tuple<BoolExpr, BoolExpr>> tmp = new HashMap<>(dependencies);
 		unnecessaryDependency.forEach(d -> {

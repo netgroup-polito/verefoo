@@ -2,9 +2,7 @@ package it.polito.verifoo.rest.common;
 
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Endhost;
-import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Property;
-import it.polito.verifoo.rest.jaxb.ProtocolTypes;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.netobjs.PacketModel;
 /**
@@ -52,7 +50,11 @@ public class PacketWrapper extends PacketModel {
 			}
 		}
 	}
-
+	/**
+	 * Extract the information from the property that force certain characteristics of the packet
+	 * @param prop
+	 * @param nctx
+	 */
 	public void setProperties(Property prop, NetContext nctx) {
 		
 		if(prop.getHTTPDefinition() != null){

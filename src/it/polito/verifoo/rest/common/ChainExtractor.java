@@ -12,9 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import it.polito.verifoo.rest.jaxb.Connection;
-import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Host;
-import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.TypeOfHost;
 
 /**

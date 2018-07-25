@@ -112,7 +112,10 @@ public class VerifooSerializer {
 	    	logger.error(e);
 		}
 	}
-	
+	/**
+	 * If no connections are declared in XML, a full mesh is created between the hosts
+	 * @param root
+	 */
 	private void createFullMesh(NFV root){
 		List<Host> hosts = root.getHosts().getHost();
 		List<Connection> connections = root.getConnections().getConnection();

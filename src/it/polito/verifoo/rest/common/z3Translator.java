@@ -2,7 +2,11 @@ package it.polito.verifoo.rest.common;
 
 import it.polito.verifoo.rest.jaxb.Host;
 import it.polito.verifoo.rest.jaxb.Node;
-
+/**
+ * This class returns the various patterns for matching the right strings in the model. This translator works for the version 3.3.4 of z3 
+ * @author Antonio
+ *
+ */
 public class z3Translator {
 	public enum Datatype{
 		ip_constructor, port_range_constructor;

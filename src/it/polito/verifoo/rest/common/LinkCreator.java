@@ -15,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.Path;
-import it.polito.verifoo.rest.jaxb.Path.PathNode;
 /**
  * Creates the link from the node's neighbours
  *
@@ -77,10 +76,17 @@ public class LinkCreator {
 		return orderedLinks;
 	}
 	/**
-	 * Creates the links to the nodes' neighbours
+	 * 
+	 * 
+	 */
+	/**
+	 * Creates the links from the nodes' neighbours exploring the various paths, ensuring to add a link only once
 	 * @param prec previous node in the chain
 	 * @param current current node in the chain
 	 * @param server the node that is the server of the chain
+	 * @param converting the list of nodes on the current path, to avoid infinite loops
+	 * @param converted the nodes from which all the neighbours are already been explored
+	 * @return
 	 * @throws BadGraphError
 	 */
 	private boolean createLink(Node prec, Node current, Node client, Node server, List<String> converting, List<String> converted) throws BadGraphError{
@@ -95,8 +101,6 @@ public class LinkCreator {
 			return false;
 		}
 		if(converted.contains(current.getName())){
-			//logger.debug("Found neighbours of " + prec.getName() + " ("+ current.getName() + ") that reaches the server " + server.getName());
-			//logger.debug("New Link from " + prec.getName() + " to "+ current.getName() +" towards server "+server.getName());
 			links.add(new Link(prec.getName(), current.getName()));
 			return true;
 		}

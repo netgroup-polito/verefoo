@@ -79,7 +79,12 @@ public class Translator {
 					}
 				});
 	}
-	
+	/**
+	 * Search for the destination of a specific auto-generated rule for a firewall
+	 * @param n
+	 * @param nrOfRule
+	 * @return
+	 */
 	private String firewallAutoConfigSearchDst(Node n, String nrOfRule){
 		List<String> nodes = g.getNode().stream().map(no -> no.getName()).collect(Collectors.toList());
 		String tosearch=z3Translator.stringToSearchFwDestination(n, nrOfRule);
@@ -114,7 +119,12 @@ public class Translator {
 		}
 		return nodeDstName;
 	}
-	
+	/**
+	 * Generalize the pattern matching of a variable declared as a DatatypeSort in the z3 model
+	 * @param tosearch
+	 * @param datatype
+	 * @return
+	 */
 	protected String firewallAutoConfigSearchComplexAttribute(String tosearch, z3Translator.Datatype datatype){
 		Pattern pattern = Pattern.compile(tosearch);
 		Matcher matcher = pattern.matcher(model);
@@ -125,7 +135,11 @@ public class Translator {
 		}
 		return attribute;
 	}
-	
+	/**
+	 *  Generalize the pattern matching of a variable declared as a primitive type (bool, int, etc) in the z3 model
+	 * @param tosearch
+	 * @return
+	 */
 	protected String firewallAutoConfigSearchPlainAttribute(String tosearch){
 		Pattern pattern = Pattern.compile(tosearch);
 		Matcher matcher = pattern.matcher(model);
@@ -253,6 +267,11 @@ public class Translator {
 		
 		
 	}
+	/**
+	 * Merge the auto-generated rule by overlapping port intervals, first by source port interval and the by destination port interval
+	 * @param listOfRules list of rules to merge
+	 * @return
+	 */
 	private List<Elements> mergeRules(List<Elements> listOfRules) {
 		/* TEST CASE
 		Elements e1 = new Elements();
@@ -334,7 +353,11 @@ public class Translator {
 		System.out.println("----------------------------");*/
 		return finalRulesByDest;
 	}
-	
+	/**
+	 * Merge the auto-generated rule by overlapping port intervals
+	 * @param rulesMap a data structure of sorted rules
+	 * @return
+	 */
 	private List<Elements> mergeRulesByMap(HashMap<String, List<Elements>> rulesMap) {
 		List<Elements> finalRules = new ArrayList<>();
 		for(Entry<String, List<Elements>> rule : rulesMap.entrySet()){

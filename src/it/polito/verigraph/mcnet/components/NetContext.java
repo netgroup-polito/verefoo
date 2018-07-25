@@ -42,7 +42,6 @@ public class NetContext extends Core{
     public List<Tuple<BoolExpr, String>> softConstrWildcard;
     public List<Tuple<BoolExpr, String>> softConstrProtoWildcard;
     public List<Tuple<BoolExpr, String>> softConstrPorts;
-    public List<Tuple<BoolExpr, Integer>> softConstrRuleOrder;
     List<Core> policies;
 
     public HashMap<String,NetworkObject> nm; //list of nodes, callable by node name
@@ -95,7 +94,6 @@ public class NetContext extends Core{
         softConstrWildcard = new ArrayList<>(); 
         softConstrProtoWildcard = new ArrayList<>(); 
         softConstrPorts = new ArrayList<>(); 
-        softConstrRuleOrder = new ArrayList<>(); 
         policies = new ArrayList<Core>();
         
         //variable true that is always true
@@ -150,11 +148,6 @@ public class NetContext extends Core{
             policy.addConstraints(solver);
         }
         //System.out.println("======NET CONTEXT SOFT CONSTRAINTS====== ");
-        //System.out.println("Nr of net context rule order soft constraint " + softConstrRuleOrder.stream().distinct().count());
-        for (Tuple<BoolExpr, Integer> t : softConstrRuleOrder) {
-        	//System.out.println(t._1 + "\n with value " + t._2);
-			solver.AssertSoft(t._1, t._2, "fw_rule");
-		}
         //System.out.println("Nr of net context proto wildcard soft constraint " + softConstrProtoWildcard.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrProtoWildcard) {
         	//System.out.println(t._1 + "\n with value " + 1000 + ". Node is " + t._2);

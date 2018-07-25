@@ -6,12 +6,15 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 
 import it.polito.verifoo.rest.jaxb.Connection;
 import it.polito.verifoo.rest.jaxb.Node;
-
+/**
+ * Sets up the enviroment to create a formatted string that represents a deployment
+ * @author Antonio
+ *
+ */
 public class ConditionStringBuilder {
 	private Logger logger = LogManager.getLogger("mylog");
 	private Context ctx;
@@ -25,7 +28,12 @@ public class ConditionStringBuilder {
 		this.connections = connections;
 		this.rawConditions = rawConditions;
 	}
-	
+	/**
+	 * From the arguments it creates the string source@host, also checking if the source is optional and registering this information
+	 * @param source
+	 * @param host
+	 * @return
+	 */
 	public String buildConditionString(Node source, String host){
 		//System.out.print("On RT("+next.getName()+") ");
 		//System.out.println(next.getName()+"@"+host1);
@@ -36,6 +44,14 @@ public class ConditionStringBuilder {
 		}
 		return source.getName()+"@"+host;
 	}
+	/**
+	 From the arguments it creates the string n1@h1/n2@h2
+	 * @param n1
+	 * @param h1
+	 * @param n2
+	 * @param h2
+	 * @return
+	 */
 	public String buildConditionString(Node n1, String h1, Node n2, String h2){
 		//logger.debug("\t"+n1.getName()+"@"+h1 + " AND " + n2.getName()+"@"+h2;;
 		return n1.getName()+"@"+h1 + "/" + n2.getName()+"@"+h2;

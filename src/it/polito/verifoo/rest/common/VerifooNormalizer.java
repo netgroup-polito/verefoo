@@ -5,27 +5,25 @@ import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-
-import org.apache.commons.lang3.SerializationUtils;
-import org.xml.sax.SAXException;
 
 import it.polito.verifoo.rest.jaxb.*;
 import static java.util.stream.Collectors.*;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+/**
+ * This class hides some limitation of z3 from the final user (e.g. two properties with same source and destination)
+ * @author Antonio
+ *
+ */
 public class VerifooNormalizer {
 	private NFV root, originalNfv;
 	private Map<String, String> networkGroups, flowGroups;
@@ -73,7 +71,10 @@ public class VerifooNormalizer {
 			e.printStackTrace();
 		}*/
 	}
-	
+
+	/**
+	 * Translates properties with a wildcard in a list of properties with the explicit enumeration of the nodes present in the graph
+	 */
 	private void normalizeNetworks() {
 		List<Property> rootProperties = root.getPropertyDefinition().getProperty();
 		root.getGraphs().getGraph().forEach((g) -> {
@@ -139,7 +140,9 @@ public class VerifooNormalizer {
 		newP.setSrcPort(p.getSrcPort());
 		return newP;
 	}
-
+	/**
+	 * Translates properties with same source and destination in properties with virtual nodes
+	 */
 	private void normalizeSameFlows(){
 		
 		root.getGraphs().getGraph().forEach((g) -> {

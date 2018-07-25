@@ -112,11 +112,12 @@ public class VerifooProxy {
 		    setProperty(prop);
 	    }
 	    /**
-	     * Sets all the conditions for the nodes. First, it sets up the host conditions. 
-	     * Then, it creates the conditions to make that a node is deployed only on one host.
+	     * Sets all the conditions for the nodes. First, it removes all the deployment condition that were not possible
+	     * for all the client/server combination. Then, it sets up the host conditions and creates 
+	     * the conditions to ensure that a node is deployed only on one host.
 	     * After that, it creates the condition that if an host has a node deployed on it, it has to be active.
-	     * Lastly, it creates the conditions that the sum of the disk requirements of all the nodes
-	     * deployed on an host, is less than disk capacity of that host 
+	     * Lastly, it creates the conditions that are needed to check that the resources on the host are enough 
+	     * for the nodes that will be deployed
 	     * @throws BadGraphError
 	     */
 		private void setConditions() throws BadGraphError{
@@ -319,7 +320,7 @@ public class VerifooProxy {
 		}
 
 		/**
-		 * Checks if in the xml, then it calls the function to calculate all the possible paths from the host client to the host server
+		 * Checks the physical topology of the XML, then it calls the function to calculate all the possible paths from the host client to the host server
 		 * @throws BadGraphError
 		 */
 		private void checkPhysicalNetwork() throws BadGraphError{
@@ -352,7 +353,7 @@ public class VerifooProxy {
 		}
 		
 		/**
-		 * Calls the function to create the links from the node's neighbours and then it calls the function that create the routing tables
+		 * Calls the function to translate the node's neighbours into links and then it calls the function that creates the routing tables
 		 * @throws BadGraphError
 		 */
 		private void checkNffg() throws BadGraphError{
@@ -380,7 +381,6 @@ public class VerifooProxy {
 				routingMap.forEach((n, tuple) -> {
 					logger.debug("----Routing Table for " + n.getName()+"----");
 					//net.routingOptimizationSG2(netobjs.get(n), tuple._1, tuple._2 destinations);
-					//net.routingOptimizationSG(netobjs.get(n), tuple._1, tuple._2);
 					//net.routingOptimization(netobjs.get(n), tuple._1);
 					tuple._1.forEach(rt -> logger.debug("From " + n.getName() + " to " + rt.ip + " -> next hop: "+ rt.nextHop));
 					net.routingOptimizationSGOptional(netobjs.get(n), tuple._1, tuple._2, autoctx);
@@ -389,7 +389,12 @@ public class VerifooProxy {
             	throw new BadGraphError("The graph of nodes is invalid",EType.INVALID_SERVICE_GRAPH);
 			}
 		}
-		
+		/**
+		 * For a specific pair of client and server in the service graph, it computes the deployment conditions considering all the possible valid chains of hosts
+		 * @param validChain
+		 * @param c
+		 * @param s
+		 */
 		private void calculateDeploymentConditions(List<List<String>> validChain, Node c, Node s){
 				clientServerCombinations++;
 				logger.debug(">>>>NEW client/server combination (total: " + clientServerCombinations + ") -> " + c.getName() + " to " + s.getName());
@@ -439,7 +444,7 @@ public class VerifooProxy {
 		
 		
 		/**
-		 * Creates all the routing rule between the internal nodes
+		 * Creates all the routing rule between the internal nodes (middleboxes), currently not fully implemented
 		 * @param clients List of clients in the service graph
 		 * @param servers List of servers in the service graph
 		 */
@@ -511,7 +516,12 @@ public class VerifooProxy {
             });*/
             
 		}
-		
+		/**
+		 * Explores the graph to find the path between client and server and then it builds the routing table based on those information (for an XML without physical topology)
+		 * @param client
+		 * @param server
+		 * @throws BadGraphError
+		 */
 		private void createRoutingConditions(Node client, Node server) throws BadGraphError{
 			
 			//System.out.println("Searching next hop for " + client.getName() + " towards " + server.getName());
@@ -559,8 +569,16 @@ public class VerifooProxy {
 				}
 			}
 		}
-		
-		
+		/**
+		 * Explores recursively the graph in order to know the right sequence of nodes (for an XML without physical topology)
+		 * @param prec the node that precedes source in this exploration
+		 * @param source the node from which is exploring the solutions
+		 * @param server the destination node
+		 * @param nodeRecursionLevel the current level of the recursion
+		 * @param visited the list of the nodes already visited
+		 * @return
+		 * @throws BadGraphError
+		 */
 		private boolean setNextHop(Node prec, Node source, Node server, int nodeRecursionLevel, HashMap<Node, List<String>> visited) throws BadGraphError{
 			//logger.debug("Searching next hop for " + source.getName() + " towards " + server.getName());
 			if(source.getName().equals(server.getName())){
@@ -610,13 +628,15 @@ public class VerifooProxy {
 			return found;
 		}
 		
-		
+	
 		/**
 		 * Creates the routing table by adding the rules by exploring for each possible path between 
 		 * an host client and host server all the possibles deploying scenarios for the nodes
-		 * @param client the node client
-		 * @param server the node server
-		 * @param stageConditions 
+		 * @param client client the node client
+		 * @param server server the node server
+		 * @param validChain 
+		 * @param hostClient the host on which the client node is deployed (fixed in the XML)
+		 * @param hostServer the host on which the client node should be deployed
 		 * @throws BadGraphError
 		 */
 		private void createRoutingConditions(Node client, Node server, List<List<String>> validChain, String hostClient, String hostServer) throws BadGraphError{
@@ -723,6 +743,7 @@ public class VerifooProxy {
 		}
 		/**
 		 * Explores recursively all the possible solution for setting a next hop condition
+		 * @param prec the node that precedes source in this exploration
 		 * @param source the node from which is exploring the solutions
 		 * @param server the node server
 		 * @param nodeRecursionLevel the current level of the recursion
@@ -730,7 +751,8 @@ public class VerifooProxy {
 		 * @param level on which host in the host chain, it is trying to deploy the remaining nodes
 		 * @param validChain 
 		 * @param hostServer
-		 * @return true if the last node has been deployed on the host server (good path), false otherwise
+		 * @param visited the list of the nodes already traversed
+		 * @return
 		 * @throws BadGraphError
 		 */
 		private boolean setNextHop(Node prec, Node source, Node server, int nodeRecursionLevel, int nChain, int level, List<List<String>> validChain, String hostServer, HashMap<Node, List<String>> visited) throws BadGraphError{
@@ -808,6 +830,10 @@ public class VerifooProxy {
 			//visited.remove(source);
 			return found;
 		}
+		/**
+		 * Adds the condition related to a requested policy
+		 * @param prop
+		 */
 		public void setProperty(List<Property> prop){
 			prop.forEach(p ->{
 				String src = p.getSrc(), dst = p.getDst();
@@ -831,8 +857,7 @@ public class VerifooProxy {
 			});
 		}
 		/**
-		 * Checks if the client node and the server node in a graph are reachable satisfying all the imposed conditions
-		 * @param prop 
+		 * Checks if the service graph satisfies all the imposed conditions
 		 * @return
 		 */
 		public IsolationResult checkNFFGProperty(){

@@ -1,13 +1,16 @@
 package it.polito.verigraph.mcnet.components;
 
-import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.IntNum;
-
+/**
+ * This class abstract the concept of a firewall rule
+ * @author Antonio
+ *
+ */
 public class AclFirewallRule {
 	private BoolExpr action;
 	private DatatypeExpr source;
@@ -198,7 +201,11 @@ public class AclFirewallRule {
 				+ start_dst_port + ", end_dst_port=" + end_dst_port + ", protocol=" + protocol + ", directional="
 				+ directional + "]";
 	}
-	
+	/**
+	 * Returns a z3 boolean expression to check if the rule match the packet
+	 * @param p0
+	 * @return
+	 */
 	public BoolExpr matchPacket(Expr p0){
 		BoolExpr ipEqual;
 		if(directional){
