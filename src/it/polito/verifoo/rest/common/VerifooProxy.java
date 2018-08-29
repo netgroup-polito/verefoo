@@ -61,7 +61,7 @@ public class VerifooProxy {
 		 * @param graph The graph that will be deployed on the network
 		 * @param hosts The list of hosts in the network
 		 * @param conns The connections between hosts
-		 * @param paths 
+		 * @param paths the list of paths that the packet flows needs to follow
 		 * @param capacityDefinition The list of the capacity for each node that will be deployed
 		 * @throws BadGraphError
 		 */
@@ -832,7 +832,6 @@ public class VerifooProxy {
 		}
 		/**
 		 * Adds the condition related to a requested policy
-		 * @param prop
 		 */
 		public void setProperty(List<Property> prop){
 			prop.forEach(p ->{
@@ -890,8 +889,6 @@ public class VerifooProxy {
 		}
 		/**
 		 * Returns true if the node is a client
-		 * @param n
-		 * @return
 		 */
 		public boolean nodeIsClient(Node n){
 			return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);
@@ -899,15 +896,13 @@ public class VerifooProxy {
 		}
 		/**
 		 * Returns true if the node is a server
-		 * @param n
-		 * @return
 		 */
 		public boolean nodeIsServer(Node n){
 			return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);
     
 		}
 		/**
-		 * @return the nrOfConditions
+		 * @return the total number of deployment conditions, which is correlated with the complexity of the problem
 		 */
 		public int getNrOfConditions() {
 			return nrOfConditions;

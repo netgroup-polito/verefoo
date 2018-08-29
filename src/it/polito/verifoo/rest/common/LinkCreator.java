@@ -16,7 +16,7 @@ import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.Path;
 /**
- * Creates the link from the node's neighbours
+ * Creates the links from the node's neighbours
  *
  */
 public class LinkCreator {
@@ -25,11 +25,18 @@ public class LinkCreator {
 	private List<Node> nodes;
 	private List<Path> paths;
 	private Map<Integer, List<Link>> pathMap = new HashMap<>();
-
+	/**
+	 * 
+	 * @param ns the list of the nodes in the network service
+	 */
 	public LinkCreator(List<Node> ns){
 		nodes = ns;
 	}
-	
+	/**
+	 * 
+	 * @param ns the list of the nodes in the network service
+	 * @param ps the list of the paths that the packet flows will follow 
+	 */
 	public LinkCreator(List<Node> ns, List<Path> ps){
 		nodes = ns;
 		paths = ps;
@@ -45,8 +52,8 @@ public class LinkCreator {
 	}
 	
 	/**
-	 * Retrives the links of the service graph
-	 * @return
+	 * Retrives the links of the service graph exploring the node's neighbours
+	 * @return the links between nodes in the service graph
 	 */
 	public List<Link> getLinks(){
 		List<Node> clients = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).collect(Collectors.toList());
@@ -76,17 +83,12 @@ public class LinkCreator {
 		return orderedLinks;
 	}
 	/**
-	 * 
-	 * 
-	 */
-	/**
 	 * Creates the links from the nodes' neighbours exploring the various paths, ensuring to add a link only once
 	 * @param prec previous node in the chain
 	 * @param current current node in the chain
 	 * @param server the node that is the server of the chain
 	 * @param converting the list of nodes on the current path, to avoid infinite loops
 	 * @param converted the nodes from which all the neighbours are already been explored
-	 * @return
 	 * @throws BadGraphError
 	 */
 	private boolean createLink(Node prec, Node current, Node client, Node server, List<String> converting, List<String> converted) throws BadGraphError{

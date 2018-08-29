@@ -12,7 +12,8 @@ import com.microsoft.z3.Context;
 import it.polito.verifoo.rest.jaxb.Connection;
 import it.polito.verifoo.rest.jaxb.Node;
 /**
- * This class is needed to create the boolean expression that express a deployment constraint from a string formatted in a specific way considering a certain number of complexities
+ * This class hides all the complexities regarding the z3 deployment constraints.
+ * It creates a boolean z3 expression, from a string formatted in a specific way, considering a certain number of complexities
  * @author Antonio
  *
  */
@@ -27,10 +28,10 @@ public class ConditionExtractor {
 	private int latency;
 	/**
 	 * Sets up the enviroment to retrieve the information to return the right boolean expression from a string (it also saves it in a specific data structure)
-	 * @param ctx
-	 * @param autoctx
-	 * @param n
-	 * @param connections
+	 * @param ctx the z3 context
+	 * @param autoctx the z3 auto-context which holds all the informations about the auto-placement
+	 * @param n the node subject of the 
+	 * @param connections the list of connections between the hosts needed to retrieve the specific deployment latency
 	 * @param conditionDB the reference to the external data structure that contains all the deployemnt conditions
 	 * @param stageConditions the reference to the external data structure that contains only a part of the deployemnt conditions
 	 */
@@ -44,9 +45,9 @@ public class ConditionExtractor {
 	}
 	/**
 	 * Builds the boolean expression that represent the deployment from a string like "n1@h1/n2@h2" where the "/" is translated into an AND
-	 * @param s
-	 * @param nodes
-	 * @return
+	 * @param s the string that needs to be translated
+	 * @param nodes the list of all the nodes in the service graph
+	 * @return the z3 boolean expression of the string
 	 */
 	private BoolExpr DeploymentConditionFromDualString(String s, List<Node> nodes){
 		String first = s.substring(0, s.lastIndexOf('/'));
@@ -100,13 +101,13 @@ public class ConditionExtractor {
 	}
 	/**
 	 * Builds the boolean expression that represent the deployment from a string like "n1@h1"
-	 * @param s a string in a form like "n1@h1"
-	 * @param client
-	 * @param server
-	 * @param nodes
-	 * @param hostClient
-	 * @param hostServer
-	 * @return
+	 * @param s the string that needs to be translated
+	 * @param client the node that represents the client
+	 * @param server the node that represents the server
+	 * @param nodes nodes the list of all the nodes in the service graph
+	 * @param hostClient the host on which the client node will be deployed
+	 * @param hostServer the host on which the server node will be deployed
+	 * @return the z3 boolean expression of the string
 	 */
 	private BoolExpr DeploymentConditionFromSingleString(String s, Node client, Node server, List<Node> nodes, String hostClient, String hostServer){
 		String node = s.substring(0,s.lastIndexOf('@'));
@@ -163,13 +164,13 @@ public class ConditionExtractor {
 	}
 	/**
 	 * Public method that receives a string that represents a deployment and returns the correspondent boolean expression
-	 * @param s
-	 * @param client
-	 * @param server
-	 * @param nodes
-	 * @param hostClient
-	 * @param hostServer
-	 * @return
+	 * @param s the string that needs to be translated
+	 * @param client the node that represents the client
+	 * @param server the node that represents the server
+	 * @param nodes nodes the list of all the nodes in the service graph
+	 * @param hostClient the host on which the client node will be deployed
+	 * @param hostServer the host on which the server node will be deployed
+	 * @return the z3 boolean expression of the string
 	 */
 	public BoolExpr DeploymentConditionFromString(String s, Node client, Node server, List<Node> nodes, String hostClient, String hostServer){
 		BoolExpr c;
@@ -182,7 +183,7 @@ public class ConditionExtractor {
 		return c;
 	}
 	/**
-	 * Add to a condition c, the information about the presence of optional nodes
+	 * Add to a condition c the information about the presence of optional nodes
 	 * @param c
 	 * @return
 	 */
@@ -196,14 +197,14 @@ public class ConditionExtractor {
 	}
 
 	/**
-	 * @return the next
+	 * @return the next hop of the node in the current deployment condition
 	 */
 	public Node getNext() {
 		return next;
 	}
 
 	/**
-	 * @return the latency
+	 * @return the latency envisages in the current deployment condition
 	 */
 	public int getLatency() {
 		return latency;

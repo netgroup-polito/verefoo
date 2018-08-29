@@ -15,7 +15,6 @@ public class TopologyDB {
 	private TopologyDB() {}
 	/**
 	 * Retrieve the topology database needed to interact with this class
-	 * @return
 	 */
     public static synchronized TopologyDB getMedicineDB() {
         if (db == null) {
@@ -25,7 +24,7 @@ public class TopologyDB {
     }
     /**
      * Add a new resource model to the database 
-     * @param s
+     * @param s the new resource model
      */
 	public void setResourceModel(PhyResourceModel m){
 		System.out.println("New simulation created");
@@ -34,7 +33,6 @@ public class TopologyDB {
 	}
 	/**
 	 * Get the hosts in the topology
-	 * @return
 	 * @throws ResourceModelException 
 	 */
 	public Hosts getResourceModel() throws ResourceModelException{

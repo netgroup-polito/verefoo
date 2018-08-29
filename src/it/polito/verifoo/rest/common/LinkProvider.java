@@ -25,16 +25,13 @@ public class LinkProvider {
 	}
 	/**
 	 * Get all the links between the nodes (based on the neighbours indications)
-	 * @return
 	 */
 	public List<Link> getAllLinks(){
 		return new ArrayList<>(links);
 	}
 	/**
 	 * Checks if exists a path between the specified client and server
-	 * @param client
-	 * @param server
-	 * @return
+	 * @return true if exists a path, false otherwise
 	 */
 	public boolean existsPath(Node client, Node server){
 		if(paths == null) return true;
@@ -51,10 +48,10 @@ public class LinkProvider {
 		return false;
 	}
 	/**
-	 * Based on a source node and the level of the recursion (depth of a path), returns the link towards the next node
+	 * Based on a source node and the level of the recursion (depth of a path), returns the links towards the next node
 	 * @param n source node
 	 * @param displacement level of the recursion (depth of a path)
-	 * @return
+	 * @return the links towards the next node
 	 */
 	public List<Link> getLinksFrom(Node n, int displacement){
 		if(lastPathId != -1){

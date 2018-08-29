@@ -18,7 +18,7 @@ public class TranslatorBasic extends Translator {
 	 * Constructor
 	 * @param model The Verifoo output.
 	 * @param nfv The NFV model to complete.
-	 * @param g 
+	 * @param g the specific network service graph that is considered
 	 */
 	public TranslatorBasic(String model,NFV nfv, Graph g){
 		super(model, nfv,g);

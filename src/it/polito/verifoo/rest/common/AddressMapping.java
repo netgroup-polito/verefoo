@@ -12,12 +12,12 @@ import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 import it.polito.verigraph.mcnet.components.Tuple;
 /**
- * This class generate the Address Mapping List between nodename and nodeip.
+ * This class generates the data structure to correlate node name and node ip.
  */
 public class AddressMapping extends ArrayList<Tuple<NetworkObject,ArrayList<DatatypeExpr>>>{
 
     /**
-	 * This class is used for generate a Address mapping between z3 ip addresses and linked network objects
+	 * This class is used to generate an address mapping between z3 ip addresses and correlated network objects
 	 */
 	private static final long serialVersionUID = -4069135108727238094L;
 	private HashMap<Node,NetworkObject> netobjs;
@@ -36,7 +36,7 @@ public class AddressMapping extends ArrayList<Tuple<NetworkObject,ArrayList<Data
 		this.net=net;
 	}
 	/**
-	 * For each node of the list we generate a tuple of Netobjs and AddressList of z3 and at the end we setup it in the Network
+	 * For each node of the list it generates a tuple formed by a netobj and its addresses
 	 * @param nodes
 	 */
 	public void setAddressMappings(List<Node> nodes) {

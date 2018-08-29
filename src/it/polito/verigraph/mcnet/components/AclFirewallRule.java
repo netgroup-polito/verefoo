@@ -7,7 +7,7 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.IntNum;
 /**
- * This class abstract the concept of a firewall rule
+ * This class abstracts the concept of a firewall rule
  * @author Antonio
  *
  */
@@ -23,6 +23,18 @@ public class AclFirewallRule {
 	private boolean directional;
 	private Context ctx;
 	private NetContext nctx;
+	/**
+	 * Creates a firewall rule with a set of parameters
+	 * @param nctx the z3 net context
+	 * @param ctx the z3 context
+	 * @param action the action of the rule in boolean format (ALLOW=true, DENY=false)
+	 * @param source the DataType expression of the source address of the rule
+	 * @param destination the DataType expression of the destination address of the rule
+	 * @param string_src_port the string representing the port source interval of the rule
+	 * @param string_dst_port the string representing the destination port interval of the rule
+	 * @param protocol the level 4 protocol encoded as integer value (it is based on the enumeration class of the jaxb object)
+	 * @param directional if the rule needs to be considered also in reverse
+	 */
 	public AclFirewallRule(NetContext nctx, Context ctx, boolean action, DatatypeExpr source, DatatypeExpr destination, String string_src_port,
 			String string_dst_port, int protocol, boolean directional) {
 		this.nctx = nctx;
@@ -65,6 +77,18 @@ public class AclFirewallRule {
 		this.protocol = ctx.mkInt(protocol);
 		this.directional = directional;
 	}
+	/**
+	 * Creates a firewall rule with a set of parameters
+	 * @param nctx the z3 net context
+	 * @param ctx the z3 context
+	 * @param action the action of the rule in boolean format (ALLOW=true, DENY=false)
+	 * @param source the source address of the rule in a string format
+	 * @param destination the destination address of the rule in a string format
+	 * @param string_src_port the string representing the port source interval of the rule
+	 * @param string_dst_port the string representing the destination port interval of the rule
+	 * @param protocol the level 4 protocol encoded as integer value (it is based on the enumeration class of the jaxb object)
+	 * @param directional if the rule needs to be considered also in reverse
+	 */
 	public AclFirewallRule(NetContext nctx, Context ctx, boolean action, String source, String destination,
 			String string_src_port, String string_dst_port, int protocol, boolean directional) {
 		DatatypeExpr sourceExpr = nctx.createIpAddress(source);
@@ -202,9 +226,8 @@ public class AclFirewallRule {
 				+ directional + "]";
 	}
 	/**
-	 * Returns a z3 boolean expression to check if the rule match the packet
-	 * @param p0
-	 * @return
+	 * @param p0 the packet for the z3 expression
+	 * @return a z3 boolean expression to check if the rule match the packet
 	 */
 	public BoolExpr matchPacket(Expr p0){
 		BoolExpr ipEqual;

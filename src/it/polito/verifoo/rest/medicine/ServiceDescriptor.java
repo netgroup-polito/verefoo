@@ -7,7 +7,11 @@ import java.util.Map;
 import it.polito.verifoo.rest.common.Link;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Node;
-
+/**
+ * This class create the service descriptor for a specific node
+ * @author Antonio
+ *
+ */
 public class ServiceDescriptor {
 	
 	private String file = "descriptor_version: \"1.0\"\n"
@@ -76,21 +80,18 @@ public class ServiceDescriptor {
 	} 
 	/**
 	 * Get the service descriptor content that will be needed by MeDICINE
-	 * @return
 	 */
 	public String getServiceDescriptor(){
 		return file;
 	}
 	/**
 	 * Gets the commands to connect the nodes
-	 * @return
 	 */
 	public String getNetworkBuild(){
 		return networkBuild;
 	}
 	/**
 	 * Gets the commands that should be used to test if the nodes are connected and reachable
-	 * @return
 	 */
 	public List<String> getTestCommands() {
 		return testCommands;

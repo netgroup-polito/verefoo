@@ -30,7 +30,7 @@ public class Translator {
 	 * Constructor
 	 * @param model The Verifoo output.
 	 * @param nfv The NFV model to complete.
-	 * @param g 
+	 * @param g the specific network service graph that is considered
 	 */
 	public Translator(String model,NFV nfv, Graph g){
 		this.model=model;
@@ -39,7 +39,7 @@ public class Translator {
 	}
 	/**
 	 * Conversion function
-	 * @return 
+	 * @return an NFV object that contains the new information retrieved in the z3 model
 	 */
 	public NFV convert(){
 		if(originalNfv.getHosts() != null) 
@@ -57,8 +57,7 @@ public class Translator {
 		setAntispamAutoConfig();
 	}
 	/**
-	 * For each host we search for all possible configuration of nodes(at)host and check if Int value is 1
-	 * Then we set the element in the XML accordingly.
+	 * Search in the model the deployed position of the nodes and updates the correspondent host object
 	 * @param host Physical Host
 	 */
 	public void searchHost(Host host){
@@ -81,9 +80,6 @@ public class Translator {
 	}
 	/**
 	 * Search for the destination of a specific auto-generated rule for a firewall
-	 * @param n
-	 * @param nrOfRule
-	 * @return
 	 */
 	private String firewallAutoConfigSearchDst(Node n, String nrOfRule){
 		List<String> nodes = g.getNode().stream().map(no -> no.getName()).collect(Collectors.toList());
@@ -121,9 +117,9 @@ public class Translator {
 	}
 	/**
 	 * Generalize the pattern matching of a variable declared as a DatatypeSort in the z3 model
-	 * @param tosearch
-	 * @param datatype
-	 * @return
+	 * @param tosearch the string to search
+	 * @param datatype the type of the z3 variable
+	 * @return the string that matches the pattern
 	 */
 	protected String firewallAutoConfigSearchComplexAttribute(String tosearch, z3Translator.Datatype datatype){
 		Pattern pattern = Pattern.compile(tosearch);
@@ -137,8 +133,6 @@ public class Translator {
 	}
 	/**
 	 *  Generalize the pattern matching of a variable declared as a primitive type (bool, int, etc) in the z3 model
-	 * @param tosearch
-	 * @return
 	 */
 	protected String firewallAutoConfigSearchPlainAttribute(String tosearch){
 		Pattern pattern = Pattern.compile(tosearch);
@@ -270,7 +264,7 @@ public class Translator {
 	/**
 	 * Merge the auto-generated rule by overlapping port intervals, first by source port interval and the by destination port interval
 	 * @param listOfRules list of rules to merge
-	 * @return
+	 * @return the list of firewall rules in an "elements" object
 	 */
 	private List<Elements> mergeRules(List<Elements> listOfRules) {
 		/* TEST CASE
@@ -356,7 +350,6 @@ public class Translator {
 	/**
 	 * Merge the auto-generated rule by overlapping port intervals
 	 * @param rulesMap a data structure of sorted rules
-	 * @return
 	 */
 	private List<Elements> mergeRulesByMap(HashMap<String, List<Elements>> rulesMap) {
 		List<Elements> finalRules = new ArrayList<>();
@@ -446,7 +439,7 @@ public class Translator {
 	}
 	
 	/**
-	 * Set the DPI auto-configurated rules in the XML according to the verifoo output
+	 * Set the DPI auto-configurated rules in the XML for the verifoo output
 	 */
 	public void setDPIAutoConfig(){
 		//List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.DPI) && n.getConfiguration().getDpi().getNotAllowed().isEmpty()).collect(Collectors.toList());
@@ -482,7 +475,7 @@ public class Translator {
 		});
 	}
 	/**
-	 * Set the antispam auto-configurated rules in the XML according to the verifoo output
+	 * Set the antispam auto-configurated rules in the XML for the verifoo output
 	 */
 	public void setAntispamAutoConfig() {
 		//List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.ANTISPAM) && n.getConfiguration().getAntispam().getSource().isEmpty()).collect(Collectors.toList());
@@ -519,8 +512,8 @@ public class Translator {
 	}
 	/**
 	 * Reduces the host resources according to the node metrics
-	 * @param h host
-	 * @param nodeName
+	 * @param h the host
+	 * @param nodeName the name of the node that is deployed on the host
 	 */
 	public void allocateResources(Host h, String nodeName){
 		NodeMetrics reqResources = nfv.getConstraints().getNodeConstraints()
@@ -533,9 +526,17 @@ public class Translator {
 		h.setDiskStorage(h.getDiskStorage()-reqResources.getReqStorage());
 		h.setMemory(h.getMemory()-reqResources.getMemory());
 	}
+	/**
+	 * Get the normalized version of the received service graph
+	 * @return the normalized version of the received service graph
+	 */
 	public VerifooNormalizer getNormalizer() {
 		return norm;
 	}
+	/**
+	 * Set the normalized version of the received service graph
+	 * @param norm the normalized version of the received service graph
+	 */
 	public void setNormalizer(VerifooNormalizer norm) {
 		this.norm = norm;
 		this.originalNfv = norm.getOriginalNfv();

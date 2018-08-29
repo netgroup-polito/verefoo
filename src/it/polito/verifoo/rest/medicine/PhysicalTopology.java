@@ -11,7 +11,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import it.polito.verifoo.rest.jaxb.Connection;
 import it.polito.verifoo.rest.jaxb.Host;
 import it.polito.verifoo.rest.jaxb.SupportedVNFType;
-
+/**
+ * This class creates the file that represents the topology that will be simulated 
+ * @author Antonio
+ *
+ */
 public class PhysicalTopology {
 	
 	public List<Host> hosts;
@@ -89,9 +93,8 @@ public class PhysicalTopology {
 		fileBody+="\tsdkg1.start()\n";
 	}
 	/**
-	 * Gets the python file that represents the topology that
+	 * @return the python file that represents the topology that
 	 * will be simulated via containernet
-	 * @return
 	 */
 	public String getTopologyDescription() {
 		return fileHeader+fileBody+fileFooter;

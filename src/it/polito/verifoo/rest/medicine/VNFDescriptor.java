@@ -3,7 +3,11 @@ package it.polito.verifoo.rest.medicine;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
-
+/**
+ * This class creates the service descriptor file following the ETSI specifications
+ * @author Antonio
+ *
+ */
 public class VNFDescriptor {
 	
 	private String fileHeader = "descriptor_version: \"vnfd-schema-01\"\n"
@@ -11,7 +15,7 @@ public class VNFDescriptor {
 	private int freeInInterface, freeOutInterface;	
 	/**
 	 * Public constructor that creates for a specific node a VNF descriptor
-	 * @param node 
+	 * @param node a specific node
 	 * @param nMetrics Contraints on the node
 	 * @param inLinks Number of incoming links
 	 * @param outLinks Number of outgoing links
@@ -109,21 +113,18 @@ public class VNFDescriptor {
 	} 
     /**
      * Get the number of incoming interfaces still not connected
-     * @return
      */
 	public int getFreeInInterface() {
 		return freeInInterface;
 	}
 	/**
      * Get the number of outgoing interfaces still not connected
-     * @return
      */
 	public int getFreeOutInterface() {
 		return freeOutInterface;
 	}
 	/**
      * Use up an incoming interface because it has been connected
-     * @return
      */
 	public int bookInInterface() {
 		freeInInterface--;
@@ -131,7 +132,6 @@ public class VNFDescriptor {
 	}
 	/**
      * Use up an outgoing interface because it has been connected
-     * @return
      */
 	public int bookOutInterface() {
 		freeOutInterface--;
@@ -139,7 +139,6 @@ public class VNFDescriptor {
 	}
 	/**
 	 * Get the VNF descriptor
-	 * @return
 	 */
 	public String getVNFDescriptor(){
 		return fileHeader;

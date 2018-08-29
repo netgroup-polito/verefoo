@@ -1,11 +1,12 @@
-it.polito.verifoo.components
+it.polito.verifoo.random
 it.polito.verifoo.rest.app
 it.polito.verifoo.rest.common
 it.polito.verifoo.rest.jaxb
 it.polito.verifoo.rest.main
+it.polito.verifoo.rest.medicine
+it.polito.verifoo.rest.neo4j
 it.polito.verifoo.rest.test
 it.polito.verifoo.rest.webservice
 it.polito.verifoo.test
 it.polito.verigraph.mcnet.components
 it.polito.verigraph.mcnet.netobjs
-it.polito.verigraph.scalability.tests

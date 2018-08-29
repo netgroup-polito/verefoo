@@ -5,7 +5,11 @@ import java.util.List;
 import it.polito.verifoo.rest.jaxb.Host;
 import it.polito.verifoo.rest.jaxb.NodeRefType;
 
-
+/**
+ * This class creates the custom placement file that SONATA will read
+ * @author Antonio
+ *
+ */
 public class VNFDeployment {
 	String placement;
 	private List<Host> hosts;
@@ -34,6 +38,9 @@ public class VNFDeployment {
 		}
 
 	}
+	/**
+	 * @return the custom placement string that represent the python file to instruct SONATA about the placement
+	 */
 	public String getPlacementDescription(){
 		return placement;
 	}

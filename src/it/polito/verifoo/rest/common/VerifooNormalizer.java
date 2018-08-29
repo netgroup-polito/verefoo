@@ -27,6 +27,10 @@ import java.util.HashMap;
 public class VerifooNormalizer {
 	private NFV root, originalNfv;
 	private Map<String, String> networkGroups, flowGroups;
+	/**
+	 * Translates the input in a normalized format
+	 * @param root the NFV element received in input
+	 */
 	public VerifooNormalizer(NFV root){
 		try{
 			JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
@@ -258,11 +262,17 @@ public class VerifooNormalizer {
     	}
     	return true;
 	}
-
+	/**
+	 * Get the original NFV element received in input
+	 * @return the original NFV element received in input
+	 */
 	public NFV getOriginalNfv() {
 		return originalNfv;
 	}
-
+	/**
+	 * Set the original NFV element received in input
+	 * @param originalRoot the original NFV element received in input
+	 */
 	public void setOriginalNfv(NFV originalRoot) {
 		this.originalNfv = originalRoot;
 	}
@@ -275,19 +285,23 @@ public class VerifooNormalizer {
 	}
 
 	/**
-	 * @return the networkGroups
+	 * @return the map that tells to which network a node belongs 
 	 */
 	public Map<String, String> getNetworkGroups() {
 		return networkGroups;
 	}
 
 	/**
-	 * @return the flowGroups
+	 * @return the map that tells to which original node a virtual node (flow) belongs  
 	 */
 	public Map<String, String> getFlowGroups() {
 		return flowGroups;
 	}
-	
+	/**
+	 * Get a specific graph from the original NFV element received in input
+	 * @param id the id of the graph in the NFV element
+	 * @return a specific graph from the original NFV element received in input
+	 */
 	public Graph getOriginalGraph(long id){
 		return originalNfv.getGraphs().getGraph().stream().filter(g -> g.getId()==id).findFirst().orElse(null);		
 	}

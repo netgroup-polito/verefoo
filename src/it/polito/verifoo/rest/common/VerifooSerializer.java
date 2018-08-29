@@ -24,13 +24,15 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
 
 /**
  * This class separates the Verifoo classes implementation from the actual input
- *  * @author Antonio
- *
  */
 public class VerifooSerializer {
 	private NFV nfv, result;
 	private boolean sat = false;
 	private Logger logger = LogManager.getLogger("mylog");
+	/**
+	 * Wraps all the Verifoo tasks, executing the z3 procedure for each graph in the NFV element
+	 * @param root the NFV element received as input
+	 */
 	public VerifooSerializer(NFV root){
 		this.nfv = root;
 		/*String neo4jURL, neo4jUsername, neo4jPassword;
@@ -133,7 +135,7 @@ public class VerifooSerializer {
 
 	
 	/**
-	 * @return the nfv object
+	 * @return the original NFV object given in the constructor
 	 */
 	public NFV getNfv() {
 		return nfv;
@@ -141,7 +143,7 @@ public class VerifooSerializer {
 
 
 	/**
-	 * @return the result
+	 * @return the NFV object after the computation 
 	 */
 	public NFV getResult() {
 		return result;

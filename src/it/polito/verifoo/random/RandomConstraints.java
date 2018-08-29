@@ -6,7 +6,11 @@ import java.util.stream.Collectors;
 import it.polito.verifoo.rest.jaxb.*;
 import it.polito.verifoo.rest.jaxb.LinkConstraints.LinkMetrics;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;;
-
+/**
+ * Generates a random set of requirements for a service graph
+ * @author Antonio
+ *
+ */
 public class RandomConstraints {
 	Random random;
 	NodeConstraints nodeConstraints = new NodeConstraints();

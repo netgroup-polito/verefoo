@@ -7,7 +7,11 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import it.polito.verifoo.rest.jaxb.*;
-
+/**
+ * Wraps the creation of a completely random input file for Verifoo
+ * @author Antonio
+ *
+ */
 public class RandomInputGenerator {
 	Graphs graphs = new Graphs();
 	Constraints constraints = null;
@@ -18,11 +22,11 @@ public class RandomInputGenerator {
 	NFV randomInput = new NFV();
 	/**
 	 * Creates a totally random generated input for Verifoo
-	 * @param maxClients
-	 * @param maxServers
-	 * @param maxInternalNodes
-	 * @param maxProperty
-	 * @param maxHosts
+	 * @param maxClients the max number of clients in the service graph (min. 1)
+	 * @param maxServers the max number of server in the service graph (min. 1)
+	 * @param maxInternalNodes the max number of internal VNF
+	 * @param maxProperty the max number of policies
+	 * @param maxHosts the max number of hosts in the physical topology
 	 */
     public RandomInputGenerator(int maxClients, int maxServers, int maxInternalNodes, int maxProperty, int maxHosts) {
     	RandomGraph serviceGraph = new RandomGraph(random, maxClients, maxServers, maxInternalNodes, maxProperty);
@@ -58,7 +62,7 @@ public class RandomInputGenerator {
     }
     /**
      * 
-     * @return
+     * @return the randomly generated input
      */
 	public NFV getRandomInput() {
 		return randomInput;

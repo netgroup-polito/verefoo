@@ -27,7 +27,11 @@ import it.polito.verifoo.rest.jaxb.Vpnaccess;
 import it.polito.verifoo.rest.jaxb.Webserver;
 import it.polito.verigraph.random.PolicyGen;
 import it.polito.verigraph.random.RandomGenerator;
-
+/**
+ * Generates a random service graph for Verifoo with random requirements and set of policies
+ * @author Antonio
+ *
+ */
 public class RandomGraph {
 
 	Graph graph = null;

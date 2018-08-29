@@ -25,17 +25,25 @@ import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 public class Neo4jClient implements AutoCloseable{
 
     private final Driver driver;
+    /**
+     * Initialize the driver to interact with the neo4j server
+     */
 	public Neo4jClient( String uri, String user, String password)
     {
         driver = GraphDatabase.driver( uri, AuthTokens.basic( user, password ) );
     }
-    
+    /**
+     * Close the connection with the neo4j server
+     */
     @Override
     public void close() throws Exception
     {
         driver.close();
     }
-
+    /**
+     * Store the information about the service graph
+     * @param root the NFV element received as input
+     */
     public void storeGraph(NFV root){
     	 try ( Session session = driver.session() ){
     		 System.out.println("Session created");

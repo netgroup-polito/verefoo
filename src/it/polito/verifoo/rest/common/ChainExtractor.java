@@ -27,10 +27,12 @@ public class ChainExtractor {
 	private static List<Host> hosts;
 	/**
 	 * Calculates all the possible paths from the host client to the host server
-	 * @param hostClient
-	 * @param hostServer
-	 * @param hosts 
-	 * @return 
+	 * @param hostClient The first host of the chain
+	 * @param hostServer The last host of the chain
+	 * @param hs The entire list of hosts
+	 * @param connections The connections between the hosts
+	 * @param maxSize Max lenght of the chains
+	 * @return
 	 */
 	public static List<List<String>> createHostChain(String hostClient, String hostServer, List<Host> hs, List<Connection> connections, int maxSize){
 		List<String> hostChain = new ArrayList<>();
@@ -122,9 +124,10 @@ public class ChainExtractor {
 	
 	/**
 	 * Calculates all the possible paths from the node client to the node server
-	 * @param hostClient
-	 * @param hostServer
-	 * @return 
+	 * @param nodeClient
+	 * @param nodeServer
+	 * @param links
+	 * @return
 	 */
 	public static List<List<String>> createNodeChain(String nodeClient, String nodeServer, List<Link> links){
 		List<String> nodeChain = new ArrayList<>();
@@ -147,11 +150,14 @@ public class ChainExtractor {
 		//logger.debug("Calculated node chain " + savedChain);
 		return new ArrayList<List<String>>(savedChain);
 	}
+
 	/**
 	 * Explores recursively all the possible paths
 	 * @param lastNode the node from which it calculates the next, for the recursion
 	 * @param nodeServer is the final node of the network
 	 * @param nodeChain List of all the nodes encountered in the current chain
+	 * @param links List of all the links between the nodes
+	 * @return
 	 */
 	private static boolean expandNodeChain(String lastNode, String nodeServer, List<String> nodeChain, List<Link> links){
 		if(lastNode.equals(nodeServer)){

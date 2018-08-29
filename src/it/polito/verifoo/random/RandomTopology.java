@@ -13,7 +13,11 @@ import it.polito.verifoo.rest.jaxb.Hosts;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.SupportedVNFType;
 import it.polito.verifoo.rest.jaxb.TypeOfHost;
-
+/**
+ * Generates a random topology for Verifoo ("Hosts" element and "Connections" element)
+ * @author Antonio
+ *
+ */
 public class RandomTopology {
 	Random random;
 	Hosts hosts = new Hosts();

@@ -48,7 +48,7 @@ import it.polito.verifoo.rest.jaxb.TypeOfHost;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 /**
  * 
- * This class runs some tests in order to check the correctness of the VerifooProxy class 
+ * This class runs some tests to collect some data about the performance of the tool 
  *
  */
 public class TestPerformance {

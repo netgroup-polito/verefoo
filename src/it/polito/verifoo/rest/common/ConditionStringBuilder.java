@@ -30,9 +30,7 @@ public class ConditionStringBuilder {
 	}
 	/**
 	 * From the arguments it creates the string source@host, also checking if the source is optional and registering this information
-	 * @param source
-	 * @param host
-	 * @return
+	 * @return the formatted string that represents the specified deployment
 	 */
 	public String buildConditionString(Node source, String host){
 		//System.out.print("On RT("+next.getName()+") ");
@@ -46,11 +44,7 @@ public class ConditionStringBuilder {
 	}
 	/**
 	 From the arguments it creates the string n1@h1/n2@h2
-	 * @param n1
-	 * @param h1
-	 * @param n2
-	 * @param h2
-	 * @return
+	 * @return the formatted string that represents the specified deployment
 	 */
 	public String buildConditionString(Node n1, String h1, Node n2, String h2){
 		//logger.debug("\t"+n1.getName()+"@"+h1 + " AND " + n2.getName()+"@"+h2;;

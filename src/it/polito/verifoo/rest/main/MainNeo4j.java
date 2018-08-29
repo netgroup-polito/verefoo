@@ -22,7 +22,11 @@ import it.polito.verifoo.rest.common.BadGraphError;
 import it.polito.verifoo.rest.common.VerifooSerializer;
 import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.neo4j.Neo4jClient;
-
+/**
+ * 
+ * This is the main class only for testing the the neo4j interaction
+ *
+ */
 public class MainNeo4j{
     
 	public static void main(String[] args) throws Exception {

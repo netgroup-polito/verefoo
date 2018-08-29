@@ -38,7 +38,7 @@ import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 /**
  * 
- * This class runs some tests in order to check the correctness of the VerifooProxy class 
+ * This class runs some tests in order to check the correctness of the auto-configuration module
  *
  */
 public class TestAutoConfiguration {
