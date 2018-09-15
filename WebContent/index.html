@@ -5,8 +5,14 @@
 </head>
 <body>
 <h2>Verifoo RESTful Web Service</h2>
-This web service has two resources named <a href="rest/deployment">deployment</a> and <a href="rest/converter">converter</a>.
-The deployment web service recives an XML file containing a NFV element that describes some service chains and a physical netwok. It returns the correspondent deployment. The converter web service recives also an XML file containing a NFV element
+This web service has the following resources
+<ul>
+	<li> <a href="rest/deployment">deployment</a> 
+	<li> <a href="rest/converter">converter</a>
+	<li> <a href="rest/simulation">simulation</a>
+</ul>
+The deployment resource recives an XML file containing a NFV element that describes some service chains and a physical netwok. It returns the correspondent deployment. 
+The converter resource recives also an XML file containing a NFV element with a ParsingString element which is the model returned by z3. The simulation resource allows the interaction with SONATA.
 </p>
 <p><a id="swaggerdocs" href="_swagger-ui/index.html?url=http://127.0.0.1:8080/verifoo/rest/swagger.json">Swagger documentation</a>
 <p><a href="VerifooDocs.pdf">Verifoo PDF documentation</a>

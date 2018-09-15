@@ -137,7 +137,7 @@ public class RandomGenerator {
 
         System.out.println("Number of graphs: "+ gen.getGraphs().size());
         for(Graph g : gen.getGraphs()){
-            gen.pringGraph(g);
+            gen.printGraph(g);
             File file = new File("./testfile/Random/graph_"+g.getId()+".json");
             try {
                 // Serialize Java object info JSON file under the examples folders
@@ -165,7 +165,7 @@ public class RandomGenerator {
         }
     }
 
-    public void pringGraph(Graph g){
+    public void printGraph(Graph g){
         if(g instanceof GraphGen){
             System.out.println("Graph ID: "+ g.getId());
             for(Node node: g.getNodes().values()){

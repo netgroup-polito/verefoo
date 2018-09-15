@@ -18,9 +18,18 @@
         <neighbour name="10.0.0.0"/>
         <neighbour name="10.0.0.10"/>
         <neighbour name="30.0.5.2"/>
-        <configuration description="A simple description" name="conf1">
-          <firewall defaultAction="ALLOW"/>
-        </configuration>
+		<configuration name="conf1" description="A simple description">
+			<firewall defaultAction="ALLOW">
+				<elements>
+					<action>DENY</action>
+					<source>10.0.0.-1</source>
+					<destination>30.0.5.2</destination>
+					<protocol>ANY</protocol>
+					<src_port>*</src_port>
+					<dst_port>*</dst_port>
+				</elements>
+			</firewall>
+		</configuration>
       </node>
       <node functional_type="WEBSERVER" name="30.0.5.2">
         <neighbour name="10.0.0.1"/>
@@ -37,7 +46,8 @@
 	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="IsolationProperty" src="10.0.0.-1" dst="30.0.5.2"/> 			
+  		<Property graph="0" name="IsolationProperty" src="10.0.0.0" dst="30.0.5.2"/> 
+  		<Property graph="0" name="IsolationProperty" src="10.0.0.10" dst="30.0.5.2"/> 			
   </PropertyDefinition>
   <Hosts>
   	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="10.0.0.0"/>

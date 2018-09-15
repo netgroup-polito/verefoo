@@ -76,12 +76,14 @@ public class VerifooSerializer {
 		}
 		try{
 			if(root.getHosts() != null && (root.getConnections() == null || root.getConnections().getConnection().size() == 0)){
+				System.out.println("No connections found! Building full mesh topology...");
 				createFullMesh(root);
-				JAXBContext jc= JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
+				System.out.println("Full mesh topology built");
+				/*JAXBContext jc= JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
 				Marshaller m = jc.createMarshaller();
 	            m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 	            m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-	            m.marshal( root.getConnections(), System.out ); 
+	            m.marshal( root.getConnections(), System.out ); */
 			}
 			List<Path> paths = null;
 			if(root.getNetworkForwardingPaths() != null)
@@ -110,9 +112,9 @@ public class VerifooSerializer {
 			//System.out.println("Graph semantically incorrect");
 	    	logger.error(e);
 	    	throw e;
-	    }catch (JAXBException e) {
+	    }/*catch (JAXBException e) {
 	    	logger.error(e);
-		}
+		}*/
 	}
 	/**
 	 * If no connections are declared in XML, a full mesh is created between the hosts

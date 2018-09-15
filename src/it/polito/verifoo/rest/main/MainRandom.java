@@ -23,7 +23,7 @@ import it.polito.verifoo.rest.common.*;
  * This is the main class only for testing the Verifoo execution
  *
  */
-public class Main {
+public class MainRandom {
 	public static void main(String[] args) throws MalformedURLException{
 		System.setProperty("log4j.configuration", new File("resources", "log4j2.xml").toURI().toURL().toString());
         Logger logger = LogManager.getLogger("mylog");
@@ -43,13 +43,27 @@ public class Main {
                 RandomInputGenerator r = null;
                 boolean exit = false;
                 int sat = 0; 
-                long beginAll = System.currentTimeMillis();;
+                long beginAll = 0;
                 while(!exit){
                 	try{
                 		Marshaller m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(   "./testfile/Isolation/nfv5nodes7hostsSAT-Wildcards-II.xml"  )));
+                		
+                        
+                        int maxClients = 1, maxServers = 1, maxInternalNodes = 3, maxProperty = 1, maxHosts = 4;
+                    	r = new RandomInputGenerator(maxClients, maxServers, maxInternalNodes, maxProperty, maxHosts);
+                        NFV root = r.getRandomInput();
+                        OutputStream out = new FileOutputStream("./testfile/Random/current.xml");
+                        //create a Marshaller and marshal to output
+                        m.marshal( root, out ); 
+                        root = (NFV) u.unmarshal( new FileInputStream( "./testfile/Random/current.xml" ) );
+
+                        beginAll=System.currentTimeMillis();
+                        VerifooSerializer test = new VerifooSerializer(root);
+                        
+                        
+                        //VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(   "./testfile/nfv3nodes3hosts.xml"   )));
                         m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");

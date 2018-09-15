@@ -89,7 +89,7 @@ public class RandomTopology {
 		n = 0;
 		for(Host src : middleboxes){
 			for(Host dst : middleboxes){
-				if(src == dst) continue;
+				if(src.equals(dst)) continue;
 				if(random.nextBoolean()){
 					Connection conn = new Connection();
 					conn.setSourceHost(src.getName());
@@ -99,11 +99,14 @@ public class RandomTopology {
 					randomConnections.add(conn);
 				}
 			}
-			if(n == 0){
+			if(n == 0 && middleboxes.size() > 1){
 				//at least one connection must be present
 				Connection conn = new Connection();
 				conn.setSourceHost(src.getName());
-				conn.setDestHost(middleboxes.get(random.nextInt(nMiddle)).getName());
+				String dst = src.getName();
+				while(src.getName().equals(dst))
+					dst = middleboxes.get(random.nextInt(nMiddle)).getName();
+				conn.setDestHost(dst);
 				conn.setAvgLatency(random.nextInt(1000)+1);
 				randomConnections.add(conn);
 			}

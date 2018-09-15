@@ -383,9 +383,6 @@ public class AclFirewall extends NetworkObject{
  		Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
  		Expr n_1 = ctx.mkConst(fw + "_firewall_send_n_1", nctx.node);
  		//System.out.println("Firewall " +fw+" -> default action: " + (defaultAction.equals(ctx.mkTrue())? "ALLOW":"DENY"));
- 		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), fw, p_0)).collect(Collectors.toList());
- 		BoolExpr[] tmp2 = new BoolExpr[recvNeighbours.size()];
- 		BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp2));
     	if (acls.size() == 0){
     		//If the size of the ACL list is empty then by default acl_func must be false
     		 solver.Add(ctx.mkForall(new Expr[]{p_0},
@@ -399,9 +396,9 @@ public class AclFirewall extends NetworkObject{
     	        	/*System.out.println(fw + " rule: "+rule.getAction()+" from " + rule.getSource() + ":"+rule.getSrc_port() +
     	        											" to " + rule.getDestination()+":"+rule.getDst_port());*/
     	        	rule_map[y] = rule.matchPacket(p_0);
-					solver.Add(ctx.mkForall(new Expr[]{p_0},
-											// at this point we assume that the rules are conflict free -> the iff can be used
-											ctx.mkIff(ctx.mkAnd(enumerateRecv,
+					solver.Add(ctx.mkForall(new Expr[]{p_0, n_0},
+											// at this point we assume that the rules are conflict free
+											ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(new Expr[] { n_0, fw, p_0 }),
 																rule.matchPacket(p_0))
 														,ctx.mkAnd(ctx.mkEq(
 																			acl_func.apply(p_0),
@@ -411,10 +408,10 @@ public class AclFirewall extends NetworkObject{
 													  )
 								, 1, null, null, null, null));
     	        }
-    	        solver.Add(ctx.mkForall(new Expr[]{p_0},
+    	        solver.Add(ctx.mkForall(new Expr[]{p_0, n_0},
 										ctx.mkImplies(
 											//no rule matches the packet -> the acl must allow the default behaviour
-											ctx.mkAnd(enumerateRecv,
+											ctx.mkAnd((BoolExpr) nctx.recv.apply(new Expr[] { n_0, fw, p_0 }),
 													ctx.mkNot(ctx.mkOr(rule_map))
 													),
 											ctx.mkEq(
@@ -425,65 +422,6 @@ public class AclFirewall extends NetworkObject{
 
     	}
     }
-    /*
-    //Use blacklist and whitelist
- 	private void aclConstraints(Optimize solver){
- 		Expr p_0 = ctx.mkConst(fw+"_firewall_acl_p_1", nctx.packet);
-    	if (acls.size() == 0){
-    		//If the size of the ACL list is empty then by default acl_func must be false
-    		 solver.Add(ctx.mkForall(new Expr[]{p_0},
-						ctx.mkEq( 
-								acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0),
-												nctx.pf.get("src_port").apply(p_0),nctx.pf.get("dest_port").apply(p_0)), ctx.mkFalse()),1,null,null,null,null));
-    	}else{
-    		 BoolExpr[] acl_map = new BoolExpr[acls.size()];
-    	        for(int y=0;y<acls.size();y++){
-    	        	Quattro<DatatypeExpr,DatatypeExpr,IntNum,IntNum> tp = acls.get(y);
-    	        	System.out.println("Added rule: DROP from " + tp._1 + " to " + tp._2);
-    	        	//acl_map[y] = ctx.mkOr(ctx.mkAnd(ctx.mkEq(a_0,tp._1),ctx.mkEq(a_1,tp._2)), ctx.mkAnd(ctx.mkEq(a_0,tp._2),ctx.mkEq(a_1,tp._1)));
-    	        	acl_map[y] = ctx.mkOr(
-    	        							ctx.mkAnd(nctx.equalPacketIpToFwIpRule(nctx.pf.get("src").apply(p_0),tp._1),nctx.equalPacketIpToFwIpRule(nctx.pf.get("dest").apply(p_0),tp._2),
-    	        										//ctx.mkEq(nctx.pf.get("src").apply(p_0),tp._1),ctx.mkEq(nctx.pf.get("dest").apply(p_0),tp._2),
-    	        										ctx.mkEq(nctx.pf.get("src_port").apply(p_0),tp._3),
-    	        										ctx.mkEq(nctx.pf.get("dest_port").apply(p_0),tp._4)
-    	        										)
-    	        							);
-    	        }
-    	        //Constraint2		acl_func(a_0,a_1) == or(foreach ip1,ip2 in acl_map ((a_0 == ip1 && a_1 == ip2)||(a_0 == ip2 && a_1 == ip1)))
-    	        solver.Add(ctx.mkForall(new Expr[]{p_0},
-    	        						ctx.mkEq( 
-    	        								acl_func.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0), nctx.pf.get("src_port").apply(p_0), nctx.pf.get("dest_port").apply(p_0)),
-    	        								ctx.mkOr(acl_map)),1,null,null,null,null));
-    	    
-    	}
-    	if (whiteAcls.size() == 0){
-       		//If the size of the ACL list is empty then by default acl_func must be false
-       		 solver.Add(ctx.mkForall(new Expr[]{p_0},
-    						ctx.mkEq( 
-    								acl_func_white.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0),
-														nctx.pf.get("src_port").apply(p_0),nctx.pf.get("dest_port").apply(p_0)), 
-    								ctx.mkTrue()),1,null,null,null,null));
-       	}else{
-       		BoolExpr[] acl_map_white = new BoolExpr[whiteAcls.size()];
-               for(int y=0;y<whiteAcls.size();y++){
-            	   Quattro<DatatypeExpr,DatatypeExpr,IntNum,IntNum> tp = whiteAcls.get(y);
-               		acl_map_white[y] = ctx.mkOr(
-											ctx.mkAnd(nctx.equalPacketIpToFwIpRule(nctx.pf.get("src").apply(p_0),tp._1),nctx.equalPacketIpToFwIpRule(nctx.pf.get("dest").apply(p_0),tp._2),
-													//ctx.mkEq(nctx.pf.get("src").apply(p_0),tp._1),ctx.mkEq(nctx.pf.get("dest").apply(p_0),tp._2),
-													ctx.mkEq(nctx.pf.get("src_port").apply(p_0),tp._3),
-													ctx.mkEq(nctx.pf.get("dest_port").apply(p_0),tp._4)
-													)
-										);
-               }
-               //Constraint2		acl_func(a_0,a_1) == or(foreach ip1,ip2 in acl_map ((a_0 == ip1 && a_1 == ip2)||(a_0 == ip2 && a_1 == ip1)))
-               solver.Add(ctx.mkForall(new Expr[]{p_0},
-               						ctx.mkEq( 
-               								acl_func_white.apply(nctx.pf.get("src").apply(p_0), nctx.pf.get("dest").apply(p_0), nctx.pf.get("src_port").apply(p_0), nctx.pf.get("dest_port").apply(p_0)),
-               								ctx.mkOr(acl_map_white)),1,null,null,null,null));
-       	}
-            
-       
-    }*/
  	/*
  	 //Use only the blacklist
  	private void aclConstraints(Optimize solver){

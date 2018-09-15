@@ -259,4 +259,10 @@ public class AclFirewallRule {
 						
 					
 	}
+	public String getSrc_port() {
+		return this.getStart_src_port()+"-"+this.getEnd_src_port();
+	}
+	public String getDst_port() {
+		return this.getStart_dst_port()+"-"+this.getEnd_dst_port();
+	}
 }
