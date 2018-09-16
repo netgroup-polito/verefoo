@@ -222,6 +222,7 @@ public class MedicineSimulator implements PhyResourceModel {
                 	try {
 						h = (Host) objectMapper.readValue(metadata, Host.class);
 					} catch (IOException e) {
+						System.out.println(e.getMessage());
 						throw new MedicineSimulationException("Error during the Json deserializing");
 					}/*
                 	h.setCores(0);

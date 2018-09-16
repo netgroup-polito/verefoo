@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import it.polito.verifoo.rest.jaxb.Connection;
 import it.polito.verifoo.rest.jaxb.Host;
+import it.polito.verifoo.rest.jaxb.NodeRefType;
 import it.polito.verifoo.rest.jaxb.SupportedVNFType;
 /**
  * This class creates the file that represents the topology that will be simulated 
@@ -71,6 +72,16 @@ public class PhysicalTopology {
 				if(i != 0) fileBody += ",";
 				fileBody += "{ \\\"functionalType\\\": \\\""+svnf.getFunctionalType()+"\\\"}";
 				i++;
+			}
+			if(h.getNodeRef().size() > 0){
+				fileBody += "]";
+				fileBody += ", \\\"nodeRef\\\":[";
+				int j = 0;
+				for(NodeRefType node : h.getNodeRef()){
+					if(j != 0) fileBody += ",";
+					fileBody += "{ \\\"node\\\": \\\""+node.getNode()+"\\\"}";
+					j++;
+				}
 			}
 			fileBody += "]}\")\n";
 		}
