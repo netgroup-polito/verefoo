@@ -43,13 +43,13 @@ public class Main {
                 RandomInputGenerator r = null;
                 boolean exit = false;
                 int sat = 0; 
-                long beginAll = System.currentTimeMillis();;
+                long beginAll = System.currentTimeMillis();
                 while(!exit){
                 	try{
                 		Marshaller m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(   "./testfile/Isolation/nfv5nodes7hostsSAT-Wildcards-II.xml"  )));
+                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(  "./testfile/Demo/3_nfv3policies-Verification-SAT.xml" )));
                         m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");

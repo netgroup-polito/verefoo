@@ -149,10 +149,10 @@ public class TestDemo {
 	}
 
 	@Test
-	public void test6_Paths() {
+	public void test6_SimpleSG() {
 		try {
-			//it is possible to specify forwarding path to create ad-hoc routing table (simulate an SDN environment)
-			test( "./testfile/Demo/6_nfv3nodes3hosts2Paths-SAT.xml", true);
+			//it is possible to specify a graph as a network service
+			test( "./testfile/Demo/6_sg4nodes5host.xml", true);
 		} catch (Exception e) {
 			fail(e.toString());
 		}		
@@ -204,7 +204,7 @@ public class TestDemo {
 	}
 	
 	@Test
-	public void testAutoConfiguration(){
+	public void test10_AutoConfiguration(){
 		try {
 			test( "./testfile/Demo/10_nfv2nodes3policiesAutoConf-NoStrict.xml", true);
 		} catch (Exception e) {

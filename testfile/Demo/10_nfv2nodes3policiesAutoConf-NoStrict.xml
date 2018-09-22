@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+
+
+|a|________			    ________|b|
+		   |		   |
+|c|______|fw1|_______|fw2|
+		   |		   |________|d|		
+|e|________|
+
+-->
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
   <graphs>
     <graph id="0">
