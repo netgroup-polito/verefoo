@@ -57,16 +57,13 @@
         <neighbour name="node1"/>
         <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf1">
-          <firewall>
+          <firewall defaultAction="ALLOW">
             <elements>
+				 <action>DENY</action>
              	 <source>nodeC</source>
              	 <destination>nodeB</destination>
 				 <src_port>2-90</src_port>
 				 <dst_port>80</dst_port>
-            </elements>
-			<elements>
-             	 <source>nodeE</source>
-             	 <destination>nodeB</destination>
             </elements>
           </firewall>
         </configuration>
