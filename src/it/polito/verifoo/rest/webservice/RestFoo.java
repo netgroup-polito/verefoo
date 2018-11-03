@@ -51,6 +51,7 @@ public class RestFoo {
 	    public NFV put(@Context HttpServletRequest req,@ApiParam(value = "Complete or Tiny Response")@DefaultValue("true")@QueryParam("complete") Boolean complete,@ApiParam(value = "Network Schema", required = true) NFV root) throws MalformedURLException {
 				String z3model = new String();
 				VerifooSerializer test = new VerifooSerializer(root);
+				NFV rootResult = test.getResult();
 				if(complete!=true) {
 					root.getHosts().getHost().removeIf((h)->!h.isActive());
 					root.getConnections().getConnection().removeIf((c)->{
@@ -61,7 +62,7 @@ public class RestFoo {
 						);
 					});						
 				}
-				return root;
+				return rootResult;
 	    }
 
 }

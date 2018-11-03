@@ -74,5 +74,10 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/slf4j-simple-1.7.25.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/validation-api-1.1.0.Final.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/yasson-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/neo4j/neo4j-3.3.4.jar"/>
+	<classpathentry kind="lib" path="lib/neo4j/neo4j-graphdb-api-3.3.4.jar"/>
+	<classpathentry kind="lib" path="lib/neo4j/neo4j-java-driver-1.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/neo4j/neo4j-kernel-3.3.4.jar"/>
+	<classpathentry kind="lib" path="lib/neo4j/neo4j-kernel-api-3.3.4.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
