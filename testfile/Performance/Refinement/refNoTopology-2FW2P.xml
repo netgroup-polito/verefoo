@@ -2,21 +2,21 @@
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
   <graphs>
     <graph id="0">
-     <node functional_type="WEBCLIENT" name="10.0.0.1">
+     <node functional_type="WEBCLIENT" name="10.0.0.-1">
         <neighbour name="20.0.0.1"/>
         <configuration description="A simple description" name="confA">
           <webclient nameWebServer="30.0.5.2"/>
         </configuration>
       </node>
-	  <node functional_type="WEBCLIENT" name="10.0.0.10">
+	  <node functional_type="WEBCLIENT" name="10.2.0.10">
         <neighbour name="20.0.0.1"/>
         <configuration description="A simple description" name="confA">
           <webclient nameWebServer="30.0.5.2"/>
         </configuration>
       </node>
       <node functional_type="FIREWALL" name="20.0.0.1">
-        <neighbour name="10.0.0.1"/>
-        <neighbour name="10.0.0.10"/>
+        <neighbour name="10.0.0.-1"/>
+        <neighbour name="10.2.0.10"/>
         <neighbour name="20.0.0.2"/>
         <configuration description="A simple description" name="conf1">
           <firewall defaultAction="ALLOW"/>
@@ -44,8 +44,7 @@
 	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
-  		<Property graph="0" name="IsolationProperty" src="10.0.0.1" dst="30.0.5.2"/> 		
-  		<Property graph="0" name="IsolationProperty" src="10.0.0.10" dst="30.0.5.2"/> 		
+  		<Property graph="0" name="IsolationProperty" src="10.-1.-1.-1" dst="30.0.5.2"/> 				
   </PropertyDefinition>
   <ParsingString></ParsingString>
 </NFV>

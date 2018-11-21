@@ -29,7 +29,7 @@ public class Main {
         Logger logger = LogManager.getLogger("mylog");
 		try {
 			
-				
+				System.out.println(System.getProperty("java.library.path"));
 				JAXBContext jc;
 	                // create a JAXBContext capable of handling the generated classes
 				synchronized(logger){
@@ -49,7 +49,7 @@ public class Main {
                 		Marshaller m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(  "./testfile/Demo/3_nfv3policies-Verification-SAT.xml" )));
+                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(  "./testfile/Performance/Refinement/refNoTopology-2FW2P.xml" )));
                         m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
@@ -64,9 +64,9 @@ public class Main {
                     	}
                     	else{
                     		System.out.println("UNSAT");
-                    		/*System.out.println("----------------------OUTPUT----------------------");
+                    		System.out.println("----------------------OUTPUT----------------------");
                             m.marshal( test.getResult(), System.out ); 
-                    		System.out.println("--------------------------------------------------");*/
+                    		System.out.println("--------------------------------------------------");
                     		if(r == null) exit = true;
                     	}
                         //MedicineSimulator sim = new MedicineSimulator(root);

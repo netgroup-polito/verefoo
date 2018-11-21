@@ -156,7 +156,7 @@ public class NetContext extends Core{
 		//System.out.println("Nr of net context wildcards soft constraint " + softConstrWildcard.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrWildcard) {
         	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, -100000, t._2);
+			solver.AssertSoft(t._1, 100, t._2);
 		}
 		//System.out.println("Nr of net context autoconfiguration soft constraint " + softConstrAutoConf.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
@@ -284,6 +284,7 @@ public class NetContext extends Core{
             	
             }
         }
+        
         //OLD APPROACH
         /*String[] new_addr = new String[addresses.length+1];
         for(int k=0;k<addresses.length;k++)
@@ -519,7 +520,35 @@ public class NetContext extends Core{
      * @return
      */
     public BoolExpr equalPacketIpToFwIpRule(Expr packet_ip, Expr fwIpRule){
-        return ctx.mkAnd(new BoolExpr[]{
+    	return ctx.mkOr(new BoolExpr[] {
+    		  ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(fwIpRule), ip_functions.get("ipAddr_1").apply(am.get("wildcard"))),
+    					ctx.mkEq(ip_functions.get("ipAddr_2").apply(fwIpRule), ip_functions.get("ipAddr_2").apply(am.get("wildcard"))),
+    					ctx.mkEq(ip_functions.get("ipAddr_3").apply(fwIpRule), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
+    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(fwIpRule), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))),
+    		  ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(packet_ip), ip_functions.get("ipAddr_1").apply(am.get("wildcard"))),
+    					ctx.mkEq(ip_functions.get("ipAddr_2").apply(packet_ip), ip_functions.get("ipAddr_2").apply(am.get("wildcard"))),
+    					ctx.mkEq(ip_functions.get("ipAddr_3").apply(packet_ip), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
+    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(packet_ip), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))),
+    		  ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(packet_ip), ip_functions.get("ipAddr_1").apply(fwIpRule)),
+    		  			ctx.mkOr(ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_2").apply(fwIpRule), ip_functions.get("ipAddr_2").apply(am.get("wildcard"))),
+	    	    					ctx.mkEq(ip_functions.get("ipAddr_3").apply(fwIpRule), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
+	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(fwIpRule), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))),
+    		  					ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_2").apply(packet_ip), ip_functions.get("ipAddr_2").apply(am.get("wildcard"))),
+	    	    					ctx.mkEq(ip_functions.get("ipAddr_3").apply(packet_ip), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
+	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(packet_ip), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))))),
+    		  ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(packet_ip), ip_functions.get("ipAddr_1").apply(fwIpRule)),
+    		  			ctx.mkEq(ip_functions.get("ipAddr_2").apply(packet_ip), ip_functions.get("ipAddr_2").apply(fwIpRule)),
+    		  			ctx.mkOr(ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_3").apply(fwIpRule), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
+	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(fwIpRule), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))),
+    		  					ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_3").apply(packet_ip), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
+	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(packet_ip), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))))),
+    		  ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(packet_ip), ip_functions.get("ipAddr_1").apply(fwIpRule)),
+  		  				ctx.mkEq(ip_functions.get("ipAddr_2").apply(packet_ip), ip_functions.get("ipAddr_2").apply(fwIpRule)),
+  		  				ctx.mkEq(ip_functions.get("ipAddr_3").apply(packet_ip), ip_functions.get("ipAddr_3").apply(fwIpRule)),
+  		  				ctx.mkOr(ctx.mkEq(ip_functions.get("ipAddr_4").apply(fwIpRule), ip_functions.get("ipAddr_4").apply(am.get("wildcard"))),
+	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(packet_ip), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))))
+    	});
+        /*return ctx.mkAnd(new BoolExpr[]{
                 ctx.mkOr(
                 		ctx.mkEq(ip_functions.get("ipAddr_1").apply(packet_ip), ip_functions.get("ipAddr_1").apply(fwIpRule)),
                 		ctx.mkEq(ip_functions.get("ipAddr_1").apply(fwIpRule), ip_functions.get("ipAddr_1").apply(am.get("wildcard")))
@@ -535,10 +564,38 @@ public class NetContext extends Core{
                 ctx.mkOr(
                 		ctx.mkEq(ip_functions.get("ipAddr_4").apply(packet_ip), ip_functions.get("ipAddr_4").apply(fwIpRule)),
                 		ctx.mkEq(ip_functions.get("ipAddr_4").apply(fwIpRule), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))
-                		)});
+                		)});*/
     }
     public BoolExpr equalIp(Expr ip1, Expr ip2){
-        return ctx.mkAnd(new BoolExpr[]{
+    	return ctx.mkOr(new BoolExpr[] {
+      		  ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip1), ip_functions.get("ipAddr_1").apply(am.get("wildcard"))),
+      					ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip1), ip_functions.get("ipAddr_2").apply(am.get("wildcard"))),
+      					ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip1), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
+      					ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))),
+      		  ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip2), ip_functions.get("ipAddr_1").apply(am.get("wildcard"))),
+      					ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip2), ip_functions.get("ipAddr_2").apply(am.get("wildcard"))),
+      					ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip2), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
+      					ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip2), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))),
+      		  ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip2), ip_functions.get("ipAddr_1").apply(ip1)),
+      		  			ctx.mkOr(ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip1), ip_functions.get("ipAddr_2").apply(am.get("wildcard"))),
+  	    	    					ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip1), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
+  	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))),
+      		  					ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip2), ip_functions.get("ipAddr_2").apply(am.get("wildcard"))),
+  	    	    					ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip2), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
+  	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip2), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))))),
+      		  ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip2), ip_functions.get("ipAddr_1").apply(ip1)),
+      		  			ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip2), ip_functions.get("ipAddr_2").apply(ip1)),
+      		  			ctx.mkOr(ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip1), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
+  	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))),
+      		  					ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip2), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
+  	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip2), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))))),
+      		  ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip2), ip_functions.get("ipAddr_1").apply(ip1)),
+    		  				ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip2), ip_functions.get("ipAddr_2").apply(ip1)),
+    		  				ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip2), ip_functions.get("ipAddr_3").apply(ip1)),
+    		  				ctx.mkOr(ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(am.get("wildcard"))),
+  	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip2), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))))
+      	});
+        /*return ctx.mkAnd(new BoolExpr[]{
                 ctx.mkOr(
                 		ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip1), ip_functions.get("ipAddr_1").apply(ip2)),
                 		ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip1), ip_functions.get("ipAddr_1").apply(am.get("wildcard"))),
@@ -558,7 +615,7 @@ public class NetContext extends Core{
                 		ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(ip2)),
                 		ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(am.get("wildcard"))),
                 		ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip2), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))
-                		)});
+                		)});*/
     }
     
     public BoolExpr equalPacketLv4ProtoToFwPacketLv4Proto(Expr proto1, Expr proto2){

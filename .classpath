@@ -12,7 +12,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/com.microsoft.z3.jar"/>
 	<classpathentry kind="lib" path="lib/junit/junit.jar"/>
 	<classpathentry kind="lib" path="lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar"/>
 	<classpathentry kind="lib" path="lib/lib4j/log4j-api-2.9.1.jar"/>
@@ -27,7 +26,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/swagger-models-1.5.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/aopalliance-repackaged-2.5.0-b32.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/cdi-api-1.1.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/com.microsoft.z3.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-lang3-3.2.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/el-api-2.2.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/guava-15.0.jar"/>
@@ -79,5 +77,10 @@
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-java-driver-1.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-kernel-3.3.4.jar"/>
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-kernel-api-3.3.4.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/com.microsoft.z3.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="verifoo/WebContent/WEB-INF/lib/jni"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="build"/>
 </classpath>

@@ -7,6 +7,7 @@
 	
 	<property environment="env"/>
 	<condition property="serverloc" value="${env.CATALINA_HOME}" else="C:\Tomcat">
+	<!--<condition property="serverloc" value="${env.CATALINA_HOME}" else="to_be_defined">-->
 	    <isset property="env.CATALINA_HOME" />
 	</condition>
 	<property name="tomcatUsername" value="admin" />
@@ -38,7 +39,7 @@
 	<!-- TOMCAT LIFECICLE MANAGEMENT-->
 	<target name="start-tomcat" depends="check-tomcat-status" unless="tomcat.started" description="Start tomcat server">
 		<echo>Start Tomcat</echo>
-		<java classname="org.apache.catalina.startup.Bootstrap" fork="true" spawn="true"
+		<java classname="org.apache.catalina.startup.Bootstrap" fork="true" 
 			classpathref="tomcat.class.path">
 			<jvmarg value="-Dcatalina.home=${server.location}" />
 		</java>
