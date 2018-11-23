@@ -316,7 +316,7 @@ public class AclFirewall extends NetworkObject{
  									ctx.mkEq(nctx.ip_functions.get("ipAddr_3").apply(dst), dstAuto3),
  									ctx.mkEq(nctx.ip_functions.get("ipAddr_4").apply(dst), dstAuto4)
  									)
- 							);
+ 							); 
  			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkAnd(
 						ctx.mkEq(nctx.ip_functions.get("ipAddr_1").apply(nctx.am.get("null")), srcAuto1),
 						ctx.mkEq(nctx.ip_functions.get("ipAddr_2").apply(nctx.am.get("null")), srcAuto2),
@@ -336,8 +336,8 @@ public class AclFirewall extends NetworkObject{
 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_3").apply(nctx.am.get("null")),dstAuto3), "fw_auto_conf"));
 			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_4").apply(nctx.am.get("null")),dstAuto4), "fw_auto_conf"));*/
 			nctx.softConstrProtoWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
-			//nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(srcp, nctx.pm.get("null")),"fw_auto_port"));
-			//nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(dstp, nctx.pm.get("null")),"fw_auto_port"));
+			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(srcp, nctx.pm.get("null")),"fw_auto_port"));
+			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(dstp, nctx.pm.get("null")),"fw_auto_port"));
  			rules.add(ctx.mkAnd(
  								//ctx.mkEq(nctx.pf.get("src").apply(p_0), src),
  								//ctx.mkEq(nctx.pf.get("dest").apply(p_0), dst)//,
@@ -351,7 +351,7 @@ public class AclFirewall extends NetworkObject{
  		}
  		Expr defaultAction = ctx.mkConst(fw + "_auto_default_action", ctx.mkBoolSort());
  		Expr ruleAction = ctx.mkConst(fw + "_auto_action", ctx.mkBoolSort());
- 		System.out.println(rules);
+ 		//System.out.println(rules);
  		BoolExpr[] tmp = new BoolExpr[rules.size()];
  		BoolExpr behaviour;
  		if(this.defaultAction.equals(ctx.mkTrue())){
@@ -371,7 +371,13 @@ public class AclFirewall extends NetworkObject{
  		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.send.apply(fw, n.getZ3Node(), p_0)).collect(Collectors.toList());
 		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
 		BoolExpr enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp3));
- 		
+		
+		
+//		System.out.println(ctx.mkForall(new Expr[] {p_0 }, 
+//				ctx.mkImplies(enumerateSend,
+//								ctx.mkAnd(enumerateRecv,
+//										behaviour)), 1, null, null, null, null));
+	    
 		constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
 				ctx.mkImplies(enumerateSend,
 								ctx.mkAnd(enumerateRecv,
