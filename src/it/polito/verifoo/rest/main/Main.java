@@ -49,7 +49,7 @@ public class Main {
                 		Marshaller m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(  "./testfile/Performance/Refinement/refNoTopology-2FW2P.xml" )));
+                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(  "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-Antispam-RR.xml" )));
                         m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
@@ -65,7 +65,7 @@ public class Main {
                     	else{
                     		System.out.println("UNSAT");
                     		System.out.println("----------------------OUTPUT----------------------");
-                            m.marshal( test.getResult(), System.out ); 
+                            //m.marshal( test.getResult(), System.out ); 
                     		System.out.println("--------------------------------------------------");
                     		if(r == null) exit = true;
                     	}

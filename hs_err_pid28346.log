@@ -1,0 +1,713 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00007f5d408e526e, pid=28346, tid=0x00007f5d97fc7700
+#
+# JRE version: Java(TM) SE Runtime Environment (8.0_191-b12) (build 1.8.0_191-b12)
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (25.191-b12 mixed mode linux-amd64 compressed oops)
+# Problematic frame:
+# C  [libz3.so+0xbff26e]  pb_util::get_k(func_decl*) const+0x1e
+#
+# Failed to write core dump. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+# If you would like to submit a bug report, please visit:
+#   http://bugreport.java.com/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x00007f5d9000d800):  JavaThread "main" [_thread_in_native, id=28347, stack(0x00007f5d97ec8000,0x00007f5d97fc8000)]
+
+siginfo: si_signo: 11 (SIGSEGV), si_code: 1 (SEGV_MAPERR), si_addr: 0x0000000000000000
+
+Registers:
+RAX=0x00007f5d909a6df8, RBX=0x00007f5d97fc5b00, RCX=0x000000000000000c, RDX=0x00007f5d90bad558
+RSP=0x00007f5d97fc5970, RBP=0x0000000000000000, RSI=0x00007f5d90bc4af8, RDI=0x00007f5d97fc5b00
+R8 =0x00007f5d90bc4898, R9 =0x00007f5d90bc48a8, R10=0x00007f5d907c6038, R11=0x0000000000000000
+R12=0x00007f5d90bad558, R13=0x0000000000000000, R14=0x0000000000000000, R15=0x000000000000000c
+RIP=0x00007f5d408e526e, EFLAGS=0x0000000000010202, CSGSFS=0x002b000000000033, ERR=0x0000000000000004
+  TRAPNO=0x000000000000000e
+
+Top of Stack: (sp=0x00007f5d97fc5970)
+0x00007f5d97fc5970:   0000000000000000 00007f5d90bc4898
+0x00007f5d97fc5980:   00007f5d90bad558 0000000000000000
+0x00007f5d97fc5990:   0000000000000000 00007f5d40840c2f
+0x00007f5d97fc59a0:   00007f5d907c4a88 0000000000000000
+0x00007f5d97fc59b0:   00007f5d90bc4af8 00007f5d00000000
+0x00007f5d97fc59c0:   00007f5d905125b8 00007f5d90bad558
+0x00007f5d97fc59d0:   00007f5d907c4a88 00007f5d97fc5aa0
+0x00007f5d97fc59e0:   00007f5d97fc5a50 00007f5d97fc5a60
+0x00007f5d97fc59f0:   00007f5d97fc5a80 00007f5d97fc5a60
+0x00007f5d97fc5a00:   00007f5d97fc5b00 00007f5d90bc4898
+0x00007f5d97fc5a10:   0000000000000001 0000000100000000
+0x00007f5d97fc5a20:   00007f5d00000001 0000000000000000
+0x00007f5d97fc5a30:   0000000000000001 0000000000000000
+0x00007f5d97fc5a40:   0000000000000001 0126e83cf5ed4900
+0x00007f5d97fc5a50:   0000000000000001 00007f5d905125b8
+0x00007f5d97fc5a60:   00007f5d00000000 0000000000000000
+0x00007f5d97fc5a70:   00007f5d00000001 0000000000000000
+0x00007f5d97fc5a80:   0000000000000000 0000000000000000
+0x00007f5d97fc5a90:   0000000000000001 0000000000000000
+0x00007f5d97fc5aa0:   00007f5d00000000 0000000000000000
+0x00007f5d97fc5ab0:   00007f5d00000001 0000000000000000
+0x00007f5d97fc5ac0:   00007f5d00000000 0000000000000000
+0x00007f5d97fc5ad0:   00007f5d00000001 0000000000000000
+0x00007f5d97fc5ae0:   00007f5d00000000 0000000000000000
+0x00007f5d97fc5af0:   00007f5d00000001 0000000000000000
+0x00007f5d97fc5b00:   00007f5d00000000 0000000000000000
+0x00007f5d97fc5b10:   0000000000000001 0000000000000000
+0x00007f5d97fc5b20:   00007f5d907c4a88 00007f5d90bc48d0
+0x00007f5d97fc5b30:   00007f5d90bc4898 00007f5d907e3738
+0x00007f5d97fc5b40:   00007f5d90bd3bc0 0000000000000002
+0x00007f5d97fc5b50:   0000000000000005 00007f5d407cc68d
+0x00007f5d97fc5b60:   00007f5d907c4a88 0126e83cf5ed4900 
+
+Instructions: (pc=0x00007f5d408e526e)
+0x00007f5d408e524e:   00 00 41 56 41 55 41 54 55 53 48 8b 42 18 48 89
+0x00007f5d408e525e:   fb 8b 08 39 4e 08 48 8b 68 08 0f 84 e2 00 00 00
+0x00007f5d408e526e:   8b 45 00 85 c0 0f 84 a7 00 00 00 c7 03 00 00 00
+0x00007f5d408e527e:   00 48 c7 43 08 00 00 00 00 4c 8d 75 08 c7 43 10 
+
+Register to memory mapping:
+
+RAX=0x00007f5d909a6df8 is an unknown value
+RBX=0x00007f5d97fc5b00 is pointing into the stack for thread: 0x00007f5d9000d800
+RCX=0x000000000000000c is an unknown value
+RDX=0x00007f5d90bad558 is an unknown value
+RSP=0x00007f5d97fc5970 is pointing into the stack for thread: 0x00007f5d9000d800
+RBP=0x0000000000000000 is an unknown value
+RSI=0x00007f5d90bc4af8 is an unknown value
+RDI=0x00007f5d97fc5b00 is pointing into the stack for thread: 0x00007f5d9000d800
+R8 =0x00007f5d90bc4898 is an unknown value
+R9 =0x00007f5d90bc48a8 is an unknown value
+R10=0x00007f5d907c6038 is an unknown value
+R11=0x0000000000000000 is an unknown value
+R12=0x00007f5d90bad558 is an unknown value
+R13=0x0000000000000000 is an unknown value
+R14=0x0000000000000000 is an unknown value
+R15=0x000000000000000c is an unknown value
+
+
+Stack: [0x00007f5d97ec8000,0x00007f5d97fc8000],  sp=0x00007f5d97fc5970,  free space=1014k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [libz3.so+0xbff26e]  pb_util::get_k(func_decl*) const+0x1e
+
+Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+j  com.microsoft.z3.Native.INTERNALoptimizeCheck(JJ)I+0
+j  com.microsoft.z3.Native.optimizeCheck(JJ)I+2
+j  com.microsoft.z3.Optimize.Check()Lcom/microsoft/z3/Status;+11
+j  it.polito.verigraph.mcnet.components.Checker.propertyCheck()Lit/polito/verigraph/mcnet/components/IsolationResult;+57
+j  it.polito.verifoo.rest.common.VerifooProxy.checkNFFGProperty()Lit/polito/verigraph/mcnet/components/IsolationResult;+65
+j  it.polito.verifoo.rest.common.VerifooSerializer.<init>(Lit/polito/verifoo/rest/jaxb/NFV;)V+282
+j  it.polito.verifoo.rest.main.Main.main([Ljava/lang/String;)V+165
+v  ~StubRoutines::call_stub
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x00007f5d900c5800 JavaThread "Service Thread" daemon [_thread_blocked, id=28365, stack(0x00007f5d7221d000,0x00007f5d7231e000)]
+  0x00007f5d900c2000 JavaThread "C1 CompilerThread2" daemon [_thread_blocked, id=28364, stack(0x00007f5d7231f000,0x00007f5d7241f000)]
+  0x00007f5d900c0800 JavaThread "C2 CompilerThread1" daemon [_thread_blocked, id=28363, stack(0x00007f5d72420000,0x00007f5d72520000)]
+  0x00007f5d900bd800 JavaThread "C2 CompilerThread0" daemon [_thread_blocked, id=28362, stack(0x00007f5d72521000,0x00007f5d72621000)]
+  0x00007f5d900bc000 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=28361, stack(0x00007f5d72621000,0x00007f5d72722000)]
+  0x00007f5d90088000 JavaThread "Finalizer" daemon [_thread_blocked, id=28359, stack(0x00007f5d730f1000,0x00007f5d731f2000)]
+  0x00007f5d90085800 JavaThread "Reference Handler" daemon [_thread_blocked, id=28358, stack(0x00007f5d731f2000,0x00007f5d732f3000)]
+=>0x00007f5d9000d800 JavaThread "main" [_thread_in_native, id=28347, stack(0x00007f5d97ec8000,0x00007f5d97fc8000)]
+
+Other Threads:
+  0x00007f5d9007b800 VMThread [stack: 0x00007f5d732f4000,0x00007f5d733f4000] [id=28357]
+  0x00007f5d900ca000 WatcherThread [stack: 0x00007f5d7211d000,0x00007f5d7221d000] [id=28366]
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+Heap:
+ PSYoungGen      total 37888K, used 16536K [0x00000000d6700000, 0x00000000db100000, 0x0000000100000000)
+  eden space 32768K, 34% used [0x00000000d6700000,0x00000000d7228100,0x00000000d8700000)
+  from space 5120K, 99% used [0x00000000d8700000,0x00000000d8bfe2d8,0x00000000d8c00000)
+  to   space 5120K, 0% used [0x00000000dac00000,0x00000000dac00000,0x00000000db100000)
+ ParOldGen       total 86016K, used 1398K [0x0000000083400000, 0x0000000088800000, 0x00000000d6700000)
+  object space 86016K, 1% used [0x0000000083400000,0x000000008355da10,0x0000000088800000)
+ Metaspace       used 17649K, capacity 18314K, committed 18560K, reserved 1064960K
+  class space    used 2236K, capacity 2368K, committed 2432K, reserved 1048576K
+
+Card table byte_map: [0x00007f5d947be000,0x00007f5d94ba5000] byte_map_base: 0x00007f5d943a4000
+
+Marking Bits: (ParMarkBitMap*) 0x00007f5d9736dd40
+ Begin Bits: [0x00007f5d781a0000, 0x00007f5d7a0d0000)
+ End Bits:   [0x00007f5d7a0d0000, 0x00007f5d7c000000)
+
+Polling page: 0x00007f5d97fdd000
+
+CodeCache: size=245760Kb used=5399Kb max_used=5411Kb free=240361Kb
+ bounds [0x00007f5d81000000, 0x00007f5d81550000, 0x00007f5d90000000]
+ total_blobs=2131 nmethods=1701 adapters=343
+ compilation: enabled
+
+Compilation events (10 events):
+Event: 0,953 Thread 0x00007f5d900c2000 1696       3       com.microsoft.z3.Native::mkEq (46 bytes)
+Event: 0,953 Thread 0x00007f5d900c2000 nmethod 1696 0x00007f5d815443d0 code [0x00007f5d81544580, 0x00007f5d81544948]
+Event: 0,953 Thread 0x00007f5d900c2000 1699       3       com.microsoft.z3.Z3Object::arrayLength (11 bytes)
+Event: 0,953 Thread 0x00007f5d900c2000 nmethod 1699 0x00007f5d81544b90 code [0x00007f5d81544d00, 0x00007f5d81544e90]
+Event: 0,953 Thread 0x00007f5d900c2000 1700       3       com.microsoft.z3.Native::optimizeAssert (42 bytes)
+Event: 0,953 Thread 0x00007f5d900c2000 nmethod 1700 0x00007f5d815467d0 code [0x00007f5d81546980, 0x00007f5d81546d28]
+Event: 0,954 Thread 0x00007f5d900c0800 nmethod 1657 0x00007f5d81549250 code [0x00007f5d81549420, 0x00007f5d8154a008]
+Event: 0,954 Thread 0x00007f5d900c0800 1663       4       java.util.AbstractCollection::<init> (5 bytes)
+Event: 0,954 Thread 0x00007f5d900c0800 nmethod 1663 0x00007f5d81547910 code [0x00007f5d81547a60, 0x00007f5d81547ab8]
+Event: 0,954 Thread 0x00007f5d900bd800 nmethod 1647 0x00007f5d81547590 code [0x00007f5d815476e0, 0x00007f5d81547808]
+
+GC Heap History (2 events):
+Event: 0,747 GC heap before
+{Heap before GC invocations=1 (full 0):
+ PSYoungGen      total 37888K, used 32768K [0x00000000d6700000, 0x00000000d9100000, 0x0000000100000000)
+  eden space 32768K, 100% used [0x00000000d6700000,0x00000000d8700000,0x00000000d8700000)
+  from space 5120K, 0% used [0x00000000d8c00000,0x00000000d8c00000,0x00000000d9100000)
+  to   space 5120K, 0% used [0x00000000d8700000,0x00000000d8700000,0x00000000d8c00000)
+ ParOldGen       total 86016K, used 0K [0x0000000083400000, 0x0000000088800000, 0x00000000d6700000)
+  object space 86016K, 0% used [0x0000000083400000,0x0000000083400000,0x0000000088800000)
+ Metaspace       used 15348K, capacity 15520K, committed 15872K, reserved 1062912K
+  class space    used 1903K, capacity 1947K, committed 2048K, reserved 1048576K
+Event: 0,760 GC heap after
+Heap after GC invocations=1 (full 0):
+ PSYoungGen      total 37888K, used 5112K [0x00000000d6700000, 0x00000000db100000, 0x0000000100000000)
+  eden space 32768K, 0% used [0x00000000d6700000,0x00000000d6700000,0x00000000d8700000)
+  from space 5120K, 99% used [0x00000000d8700000,0x00000000d8bfe2d8,0x00000000d8c00000)
+  to   space 5120K, 0% used [0x00000000dac00000,0x00000000dac00000,0x00000000db100000)
+ ParOldGen       total 86016K, used 1398K [0x0000000083400000, 0x0000000088800000, 0x00000000d6700000)
+  object space 86016K, 1% used [0x0000000083400000,0x000000008355da10,0x0000000088800000)
+ Metaspace       used 15348K, capacity 15520K, committed 15872K, reserved 1062912K
+  class space    used 1903K, capacity 1947K, committed 2048K, reserved 1048576K
+}
+
+Deoptimization events (10 events):
+Event: 0,432 Thread 0x00007f5d9000d800 Uncommon trap: reason=class_check action=maybe_recompile pc=0x00007f5d81265f78 method=java.util.HashMap.putVal(ILjava/lang/Object;Ljava/lang/Object;ZZ)Ljava/lang/Object; @ 203
+Event: 0,433 Thread 0x00007f5d9000d800 Uncommon trap: reason=class_check action=maybe_recompile pc=0x00007f5d81265f78 method=java.util.HashMap.putVal(ILjava/lang/Object;Ljava/lang/Object;ZZ)Ljava/lang/Object; @ 203
+Event: 0,485 Thread 0x00007f5d9000d800 Uncommon trap: reason=unstable_if action=reinterpret pc=0x00007f5d81252d90 method=sun.net.www.ParseUtil.encodePath(Ljava/lang/String;Z)Ljava/lang/String; @ 109
+Event: 0,486 Thread 0x00007f5d9000d800 Uncommon trap: reason=unstable_if action=reinterpret pc=0x00007f5d811efe6c method=sun.net.www.ParseUtil.encodePath(Ljava/lang/String;Z)Ljava/lang/String; @ 109
+Event: 0,553 Thread 0x00007f5d9000d800 Uncommon trap: reason=unstable_if action=reinterpret pc=0x00007f5d811e2de4 method=java.lang.AbstractStringBuilder.append(Ljava/lang/String;)Ljava/lang/AbstractStringBuilder; @ 1
+Event: 0,603 Thread 0x00007f5d9000d800 Uncommon trap: reason=bimorphic action=maybe_recompile pc=0x00007f5d812ee954 method=java.util.HashMap.putVal(ILjava/lang/Object;Ljava/lang/Object;ZZ)Ljava/lang/Object; @ 91
+Event: 0,604 Thread 0x00007f5d9000d800 Uncommon trap: reason=bimorphic action=maybe_recompile pc=0x00007f5d812ee954 method=java.util.HashMap.putVal(ILjava/lang/Object;Ljava/lang/Object;ZZ)Ljava/lang/Object; @ 91
+Event: 0,610 Thread 0x00007f5d9000d800 Uncommon trap: reason=bimorphic action=maybe_recompile pc=0x00007f5d812ee954 method=java.util.HashMap.putVal(ILjava/lang/Object;Ljava/lang/Object;ZZ)Ljava/lang/Object; @ 91
+Event: 0,635 Thread 0x00007f5d9000d800 Uncommon trap: reason=unstable_if action=reinterpret pc=0x00007f5d811bebdc method=java.lang.AbstractStringBuilder.append(Ljava/lang/String;)Ljava/lang/AbstractStringBuilder; @ 1
+Event: 0,708 Thread 0x00007f5d9000d800 Uncommon trap: reason=bimorphic action=maybe_recompile pc=0x00007f5d812ee954 method=java.util.HashMap.putVal(ILjava/lang/Object;Ljava/lang/Object;ZZ)Ljava/lang/Object; @ 91
+
+Classes redefined (0 events):
+No events
+
+Internal exceptions (10 events):
+Event: 0,420 Thread 0x00007f5d9000d800 Exception <a 'java/lang/NullPointerException'> (0x00000000d7d91850) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u191/11894/hotspot/src/share/vm/interpreter/linkResolver.cpp, line 1287]
+Event: 0,424 Thread 0x00007f5d9000d800 Implicit null exception at 0x00007f5d812620fb to 0x00007f5d81262a1d
+Event: 0,553 Thread 0x00007f5d9000d800 Implicit null exception at 0x00007f5d811e2a35 to 0x00007f5d811e2dd1
+Event: 0,635 Thread 0x00007f5d9000d800 Implicit null exception at 0x00007f5d811be7f6 to 0x00007f5d811bebc5
+Event: 0,674 Thread 0x00007f5d9000d800 Exception <a 'java/lang/ClassNotFoundException': com/sun/org/glassfish/hk2/osgiresourcelocator/ServiceLoader> (0x00000000d847eb38) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u191/11894/hotspot/src/share/vm/classfile/systemDictionary.cpp, line 
+Event: 0,775 Thread 0x00007f5d9000d800 Exception <a 'java/lang/NoSuchFieldError': method resolution failed> (0x00000000d678f4b8) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u191/11894/hotspot/src/share/vm/prims/methodHandles.cpp, line 1167]
+Event: 0,775 Thread 0x00007f5d9000d800 Exception <a 'java/lang/NoSuchFieldError': method resolution failed> (0x00000000d679c7a8) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u191/11894/hotspot/src/share/vm/prims/methodHandles.cpp, line 1167]
+Event: 0,796 Thread 0x00007f5d9000d800 Exception <a 'java/lang/ClassNotFoundException': com/sun/org/glassfish/hk2/osgiresourcelocator/ServiceLoader> (0x00000000d68c78b0) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u191/11894/hotspot/src/share/vm/classfile/systemDictionary.cpp, line 
+Event: 0,912 Thread 0x00007f5d9000d800 Exception <a 'java/lang/NoSuchMethodError': java.lang.Object.lambda$comparing$77a9974f$1(Ljava/util/function/Function;Ljava/lang/Object;Ljava/lang/Object;)I> (0x00000000d701c878) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u191/11894/hotspot/sr
+Event: 0,913 Thread 0x00007f5d9000d800 Exception <a 'java/lang/NoSuchMethodError': java.lang.Object.lambda$thenComparing$36697e65$1(Ljava/util/Comparator;Ljava/lang/Object;Ljava/lang/Object;)I> (0x00000000d702f210) thrown at [/HUDSON/workspace/8-2-build-linux-amd64/jdk8u191/11894/hotspot/src/s
+
+Events (10 events):
+Event: 0,951 loading class it/polito/verigraph/mcnet/components/Checker$Prop
+Event: 0,951 loading class it/polito/verigraph/mcnet/components/Checker$Prop done
+Event: 0,951 loading class it/polito/verigraph/mcnet/components/NetworkObject
+Event: 0,951 loading class it/polito/verigraph/mcnet/components/NetworkObject done
+Event: 0,951 loading class it/polito/verigraph/mcnet/components/NetworkObject
+Event: 0,951 loading class it/polito/verigraph/mcnet/components/NetworkObject done
+Event: 0,951 loading class it/polito/verigraph/mcnet/components/Checker
+Event: 0,951 loading class it/polito/verigraph/mcnet/components/Checker done
+Event: 0,953 loading class com/microsoft/z3/Optimize$Handle
+Event: 0,953 loading class com/microsoft/z3/Optimize$Handle done
+
+
+Dynamic libraries:
+00400000-00401000 r-xp 00000000 08:01 282504                             /usr/lib/jvm/java-8-oracle/bin/java
+00600000-00601000 r--p 00000000 08:01 282504                             /usr/lib/jvm/java-8-oracle/bin/java
+00601000-00602000 rw-p 00001000 08:01 282504                             /usr/lib/jvm/java-8-oracle/bin/java
+018c5000-018e6000 rw-p 00000000 00:00 0                                  [heap]
+83400000-88800000 rw-p 00000000 00:00 0 
+88800000-d6700000 ---p 00000000 00:00 0 
+d6700000-db100000 rw-p 00000000 00:00 0 
+db100000-100000000 ---p 00000000 00:00 0 
+100000000-100260000 rw-p 00000000 00:00 0 
+100260000-140000000 ---p 00000000 00:00 0 
+7f5d3fce6000-7f5d40dd2000 r-xp 00000000 08:01 927915                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jni/libz3.so
+7f5d40dd2000-7f5d40fd1000 ---p 010ec000 08:01 927915                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jni/libz3.so
+7f5d40fd1000-7f5d40ffa000 r--p 010eb000 08:01 927915                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jni/libz3.so
+7f5d40ffa000-7f5d40ffd000 rw-p 01114000 08:01 927915                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jni/libz3.so
+7f5d40ffd000-7f5d44000000 rw-p 00000000 00:00 0 
+7f5d44000000-7f5d44021000 rw-p 00000000 00:00 0 
+7f5d44021000-7f5d48000000 ---p 00000000 00:00 0 
+7f5d48000000-7f5d48021000 rw-p 00000000 00:00 0 
+7f5d48021000-7f5d4c000000 ---p 00000000 00:00 0 
+7f5d4c000000-7f5d4c250000 rw-p 00000000 00:00 0 
+7f5d4c250000-7f5d50000000 ---p 00000000 00:00 0 
+7f5d50000000-7f5d503da000 rw-p 00000000 00:00 0 
+7f5d503da000-7f5d54000000 ---p 00000000 00:00 0 
+7f5d54000000-7f5d54021000 rw-p 00000000 00:00 0 
+7f5d54021000-7f5d58000000 ---p 00000000 00:00 0 
+7f5d58000000-7f5d582f0000 rw-p 00000000 00:00 0 
+7f5d582f0000-7f5d5c000000 ---p 00000000 00:00 0 
+7f5d5c000000-7f5d5c021000 rw-p 00000000 00:00 0 
+7f5d5c021000-7f5d60000000 ---p 00000000 00:00 0 
+7f5d60000000-7f5d60021000 rw-p 00000000 00:00 0 
+7f5d60021000-7f5d64000000 ---p 00000000 00:00 0 
+7f5d64000000-7f5d64021000 rw-p 00000000 00:00 0 
+7f5d64021000-7f5d68000000 ---p 00000000 00:00 0 
+7f5d68000000-7f5d68021000 rw-p 00000000 00:00 0 
+7f5d68021000-7f5d6c000000 ---p 00000000 00:00 0 
+7f5d6c000000-7f5d6c021000 rw-p 00000000 00:00 0 
+7f5d6c021000-7f5d70000000 ---p 00000000 00:00 0 
+7f5d705d2000-7f5d7079a000 rw-p 00000000 00:00 0 
+7f5d7079a000-7f5d707b1000 r-xp 00000000 08:01 130383                     /lib/x86_64-linux-gnu/libgcc_s.so.1
+7f5d707b1000-7f5d709b0000 ---p 00017000 08:01 130383                     /lib/x86_64-linux-gnu/libgcc_s.so.1
+7f5d709b0000-7f5d709b1000 r--p 00016000 08:01 130383                     /lib/x86_64-linux-gnu/libgcc_s.so.1
+7f5d709b1000-7f5d709b2000 rw-p 00017000 08:01 130383                     /lib/x86_64-linux-gnu/libgcc_s.so.1
+7f5d709b2000-7f5d709e0000 r-xp 00000000 08:01 394069                     /usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+7f5d709e0000-7f5d70bdf000 ---p 0002e000 08:01 394069                     /usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+7f5d70bdf000-7f5d70be0000 r--p 0002d000 08:01 394069                     /usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+7f5d70be0000-7f5d70be1000 rw-p 0002e000 08:01 394069                     /usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+7f5d70be1000-7f5d70d5a000 r-xp 00000000 08:01 394070                     /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25
+7f5d70d5a000-7f5d70f5a000 ---p 00179000 08:01 394070                     /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25
+7f5d70f5a000-7f5d70f64000 r--p 00179000 08:01 394070                     /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25
+7f5d70f64000-7f5d70f66000 rw-p 00183000 08:01 394070                     /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25
+7f5d70f66000-7f5d70f6a000 rw-p 00000000 00:00 0 
+7f5d70f7b000-7f5d70f7c000 r--p 00000000 00:00 0 
+7f5d70f7c000-7f5d70fa4000 r-xp 00000000 08:01 927931                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jni/libz3java.so
+7f5d70fa4000-7f5d711a3000 ---p 00028000 08:01 927931                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jni/libz3java.so
+7f5d711a3000-7f5d711a4000 r--p 00027000 08:01 927931                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jni/libz3java.so
+7f5d711a4000-7f5d711a6000 rw-p 00028000 08:01 927931                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jni/libz3java.so
+7f5d711a6000-7f5d711b2000 rw-p 0003d000 08:01 927931                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jni/libz3java.so
+7f5d711b2000-7f5d71372000 rw-p 00000000 00:00 0 
+7f5d71372000-7f5d713b2000 ---p 00000000 00:00 0 
+7f5d713b2000-7f5d715b2000 rw-p 00000000 00:00 0 
+7f5d715b2000-7f5d715c5000 r--s 00345000 08:01 282887                     /usr/lib/jvm/java-8-oracle/jre/lib/resources.jar
+7f5d715c5000-7f5d717c5000 rw-p 00000000 00:00 0 
+7f5d717c5000-7f5d719c5000 rw-p 00000000 00:00 0 
+7f5d719c5000-7f5d719d6000 r-xp 00000000 08:01 282953                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libnio.so
+7f5d719d6000-7f5d71bd5000 ---p 00011000 08:01 282953                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libnio.so
+7f5d71bd5000-7f5d71bd6000 r--p 00010000 08:01 282953                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libnio.so
+7f5d71bd6000-7f5d71bd7000 rw-p 00011000 08:01 282953                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libnio.so
+7f5d71bd7000-7f5d71bf2000 r--s 001d4000 08:01 420770                     /usr/lib/jvm/java-8-oracle/jre/lib/ext/nashorn.jar
+7f5d71bf2000-7f5d71c08000 r-xp 00000000 08:01 282950                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libnet.so
+7f5d71c08000-7f5d71e07000 ---p 00016000 08:01 282950                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libnet.so
+7f5d71e07000-7f5d71e08000 r--p 00015000 08:01 282950                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libnet.so
+7f5d71e08000-7f5d71e09000 rw-p 00016000 08:01 282950                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libnet.so
+7f5d71e09000-7f5d71e11000 r-xp 00000000 08:01 282958                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libmanagement.so
+7f5d71e11000-7f5d72011000 ---p 00008000 08:01 282958                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libmanagement.so
+7f5d72011000-7f5d72012000 r--p 00008000 08:01 282958                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libmanagement.so
+7f5d72012000-7f5d72013000 rw-p 00009000 08:01 282958                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libmanagement.so
+7f5d72013000-7f5d72015000 r--s 00006000 08:01 927385                     /home/verifoo/git/verifoo/lib/neo4j/neo4j-kernel-api-3.3.4.jar
+7f5d72015000-7f5d7205a000 r--s 002f9000 08:01 927599                     /home/verifoo/git/verifoo/lib/neo4j/neo4j-kernel-3.3.4.jar
+7f5d7205a000-7f5d72090000 r--s 0022c000 08:01 927756                     /home/verifoo/git/verifoo/lib/neo4j/neo4j-java-driver-1.5.1.jar
+7f5d72090000-7f5d72097000 r--s 00029000 08:01 927598                     /home/verifoo/git/verifoo/lib/neo4j/neo4j-graphdb-api-3.3.4.jar
+7f5d72097000-7f5d72098000 r--s 00005000 08:01 927883                     /home/verifoo/git/verifoo/lib/neo4j/neo4j-3.3.4.jar
+7f5d72098000-7f5d72099000 r--s 00003000 08:01 928056                     /home/verifoo/git/verifoo/lib/junit/concurrent-junit-1.0.0.jar
+7f5d72099000-7f5d720a0000 r--s 00042000 08:01 927319                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/yasson-1.0.jar
+7f5d720a0000-7f5d720a4000 r--s 0000c000 08:01 916316                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/validation-api-1.1.0.Final.jar
+7f5d720a4000-7f5d720a7000 r--s 00017000 08:01 927868                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/swagger-models-1.5.0.jar
+7f5d720a7000-7f5d720a8000 r--s 00001000 08:01 927561                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/swagger-jersey2-jaxrs-1.5.0.jar
+7f5d720a8000-7f5d720aa000 r--s 00010000 08:01 912977                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/swagger-jaxrs-1.5.0.jar
+7f5d720aa000-7f5d720ab000 r--s 0000b000 08:01 927473                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/swagger-core-1.5.0.jar
+7f5d720ab000-7f5d720ad000 r--s 00002000 08:01 927448                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/swagger-annotations-1.5.0.jar
+7f5d720ad000-7f5d720ae000 r--s 00003000 08:01 927418                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/slf4j-simple-1.7.25.jar
+7f5d720ae000-7f5d720b0000 r--s 00009000 08:01 927405                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/slf4j-api-1.7.25.jar
+7f5d720b0000-7f5d720b3000 r--s 00020000 08:01 928000                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/reflections-0.9.9.jar
+7f5d720b3000-7f5d720b6000 r--s 0000a000 08:01 928019                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/persistence-api-1.0.jar
+7f5d720b6000-7f5d720b7000 r--s 00004000 08:01 927719                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/osgi-resource-locator-1.0.1.jar
+7f5d720b7000-7f5d720bc000 r--s 00038000 08:01 927671                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/org.osgi.core-4.2.0.jar
+7f5d720bc000-7f5d720c5000 r--s 00093000 08:01 927878                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/org.eclipse.persistence.moxy-2.6.0.jar
+7f5d720c5000-7f5d720e4000 r--s 0015c000 08:01 927179                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/log4j-core-2.9.1.jar
+7f5d720e4000-7f5d720e9000 r--s 00036000 08:01 927567                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/log4j-api-2.9.1.jar
+7f5d720e9000-7f5d720ea000 r--s 00001000 08:01 927255                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jsr250-api-1.0.jar
+7f5d720ea000-7f5d720ff000 r--s 000d1000 08:01 927220                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-server-2.25.1.jar
+7f5d720ff000-7f5d72101000 r--s 00009000 08:01 927802                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-media-sse-2.25.1.jar
+7f5d72101000-7f5d72104000 r--s 0000e000 08:01 927005                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-media-multipart-2.25.1.jar
+7f5d72104000-7f5d7211c000 r--s 000d6000 08:01 927532                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-guava-2.25.1.jar
+7f5d7211c000-7f5d7211d000 ---p 00000000 00:00 0 
+7f5d7211d000-7f5d7221d000 rw-p 00000000 00:00 0 
+7f5d7221d000-7f5d72220000 ---p 00000000 00:00 0 
+7f5d72220000-7f5d7231e000 rw-p 00000000 00:00 0 
+7f5d7231e000-7f5d7231f000 ---p 00000000 00:00 0 
+7f5d7231f000-7f5d72322000 ---p 00000000 00:00 0 
+7f5d72322000-7f5d7241f000 rw-p 00000000 00:00 0 
+7f5d7241f000-7f5d72420000 ---p 00000000 00:00 0 
+7f5d72420000-7f5d72423000 ---p 00000000 00:00 0 
+7f5d72423000-7f5d72520000 rw-p 00000000 00:00 0 
+7f5d72520000-7f5d72521000 ---p 00000000 00:00 0 
+7f5d72521000-7f5d72524000 ---p 00000000 00:00 0 
+7f5d72524000-7f5d72621000 rw-p 00000000 00:00 0 
+7f5d72621000-7f5d72624000 ---p 00000000 00:00 0 
+7f5d72624000-7f5d72722000 rw-p 00000000 00:00 0 
+7f5d72722000-7f5d730f1000 r--p 00000000 08:01 397428                     /usr/lib/locale/locale-archive
+7f5d730f1000-7f5d730f4000 ---p 00000000 00:00 0 
+7f5d730f4000-7f5d731f2000 rw-p 00000000 00:00 0 
+7f5d731f2000-7f5d731f5000 ---p 00000000 00:00 0 
+7f5d731f5000-7f5d732f3000 rw-p 00000000 00:00 0 
+7f5d732f3000-7f5d732f4000 ---p 00000000 00:00 0 
+7f5d732f4000-7f5d74000000 rw-p 00000000 00:00 0 
+7f5d74000000-7f5d74021000 rw-p 00000000 00:00 0 
+7f5d74021000-7f5d78000000 ---p 00000000 00:00 0 
+7f5d78000000-7f5d78002000 r--s 00005000 08:01 927867                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-media-moxy-2.25.1.jar
+7f5d78002000-7f5d78004000 r--s 00010000 08:01 927894                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-media-jaxb-2.25.1.jar
+7f5d78004000-7f5d78007000 r--s 0000d000 08:01 927611                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-hk2.jar
+7f5d78007000-7f5d7800a000 r--s 0000f000 08:01 927513                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-entity-filtering-2.25.1.jar
+7f5d7800a000-7f5d78014000 r--s 00061000 08:01 927407                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-core-1.19.1.jar
+7f5d78014000-7f5d78017000 r--s 0000e000 08:01 927888                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-container-servlet-core-2.25.1.jar
+7f5d78017000-7f5d78019000 r--s 00003000 08:01 927945                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-container-servlet-2.25.1.jar
+7f5d78019000-7f5d78027000 r--s 000a1000 08:01 927687                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-common-2.25.1.jar
+7f5d78027000-7f5d7802b000 r--s 00026000 08:01 927434                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-client-2.25.1.jar
+7f5d7802b000-7f5d7802e000 r--s 00016000 08:01 927084                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jaxb-api-2.2.12-b140109.1041.jar
+7f5d7802e000-7f5d78032000 r--s 00019000 08:01 927247                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.ws.rs-api-2.0.1.jar
+7f5d78032000-7f5d78035000 r--s 00012000 08:01 926987                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.servlet-api-3.0.1.jar
+7f5d78035000-7f5d7805f000 r--s 001e9000 08:01 927666                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/guava-15.0.jar
+7f5d7805f000-7f5d7807e000 r--s 0015c000 08:01 927162                     /home/verifoo/git/verifoo/lib/lib4j/log4j-core-2.9.1.jar
+7f5d7807e000-7f5d7c000000 rw-p 00000000 00:00 0 
+7f5d7c000000-7f5d7c021000 rw-p 00000000 00:00 0 
+7f5d7c021000-7f5d80000000 ---p 00000000 00:00 0 
+7f5d80000000-7f5d80001000 r--s 00002000 08:01 927167                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jersey-media-json-binding.jar
+7f5d80001000-7f5d80002000 r--s 00001000 08:01 927183                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jboss-interceptors-api_1.1_spec-1.0.0.Beta1.jar
+7f5d80002000-7f5d8000c000 r--s 000ae000 08:01 912746                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javassist-3.20.0-GA.jar
+7f5d8000c000-7f5d8001d000 r--s 000f6000 08:01 927370                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jackson-databind-2.4.2.jar
+7f5d8001d000-7f5d80240000 rw-p 00000000 00:00 0 
+7f5d80240000-7f5d8041a000 r--s 03d6c000 08:01 282849                     /usr/lib/jvm/java-8-oracle/jre/lib/rt.jar
+7f5d8041a000-7f5d81000000 rw-p 00000000 00:00 0 
+7f5d81000000-7f5d81550000 rwxp 00000000 00:00 0 
+7f5d81550000-7f5d90000000 ---p 00000000 00:00 0 
+7f5d90000000-7f5d90d22000 rw-p 00000000 00:00 0 
+7f5d90d22000-7f5d94000000 ---p 00000000 00:00 0 
+7f5d94000000-7f5d94002000 r--s 00004000 08:01 912975                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.json.bind-api-1.0.jar
+7f5d94002000-7f5d94003000 r--s 00006000 08:01 912983                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.json-api-1.1.jar
+7f5d94003000-7f5d94006000 r--s 0001c000 08:01 927237                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.json-1.1.jar
+7f5d94006000-7f5d94007000 r--s 00001000 08:01 928009                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.inject-2.5.0-b32.jar
+7f5d94007000-7f5d94009000 r--s 00005000 08:01 927401                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.annotation-api-1.2.jar
+7f5d94009000-7f5d9400d000 r--s 00034000 08:01 927417                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jackson-core-2.4.2.jar
+7f5d9400d000-7f5d94010000 r--s 00007000 08:01 927392                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jackson-annotations-2.4.0.jar
+7f5d94010000-7f5d94013000 r--s 0001e000 08:01 927673                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/hk2-utils-2.5.0-b32.jar
+7f5d94013000-7f5d94019000 r--s 00028000 08:01 916288                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/hk2-api-2.5.0-b32.jar
+7f5d94019000-7f5d94120000 rw-p 00000000 00:00 0 
+7f5d94120000-7f5d94121000 ---p 00000000 00:00 0 
+7f5d94121000-7f5d94221000 rw-p 00000000 00:00 0 
+7f5d94221000-7f5d94222000 ---p 00000000 00:00 0 
+7f5d94222000-7f5d94322000 rw-p 00000000 00:00 0 
+7f5d94322000-7f5d94323000 ---p 00000000 00:00 0 
+7f5d94323000-7f5d94423000 rw-p 00000000 00:00 0 
+7f5d94423000-7f5d94424000 ---p 00000000 00:00 0 
+7f5d94424000-7f5d9454e000 rw-p 00000000 00:00 0 
+7f5d9454e000-7f5d947be000 ---p 00000000 00:00 0 
+7f5d947be000-7f5d947e8000 rw-p 00000000 00:00 0 
+7f5d947e8000-7f5d94a57000 ---p 00000000 00:00 0 
+7f5d94a57000-7f5d94a7d000 rw-p 00000000 00:00 0 
+7f5d94a7d000-7f5d94ba4000 ---p 00000000 00:00 0 
+7f5d94ba4000-7f5d94bbb000 rw-p 00000000 00:00 0 
+7f5d94bbb000-7f5d94f65000 ---p 00000000 00:00 0 
+7f5d94f65000-7f5d94f7f000 r-xp 00000000 08:01 282946                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libzip.so
+7f5d94f7f000-7f5d9517f000 ---p 0001a000 08:01 282946                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libzip.so
+7f5d9517f000-7f5d95180000 r--p 0001a000 08:01 282946                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libzip.so
+7f5d95180000-7f5d95181000 rw-p 0001b000 08:01 282946                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libzip.so
+7f5d95181000-7f5d9518c000 r-xp 00000000 08:01 137054                     /lib/x86_64-linux-gnu/libnss_files-2.27.so
+7f5d9518c000-7f5d9538b000 ---p 0000b000 08:01 137054                     /lib/x86_64-linux-gnu/libnss_files-2.27.so
+7f5d9538b000-7f5d9538c000 r--p 0000a000 08:01 137054                     /lib/x86_64-linux-gnu/libnss_files-2.27.so
+7f5d9538c000-7f5d9538d000 rw-p 0000b000 08:01 137054                     /lib/x86_64-linux-gnu/libnss_files-2.27.so
+7f5d9538d000-7f5d95393000 rw-p 00000000 00:00 0 
+7f5d95393000-7f5d953aa000 r-xp 00000000 08:01 137048                     /lib/x86_64-linux-gnu/libnsl-2.27.so
+7f5d953aa000-7f5d955a9000 ---p 00017000 08:01 137048                     /lib/x86_64-linux-gnu/libnsl-2.27.so
+7f5d955a9000-7f5d955aa000 r--p 00016000 08:01 137048                     /lib/x86_64-linux-gnu/libnsl-2.27.so
+7f5d955aa000-7f5d955ab000 rw-p 00017000 08:01 137048                     /lib/x86_64-linux-gnu/libnsl-2.27.so
+7f5d955ab000-7f5d955ad000 rw-p 00000000 00:00 0 
+7f5d955ad000-7f5d955b8000 r-xp 00000000 08:01 137065                     /lib/x86_64-linux-gnu/libnss_nis-2.27.so
+7f5d955b8000-7f5d957b7000 ---p 0000b000 08:01 137065                     /lib/x86_64-linux-gnu/libnss_nis-2.27.so
+7f5d957b7000-7f5d957b8000 r--p 0000a000 08:01 137065                     /lib/x86_64-linux-gnu/libnss_nis-2.27.so
+7f5d957b8000-7f5d957b9000 rw-p 0000b000 08:01 137065                     /lib/x86_64-linux-gnu/libnss_nis-2.27.so
+7f5d957b9000-7f5d957c1000 r-xp 00000000 08:01 137050                     /lib/x86_64-linux-gnu/libnss_compat-2.27.so
+7f5d957c1000-7f5d959c1000 ---p 00008000 08:01 137050                     /lib/x86_64-linux-gnu/libnss_compat-2.27.so
+7f5d959c1000-7f5d959c2000 r--p 00008000 08:01 137050                     /lib/x86_64-linux-gnu/libnss_compat-2.27.so
+7f5d959c2000-7f5d959c3000 rw-p 00009000 08:01 137050                     /lib/x86_64-linux-gnu/libnss_compat-2.27.so
+7f5d959c3000-7f5d959f0000 r-xp 00000000 08:01 282940                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libjava.so
+7f5d959f0000-7f5d95bef000 ---p 0002d000 08:01 282940                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libjava.so
+7f5d95bef000-7f5d95bf0000 r--p 0002c000 08:01 282940                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libjava.so
+7f5d95bf0000-7f5d95bf2000 rw-p 0002d000 08:01 282940                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libjava.so
+7f5d95bf2000-7f5d95bff000 r-xp 00000000 08:01 282945                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libverify.so
+7f5d95bff000-7f5d95dfe000 ---p 0000d000 08:01 282945                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libverify.so
+7f5d95dfe000-7f5d95e00000 r--p 0000c000 08:01 282945                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libverify.so
+7f5d95e00000-7f5d95e01000 rw-p 0000e000 08:01 282945                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/libverify.so
+7f5d95e01000-7f5d95e08000 r-xp 00000000 08:01 137105                     /lib/x86_64-linux-gnu/librt-2.27.so
+7f5d95e08000-7f5d96007000 ---p 00007000 08:01 137105                     /lib/x86_64-linux-gnu/librt-2.27.so
+7f5d96007000-7f5d96008000 r--p 00006000 08:01 137105                     /lib/x86_64-linux-gnu/librt-2.27.so
+7f5d96008000-7f5d96009000 rw-p 00007000 08:01 137105                     /lib/x86_64-linux-gnu/librt-2.27.so
+7f5d96009000-7f5d961a6000 r-xp 00000000 08:01 137027                     /lib/x86_64-linux-gnu/libm-2.27.so
+7f5d961a6000-7f5d963a5000 ---p 0019d000 08:01 137027                     /lib/x86_64-linux-gnu/libm-2.27.so
+7f5d963a5000-7f5d963a6000 r--p 0019c000 08:01 137027                     /lib/x86_64-linux-gnu/libm-2.27.so
+7f5d963a6000-7f5d963a7000 rw-p 0019d000 08:01 137027                     /lib/x86_64-linux-gnu/libm-2.27.so
+7f5d963a7000-7f5d97089000 r-xp 00000000 08:01 282922                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/server/libjvm.so
+7f5d97089000-7f5d97289000 ---p 00ce2000 08:01 282922                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/server/libjvm.so
+7f5d97289000-7f5d9731f000 r--p 00ce2000 08:01 282922                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/server/libjvm.so
+7f5d9731f000-7f5d97350000 rw-p 00d78000 08:01 282922                     /usr/lib/jvm/java-8-oracle/jre/lib/amd64/server/libjvm.so
+7f5d97350000-7f5d9738b000 rw-p 00000000 00:00 0 
+7f5d9738b000-7f5d97572000 r-xp 00000000 08:01 136964                     /lib/x86_64-linux-gnu/libc-2.27.so
+7f5d97572000-7f5d97772000 ---p 001e7000 08:01 136964                     /lib/x86_64-linux-gnu/libc-2.27.so
+7f5d97772000-7f5d97776000 r--p 001e7000 08:01 136964                     /lib/x86_64-linux-gnu/libc-2.27.so
+7f5d97776000-7f5d97778000 rw-p 001eb000 08:01 136964                     /lib/x86_64-linux-gnu/libc-2.27.so
+7f5d97778000-7f5d9777c000 rw-p 00000000 00:00 0 
+7f5d9777c000-7f5d9777f000 r-xp 00000000 08:01 136987                     /lib/x86_64-linux-gnu/libdl-2.27.so
+7f5d9777f000-7f5d9797e000 ---p 00003000 08:01 136987                     /lib/x86_64-linux-gnu/libdl-2.27.so
+7f5d9797e000-7f5d9797f000 r--p 00002000 08:01 136987                     /lib/x86_64-linux-gnu/libdl-2.27.so
+7f5d9797f000-7f5d97980000 rw-p 00003000 08:01 136987                     /lib/x86_64-linux-gnu/libdl-2.27.so
+7f5d97980000-7f5d97997000 r-xp 00000000 08:01 282764                     /usr/lib/jvm/java-8-oracle/lib/amd64/jli/libjli.so
+7f5d97997000-7f5d97b96000 ---p 00017000 08:01 282764                     /usr/lib/jvm/java-8-oracle/lib/amd64/jli/libjli.so
+7f5d97b96000-7f5d97b97000 r--p 00016000 08:01 282764                     /usr/lib/jvm/java-8-oracle/lib/amd64/jli/libjli.so
+7f5d97b97000-7f5d97b98000 rw-p 00017000 08:01 282764                     /usr/lib/jvm/java-8-oracle/lib/amd64/jli/libjli.so
+7f5d97b98000-7f5d97bb2000 r-xp 00000000 08:01 137097                     /lib/x86_64-linux-gnu/libpthread-2.27.so
+7f5d97bb2000-7f5d97db1000 ---p 0001a000 08:01 137097                     /lib/x86_64-linux-gnu/libpthread-2.27.so
+7f5d97db1000-7f5d97db2000 r--p 00019000 08:01 137097                     /lib/x86_64-linux-gnu/libpthread-2.27.so
+7f5d97db2000-7f5d97db3000 rw-p 0001a000 08:01 137097                     /lib/x86_64-linux-gnu/libpthread-2.27.so
+7f5d97db3000-7f5d97db7000 rw-p 00000000 00:00 0 
+7f5d97db7000-7f5d97dde000 r-xp 00000000 08:01 136936                     /lib/x86_64-linux-gnu/ld-2.27.so
+7f5d97dde000-7f5d97ddf000 r--s 00000000 08:01 927899                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.inject-1.jar
+7f5d97ddf000-7f5d97de2000 r--s 0002b000 08:01 927974                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/hk2-locator-2.5.0-b32.jar
+7f5d97de2000-7f5d97de4000 r--s 00007000 08:01 916296                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/el-api-2.2.jar
+7f5d97de4000-7f5d97deb000 r--s 00058000 08:01 927887                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/commons-lang3-3.2.1.jar
+7f5d97deb000-7f5d97def000 r--s 00027000 08:01 927769                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/com.microsoft.z3.jar
+7f5d97def000-7f5d97df3000 r--s 0000e000 08:01 927786                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/cdi-api-1.1.jar
+7f5d97df3000-7f5d97df5000 r--s 00002000 08:01 927721                     /home/verifoo/git/verifoo/WebContent/WEB-INF/lib/aopalliance-repackaged-2.5.0-b32.jar
+7f5d97df5000-7f5d97dfa000 r--s 00036000 08:01 927833                     /home/verifoo/git/verifoo/lib/lib4j/log4j-api-2.9.1.jar
+7f5d97dfa000-7f5d97dfc000 r--s 0000c000 08:01 927866                     /home/verifoo/git/verifoo/lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar
+7f5d97dfc000-7f5d97ec7000 rw-p 00000000 00:00 0 
+7f5d97ec7000-7f5d97ec8000 ---p 00000000 00:00 0 
+7f5d97ec8000-7f5d97ecb000 ---p 00000000 00:00 0 
+7f5d97ecb000-7f5d97fcc000 rw-p 00000000 00:00 0 
+7f5d97fcc000-7f5d97fd4000 r--s 00045000 08:01 916293                     /home/verifoo/git/verifoo/lib/junit/junit.jar
+7f5d97fd4000-7f5d97fdc000 rw-s 00000000 08:01 555009                     /tmp/hsperfdata_verifoo/28346
+7f5d97fdc000-7f5d97fdd000 rw-p 00000000 00:00 0 
+7f5d97fdd000-7f5d97fde000 r--p 00000000 00:00 0 
+7f5d97fde000-7f5d97fdf000 r--p 00027000 08:01 136936                     /lib/x86_64-linux-gnu/ld-2.27.so
+7f5d97fdf000-7f5d97fe0000 rw-p 00028000 08:01 136936                     /lib/x86_64-linux-gnu/ld-2.27.so
+7f5d97fe0000-7f5d97fe1000 rw-p 00000000 00:00 0 
+7ffda7918000-7ffda793a000 rw-p 00000000 00:00 0                          [stack]
+7ffda7947000-7ffda794a000 r--p 00000000 00:00 0                          [vvar]
+7ffda794a000-7ffda794c000 r-xp 00000000 00:00 0                          [vdso]
+ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]
+
+VM Arguments:
+jvm_args: -Djava.library.path=/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jni -Dfile.encoding=UTF-8 
+java_command: it.polito.verifoo.rest.main.Main
+java_class_path (initial): /home/verifoo/git/verifoo/build:/home/verifoo/git/verifoo/lib/junit/junit.jar:/home/verifoo/git/verifoo/lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar:/home/verifoo/git/verifoo/lib/lib4j/log4j-api-2.9.1.jar:/home/verifoo/git/verifoo/lib/lib4j/log4j-core-2.9.1.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/aopalliance-repackaged-2.5.0-b32.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/cdi-api-1.1.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/com.microsoft.z3.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/commons-lang3-3.2.1.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/el-api-2.2.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/guava-15.0.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/hk2-api-2.5.0-b32.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/hk2-locator-2.5.0-b32.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/hk2-utils-2.5.0-b32.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jackson-annotations-2.4.0.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jackson-core-2.4.2.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jackson-databind-2.4.2.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javassist-3.20.0-GA.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.annotation-api-1.2.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.inject-1.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.inject-2.5.0-b32.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.json-1.1.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.json-api-1.1.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.json.bind-api-1.0.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.servlet-api-3.0.1.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/javax.ws.rs-api-2.0.1.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jaxb-api-2.2.12-b140109.1041.jar:/home/verifoo/git/verifoo/WebContent/WEB-INF/lib/jboss-interceptors-api_1.1_spec-1.0.0.B
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+JAVA_HOME=/usr/lib/jvm/java-8-oracle
+JRE_HOME=/usr/lib/jvm/java-8-oracle/jre
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin
+USERNAME=verifoo
+SHELL=/bin/bash
+DISPLAY=:0
+
+Signal Handlers:
+SIGSEGV: [libjvm.so+0xaced60], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGBUS: [libjvm.so+0xaced60], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGFPE: [libjvm.so+0x907ca0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGPIPE: [libjvm.so+0x907ca0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGXFSZ: [libjvm.so+0x907ca0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGILL: [libjvm.so+0x907ca0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGUSR1: SIG_DFL, sa_mask[0]=00000000000000000000000000000000, sa_flags=none
+SIGUSR2: [libjvm.so+0x907b70], sa_mask[0]=00100000000000000000000000000000, sa_flags=SA_RESTART|SA_SIGINFO
+SIGHUP: [libjvm.so+0x908190], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGINT: [libjvm.so+0x908190], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGTERM: [libjvm.so+0x908190], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGQUIT: [libjvm.so+0x908190], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+
+
+---------------  S Y S T E M  ---------------
+
+OS:DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=18.04
+DISTRIB_CODENAME=bionic
+DISTRIB_DESCRIPTION="Ubuntu 18.04.1 LTS"
+
+uname:Linux 4.15.0-39-generic #42-Ubuntu SMP Tue Oct 23 15:48:01 UTC 2018 x86_64
+libc:glibc 2.27 NPTL 2.27 
+rlimit: STACK infinity, CORE 0k, NPROC 31669, NOFILE 1048576, AS infinity
+load average:5,11 2,18 3,26
+
+/proc/meminfo:
+MemTotal:        8167940 kB
+MemFree:         4795564 kB
+MemAvailable:    4846192 kB
+Buffers:           12880 kB
+Cached:           288568 kB
+SwapCached:        52480 kB
+Active:          2111988 kB
+Inactive:        1096408 kB
+Active(anon):    2074660 kB
+Inactive(anon):   879308 kB
+Active(file):      37328 kB
+Inactive(file):   217100 kB
+Unevictable:          64 kB
+Mlocked:              64 kB
+SwapTotal:        771684 kB
+SwapFree:           3964 kB
+Dirty:             20620 kB
+Writeback:             0 kB
+AnonPages:       2854744 kB
+Mapped:           197252 kB
+Shmem:             46980 kB
+Slab:              69412 kB
+SReclaimable:      31092 kB
+SUnreclaim:        38320 kB
+KernelStack:       11056 kB
+PageTables:        42348 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     4855652 kB
+Committed_AS:    7575460 kB
+VmallocTotal:   34359738367 kB
+VmallocUsed:           0 kB
+VmallocChunk:          0 kB
+HardwareCorrupted:     0 kB
+AnonHugePages:         0 kB
+ShmemHugePages:        0 kB
+ShmemPmdMapped:        0 kB
+CmaTotal:              0 kB
+CmaFree:               0 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+DirectMap4k:      137152 kB
+DirectMap2M:     8251392 kB
+
+container (cgroup) information:
+container_type: cgroupv1
+cpu_cpuset_cpus: 0-3
+cpu_memory_nodes: 0
+active_processor_count: 4
+cpu_quota: -1
+cpu_period: 100000
+cpu_shares: -1
+memory_limit_in_bytes: -1
+memory_and_swap_limit_in_bytes: -2
+memory_soft_limit_in_bytes: -1
+memory_usage_in_bytes: 3236970496
+memory_max_usage_in_bytes: 0
+
+
+CPU:total 4 (initial active 4) (4 cores per cpu, 1 threads per core) family 6 model 94 stepping 3, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, avx, avx2, aes, clmul, 3dnowpref, lzcnt, tsc, tscinvbit
+
+/proc/cpuinfo:
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 94
+model name	: Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz
+stepping	: 3
+cpu MHz		: 3408.006
+cache size	: 8192 KB
+physical id	: 0
+siblings	: 4
+core id		: 0
+cpu cores	: 4
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 22
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid pni pclmulqdq ssse3 cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single pti fsgsbase avx2 invpcid rdseed clflushopt
+bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf
+bogomips	: 6816.01
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 39 bits physical, 48 bits virtual
+power management:
+
+processor	: 1
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 94
+model name	: Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz
+stepping	: 3
+cpu MHz		: 3408.006
+cache size	: 8192 KB
+physical id	: 0
+siblings	: 4
+core id		: 1
+cpu cores	: 4
+apicid		: 1
+initial apicid	: 1
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 22
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid pni pclmulqdq ssse3 cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single pti fsgsbase avx2 invpcid rdseed clflushopt
+bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf
+bogomips	: 6816.01
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 39 bits physical, 48 bits virtual
+power management:
+
+processor	: 2
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 94
+model name	: Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz
+stepping	: 3
+cpu MHz		: 3408.006
+cache size	: 8192 KB
+physical id	: 0
+siblings	: 4
+core id		: 2
+cpu cores	: 4
+apicid		: 2
+initial apicid	: 2
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 22
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid pni pclmulqdq ssse3 cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single pti fsgsbase avx2 invpcid rdseed clflushopt
+bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf
+bogomips	: 6816.01
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 39 bits physical, 48 bits virtual
+power management:
+
+processor	: 3
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 94
+model name	: Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz
+stepping	: 3
+cpu MHz		: 3408.006
+cache size	: 8192 KB
+physical id	: 0
+siblings	: 4
+core id		: 3
+cpu cores	: 4
+apicid		: 3
+initial apicid	: 3
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 22
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid pni pclmulqdq ssse3 cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single pti fsgsbase avx2 invpcid rdseed clflushopt
+bugs		: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf
+bogomips	: 6816.01
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 39 bits physical, 48 bits virtual
+power management:
+
+
+
+Memory: 4k page, physical 8167940k(4795564k free), swap 771684k(3964k free)
+
+vm_info: Java HotSpot(TM) 64-Bit Server VM (25.191-b12) for linux-amd64 JRE (1.8.0_191-b12), built on Oct  6 2018 05:43:09 by "java_re" with gcc 7.3.0
+
+time: Wed Nov 21 17:13:17 2018
+elapsed time: 1 seconds (0d 0h 0m 1s)
+

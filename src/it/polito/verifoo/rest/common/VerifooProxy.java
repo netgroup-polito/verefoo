@@ -383,6 +383,7 @@ public class VerifooProxy {
 					//net.routingOptimizationSG2(netobjs.get(n), tuple._1, tuple._2 destinations);
 					//net.routingOptimization(netobjs.get(n), tuple._1);
 					tuple._1.forEach(rt -> logger.debug("From " + n.getName() + " to " + rt.ip + " -> next hop: "+ rt.nextHop));
+					//tuple._1.forEach(rt -> System.out.println("From " + n.getName() + " to " + rt.ip + " -> next hop: "+ rt.nextHop));
 					net.routingOptimizationSGOptional(netobjs.get(n), tuple._1, tuple._2, autoctx);
 				});
 			}catch(StackOverflowError e) {
@@ -548,25 +549,37 @@ public class VerifooProxy {
 					*/
 					rawRoutingConditions.get(client).add(next.getName());
 				}
-				for(Node n : rawRoutingConditions.keySet()){
-					ArrayList<RoutingTable> rt = new ArrayList<RoutingTable>();
-					//logger.debug("-----Routing Table NODE "+n.getName()+"-----");
-					List<String> nextHops = rawRoutingConditions.get(n).stream().distinct().collect(Collectors.toList());
-					for(String nextString:nextHops){
-						Node nextNode = nodes.stream().filter(no -> no.getName().equals(nextString) ).findFirst().get();
-						if(!nodeIsServer(n)){
-							//logger.debug("Adding ("+ ctx.mkTrue() +"), from "+ n.getName() +" to " + server.getName() + " next hop is " + nextNode.getName() + " with latency " + 0);
-							//System.out.println("Adding ("+ c +"), from "+ n.getName() +" to " + server.getName() + " next hop is " + next.getName() + " with latency " + latency);
-							rt.add(new RoutingTable(nctx.am.get(server.getName()), netobjs.get(nextNode), nctx.addLatency(1), ctx.mkTrue()));
-						}
+				
+			}
+			
+			for(Node n : rawRoutingConditions.keySet()){
+				ArrayList<RoutingTable> rt = new ArrayList<RoutingTable>();
+				//logger.debug("-----Routing Table NODE "+n.getName()+"-----");
+				List<String> nextHops = rawRoutingConditions.get(n).stream().distinct().collect(Collectors.toList());
+				for(String nextString:nextHops){
+					Node nextNode = nodes.stream().filter(no -> no.getName().equals(nextString) ).findFirst().get();
+					if(!nodeIsServer(n)){
+						//logger.debug("Adding ("+ ctx.mkTrue() +"), from "+ n.getName() +" to " + server.getName() + " next hop is " + nextNode.getName() + " with latency " + 0);
+						//System.out.println("Adding ("+ c +"), from "+ n.getName() +" to " + server.getName() + " next hop is " + next.getName() + " with latency " + latency);
+						rt.add(new RoutingTable(nctx.am.get(server.getName()), netobjs.get(nextNode), nctx.addLatency(1), ctx.mkTrue()));
 					}
-					if(!routingMap.containsKey(n)){
-						//logger.debug("Adding to the routing map " + n.getName());
-						routingMap.put(n, new Tuple<>(new ArrayList<>(), new ArrayList<>()));
-					}
-					Tuple<ArrayList<RoutingTable>, ArrayList<LinkMetrics>> tuple = routingMap.get(n);
-					tuple._1.addAll(rt);
 				}
+				
+				
+				//routingMap.values().stream().forEach(p-> System.out.println("before"+p._1.size()));
+				System.out.println("??????????????????????");
+				
+				
+				if(!routingMap.containsKey(n)){
+					//logger.debug("Adding to the routing map " + n.getName());
+					routingMap.put(n, new Tuple<>(new ArrayList<>(), new ArrayList<>()));
+					
+				}
+				Tuple<ArrayList<RoutingTable>, ArrayList<LinkMetrics>> tuple = routingMap.get(n);
+				tuple._1.addAll(rt);
+				
+				
+				//routingMap.values().stream().forEach(p-> System.out.println("after"+p._1.size()));
 			}
 		}
 		/**
@@ -718,6 +731,7 @@ public class VerifooProxy {
 						//logger.debug("Adding to the routing map " + n.getName());
 						routingMap.put(n, new Tuple<>(new ArrayList<>(), new ArrayList<>()));
 					}
+					
 					Tuple<ArrayList<RoutingTable>, ArrayList<LinkMetrics>> tuple = routingMap.get(n);
 					tuple._1.addAll(rt);
 					tuple._2.addAll(bConstraints);
@@ -876,6 +890,7 @@ public class VerifooProxy {
 		    }else{
 		    	 	logger.debug("SAT ");
 		     		logger.debug( ""+ret.model); //p.printModel(ret.model);
+		     		//System.out.println(ret.model);
 		     		
 		    }
 			return ret;

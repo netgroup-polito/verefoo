@@ -215,6 +215,7 @@ public class Checker {
 		
 		switch (property) {
 			case ISOLATION: 
+					System.out.println("test");
 					addIsolationProperty(src, dest, 0, "0-"+nctx.MAX_PORT, "0-"+nctx.MAX_PORT);
 					break;
 			case REACHABILITY: 
@@ -247,10 +248,11 @@ public class Checker {
 		int lv4proto = (otherConstr == null || otherConstr.getLv4Proto() == null) ? 0:otherConstr.getLv4Proto().ordinal();
 		propertyAdd(src, dest, property, lv4proto, src_port, dst_port);
 		Expr p_0 = ctx.mkConst("check_prop_p0_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
-
 		List<Expr> sendNeighbours = src.neighbours.stream().map(n -> nctx.send.apply(src.getZ3Node(), n.getZ3Node(), p_0)).collect(Collectors.toList());
 		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
 		BoolExpr enumerateSendP0 = ctx.mkOr(sendNeighbours.toArray(tmp3));
+
+
 		constraintList.add(ctx.mkForall(new Expr[]{p_0},
 				ctx.mkImplies(ctx.mkAnd(enumerateSendP0),
 						ctx.mkAnd(ctx.mkEq(nctx.pf.get("lv4proto").apply(p_0), (IntExpr)ctx.mkInt(lv4proto)),
@@ -285,7 +287,9 @@ public class Checker {
 		p.add("maxres.wmax", true  );
 		//p.add("maxres.add_upper_bound_block", true  );
 		solver.setParameters(p);
+		
 		result = this.solver.Check();
+		
 		/*Handle temp = null;
 		for (Entry<String, Handle> handle : nctx.handles.entrySet()) {
 			temp = handle.getValue();

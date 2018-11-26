@@ -100,6 +100,9 @@ public class VerifooSerializer {
 	        		result = t.convert();
 	        		root = result;
 	        		sat = true;
+	        		//System.out.println("%%%%%%%%%%%%%%%%%%%%%%");
+	        		//System.out.println(res.model);
+	        		//System.out.println("%%%%%%%%%%%%%%%%%%%%%%");
 	        	}
 	        	else{
 	        		sat = false;

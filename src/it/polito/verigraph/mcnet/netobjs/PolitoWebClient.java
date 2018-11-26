@@ -70,7 +70,9 @@ public class PolitoWebClient extends NetworkObject{
         Expr n_0 = ctx.mkConst("PolitoWebClient_"+politoWebClient+"_n_0", nctx.node);
         Expr p_0 = ctx.mkConst("PolitoWebClient_"+politoWebClient+"_p_0", nctx.packet);
         //IntExpr t_0 = ctx.mkIntConst("PolitoWebClient_"+politoWebClient+"_t_0");
-
+        
+       
+        
         //Constraint1send(politoWebClient, n_0, p, t_0) -> nodeHasAddr(politoWebClient,p.src)
         constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
                 ctx.mkImplies((BoolExpr)nctx.send.apply(politoWebClient, n_0, p_0),

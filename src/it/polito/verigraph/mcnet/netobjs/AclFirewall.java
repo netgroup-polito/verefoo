@@ -340,7 +340,7 @@ public class AclFirewall extends NetworkObject{
 			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(dstp, nctx.pm.get("null")),"fw_auto_port"));
  			rules.add(ctx.mkAnd(
  								//ctx.mkEq(nctx.pf.get("src").apply(p_0), src),
- 								//ctx.mkEq(nctx.pf.get("dest").apply(p_0), dst)//,
+ 								//ctx.mkEq(nctx.pf.get("dest").apply(p_0), dst),//,
  								nctx.equalPacketIpToFwIpRule(nctx.pf.get("src").apply(p_0), src),
  								nctx.equalPacketIpToFwIpRule(nctx.pf.get("dest").apply(p_0), dst),
  								//nctx.equalPacketLv4ProtoToFwPacketLv4Proto(nctx.pf.get("lv4proto").apply(p_0), proto),
@@ -378,11 +378,26 @@ public class AclFirewall extends NetworkObject{
 //								ctx.mkAnd(enumerateRecv,
 //										behaviour)), 1, null, null, null, null));
 	    
+		/*for(Expr e:sendNeighbours) {
+			constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
+					ctx.mkImplies(ctx.mkEq(e, ctx.mkTrue()),
+									ctx.mkAnd(enumerateRecv,
+											behaviour)), 1, null, null, null, null));
+		}*/
 		constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
 				ctx.mkImplies(enumerateSend,
 								ctx.mkAnd(enumerateRecv,
 										behaviour)), 1, null, null, null, null));
 		
+		/*for(Expr e:recvNeighbours) {
+			constraints.add(ctx.mkForall(new Expr[] { p_0 },
+					ctx.mkImplies(ctx.mkAnd(ctx.mkEq(e, ctx.mkTrue()),
+							behaviour), ctx.mkAnd(enumerateSend)), 
+					1, null, null, null, null));
+		}*/
+		
+		
+	
 		constraints.add(ctx.mkForall(new Expr[] { p_0 },
 										ctx.mkImplies(ctx.mkAnd(enumerateRecv,
 												behaviour), ctx.mkAnd(enumerateSend)), 

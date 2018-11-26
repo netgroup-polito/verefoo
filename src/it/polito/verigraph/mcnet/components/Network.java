@@ -421,7 +421,7 @@ public class Network extends Core {
 		HashMap<String, ArrayList<BoolExpr>> collectedWithoutOptional = new HashMap<String, ArrayList<BoolExpr>>();
 		HashMap<String, NetworkObject> node_dict = new HashMap<String, NetworkObject>();
 		HashMap<String, HashMap<String, Tuple<Integer, BoolExpr>>> latency = new HashMap<>();
-		//System.out.println("==========NEW ROUTING TABLE for " + node.getZ3Node() + "==========");
+		System.out.println("==========NEW ROUTING TABLE for " + node.getZ3Node() + "==========");
 		BoolExpr predicates = null;
 		//Collect some information in order to build the conditions in the next step
 		ArrayList<BoolExpr> alb = new ArrayList<BoolExpr>();
@@ -479,9 +479,9 @@ public class Network extends Core {
 			//System.out.println("Searching optional between " + node + " and " + node_dict.get(s) + ". Found: " + optionalInBetween);
 			nextHopsWithoutOptional.add(ctx.mkEq(n_0,node_dict.get(s).getZ3Node()));
 		}
-		//System.out.println("Next Hops: " + nextHops);
+		System.out.println("Next Hops: " + nextHops);
 		//System.out.println("Next Hops With Optional: " + nextHopsWithOptional);
-		//System.out.println("Next Hops Without Optional: " + nextHopsWithoutOptional);
+		System.out.println("Next Hops Without Optional: " + nextHopsWithoutOptional);
 		for (Map.Entry<String, ArrayList<BoolExpr>> entry : collected.entrySet()) {
 			BoolExpr[] pred = new BoolExpr[entry.getValue().size()];
 			HashMap<String, Tuple<Integer, BoolExpr>> sett = latency.get(entry.getKey());

@@ -156,7 +156,7 @@ public class NetContext extends Core{
 		//System.out.println("Nr of net context wildcards soft constraint " + softConstrWildcard.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrWildcard) {
         	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, 100, t._2);
+			solver.AssertSoft(t._1, 10, t._2);
 		}
 		//System.out.println("Nr of net context autoconfiguration soft constraint " + softConstrAutoConf.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
@@ -176,7 +176,7 @@ public class NetContext extends Core{
         //System.out.println("Nr of net context ports soft constraint " + softConstrPorts.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrPorts) {
         	//System.out.println(t._1 + "\n with value " + 1 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, -1, t._2);
+			solver.AssertSoft(t._1, 1, t._2);
 		}
     }
 
@@ -276,6 +276,7 @@ public class NetContext extends Core{
             	else if(new_addr[i].equals("wildcard")){
             		constraints.add(equalIpToIntArray(fd, getIpFromString("-1.-1.-1.-1")));
             	} else{
+            		System.out.println("uhm");
             		//251 is a prime number, to reduce collisions
             		int symbolicAddr = Math.abs(new_addr[i].hashCode()%251);
             		constraints.add(equalIpToIntArray(fd, getIpFromString(symbolicAddr + "." + symbolicAddr + "." + symbolicAddr + "." + symbolicAddr)));
@@ -546,8 +547,13 @@ public class NetContext extends Core{
   		  				ctx.mkEq(ip_functions.get("ipAddr_2").apply(packet_ip), ip_functions.get("ipAddr_2").apply(fwIpRule)),
   		  				ctx.mkEq(ip_functions.get("ipAddr_3").apply(packet_ip), ip_functions.get("ipAddr_3").apply(fwIpRule)),
   		  				ctx.mkOr(ctx.mkEq(ip_functions.get("ipAddr_4").apply(fwIpRule), ip_functions.get("ipAddr_4").apply(am.get("wildcard"))),
-	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(packet_ip), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))))
-    	});
+	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(packet_ip), ip_functions.get("ipAddr_4").apply(am.get("wildcard"))))),
+    		  ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(fwIpRule), ip_functions.get("ipAddr_1").apply(packet_ip)),
+  	  				ctx.mkEq(ip_functions.get("ipAddr_2").apply(fwIpRule), ip_functions.get("ipAddr_2").apply(packet_ip)),
+  	  				ctx.mkEq(ip_functions.get("ipAddr_3").apply(fwIpRule), ip_functions.get("ipAddr_3").apply(packet_ip)),
+  	  				ctx.mkEq(ip_functions.get("ipAddr_4").apply(fwIpRule), ip_functions.get("ipAddr_4").apply(packet_ip)))
+
+    	}); 
         /*return ctx.mkAnd(new BoolExpr[]{
                 ctx.mkOr(
                 		ctx.mkEq(ip_functions.get("ipAddr_1").apply(packet_ip), ip_functions.get("ipAddr_1").apply(fwIpRule)),
@@ -593,7 +599,11 @@ public class NetContext extends Core{
     		  				ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip2), ip_functions.get("ipAddr_2").apply(ip1)),
     		  				ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip2), ip_functions.get("ipAddr_3").apply(ip1)),
     		  				ctx.mkOr(ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(am.get("wildcard"))),
-  	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip2), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))))
+  	    	    					ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip2), ip_functions.get("ipAddr_4").apply(am.get("wildcard"))))),
+      		ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip2), ip_functions.get("ipAddr_1").apply(ip1)),
+	  				ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip2), ip_functions.get("ipAddr_2").apply(ip1)),
+	  				ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip2), ip_functions.get("ipAddr_3").apply(ip1)),
+	  				ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip2), ip_functions.get("ipAddr_4").apply(ip1)))
       	});
         /*return ctx.mkAnd(new BoolExpr[]{
                 ctx.mkOr(
@@ -647,9 +657,12 @@ public class NetContext extends Core{
      */
     public BoolExpr PacketsHeadersEqual(Expr p1, Expr p2){
         return ctx.mkAnd(new BoolExpr[]{
-                ctx.mkEq(pf.get("src").apply(p1), pf.get("src").apply(p2)),
-                ctx.mkEq(pf.get("dest").apply(p1), pf.get("dest").apply(p2)),
-                ctx.mkEq(pf.get("origin").apply(p1), pf.get("origin").apply(p2)),
+        		equalIp(pf.get("src").apply(p1), pf.get("src").apply(p2)),
+                //ctx.mkEq(pf.get("src").apply(p1), pf.get("src").apply(p2)),
+        		equalIp(pf.get("dest").apply(p1), pf.get("dest").apply(p2)),
+                //ctx.mkEq(pf.get("dest").apply(p1), pf.get("dest").apply(p2)),
+                equalIp(pf.get("origin").apply(p1), pf.get("origin").apply(p2)),
+                //ctx.mkEq(pf.get("origin").apply(p1), pf.get("origin").apply(p2)),
                 ctx.mkEq(pf.get("seq").apply(p1), pf.get("seq").apply(p2)),
                 ctx.mkEq(pf.get("lv4proto").apply(p1), pf.get("lv4proto").apply(p2)),
                 ctx.mkEq(pf.get("src_port").apply(p1),pf.get("src_port").apply(p2)),
@@ -677,11 +690,13 @@ public Function failurePredicate (NetContext context)
 }*/
 
     public BoolExpr destAddrPredicate (Expr p, DatatypeExpr address){
-        return  ctx.mkEq(pf.get("dest").apply(p),address);
+        //return  ctx.mkEq(pf.get("dest").apply(p),address);
+    	return equalIp(pf.get("dest").apply(p), address);
     }
 
     public  BoolExpr srcAddrPredicate (Expr p, DatatypeExpr address){
-        return  ctx.mkEq(pf.get("src").apply(p),address);
+        //return  ctx.mkEq(pf.get("src").apply(p),address);
+    	return equalIp(pf.get("src").apply(p), address);
     }
     
     public boolean inNetwork(String network, String ip){
@@ -693,7 +708,8 @@ public Function failurePredicate (NetContext context)
     			return false;
     		i++;
     	}
-    	return true;
+    	
+    	return true; 
 	}
 
 }

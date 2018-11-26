@@ -64,6 +64,7 @@ public class EndHost extends NetworkObject{
         Expr n_0 = ctx.mkConst("eh_"+node+"_n_0", nctx.node);
         //IntExpr t_0 = ctx.mkIntConst("eh_"+node+"_t_0");
         Expr p_0 = ctx.mkConst("eh_"+node+"_p_0", nctx.packet);
+     
 
         //Constraint1send(node, n_0, p, t_0) -> nodeHasAddr(node,p.src)
         constraints.add(
