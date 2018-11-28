@@ -212,10 +212,10 @@ public class Translator {
 
 		        if(nameToGroup.containsKey(nodeSrcName))
 		        	nodeSrcName = nameToGroup.get(nodeSrcName);
-		        System.out.println(nodeSrcName);
+		        //System.out.println(nodeSrcName);
 		        e.setSource(nodeSrcName);
 		        String nrOfRule = z3Translator.matchNrOfRule(matchSrc);
-		        System.out.println("Nr Of Rule: " + nrOfRule);
+		        //System.out.println("Nr Of Rule: " + nrOfRule);
 		        String nodeDstName = firewallAutoConfigSearchDst(n, nrOfRule);
 		        //System.out.println(nodeDstName);
 		        if(nameToGroup.containsKey(nodeDstName))

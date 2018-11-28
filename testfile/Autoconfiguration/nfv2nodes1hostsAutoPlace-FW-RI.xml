@@ -55,21 +55,5 @@
   <PropertyDefinition>
 		<Property graph="0" name="IsolationProperty" src="a" dst="b"/> 				
   </PropertyDefinition>
-  <Hosts>
-  	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="a"/>
-  	<Host name="host1" cpu="1" cores="4" memory="16" diskStorage="50" maxVNF="5" type="MIDDLEBOX">
-		<SupportedVNF functional_type="FIREWALL"/>
-		<SupportedVNF functional_type="CACHE"/>
-		<SupportedVNF functional_type="ANTISPAM"/>
-		<SupportedVNF functional_type="NAT"/>
-		<SupportedVNF functional_type="DPI"/>
-		<SupportedVNF functional_type="FIELDMODIFIER"/>
-	</Host>
-  	<Host name="hostB" cpu="2" cores="2" memory="4" diskStorage="50" type="SERVER" fixedEndpoint="b"/>
-  </Hosts>
-   <Connections>
-  	<Connection sourceHost="hostA" destHost="host1" avgLatency ="1"/>
-  	<Connection sourceHost="host1" destHost="hostB" avgLatency ="1"/>
-  </Connections>
   <ParsingString></ParsingString>
 </NFV>

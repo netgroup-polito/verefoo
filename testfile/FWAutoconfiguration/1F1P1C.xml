@@ -9,15 +9,23 @@
         </configuration>
       </node>
      
-      <node functional_type="CACHE" name="20.0.0.2">
+      <node functional_type="ANTISPAM" name="20.0.0.2">
         <neighbour name="10.0.0.1"/>
         <neighbour name="20.0.0.3"/>
+        <neighbour name="20.0.0.4"/>
         <configuration description="A simple description" name="conf2">
-          <cache>
-			<resource>10.0.0.1</resource>
-          </cache>
+        
         </configuration>
       </node>
+      
+          <node functional_type="FIREWALL" name="20.0.0.4">
+      	<neighbour name="20.0.0.2"/>
+        <neighbour name="30.0.5.2"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall defaultAction="ALLOW"/>
+        </configuration>
+      </node>
+      
       <node functional_type="FIREWALL" name="20.0.0.3">
       	<neighbour name="20.0.0.2"/>
         <neighbour name="30.0.5.2"/>
@@ -27,6 +35,7 @@
       </node>
       <node functional_type="WEBSERVER" name="30.0.5.2">
         <neighbour name="20.0.0.3"/>
+          <neighbour name="20.0.0.4"/>
         <configuration description="A simple description" name="confB">
           <webserver>
           	<name>30.0.5.2</name>
@@ -41,7 +50,6 @@
   </Constraints>
   <PropertyDefinition>
   		<Property graph="0" name="IsolationProperty" src="10.0.0.1" dst="30.0.5.2"/> 		
-  	
   </PropertyDefinition>
   <ParsingString></ParsingString>
 </NFV>

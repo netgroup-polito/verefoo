@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import it.polito.verifoo.rest.autoconfiguration.FWAutoconfigurationManager;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.Path;
@@ -24,6 +25,7 @@ public class LinkCreator {
 	private List<Link> links = new ArrayList<>();
 	private List<Node> nodes;
 	private List<Path> paths;
+	private FWAutoconfigurationManager FWmanager;
 	private Map<Integer, List<Link>> pathMap = new HashMap<>();
 	/**
 	 * 
@@ -31,6 +33,16 @@ public class LinkCreator {
 	 */
 	public LinkCreator(List<Node> ns){
 		nodes = ns;
+		FWmanager = null;
+	}
+	/**
+	 * 
+	 * @param ns the list of the nodes in the network service
+	 * @param FWmanager the class to manage firewall autoconfiguration
+	 */
+	public LinkCreator(List<Node> ns, FWAutoconfigurationManager FWmanager){
+		nodes = ns;
+		this.FWmanager = FWmanager;
 	}
 	/**
 	 * 
@@ -126,6 +138,10 @@ public class LinkCreator {
 					links.add(l);
 					converted.add(current.getName());
 					found = true;
+					
+					if(current.getFunctionalType()== FunctionalTypes.FIREWALL && current.getConfiguration().getFirewall().getElements().isEmpty() && FWmanager != null) {
+						FWmanager.setPolicy(current, client, server);
+					}
 				}
 				else{
 					//logger.debug("Neighbour from " + current.getName() + " (" + neighbour +") don't reach the server " + server.getName());

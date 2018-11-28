@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import it.polito.verifoo.rest.autoconfiguration.FWAutoconfigurationManager;
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.Path;
@@ -16,12 +17,14 @@ public class LinkProvider {
 	private List<Link> links;
 	private List<Node> nodes;
 	private List<Path> paths;
+	private FWAutoconfigurationManager FWmanager;
 	private int lastPathId = -1, lastNodeIndex = -1; 
 	
-	public LinkProvider(List<Node> ns, List<Path> ps){
+	public LinkProvider(List<Node> ns, List<Path> ps, FWAutoconfigurationManager FWmanager){
 		nodes = ns;
 		paths = ps;
-		links = (new LinkCreator(ns)).getLinks();
+		this.FWmanager = FWmanager;
+		links = (new LinkCreator(ns, this.FWmanager)).getLinks();
 	}
 	/**
 	 * Get all the links between the nodes (based on the neighbours indications)

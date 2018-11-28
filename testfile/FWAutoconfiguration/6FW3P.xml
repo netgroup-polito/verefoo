@@ -3,7 +3,7 @@
 	xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
 	<graphs>
 		<graph id="0">
-			<node functional_type="WEBCLIENT" name="11.0.0.1">
+			<node functional_type="WEBCLIENT" name="10.0.0.1">
 				<neighbour name="20.0.0.1" />
 				<configuration description="A simple description"
 					name="confA">
@@ -11,8 +11,16 @@
 				</configuration>
 			</node>
 			
-			<node functional_type="WEBCLIENT" name="10.0.0.1">
+			<node functional_type="WEBCLIENT" name="11.0.0.2">
 				<neighbour name="20.0.0.2" />
+				<configuration description="A simple description"
+					name="conf1">
+					<webclient nameWebServer="30.0.5.2" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="10.0.0.3">
+				<neighbour name="20.0.0.4" />
 				<configuration description="A simple description"
 					name="conf1">
 					<webclient nameWebServer="30.0.5.2" />
@@ -20,8 +28,7 @@
 			</node>
 
 			<node functional_type="FIREWALL" name="20.0.0.1">
-				<neighbour name="11.0.0.1" />
-			
+				<neighbour name="10.0.0.1" />
 				<neighbour name="20.0.0.3" />
 				
 				<configuration description="A simple description"
@@ -30,28 +37,52 @@
 				</configuration>
 			</node>
 			<node functional_type="FIREWALL" name="20.0.0.2">
-				<neighbour name="10.0.0.1" />
+				<neighbour name="11.0.0.2" />
 				<neighbour name="20.0.0.3" />
-			
-				
 				<configuration description="A simple description"
 					name="conf1">
 					<firewall defaultAction="ALLOW" />
 				</configuration>
 			</node>
-			
 
 			<node functional_type="FIREWALL" name="20.0.0.3">
-				<neighbour name="30.0.5.2" />
+				<neighbour name="20.0.0.6" />
 				<neighbour name="20.0.0.1" />
 				<neighbour name="20.0.0.2" />
-
-				
 				<configuration description="A simple description"
 					name="conf1">
 					<firewall defaultAction="ALLOW" />
 				</configuration>
 			</node>
+			
+			<node functional_type="FIREWALL" name="20.0.0.4">
+				<neighbour name="10.0.0.3" />
+				<neighbour name="20.0.0.5" />
+				<configuration description="A simple description"
+					name="conf1">
+					<firewall defaultAction="ALLOW" />
+				</configuration>
+			</node>
+			
+			<node functional_type="FIREWALL" name="20.0.0.5">
+				<neighbour name="20.0.0.4" />
+				<neighbour name="20.0.0.6" />
+				<configuration description="A simple description"
+					name="conf1">
+					<firewall defaultAction="ALLOW" />
+				</configuration>
+			</node>
+			
+			<node functional_type="FIREWALL" name="20.0.0.6">
+				<neighbour name="30.0.5.2" />
+				<neighbour name="20.0.0.5" />
+				<neighbour name="20.0.0.3" />
+				<configuration description="A simple description"
+					name="conf1">
+					<firewall defaultAction="ALLOW" />
+				</configuration>
+			</node>
+			
 			<node functional_type="WEBSERVER" name="30.0.5.2">
 				<neighbour name="20.0.0.3" />
 				<configuration description="A simple description"
@@ -68,10 +99,13 @@
 		<LinkConstraints />
 	</Constraints>
 	<PropertyDefinition>
-		<Property graph="0" name="ReachabilityProperty" src="11.0.0.1"
+		<Property graph="0" name="IsolationProperty" src="10.0.0.1"
 			dst="30.0.5.2" />
-			<Property graph="0" name="ReachabilityProperty" src="10.0.0.1"
+		<Property graph="0" name="ReachabilityProperty" src="11.0.0.2"
 			dst="30.0.5.2" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.3"
+			dst="30.0.5.2" />
+		
 
 	</PropertyDefinition>
 	<ParsingString></ParsingString>

@@ -17,6 +17,8 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.Status;
 import it.polito.verifoo.components.RoutingTable;
+import it.polito.verifoo.rest.autoconfiguration.FWAutoconfigurationManager;
+import it.polito.verifoo.rest.autoconfiguration.WildcardManager;
 import it.polito.verifoo.rest.jaxb.*;
 import it.polito.verifoo.rest.jaxb.LinkConstraints.LinkMetrics;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
@@ -33,6 +35,8 @@ public class VerifooProxy {
 	    private Network net;
 	    private AutoContext autoctx;
 	    private NodeNetworkObject netobjs;
+	    private WildcardManager wildcardManager;
+	    private FWAutoconfigurationManager FWmanager;
 	    private HashMap<Node,List<String>> rawDeploymentConditions;
 	    private HashMap<Node,List<String>> rawRoutingConditions;
 	    private HashMap<Node, HashMap<String, BoolExpr>> conditionDB;
@@ -81,8 +85,10 @@ public class VerifooProxy {
 			nctx = NetContextGenerator.generate(ctx,nodes,prop);
 			autoctx = new AutoContext(ctx);
 			net = new Network (ctx,new Object[]{nctx});
+			wildcardManager = new WildcardManager(nodes);
+			FWmanager = new FWAutoconfigurationManager(wildcardManager, prop, nodes);
 			/* Generate the different network object and map it to XML Node */
-			netobjs=new NodeNetworkObject(ctx, nctx, autoctx, net,nodes, prop.size(), nodeMetrics, prop);
+			netobjs=new NodeNetworkObject(ctx, nctx, autoctx, net,nodes, prop.size(), nodeMetrics, prop, FWmanager);
 			
 			AddressMapping adm = new AddressMapping(netobjs, nctx, net);
 			adm.setAddressMappings(nodes);
@@ -103,6 +109,7 @@ public class VerifooProxy {
 			if(this.hosts.size() != 0)
 				checkPhysicalNetwork();
 		    checkNffg();	
+		    FWmanager.minimizeRules();
 		    netobjs.generateVPN();
 		    netobjs.attachToNet();
 		    if(this.hosts.size() != 0)
@@ -362,7 +369,7 @@ public class VerifooProxy {
     
             try{
 				//links = (new LinkCreator(nodes)).getLinks();
-            	linkProvider = new LinkProvider(nodes, paths);
+            	linkProvider = new LinkProvider(nodes, paths, FWmanager);
 				//logger.debug("Links created");
 				//createInternalRouting(clients, servers);
 				List<List<String>> validChain = new ArrayList<>();

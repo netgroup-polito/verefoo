@@ -2,150 +2,86 @@
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./xsd/nfvSchema.xsd">
     <graphs>
         <graph id="0">
-            <node name="nodeA" functional_type="ENDHOST">
-                <neighbour name="node1"/>
-                <neighbour name="node2"/>
+            <node name="10.0.0.1" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.1"/>
                 <configuration name="confA" description="A simple description">
-                    <endhost protocol="POP3_REQUEST" email_from="1"/>
+                    <webclient nameWebServer="30.0.5.2"/>
                 </configuration>
             </node>
-            <node name="nodeC" functional_type="ENDHOST">
-                <neighbour name="node1"/>
-                <neighbour name="node2"/>
-                <configuration name="confA" description="A simple description">
-                    <endhost protocol="POP3_REQUEST" email_from="2"/>
-                </configuration>
-            </node>
-            <node name="node1" functional_type="ANTISPAM">
-                <neighbour name="nodeA"/>
-                <neighbour name="nodeC"/>
-                <neighbour name="node2"/>
+            <node name="11.0.0.2" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.2"/>
                 <configuration name="conf1" description="A simple description">
-                    <antispam/>
+                    <webclient nameWebServer="30.0.5.2"/>
                 </configuration>
             </node>
-            <node name="node2" functional_type="NAT">
-                <neighbour name="nodeA"/>
-                <neighbour name="nodeC"/>
-                <neighbour name="node1"/>
-                <neighbour name="node3"/>
-                <neighbour name="nodeB"/>
-                <configuration name="conf2" description="A simple description">
-                    <nat>
-                        <source>nodeA</source>
-                        <source>nodeC</source>
-                    </nat>
-                </configuration>
-            </node>
-            <node name="node3" functional_type="ANTISPAM">
-                <neighbour name="node2"/>
-                <neighbour name="nodeB"/>
+            <node name="10.0.0.3" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.4"/>
                 <configuration name="conf1" description="A simple description">
-                    <antispam/>
+                    <webclient nameWebServer="30.0.5.2"/>
                 </configuration>
             </node>
-            <node name="nodeB" functional_type="WEBSERVER">
-                <neighbour name="node2"/>
-                <neighbour name="node3"/>
+            <node name="20.0.0.1" functional_type="FIREWALL">
+                <neighbour name="10.0.0.1"/>
+                <neighbour name="20.0.0.3"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall defaultAction="ALLOW"/>
+                </configuration>
+            </node>
+            <node name="20.0.0.2" functional_type="FIREWALL">
+                <neighbour name="11.0.0.2"/>
+                <neighbour name="20.0.0.3"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall defaultAction="ALLOW"/>
+                </configuration>
+            </node>
+            <node name="20.0.0.3" functional_type="FIREWALL">
+                <neighbour name="20.0.0.6"/>
+                <neighbour name="20.0.0.1"/>
+                <neighbour name="20.0.0.2"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall defaultAction="ALLOW"/>
+                </configuration>
+            </node>
+            <node name="20.0.0.4" functional_type="FIREWALL">
+                <neighbour name="10.0.0.3"/>
+                <neighbour name="20.0.0.5"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall defaultAction="ALLOW"/>
+                </configuration>
+            </node>
+            <node name="20.0.0.5" functional_type="FIREWALL">
+                <neighbour name="20.0.0.4"/>
+                <neighbour name="20.0.0.6"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall defaultAction="ALLOW"/>
+                </configuration>
+            </node>
+            <node name="20.0.0.6" functional_type="FIREWALL">
+                <neighbour name="30.0.5.2"/>
+                <neighbour name="20.0.0.5"/>
+                <neighbour name="20.0.0.3"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall defaultAction="ALLOW"/>
+                </configuration>
+            </node>
+            <node name="30.0.5.2" functional_type="WEBSERVER">
+                <neighbour name="20.0.0.3"/>
                 <configuration name="confB" description="A simple description">
                     <webserver>
-                        <name>nodeB</name>
+                        <name>30.0.5.2</name>
                     </webserver>
                 </configuration>
             </node>
         </graph>
     </graphs>
     <Constraints>
-        <NodeConstraints>
-            <NodeMetrics node="node1" optional="true"/>
-            <NodeMetrics node="node3" optional="true"/>
-        </NodeConstraints>
+        <NodeConstraints/>
         <LinkConstraints/>
     </Constraints>
     <PropertyDefinition>
-        <Property name="ReachabilityProperty" graph="0" src="nodeA" dst="nodeB"/>
-        <Property name="ReachabilityProperty" graph="0" src="nodeC" dst="nodeB"/>
+        <Property name="IsolationProperty" graph="0" src="10.0.0.1" dst="30.0.5.2"/>
+        <Property name="ReachabilityProperty" graph="0" src="11.0.0.2" dst="30.0.5.2"/>
+        <Property name="IsolationProperty" graph="0" src="10.0.0.3" dst="30.0.5.2"/>
     </PropertyDefinition>
-    <Hosts>
-        <Host name="hostA" cpu="2" cores="2" diskStorage="10" memory="4" type="CLIENT" fixedEndpoint="nodeA"/>
-        <Host name="hostC" cpu="2" cores="2" diskStorage="10" memory="4" type="CLIENT" fixedEndpoint="nodeC"/>
-        <Host name="host1" cpu="1" cores="4" diskStorage="50" memory="16" maxVNF="4" type="MIDDLEBOX">
-            <SupportedVNF functional_type="FIREWALL"/>
-            <SupportedVNF functional_type="CACHE"/>
-            <SupportedVNF functional_type="ANTISPAM"/>
-            <SupportedVNF functional_type="NAT"/>
-            <SupportedVNF functional_type="DPI"/>
-            <SupportedVNF functional_type="FIELDMODIFIER"/>
-        </Host>
-        <Host name="host2" cpu="3" cores="8" diskStorage="50" memory="16" maxVNF="4" type="MIDDLEBOX">
-            <SupportedVNF functional_type="FIREWALL"/>
-            <SupportedVNF functional_type="CACHE"/>
-            <SupportedVNF functional_type="ANTISPAM"/>
-            <SupportedVNF functional_type="NAT"/>
-            <SupportedVNF functional_type="DPI"/>
-            <SupportedVNF functional_type="FIELDMODIFIER"/>
-        </Host>
-        <Host name="host3" cpu="4" cores="4" diskStorage="50" memory="16" maxVNF="4" type="MIDDLEBOX">
-            <SupportedVNF functional_type="FIREWALL"/>
-            <SupportedVNF functional_type="CACHE"/>
-            <SupportedVNF functional_type="ANTISPAM"/>
-            <SupportedVNF functional_type="NAT"/>
-            <SupportedVNF functional_type="DPI"/>
-            <SupportedVNF functional_type="FIELDMODIFIER"/>
-        </Host>
-        <Host name="host4" cpu="4" cores="4" diskStorage="50" memory="16" maxVNF="4" type="MIDDLEBOX">
-            <SupportedVNF functional_type="FIREWALL"/>
-            <SupportedVNF functional_type="CACHE"/>
-            <SupportedVNF functional_type="FIELDMODIFIER"/>
-        </Host>
-        <Host name="host5" cpu="4" cores="4" diskStorage="50" memory="16" maxVNF="4" type="MIDDLEBOX">
-            <SupportedVNF functional_type="FIREWALL"/>
-            <SupportedVNF functional_type="CACHE"/>
-            <SupportedVNF functional_type="ANTISPAM"/>
-            <SupportedVNF functional_type="NAT"/>
-            <SupportedVNF functional_type="DPI"/>
-            <SupportedVNF functional_type="FIELDMODIFIER"/>
-        </Host>
-        <Host name="host6" cpu="4" cores="4" diskStorage="50" memory="16" maxVNF="4" type="MIDDLEBOX">
-            <SupportedVNF functional_type="FIREWALL"/>
-            <SupportedVNF functional_type="CACHE"/>
-            <SupportedVNF functional_type="ANTISPAM"/>
-            <SupportedVNF functional_type="NAT"/>
-            <SupportedVNF functional_type="DPI"/>
-            <SupportedVNF functional_type="FIELDMODIFIER"/>
-        </Host>
-        <Host name="host7" cpu="4" cores="4" diskStorage="50" memory="16" maxVNF="4" type="MIDDLEBOX">
-            <SupportedVNF functional_type="FIREWALL"/>
-            <SupportedVNF functional_type="CACHE"/>
-            <SupportedVNF functional_type="ANTISPAM"/>
-            <SupportedVNF functional_type="NAT"/>
-            <SupportedVNF functional_type="DPI"/>
-            <SupportedVNF functional_type="FIELDMODIFIER"/>
-        </Host>
-        <Host name="hostB" cpu="2" cores="2" diskStorage="50" memory="4" type="SERVER" fixedEndpoint="nodeB"/>
-    </Hosts>
-    <Connections>
-        <Connection sourceHost="hostA" destHost="host1" avgLatency="1"/>
-        <Connection sourceHost="hostC" destHost="host1" avgLatency="1"/>
-        <Connection sourceHost="hostA" destHost="host2" avgLatency="100"/>
-        <Connection sourceHost="hostC" destHost="host2" avgLatency="100"/>
-        <Connection sourceHost="host1" destHost="host2" avgLatency="1"/>
-        <Connection sourceHost="host1" destHost="host3" avgLatency="1"/>
-        <Connection sourceHost="host1" destHost="host4" avgLatency="1000"/>
-        <Connection sourceHost="host2" destHost="host1" avgLatency="1"/>
-        <Connection sourceHost="host2" destHost="host3" avgLatency="1"/>
-        <Connection sourceHost="host2" destHost="host4" avgLatency="1"/>
-        <Connection sourceHost="host2" destHost="host6" avgLatency="1"/>
-        <Connection sourceHost="host2" destHost="hostB" avgLatency="100"/>
-        <Connection sourceHost="host3" destHost="host2" avgLatency="1"/>
-        <Connection sourceHost="host3" destHost="host4" avgLatency="1"/>
-        <Connection sourceHost="host3" destHost="host5" avgLatency="1"/>
-        <Connection sourceHost="host3" destHost="hostB" avgLatency="1"/>
-        <Connection sourceHost="host4" destHost="host5" avgLatency="1"/>
-        <Connection sourceHost="host4" destHost="host7" avgLatency="1"/>
-        <Connection sourceHost="host5" destHost="host6" avgLatency="1"/>
-        <Connection sourceHost="host6" destHost="host7" avgLatency="1"/>
-        <Connection sourceHost="host7" destHost="hostB" avgLatency="1"/>
-    </Connections>
     <ParsingString></ParsingString>
 </NFV>

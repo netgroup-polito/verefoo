@@ -10,6 +10,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
+
+import it.polito.verifoo.rest.autoconfiguration.FWAutoconfigurationManager;
 import it.polito.verifoo.rest.jaxb.ActionTypes;
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
@@ -34,6 +36,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
     private NetContext nctx;
 	private AutoContext autoctx;
     private Network net;
+    private FWAutoconfigurationManager FWmanager;
 	private int nRules, nIsolationProp, nReachabilityProp;
 	private List<NodeMetrics> nodeMetrics;
 	private List<Property> properties;
@@ -50,7 +53,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 	 * @param properties list of policies
 	 */
     public NodeNetworkObject(Context ctx, NetContext nctx, AutoContext autoctx, Network net, 
-    		List<Node> nodes, int nRules, List<NodeMetrics> nodeMetrics, List<Property> properties) {
+    		List<Node> nodes, int nRules, List<NodeMetrics> nodeMetrics, List<Property> properties, FWAutoconfigurationManager FWmanager) {
 		super();
 		this.ctx = ctx;
 		this.nctx = nctx;
@@ -59,6 +62,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 		this.nRules = nRules;
 		this.nodeMetrics = nodeMetrics;
 		this.properties = properties;
+		this.FWmanager = FWmanager;
 		nIsolationProp = (int) properties.stream().filter(p -> p.getName().equals(PName.ISOLATION_PROPERTY)).count();
 		nReachabilityProp = (int) properties.stream().filter(p -> p.getName().equals(PName.REACHABILITY_PROPERTY)).count();
 		this.nodes = nodes;
@@ -197,6 +201,7 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 						boolean defaultAction;
 						if(n.getConfiguration().getFirewall().getDefaultAction() == null){
 							//more conservative approach
+							n.getConfiguration().getFirewall().setDefaultAction(ActionTypes.DENY);
 							defaultAction = false;
 						}else{
 							defaultAction = n.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW);
@@ -211,6 +216,8 @@ public class NodeNetworkObject extends HashMap<Node, NetworkObject>{
 							//System.out.println("Autoconfiguration for " + n.getName());
 							fw = new AclFirewall(ctx,new Object[]{nctx.nm.get(n.getName()),net,nctx,defaultAction,neighbours, nRules});
 						}
+						
+						FWmanager.addFirewall(fw, n);
 						
 					}
 					else{

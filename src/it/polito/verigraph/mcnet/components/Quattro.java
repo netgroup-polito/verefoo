@@ -26,10 +26,10 @@ package it.polito.verigraph.mcnet.components;
  *@author Giacomo Costantini
  */
 public class Quattro<T, U, V, X> {
-	  public final T _1;
-	  public final U _2;
-	  public final V _3;
-	  public final X _4;
+	  public T _1;
+	  public U _2;
+	  public V _3;
+	  public X _4;
 
 	 
 	  public Quattro(T arg1,U arg2, V arg3,X arg4) {

@@ -86,7 +86,7 @@ public class AclFirewall extends NetworkObject{
 				autoplace = false;
 			}
 			autoconf = true; 
-			firewallSendRules((Integer) args[0][5]);
+			//firewallSendRules((Integer) args[0][5]);
 	    }
 		else{
 			autoplace = false;
@@ -203,7 +203,7 @@ public class AclFirewall extends NetworkObject{
     	  
     }
     
-    private void firewallSendRules(Integer nRules) {
+    public void firewallSendRules(Integer nRules) {
     	if(autoplace)
     		firewallSendRulesAutoPlacement(nRules);
     	else
