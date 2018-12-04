@@ -151,7 +151,7 @@ public class TestFirmatoFW {
 			assertTrue(autoNodes.size() == 1);
 			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
 			assertTrue(e.size() == 1);
-			assertTrue(e.get(0).getSource().equals("10.0.0.-1"));
+			assertTrue(e.get(0).getSource().equals("-1.-1.-1.-1"));
 		} catch (Exception e) {
 			fail(e.toString());
 		}

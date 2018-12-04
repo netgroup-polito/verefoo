@@ -27,7 +27,7 @@
 				</configuration>
 			</node>
 			
-			<node functional_type="WEBCLIENT" name="10.0.0.3">
+			<node functional_type="WEBCLIENT" name="10.0.0.4">
 				<neighbour name="20.0.0.3" />
 				<configuration description="A simple description"
 					name="conf1">

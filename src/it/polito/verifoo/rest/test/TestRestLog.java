@@ -17,8 +17,8 @@ import org.junit.Test;
  *
  */
 public class TestRestLog {
-	//private static String service="http://127.0.0.1:8080/verifoo/log";
-	private static String service = System.getProperty("it.polito.rest.test.URL")+"/log";
+	private static String service="http://127.0.0.1:8080/verifoo/log";
+	//private static String service = System.getProperty("it.polito.rest.test.URL")+"/log";
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {

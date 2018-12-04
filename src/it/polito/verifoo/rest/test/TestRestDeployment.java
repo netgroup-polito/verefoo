@@ -26,8 +26,8 @@ import it.polito.verifoo.rest.jaxb.EType;
  *
  */
 public class TestRestDeployment {
-	//private static String service="http://127.0.0.1:8080/verifoo/deployment";
-	private static String service = System.getProperty("it.polito.rest.test.URL")+"/deployment";
+	private static String service="http://127.0.0.1:8080/verifoo/deployment";
+	//private static String service = System.getProperty("it.polito.rest.test.URL")+"/deployment";
 
 	/**
 	 * @throws java.lang.Exception

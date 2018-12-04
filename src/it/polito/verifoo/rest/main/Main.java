@@ -29,7 +29,7 @@ public class Main {
         Logger logger = LogManager.getLogger("mylog");
 		try {
 			
-				System.out.println(System.getProperty("java.library.path"));
+				//System.out.println(System.getProperty("java.library.path"));
 				JAXBContext jc;
 	                // create a JAXBContext capable of handling the generated classes
 				synchronized(logger){

@@ -276,7 +276,6 @@ public class NetContext extends Core{
             	else if(new_addr[i].equals("wildcard")){
             		constraints.add(equalIpToIntArray(fd, getIpFromString("-1.-1.-1.-1")));
             	} else{
-            		System.out.println("uhm");
             		//251 is a prime number, to reduce collisions
             		int symbolicAddr = Math.abs(new_addr[i].hashCode()%251);
             		constraints.add(equalIpToIntArray(fd, getIpFromString(symbolicAddr + "." + symbolicAddr + "." + symbolicAddr + "." + symbolicAddr)));

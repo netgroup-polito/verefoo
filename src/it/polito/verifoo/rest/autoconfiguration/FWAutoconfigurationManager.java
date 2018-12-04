@@ -92,9 +92,10 @@ public class FWAutoconfigurationManager {
 				if(!policies.isEmpty()) {
 					List<String> destinations = policies.stream().map(p -> p.getDst()).distinct().collect(Collectors.toList());
 					for(String destination : destinations) {
-						Set<String> interestedSRC = interestedPolicies.stream().filter(p -> p.getDst() == destination).map(p -> p.getSrc()).distinct().collect(Collectors.toSet());
-						Set<String> notInterestedSRC = allPolicies.stream().filter(p -> p.getDst() != destination).map(p -> p.getSrc()).distinct().collect(Collectors.toSet());
-						if(wildcardManager.areAggregable(interestedSRC, notInterestedSRC)) {
+						Set<String> interestedSRC = interestedPolicies.stream().filter(p -> p.getDst().equals(destination)).map(p -> p.getSrc()).distinct().collect(Collectors.toSet());
+						Set<String> notInterestedSRC = allPolicies.stream().filter(p -> ! p.getDst().equals(destination)).map(p -> p.getSrc()).distinct().collect(Collectors.toSet());
+						
+						if(!interestedSRC.isEmpty() && wildcardManager.areAggregable(interestedSRC, notInterestedSRC)) {
 							value._3 -= interestedSRC.size();
 							value._3 += 1;
 						}

@@ -48,8 +48,8 @@ public class TestRestConcurrency {
 	@Test
     @ThreadCount(THREAD_COUNT)
 	public void TestConcurrentRequest() throws IOException {
-		//String service="http://127.0.0.1:8080/verifoo/deployment";
-		String service = System.getProperty("it.polito.rest.test.URL")+"/deployment";
+		String service="http://127.0.0.1:8080/verifoo/deployment";
+		//String service = System.getProperty("it.polito.rest.test.URL")+"/deployment";
 		String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/nfv3nodes3hostsSAT-MAIL.xml")).collect(Collectors.joining("\n"));
 		javax.ws.rs.core.Response res=ClientBuilder.newClient()
 			.target(service)

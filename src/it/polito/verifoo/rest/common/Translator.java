@@ -90,7 +90,7 @@ public class Translator {
 		while (matcherDst.find()) {
 	        String matchDst = matcherDst.group();
 	        String dstRule = z3Translator.matchComplexAttribute(matchDst, z3Translator.Datatype.ip_constructor);
-	        System.out.println("///DstRule " + dstRule + "////");
+	        //System.out.println("///DstRule " + dstRule + "////");
 	        tosearch=z3Translator.stringToSearchAddress(dstRule);
 			Pattern patternNodeDst = Pattern.compile(tosearch);
 			Matcher matcherNodeDst = patternNodeDst.matcher(model);
@@ -100,7 +100,7 @@ public class Translator {
 		        String match = matcherNodeDst.group();
 		        String nodeDst = z3Translator.matchNodeName(match);
 		        if(nodes.contains(nodeDst)){
-		        	System.out.println("Found dest node " + nodeDst + " with address " + dstRule);
+		        	//System.out.println("Found dest node " + nodeDst + " with address " + dstRule);
 		        	nodeDstName = nodeDst;
 		        	dstFound = true;
 		        	break;
