@@ -20,8 +20,12 @@ public class WildcardManager {
 	private HashMap<String, HashSet<String>> wildcardLevel3;
 	private HashMap<String, HashSet<String>> wildcardLevel4;
 	
+	private boolean nodesWithIPAddresses;
+	
 	
 	public WildcardManager(List<Node> nodes) {
+		
+		nodesWithIPAddresses = true;
 		String addresses[] = {}; 
 		addresses = nodes.stream().map((n)->n.getName()).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(addresses);
 		
@@ -29,9 +33,16 @@ public class WildcardManager {
 		wildcardLevel2 = new HashMap<String, HashSet<String>>();
 		wildcardLevel3 = new HashMap<String, HashSet<String>>();
 		wildcardLevel4 = new HashMap<String, HashSet<String>>();
+		
+		
 		for(String address : addresses) {
 			
 			String[] parts = address.split("\\.");
+			
+			if(parts.length != 4) {
+				nodesWithIPAddresses = false;
+				return;
+			}
 			
 			if(wildcardLevel1.containsKey("-1.-1.-1.-1")) {
 				wildcardLevel1.get("-1.-1.-1.-1").add(address);
@@ -99,6 +110,10 @@ public class WildcardManager {
 		}
 		
 		return false;
+	}
+	
+	public boolean areNodesWithIPAddresses() {
+		return nodesWithIPAddresses;
 	}
 
 }

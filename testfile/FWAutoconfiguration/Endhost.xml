@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
+  <graphs>
+    <graph id="0">
+     <node functional_type="ENDHOST" name="10.0.0.1">
+        <neighbour name="20.0.0.3"/>
+        <configuration description="A simple description" name="confA">
+          <endhost body="test1"/>
+        </configuration>
+      </node>
+      <node functional_type="ENDHOST" name="10.0.1.2">
+        <neighbour name="20.0.0.3"/>
+        <configuration description="A simple description" name="confA">
+         <endhost body="test1"/>
+        </configuration>
+      </node>
+      <node functional_type="FIREWALL" name="20.0.0.3">
+      	<neighbour name="10.0.0.1"/>
+      	<neighbour name="10.0.1.2"/>
+        <neighbour name="30.0.5.2"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall defaultAction="ALLOW"/>
+        </configuration>
+      </node>
+      <node functional_type="ENDHOST" name="30.0.5.2">
+        <neighbour name="20.0.0.3"/>
+        <configuration description="A simple description" name="confB">
+         <endhost body="test1"/>
+        </configuration>
+      </node>
+    </graph>
+  </graphs>
+  <Constraints>
+	  <NodeConstraints/>
+	  <LinkConstraints/>
+  </Constraints>
+  <PropertyDefinition>
+  		<Property graph="0" name="IsolationProperty" src="10.0.0.1" dst="30.0.5.2"/> 		
+  		<Property graph="0" name="ReachabilityProperty" src="10.0.1.2" dst="30.0.5.2"/> 		
+  
+  </PropertyDefinition>
+  <ParsingString></ParsingString>
+</NFV>

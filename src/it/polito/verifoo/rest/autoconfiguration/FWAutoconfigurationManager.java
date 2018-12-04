@@ -65,42 +65,54 @@ public class FWAutoconfigurationManager {
 	
 	public void minimizeRules() {
 		
-		for(Map.Entry<String, Quattro<AclFirewall, Node, Integer, Boolean>> entry : autoconfFW.entrySet()) {
-			String key = entry.getKey();
-			Quattro<AclFirewall, Node, Integer, Boolean> value = entry.getValue();
-			
-			if(value._2.getNeighbour().size() == 2) {
-				List<Neighbour> neighbours = value._2.getNeighbour();
-				
+		if(wildcardManager.areNodesWithIPAddresses()) {
+			for(Map.Entry<String, Quattro<AclFirewall, Node, Integer, Boolean>> entry : autoconfFW.entrySet()) {
+				String key = entry.getKey();
+				Quattro<AclFirewall, Node, Integer, Boolean> value = entry.getValue();
 
-				Node n0 = nodes.stream().filter(n -> n.getName().equals(neighbours.get(0).getName())).findFirst().get();
-				Node n1 = nodes.stream().filter(n -> n.getName().equals(neighbours.get(1).getName())).findFirst().get();
-			
-				if((n0.getFunctionalType() == FunctionalTypes.FIREWALL && n1.getFunctionalType() == FunctionalTypes.FIREWALL) ||
-						(n0.getFunctionalType() == FunctionalTypes.FIREWALL && (n1.getFunctionalType() == FunctionalTypes.WEBSERVER || n1.getFunctionalType() == FunctionalTypes.MAILSERVER)) ||
-						(n1.getFunctionalType() == FunctionalTypes.FIREWALL && (n0.getFunctionalType() == FunctionalTypes.WEBSERVER || n0.getFunctionalType() == FunctionalTypes.MAILSERVER))) {
-					value._3 = 0;
-					value._1.firewallSendRules(value._3);
-					continue;
-				}
-			} 
-			
+				if(value._2.getNeighbour().size() == 2) {
+					List<Neighbour> neighbours = value._2.getNeighbour();
+					
+
+					Node n0 = nodes.stream().filter(n -> n.getName().equals(neighbours.get(0).getName())).findFirst().get();
+					Node n1 = nodes.stream().filter(n -> n.getName().equals(neighbours.get(1).getName())).findFirst().get();
 				
-			List<Property> interestedPolicies = FWInterestedPolicies.get(value._2.getName());
-			List<Property> allPolicies = FWAllPolicies.get(value._2.getName());
-			if(!policies.isEmpty()) {
-				List<String> destinations = policies.stream().map(p -> p.getDst()).distinct().collect(Collectors.toList());
-				for(String destination : destinations) {
-					Set<String> interestedSRC = interestedPolicies.stream().filter(p -> p.getDst() == destination).map(p -> p.getSrc()).distinct().collect(Collectors.toSet());
-					Set<String> notInterestedSRC = allPolicies.stream().filter(p -> p.getDst() != destination).map(p -> p.getSrc()).distinct().collect(Collectors.toSet());
-					if(wildcardManager.areAggregable(interestedSRC, notInterestedSRC)) {
-						value._3 = 1;
+					if((n0.getFunctionalType() == FunctionalTypes.FIREWALL && n1.getFunctionalType() == FunctionalTypes.FIREWALL) ||
+							(n0.getFunctionalType() == FunctionalTypes.FIREWALL && (n1.getFunctionalType() == FunctionalTypes.WEBSERVER || n1.getFunctionalType() == FunctionalTypes.MAILSERVER)) ||
+							(n1.getFunctionalType() == FunctionalTypes.FIREWALL && (n0.getFunctionalType() == FunctionalTypes.WEBSERVER || n0.getFunctionalType() == FunctionalTypes.MAILSERVER))) {
+						value._3 = 0;
+						value._1.firewallSendRules(value._3);
+						continue;
+					}
+				} 
+				
+					
+				List<Property> interestedPolicies = FWInterestedPolicies.get(value._2.getName());
+				List<Property> allPolicies = FWAllPolicies.get(value._2.getName());
+				if(!policies.isEmpty()) {
+					List<String> destinations = policies.stream().map(p -> p.getDst()).distinct().collect(Collectors.toList());
+					for(String destination : destinations) {
+						Set<String> interestedSRC = interestedPolicies.stream().filter(p -> p.getDst() == destination).map(p -> p.getSrc()).distinct().collect(Collectors.toSet());
+						Set<String> notInterestedSRC = allPolicies.stream().filter(p -> p.getDst() != destination).map(p -> p.getSrc()).distinct().collect(Collectors.toSet());
+						if(wildcardManager.areAggregable(interestedSRC, notInterestedSRC)) {
+							value._3 -= interestedSRC.size();
+							value._3 += 1;
+						}
 					}
 				}
+				
+				value._1.firewallSendRules(value._3); //creation of Z3 formulas for autoconfiguration firewall
 			}
 			
-			value._1.firewallSendRules(value._3); //creation of Z3 formulas for autoconfiguration firewall
+		} else {
+			
+			for(Map.Entry<String, Quattro<AclFirewall, Node, Integer, Boolean>> entry : autoconfFW.entrySet()) {
+				Quattro<AclFirewall, Node, Integer, Boolean> value = entry.getValue();
+				value._1.firewallSendRules(value._3);
+			}
+			
 		}
+		
 		
 	}
 	
