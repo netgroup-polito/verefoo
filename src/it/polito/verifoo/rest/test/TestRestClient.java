@@ -58,7 +58,7 @@ public class TestRestClient {
 	@Test
 	public void testdeploymentService() {
 		try {
-			String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/Demo/1_nfv1nodes7hostsSAT-FW.xml")).collect(Collectors.joining("\n"));
+			String xmlread=java.nio.file.Files.lines(Paths.get("./testfile/FWAutoconfiguration/8FW5P.xml")).collect(Collectors.joining("\n"));
 			//System.out.println(xmlread);
 			Response res = ClientBuilder.newClient()
 					.target(target)
