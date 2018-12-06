@@ -196,16 +196,9 @@ public class Checker {
 
 		Expr p0 = ctx.mkConst("check_isolation_p0_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
 		Expr p1 = ctx.mkConst("check_isolation_p1_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
-		Expr n_0 = ctx.mkConst("check_isolation_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
-		Expr n_1 = ctx.mkConst("check_isolation_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
+		//Expr n_0 = ctx.mkConst("check_isolation_n_0_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
+		//Expr n_1 = ctx.mkConst("check_isolation_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
 	
-		
-		
-		/*constraintList.add(ctx.mkForall(new Expr[]{n_0, p0},
-				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0)),
-						ctx.mkAnd(ctx.mkNot(ctx.mkEq(src.getZ3Node(), nctx.pf.get("origin").apply(p0))))),1,null,null,null,null));
-		constraintList.add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1)); */
-		
 		for(NetworkObject n : dest.neighbours) {
 			constraintList.add(ctx.mkForall(new Expr[]{p0},
 					ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n.getZ3Node(), dest.getZ3Node(), p0)),
@@ -218,6 +211,11 @@ public class Checker {
 		}
 		
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
+
+		/*constraintList.add(ctx.mkForall(new Expr[]{n_0, p0},
+		ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0)),
+				ctx.mkAnd(ctx.mkNot(ctx.mkEq(src.getZ3Node(), nctx.pf.get("origin").apply(p0))))),1,null,null,null,null));
+		constraintList.add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1)); */
 
 	}
 	
