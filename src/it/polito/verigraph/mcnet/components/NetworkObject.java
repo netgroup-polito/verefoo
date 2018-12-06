@@ -9,10 +9,15 @@
 package it.polito.verigraph.mcnet.components;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
+import com.microsoft.z3.Expr;
 
 import it.polito.verigraph.mcnet.components.Core;
 
@@ -34,6 +39,9 @@ public abstract class NetworkObject extends Core{
 	public BoolExpr enumerateRecvP1;
 	public BoolExpr enumerateSendP1;
 	public ArrayList<NetworkObject> neighbours;
+	public Map<Expr, Set<Expr>> nodesFrom = new HashMap<>();
+	public Map<Expr, Set<Expr>> nodesTo = new HashMap<>();
+	
     /**
      * Get a reference to the z3 node this class wraps around
      * @return
@@ -65,7 +73,30 @@ public abstract class NetworkObject extends Core{
      * @param policy
      * @throws UnsupportedOperationException
      */
-    void setPolicy (Object policy) throws UnsupportedOperationException{
+    public void setPolicy (Object policy) throws UnsupportedOperationException{
         throw new UnsupportedOperationException();
     }
+    
+    public void addNodesFrom(NetworkObject prev, NetworkObject next) {
+    	
+	    if(nodesFrom.containsKey(prev.getZ3Node())) {
+			nodesFrom.get(prev.getZ3Node()).add(next.getZ3Node());
+		} else {
+			Set<Expr> set = new HashSet<>();
+			set.add(next.getZ3Node());
+			nodesFrom.put(prev.getZ3Node(), set);
+		}
+	}
+    
+    public void addNodesTo(NetworkObject prev, NetworkObject next) {
+    	
+	    if(nodesTo.containsKey(next.getZ3Node())) {
+			nodesTo.get(next.getZ3Node()).add(prev.getZ3Node());
+		} else {
+			Set<Expr> set = new HashSet<>();
+			set.add(prev.getZ3Node());
+			nodesTo.put(next.getZ3Node(), set);
+		}
+	}
+    
 }

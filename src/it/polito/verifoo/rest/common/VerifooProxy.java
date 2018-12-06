@@ -2,9 +2,11 @@ package it.polito.verifoo.rest.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,6 +26,7 @@ import it.polito.verifoo.rest.jaxb.LinkConstraints.LinkMetrics;
 import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verigraph.mcnet.components.*;
 import it.polito.verigraph.mcnet.components.Checker.Prop;
+import it.polito.verigraph.mcnet.netobjs.AclFirewall;
 /**
  * 
  * This is the main class that will interface with the Verifoo classes
@@ -108,8 +111,8 @@ public class VerifooProxy {
 			cb = new ConditionStringBuilder(ctx, autoctx, connections, rawDeploymentConditions);
 			if(this.hosts.size() != 0)
 				checkPhysicalNetwork();
-		    checkNffg();	
-		    FWmanager.minimizeRules();
+			checkNffg();	
+			FWmanager.minimizeRules();
 		    netobjs.generateVPN();
 		    netobjs.attachToNet();
 		    if(this.hosts.size() != 0)
@@ -372,6 +375,7 @@ public class VerifooProxy {
             	linkProvider = new LinkProvider(nodes, paths, FWmanager);
 				//logger.debug("Links created");
 				//createInternalRouting(clients, servers);
+            	//FWmanager.minimizeRules();
 				List<List<String>> validChain = new ArrayList<>();
 				for(Node c:clients){
 					for(Node s:servers){
@@ -574,9 +578,7 @@ public class VerifooProxy {
 				
 				
 				//routingMap.values().stream().forEach(p-> System.out.println("before"+p._1.size()));
-				//System.out.println("??????????????????????");
-				
-				
+		
 				if(!routingMap.containsKey(n)){
 					//logger.debug("Adding to the routing map " + n.getName());
 					routingMap.put(n, new Tuple<>(new ArrayList<>(), new ArrayList<>()));
@@ -641,6 +643,11 @@ public class VerifooProxy {
 					//logger.debug("Route from SERVER " + source.getName() + " to " + nctx.am.get(server.getName())  + " -> " + netobjs.get(next));
 					rawRoutingConditions.get(source).add(next.getName());
 					found = true;
+	
+					NetworkObject sourceNetworkObject =  netobjs.get(source);
+					sourceNetworkObject.addNodesFrom(netobjs.get(prec), netobjs.get(next));
+					sourceNetworkObject.addNodesTo(netobjs.get(prec),netobjs.get(next));
+	
 				}
 				//logger.debug("Removing to visited from " + source.getName() +" to " + dest);
 				visited.get(source).remove(dest);

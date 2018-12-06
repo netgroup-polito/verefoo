@@ -9,7 +9,11 @@
 package it.polito.verigraph.mcnet.netobjs;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.microsoft.z3.ArithExpr;
@@ -49,7 +53,12 @@ public class AclFirewall extends NetworkObject{
 	//FuncDecl acl_func_white;
 	private boolean autoconf, autoplace;
 	private AutoContext autoctx;
+	BoolExpr behaviour;
 	
+	/*public Set<NetworkObject> nodesFrom = new HashSet<>();
+	public Set<NetworkObject> nodesTo = new HashSet<>();*/
+	
+
 	
 	public AclFirewall(Context ctx, Object[]... args) {
 		super(ctx, args);
@@ -353,7 +362,7 @@ public class AclFirewall extends NetworkObject{
  		Expr ruleAction = ctx.mkConst(fw + "_auto_action", ctx.mkBoolSort());
  		//System.out.println(rules);
  		BoolExpr[] tmp = new BoolExpr[rules.size()];
- 		BoolExpr behaviour;
+ 		
  		if(this.defaultAction.equals(ctx.mkTrue())){
  			behaviour = ctx.mkNot(ctx.mkOr(rules.toArray(tmp)));
  			constraints.add(ctx.mkEq(defaultAction, ctx.mkTrue()));
@@ -365,43 +374,54 @@ public class AclFirewall extends NetworkObject{
  		}
  		//System.out.println("Behaviour: "+ behaviour);
 
- 		List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), fw, p_0)).collect(Collectors.toList());
+ 		/*List<Expr> recvNeighbours = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), fw, p_0)).collect(Collectors.toList());
  		BoolExpr[] tmp2 = new BoolExpr[recvNeighbours.size()];
  		BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp2));
  		List<Expr> sendNeighbours = neighbours.stream().map(n -> nctx.send.apply(fw, n.getZ3Node(), p_0)).collect(Collectors.toList());
 		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
-		BoolExpr enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp3));
-		
-		
-//		System.out.println(ctx.mkForall(new Expr[] {p_0 }, 
-//				ctx.mkImplies(enumerateSend,
-//								ctx.mkAnd(enumerateRecv,
-//										behaviour)), 1, null, null, null, null));
-	    
-		/*for(Expr e:sendNeighbours) {
-			constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
-					ctx.mkImplies(ctx.mkEq(e, ctx.mkTrue()),
-									ctx.mkAnd(enumerateRecv,
-											behaviour)), 1, null, null, null, null));
-		}*/
-		constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
-				ctx.mkImplies(enumerateSend,
-								ctx.mkAnd(enumerateRecv,
-										behaviour)), 1, null, null, null, null));
-		
-		/*for(Expr e:recvNeighbours) {
-			constraints.add(ctx.mkForall(new Expr[] { p_0 },
-					ctx.mkImplies(ctx.mkAnd(ctx.mkEq(e, ctx.mkTrue()),
-							behaviour), ctx.mkAnd(enumerateSend)), 
-					1, null, null, null, null));
-		}*/
-		
-		
-	
+		BoolExpr enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp3));*/
+ 		
+ 		/*onstraints.add(ctx.mkForall(new Expr[] {p_0 }, 
+		ctx.mkImplies(enumerateSend,
+						ctx.mkAnd(enumerateRecv,
+								behaviour)), 1, null, null, null, null));
+
 		constraints.add(ctx.mkForall(new Expr[] { p_0 },
-										ctx.mkImplies(ctx.mkAnd(enumerateRecv,
-												behaviour), ctx.mkAnd(enumerateSend)), 
-										1, null, null, null, null));
+									ctx.mkImplies(ctx.mkAnd(enumerateRecv,
+											behaviour), ctx.mkAnd(enumerateSend)), 
+									1, null, null, null, null));*/
+ 		
+ 		
+ 		for(Map.Entry<Expr, Set<Expr>> entry : nodesFrom.entrySet()) {
+ 			Expr e = entry.getKey();
+ 			BoolExpr recv = (BoolExpr) nctx.recv.apply(e, fw, p_0);
+ 			Set<Expr> set = entry.getValue();
+ 			List<Expr> sendNeighbours = set.stream().map(n -> nctx.send.apply(fw, n, p_0)).distinct().collect(Collectors.toList());
+ 			BoolExpr[] tmp3 = new BoolExpr[set.size()];
+ 			BoolExpr enumerateSend = ctx.mkAnd(sendNeighbours.toArray(tmp3));
+ 			
+
+ 			constraints.add(ctx.mkForall(new Expr[] { p_0 },
+ 											ctx.mkImplies(ctx.mkAnd((BoolExpr) recv,
+ 													behaviour), ctx.mkAnd(enumerateSend)), 
+ 											1, null, null, null, null));
+ 		}
+ 		
+ 		for(Map.Entry<Expr, Set<Expr>> entry : nodesTo.entrySet()) {
+ 			Expr e = entry.getKey();
+ 			BoolExpr send = (BoolExpr) nctx.send.apply(fw, e, p_0);
+ 			Set<Expr> set = entry.getValue();
+ 			List<Expr> recvNeighbours = set.stream().map(n -> nctx.recv.apply(n, fw, p_0)).distinct().collect(Collectors.toList());
+ 			BoolExpr[] tmp2 = new BoolExpr[set.size()];
+ 	 		BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp2));
+ 			
+ 	 		constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
+ 					ctx.mkImplies((BoolExpr) send,
+ 									ctx.mkAnd(enumerateRecv,
+ 											behaviour)), 1, null, null, null, null));
+ 
+ 		}
+		
 		
 /*
  		Expr n_0 = ctx.mkConst(fw + "_firewall_send_n_0", nctx.node);
@@ -464,6 +484,7 @@ public class AclFirewall extends NetworkObject{
 
     	}
     }
+ 	
  	/*
  	 //Use only the blacklist
  	private void aclConstraints(Optimize solver){

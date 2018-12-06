@@ -198,7 +198,7 @@ public class Translator {
 			        String match = matcherNodeScr.group();
 			        String nodeSrc = z3Translator.matchNodeName(match);
 			        if(nodes.contains(nodeSrc)){
-			        	System.out.println("Found source node " + nodeSrc + " with address " + srcRule);
+			        	//System.out.println("Found source node " + nodeSrc + " with address " + srcRule);
 			        	nodeSrcName = nodeSrc;
 			        	srcFound = true;
 			        	break;
