@@ -201,10 +201,22 @@ public class Checker {
 	
 		
 		
-		constraintList.add(ctx.mkForall(new Expr[]{n_0, p0},
+		/*constraintList.add(ctx.mkForall(new Expr[]{n_0, p0},
 				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0)),
 						ctx.mkAnd(ctx.mkNot(ctx.mkEq(src.getZ3Node(), nctx.pf.get("origin").apply(p0))))),1,null,null,null,null));
-		constraintList.add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1));
+		constraintList.add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1)); */
+		
+		for(NetworkObject n : dest.neighbours) {
+			constraintList.add(ctx.mkForall(new Expr[]{p0},
+					ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n.getZ3Node(), dest.getZ3Node(), p0)),
+							ctx.mkAnd(ctx.mkNot(ctx.mkEq(src.getZ3Node(), nctx.pf.get("origin").apply(p0))))),1,null,null,null,null));
+		}
+		
+		
+		for(NetworkObject n : src.neighbours) {
+			constraintList.add(ctx.mkForall(new Expr[]{p0}, ((BoolExpr) nctx.send.apply(src.getZ3Node(), n.getZ3Node(), p1)),1,null,null,null,null));
+		}
+		
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
 
 	}
