@@ -195,10 +195,10 @@ public class Network extends Core {
 		compositionPolicy(node, routing_table);
 	}
 
-	public void routingTable2(NetworkObject node,
+	/* public void routingTable2(NetworkObject node,
 			ArrayList<RoutingTable> rta) {
 		compositionPolicy2(node, rta);
-	}
+	} */
 
 	/**
 	 * Composition policies steer packets between middleboxes.
@@ -254,10 +254,10 @@ public class Network extends Core {
 	 * @param routing_table
 	 * @param shunt_node
 	 */
-	public void routingTableShunt(NetworkObject node, ArrayList<Tuple<DatatypeExpr, NetworkObject>> routing_table,
+	/* public void routingTableShunt(NetworkObject node, ArrayList<Tuple<DatatypeExpr, NetworkObject>> routing_table,
 			NetworkObject shunt_node) {
 		compositionPolicyShunt(node, routing_table, shunt_node);
-	}
+	} */
 
 	/**
 	 * Composition policies steer packets between middleboxes.Policy is in the
@@ -268,7 +268,7 @@ public class Network extends Core {
 	 * @param shunt_node
 	 */
 
-	public void compositionPolicy2(NetworkObject node,
+	/* public void compositionPolicy2(NetworkObject node,
 			ArrayList<RoutingTable> rta) {
 		// Policy is of the form predicate -> node
 		Expr p_0 = ctx.mkConst(node + "_composition_p_0", nctx.packet);
@@ -327,7 +327,7 @@ public class Network extends Core {
 				///System.out.println("\n SO for " + node +"w="+latency_val + "\n" + mkImplies );
 			}
 		}
-	}
+	} */
 
 	/**
 	 * Transform a node routing table in the correct sequence of constraints for a chain
@@ -790,7 +790,7 @@ public class Network extends Core {
 	 * @param bConstraints constraints on the latency between the nodes
 	 * @param destinations
 	 */
-	public void routingOptimizationSG2(NetworkObject node, ArrayList<RoutingTable> rta, List<LinkMetrics> bConstraints, Map<String, List<DatatypeExpr>> destinations) {
+	/* public void routingOptimizationSG2(NetworkObject node, ArrayList<RoutingTable> rta, List<LinkMetrics> bConstraints, Map<String, List<DatatypeExpr>> destinations) {
 		// Policy is of the form predicate -> node
 		Expr p_0 = ctx.mkConst(node + "_composition_p_0", nctx.packet);
 		Expr n_0 = ctx.mkConst(node + "_composition_n_0", nctx.node);
@@ -879,13 +879,13 @@ public class Network extends Core {
 				Integer latency_val = -temp.getValue()._1;
 				assert(latency_val <= 0);
 				BoolExpr mkImplies;
-				/*if(initialInternal != null){
+				if(initialInternal != null){
 					System.out.println(ctx.mkOr(initialInternal, initial) + " => " + forTheKey);
 					mkImplies = ctx.mkImplies( ctx.mkOr(initialInternal, initial) , forTheKey );
 				}else{
 					System.out.println(initial + " => " + forTheKey);
 					mkImplies = ctx.mkImplies(initial , forTheKey );
-				}*/
+				}
 				mkImplies = ctx.mkImplies(initial , forTheKey );
 				softConstraints.put(forTheKey, new Tuple<Integer, String>(latency_val, node + "_" + entry.getKey()));
 				routes.add(nctx.bool_to_int(mkImplies));
@@ -914,10 +914,10 @@ public class Network extends Core {
 			//System.out.println("AND Conditions: " + possibleNextHops);
 			constraints.add(ctx.mkAnd(possibleNextHops.toArray(l)));
 		}
-	}
+	}*/
 	
 	
-	public void internalRoutingOptimizationSG(NetworkObject src, List<DatatypeExpr> destinations, NetworkObject nextHop) {
+	/* public void internalRoutingOptimizationSG(NetworkObject src, List<DatatypeExpr> destinations, NetworkObject nextHop) {
 		// Policy is of the form predicate -> node
 		Expr p_0 = ctx.mkConst(src + "_composition_p_0", nctx.packet);
 		Expr n_0 = ctx.mkConst(src + "_composition_n_0", nctx.node); 
@@ -938,11 +938,11 @@ public class Network extends Core {
 										,1, null, null, null, null);
 		System.out.println("Rule: " + initial);
 		constraints.add(initial);
-	}
+	} */
 	
 	
 	
-	public void compositionPolicyShunt(NetworkObject node, ArrayList<Tuple<DatatypeExpr, NetworkObject>> routing_table,
+	/* public void compositionPolicyShunt(NetworkObject node, ArrayList<Tuple<DatatypeExpr, NetworkObject>> routing_table,
 			NetworkObject shunt_node) {
 		Expr p_0 = ctx.mkConst(node + "_composition_p_0", nctx.packet);
 		Expr n_0 = ctx.mkConst(node + "_composition_n_0", nctx.node);
@@ -977,7 +977,7 @@ public class Network extends Core {
 					1, null, null, null, null));
 		}
 
-	}
+	}*/
 
 	// public void SimpleIsolation (NetworkObject node, ArrayList<DatatypeExpr>
 	// addresses){

@@ -186,16 +186,17 @@ public class TestPerformanceAutoConfigurationFW {
 		}
 		return newServer;
 	}
+	
 	@Test
 	public void testBGPerformance(){
 		try {
 			List<String> files = new ArrayList<>();
 			
-			files.add("./testfile/FWAutoconfiguration/3FW2P.xml");
-			files.add("./testfile/FWAutoconfiguration/3FW3P.xml");
+			/*files.add("./testfile/FWAutoconfiguration/3FW2P.xml");
+			files.add("./testfile/FWAutoconfiguration/3FW3P.xml");*/
 			files.add("./testfile/FWAutoconfiguration/3FW4P.xml");
 			files.add("./testfile/FWAutoconfiguration/3FW5P.xml");
-			files.add("./testfile/FWAutoconfiguration/4FW2P.xml");
+			/*files.add("./testfile/FWAutoconfiguration/4FW2P.xml");
 			files.add("./testfile/FWAutoconfiguration/4FW3P.xml");
 			files.add("./testfile/FWAutoconfiguration/4FW4P.xml");
 			files.add("./testfile/FWAutoconfiguration/4FW5P.xml");
@@ -214,7 +215,7 @@ public class TestPerformanceAutoConfigurationFW {
 			files.add("./testfile/FWAutoconfiguration/8FW2P.xml");
 			files.add("./testfile/FWAutoconfiguration/8FW3P.xml");
 			files.add("./testfile/FWAutoconfiguration/8FW4P.xml");
-			files.add("./testfile/FWAutoconfiguration/8FW5P.xml");
+			files.add("./testfile/FWAutoconfiguration/8FW5P.xml");*/
 			
 			for(String f : files){
 				condTime = 0;

@@ -99,6 +99,8 @@
 			dst="30.0.5.2" />
 		<Property graph="0" name="IsolationProperty" src="10.0.0.3"
 			dst="30.0.5.2" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.4"
+			dst="30.0.5.2" />
 
 	</PropertyDefinition>
 	<ParsingString></ParsingString>
