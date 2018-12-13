@@ -226,13 +226,15 @@ public class Translator {
 			        String src_port = firewallAutoConfigSearchComplexAttribute(z3Translator.stringToSearchFwPort(n, nrOfRule, "src"), z3Translator.Datatype.port_range_constructor);
 			        src_port = src_port.replace(" ", "-");
 			        //if(!src_port.equals("null") && !src_port.equals("*"))
-			        	e.setSrcPort((new PortInterval(src_port).toString()));
+			        if(src_port.equals("null")) src_port = new String("*");
+			        e.setSrcPort((new PortInterval(src_port).toString()));
 			        //System.out.println(e.getSrcPort());
 			        
 			        String dst_port = firewallAutoConfigSearchComplexAttribute(z3Translator.stringToSearchFwPort(n, nrOfRule, "dst"), z3Translator.Datatype.port_range_constructor);
 			        dst_port = dst_port.replace(" ", "-");
 			        //if(!dst_port.equals("null") && !dst_port.equals("*"))
-			        	e.setDstPort((new PortInterval(dst_port).toString()));
+			        if(dst_port.equals("null")) dst_port = new String("*");
+			        e.setDstPort((new PortInterval(dst_port).toString()));
 			        //System.out.println(e.getDstPort());
 			        
 			        String action = firewallAutoConfigSearchPlainAttribute(z3Translator.stringToSearchFwAction(n, "action"));
