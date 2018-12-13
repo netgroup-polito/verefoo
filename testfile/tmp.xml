@@ -48,7 +48,7 @@
     </Constraints>
     <PropertyDefinition>
         <Property name="ReachabilityProperty" graph="0" src="nodeA" dst="nodeB"/>
-        <Property name="IsolationProperty" graph="0" src="nodeC" dst="nodeB"/>
+        <Property name="ReachabilityProperty" graph="0" src="nodeC" dst="nodeB"/>
     </PropertyDefinition>
     <Hosts>
         <Host name="hostA" cpu="2" cores="2" diskStorage="10" memory="4" type="CLIENT" fixedEndpoint="nodeA"/>

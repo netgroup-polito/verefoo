@@ -849,6 +849,10 @@ public class VerifooProxy {
 							rawDeploymentConditions.get(source).add(cb.buildConditionString(source, currentHost, next, validChain.get(nChain).get(i)));
 						}
 						found = true;
+						
+						NetworkObject sourceNetworkObject =  netobjs.get(source);
+						sourceNetworkObject.addNodesFrom(netobjs.get(prec), netobjs.get(next));
+						sourceNetworkObject.addNodesTo(netobjs.get(prec),netobjs.get(next));
 					}
 				}
 				//logger.debug("Removing to visited from " + source.getName() +" to " + dest);
