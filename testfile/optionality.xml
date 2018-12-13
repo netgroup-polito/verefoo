@@ -52,7 +52,7 @@
         <LinkConstraints/>
     </Constraints>
     <PropertyDefinition>
-        <Property graph="0" name="ReachabilityProperty" src="a" dst="b" />
+        <Property graph="0" name="IsolationProperty" src="a" dst="b" />
     </PropertyDefinition>
       <Hosts>
   	<Host name="hostA" cpu="2" cores="2" memory="4" diskStorage="10" type="CLIENT" fixedEndpoint="a"/>

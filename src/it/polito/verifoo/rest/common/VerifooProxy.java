@@ -111,10 +111,11 @@ public class VerifooProxy {
 			cb = new ConditionStringBuilder(ctx, autoctx, connections, rawDeploymentConditions);
 			if(this.hosts.size() != 0)
 				checkPhysicalNetwork();
+			netobjs.attachToNet();
 			checkNffg();	
 			FWmanager.minimizeRules();
 		    netobjs.generateVPN();
-		    netobjs.attachToNet();
+		    
 		    if(this.hosts.size() != 0)
 		    	setConditions();
 		    check = new Checker(ctx,nctx,net);
@@ -849,6 +850,10 @@ public class VerifooProxy {
 							rawDeploymentConditions.get(source).add(cb.buildConditionString(source, currentHost, next, validChain.get(nChain).get(i)));
 						}
 						found = true;
+						
+						NetworkObject sourceNetworkObject =  netobjs.get(source);
+						sourceNetworkObject.addNodesFrom(netobjs.get(prec), netobjs.get(next));
+						sourceNetworkObject.addNodesTo(netobjs.get(prec),netobjs.get(next));
 					}
 				}
 				//logger.debug("Removing to visited from " + source.getName() +" to " + dest);
@@ -936,4 +941,12 @@ public class VerifooProxy {
 		public int getNrOfConditions() {
 			return nrOfConditions;
 		}
+		/**
+		 * @return the NodeNetworkObject object
+		 */
+		public NodeNetworkObject getNetobjs() {
+			return netobjs;
+		}
+		
+		
 }

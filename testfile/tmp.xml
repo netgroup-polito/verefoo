@@ -9,28 +9,56 @@
                 </configuration>
             </node>
             <node name="nodeC" functional_type="WEBCLIENT">
-                <neighbour name="node1"/>
+                <neighbour name="node2"/>
                 <configuration name="confA" description="A simple description">
                     <webclient nameWebServer="nodeB"/>
                 </configuration>
             </node>
             <node name="node1" functional_type="FIREWALL">
                 <neighbour name="nodeA"/>
-                <neighbour name="nodeC"/>
                 <neighbour name="node3"/>
                 <configuration name="conf1" description="A simple description">
-                    <firewall/>
+                    <firewall defaultAction="DENY"/>
+                </configuration>
+            </node>
+            <node name="node2" functional_type="FIREWALL">
+                <neighbour name="node4"/>
+                <neighbour name="nodeC"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall defaultAction="DENY"/>
                 </configuration>
             </node>
             <node name="node3" functional_type="FIREWALL">
                 <neighbour name="node1"/>
-                <neighbour name="nodeB"/>
+                <neighbour name="node5"/>
                 <configuration name="conf1" description="A simple description">
-                    <firewall/>
+                    <firewall defaultAction="DENY"/>
+                </configuration>
+            </node>
+            <node name="node4" functional_type="FIREWALL">
+                <neighbour name="node2"/>
+                <neighbour name="node5"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall defaultAction="DENY"/>
+                </configuration>
+            </node>
+            <node name="node5" functional_type="FIREWALL">
+                <neighbour name="node3"/>
+                <neighbour name="node4"/>
+                <neighbour name="node6"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall defaultAction="DENY"/>
+                </configuration>
+            </node>
+            <node name="node6" functional_type="FIREWALL">
+                <neighbour name="nodeB"/>
+                <neighbour name="node5"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall defaultAction="ALLOW"/>
                 </configuration>
             </node>
             <node name="nodeB" functional_type="WEBSERVER">
-                <neighbour name="node3"/>
+                <neighbour name="node6"/>
                 <configuration name="confB" description="A simple description">
                     <webserver>
                         <name>nodeB</name>
@@ -41,32 +69,15 @@
     </graphs>
     <Constraints>
         <NodeConstraints>
-            <NodeMetrics node="node1" optional="true"/>
             <NodeMetrics node="node3" optional="true"/>
+            <NodeMetrics node="node4" optional="true"/>
+            <NodeMetrics node="node5" optional="true"/>
         </NodeConstraints>
         <LinkConstraints/>
     </Constraints>
     <PropertyDefinition>
-        <Property name="ReachabilityProperty" graph="0" src="nodeA" dst="nodeB"/>
-        <Property name="IsolationProperty" graph="0" src="nodeC" dst="nodeB"/>
+        <Property name="IsolationProperty" graph="0" src="nodeA" dst="nodeB"/>
+        <Property name="ReachabilityProperty" graph="0" src="nodeC" dst="nodeB"/>
     </PropertyDefinition>
-    <Hosts>
-        <Host name="hostA" cpu="2" cores="2" diskStorage="10" memory="4" type="CLIENT" fixedEndpoint="nodeA"/>
-        <Host name="hostC" cpu="2" cores="2" diskStorage="10" memory="4" type="CLIENT" fixedEndpoint="nodeC"/>
-        <Host name="host1" cpu="1" cores="4" diskStorage="50" memory="16" maxVNF="5" type="MIDDLEBOX">
-            <SupportedVNF functional_type="FIREWALL"/>
-            <SupportedVNF functional_type="CACHE"/>
-            <SupportedVNF functional_type="ANTISPAM"/>
-            <SupportedVNF functional_type="NAT"/>
-            <SupportedVNF functional_type="DPI"/>
-            <SupportedVNF functional_type="FIELDMODIFIER"/>
-        </Host>
-        <Host name="hostB" cpu="2" cores="2" diskStorage="50" memory="4" type="SERVER" fixedEndpoint="nodeB"/>
-    </Hosts>
-    <Connections>
-        <Connection sourceHost="hostA" destHost="host1" avgLatency="1"/>
-        <Connection sourceHost="hostC" destHost="host1" avgLatency="1"/>
-        <Connection sourceHost="host1" destHost="hostB" avgLatency="1"/>
-    </Connections>
     <ParsingString></ParsingString>
 </NFV>

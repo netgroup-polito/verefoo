@@ -1,5 +1,6 @@
 package it.polito.verifoo.rest.common;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,7 @@ import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Graph;
 import it.polito.verifoo.rest.jaxb.Host;
 import it.polito.verifoo.rest.jaxb.NFV;
+import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.Path;
 import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verifoo.rest.neo4j.Neo4jClient;
@@ -29,12 +31,14 @@ public class VerifooSerializer {
 	private NFV nfv, result;
 	private boolean sat = false;
 	private Logger logger = LogManager.getLogger("mylog");
+	private List<Node> removedNodes;
 	/**
 	 * Wraps all the Verifoo tasks, executing the z3 procedure for each graph in the NFV element
 	 * @param root the NFV element received as input
 	 */
 	public VerifooSerializer(NFV root){
 		this.nfv = root;
+		removedNodes = new ArrayList<Node>();
 		/*String neo4jURL, neo4jUsername, neo4jPassword;
 		if(System.getProperty("it.polito.verifoo.rest.neo4j.neo4jURL") != null){
 			neo4jURL = "bolt://"+System.getProperty("it.polito.verifoo.rest.neo4j.neo4jURL");
@@ -95,11 +99,15 @@ public class VerifooSerializer {
 	        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(), prop, paths);
 	        	IsolationResult res=test.checkNFFGProperty();
 	        	if(res.result != Status.UNSATISFIABLE){
-	        		Translator t = new Translator(res.model.toString(),root, g);
+	        		Translator t = new Translator(res.model.toString(),root, g, test.getNetobjs(), removedNodes);
 	        		t.setNormalizer(norm);
 	        		result = t.convert();
 	        		root = result;
 	        		sat = true;
+	        		System.out.println("%%REMOVED OPTIONAL NODES %%");
+	        		removedNodes.forEach(n -> {
+	        			System.out.println(n.getName() + " is removed.");
+	        		});
 	        		//System.out.println("%%%%%%%%%%%%%%%%%%%%%%");
 	        		//System.out.println(res.model);
 	        		//System.out.println("%%%%%%%%%%%%%%%%%%%%%%");

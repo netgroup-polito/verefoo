@@ -297,9 +297,7 @@ public class Checker {
 		p.add("maxres.wmax", true  );
 		//p.add("maxres.add_upper_bound_block", true  );
 		solver.setParameters(p);
-		
 		result = this.solver.Check();
-		
 		/*Handle temp = null;
 		for (Entry<String, Handle> handle : nctx.handles.entrySet()) {
 			temp = handle.getValue();

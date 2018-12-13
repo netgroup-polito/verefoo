@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,7 @@ import it.polito.verigraph.mcnet.components.Core;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 import it.polito.verigraph.mcnet.components.Tuple;
+import it.polito.verigraph.mcnet.netobjs.AclFirewall;
 import it.polito.verigraph.mcnet.components.Quattro;
 
 /**
@@ -404,6 +406,34 @@ public class Network extends Core {
 			constraints.add(ctx.mkEq(ctx.mkAdd(routes.toArray(list)), ctx.mkInt(1)));
 		}
 	}
+	
+	
+	private BoolExpr createNextHopWithOptional(NetworkObject node, Expr prec, Expr e){
+		Expr n_0 = ctx.mkConst(node + "_composition_n_0", nctx.node);
+		NetworkObject no = elements.stream().filter(el -> el.getZ3Node().equals(e)).findFirst().orElse(null);
+		if(!(no instanceof AclFirewall)) {
+  			return ctx.mkEq(n_0,e);
+  		}
+  		AclFirewall firewall = (AclFirewall) no;
+  		if(firewall.autoplace == false) {
+  			return ctx.mkEq(n_0,e);
+  		} 
+  		BoolExpr first =  ctx.mkAnd((BoolExpr) ctx.mkEq(n_0,e), firewall.isUsed());
+  		List<BoolExpr> exprList = new ArrayList<>();
+  		Map<Expr, Set<Expr>> nextNodesTo = firewall.nodesTo;
+  		for(Map.Entry<Expr, Set<Expr>> entry : nextNodesTo.entrySet()) {
+  			Set<Expr> set = entry.getValue();
+  			if(set.contains(prec)) {
+  				exprList.add(createNextHopWithOptional(node, e, entry.getKey()));
+  			}
+  		}
+  		BoolExpr[] tmp = new BoolExpr[exprList.size()];
+  		BoolExpr second = ctx.mkAnd(ctx.mkNot(firewall.isUsed()), ctx.mkAnd(exprList.toArray(tmp)));
+  		BoolExpr result = ctx.mkOr(first, second);
+  		return result;
+
+		//ctx.mkEq(n_0,node_dict.get(s).getZ3Node())
+	}
 	/**
 	 * Transform a node routing table in the correct sequence of constraints for a service graph (it considers also the possibility to have the autoplacement)
 	 * @param node
@@ -471,7 +501,7 @@ public class Network extends Core {
 			nextHops.add(ctx.mkEq(n_0,node_dict.get(s).getZ3Node()));
 		}
 		for(String s : collectedWithOptional.keySet()){
-			nextHopsWithOptional.add(ctx.mkEq(n_0,node_dict.get(s).getZ3Node()));
+			nextHopsWithOptional.add(createNextHopWithOptional(node, (Expr)node.getZ3Node(), (Expr)node_dict.get(s).getZ3Node()));
 		}
 		for(String s : collectedWithoutOptional.keySet()){
 			
@@ -499,6 +529,7 @@ public class Network extends Core {
 																			//.filter(no -> !no.toString().equals(entry.getKey()))
 																			.map(no -> no.isUsed())
 																			.collect(Collectors.toList());
+					
 					if(optionalInBetweenTmp.size() > 0){
 						//System.out.println("Left from before: " + optionalInBetweenTmp);
 						BoolExpr tmp2[] = new BoolExpr[optionalInBetweenTmp.size()];

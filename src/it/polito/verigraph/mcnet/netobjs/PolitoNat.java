@@ -156,44 +156,7 @@ public class PolitoNat extends NetworkObject {
 		// p_1.origin == p_0.origin &&
 		// same for p_1.<src,orig_body,body,seq,proto,emailFrom,url,options> ==
 		// p_0.<...>)
-		constraints.add(ctx.mkForall(new Expr[] { p_0 },
-				ctx.mkImplies(
-						ctx.mkAnd(enumerateSendP0,
-								(BoolExpr) private_addr_func.apply(nctx.pf.get("dest").apply(p_0))),
-						ctx.mkAnd(ctx.mkNot((BoolExpr) private_addr_func.apply(nctx.pf.get("src").apply(p_0))),
-								ctx.mkExists(new Expr[] { p_1 }, ctx.mkAnd(
-
-										enumerateRecvP1,
-										ctx.mkNot((BoolExpr) private_addr_func.apply(nctx.pf.get("src").apply(p_1))),
-										ctx.mkEq(nctx.pf.get("dest").apply(p_1), natIp),
-										ctx.mkEq(nctx.pf.get("src").apply(p_1), nctx.pf.get("src").apply(p_0)),
-										ctx.mkEq(nctx.pf.get("origin").apply(p_0), nctx.pf.get("origin").apply(p_1)),
-										ctx.mkEq(nctx.pf.get("inner_src").apply(p_1),
-												nctx.pf.get("inner_src").apply(p_0)),
-										ctx.mkEq(nctx.pf.get("inner_dest").apply(p_1),
-												nctx.pf.get("inner_dest").apply(p_0)),
-										ctx.mkEq(nctx.pf.get("orig_body").apply(p_1),
-												nctx.pf.get("orig_body").apply(p_0)),
-										ctx.mkEq(nctx.pf.get("body").apply(p_1), nctx.pf.get("body").apply(p_0)),
-										ctx.mkEq(nctx.pf.get("seq").apply(p_1), nctx.pf.get("seq").apply(p_0)),
-										ctx.mkEq(nctx.pf.get("lv4proto").apply(p_1), nctx.pf.get("lv4proto").apply(p_0)),
-										ctx.mkEq(nctx.pf.get("proto").apply(p_1), nctx.pf.get("proto").apply(p_0)),
-										ctx.mkEq(nctx.pf.get("src_port").apply(p_1), nctx.pf.get("src_port").apply(p_0)),
-										ctx.mkEq(nctx.pf.get("dest_port").apply(p_1), nctx.pf.get("dest_port").apply(p_0)),
-										ctx.mkEq(nctx.pf.get("emailFrom").apply(p_1),
-												nctx.pf.get("emailFrom").apply(p_0)),
-										ctx.mkEq(nctx.pf.get("url").apply(p_1), nctx.pf.get("url").apply(p_0)),
-										ctx.mkEq(nctx.pf.get("options").apply(p_1), nctx.pf.get("options").apply(p_0)),
-										ctx.mkExists(new Expr[] { p_2 }, ctx.mkAnd(
-
-												enumerateRecvP2,
-												(BoolExpr) private_addr_func.apply(nctx.pf.get("src").apply(p_2)),
-												ctx.mkEq(nctx.pf.get("src").apply(p_1), nctx.pf.get("dest").apply(p_2)),
-												ctx.mkEq(nctx.pf.get("src").apply(p_2),
-														nctx.pf.get("dest").apply(p_0))),
-												1, null, null, null, null)),
-										1, null, null, null, null))),
-				1, null, null, null, null));
+		
 
  		List<Expr> sendNeighbours2 = neighbours.stream().map(n -> nctx.send.apply(nat, n.getZ3Node(), p_4)).collect(Collectors.toList());
 		BoolExpr[] tmp5 = new BoolExpr[sendNeighbours2.size()];
