@@ -9,56 +9,35 @@
                 </configuration>
             </node>
             <node name="nodeC" functional_type="WEBCLIENT">
-                <neighbour name="node2"/>
+                <neighbour name="node1"/>
                 <configuration name="confA" description="A simple description">
                     <webclient nameWebServer="nodeB"/>
                 </configuration>
             </node>
             <node name="node1" functional_type="FIREWALL">
                 <neighbour name="nodeA"/>
-                <neighbour name="node3"/>
+                <neighbour name="nodeC"/>
+                <neighbour name="node2"/>
                 <configuration name="conf1" description="A simple description">
                     <firewall defaultAction="DENY"/>
                 </configuration>
             </node>
             <node name="node2" functional_type="FIREWALL">
-                <neighbour name="node4"/>
-                <neighbour name="nodeC"/>
+                <neighbour name="node1"/>
+                <neighbour name="node3"/>
                 <configuration name="conf1" description="A simple description">
                     <firewall defaultAction="DENY"/>
                 </configuration>
             </node>
             <node name="node3" functional_type="FIREWALL">
-                <neighbour name="node1"/>
-                <neighbour name="node5"/>
-                <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="DENY"/>
-                </configuration>
-            </node>
-            <node name="node4" functional_type="FIREWALL">
                 <neighbour name="node2"/>
-                <neighbour name="node5"/>
-                <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="DENY"/>
-                </configuration>
-            </node>
-            <node name="node5" functional_type="FIREWALL">
-                <neighbour name="node3"/>
-                <neighbour name="node4"/>
-                <neighbour name="node6"/>
-                <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="DENY"/>
-                </configuration>
-            </node>
-            <node name="node6" functional_type="FIREWALL">
                 <neighbour name="nodeB"/>
-                <neighbour name="node5"/>
                 <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="ALLOW"/>
+                    <firewall defaultAction="DENY"/>
                 </configuration>
             </node>
             <node name="nodeB" functional_type="WEBSERVER">
-                <neighbour name="node6"/>
+                <neighbour name="node3"/>
                 <configuration name="confB" description="A simple description">
                     <webserver>
                         <name>nodeB</name>
@@ -69,9 +48,7 @@
     </graphs>
     <Constraints>
         <NodeConstraints>
-            <NodeMetrics node="node3" optional="true"/>
-            <NodeMetrics node="node4" optional="true"/>
-            <NodeMetrics node="node5" optional="true"/>
+            <NodeMetrics node="node2" optional="true"/>
         </NodeConstraints>
         <LinkConstraints/>
     </Constraints>
