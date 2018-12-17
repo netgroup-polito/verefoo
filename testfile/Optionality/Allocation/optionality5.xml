@@ -65,11 +65,11 @@
        <neighbour name="node6"/>
          <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf1">
-         <firewall defaultAction="ALLOW"/>
+         <firewall defaultAction="DENY"/>
         </configuration>
       </node>
       <node functional_type="WEBSERVER" name="nodeB">
-		<neighbour name="node6"/>
+		<neighbour name="node7"/>
         <configuration description="A simple description" name="confB">
           <webserver>
           	<name>nodeB</name>
@@ -80,16 +80,19 @@
   </graphs>
   <Constraints>
 	  <NodeConstraints>
+	  <NodeMetrics node="node1" optional="true"/>
+	  <NodeMetrics node="node2" optional="true"/>
 		<NodeMetrics node="node3" optional="true"/>
 		<NodeMetrics node="node4" optional="true"/>
 		<NodeMetrics node="node5" optional="true"/>
 		<NodeMetrics node="node6" optional="true"/>
+		
 	  </NodeConstraints>
 	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
-		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 	
-  		<Property graph="0" name="ReachabilityProperty" src="nodeC" dst="nodeB"/> 			
+		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 	
+  		<Property graph="0" name="IsolationProperty" src="nodeC" dst="nodeB"/> 			
   </PropertyDefinition>
   
   <ParsingString></ParsingString>

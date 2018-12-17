@@ -258,4 +258,8 @@ public class AutoContext extends Core{
 		logger.debug("Final Dependencies" + res);
 		return res;
 	}
+	
+	public HashMap<Node, NetworkObject> getOptionalNodes(){
+		return optionalNodes;
+	}
 }

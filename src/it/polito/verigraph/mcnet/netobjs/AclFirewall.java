@@ -51,15 +51,10 @@ public class AclFirewall extends NetworkObject{
 	FuncDecl acl_func;
 	FuncDecl rule_func;
 	//FuncDecl acl_func_white;
-	public boolean autoconf, autoplace;
+	public boolean autoconf;
 	private AutoContext autoctx;
 	BoolExpr behaviour;
-	
-	/*public Set<NetworkObject> nodesFrom = new HashSet<>();
-	public Set<NetworkObject> nodesTo = new HashSet<>();*/
-	
 
-	
 	public AclFirewall(Context ctx, Object[]... args) {
 		super(ctx, args);
 	}
@@ -460,7 +455,7 @@ public class AclFirewall extends NetworkObject{
   			}
   		}
   		BoolExpr[] tmp = new BoolExpr[exprList.size()];
-  		BoolExpr second = ctx.mkAnd(ctx.mkNot(firewall.isUsed()), ctx.mkOr(exprList.toArray(tmp)));
+  		BoolExpr second = ctx.mkAnd(ctx.mkNot(firewall.isUsed()), ctx.mkAnd(exprList.toArray(tmp)));
   		BoolExpr result = ctx.mkOr(first, second);
   		return result;
   	

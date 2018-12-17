@@ -11,6 +11,8 @@ package it.polito.verigraph.mcnet.components;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ import com.microsoft.z3.Params;
 import com.microsoft.z3.Status;
 
 import it.polito.verifoo.rest.common.AutoContext;
+import it.polito.verifoo.rest.common.NodeNetworkObject;
 import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verigraph.mcnet.components.NetContext;
@@ -43,6 +46,7 @@ public class Checker {
 	Network net;
 	NetContext nctx;
 	AutoContext autoctx = null;
+	NodeNetworkObject netobjs;
 	Optimize solver;
 	ArrayList<BoolExpr> constraints;
 	public BoolExpr[] assertions;
@@ -53,6 +57,7 @@ public class Checker {
 	public enum Prop {
 	    ISOLATION,REACHABILITY
 	}
+	
 	public Checker(Context context, NetContext nctx, Network network) {
 		this.ctx = context;
 		this.net = network;
@@ -61,6 +66,17 @@ public class Checker {
 		this.constraints = new ArrayList<BoolExpr>();
 		this.constraintList =new ArrayList<BoolExpr>();
 	}
+	
+	public Checker(Context context, NetContext nctx, Network network,NodeNetworkObject netobjs) {
+		this.ctx = context;
+		this.net = network;
+		this.nctx = nctx;
+		this.solver = ctx.mkOptimize();
+		this.constraints = new ArrayList<BoolExpr>();
+		this.constraintList =new ArrayList<BoolExpr>();
+		this.netobjs = netobjs;
+	}
+
 
 	/**
 	 * Resets the constraints
@@ -191,6 +207,7 @@ public class Checker {
 		//this.solver.Pop();
 		return new IsolationResult(ctx, result, p0, n_0, t_1, t_0, nctx, assertions, model);
 	}
+	
 	private List<BoolExpr> constraintList;
 	private void addIsolationProperty(NetworkObject src, NetworkObject dest, int lv4proto, String src_port, String dst_port) {
 
@@ -207,7 +224,7 @@ public class Checker {
 		
 		
 		for(NetworkObject n : src.neighbours) {
-			constraintList.add(ctx.mkForall(new Expr[]{p0}, ((BoolExpr) nctx.send.apply(src.getZ3Node(), n.getZ3Node(), p1)),1,null,null,null,null));
+			constraintList.add(createIsolationConditionFromSource(src, src, n, p1));
 		}
 		
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
@@ -219,13 +236,35 @@ public class Checker {
 
 	}
 	
+	private BoolExpr createIsolationConditionFromSource(NetworkObject src, NetworkObject prec, NetworkObject next, Expr p1) {
+		NetworkObject nextNO = netobjs.values().stream().filter(no -> no.getZ3Node().equals(next.getZ3Node())).findFirst().orElse(null);
+
+		if(!nextNO.autoplace) {
+			return (BoolExpr) nctx.send.apply(src.getZ3Node(), next.getZ3Node(), p1);
+		}
+		BoolExpr first =  ctx.mkAnd((BoolExpr) nctx.send.apply(src.getZ3Node(), next.getZ3Node(), p1), nextNO.isUsed());
+  		List<BoolExpr> exprList = new ArrayList<>();
+  		Map<Expr, Set<Expr>> nextNodesTo = nextNO.nodesTo;
+  		for(Map.Entry<Expr, Set<Expr>> entry : nextNodesTo.entrySet()) {
+  			Set<Expr> set = entry.getValue();
+  			if(set.contains(prec.getZ3Node())) {
+  				NetworkObject next2 = net.elements.stream().filter(no -> no.getZ3Node().equals(entry.getKey())).findFirst().orElse(null);
+  				exprList.add(createIsolationConditionFromSource(src, next, next2, p1));
+  			}
+  		}
+  		BoolExpr[] tmp = new BoolExpr[exprList.size()];
+  		BoolExpr second = ctx.mkAnd(ctx.mkNot(nextNO.isUsed()), ctx.mkAnd(exprList.toArray(tmp)));
+  		BoolExpr result = ctx.mkOr(first, second);
+  		return result;
+		
+	}
+	
 	public void propertyAdd(NetworkObject src, NetworkObject dest, Prop property) {
 		assert (net.elements.contains(src));
 		assert (net.elements.contains(dest));
 		
 		switch (property) {
 			case ISOLATION: 
-					System.out.println("test");
 					addIsolationProperty(src, dest, 0, "0-"+nctx.MAX_PORT, "0-"+nctx.MAX_PORT);
 					break;
 			case REACHABILITY: 

@@ -118,7 +118,7 @@ public class VerifooProxy {
 		    
 		    if(this.hosts.size() != 0)
 		    	setConditions();
-		    check = new Checker(ctx,nctx,net);
+		    check = new Checker(ctx,nctx,net, netobjs);
 		    check.setAutoctx(autoctx);
 		    setProperty(prop);
 	    }

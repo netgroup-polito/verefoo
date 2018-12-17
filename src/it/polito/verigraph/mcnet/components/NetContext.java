@@ -151,7 +151,7 @@ public class NetContext extends Core{
         //System.out.println("Nr of net context proto wildcard soft constraint " + softConstrProtoWildcard.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrProtoWildcard) {
         	//System.out.println(t._1 + "\n with value " + 1000 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, -1000, t._2);
+			solver.AssertSoft(t._1, 1000, t._2);
 		}
 		//System.out.println("Nr of net context wildcards soft constraint " + softConstrWildcard.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrWildcard) {
@@ -165,7 +165,7 @@ public class NetContext extends Core{
 		}
 		//System.out.println("Nr of net context autoplacement soft constraint " + softConstrAutoPlace.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrAutoPlace) {
-        	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
+        	System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
 			solver.AssertSoft(t._1, 100, t._2);
 		}
 		//System.out.println("Nr of net context soft constraint " + softConstraints.stream().distinct().count());

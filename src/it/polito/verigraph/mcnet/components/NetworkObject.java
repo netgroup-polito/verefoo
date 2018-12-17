@@ -34,13 +34,14 @@ public abstract class NetworkObject extends Core{
     protected DatatypeExpr z3Node;
     protected boolean isEndHost;
     protected BoolExpr used;
+    protected boolean autoplace;
 	public BoolExpr enumerateRecvP0;
 	public BoolExpr enumerateSendP0;
 	public BoolExpr enumerateRecvP1;
 	public BoolExpr enumerateSendP1;
 	public ArrayList<NetworkObject> neighbours;
-	public Map<Expr, Set<Expr>> nodesFrom = new HashMap<>();
-	public Map<Expr, Set<Expr>> nodesTo = new HashMap<>();
+	protected Map<Expr, Set<Expr>> nodesFrom = new HashMap<>();
+	protected Map<Expr, Set<Expr>> nodesTo = new HashMap<>();
 	
     /**
      * Get a reference to the z3 node this class wraps around
@@ -98,6 +99,14 @@ public abstract class NetworkObject extends Core{
 			nodesTo.put(next.getZ3Node(), set);
 		}
 	}
+    
+    public Map<Expr, Set<Expr>>  getNodesFrom(){
+    	return nodesFrom;
+    }
+    
+    public Map<Expr, Set<Expr>>  getNodesTo(){
+    	return nodesTo;
+    }
     
     
     

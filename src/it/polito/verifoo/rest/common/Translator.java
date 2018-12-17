@@ -566,8 +566,8 @@ public class Translator {
 						.flatMap(graph -> graph.getNode().stream())
 						.filter(node -> node.getName().equals(opNode.getName())).findFirst().orElse(null);
 				NetworkObject no = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(n.getName())).map(e -> e.getValue()).findFirst().orElse(null);
-				Map<Expr, Set<Expr>> nodesFrom = no.nodesFrom;
-				Map<Expr, Set<Expr>> nodesTo = no.nodesTo;
+				Map<Expr, Set<Expr>> nodesFrom = no.getNodesFrom();
+				Map<Expr, Set<Expr>> nodesTo = no.getNodesTo();
 				
 				for(Map.Entry<Expr, Set<Expr>> entry : nodesFrom.entrySet()) {
 					String precName = netobjs.entrySet().stream().filter(e -> e.getValue().getZ3Node().equals(entry.getKey())).map(e -> e.getKey().getName()).findFirst().orElse(null);
@@ -575,12 +575,12 @@ public class Translator {
 							.filter(graph -> graph.getId() == g.getId())
 							.flatMap(graph -> graph.getNode().stream())
 							.filter(node -> node.getName().equals(precName)).findFirst().orElse(null);
-					System.out.println(n.getName() + " " + entry.getKey() + " " + entry.getValue());
+					
 					List<Neighbour> neighboursPrec = prec.getNeighbour();
 					neighboursPrec.removeIf(neigh -> neigh.getName().equals(n.getName()));
 					NetworkObject prevNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(prec.getName())).map(e -> e.getValue()).findFirst().orElse(null);
-					Map<Expr, Set<Expr>> precNodesFrom = prevNO.nodesFrom;
-					Map<Expr, Set<Expr>> precNodesTo = prevNO.nodesTo;
+					Map<Expr, Set<Expr>> precNodesFrom = prevNO.getNodesFrom();
+					Map<Expr, Set<Expr>> precNodesTo = prevNO.getNodesTo();
 					
 					Set<Expr> toSet = precNodesTo.get(no.getZ3Node());
 					precNodesTo.remove(no.getZ3Node());
@@ -625,8 +625,8 @@ public class Translator {
 							.filter(node -> node.getName().equals(nextName)).findFirst().orElse(null);
 					List<Neighbour> neighboursNext =  next.getNeighbour();
 					NetworkObject nextNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(next.getName())).map(e -> e.getValue()).findFirst().orElse(null);
-					Map<Expr, Set<Expr>> nextNodesFrom = nextNO.nodesFrom;
-					Map<Expr, Set<Expr>> nextNodesTo = nextNO.nodesTo;
+					Map<Expr, Set<Expr>> nextNodesFrom = nextNO.getNodesFrom();
+					Map<Expr, Set<Expr>> nextNodesTo = nextNO.getNodesTo();
 					
 					Set<Expr> fromSet = nextNodesFrom.get(no.getZ3Node());
 					nextNodesFrom.remove(no.getZ3Node());
