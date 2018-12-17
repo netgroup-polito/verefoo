@@ -567,65 +567,102 @@ public class Translator {
 						.filter(node -> node.getName().equals(opNode.getName())).findFirst().orElse(null);
 				NetworkObject no = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(n.getName())).map(e -> e.getValue()).findFirst().orElse(null);
 				Map<Expr, Set<Expr>> nodesFrom = no.nodesFrom;
-	
+				Map<Expr, Set<Expr>> nodesTo = no.nodesTo;
+				
 				for(Map.Entry<Expr, Set<Expr>> entry : nodesFrom.entrySet()) {
 					String precName = netobjs.entrySet().stream().filter(e -> e.getValue().getZ3Node().equals(entry.getKey())).map(e -> e.getKey().getName()).findFirst().orElse(null);
 					Node prec = originalNfv.getGraphs().getGraph().stream()
 							.filter(graph -> graph.getId() == g.getId())
 							.flatMap(graph -> graph.getNode().stream())
 							.filter(node -> node.getName().equals(precName)).findFirst().orElse(null);
+					System.out.println(n.getName() + " " + entry.getKey() + " " + entry.getValue());
 					List<Neighbour> neighboursPrec = prec.getNeighbour();
-					//System.out.println(n.getName() + " " + entry.getKey() + " " + entry.getValue());
+					neighboursPrec.removeIf(neigh -> neigh.getName().equals(n.getName()));
+					NetworkObject prevNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(prec.getName())).map(e -> e.getValue()).findFirst().orElse(null);
+					Map<Expr, Set<Expr>> precNodesFrom = prevNO.nodesFrom;
+					Map<Expr, Set<Expr>> precNodesTo = prevNO.nodesTo;
+					
+					Set<Expr> toSet = precNodesTo.get(no.getZ3Node());
+					precNodesTo.remove(no.getZ3Node());
+					
 					for(Expr exprDest : entry.getValue()) {
 						String nextName = netobjs.entrySet().stream().filter(e -> e.getValue().getZ3Node().equals(exprDest)).map(e -> e.getKey().getName()).findFirst().orElse(null);
 						Node next = originalNfv.getGraphs().getGraph().stream()
 								.filter(graph -> graph.getId() == g.getId())
 								.flatMap(graph -> graph.getNode().stream())
 								.filter(node -> node.getName().equals(nextName)).findFirst().orElse(null);
-						List<Neighbour> neighboursNext =  next.getNeighbour();
-						neighboursPrec.removeIf(neigh -> neigh.getName().equals(n.getName()));
-						neighboursNext.removeIf(neigh -> neigh.getName().equals(n.getName()));
-						NetworkObject prevNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(prec.getName())).map(e -> e.getValue()).findFirst().orElse(null);
+	
 						NetworkObject nextNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(next.getName())).map(e -> e.getValue()).findFirst().orElse(null);
-						no.nodesTo.get(nextNO.getZ3Node()).removeIf(el -> el.equals(prevNO.getZ3Node()));
+						
 						boolean presentNext = neighboursPrec.stream().anyMatch(neigh -> neigh.getName().equals(next.getName()));
 						if(!presentNext) {
 							Neighbour neigh = new Neighbour();
 							neigh.setName(next.getName());
 							neighboursPrec.add(neigh);
-							Map<Expr, Set<Expr>> precNodesFrom = prevNO.nodesFrom;
-							Map<Expr, Set<Expr>> precNodesTo = prevNO.nodesTo;
-							for(Map.Entry<Expr, Set<Expr>> e : precNodesFrom.entrySet()) {
-								if(e.getValue().contains(no.getZ3Node())) {
-									e.getValue().remove(no.getZ3Node());
-									e.getValue().add(nextNO.getZ3Node());
-								}
-								
-							}
-							Set<Expr> toSet = precNodesTo.get(no.getZ3Node());
-							precNodesTo.remove(no.getZ3Node());
-							precNodesTo.put(nextNO.getZ3Node(), toSet);
 						}
+						
+						precNodesTo.put(nextNO.getZ3Node(), toSet);
+					}
+						
+					
+					for(Map.Entry<Expr, Set<Expr>> e : precNodesFrom.entrySet()) {
+						if(e.getValue().contains(no.getZ3Node())) {
+							e.getValue().remove(no.getZ3Node());
+							e.getValue().addAll(entry.getValue());
+								
+						}
+							
+					}
+					
+				}
+				
+				
+				for(Map.Entry<Expr, Set<Expr>> entry : nodesTo.entrySet()) {
+					String nextName = netobjs.entrySet().stream().filter(e -> e.getValue().getZ3Node().equals(entry.getKey())).map(e -> e.getKey().getName()).findFirst().orElse(null);
+					Node next = originalNfv.getGraphs().getGraph().stream()
+							.filter(graph -> graph.getId() == g.getId())
+							.flatMap(graph -> graph.getNode().stream())
+							.filter(node -> node.getName().equals(nextName)).findFirst().orElse(null);
+					List<Neighbour> neighboursNext =  next.getNeighbour();
+					NetworkObject nextNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(next.getName())).map(e -> e.getValue()).findFirst().orElse(null);
+					Map<Expr, Set<Expr>> nextNodesFrom = nextNO.nodesFrom;
+					Map<Expr, Set<Expr>> nextNodesTo = nextNO.nodesTo;
+					
+					Set<Expr> fromSet = nextNodesFrom.get(no.getZ3Node());
+					nextNodesFrom.remove(no.getZ3Node());
+					
+					for(Expr exprPrec : entry.getValue()) {
+						String precName = netobjs.entrySet().stream().filter(e -> e.getValue().getZ3Node().equals(exprPrec)).map(e -> e.getKey().getName()).findFirst().orElse(null);
+						Node prec = originalNfv.getGraphs().getGraph().stream()
+								.filter(graph -> graph.getId() == g.getId())
+								.flatMap(graph -> graph.getNode().stream())
+								.filter(node -> node.getName().equals(precName)).findFirst().orElse(null);
+						neighboursNext.removeIf(neigh -> neigh.getName().equals(n.getName()));
+						NetworkObject prevNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(prec.getName())).map(e -> e.getValue()).findFirst().orElse(null);
+						
 						boolean presentPrec = neighboursNext.stream().anyMatch(neigh -> neigh.getName().equals(prec.getName()));
 						if(!presentPrec) {
 							Neighbour neigh = new Neighbour();
 							neigh.setName(prec.getName());
 							neighboursNext.add(neigh);
-							Map<Expr, Set<Expr>> nextNodesFrom = nextNO.nodesFrom;
-							Map<Expr, Set<Expr>> nextNodesTo = nextNO.nodesTo;
-							for(Map.Entry<Expr, Set<Expr>> e : nextNodesTo.entrySet()) {
-								if(e.getValue().contains(no.getZ3Node())) {
-									e.getValue().remove(no.getZ3Node());
-									e.getValue().add(prevNO.getZ3Node());
-								}
-							}
-							Set<Expr> fromSet = nextNodesFrom.get(no.getZ3Node());
-							if(no.nodesTo.get(nextNO.getZ3Node()).isEmpty()) nextNodesFrom.remove(no.getZ3Node());
-							nextNodesFrom.put(prevNO.getZ3Node(), fromSet);
 						}
-
+						
+						nextNodesFrom.put(prevNO.getZ3Node(), fromSet);
+						
 					}
+					
+					
+					for(Map.Entry<Expr, Set<Expr>> e : nextNodesTo.entrySet()) {
+						if(e.getValue().contains(no.getZ3Node())) {
+							e.getValue().remove(no.getZ3Node());
+							e.getValue().addAll(entry.getValue());
+			
+						}
+					}
+	
+		
 				}
+				
 				Graph graphWithOptional = originalNfv.getGraphs().getGraph().stream()
 						.filter(graph -> graph.getId() == g.getId())
 						.findFirst().orElse(null);

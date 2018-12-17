@@ -47,7 +47,7 @@
     </graphs>
     <Constraints>
         <NodeConstraints>
-        <NodeMetrics node="fw3" optional="true"/>
+        <NodeMetrics node="fw2" optional="true"/>
         </NodeConstraints>
         <LinkConstraints/>
     </Constraints>

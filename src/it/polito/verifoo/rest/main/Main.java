@@ -49,7 +49,7 @@ public class Main {
                 		Marshaller m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(  "./testfile/optionality2.xml" )));
+                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(  "./testfile/optionality5.xml" )));
                         m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
