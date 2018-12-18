@@ -58,7 +58,7 @@
         <neighbour name="node5"/>
          <neighbour name="node7"/>
         <configuration description="A simple description" name="conf1">
-         <firewall defaultAction="ALLOW"/>
+         <firewall defaultAction="DENY"/>
         </configuration>
       </node>
        <node functional_type="FIREWALL" name="node7">
@@ -86,7 +86,7 @@
 		<NodeMetrics node="node4" optional="true"/>
 		<NodeMetrics node="node5" optional="true"/>
 		<NodeMetrics node="node6" optional="true"/>
-		
+		<NodeMetrics node="node7" optional="true"/>
 	  </NodeConstraints>
 	  <LinkConstraints/>
   </Constraints>

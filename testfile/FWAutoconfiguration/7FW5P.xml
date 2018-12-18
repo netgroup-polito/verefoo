@@ -112,7 +112,7 @@
 			</node>
 			
 			<node functional_type="WEBSERVER" name="30.0.5.2">
-				<neighbour name="20.0.0.6" />
+				<neighbour name="20.0.0.7" />
 				<configuration description="A simple description"
 					name="confB">
 					<webserver>

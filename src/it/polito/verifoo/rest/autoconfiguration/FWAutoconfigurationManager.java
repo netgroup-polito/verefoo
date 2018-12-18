@@ -101,7 +101,6 @@ public class FWAutoconfigurationManager {
 						}
 					}
 				}
-				
 				value._1.firewallSendRules(value._3); //creation of Z3 formulas for autoconfiguration firewall
 			}
 			

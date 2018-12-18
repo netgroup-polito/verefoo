@@ -72,7 +72,7 @@ public class AutoContext extends Core{
 		//System.out.println("Nr of autocontext autoconfiguration soft constraint " + softConstrAutoConf.size());
         for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
         	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
-			//solver.AssertSoft(t._1, 1000, t._2);
+			solver.AssertSoft(t._1, 1000, t._2);
 		}
 		//System.out.println("Nr of autocontext autoplacement soft constraint " + softConstrAutoPlace.size());
         for (Tuple<BoolExpr, String> t : softConstrAutoPlace) {

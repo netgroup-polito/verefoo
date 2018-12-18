@@ -218,7 +218,7 @@ public class Checker {
 	
 		for(NetworkObject n : dest.neighbours) {
 			constraintList.add(ctx.mkForall(new Expr[]{p0},
-					ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n.getZ3Node(), dest.getZ3Node(), p0)),
+					ctx.mkImplies(ctx.mkAnd((BoolExpr) createIsolationConditionFromDestination(dest, n, dest, p0)),
 							ctx.mkAnd(ctx.mkNot(ctx.mkEq(src.getZ3Node(), nctx.pf.get("origin").apply(p0))))),1,null,null,null,null));
 		}
 		
@@ -254,6 +254,29 @@ public class Checker {
   		}
   		BoolExpr[] tmp = new BoolExpr[exprList.size()];
   		BoolExpr second = ctx.mkAnd(ctx.mkNot(nextNO.isUsed()), ctx.mkAnd(exprList.toArray(tmp)));
+  		BoolExpr result = ctx.mkOr(first, second);
+  		return result;
+		
+	}
+	
+	private BoolExpr createIsolationConditionFromDestination(NetworkObject dest, NetworkObject prec, NetworkObject next, Expr p0) {
+		NetworkObject precNO = netobjs.values().stream().filter(no -> no.getZ3Node().equals(prec.getZ3Node())).findFirst().orElse(null);
+
+		if(!precNO.autoplace) {
+			return (BoolExpr) nctx.recv.apply(prec.getZ3Node(), dest.getZ3Node(), p0);
+		}
+		BoolExpr first =  ctx.mkAnd((BoolExpr) nctx.recv.apply(prec.getZ3Node(), dest.getZ3Node(), p0), precNO.isUsed());
+  		List<BoolExpr> exprList = new ArrayList<>();
+  		Map<Expr, Set<Expr>> precNodesFrom = precNO.nodesFrom;
+  		for(Map.Entry<Expr, Set<Expr>> entry : precNodesFrom.entrySet()) {
+  			Set<Expr> set = entry.getValue();
+  			if(set.contains(next.getZ3Node())) {
+  				NetworkObject prec2 = net.elements.stream().filter(no -> no.getZ3Node().equals(entry.getKey())).findFirst().orElse(null);
+  				exprList.add(createIsolationConditionFromDestination(dest, prec2, prec, p0));
+  			}
+  		}
+  		BoolExpr[] tmp = new BoolExpr[exprList.size()];
+  		BoolExpr second = ctx.mkAnd(ctx.mkNot(precNO.isUsed()), ctx.mkOr(exprList.toArray(tmp)));
   		BoolExpr result = ctx.mkOr(first, second);
   		return result;
 		

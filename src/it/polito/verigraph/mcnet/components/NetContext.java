@@ -156,7 +156,7 @@ public class NetContext extends Core{
 		//System.out.println("Nr of net context wildcards soft constraint " + softConstrWildcard.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrWildcard) {
         	//System.out.println(t._1 + "\n with value " + 10 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, 10, t._2);
+			solver.AssertSoft(t._1, 100, t._2);
 		}
 		//System.out.println("Nr of net context autoconfiguration soft constraint " + softConstrAutoConf.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrAutoConf) {
