@@ -25,6 +25,7 @@ import com.microsoft.z3.Sort;
 import com.microsoft.z3.Optimize.Handle;
 
 import it.polito.verigraph.mcnet.netobjs.DumbNode;
+import it.polito.verifoo.rest.autoconfiguration.WildcardManager;
 import it.polito.verigraph.mcnet.components.Core;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 
@@ -48,13 +49,16 @@ public class NetContext extends Core{
     public HashMap<String,DatatypeExpr> am; // list of addresses, callable by address name
     public HashMap<String,DatatypeExpr> pm; // list of port range, callable by string
     public HashMap<String,FuncDecl> pf;
-    Context ctx;
+    public Context ctx;
     public EnumSort node;
 	public DatatypeSort address;
 	public DatatypeSort port_range;
     public HashMap<String,FuncDecl> port_functions;
     public FuncDecl /*src_port,dest_port,*/nodeHasAddr,addrToNode,send,recv;
     public DatatypeSort packet;
+    public HashMap<String,Handle> handles;
+    
+    public WildcardManager wildcardManager;
     
     public HashMap<String,FuncDecl> ip_functions;
     /*   Constants definition
@@ -73,7 +77,6 @@ public class NetContext extends Core{
      */
     public NetContext(Context ctx,Object[]... args ){
         super(ctx,args);
-
     }
 
     @Override
@@ -104,16 +107,15 @@ public class NetContext extends Core{
         
     }
     
+    public void setWildcardManager(WildcardManager wildcardManager) {
+    	this.wildcardManager = wildcardManager;
+    }
+    
     public int addLatency(int latencyAll){
     	this.latencyAll=this.latencyAll+latencyAll;
     	//System.out.println("Latency added -> total: " + this.latencyAll);
     	return latencyAll;
     }
-    
-    public HashMap<String,Handle> handles;
-  
-    
-  
     
   
 
@@ -513,12 +515,15 @@ public class NetContext extends Core{
 
     }
     
-    /**
-     * Two ip addresses are equals
-     * @param p1
-     * @param p2
-     * @return
-     */
+    public BoolExpr equalNodeNameToFWRule(String index, Expr p_0, Expr fwRule) {
+    	if(wildcardManager != null && wildcardManager.areNodesWithIPAddresses()) {
+    		return equalPacketIpToFwIpRule(pf.get(index).apply(p_0), fwRule);
+    	}else {
+    		return ctx.mkEq(pf.get(index).apply(p_0), fwRule);
+    	}
+    }
+    
+
     public BoolExpr equalPacketIpToFwIpRule(Expr packet_ip, Expr fwIpRule){
     	return ctx.mkOr(new BoolExpr[] {
     		  ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(fwIpRule), ip_functions.get("ipAddr_1").apply(am.get("wildcard"))),
@@ -553,24 +558,15 @@ public class NetContext extends Core{
   	  				ctx.mkEq(ip_functions.get("ipAddr_4").apply(fwIpRule), ip_functions.get("ipAddr_4").apply(packet_ip)))
 
     	}); 
-        /*return ctx.mkAnd(new BoolExpr[]{
-                ctx.mkOr(
-                		ctx.mkEq(ip_functions.get("ipAddr_1").apply(packet_ip), ip_functions.get("ipAddr_1").apply(fwIpRule)),
-                		ctx.mkEq(ip_functions.get("ipAddr_1").apply(fwIpRule), ip_functions.get("ipAddr_1").apply(am.get("wildcard")))
-                		),
-                ctx.mkOr(
-                		ctx.mkEq(ip_functions.get("ipAddr_2").apply(packet_ip), ip_functions.get("ipAddr_2").apply(fwIpRule)),
-                		ctx.mkEq(ip_functions.get("ipAddr_2").apply(fwIpRule), ip_functions.get("ipAddr_2").apply(am.get("wildcard")))
-                		),
-                ctx.mkOr(
-                		ctx.mkEq(ip_functions.get("ipAddr_3").apply(packet_ip), ip_functions.get("ipAddr_3").apply(fwIpRule)),
-                		ctx.mkEq(ip_functions.get("ipAddr_3").apply(fwIpRule), ip_functions.get("ipAddr_3").apply(am.get("wildcard")))
-                		),
-                ctx.mkOr(
-                		ctx.mkEq(ip_functions.get("ipAddr_4").apply(packet_ip), ip_functions.get("ipAddr_4").apply(fwIpRule)),
-                		ctx.mkEq(ip_functions.get("ipAddr_4").apply(fwIpRule), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))
-                		)});*/
+  
     }
+    
+    /**
+     * Two ip addresses are equals
+     * @param p1
+     * @param p2
+     * @return
+     */
     public BoolExpr equalIp(Expr ip1, Expr ip2){
     	return ctx.mkOr(new BoolExpr[] {
       		  ctx.mkAnd(ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip1), ip_functions.get("ipAddr_1").apply(am.get("wildcard"))),
@@ -604,27 +600,7 @@ public class NetContext extends Core{
 	  				ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip2), ip_functions.get("ipAddr_3").apply(ip1)),
 	  				ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip2), ip_functions.get("ipAddr_4").apply(ip1)))
       	});
-        /*return ctx.mkAnd(new BoolExpr[]{
-                ctx.mkOr(
-                		ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip1), ip_functions.get("ipAddr_1").apply(ip2)),
-                		ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip1), ip_functions.get("ipAddr_1").apply(am.get("wildcard"))),
-                		ctx.mkEq(ip_functions.get("ipAddr_1").apply(ip2), ip_functions.get("ipAddr_1").apply(am.get("wildcard")))
-                		),
-                ctx.mkOr(
-                		ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip1), ip_functions.get("ipAddr_2").apply(ip2)),
-                		ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip1), ip_functions.get("ipAddr_2").apply(am.get("wildcard"))),
-                		ctx.mkEq(ip_functions.get("ipAddr_2").apply(ip2), ip_functions.get("ipAddr_2").apply(am.get("wildcard")))
-                		),
-                ctx.mkOr(
-                		ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip1), ip_functions.get("ipAddr_3").apply(ip2)),
-                		ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip1), ip_functions.get("ipAddr_3").apply(am.get("wildcard"))),
-                		ctx.mkEq(ip_functions.get("ipAddr_3").apply(ip2), ip_functions.get("ipAddr_3").apply(am.get("wildcard")))
-                		),
-                ctx.mkOr(
-                		ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(ip2)),
-                		ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip1), ip_functions.get("ipAddr_4").apply(am.get("wildcard"))),
-                		ctx.mkEq(ip_functions.get("ipAddr_4").apply(ip2), ip_functions.get("ipAddr_4").apply(am.get("wildcard")))
-                		)});*/
+  
     }
     
     public BoolExpr equalPacketLv4ProtoToFwPacketLv4Proto(Expr proto1, Expr proto2){

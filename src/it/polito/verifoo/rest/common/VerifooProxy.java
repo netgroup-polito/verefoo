@@ -85,10 +85,11 @@ public class VerifooProxy {
 		    this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
 		    this.linkMetrics = constraints.getLinkConstraints().getLinkMetrics();
 		    this.paths = paths;
+		    wildcardManager = new WildcardManager(nodes);
 			nctx = NetContextGenerator.generate(ctx,nodes,prop);
+			nctx.setWildcardManager(wildcardManager);
 			autoctx = new AutoContext(ctx);
 			net = new Network (ctx,new Object[]{nctx});
-			wildcardManager = new WildcardManager(nodes);
 			FWmanager = new FWAutoconfigurationManager(wildcardManager, prop, nodes);
 			/* Generate the different network object and map it to XML Node */
 			netobjs=new NodeNetworkObject(ctx, nctx, autoctx, net,nodes, prop.size(), nodeMetrics, prop, FWmanager);
