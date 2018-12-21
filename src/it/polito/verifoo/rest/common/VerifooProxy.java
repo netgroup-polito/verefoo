@@ -554,13 +554,15 @@ public class VerifooProxy {
 				//								+ " to " + nctx.am.get(server.getIp()) 
 				//								+ " -> next hop: " + netobjs.get(next));
 				
-				if(setNextHop(client, next, server, 1, new HashMap<>())){
+				if(setNextHop(client, client, next, server, 1, new HashMap<>())){
 					/*System.out.println("Route from " + client.getName() 
 					+ " to " + nctx.am.get(server.getIp()) 
 					+ " -> next hop: " + netobjs.get(next));
 					System.out.println("From " + hostClient + " to " + host1);
 					*/
 					rawRoutingConditions.get(client).add(next.getName());
+					NetworkObject sourceNetworkObject =  netobjs.get(client);
+					sourceNetworkObject.addFirstHop(netobjs.get(server),netobjs.get(next));
 				}
 				
 			}
@@ -603,11 +605,13 @@ public class VerifooProxy {
 		 * @return
 		 * @throws BadGraphError
 		 */
-		private boolean setNextHop(Node prec, Node source, Node server, int nodeRecursionLevel, HashMap<Node, List<String>> visited) throws BadGraphError{
+		private boolean setNextHop(Node origin, Node prec, Node source, Node server, int nodeRecursionLevel, HashMap<Node, List<String>> visited) throws BadGraphError{
 			//logger.debug("Searching next hop for " + source.getName() + " towards " + server.getName());
 			if(source.getName().equals(server.getName())){
 					logger.debug("Route from SERVER " + source.getName() + " to " + nctx.am.get(server.getName())  + " -> next hop: DESTINATION REACHED");
 					//rawRoutingConditions.get(prec).add(source.getName());
+					NetworkObject sourceNetworkObject =  netobjs.get(source);
+					sourceNetworkObject.addLastHop(netobjs.get(origin),netobjs.get(prec));
 					return true;
 			}
 			//List<String> nextDest = links.stream().filter(l -> l.getSourceNode().equals(source.getName())).map(l -> l.getDestNode() ).collect(Collectors.toList());
@@ -637,7 +641,7 @@ public class VerifooProxy {
 				//logger.debug("Adding to visited from " + source.getName() +" to " + dest);
 				visited.get(source).add(dest);
 				//logger.debug("Route from " + source.getName()+ " to " + nctx.am.get(server.getName())+ " -> next hop: " + netobjs.get(next));
-				if(setNextHop(source, next, server, nodeRecursionLevel+1, visited)){
+				if(setNextHop(origin, source, next, server, nodeRecursionLevel+1, visited)){
 					if(autoctx.nodeIsOptional(source)){
 						autoctx.addOptionalPlacement(netobjs.get(prec), netobjs.get(next), netobjs.get(source));
 					}
@@ -793,6 +797,7 @@ public class VerifooProxy {
 					//logger.debug("Route from SERVER " + source.getName() + " to " + nctx.am.get(server.getName())  + " -> next hop: DESTINATION REACHED" + " CurrentHost: " + currentHost);
 					rawDeploymentConditions.get(source).add(cb.buildConditionString(source, currentHost));
 					//logger.debug("Found path from lv " + level + " of chain " +nChain );
+					
 					return true;
 				}
 				else{
@@ -910,7 +915,7 @@ public class VerifooProxy {
 		    }else{
 		    	 	logger.debug("SAT ");
 		     		logger.debug( ""+ret.model); //p.printModel(ret.model);
-		     		//System.out.println(ret.model);
+		     		System.out.println(ret.model);
 		     		
 		    }
 			return ret;

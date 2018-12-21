@@ -220,6 +220,7 @@ public class AclFirewall extends NetworkObject{
   			autoctx.softConstrAutoPlace.add(new Tuple<BoolExpr, String>(ctx.mkNot(used), "fw_auto_conf"));
   		}
   		
+  		//System.out.println(nRules + " " + fw);
   		for(int i = 0; i < nRules; i++){
   			Expr src = ctx.mkConst(fw + "_auto_src_"+i, nctx.address);
   			Expr dst = ctx.mkConst(fw + "_auto_dst_"+i, nctx.address);
@@ -303,6 +304,7 @@ public class AclFirewall extends NetworkObject{
   		}
   		
   		for(Map.Entry<Expr, Set<Expr>> entry : nodesFrom.entrySet()) {
+  			
   			Expr e = entry.getKey();
   			BoolExpr recv= createRecvExpr(e, this.getZ3Node());
   			Set<Expr> set = entry.getValue();

@@ -2,75 +2,199 @@
 <NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./xsd/nfvSchema.xsd">
     <graphs>
         <graph id="0">
-            <node name="nodeA" functional_type="WEBCLIENT">
-                <neighbour name="node1"/>
+            <node name="10.0.0.1" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.1"/>
                 <configuration name="confA" description="A simple description">
-                    <webclient nameWebServer="nodeB"/>
+                    <webclient nameWebServer="30.0.5.2"/>
                 </configuration>
             </node>
-            <node name="nodeC" functional_type="WEBCLIENT">
-                <neighbour name="node2"/>
+            <node name="10.0.0.2" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.12"/>
                 <configuration name="confA" description="A simple description">
-                    <webclient nameWebServer="nodeB"/>
+                    <webclient nameWebServer="30.0.5.2"/>
                 </configuration>
             </node>
-            <node name="node1" functional_type="FIREWALL">
-                <neighbour name="nodeA"/>
-                <neighbour name="node3"/>
+            <node name="20.0.0.1" functional_type="FIREWALL">
+                <neighbour name="20.0.0.5"/>
+                <neighbour name="10.0.0.1"/>
                 <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="DENY"/>
+                    <firewall/>
                 </configuration>
             </node>
-            <node name="node2" functional_type="FIREWALL">
-                <neighbour name="node3"/>
-                <neighbour name="nodeC"/>
+            <node name="20.0.0.2" functional_type="FIREWALL">
+                <neighbour name="20.0.0.5"/>
                 <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="DENY"/>
+                    <firewall/>
                 </configuration>
             </node>
-            <node name="node3" functional_type="FIREWALL">
-                <neighbour name="node1"/>
-                <neighbour name="node2"/>
-                <neighbour name="node4"/>
-                <neighbour name="node5"/>
+            <node name="20.0.0.3" functional_type="FIREWALL">
+                <neighbour name="20.0.0.6"/>
                 <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="DENY"/>
+                    <firewall/>
                 </configuration>
             </node>
-            <node name="node4" functional_type="FIREWALL">
-                <neighbour name="node3"/>
-                <neighbour name="node6"/>
+            <node name="20.0.0.4" functional_type="FIREWALL">
+                <neighbour name="20.0.0.6"/>
                 <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="ALLOW"/>
+                    <firewall/>
                 </configuration>
             </node>
-            <node name="node5" functional_type="FIREWALL">
-                <neighbour name="node3"/>
-                <neighbour name="node6"/>
+            <node name="20.0.0.5" functional_type="FIREWALL">
+                <neighbour name="20.0.0.1"/>
+                <neighbour name="20.0.0.2"/>
+                <neighbour name="20.0.0.7"/>
                 <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="DENY"/>
+                    <firewall/>
                 </configuration>
             </node>
-            <node name="node6" functional_type="FIREWALL">
-                <neighbour name="node4"/>
-                <neighbour name="node5"/>
-                <neighbour name="node7"/>
+            <node name="20.0.0.6" functional_type="FIREWALL">
+                <neighbour name="20.0.0.3"/>
+                <neighbour name="20.0.0.4"/>
+                <neighbour name="20.0.0.7"/>
                 <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="DENY"/>
+                    <firewall/>
                 </configuration>
             </node>
-            <node name="node7" functional_type="FIREWALL">
-                <neighbour name="node6"/>
-                <neighbour name="nodeB"/>
+            <node name="20.0.0.7" functional_type="FIREWALL">
+                <neighbour name="20.0.0.5"/>
+                <neighbour name="20.0.0.6"/>
+                <neighbour name="20.0.0.15"/>
                 <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="DENY"/>
+                    <firewall/>
                 </configuration>
             </node>
-            <node name="nodeB" functional_type="WEBSERVER">
-                <neighbour name="node7"/>
+            <node name="20.0.0.8" functional_type="FIREWALL">
+                <neighbour name="20.0.0.12"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.9" functional_type="FIREWALL">
+                <neighbour name="20.0.0.12"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.10" functional_type="FIREWALL">
+                <neighbour name="20.0.0.13"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.11" functional_type="FIREWALL">
+                <neighbour name="20.0.0.13"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.12" functional_type="FIREWALL">
+                <neighbour name="20.0.0.8"/>
+                <neighbour name="20.0.0.9"/>
+                <neighbour name="20.0.0.14"/>
+                <neighbour name="10.0.0.2"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.13" functional_type="FIREWALL">
+                <neighbour name="20.0.0.10"/>
+                <neighbour name="20.0.0.11"/>
+                <neighbour name="20.0.0.14"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.14" functional_type="FIREWALL">
+                <neighbour name="20.0.0.12"/>
+                <neighbour name="20.0.0.13"/>
+                <neighbour name="20.0.0.15"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.15" functional_type="FIREWALL">
+                <neighbour name="20.0.0.7"/>
+                <neighbour name="20.0.0.14"/>
+                <neighbour name="20.0.0.23"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.16" functional_type="FIREWALL">
+                <neighbour name="20.0.0.20"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.17" functional_type="FIREWALL">
+                <neighbour name="20.0.0.20"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.18" functional_type="FIREWALL">
+                <neighbour name="20.0.0.21"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.19" functional_type="FIREWALL">
+                <neighbour name="20.0.0.21"/>
+                <neighbour name="30.0.5.2"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.20" functional_type="FIREWALL">
+                <neighbour name="20.0.0.16"/>
+                <neighbour name="20.0.0.17"/>
+                <neighbour name="20.0.0.22"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.21" functional_type="FIREWALL">
+                <neighbour name="20.0.0.18"/>
+                <neighbour name="20.0.0.19"/>
+                <neighbour name="20.0.0.22"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.22" functional_type="FIREWALL">
+                <neighbour name="20.0.0.20"/>
+                <neighbour name="20.0.0.21"/>
+                <neighbour name="20.0.0.23"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.23" functional_type="FIREWALL">
+                <neighbour name="20.0.0.15"/>
+                <neighbour name="20.0.0.22"/>
+                <neighbour name="20.0.0.24"/>
+                <neighbour name="20.0.0.25"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.24" functional_type="FIREWALL">
+                <neighbour name="20.0.0.23"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="20.0.0.25" functional_type="FIREWALL">
+                <neighbour name="20.0.0.23"/>
+                <configuration name="conf1" description="A simple description">
+                    <firewall/>
+                </configuration>
+            </node>
+            <node name="30.0.5.2" functional_type="WEBSERVER">
+                <neighbour name="20.0.0.19"/>
                 <configuration name="confB" description="A simple description">
                     <webserver>
-                        <name>nodeB</name>
+                        <name>30.0.5.2</name>
                     </webserver>
                 </configuration>
             </node>
@@ -78,19 +202,36 @@
     </graphs>
     <Constraints>
         <NodeConstraints>
-            <NodeMetrics node="node1" optional="true"/>
-            <NodeMetrics node="node2" optional="true"/>
-            <NodeMetrics node="node3" optional="true"/>
-            <NodeMetrics node="node4" optional="true"/>
-            <NodeMetrics node="node5" optional="true"/>
-            <NodeMetrics node="node6" optional="true"/>
-            <NodeMetrics node="node7" optional="true"/>
+            <NodeMetrics node="20.0.0.1" optional="true"/>
+            <NodeMetrics node="20.0.0.2" optional="true"/>
+            <NodeMetrics node="20.0.0.3" optional="true"/>
+            <NodeMetrics node="20.0.0.4" optional="true"/>
+            <NodeMetrics node="20.0.0.5" optional="true"/>
+            <NodeMetrics node="20.0.0.6" optional="true"/>
+            <NodeMetrics node="20.0.0.7" optional="true"/>
+            <NodeMetrics node="20.0.0.8" optional="true"/>
+            <NodeMetrics node="20.0.0.9" optional="true"/>
+            <NodeMetrics node="20.0.0.10" optional="true"/>
+            <NodeMetrics node="20.0.0.11" optional="true"/>
+            <NodeMetrics node="20.0.0.12" optional="true"/>
+            <NodeMetrics node="20.0.0.13" optional="true"/>
+            <NodeMetrics node="20.0.0.14" optional="true"/>
+            <NodeMetrics node="20.0.0.15" optional="true"/>
+            <NodeMetrics node="20.0.0.16" optional="true"/>
+            <NodeMetrics node="20.0.0.17" optional="true"/>
+            <NodeMetrics node="20.0.0.18" optional="true"/>
+            <NodeMetrics node="20.0.0.19" optional="true"/>
+            <NodeMetrics node="20.0.0.20" optional="true"/>
+            <NodeMetrics node="20.0.0.21" optional="true"/>
+            <NodeMetrics node="20.0.0.22" optional="true"/>
+            <NodeMetrics node="20.0.0.32" optional="true"/>
+            <NodeMetrics node="20.0.0.24" optional="true"/>
+            <NodeMetrics node="20.0.0.25" optional="true"/>
         </NodeConstraints>
         <LinkConstraints/>
     </Constraints>
     <PropertyDefinition>
-        <Property name="ReachabilityProperty" graph="0" src="nodeA" dst="nodeB"/>
-        <Property name="IsolationProperty" graph="0" src="nodeC" dst="nodeB"/>
+        <Property name="ReachabilityProperty" graph="0" src="10.0.0.-1" dst="30.0.5.2"/>
     </PropertyDefinition>
     <ParsingString></ParsingString>
 </NFV>

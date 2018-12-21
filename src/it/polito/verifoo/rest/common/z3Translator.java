@@ -47,9 +47,7 @@ public class z3Translator {
 	}
 	
 	public static String stringToSeachNetworkObjectUsed(Node n) {
-		//return "(define-fun node2_used () Bool\n" + 
-			//	"false)";
-		return "define-fun .*" + n.getName() + ".*_used \\(\\) Bool\n.*false";
+		return "define-fun .*" + n.getName() + ".*_used.* \\(\\) Bool\n.*false";
 	}
 	
 	

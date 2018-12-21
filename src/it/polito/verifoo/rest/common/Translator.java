@@ -556,15 +556,23 @@ public class Translator {
 				})
 				.collect(Collectors.toList());
 		
+		
 		optionalNodes.forEach(opNode -> {
+			
 			String tosearch = z3Translator.stringToSeachNetworkObjectUsed(opNode);
 			Pattern pattern = Pattern.compile(tosearch);
 			Matcher matcher = pattern.matcher(model);
+			
+			
 			while(matcher.find()) {
+			
+				
 				Node n = originalNfv.getGraphs().getGraph().stream()
 						.filter(graph -> graph.getId() == g.getId())
 						.flatMap(graph -> graph.getNode().stream())
 						.filter(node -> node.getName().equals(opNode.getName())).findFirst().orElse(null);
+				if(n == null) continue;
+			
 				NetworkObject no = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(n.getName())).map(e -> e.getValue()).findFirst().orElse(null);
 				Map<Expr, Set<Expr>> nodesFrom = no.getNodesFrom();
 				Map<Expr, Set<Expr>> nodesTo = no.getNodesTo();

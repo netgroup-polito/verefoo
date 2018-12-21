@@ -340,9 +340,23 @@ public class Checker {
 		Expr n_1 = ctx.mkConst("check_reach_n_1_" + src.getZ3Node() + "_" + dest.getZ3Node()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
 
 		// Constraint1recv(n_0,destNode,p0,t_0)
-		constraintList.add((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Node(), p0));
+		Map<Expr, Set<Expr>> lastHops = dest.getLastHops();
+		Set<Expr> set = lastHops.get(src.getZ3Node());
+		//List<Expr> recvNeighbours = set.stream().map(n -> (BoolExpr) nctx.recv.apply(n, dest.getZ3Node(), p0)).distinct().collect(Collectors.toList());
+		List<Expr> recvNeighbours = set.stream().map(n -> netobjs.values().stream().filter(no -> no.getZ3Node().equals(n)).findFirst().orElse(null)).map(n -> (BoolExpr) createIsolationConditionFromDestination(dest, n, dest, p0 )).distinct().collect(Collectors.toList());
+  		BoolExpr[] tmp = new BoolExpr[set.size()];
+  	 	BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp));
+		constraintList.add(enumerateRecv);
+
 		// Constraint send(srcNode,n_1,p0,t_0)
-		constraintList.add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1));
+		Map<Expr, Set<Expr>> firstHops = src.getFirstHops();
+		Set<Expr> set2 = firstHops.get(dest.getZ3Node());
+		//List<Expr> sendNeighbours = set2.stream().map(n -> (BoolExpr) nctx.send.apply(src.getZ3Node(), n, p1)).distinct().collect(Collectors.toList());
+		List<Expr> sendNeighbours = set.stream().map(n -> netobjs.values().stream().filter(no -> no.getZ3Node().equals(n)).findFirst().orElse(null)).map(n -> (BoolExpr) createIsolationConditionFromSource(src, src, n, p1 )).distinct().collect(Collectors.toList());
+		BoolExpr[] tmp2 = new BoolExpr[set2.size()];
+  	 	BoolExpr enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp2));
+		constraintList.add(enumerateSend);
+		//constraintList.add((BoolExpr) nctx.send.apply(src.getZ3Node(), n_1, p1));
 		// Constraint4p1.origin == srcNode
 		constraintList.add(ctx.mkEq(nctx.pf.get("origin").apply(p0), src.getZ3Node()));
 

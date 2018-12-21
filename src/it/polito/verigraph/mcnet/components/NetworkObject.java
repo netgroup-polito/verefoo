@@ -42,6 +42,8 @@ public abstract class NetworkObject extends Core{
 	public ArrayList<NetworkObject> neighbours;
 	protected Map<Expr, Set<Expr>> nodesFrom = new HashMap<>();
 	protected Map<Expr, Set<Expr>> nodesTo = new HashMap<>();
+	protected Map<Expr, Set<Expr>> lastHops = new HashMap<>();
+	protected Map<Expr, Set<Expr>> firstHops = new HashMap<>();
 	
     /**
      * Get a reference to the z3 node this class wraps around
@@ -100,6 +102,28 @@ public abstract class NetworkObject extends Core{
 		}
 	}
     
+    public void addFirstHop(NetworkObject dest, NetworkObject hop) {
+    	
+	    if(firstHops.containsKey(dest.getZ3Node())) {
+			firstHops.get(dest.getZ3Node()).add(hop.getZ3Node());
+		} else {
+			Set<Expr> set = new HashSet<>();
+			set.add(hop.getZ3Node());
+			firstHops.put(dest.getZ3Node(), set);
+		}
+	}
+    
+  public void addLastHop(NetworkObject origin, NetworkObject hop) {
+    	
+	    if(lastHops.containsKey(origin.getZ3Node())) {
+			lastHops.get(origin.getZ3Node()).add(hop.getZ3Node());
+		} else {
+			Set<Expr> set = new HashSet<>();
+			set.add(hop.getZ3Node());
+			lastHops.put(origin.getZ3Node(), set);
+		}
+	}
+    
     public Map<Expr, Set<Expr>>  getNodesFrom(){
     	return nodesFrom;
     }
@@ -108,6 +132,14 @@ public abstract class NetworkObject extends Core{
     	return nodesTo;
     }
     
+    
+    public Map<Expr, Set<Expr>>  getFirstHops(){
+    	return firstHops;
+    }
+    
+    public Map<Expr, Set<Expr>>  getLastHops(){
+    	return lastHops;
+    }
     
     
 }

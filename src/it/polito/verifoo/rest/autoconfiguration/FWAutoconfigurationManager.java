@@ -52,14 +52,29 @@ public class FWAutoconfigurationManager {
 	
 	public void setPolicy(Node firewall, Node source, Node destination) {
 
+		int newRules = 0;
 		List<Property> allProperties = policies.stream().filter(p -> p.getSrc().equals(source.getName()) && p.getDst().equals(destination.getName())).collect(Collectors.toList());		
 		List<Property> interestedProperties = allProperties.stream().filter(p ->
 				( p.getName().value().equals("IsolationProperty") && firewall.getConfiguration().getFirewall().getDefaultAction() == ActionTypes.ALLOW ) 
 				|| (p.getName().value().equals("ReachabilityProperty") && firewall.getConfiguration().getFirewall().getDefaultAction() == ActionTypes.DENY)).collect(Collectors.toList());
+		for(Property property : allProperties) {
+			boolean found = FWAllPolicies.get(firewall.getName()).stream().anyMatch(p -> p.getSrc().equals(property.getSrc()) && p.getDst().equals(property.getDst()));
+			if(!found) {
+				FWAllPolicies.get(firewall.getName()).add(property);
+			}
+		}
+		//FWAllPolicies.get(firewall.getName()).addAll(allProperties);
 		
-		FWAllPolicies.get(firewall.getName()).addAll(allProperties);
-		FWInterestedPolicies.get(firewall.getName()).addAll(interestedProperties);
-		autoconfFW.get(firewall.getName())._3 += interestedProperties.size();
+		for(Property property : interestedProperties) {
+			boolean found = FWInterestedPolicies.get(firewall.getName()).stream().anyMatch(p -> p.getSrc().equals(property.getSrc()) && p.getDst().equals(property.getDst()));
+			if(!found) {
+				FWInterestedPolicies.get(firewall.getName()).add(property);
+				newRules++;
+			}
+		}
+		//FWInterestedPolicies.get(firewall.getName()).addAll(interestedProperties);
+		
+		autoconfFW.get(firewall.getName())._3 += newRules;
 		
 	}
 	
@@ -70,7 +85,7 @@ public class FWAutoconfigurationManager {
 				String key = entry.getKey();
 				Quattro<AclFirewall, Node, Integer, Boolean> value = entry.getValue();
 
-				if(value._2.getNeighbour().size() == 2) {
+				/*if(value._2.getNeighbour().size() == 2) {
 					List<Neighbour> neighbours = value._2.getNeighbour();
 					
 
@@ -84,7 +99,7 @@ public class FWAutoconfigurationManager {
 						value._1.firewallSendRules(value._3);
 						continue;
 					}
-				} 
+				} */
 				
 					
 				List<Property> interestedPolicies = FWInterestedPolicies.get(value._2.getName());
