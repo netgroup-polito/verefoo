@@ -18,15 +18,15 @@ import it.polito.verifoo.rest.jaxb.Node;
 public class ConditionStringBuilder {
 	private Logger logger = LogManager.getLogger("mylog");
 	private Context ctx;
-	private AutoContext autoctx;
+
 	private List<Connection> connections;
-	private HashMap<Node,List<String>> rawConditions;
+	private HashMap<AllocationNode,List<String>> rawConditions;
 	
-	public ConditionStringBuilder(Context ctx, AutoContext autoctx, List<Connection> connections, HashMap<Node,List<String>> rawConditions) {
+	public ConditionStringBuilder(Context ctx,  List<Connection> connections, HashMap<AllocationNode, List<String>> rawDeploymentConditions) {
 		this.ctx = ctx;
-		this.autoctx = autoctx;
+
 		this.connections = connections;
-		this.rawConditions = rawConditions;
+		this.rawConditions = rawDeploymentConditions;
 	}
 	/**
 	 * From the arguments it creates the string source@host, also checking if the source is optional and registering this information
@@ -36,10 +36,6 @@ public class ConditionStringBuilder {
 		//System.out.print("On RT("+next.getName()+") ");
 		//System.out.println(next.getName()+"@"+host1);
 		//logger.debug("\t"+source.getName()+"@"+currentHost);
-		
-		if(autoctx.nodeIsOptional(source)){
-			autoctx.addOptionalCondition(source, ctx.mkBoolConst(source.getName()+"@"+host));
-		}
 		return source.getName()+"@"+host;
 	}
 	/**

@@ -20,6 +20,7 @@ import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 import it.polito.verigraph.mcnet.components.PortInterval;
 import it.polito.verigraph.mcnet.components.Tuple;
+import it.polito.verigraph.mcnet.netobjs.AclFirewall;
 /**
  * This class implements a parser for verifoo output (the z3 model), in order to translate it into the correct XML 
  */
@@ -30,8 +31,8 @@ public class Translator {
 	protected org.apache.logging.log4j.Logger logger = LogManager.getLogger("mylog");
 	protected Graph g;
 	protected VerifooNormalizer norm;
-	protected NodeNetworkObject netobjs;
 	protected List<Node> removedNodes;
+	private Map<String, AllocationNode> allocationNodes;
 	/**
 	 * Constructor
 	 * @param model The Verifoo output.
@@ -43,20 +44,13 @@ public class Translator {
 		this.nfv=nfv;
 		this.g = g;
 	}
-	/**
-	 * Constructor
-	 * @param model The Verifoo output.
-	 * @param nfv The NFV model to complete.
-	 * @param g the specific network service graph that is considered
-	 * @param netobjs map containing all the network objects
-	 * @param removedNodes optional nodes not used (TEMPORARY)
-	 */
-	public Translator(String model,NFV nfv, Graph g, NodeNetworkObject netobjs, List<Node> removedNodes){
+
+	
+	public Translator(String model,NFV nfv, Graph g, Map<String, AllocationNode> allocationNodes){
 		this.model=model;
 		this.nfv=nfv;
 		this.g = g;
-		this.netobjs = netobjs;
-		this.removedNodes = removedNodes;
+		this.allocationNodes = allocationNodes;
 	}
 	/**
 	 * Conversion function
@@ -65,8 +59,8 @@ public class Translator {
 	public NFV convert(){
 		if(originalNfv.getHosts() != null) 
 			originalNfv.getHosts().getHost().forEach(this::searchHost);
-		setAutoConfig();
 		setAutoPlacement();
+		setAutoConfig();
 		//originalNfv.setHosts(nfv.getHosts());
 		return originalNfv;
 	}
@@ -75,8 +69,8 @@ public class Translator {
 	 */
 	public void setAutoConfig() {
 		setFirewallAutoConfig();
-		setDPIAutoConfig();
-		setAntispamAutoConfig();
+		//setDPIAutoConfig();
+		//setAntispamAutoConfig();
 	}
 	/**
 	 * Search in the model the deployed position of the nodes and updates the correspondent host object
@@ -173,7 +167,7 @@ public class Translator {
 		//List<Node> autoNodes = g.getNode().stream().filter(n ->n.getFunctionalType().equals(FunctionalTypes.FIREWALL) && n.getConfiguration().getFirewall().getElements().isEmpty()).collect(Collectors.toList());
 		List<Node> autoNodes = originalNfv.getGraphs().getGraph().stream().filter(graph -> graph.getId() == g.getId())
 				.flatMap(graph -> graph.getNode().stream())
-				.filter(n ->n.getFunctionalType().equals(FunctionalTypes.FIREWALL) && n.getConfiguration().getFirewall().getElements().isEmpty())
+				.filter(n -> n.getFunctionalType()!= null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) && n.getConfiguration().getFirewall().getElements().isEmpty())
 				.collect(Collectors.toList());List<String> nodes = g.getNode().stream().map(n -> n.getName()).collect(Collectors.toList());
 		/*List<Node> originalAutoNodes = originalNfv.getGraphs().getGraph().stream()
 						.flatMap(graph -> graph.getNode().stream())
@@ -543,23 +537,16 @@ public class Translator {
 	 */
 	public void setAutoPlacement() {
 		
-		List<NodeMetrics> nodeMetrics = originalNfv.getConstraints().getNodeConstraints().getNodeMetrics().stream().collect(Collectors.toList());
 		
-		List<Node> optionalNodes = originalNfv.getGraphs().getGraph().stream().filter(graph -> graph.getId() == g.getId())
-				.flatMap(graph -> graph.getNode().stream())
-				.filter(n -> { 
-					for(NodeMetrics nm : nodeMetrics) {
-						if(n.getName().equals(nm.getNode()))
-							return true;
-					}
-					return false;
-				})
+		
+		List<AllocationNode> usableNodes = allocationNodes.values().stream()
+				.filter(n ->  n.getNode().getConfiguration() == null )
 				.collect(Collectors.toList());
 		
 		
-		optionalNodes.forEach(opNode -> {
+		usableNodes.forEach(allocationNode -> {
 			
-			String tosearch = z3Translator.stringToSeachNetworkObjectUsed(opNode);
+			String tosearch = z3Translator.stringToSeachNetworkObjectUsed(allocationNode.getNode());
 			Pattern pattern = Pattern.compile(tosearch);
 			Matcher matcher = pattern.matcher(model);
 			
@@ -570,117 +557,51 @@ public class Translator {
 				Node n = originalNfv.getGraphs().getGraph().stream()
 						.filter(graph -> graph.getId() == g.getId())
 						.flatMap(graph -> graph.getNode().stream())
-						.filter(node -> node.getName().equals(opNode.getName())).findFirst().orElse(null);
+						.filter(node -> node.getName().equals(allocationNode.getNode().getName())).findFirst().orElse(null);
+				
+				if(n == null) continue;
+				
+				Configuration configuration = new Configuration();
+				configuration.setName("AutoConf");
+				n.setFunctionalType(FunctionalTypes.FIREWALL);
+				Firewall f = new Firewall();
+				
+				for(NetworkObject no:  allocationNode.getPlaceableVNF().values())
+					if(no instanceof AclFirewall) {
+						AclFirewall aclf = (AclFirewall) no;
+						if(!aclf.isBlacklisting())
+							f.setDefaultAction(ActionTypes.ALLOW);
+						else
+							f.setDefaultAction(ActionTypes.DENY);
+					}
+				
+				configuration.setFirewall(f);
+				n.setConfiguration(configuration);
+			}
+					
+		});
+		
+		usableNodes.forEach(allocationNode -> {
+			String tosearch = z3Translator.stringToSeachNetworkObjectNotUsed(allocationNode.getNode());
+			Pattern pattern = Pattern.compile(tosearch);
+			Matcher matcher = pattern.matcher(model);
+			
+			while(matcher.find()) {
+				Node n = originalNfv.getGraphs().getGraph().stream()
+						.filter(graph -> graph.getId() == g.getId())
+						.flatMap(graph -> graph.getNode().stream())
+						.filter(node -> node.getName().equals(allocationNode.getNode().getName())).findFirst().orElse(null);
+				
 				if(n == null) continue;
 			
-				NetworkObject no = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(n.getName())).map(e -> e.getValue()).findFirst().orElse(null);
-				Map<Expr, Set<Expr>> nodesFrom = no.getNodesFrom();
-				Map<Expr, Set<Expr>> nodesTo = no.getNodesTo();
-				
-				for(Map.Entry<Expr, Set<Expr>> entry : nodesFrom.entrySet()) {
-					String precName = netobjs.entrySet().stream().filter(e -> e.getValue().getZ3Node().equals(entry.getKey())).map(e -> e.getKey().getName()).findFirst().orElse(null);
-					Node prec = originalNfv.getGraphs().getGraph().stream()
-							.filter(graph -> graph.getId() == g.getId())
-							.flatMap(graph -> graph.getNode().stream())
-							.filter(node -> node.getName().equals(precName)).findFirst().orElse(null);
-					
-					List<Neighbour> neighboursPrec = prec.getNeighbour();
-					neighboursPrec.removeIf(neigh -> neigh.getName().equals(n.getName()));
-					NetworkObject prevNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(prec.getName())).map(e -> e.getValue()).findFirst().orElse(null);
-					Map<Expr, Set<Expr>> precNodesFrom = prevNO.getNodesFrom();
-					Map<Expr, Set<Expr>> precNodesTo = prevNO.getNodesTo();
-					
-					Set<Expr> toSet = precNodesTo.get(no.getZ3Node());
-					precNodesTo.remove(no.getZ3Node());
-					
-					for(Expr exprDest : entry.getValue()) {
-						String nextName = netobjs.entrySet().stream().filter(e -> e.getValue().getZ3Node().equals(exprDest)).map(e -> e.getKey().getName()).findFirst().orElse(null);
-						Node next = originalNfv.getGraphs().getGraph().stream()
-								.filter(graph -> graph.getId() == g.getId())
-								.flatMap(graph -> graph.getNode().stream())
-								.filter(node -> node.getName().equals(nextName)).findFirst().orElse(null);
-	
-						NetworkObject nextNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(next.getName())).map(e -> e.getValue()).findFirst().orElse(null);
-						
-						boolean presentNext = neighboursPrec.stream().anyMatch(neigh -> neigh.getName().equals(next.getName()));
-						if(!presentNext) {
-							Neighbour neigh = new Neighbour();
-							neigh.setName(next.getName());
-							neighboursPrec.add(neigh);
-						}
-						
-						precNodesTo.put(nextNO.getZ3Node(), toSet);
-					}
-						
-					
-					for(Map.Entry<Expr, Set<Expr>> e : precNodesFrom.entrySet()) {
-						if(e.getValue().contains(no.getZ3Node())) {
-							e.getValue().remove(no.getZ3Node());
-							e.getValue().addAll(entry.getValue());
-								
-						}
-							
-					}
-					
-				}
-				
-				
-				for(Map.Entry<Expr, Set<Expr>> entry : nodesTo.entrySet()) {
-					String nextName = netobjs.entrySet().stream().filter(e -> e.getValue().getZ3Node().equals(entry.getKey())).map(e -> e.getKey().getName()).findFirst().orElse(null);
-					Node next = originalNfv.getGraphs().getGraph().stream()
-							.filter(graph -> graph.getId() == g.getId())
-							.flatMap(graph -> graph.getNode().stream())
-							.filter(node -> node.getName().equals(nextName)).findFirst().orElse(null);
-					List<Neighbour> neighboursNext =  next.getNeighbour();
-					NetworkObject nextNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(next.getName())).map(e -> e.getValue()).findFirst().orElse(null);
-					Map<Expr, Set<Expr>> nextNodesFrom = nextNO.getNodesFrom();
-					Map<Expr, Set<Expr>> nextNodesTo = nextNO.getNodesTo();
-					
-					Set<Expr> fromSet = nextNodesFrom.get(no.getZ3Node());
-					nextNodesFrom.remove(no.getZ3Node());
-					
-					for(Expr exprPrec : entry.getValue()) {
-						String precName = netobjs.entrySet().stream().filter(e -> e.getValue().getZ3Node().equals(exprPrec)).map(e -> e.getKey().getName()).findFirst().orElse(null);
-						Node prec = originalNfv.getGraphs().getGraph().stream()
-								.filter(graph -> graph.getId() == g.getId())
-								.flatMap(graph -> graph.getNode().stream())
-								.filter(node -> node.getName().equals(precName)).findFirst().orElse(null);
-						neighboursNext.removeIf(neigh -> neigh.getName().equals(n.getName()));
-						NetworkObject prevNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(prec.getName())).map(e -> e.getValue()).findFirst().orElse(null);
-						
-						boolean presentPrec = neighboursNext.stream().anyMatch(neigh -> neigh.getName().equals(prec.getName()));
-						if(!presentPrec) {
-							Neighbour neigh = new Neighbour();
-							neigh.setName(prec.getName());
-							neighboursNext.add(neigh);
-						}
-						
-						nextNodesFrom.put(prevNO.getZ3Node(), fromSet);
-						
-					}
-					
-					
-					for(Map.Entry<Expr, Set<Expr>> e : nextNodesTo.entrySet()) {
-						if(e.getValue().contains(no.getZ3Node())) {
-							e.getValue().remove(no.getZ3Node());
-							e.getValue().addAll(entry.getValue());
-			
-						}
-					}
-	
-		
-				}
-				
-				Graph graphWithOptional = originalNfv.getGraphs().getGraph().stream()
-						.filter(graph -> graph.getId() == g.getId())
-						.findFirst().orElse(null);
-				List<Node> allNodes = graphWithOptional.getNode();
-				allNodes.removeIf(node -> node.getName().equals(n.getName()));
-				removedNodes.add(n);
+				Configuration configuration = new Configuration();
+				configuration.setName("ForwardConf");
+				n.setFunctionalType(FunctionalTypes.FORWARDER);
+				Forwarder f = new Forwarder();
+				f.setName("Forwarder");
+				configuration.setForwarder(f);
+				n.setConfiguration(configuration);
 			}
-			
-			
-			
 		});
 		
 		
@@ -721,3 +642,111 @@ public class Translator {
 	}
 	
 }
+
+
+
+
+/*Map<AllocationNode, Set<AllocationNode>> nodesFrom = allocationNode.getLeftHops();
+Map<AllocationNode, Set<AllocationNode>> nodesTo = allocationNode.geRightHops();
+
+for(Map.Entry<Expr, Set<Expr>> entry : nodesFrom.entrySet()) {
+	String precName = netobjs.entrySet().stream().filter(e -> e.getValue().getZ3Node().equals(entry.getKey())).map(e -> e.getKey().getName()).findFirst().orElse(null);
+	Node prec = originalNfv.getGraphs().getGraph().stream()
+			.filter(graph -> graph.getId() == g.getId())
+			.flatMap(graph -> graph.getNode().stream())
+			.filter(node -> node.getName().equals(precName)).findFirst().orElse(null);
+	
+	List<Neighbour> neighboursPrec = prec.getNeighbour();
+	neighboursPrec.removeIf(neigh -> neigh.getName().equals(n.getName()));
+	NetworkObject prevNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(prec.getName())).map(e -> e.getValue()).findFirst().orElse(null);
+	Map<Expr, Set<Expr>> precNodesFrom = prevNO.getNodesFrom();
+	Map<Expr, Set<Expr>> precNodesTo = prevNO.getNodesTo();
+	
+	Set<Expr> toSet = precNodesTo.get(no.getZ3Node());
+	precNodesTo.remove(no.getZ3Node());
+	
+	for(Expr exprDest : entry.getValue()) {
+		String nextName = netobjs.entrySet().stream().filter(e -> e.getValue().getZ3Node().equals(exprDest)).map(e -> e.getKey().getName()).findFirst().orElse(null);
+		Node next = originalNfv.getGraphs().getGraph().stream()
+				.filter(graph -> graph.getId() == g.getId())
+				.flatMap(graph -> graph.getNode().stream())
+				.filter(node -> node.getName().equals(nextName)).findFirst().orElse(null);
+
+		NetworkObject nextNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(next.getName())).map(e -> e.getValue()).findFirst().orElse(null);
+		
+		boolean presentNext = neighboursPrec.stream().anyMatch(neigh -> neigh.getName().equals(next.getName()));
+		if(!presentNext) {
+			Neighbour neigh = new Neighbour();
+			neigh.setName(next.getName());
+			neighboursPrec.add(neigh);
+		}
+		
+		precNodesTo.put(nextNO.getZ3Node(), toSet);
+	}
+		
+	
+	for(Map.Entry<Expr, Set<Expr>> e : precNodesFrom.entrySet()) {
+		if(e.getValue().contains(no.getZ3Node())) {
+			e.getValue().remove(no.getZ3Node());
+			e.getValue().addAll(entry.getValue());
+				
+		}
+			
+	}
+	
+}
+
+
+for(Map.Entry<Expr, Set<Expr>> entry : nodesTo.entrySet()) {
+	String nextName = netobjs.entrySet().stream().filter(e -> e.getValue().getZ3Node().equals(entry.getKey())).map(e -> e.getKey().getName()).findFirst().orElse(null);
+	Node next = originalNfv.getGraphs().getGraph().stream()
+			.filter(graph -> graph.getId() == g.getId())
+			.flatMap(graph -> graph.getNode().stream())
+			.filter(node -> node.getName().equals(nextName)).findFirst().orElse(null);
+	List<Neighbour> neighboursNext =  next.getNeighbour();
+	NetworkObject nextNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(next.getName())).map(e -> e.getValue()).findFirst().orElse(null);
+	Map<Expr, Set<Expr>> nextNodesFrom = nextNO.getNodesFrom();
+	Map<Expr, Set<Expr>> nextNodesTo = nextNO.getNodesTo();
+	
+	Set<Expr> fromSet = nextNodesFrom.get(no.getZ3Node());
+	nextNodesFrom.remove(no.getZ3Node());
+	
+	for(Expr exprPrec : entry.getValue()) {
+		String precName = netobjs.entrySet().stream().filter(e -> e.getValue().getZ3Node().equals(exprPrec)).map(e -> e.getKey().getName()).findFirst().orElse(null);
+		Node prec = originalNfv.getGraphs().getGraph().stream()
+				.filter(graph -> graph.getId() == g.getId())
+				.flatMap(graph -> graph.getNode().stream())
+				.filter(node -> node.getName().equals(precName)).findFirst().orElse(null);
+		neighboursNext.removeIf(neigh -> neigh.getName().equals(n.getName()));
+		NetworkObject prevNO = netobjs.entrySet().stream().filter(e -> e.getKey().getName().equals(prec.getName())).map(e -> e.getValue()).findFirst().orElse(null);
+		
+		boolean presentPrec = neighboursNext.stream().anyMatch(neigh -> neigh.getName().equals(prec.getName()));
+		if(!presentPrec) {
+			Neighbour neigh = new Neighbour();
+			neigh.setName(prec.getName());
+			neighboursNext.add(neigh);
+		}
+		
+		nextNodesFrom.put(prevNO.getZ3Node(), fromSet);
+		
+	}
+	
+	
+	for(Map.Entry<Expr, Set<Expr>> e : nextNodesTo.entrySet()) {
+		if(e.getValue().contains(no.getZ3Node())) {
+			e.getValue().remove(no.getZ3Node());
+			e.getValue().addAll(entry.getValue());
+
+		}
+	}
+
+
+}
+
+Graph graphWithOptional = originalNfv.getGraphs().getGraph().stream()
+		.filter(graph -> graph.getId() == g.getId())
+		.findFirst().orElse(null);
+List<Node> allNodes = graphWithOptional.getNode();
+allNodes.removeIf(node -> node.getName().equals(n.getName()));
+removedNodes.add(n);
+}*/

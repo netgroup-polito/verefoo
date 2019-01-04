@@ -47,9 +47,13 @@ public class z3Translator {
 	}
 	
 	public static String stringToSeachNetworkObjectUsed(Node n) {
-		return "define-fun .*" + n.getName() + ".*_used.* \\(\\) Bool\n.*false";
+		return "define-fun (\\D)*" + n.getName() + "(\\D)*_used.* \\(\\) Bool\n.*true";
 	}
 	
+
+	public static String stringToSeachNetworkObjectNotUsed(Node n) {
+		return "define-fun (\\D)*" + n.getName() + "(\\D)*_used.* \\(\\) Bool\n.*false";
+	}
 	
 	
 	public static String matchNodeName(String match){

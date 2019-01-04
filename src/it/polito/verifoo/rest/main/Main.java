@@ -16,7 +16,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 import it.polito.verifoo.rest.jaxb.*;
-import it.polito.verifoo.random.RandomInputGenerator;
 import it.polito.verifoo.rest.common.*;
 /**
  * 
@@ -40,7 +39,7 @@ public class Main {
                 SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
                 Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
                 u.setSchema(schema);
-                RandomInputGenerator r = null;
+                
                 boolean exit = false;
                 int sat = 0; 
                 long beginAll = System.currentTimeMillis();
@@ -49,7 +48,7 @@ public class Main {
                 		Marshaller m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(  "./testfile/PerformanceTests/Perf01.xml" )));
+                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(  "./testfile/prova.xml" )));
                         m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
@@ -68,7 +67,7 @@ public class Main {
                     		System.out.println("----------------------OUTPUT----------------------");
                             //m.marshal( test.getResult(), System.out ); 
                     		System.out.println("--------------------------------------------------");
-                    		if(r == null) exit = true;
+                    		System.exit(1);
                     	}
                         //MedicineSimulator sim = new MedicineSimulator(root);
                         //sim.printAll();
@@ -78,7 +77,7 @@ public class Main {
             			//logger.error("Graph semantically incorrect");
             			//System.out.println("Graph semantically incorrect");
                     	logger.error(e);
-                    	if(r == null) exit = true;
+                    	System.exit(1);
                     }
             		long endAll=System.currentTimeMillis();
             		System.out.println("time: " + (endAll-beginAll) + "ms;");

@@ -8,7 +8,6 @@ import com.microsoft.z3.DatatypeExpr;
 
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verigraph.mcnet.components.NetContext;
-import it.polito.verigraph.mcnet.components.Network;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 import it.polito.verigraph.mcnet.components.Tuple;
 /**

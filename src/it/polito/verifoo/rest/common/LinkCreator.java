@@ -16,6 +16,7 @@ import it.polito.verifoo.rest.autoconfiguration.FWAutoconfigurationManager;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.Path;
+import it.polito.verifoo.rest.jaxb.Property;
 /**
  * Creates the links from the node's neighbours
  *
@@ -25,7 +26,7 @@ public class LinkCreator {
 	private List<Link> links = new ArrayList<>();
 	private List<Node> nodes;
 	private List<Path> paths;
-	private FWAutoconfigurationManager FWmanager;
+	private List<Property> properties;
 	private Map<Integer, List<Link>> pathMap = new HashMap<>();
 	/**
 	 * 
@@ -33,23 +34,14 @@ public class LinkCreator {
 	 */
 	public LinkCreator(List<Node> ns){
 		nodes = ns;
-		FWmanager = null;
 	}
-	/**
-	 * 
-	 * @param ns the list of the nodes in the network service
-	 * @param FWmanager the class to manage firewall autoconfiguration
-	 */
-	public LinkCreator(List<Node> ns, FWAutoconfigurationManager FWmanager){
+
+	public LinkCreator(List<Node> ns, List<Property> properties){
 		nodes = ns;
-		this.FWmanager = FWmanager;
+		this.properties = properties;
 	}
-	/**
-	 * 
-	 * @param ns the list of the nodes in the network service
-	 * @param ps the list of the paths that the packet flows will follow 
-	 */
-	public LinkCreator(List<Node> ns, List<Path> ps){
+
+	/*public LinkCreator(List<Node> ns, List<Path> ps){
 		nodes = ns;
 		paths = ps;
 //		for(Path p : ps){
@@ -68,22 +60,24 @@ public class LinkCreator {
 	 * @return the links between nodes in the service graph
 	 */
 	public List<Link> getLinks(){
-		List<Node> clients = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);}).collect(Collectors.toList());
-        List<Node> servers = nodes.stream().filter(n -> {return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER) || n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);}).collect(Collectors.toList());
-        for(Node client:clients){
-			for(Node server:servers){
-				List<String> neighbours = client.getNeighbour().stream()
+		
+        for(Property p : properties) {
+        	String src = p.getSrc();
+        	String dst = p.getDst();
+        	Node srcNode = nodes.stream().filter(n -> n.getName().equals(src)).findFirst().orElse(null);
+        	Node dstNode = nodes.stream().filter(n -> n.getName().equals(dst)).findFirst().orElse(null);
+			List<String> neighbours =srcNode.getNeighbour().stream()
 												.map(n -> n.getName())
 												.collect(Collectors.toList());
 				//logger.debug("Found neighbours of " + client.getName() + " ("+ neighbours + ")");
 		        for(String neighbour : neighbours){
 		        	Node next = nodes.stream().filter(n -> n.getName().equals(neighbour)).findFirst().get();
 		        	//logger.debug("Creating path from client " + client.getName() + " to "+ next.getName() +" towards server "+server.getName());
-		        	createLink(client, next, client, server, new ArrayList<>(), new ArrayList<>());
+		        	createLink(srcNode, next, srcNode, dstNode, new ArrayList<>(), new ArrayList<>());
 		        	//logger.debug("New Link from " + client.getName() + " to "+ next.getName() +" towards server "+server.getName());
 		        }
 				//links.add(new Link(client.getName(), next.getName()));
-			}
+			
 		}
         
 		List<Link> orderedLinks = links.stream()
@@ -110,7 +104,8 @@ public class LinkCreator {
 			links.add(new Link(prec.getName(), current.getName()));
 			return true;
 		}
-		if(current.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || current.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| current.getFunctionalType().equals(FunctionalTypes.ENDHOST)){
+		if(current.getFunctionalType()!= null)
+			if(current.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) || current.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)|| current.getFunctionalType().equals(FunctionalTypes.ENDHOST)){
 			//logger.debug("Link from " + prec.getName() + " to "+ current.getName() +" reaches client "+client.getName());
 			return false;
 		}
@@ -139,9 +134,9 @@ public class LinkCreator {
 					converted.add(current.getName());
 					found = true;
 					
-					if(current.getFunctionalType()== FunctionalTypes.FIREWALL && current.getConfiguration().getFirewall().getElements().isEmpty() && FWmanager != null) {
+					/*if(current.getFunctionalType()== FunctionalTypes.FIREWALL && current.getConfiguration().getFirewall().getElements().isEmpty() && FWmanager != null) {
 						FWmanager.setPolicy(current, client, server);
-					}
+					}*/
 				}
 				else{
 					//logger.debug("Neighbour from " + current.getName() + " (" + neighbour +") don't reach the server " + server.getName());

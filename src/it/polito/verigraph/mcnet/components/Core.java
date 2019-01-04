@@ -8,9 +8,13 @@
  *******************************************************************************/
 package it.polito.verigraph.mcnet.components;
 
+import java.util.HashMap;
+
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Solver;
+
+import it.polito.verifoo.rest.common.AllocationNode;
 
 /**Core component for everything that matters
  *
@@ -23,18 +27,20 @@ public abstract class Core{
     /**
      * Base class for all objects in the modeling framework
      * @param ctx
+     * @param allNodes 
      * @param args
      */
-    public Core(Context ctx, Object[]... args){ // Object[]... -> The nearest way to implement variable length argument lists
+    public Core(Context ctx, HashMap<String, AllocationNode> allNodes, Object[]... args){ // Object[]... -> The nearest way to implement variable length argument lists
         //in Java, in the most generic way.
-        init(ctx,args);
+        init(ctx,allNodes, args);
     }
     /**
      * Override _init for any constructor initialization. Avoids having to explicitly call super.__init__ every Time.class
      * @param ctx
+     * @param allNodes 
      * @param args
      */
-    abstract protected void init(Context ctx,Object[]... args);
+    abstract protected void init(Context ctx,HashMap<String, AllocationNode> allNodes, Object[]... args);
 
     /**
      * Add constraints to solver

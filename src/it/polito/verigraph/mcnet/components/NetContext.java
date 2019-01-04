@@ -26,6 +26,7 @@ import com.microsoft.z3.Optimize.Handle;
 
 import it.polito.verigraph.mcnet.netobjs.DumbNode;
 import it.polito.verifoo.rest.autoconfiguration.WildcardManager;
+import it.polito.verifoo.rest.common.AllocationNode;
 import it.polito.verigraph.mcnet.components.Core;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 
@@ -45,7 +46,7 @@ public class NetContext extends Core{
     public List<Tuple<BoolExpr, String>> softConstrPorts;
     List<Core> policies;
 
-    public HashMap<String,NetworkObject> nm; //list of nodes, callable by node name
+    public HashMap<String,DatatypeExpr> nm; //list of nodes, callable by node name
     public HashMap<String,DatatypeExpr> am; // list of addresses, callable by address name
     public HashMap<String,DatatypeExpr> pm; // list of port range, callable by string
     public HashMap<String,FuncDecl> pf;
@@ -59,6 +60,7 @@ public class NetContext extends Core{
     public HashMap<String,Handle> handles;
     
     public WildcardManager wildcardManager;
+    private HashMap<String, AllocationNode> allocationNodes;
     
     public HashMap<String,FuncDecl> ip_functions;
     /*   Constants definition
@@ -75,14 +77,16 @@ public class NetContext extends Core{
      * @param ctx
      * @param args
      */
-    public NetContext(Context ctx,Object[]... args ){
-        super(ctx,args);
+    public NetContext(Context ctx, HashMap<String, AllocationNode> allocationNodes, Object[]... args){
+    	super(ctx, allocationNodes, args);
     }
 
-    @Override
-    protected void init(Context ctx, Object[]... args) {
+
+	@Override
+    protected void init(Context ctx, HashMap<String, AllocationNode> allocationNodes, Object[]... args) {
         this.ctx = ctx;
-        nm = new HashMap<String,NetworkObject>(); //list of nodes, callable by node name
+        this.allocationNodes = allocationNodes;
+        nm = new HashMap<String,DatatypeExpr>(); //list of nodes, callable by node name
         am = new HashMap<String,DatatypeExpr>(); // list of addresses, callable by address name
         pm = new HashMap<String,DatatypeExpr>();
         pf= new HashMap<String,FuncDecl>() ;
@@ -134,11 +138,12 @@ public class NetContext extends Core{
      * @param policy
      */
     public void AddPolicy (NetworkObject policy){
-        policies.add(policy);
+        //policies.add(policy);
     }
 
     @Override
     protected void addConstraints(Optimize solver) {
+    	setAddressMappings();
         BoolExpr[] constr = new BoolExpr[constraints.size()];
 		//System.out.println("Nr of net context hard constraint " + constraints.stream().distinct().count());
         /*System.out.println("======NET CONTEXT HARD CONSTRAINTS====== ");
@@ -167,8 +172,8 @@ public class NetContext extends Core{
 		}
 		//System.out.println("Nr of net context autoplacement soft constraint " + softConstrAutoPlace.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstrAutoPlace) {
-        	System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
-			solver.AssertSoft(t._1, 100, t._2);
+        	//System.out.println(t._1 + "\n with value " + 100 + ". Node is " + t._2);
+			solver.AssertSoft(t._1, 100000000, t._2);
 		}
 		//System.out.println("Nr of net context soft constraint " + softConstraints.stream().distinct().count());
         for (Tuple<BoolExpr, String> t : softConstraints) {
@@ -244,8 +249,10 @@ public class NetContext extends Core{
         node = ctx.mkEnumSort("Node", nodes);
         for(int i=0;i<node.getConsts().length;i++){
             DatatypeExpr fd  = (DatatypeExpr)node.getConst(i);   
-            DumbNode dn =new DumbNode(ctx,new Object[]{fd});
-            nm.put(fd.toString().replace("|", ""),dn);
+            //DumbNode dn =new DumbNode(ctx,new Object[]{fd});
+            nm.put(fd.toString().replace("|", ""),fd);
+            AllocationNode n = allocationNodes.get(nodes[i]);
+            n.setZ3Name(fd);
         }
 
         //Addresses for this network         
@@ -267,6 +274,10 @@ public class NetContext extends Core{
         for(int i=0;i<new_addr.length;i++){
             //DatatypeExpr fd  = (DatatypeExpr)address.getConst(i);
         	DatatypeExpr fd = (DatatypeExpr) ctx.mkConst(new_addr[i], address);
+        	 AllocationNode n = allocationNodes.get(fd.toString().replace("|", ""));
+             if(n != null) {
+            	 n.setZ3Node(fd);
+             }
             //System.out.println(fd.toString().replace("|", ""));
             am.put(fd.toString().replace("|", ""),fd);
             try{
@@ -686,5 +697,29 @@ public Function failurePredicate (NetContext context)
     	
     	return true; 
 	}
+    
+    public void setAddressMappings() {
+    	for (AllocationNode an : allocationNodes.values()) {
+			Expr a_0 = ctx.mkConst(an.getZ3Name() + "_address_mapping_a_0", address);
+			ArrayList<BoolExpr> or_clause = new ArrayList<BoolExpr>();
+			// Constraint 1 addrToNode(foreach ad in addr) = node
+				constraints.add(ctx.mkEq(addrToNode.apply(an.getZ3Node()), an.getZ3Name()));
+				or_clause.add(ctx.mkEq(a_0, an.getZ3Node()));
+				// System.out.println("Constraints mapping: " +
+				// (ctx.mkEq(nctx.addrToNode.apply(ad), node.getZ3Node())));
+			
+			BoolExpr[] orClause = new BoolExpr[or_clause.size()];
+
+			// Constraint 2nodeHasAddr(node, a_0) == Or(foreach ad in addr (a_0
+			// == ad))
+			// Note we need the iff here to make sure that we set nodeHasAddr to
+			// false
+			// for other addresses.
+			constraints.add(ctx.mkForall(new Expr[] { a_0 },
+					ctx.mkEq(ctx.mkOr(or_clause.toArray(orClause)), nodeHasAddr.apply(an.getZ3Name(), a_0)), 1,
+					null, null, null, null));
+
+		}
+    }
 
 }

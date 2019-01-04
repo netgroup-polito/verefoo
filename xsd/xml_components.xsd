@@ -23,6 +23,7 @@
             <xsd:enumeration value="WEBCLIENT" />
             <xsd:enumeration value="WEBSERVER" />
             <xsd:enumeration value="FIELDMODIFIER" />
+            <xsd:enumeration value="FORWARDER" />
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="protocolTypes">
@@ -71,11 +72,11 @@
                 <xsd:element ref="neighbour" maxOccurs="unbounded"
                     minOccurs="0" />
                 <xsd:element ref="configuration" maxOccurs="1"
-                    minOccurs="1" />
+                    minOccurs="0" />
             </xsd:sequence>
             <xsd:attribute name="id" type="xsd:long" use="optional" />
             <xsd:attribute name="name" type="xsd:string" use="required" />
-            <xsd:attribute name="functional_type" type="functionalTypes" use="required" />
+            <xsd:attribute name="functional_type" type="functionalTypes" use="optional" />
         </xsd:complexType>
         <xsd:unique name="uniqueNeighbourId">
             <xsd:selector xpath="neighbour" />
@@ -110,6 +111,7 @@
                 <xsd:element ref="webclient" />
                 <xsd:element ref="webserver" />
                 <xsd:element ref="fieldmodifier" />
+                <xsd:element ref="forwarder" />
             </xsd:choice>
             <xsd:attribute name="id" type="xsd:long" use="optional" />
             <xsd:attribute name="name" type="xsd:string"
@@ -264,4 +266,12 @@
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
+     <xsd:element name="forwarder">
+     <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="name" type="xsd:string" default="Forwarder"
+                    nillable="true" />
+            </xsd:sequence>
+        </xsd:complexType>
+       </xsd:element>
 </xsd:schema>

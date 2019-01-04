@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
+	<graphs>
+		<graph id="0">
+			<node functional_type="WEBCLIENT" name="10.0.0.1">
+				<neighbour name="20.0.0.1" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="30.0.0.1" />
+				</configuration>
+			</node>
+			
+				
+			<node functional_type="WEBCLIENT" name="10.0.0.2">
+				<neighbour name="20.0.0.1" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="30.0.0.1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="10.0.0.3">
+				<neighbour name="20.0.0.1" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="30.0.0.1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="10.0.0.4">
+				<neighbour name="20.0.0.1" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="30.0.0.1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="10.0.0.5">
+				<neighbour name="20.0.0.1" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="30.0.0.1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="10.0.0.6">
+				<neighbour name="20.0.0.1" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="30.0.0.1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="10.0.0.7">
+				<neighbour name="20.0.0.1" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="30.0.0.1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="10.0.0.8">
+				<neighbour name="20.0.0.1" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="30.0.0.1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="10.0.0.9">
+				<neighbour name="20.0.0.1" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="30.0.0.1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="10.0.0.10">
+				<neighbour name="20.0.0.1" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="30.0.0.1" />
+				</configuration>
+			</node>
+			
+			<node name="20.0.0.1">
+				<neighbour name="20.0.0.2" />
+				<neighbour name="10.0.0.1" />
+				<neighbour name="10.0.0.2" />
+				<neighbour name="10.0.0.3" />
+				<neighbour name="10.0.0.4" />
+				<neighbour name="10.0.0.5" />
+				<neighbour name="10.0.0.6" />
+				<neighbour name="10.0.0.7" />
+				<neighbour name="10.0.0.8" />
+				<neighbour name="10.0.0.9" />
+				<neighbour name="10.0.0.10" />
+			</node>
+			
+			<node name="20.0.0.2">
+				<neighbour name="20.0.0.3" />
+				<neighbour name="20.0.0.1" />
+			</node>
+			
+			<node name="20.0.0.3">
+				<neighbour name="20.0.0.4" />
+				<neighbour name="20.0.0.2" />
+			</node>
+			
+			
+			<node name="20.0.0.4">
+				<neighbour name="20.0.0.5" />
+				<neighbour name="20.0.0.3" />
+			</node>
+			
+			<node name="20.0.0.5">
+				<neighbour name="20.0.0.4" />
+				<neighbour name="20.0.0.6" />
+			</node>
+			
+			<node name="20.0.0.6">
+				<neighbour name="20.0.0.5" />
+				<neighbour name="20.0.0.7" />
+			</node>
+			
+			<node name="20.0.0.7">
+				<neighbour name="20.0.0.6" />
+				<neighbour name="20.0.0.8" />
+			</node>
+			
+			<node name="20.0.0.8">
+				<neighbour name="20.0.0.7" />
+				<neighbour name="20.0.0.9" />
+			</node>
+			
+			<node name="20.0.0.9">
+				<neighbour name="20.0.0.8" />
+				<neighbour name="20.0.0.10" />
+			</node>
+			
+			<node name="20.0.0.10">
+				<neighbour name="20.0.0.9" />
+				<neighbour name="20.0.0.11" />
+			</node>
+			
+			<node name="20.0.0.11">
+				<neighbour name="20.0.0.10" />
+				<neighbour name="20.0.0.12" />
+			</node>
+			
+			<node name="20.0.0.12">
+				<neighbour name="20.0.0.11" />
+				<neighbour name="20.0.0.13" />
+			</node>
+			
+			<node name="20.0.0.13">
+				<neighbour name="20.0.0.12" />
+				<neighbour name="30.0.0.1" />
+			</node>
+			
+			
+			<node functional_type="WEBSERVER" name="30.0.0.1">
+				<neighbour name="20.0.0.13" />
+				<configuration description="A simple description"
+					name="confB">
+					<webserver>
+						<name>30.0.0.1</name>
+					</webserver>
+				</configuration>
+			</node>
+			
+		
+		</graph>
+	</graphs>
+	<Constraints>
+		<NodeConstraints>
+	
+		</NodeConstraints>
+		<LinkConstraints />
+	</Constraints>
+	<PropertyDefinition>
+		
+			<Property graph="0" name="IsolationProperty" src="10.0.0.1"
+			dst="30.0.0.1" />
+			<Property graph="0" name="IsolationProperty" src="10.0.0.2"
+			dst="30.0.0.1" />
+			<Property graph="0" name="IsolationProperty" src="10.0.0.3"
+			dst="30.0.0.1" />
+			<Property graph="0" name="IsolationProperty" src="10.0.0.4"
+			dst="30.0.0.1" />
+			<Property graph="0" name="IsolationProperty" src="10.0.0.5"
+			dst="30.0.0.1" />	
+			<Property graph="0" name="IsolationProperty" src="10.0.0.6"
+			dst="30.0.0.1" />	
+			<Property graph="0" name="IsolationProperty" src="10.0.0.7"
+			dst="30.0.0.1" />
+			<Property graph="0" name="IsolationProperty" src="10.0.0.8"
+			dst="30.0.0.1" />
+			<Property graph="0" name="IsolationProperty" src="10.0.0.9"
+			dst="30.0.0.1" />
+			<Property graph="0" name="IsolationProperty" src="10.0.0.10"
+			dst="30.0.0.1" />
+			
+	</PropertyDefinition>
+	<ParsingString></ParsingString>
+</NFV>

@@ -2,7 +2,7 @@ package it.polito.verifoo.rest.autoconfiguration;
 
 import it.polito.verigraph.mcnet.components.Quattro;
 import it.polito.verigraph.mcnet.netobjs.AclFirewall;
-
+import it.polito.verifoo.rest.common.AllocationNode;
 import it.polito.verifoo.rest.jaxb.*;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class FWAutoconfigurationManager {
 	
 	private WildcardManager wildcardManager;
-	private HashMap<String, Quattro<AclFirewall, Node, Integer, Boolean>> autoconfFW;
+	private HashMap<String, Quattro<AclFirewall, AllocationNode, Integer, Boolean>> autoconfFW;
 	private HashMap<String, List<Property>> FWAllPolicies;
 	private HashMap<String, List<Property>> FWInterestedPolicies;
 	private List<Node> nodes;
@@ -29,62 +29,62 @@ public class FWAutoconfigurationManager {
 		this.policies = policies;
 		
 		this.nodes = nodes;
-		autoconfFW = new HashMap<String, Quattro<AclFirewall, Node, Integer, Boolean>>();
+		autoconfFW = new HashMap<String, Quattro<AclFirewall, AllocationNode, Integer, Boolean>>();
 		FWAllPolicies = new HashMap<String, List<Property>>();
 		FWInterestedPolicies = new HashMap<String, List<Property>>();
 	}
 	
-	public void addFirewall(AclFirewall f, Node n) {
+	public void addFirewall(AclFirewall f, AllocationNode n) {
 		
 		boolean autoplace;
 		
-		if(n.getConfiguration() == null) {
-			autoplace = true;
-		} else {
-			autoplace = false;
+		autoplace = true;
+		
+		if(!autoconfFW.containsKey(n.getNode().getName())) {
+			autoconfFW.put(n.getNode().getName(), new Quattro<AclFirewall, AllocationNode, Integer, Boolean>(f, n, new Integer(0), new Boolean(autoplace)));
+			FWAllPolicies.put(n.getNode().getName(), new ArrayList<Property>());
+			FWInterestedPolicies.put(n.getNode().getName(), new ArrayList<Property>());
 		}
 		
-		autoconfFW.put(n.getName(), new Quattro<AclFirewall, Node, Integer, Boolean>(f, n, new Integer(0), new Boolean(autoplace)));
-		FWAllPolicies.put(n.getName(), new ArrayList<Property>());
-		FWInterestedPolicies.put(n.getName(), new ArrayList<Property>());
 
 	}
 	
-	public void setPolicy(Node firewall, Node source, Node destination) {
-
+	public void setPolicy(AllocationNode node, Node source, Node destination) {
+	
 		int newRules = 0;
+		AclFirewall firewall = autoconfFW.get(node.getIpAddress())._1;
 		List<Property> allProperties = policies.stream().filter(p -> p.getSrc().equals(source.getName()) && p.getDst().equals(destination.getName())).collect(Collectors.toList());		
 		List<Property> interestedProperties = allProperties.stream().filter(p ->
-				( p.getName().value().equals("IsolationProperty") && firewall.getConfiguration().getFirewall().getDefaultAction() == ActionTypes.ALLOW ) 
-				|| (p.getName().value().equals("ReachabilityProperty") && firewall.getConfiguration().getFirewall().getDefaultAction() == ActionTypes.DENY)).collect(Collectors.toList());
+				( p.getName().value().equals("IsolationProperty") && !firewall.isBlacklisting()) 
+				|| (p.getName().value().equals("ReachabilityProperty") && firewall.isBlacklisting())).collect(Collectors.toList());
 		for(Property property : allProperties) {
-			boolean found = FWAllPolicies.get(firewall.getName()).stream().anyMatch(p -> p.getSrc().equals(property.getSrc()) && p.getDst().equals(property.getDst()));
+			boolean found = FWAllPolicies.get(node.getIpAddress()).stream().anyMatch(p -> p.getSrc().equals(property.getSrc()) && p.getDst().equals(property.getDst()));
 			if(!found) {
-				FWAllPolicies.get(firewall.getName()).add(property);
+				FWAllPolicies.get(node.getIpAddress()).add(property);
 			}
 		}
 		//FWAllPolicies.get(firewall.getName()).addAll(allProperties);
 		
 		for(Property property : interestedProperties) {
-			boolean found = FWInterestedPolicies.get(firewall.getName()).stream().anyMatch(p -> p.getSrc().equals(property.getSrc()) && p.getDst().equals(property.getDst()));
+			boolean found = FWInterestedPolicies.get(node.getIpAddress()).stream().anyMatch(p -> p.getSrc().equals(property.getSrc()) && p.getDst().equals(property.getDst()));
 			if(!found) {
-				FWInterestedPolicies.get(firewall.getName()).add(property);
+				FWInterestedPolicies.get(node.getIpAddress()).add(property);
 				newRules++;
 			}
 		}
 		//FWInterestedPolicies.get(firewall.getName()).addAll(interestedProperties);
 		
-		autoconfFW.get(firewall.getName())._3 += newRules;
+		autoconfFW.get(node.getIpAddress())._3 += newRules;
 		
 	}
 	
 	public void minimizeRules() {
 		
 		if(wildcardManager.areNodesWithIPAddresses()) {
-			for(Map.Entry<String, Quattro<AclFirewall, Node, Integer, Boolean>> entry : autoconfFW.entrySet()) {
+			for(Map.Entry<String, Quattro<AclFirewall, AllocationNode, Integer, Boolean>> entry : autoconfFW.entrySet()) {
 				String key = entry.getKey();
-				Quattro<AclFirewall, Node, Integer, Boolean> value = entry.getValue();
-
+				Quattro<AclFirewall, AllocationNode, Integer, Boolean> value = entry.getValue();
+				//System.out.println(value._2.getIpAddress() + value._3);
 				/*if(value._2.getNeighbour().size() == 2) {
 					List<Neighbour> neighbours = value._2.getNeighbour();
 					
@@ -102,8 +102,8 @@ public class FWAutoconfigurationManager {
 				} */
 				
 					
-				List<Property> interestedPolicies = FWInterestedPolicies.get(value._2.getName());
-				List<Property> allPolicies = FWAllPolicies.get(value._2.getName());
+				List<Property> interestedPolicies = FWInterestedPolicies.get(value._2.getNode().getName());
+				List<Property> allPolicies = FWAllPolicies.get(value._2.getNode().getName());
 				if(!policies.isEmpty()) {
 					List<String> destinations = policies.stream().map(p -> p.getDst()).distinct().collect(Collectors.toList());
 					for(String destination : destinations) {
@@ -116,13 +116,19 @@ public class FWAutoconfigurationManager {
 						}
 					}
 				}
-				value._1.firewallSendRules(value._3); //creation of Z3 formulas for autoconfiguration firewall
+				//System.out.println(value._3);
+				if(value._1.isAutoconfigured()) {
+					value._1.firewallSendRules(value._3);
+				} else {
+					value._1.firewallSendRules();
+				}
+				
 			}
 			
 		} else {
 			
-			for(Map.Entry<String, Quattro<AclFirewall, Node, Integer, Boolean>> entry : autoconfFW.entrySet()) {
-				Quattro<AclFirewall, Node, Integer, Boolean> value = entry.getValue();
+			for(Map.Entry<String, Quattro<AclFirewall, AllocationNode, Integer, Boolean>> entry : autoconfFW.entrySet()) {
+				Quattro<AclFirewall, AllocationNode, Integer, Boolean> value = entry.getValue();
 				value._1.firewallSendRules(value._3);
 			}
 			
@@ -131,5 +137,9 @@ public class FWAutoconfigurationManager {
 		
 	}
 	
+	
+	public boolean firewallIsPresent(AllocationNode n) {
+		return autoconfFW.containsKey(n.getIpAddress());
+	}
 
 }

@@ -8,6 +8,7 @@ import it.polito.verifoo.rest.autoconfiguration.FWAutoconfigurationManager;
 import it.polito.verifoo.rest.jaxb.EType;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verifoo.rest.jaxb.Path;
+import it.polito.verifoo.rest.jaxb.Property;
 /**
  * Wraps the choice of the outgoing links from a certain node
  * @author Antonio
@@ -17,14 +18,14 @@ public class LinkProvider {
 	private List<Link> links;
 	private List<Node> nodes;
 	private List<Path> paths;
-	private FWAutoconfigurationManager FWmanager;
+	private List<Property> properties;
 	private int lastPathId = -1, lastNodeIndex = -1; 
 	
-	public LinkProvider(List<Node> ns, List<Path> ps, FWAutoconfigurationManager FWmanager){
+	public LinkProvider(List<Node> ns, List<Path> ps, List<Property> properties){
 		nodes = ns;
 		paths = ps;
-		this.FWmanager = FWmanager;
-		links = (new LinkCreator(ns, this.FWmanager)).getLinks();
+		this.properties = properties;
+		links = (new LinkCreator(ns, this.properties)).getLinks();
 	}
 	/**
 	 * Get all the links between the nodes (based on the neighbours indications)

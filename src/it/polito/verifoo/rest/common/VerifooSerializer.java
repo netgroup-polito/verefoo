@@ -99,15 +99,15 @@ public class VerifooSerializer {
 	        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(), prop, paths);
 	        	IsolationResult res=test.checkNFFGProperty();
 	        	if(res.result != Status.UNSATISFIABLE){
-	        		Translator t = new Translator(res.model.toString(),root, g, test.getNetobjs(), removedNodes);
+	        		Translator t = new Translator(res.model.toString(),root, g, test.getAllocationNodes());
 	        		t.setNormalizer(norm);
 	        		result = t.convert();
 	        		root = result;
 	        		sat = true;
-	        		System.out.println("%%REMOVED OPTIONAL NODES %%");
-	        		removedNodes.forEach(n -> {
+	        		//System.out.println("%%REMOVED OPTIONAL NODES %%");
+	        		/*removedNodes.forEach(n -> {
 	        			System.out.println(n.getName() + " is removed.");
-	        		});
+	        		});*/
 	        		//System.out.println("%%%%%%%%%%%%%%%%%%%%%%");
 	        		//System.out.println(res.model);
 	        		//System.out.println("%%%%%%%%%%%%%%%%%%%%%%");

@@ -4,6 +4,7 @@
 package it.polito.verifoo.rest.common;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,9 +24,10 @@ public final class NetContextGenerator{
 	 * @param ctx Z3 Context
 	 * @param nodes Node List
 	 * @param properties the list of properties
+	 * @param allocationNodes 
 	 * @return NetContext
 	 */
-	public static NetContext generate(Context ctx,List<Node> nodes,List<Property> properties){
+	public static NetContext generate(Context ctx,List<Node> nodes,List<Property> properties, HashMap<String, AllocationNode> allocationNodes){
 		//the @ is used internally as a special symbol
 		for(Node n : nodes){
 			if(n.getName().contains("@"))
@@ -39,6 +41,6 @@ public final class NetContextGenerator{
 		src_portRange=properties.stream().map(p -> p.getSrcPort()).filter(p -> p!=null).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(src_portRange);
 		String[] dst_portRange={};
 		dst_portRange=properties.stream().map(p -> p.getDstPort()).filter(p -> p!=null).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(dst_portRange);
-	    return new NetContext(ctx,nodesname,nodesip,src_portRange, dst_portRange);
+	    return new NetContext(ctx,allocationNodes, nodesname,nodesip,src_portRange, dst_portRange);
 	}
 }

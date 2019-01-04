@@ -18,6 +18,7 @@ import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
+import com.microsoft.z3.Optimize;
 
 import it.polito.verigraph.mcnet.components.Core;
 
@@ -25,10 +26,9 @@ import it.polito.verigraph.mcnet.components.Core;
  *
  *
  */
-public abstract class NetworkObject extends Core{
+abstract public class NetworkObject {
 
-    public NetworkObject(Context ctx,Object[]... args) {
-        super(ctx,args);
+    public NetworkObject() {
     }
 
     protected DatatypeExpr z3Node;
@@ -40,16 +40,12 @@ public abstract class NetworkObject extends Core{
 	public BoolExpr enumerateRecvP1;
 	public BoolExpr enumerateSendP1;
 	public ArrayList<NetworkObject> neighbours;
-	protected Map<Expr, Set<Expr>> nodesFrom = new HashMap<>();
-	protected Map<Expr, Set<Expr>> nodesTo = new HashMap<>();
-	protected Map<Expr, Set<Expr>> lastHops = new HashMap<>();
-	protected Map<Expr, Set<Expr>> firstHops = new HashMap<>();
 	
     /**
      * Get a reference to the z3 node this class wraps around
      * @return
      */
-    abstract public DatatypeExpr getZ3Node();
+
 
     public String toString(){
         return z3Node.toString();
@@ -79,67 +75,10 @@ public abstract class NetworkObject extends Core{
     public void setPolicy (Object policy) throws UnsupportedOperationException{
         throw new UnsupportedOperationException();
     }
+
+	abstract public void addContraints(Optimize solver);
     
-    public void addNodesFrom(NetworkObject prev, NetworkObject next) {
-    	
-	    if(nodesFrom.containsKey(prev.getZ3Node())) {
-			nodesFrom.get(prev.getZ3Node()).add(next.getZ3Node());
-		} else {
-			Set<Expr> set = new HashSet<>();
-			set.add(next.getZ3Node());
-			nodesFrom.put(prev.getZ3Node(), set);
-		}
-	}
-    
-    public void addNodesTo(NetworkObject prev, NetworkObject next) {
-    	
-	    if(nodesTo.containsKey(next.getZ3Node())) {
-			nodesTo.get(next.getZ3Node()).add(prev.getZ3Node());
-		} else {
-			Set<Expr> set = new HashSet<>();
-			set.add(prev.getZ3Node());
-			nodesTo.put(next.getZ3Node(), set);
-		}
-	}
-    
-    public void addFirstHop(NetworkObject dest, NetworkObject hop) {
-    	
-	    if(firstHops.containsKey(dest.getZ3Node())) {
-			firstHops.get(dest.getZ3Node()).add(hop.getZ3Node());
-		} else {
-			Set<Expr> set = new HashSet<>();
-			set.add(hop.getZ3Node());
-			firstHops.put(dest.getZ3Node(), set);
-		}
-	}
-    
-  public void addLastHop(NetworkObject origin, NetworkObject hop) {
-    	
-	    if(lastHops.containsKey(origin.getZ3Node())) {
-			lastHops.get(origin.getZ3Node()).add(hop.getZ3Node());
-		} else {
-			Set<Expr> set = new HashSet<>();
-			set.add(hop.getZ3Node());
-			lastHops.put(origin.getZ3Node(), set);
-		}
-	}
-    
-    public Map<Expr, Set<Expr>>  getNodesFrom(){
-    	return nodesFrom;
-    }
-    
-    public Map<Expr, Set<Expr>>  getNodesTo(){
-    	return nodesTo;
-    }
-    
-    
-    public Map<Expr, Set<Expr>>  getFirstHops(){
-    	return firstHops;
-    }
-    
-    public Map<Expr, Set<Expr>>  getLastHops(){
-    	return lastHops;
-    }
+  
     
     
 }

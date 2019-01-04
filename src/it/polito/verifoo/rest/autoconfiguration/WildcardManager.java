@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import it.polito.verifoo.rest.common.AllocationNode;
 import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verigraph.mcnet.components.Quattro;
 import it.polito.verigraph.mcnet.netobjs.AclFirewall;
@@ -23,11 +24,11 @@ public class WildcardManager {
 	private boolean nodesWithIPAddresses;
 	
 	
-	public WildcardManager(List<Node> nodes) {
+	public WildcardManager(HashMap<String, AllocationNode> allocationNodes) {
 		
 		nodesWithIPAddresses = true;
 		String addresses[] = {}; 
-		addresses = nodes.stream().map((n)->n.getName()).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(addresses);
+		addresses = allocationNodes.values().stream().map((n)->n.getNode().getName()).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(addresses);
 		
 		wildcardLevel1 = new HashMap<String, HashSet<String>>();
 		wildcardLevel2 = new HashMap<String, HashSet<String>>();
