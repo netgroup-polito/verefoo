@@ -18,6 +18,7 @@ import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 import it.polito.verigraph.mcnet.netobjs.AclFirewall;
 import it.polito.verigraph.mcnet.netobjs.PolitoEndHost;
+import it.polito.verigraph.mcnet.netobjs.PolitoNat;
 
 public class VNFAllocationManager {
 	private Context ctx;
@@ -127,8 +128,14 @@ public class VNFAllocationManager {
 				else if(type.equals(FunctionalTypes.WEBSERVER)) {
 					PolitoEndHost endHost = (PolitoEndHost) no;
 					endHost.installAsWebServer();
+				}else if(type.equals(FunctionalTypes.WEBSERVER)) {
+					PolitoEndHost endHost = (PolitoEndHost) no;
+					endHost.installAsWebServer();
+				}else if(node.getFunctionalType() == FunctionalTypes.NAT) {
+					PolitoNat nat = new PolitoNat(allocationNode, ctx, nctx);
+					allocationNode.getPlaceableVNF().put(FunctionalTypes.NAT, nat);
+					nat.natModel(nctx.am.get(node.getName()));
 				}
-				
 			}
 			
 		});
