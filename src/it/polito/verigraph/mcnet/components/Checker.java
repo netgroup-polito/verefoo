@@ -316,7 +316,7 @@ public class Checker {
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.pf.get("dest").apply(p1)));
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.pf.get("src").apply(p1)));
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.pf.get("dest").apply(p0)));
-		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.pf.get("src").apply(p0)));
+		//constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.pf.get("src").apply(p0)));
 	}
 
 	public IsolationResult propertyCheck(){
@@ -325,18 +325,17 @@ public class Checker {
 		Params p = ctx.mkParams();
 		p.add("maxsat_engine", ctx.mkSymbol("wmax")  );
 		p.add("maxres.wmax", true  );
-		//p.add("maxres.add_upper_bound_block", true  );
+
+		
+		
 		solver.setParameters(p);
 		result = this.solver.Check();
-		/*Handle temp = null;
-		for (Entry<String, Handle> handle : nctx.handles.entrySet()) {
-			temp = handle.getValue();
-		}
-		if(temp!=null) System.out.println(nctx.latencyAll+Integer.parseInt(temp.getValue()+""));
-		if(temp!=null) System.out.println("Weight of falsified constraints:"+temp.getValue());*/
+		
 		
 		model = null;
-		assertions = null;
+		assertions = solver.getAssertions();
+		//Arrays.asList(assertions).forEach(System.out::println);
+		//System.out.println(Arrays.toString(assertions));
 		if (result == Status.SATISFIABLE) {
 			model = this.solver.getModel();
 		}

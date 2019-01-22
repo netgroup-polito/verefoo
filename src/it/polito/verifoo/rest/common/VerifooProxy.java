@@ -958,7 +958,7 @@ public class VerifooProxy {
 		    }else{
 		    	 	logger.debug("SAT ");
 		     		logger.debug( ""+ret.model); //p.printModel(ret.model);
-		     		//System.out.println(ret.model);
+		     		System.out.println(ret.model);
 		     		
 		    }
 			return ret;

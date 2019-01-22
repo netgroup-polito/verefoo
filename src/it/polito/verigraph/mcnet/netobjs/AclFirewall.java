@@ -70,13 +70,13 @@ public class AclFirewall extends NetworkObject{
 		constraints = new ArrayList<BoolExpr>();
    		acls = new ArrayList<>();
    		whiteAcls = new ArrayList<>();
-   		defaultAction = ctx.mkFalse();
+   		defaultAction = ctx.mkTrue();
    		used = ctx.mkBoolConst(fw+"_used");
    		
 		autoplace = true;
 		autoconfigured = true;
 		isEndHost = false;
-   		blacklisting = true;
+   		blacklisting = false;
 	}
 
 
@@ -442,14 +442,17 @@ public class AclFirewall extends NetworkObject{
   			
   		}
   		
-  		
   		for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getRightHops().entrySet()){
   			AllocationNode an = entry.getKey();
   			Expr e = an.getZ3Name();
   			BoolExpr send = (BoolExpr) nctx.send.apply(fw, e, p_0);
 
   			List<Expr> list = entry.getValue().stream().map(n -> n.getZ3Name()).collect(Collectors.toList());
+  			
+  			
   			List<Expr> recvNeighbours = list.stream().map(n -> (BoolExpr) nctx.recv.apply(n, fw, p_0)).distinct().collect(Collectors.toList());
+  			
+  			
   			BoolExpr[] tmp2 = new BoolExpr[list.size()];
   	 		BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp2));
   	 		if(autoplace) {
@@ -551,7 +554,6 @@ public class AclFirewall extends NetworkObject{
 		BoolExpr[] constr = new BoolExpr[constraints.size()];
 	    solver.Add(constraints.toArray(constr));
 	    aclConstraints(solver);
-		
 	}
 
 

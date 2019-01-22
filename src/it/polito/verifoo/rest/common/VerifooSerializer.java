@@ -108,9 +108,9 @@ public class VerifooSerializer {
 	        		/*removedNodes.forEach(n -> {
 	        			System.out.println(n.getName() + " is removed.");
 	        		});*/
-	        		//System.out.println("%%%%%%%%%%%%%%%%%%%%%%");
-	        		//System.out.println(res.model);
-	        		//System.out.println("%%%%%%%%%%%%%%%%%%%%%%");
+	        		System.out.println("%%%%%%%%%%%%%%%%%%%%%%");
+	        		System.out.println(res.model);
+	        		System.out.println("%%%%%%%%%%%%%%%%%%%%%%");
 	        	}
 	        	else{
 	        		sat = false;

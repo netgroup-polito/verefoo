@@ -69,7 +69,7 @@ public class PolitoNat extends NetworkObject {
 	}
 
 	public void natModel(DatatypeExpr natIp) {
-
+		setInternalAddress();
 		Expr p_0 = ctx.mkConst("p_0", nctx.packet);
 		Expr p_1 = ctx.mkConst("p_1", nctx.packet);
 		Expr p_2 = ctx.mkConst("p_2", nctx.packet);
@@ -98,15 +98,17 @@ public class PolitoNat extends NetworkObject {
 		Quantifier leftToRight = ctx.mkForall(
 				new Expr[] { p_0 }, ctx
 						.mkImplies(
-								ctx.mkAnd(enumerateSend(p_0,source.getRightHops().keySet()),
-										ctx.mkNot((BoolExpr) private_addr_func.apply(nctx.pf.get("dest").apply(p_0)))),
-								ctx.mkAnd(ctx.mkEq(nctx.pf.get("src").apply(p_0), natIp), ctx.mkExists(
+								ctx.mkAnd(enumerateSend(p_0,source.getRightHops().keySet())
+										,ctx.mkNot((BoolExpr) private_addr_func.apply(nctx.pf.get("dest").apply(p_0)))
+										),
+								ctx.mkAnd(ctx.mkEq(nctx.pf.get("src").apply(p_0), natIp), 
+										ctx.mkExists(
 										new Expr[] { p_1 },
-										ctx.mkAnd(enumerateRecv(p_1,source.getLeftHops().keySet()),
-												(BoolExpr) private_addr_func
-														.apply(nctx.pf.get("src").apply(p_1)),
-												ctx.mkEq(nctx.pf.get("origin").apply(p_1),
-														nctx.pf.get("origin").apply(p_0)),
+										ctx.mkAnd(enumerateRecv(p_1,source.getLeftHops().keySet())
+												,(BoolExpr) private_addr_func.apply(nctx.pf.get("src").apply(p_1)),
+												ctx.mkEq(nctx.pf.get("origin").apply(p_1),nctx.pf.get("origin").apply(p_0)),
+												ctx.mkEq(nctx.pf.get("encrypted").apply(p_1),
+														nctx.pf.get("encrypted").apply(p_0)),
 												ctx.mkEq(nctx.pf.get("inner_src").apply(p_1),
 														nctx.pf.get("inner_src").apply(p_0)),
 												ctx.mkEq(nctx.pf.get("inner_dest").apply(p_1),
@@ -130,10 +132,11 @@ public class PolitoNat extends NetworkObject {
 														nctx.pf.get("emailFrom").apply(p_0)),
 												ctx.mkEq(nctx.pf.get("url").apply(p_1), nctx.pf.get("url").apply(p_0)),
 												ctx.mkEq(nctx.pf.get("options").apply(p_1),
-														nctx.pf.get("options").apply(p_0))),
+														nctx.pf.get("options").apply(p_0))
+												),
 										1, null, null, null, null))),
 				1, null, null, null, null);
-		//System.out.println("-------------Nat leftToRight: "+leftToRight);
+		System.out.println("-------------Nat leftToRight: "+leftToRight);
 		constraints.add(leftToRight);
 
 		// Constraint2
@@ -181,8 +184,7 @@ public class PolitoNat extends NetworkObject {
 												enumerateRecv(p_2, source.getLeftHops().keySet()),
 												(BoolExpr) private_addr_func.apply(nctx.pf.get("src").apply(p_2)),
 												ctx.mkEq(nctx.pf.get("src").apply(p_1), nctx.pf.get("dest").apply(p_2)),
-												ctx.mkEq(nctx.pf.get("src").apply(p_2),
-														nctx.pf.get("dest").apply(p_0))),
+												ctx.mkEq(nctx.pf.get("src").apply(p_2),nctx.pf.get("dest").apply(p_0))),
 												1, null, null, null, null)),
 										1, null, null, null, null))),
 				1, null, null, null, null);
@@ -199,10 +201,10 @@ public class PolitoNat extends NetworkObject {
 		BoolExpr enumerateRecvP3 = ctx.mkOr(recvNeighbours3.toArray(tmp6));*/
 
 		// extra constraints to oblige the VNF to forward the received packets
-		/*BoolExpr expr = ctx.mkImplies(
-				ctx.mkAnd(enumerateRecvP3, (BoolExpr) private_addr_func.apply(nctx.pf.get("src").apply(p_3))),
+		BoolExpr expr = ctx.mkImplies(
+				ctx.mkAnd(enumerateRecv(p_3,source.getLeftHops().keySet()), (BoolExpr) private_addr_func.apply(nctx.pf.get("src").apply(p_3))),
 				ctx.mkExists(new Expr[] { p_4 },
-						ctx.mkAnd(enumerateSendP4,
+						ctx.mkAnd(enumerateSend(p_4,source.getRightHops().keySet()),
 								ctx.mkNot((BoolExpr) private_addr_func.apply(nctx.pf.get("dest").apply(p_4))),
 								ctx.mkEq(nctx.pf.get("src").apply(p_4), natIp),
 								ctx.mkEq(nctx.pf.get("origin").apply(p_3), nctx.pf.get("origin").apply(p_4)),
@@ -225,7 +227,8 @@ public class PolitoNat extends NetworkObject {
 						, 1, null, null, null, null)
 
 		);
-		constraints.add(ctx.mkForall(new Expr[] { p_3 }, expr, 1, null, null, null, null));*/
+		//System.out.println("$$ "+expr);
+		constraints.add(ctx.mkForall(new Expr[] { p_3 }, expr, 1, null, null, null, null));
 
 	}
 
@@ -251,24 +254,29 @@ public class PolitoNat extends NetworkObject {
 
 
 
-	public void setInternalAddress(Optimize solver) {
+	public void setInternalAddress() {
 		List<BoolExpr> constr = new ArrayList<BoolExpr>();
 		Expr n_0 = ctx.mkConst("nat_node", nctx.address);
 
 		for (AllocationNode n : source.getLeftHops().keySet()) {
 			constr.add(ctx.mkEq(n_0, n.getZ3Node()));
+			for (AllocationNode n1 : n.getLeftHops().keySet()) {
+				constr.add(ctx.mkEq(n_0, n1.getZ3Node()));
+			}
 		}
+		System.out.println(constr);
+		
+		
 		BoolExpr[] constrs = new BoolExpr[constr.size()];
 		// Constraintprivate_addr_func(n_0) == or(n_0==n foreach internal
 		// address)
-		solver.Add(ctx.mkForall(new Expr[] { n_0 },
-				ctx.mkEq(private_addr_func.apply(n_0), ctx.mkOr(constr.toArray(constrs))), 1, null, null, null, null));
+		Quantifier internalAddresses = ctx.mkForall(new Expr[] { n_0 }, ctx.mkEq(private_addr_func.apply(n_0), ctx.mkOr(constr.toArray(constrs))), 1, null, null, null, null);
+		constraints.add(internalAddresses);
 	}
 
 	@Override
 	public void addContraints(Optimize solver) {
 		BoolExpr[] constr = new BoolExpr[constraints.size()];
 	    solver.Add(constraints.toArray(constr));
-	    setInternalAddress(solver);
 	}
 }
