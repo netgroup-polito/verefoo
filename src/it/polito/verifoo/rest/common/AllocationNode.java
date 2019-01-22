@@ -12,11 +12,29 @@ import it.polito.verigraph.mcnet.components.NetworkObject;
 public class AllocationNode {
 
 	private Node node;
-	private Map<FunctionalTypes, NetworkObject> placeableVNF;
+	//private Map<FunctionalTypes, NetworkObject> placeableVNF;
+	private NetworkObject placedNF;
+	private FunctionalTypes typeNF;
 	private String ipAddress;
 	private List<Property> interestedProperties;
 	private DatatypeExpr z3Name;
 	private DatatypeExpr z3Node;
+	
+	
+	private Map<AllocationNode, Set<AllocationNode>> leftHops = new HashMap<>();
+	private Map<AllocationNode, Set<AllocationNode>> rightHops = new HashMap<>();
+	private Map<AllocationNode, Set<AllocationNode>> lastHops = new HashMap<>();
+	private Map<AllocationNode, Set<AllocationNode>> firstHops = new HashMap<>();
+	
+	
+	public AllocationNode(Node node) {
+		this.node = node;
+		placedNF = null;
+		typeNF = null;
+		ipAddress = node.getName();
+	}
+	
+	
 	public DatatypeExpr getZ3Node() {
 		return z3Node;
 	}
@@ -25,10 +43,6 @@ public class AllocationNode {
 		this.z3Node = z3Node;
 	}
 
-	private Map<AllocationNode, Set<AllocationNode>> leftHops = new HashMap<>();
-	private Map<AllocationNode, Set<AllocationNode>> rightHops = new HashMap<>();
-	private Map<AllocationNode, Set<AllocationNode>> lastHops = new HashMap<>();
-	private Map<AllocationNode, Set<AllocationNode>> firstHops = new HashMap<>();
 	
 	
 	public String getIpAddress() {
@@ -71,12 +85,7 @@ public class AllocationNode {
 		this.firstHops = firstHops;
 	}
 
-	public AllocationNode(Node node) {
-		this.node = node;
-		placeableVNF = new HashMap<FunctionalTypes, NetworkObject>();
-		ipAddress = node.getName();
-	}
-	
+
 	public Node getNode() {
 		return node;
 	}
@@ -85,12 +94,21 @@ public class AllocationNode {
 		this.node = node;
 	}
 	
-	public Map<FunctionalTypes, NetworkObject> getPlaceableVNF() {
-		return placeableVNF;
+
+	public NetworkObject getPlacedNF() {
+		return placedNF;
 	}
-	
-	public void setPlaceableVNF(Map<FunctionalTypes, NetworkObject> placeableVNF) {
-		this.placeableVNF = placeableVNF;
+
+	public void setPlacedNF(NetworkObject placedNF) {
+		this.placedNF = placedNF;
+	}
+
+	public FunctionalTypes getTypeNF() {
+		return typeNF;
+	}
+
+	public void setTypeNF(FunctionalTypes typeNF) {
+		this.typeNF = typeNF;
 	}
 
 	@Override
@@ -127,8 +145,8 @@ public class AllocationNode {
 	}
 
 	public void addConstraints(Optimize solver) {
-		for(NetworkObject no : placeableVNF.values()) {
-			no.addContraints(solver);
+		if(placedNF != null) {
+			placedNF.addContraints(solver);
 		}
 	}
 	

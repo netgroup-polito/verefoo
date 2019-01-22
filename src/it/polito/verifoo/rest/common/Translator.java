@@ -566,14 +566,14 @@ public class Translator {
 				n.setFunctionalType(FunctionalTypes.FIREWALL);
 				Firewall f = new Firewall();
 				
-				for(NetworkObject no:  allocationNode.getPlaceableVNF().values())
-					if(no instanceof AclFirewall) {
-						AclFirewall aclf = (AclFirewall) no;
-						if(!aclf.isBlacklisting())
-							f.setDefaultAction(ActionTypes.ALLOW);
-						else
-							f.setDefaultAction(ActionTypes.DENY);
-					}
+				NetworkObject no = allocationNode.getPlacedNF();
+				if(no instanceof AclFirewall) {
+					AclFirewall aclf = (AclFirewall) no;
+					if(!aclf.isBlacklisting())
+						f.setDefaultAction(ActionTypes.ALLOW);
+					else
+						f.setDefaultAction(ActionTypes.DENY);
+				}
 				
 				configuration.setFirewall(f);
 				n.setConfiguration(configuration);
