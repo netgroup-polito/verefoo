@@ -20,7 +20,7 @@ import it.polito.verigraph.mcnet.netobjs.AclFirewall;
 import it.polito.verigraph.mcnet.netobjs.PolitoEndHost;
 import it.polito.verigraph.mcnet.netobjs.PolitoNat;
 
-public class VNFAllocationManager {
+public class NFAllocationManager {
 	private Context ctx;
     private NetContext nctx;
     private FWAutoconfigurationManager FWmanager;
@@ -29,7 +29,7 @@ public class VNFAllocationManager {
 	private List<Property> properties;
 	private HashMap<String, AllocationNode> nodes;
 	
-	 public VNFAllocationManager(Context ctx, NetContext nctx, 
+	 public NFAllocationManager(Context ctx, NetContext nctx, 
 	    		HashMap<String, AllocationNode> allocationNodes, List<NodeMetrics> nodeMetrics, List<Property> properties, FWAutoconfigurationManager FWmanager) {
 			super();
 			this.ctx = ctx;
@@ -42,7 +42,12 @@ public class VNFAllocationManager {
 			this.nodes = allocationNodes;
 		}
 
-	public void istanciateDefineVNF() {
+	 
+	 /* 
+	  * This method is invoked by VerifooProxy to instanciate the Network Functions which have been specified in the input, processing the input nodes with a proper Configuration (i.e. node which isn't empty). For the moment it's able to instanciate web client/server and firewall. 
+	  * Each other NF can be added here following the same pattern (legacy class: NodeNetworkObject)
+	  */
+	public void instanciateDefineNF() {
 		
 		nodes.values().forEach(allocationNode -> {
 			Node node = allocationNode.getNode();
@@ -56,8 +61,8 @@ public class VNFAllocationManager {
 					//AllocationNode server = nodes.values().stream().filter(n -> n.getIpAddress().equals(node.getConfiguration().getWebclient().getNameWebServer())).findFirst().orElse(null);
 					
 					client.installEndHost(p);
-					allocationNode.getPlaceableVNF().put( FunctionalTypes.WEBCLIENT, client);
-					
+					allocationNode.setPlacedNF(client);
+					allocationNode.setTypeNF(FunctionalTypes.WEBCLIENT);
 				}
 			
 			
@@ -68,7 +73,9 @@ public class VNFAllocationManager {
 					if(prop != null){ p.setProperties(prop, nctx);}
 					
 					server.installEndHost(p);
-					allocationNode.getPlaceableVNF().put(FunctionalTypes.WEBSERVER, server);
+					allocationNode.setPlacedNF(server);
+					allocationNode.setTypeNF(FunctionalTypes.WEBSERVER);
+					;
 				}
 				
 				else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
@@ -89,54 +96,71 @@ public class VNFAllocationManager {
 					} 
 					
 					FWmanager.addFirewall(firewall,  allocationNode);
-					allocationNode.getPlaceableVNF().put(FunctionalTypes.FIREWALL, firewall);
+					allocationNode.setPlacedNF(firewall);
+					allocationNode.setTypeNF(FunctionalTypes.FIREWALL);
+				}
+				
+				else if(node.getFunctionalType() == FunctionalTypes.NAT) {
+					PolitoNat nat = new PolitoNat(allocationNode, ctx, nctx);
+					allocationNode.setPlacedNF(nat);
+					allocationNode.setTypeNF(FunctionalTypes.NAT);
 				}
 			}
 			
 		});
 	}
 
-	public void VNFchoice(AllocationNode source, AllocationNode origin, AllocationNode finalDest) {
-		boolean interested = properties.stream().anyMatch(p -> p.getSrc().equals(origin.getIpAddress()) && p.getDst().equals(finalDest.getIpAddress()));
-		if(interested) {
-			if(!FWmanager.firewallIsPresent(source)) {
-				AclFirewall firewall = new AclFirewall(source, ctx, nctx);
-				FWmanager.addFirewall(firewall, source);
-				source.getPlaceableVNF().put(FunctionalTypes.FIREWALL, firewall);
+	
+	/*
+	 * This method is invoked in the recursive visit of the graph inside Verifoo Proxy. It feature an heuristic algorithm to select which NF place on the node. 
+	 * The heuristic will be completed in the future, for the moment it considers just one type of NF per time.
+	 */
+	public void NFchoice(AllocationNode source, AllocationNode origin, AllocationNode finalDest) {
+		if(source.getTypeNF() == null || source.getTypeNF().equals(FunctionalTypes.FIREWALL)) {
+			boolean interested = properties.stream().anyMatch(p -> p.getSrc().equals(origin.getIpAddress()) && p.getDst().equals(finalDest.getIpAddress()));
+			if(interested) {
+				if(!FWmanager.firewallIsPresent(source)) {
+					AclFirewall firewall = new AclFirewall(source, ctx, nctx);
+					FWmanager.addFirewall(firewall, source);
+					source.setPlacedNF(firewall);
+					source.setTypeNF(FunctionalTypes.FIREWALL);
+				}
+				
+				FWmanager.setPolicy(source, origin.getNode(), finalDest.getNode());
+				
 			}
-			
-			FWmanager.setPolicy(source, origin.getNode(), finalDest.getNode());
-			
 		}
+	
 	}
 	
+	/*
+	 * this method is invoked in Verifoo Proxy before the creation of the Checker but after the recursive visit of the graph. 
+	 * It allows to create hard and soft contraints for each Network Function placed inside a node.
+	 */
 	
-	public void VNFinstall() {
+	public void NFinstall() {
 		
 		nodes.values().forEach(allocationNode -> {
 			Node node = allocationNode.getNode();
-			Map<FunctionalTypes, NetworkObject> vnf = allocationNode.getPlaceableVNF();
-			for(Map.Entry<FunctionalTypes, NetworkObject> pair : vnf.entrySet()) {
-				FunctionalTypes type = pair.getKey();
-				NetworkObject no = pair.getValue();
+			FunctionalTypes type = allocationNode.getTypeNF();
+			NetworkObject no = allocationNode.getPlacedNF();
 				
-				if(type.equals(FunctionalTypes.WEBCLIENT)) {
-					PolitoEndHost endHost = (PolitoEndHost) no;
-					AllocationNode server = nodes.values().stream().filter(n -> n.getIpAddress().equals(node.getConfiguration().getWebclient().getNameWebServer())).findFirst().orElse(null);
-					endHost.installAsWebClient(server.getZ3Node());
-				}
-				else if(type.equals(FunctionalTypes.WEBSERVER)) {
-					PolitoEndHost endHost = (PolitoEndHost) no;
-					endHost.installAsWebServer();
-				}else if(type.equals(FunctionalTypes.WEBSERVER)) {
-					PolitoEndHost endHost = (PolitoEndHost) no;
-					endHost.installAsWebServer();
-				}else if(node.getFunctionalType() == FunctionalTypes.NAT) {
-					PolitoNat nat = new PolitoNat(allocationNode, ctx, nctx);
-					allocationNode.getPlaceableVNF().put(FunctionalTypes.NAT, nat);
-					nat.natModel(nctx.am.get(node.getName()));
-				}
+			if(type.equals(FunctionalTypes.WEBCLIENT)) {
+				PolitoEndHost endHost = (PolitoEndHost) no;
+				AllocationNode server = nodes.values().stream().filter(n -> n.getIpAddress().equals(node.getConfiguration().getWebclient().getNameWebServer())).findFirst().orElse(null);
+				endHost.installAsWebClient(server.getZ3Node());
 			}
+			else if(type.equals(FunctionalTypes.WEBSERVER)) {
+				PolitoEndHost endHost = (PolitoEndHost) no;
+				endHost.installAsWebServer();
+			}else if(type.equals(FunctionalTypes.WEBSERVER)) {
+				PolitoEndHost endHost = (PolitoEndHost) no;
+				endHost.installAsWebServer();
+			}else if(node.getFunctionalType() == FunctionalTypes.NAT) {	
+				PolitoNat nat = (PolitoNat) no;
+				nat.natModel(nctx.am.get(node.getName()));
+			}
+			
 			
 		});
 		

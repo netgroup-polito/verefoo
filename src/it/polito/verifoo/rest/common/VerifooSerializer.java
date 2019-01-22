@@ -109,7 +109,7 @@ public class VerifooSerializer {
 	        			System.out.println(n.getName() + " is removed.");
 	        		});*/
 	        		//System.out.println("%%%%%%%%%%%%%%%%%%%%%%");
-	        		//System.out.println(res.model);
+	        		System.out.println(res.model);
 	        		//System.out.println("%%%%%%%%%%%%%%%%%%%%%%");
 	        	}
 	        	else{

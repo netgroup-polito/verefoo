@@ -29,7 +29,7 @@ import com.microsoft.z3.Status;
 
 import it.polito.verifoo.rest.common.AllocationNode;
 import it.polito.verifoo.rest.common.NodeNetworkObject;
-import it.polito.verifoo.rest.common.VNFAllocationManager;
+import it.polito.verifoo.rest.common.NFAllocationManager;
 import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verigraph.mcnet.components.IsolationResult;
 import it.polito.verigraph.mcnet.components.NetContext;
@@ -61,7 +61,7 @@ public class Checker {
 	
 
 	
-	public Checker(Context context, NetContext nctx, HashMap<String,AllocationNode> allocationNodes, VNFAllocationManager allocationManager) {
+	public Checker(Context context, NetContext nctx, HashMap<String,AllocationNode> allocationNodes, NFAllocationManager allocationManager) {
 		this.ctx = context;
 		
 		this.nctx = nctx;

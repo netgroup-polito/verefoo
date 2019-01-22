@@ -5,33 +5,78 @@
             <node name="10.0.0.1" functional_type="WEBCLIENT">
                 <neighbour name="20.0.0.1"/>
                 <configuration name="confA" description="A simple description">
-                    <webclient nameWebServer="30.0.5.2"/>
+                    <webclient nameWebServer="30.0.0.1"/>
                 </configuration>
             </node>
             <node name="10.0.0.2" functional_type="WEBCLIENT">
                 <neighbour name="20.0.0.1"/>
                 <configuration name="confA" description="A simple description">
-                    <webclient nameWebServer="30.0.5.2"/>
+                    <webclient nameWebServer="30.0.0.1"/>
+                </configuration>
+            </node>
+            <node name="10.0.0.3" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.1"/>
+                <configuration name="confA" description="A simple description">
+                    <webclient nameWebServer="30.0.0.1"/>
+                </configuration>
+            </node>
+            <node name="10.0.0.4" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.1"/>
+                <configuration name="confA" description="A simple description">
+                    <webclient nameWebServer="30.0.0.1"/>
+                </configuration>
+            </node>
+            <node name="10.0.0.5" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.1"/>
+                <configuration name="confA" description="A simple description">
+                    <webclient nameWebServer="30.0.0.1"/>
                 </configuration>
             </node>
             <node name="20.0.0.1">
-                <neighbour name="10.0.0.1"/>
                 <neighbour name="20.0.0.2"/>
+                <neighbour name="10.0.0.1"/>
                 <neighbour name="10.0.0.2"/>
+                <neighbour name="10.0.0.3"/>
+                <neighbour name="10.0.0.4"/>
+                <neighbour name="10.0.0.5"/>
             </node>
             <node name="20.0.0.2">
-                <neighbour name="20.0.0.1"/>
-                <neighbour name="30.0.5.2"/>
                 <neighbour name="20.0.0.3"/>
+                <neighbour name="20.0.0.1"/>
             </node>
             <node name="20.0.0.3">
+                <neighbour name="20.0.0.4"/>
                 <neighbour name="20.0.0.2"/>
             </node>
-            <node name="30.0.5.2" functional_type="WEBSERVER">
-                <neighbour name="20.0.0.2"/>
+            <node name="20.0.0.4">
+                <neighbour name="20.0.0.5"/>
+                <neighbour name="20.0.0.3"/>
+            </node>
+            <node name="20.0.0.5">
+                <neighbour name="20.0.0.4"/>
+                <neighbour name="20.0.0.6"/>
+            </node>
+            <node name="20.0.0.6">
+                <neighbour name="20.0.0.5"/>
+                <neighbour name="20.0.0.7"/>
+            </node>
+            <node name="20.0.0.7">
+                <neighbour name="20.0.0.6"/>
+                <neighbour name="20.0.0.8"/>
+            </node>
+            <node name="20.0.0.8">
+                <neighbour name="20.0.0.7"/>
+                <neighbour name="20.0.0.9"/>
+            </node>
+            <node name="20.0.0.9">
+                <neighbour name="20.0.0.8"/>
+                <neighbour name="30.0.0.1"/>
+            </node>
+            <node name="30.0.0.1" functional_type="WEBSERVER">
+                <neighbour name="20.0.0.9"/>
                 <configuration name="confB" description="A simple description">
                     <webserver>
-                        <name>30.0.5.2</name>
+                        <name>30.0.0.1</name>
                     </webserver>
                 </configuration>
             </node>
@@ -42,9 +87,11 @@
         <LinkConstraints/>
     </Constraints>
     <PropertyDefinition>
-        <Property name="IsolationProperty" graph="0" src="10.0.0.2" dst="30.0.5.2"/>
-        <Property name="IsolationProperty" graph="0" src="10.0.0.1" dst="30.0.5.2"/>
-        <Property name="ReachabilityProperty" graph="0" src="30.0.5.2" dst="10.0.0.1"/>
+        <Property name="IsolationProperty" graph="0" src="10.0.0.1" dst="30.0.0.1"/>
+        <Property name="IsolationProperty" graph="0" src="10.0.0.2" dst="30.0.0.1"/>
+        <Property name="IsolationProperty" graph="0" src="10.0.0.3" dst="30.0.0.1"/>
+        <Property name="IsolationProperty" graph="0" src="10.0.0.4" dst="30.0.0.1"/>
+        <Property name="IsolationProperty" graph="0" src="10.0.0.5" dst="30.0.0.1"/>
     </PropertyDefinition>
     <ParsingString></ParsingString>
 </NFV>

@@ -60,7 +60,7 @@ public class VerifooProxy {
 		private List<LinkMetrics> linkMetrics;
 		private int nrOfConditions;
 		private ConditionStringBuilder cb;
-		private VNFAllocationManager allocationManager;
+		private NFAllocationManager allocationManager;
 
 		/**
 		 * Public constructor for the verifoo proxy service
@@ -94,7 +94,7 @@ public class VerifooProxy {
 			nctx.setWildcardManager(wildcardManager);
 			
 			FWmanager = new FWAutoconfigurationManager(wildcardManager, prop, nodes);
-			allocationManager = new VNFAllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, FWmanager);
+			allocationManager = new NFAllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, FWmanager);
 			/*AddressMapping adm = new AddressMapping(netobjs, nctx, net);
 			adm.setAddressMappings(nodes);*/
 		    
@@ -111,10 +111,10 @@ public class VerifooProxy {
 			//if(this.hosts.size() != 0)
 				//checkPhysicalNetwork();
 			//netobjs.attachToNet();
-			allocationManager.istanciateDefineVNF();
+			allocationManager.instanciateDefineNF();
 			checkNffg();	
 			FWmanager.minimizeRules();
-			allocationManager.VNFinstall();
+			allocationManager.NFinstall();
 		    //netobjs.generateVPN();
 		    
 		    //if(this.hosts.size() != 0)
@@ -692,7 +692,7 @@ public class VerifooProxy {
 						rightHops.put(next, set);
 					}
 					
-					allocationManager.VNFchoice(source, origin, finalDest);
+					allocationManager.NFchoice(source, origin, finalDest);
 	
 	
 				}
