@@ -70,10 +70,54 @@
             </node>
             <node name="20.0.0.9">
                 <neighbour name="20.0.0.8"/>
+                <neighbour name="20.0.0.10"/>
+            </node>
+            <node name="20.0.0.10">
+                <neighbour name="20.0.0.9"/>
+                <neighbour name="20.0.0.11"/>
+            </node>
+            <node name="20.0.0.11">
+                <neighbour name="20.0.0.10"/>
+                <neighbour name="20.0.0.12"/>
+            </node>
+            <node name="20.0.0.12">
+                <neighbour name="20.0.0.11"/>
+                <neighbour name="20.0.0.13"/>
+            </node>
+            <node name="20.0.0.13">
+                <neighbour name="20.0.0.12"/>
+                <neighbour name="20.0.0.14"/>
+            </node>
+            <node name="20.0.0.14">
+                <neighbour name="20.0.0.13"/>
+                <neighbour name="20.0.0.15"/>
+            </node>
+            <node name="20.0.0.15">
+                <neighbour name="20.0.0.14"/>
+                <neighbour name="20.0.0.16"/>
+            </node>
+            <node name="20.0.0.16">
+                <neighbour name="20.0.0.15"/>
+                <neighbour name="20.0.0.17"/>
+            </node>
+            <node name="20.0.0.17">
+                <neighbour name="20.0.0.16"/>
+                <neighbour name="20.0.0.18"/>
+            </node>
+            <node name="20.0.0.18">
+                <neighbour name="20.0.0.17"/>
+                <neighbour name="20.0.0.19"/>
+            </node>
+            <node name="20.0.0.19">
+                <neighbour name="20.0.0.18"/>
+                <neighbour name="20.0.0.20"/>
+            </node>
+            <node name="20.0.0.20">
+                <neighbour name="20.0.0.19"/>
                 <neighbour name="30.0.0.1"/>
             </node>
             <node name="30.0.0.1" functional_type="WEBSERVER">
-                <neighbour name="20.0.0.9"/>
+                <neighbour name="20.0.0.20"/>
                 <configuration name="confB" description="A simple description">
                     <webserver>
                         <name>30.0.0.1</name>

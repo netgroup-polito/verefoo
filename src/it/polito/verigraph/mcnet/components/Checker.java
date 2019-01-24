@@ -333,8 +333,8 @@ public class Checker {
 		
 		
 		model = null;
-		assertions = solver.getAssertions();
-		Arrays.asList(assertions).forEach(t-> System.out.println(t+"\n\n"));
+		//assertions = solver.getAssertions();
+		//Arrays.asList(assertions).forEach(t-> System.out.println(t+"\n\n"));
 		//System.out.println(Arrays.toString(assertions));
 		if (result == Status.SATISFIABLE) {
 			model = this.solver.getModel();

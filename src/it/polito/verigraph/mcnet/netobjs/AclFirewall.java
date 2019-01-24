@@ -61,6 +61,12 @@ public class AclFirewall extends NetworkObject{
 	boolean autoconfigured;
 
 
+	/**
+	 * Public constructor for the AclFirewall
+	 * @param source It is the Allocation Node on which the firewall is put
+	 * @param ctx It is the Z3 Context in which the model is generated
+	 * @param nctx It is the NetContext object to which contraints are sent
+	 */
 	public AclFirewall(AllocationNode source, Context ctx, NetContext nctx) {
 		fw = source.getZ3Name();
 		this.source = source;
@@ -70,10 +76,10 @@ public class AclFirewall extends NetworkObject{
 		constraints = new ArrayList<BoolExpr>();
    		acls = new ArrayList<>();
    		whiteAcls = new ArrayList<>();
-   		defaultAction = ctx.mkTrue();
+   		defaultAction = ctx.mkFalse();
    		used = ctx.mkBoolConst(fw+"_used");
    		
-		autoplace = true;
+		autoplace = true; 
 		autoconfigured = true;
 		isEndHost = false;
    		blacklisting = false;
@@ -121,17 +127,18 @@ public class AclFirewall extends NetworkObject{
 	
 
 	/**
-	 * Wrap add acls	
+	 * This method let wrap "add acls" method	
 	 * @param policy
 	 */
 	public void setPolicy(ArrayList<Tuple<DatatypeExpr, DatatypeExpr>> policy){
 		addAcls(policy);
 	}
 	
-	public void setDefaultAction(boolean action){
-		defaultAction = action? ctx.mkTrue(): ctx.mkFalse();
-	}
 	
+	/**
+	 * This method allows to add a set of ACL for already configured firewall
+	 * @param acls List of ACLs to add to the set of manually configured rules of the firewall
+	 */
 	public void addAcls(ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acls){
 		if(!autoconf){	// if not an autoconfiguration firewall
 			for(Tuple<DatatypeExpr, DatatypeExpr> acl : acls){
@@ -142,6 +149,21 @@ public class AclFirewall extends NetworkObject{
 			
 	}
 	
+	
+	/**
+	 * This method allows to change the default behaviour of the firewall: blacklisting (true) or whitelisting (false)
+	 * @param action The boolean is true for blacklisting, false for whitelisting.
+	 */
+	public void setDefaultAction(boolean action){
+		defaultAction = action? ctx.mkTrue(): ctx.mkFalse();
+		this.setBlacklisting(action);
+	}
+	
+	
+	/**
+	 * This method allows to add whiteList ACLs
+	 * @param acls List of WhiteACLs to add to the set of manually configured rules of the firewall
+	 */
 	public void addWhiteListAcls(ArrayList<Tuple<DatatypeExpr,DatatypeExpr>> acls){
 		if(!autoconf){	// if not an autoconfiguration firewall
 			for(Tuple<DatatypeExpr, DatatypeExpr> acl : acls){
@@ -151,17 +173,20 @@ public class AclFirewall extends NetworkObject{
 		}
 	}
 	
+
+	/**
+	 * This method allows to add a complete ACLs
+	 * @param acls List of WhiteACLs to add to the set of manually configured rules of the firewall
+	 */
 	public void addCompleteAcls(ArrayList<AclFirewallRule> acls){
 		if(!autoconf){	// if not an autoconfiguration firewall
 			this.acls.addAll(acls);
 		}	
 	}
-	
-	/*@Override
-	public DatatypeExpr getZ3Node() {
-		return fw;
-	}*/
-	
+
+	/**
+	 * This method allows to generate the Acl for a manually configured firewall
+	 */
 	public void generateAcl(){
 		Node n = source.getNode();
 		if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
@@ -214,6 +239,9 @@ public class AclFirewall extends NetworkObject{
 		
 	}
 	
+	/**
+	 * This method allows to create HARD constraints for a manually configured firewall, basing on its ACLs precedently computed
+	 */
     public void firewallSendRules (){
     	Expr p_0 = ctx.mkConst(fw+"_firewall_send_p_0", nctx.packet);
     	Expr n_0 = ctx.mkConst(fw+"_firewall_send_n_0", nctx.node);
@@ -226,6 +254,15 @@ public class AclFirewall extends NetworkObject{
     	//Constraint1		send(fw, n_0, p, t_0)  -> (exist n_1,t_1 : (recv(n_1, fw, p, t_1) && 
     	//    				t_1 < t_0 && !acl_func(p.src,p.dest))
     	
+    	
+    	/**
+    	 * This section allows the creation of the following forwarding rules:
+    	 * For each p_0, if recv(leftHop, fw, p_0) && acl_func.apply(p_0) -> for each rightHop, send(fw, rightHop, p_0)
+    	 * In words:
+    	 * For each packet, if the firewall has received this packet from a leftHop and its ACLs don't block the packet itself,
+    	 * then the firewall must send the packet to ALL its nextHops towards its destination 
+    	 */
+    	
     	for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getLeftHops().entrySet()) {
   			
   			AllocationNode an = entry.getKey();
@@ -235,9 +272,7 @@ public class AclFirewall extends NetworkObject{
   			List<Expr> sendNeighbours = list.stream().map(n -> (BoolExpr) nctx.send.apply(fw, n, p_0)).distinct().collect(Collectors.toList());
   			BoolExpr[] tmp3 = new BoolExpr[list.size()];
   			BoolExpr enumerateSend = ctx.mkAnd(sendNeighbours.toArray(tmp3));
-  			//System.out.println(recv);
-  			//System.out.println(enumerateSend);
-  			
+
   			constraints.add(ctx.mkForall(new Expr[] { p_0 },
 							ctx.mkImplies(ctx.mkAnd((BoolExpr) recv,
 							(BoolExpr)acl_func.apply(p_0)), ctx.mkAnd(enumerateSend)), 
@@ -245,6 +280,16 @@ public class AclFirewall extends NetworkObject{
   			
 
   		}
+    	
+    	/**
+    	 * This section allows the creation of the following forwarding rules:
+    	 * For each p_0, for each rightHop, send(fw, rightHop, p_0) -> exist at least one leftHop that recv(leftHop, fw, p_0) && acl_func.apply(p_0) -> 
+    	 * In words:
+    	 * For each packet, if the firewall has sent this packet to a nextHop, that it means that:
+    	 * 1) this packet has been received by at least one leftHop
+    	 * 2) this packet isn't blocked by ACLs
+    	 */
+    	
     	
     	for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getRightHops().entrySet()){
   			AllocationNode an = entry.getKey();
@@ -312,6 +357,12 @@ public class AclFirewall extends NetworkObject{
     	  
     }
     
+    
+
+	/**
+	 * This method allows to create SOFT and HARD constraints for an auto-configured firewall
+	 *@param nRules It is the number of MAXIMUM rules the firewall should try to configure
+	 */
     public void firewallSendRules(Integer nRules) {
     	
     	Expr p_0 = ctx.mkConst(fw + "_firewall_send_p_0", nctx.packet);
@@ -340,6 +391,14 @@ public class AclFirewall extends NetworkObject{
   			IntExpr dstAuto2 = ctx.mkIntConst(fw + "_auto_dst_ip_2_"+i);
   			IntExpr dstAuto3 = ctx.mkIntConst(fw + "_auto_dst_ip_3_"+i);
   			IntExpr dstAuto4 = ctx.mkIntConst(fw + "_auto_dst_ip_4_"+i);
+  			
+  			/**
+  	    	 * This section allows the creation of the following hard constraints:
+  	    	 * 1) if in a rule the source isn't NULL, then also the destination shouldn't be NULL
+  	    	 * 2) if in a rule the source is NULL, then also the destination shouldn't be NULL
+  	    	 * This is done only with autoplacement feature.
+  	    	 * Observation: maybe we can introduce the REVERSE rules!
+  	    	 */
   			if(autoplace) {
   				implications1.add(ctx.mkAnd(ctx.mkNot(ctx.mkEq( src, this.nctx.am.get("null"))),
   						ctx.mkNot(ctx.mkEq( dst, this.nctx.am.get("null")))));
@@ -347,6 +406,12 @@ public class AclFirewall extends NetworkObject{
   						ctx.mkEq( dst, this.nctx.am.get("null"))));
   			}
   			
+  			
+  			/**
+  	    	 * This section allows the creation of the following hard constraints:
+  	    	 * Each component of source or destination ipAddress of the rule should be equal to the defined Z3 variable in this method.
+  	    	 * It's used for a mapping useful only for Z3 model, not first-order logic behaviour of firewall.
+  	    	 */
   			constraints.add(ctx.mkAnd(
 						ctx.mkEq(nctx.ip_functions.get("ipAddr_1").apply(src), srcAuto1),
 						ctx.mkEq(nctx.ip_functions.get("ipAddr_2").apply(src), srcAuto2),
@@ -359,6 +424,12 @@ public class AclFirewall extends NetworkObject{
 						)
 				); 
   			
+  			
+  			/**
+  	    	 * This section allows the creation of the following soft constraints:
+  	    	 * If possible, the source/destination IP address components should be equal to the wildcard.
+  	    	 * This way the rule is able to manage more than one property at the same time.
+  	    	 */
   			nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_1").apply(nctx.am.get("wildcard")),srcAuto1), "fw_auto_conf"));
   			nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_2").apply(nctx.am.get("wildcard")),srcAuto2), "fw_auto_conf"));
   			nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ip_functions.get("ipAddr_3").apply(nctx.am.get("wildcard")),srcAuto3), "fw_auto_conf"));
@@ -372,6 +443,11 @@ public class AclFirewall extends NetworkObject{
 					ctx.mkEq(nctx.ip_functions.get("ipAddr_4").apply(nctx.am.get("wildcard")), srcAuto4)	
 			)); */
   			
+  			/**
+  	    	 * This section allows the creation of the following soft constraints:
+  	    	 * If possible, the source/destination IP address components should be NULL at the same time.
+  	    	 * This way the rule isn't generated.
+  	    	 */
   			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkAnd(
  						ctx.mkEq(nctx.ip_functions.get("ipAddr_1").apply(nctx.am.get("null")), srcAuto1),
  						ctx.mkEq(nctx.ip_functions.get("ipAddr_2").apply(nctx.am.get("null")), srcAuto2),
@@ -383,6 +459,12 @@ public class AclFirewall extends NetworkObject{
  						ctx.mkEq(nctx.ip_functions.get("ipAddr_4").apply(nctx.am.get("null")), dstAuto4)
  						), "fw_auto_conf"));
   			
+  			/**
+  	    	 * This section allows the creation of the following soft constraints:
+  	    	 * 1) use wildcards for protocol field if possible
+  	    	 * 2) use wildcards for source port if possible
+  	    	 * 3) use wildcards for destination port if possible
+  	    	 */
  			nctx.softConstrProtoWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
  			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(srcp, nctx.pm.get("null")),"fw_auto_port"));
  			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(dstp, nctx.pm.get("null")),"fw_auto_port"));
@@ -395,6 +477,11 @@ public class AclFirewall extends NetworkObject{
  			 					ctx.mkEq(nctx.pf.get("dest_port").apply(p_0), dstp)
  			 					));
   		}
+  		
+  		/**
+	     * This section allow the creation of Z3 variables for defaultAction and rules.
+	     * behaviour variables is the combination of the auto-configured rules.
+	    */
   		
   		Expr defaultAction = ctx.mkConst(fw + "_auto_default_action", ctx.mkBoolSort());
   		Expr ruleAction = ctx.mkConst(fw + "_auto_action", ctx.mkBoolSort());
@@ -412,6 +499,8 @@ public class AclFirewall extends NetworkObject{
   		}
   		
   		
+  		
+  		
   		for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getLeftHops().entrySet()) {
   			
   			AllocationNode an = entry.getKey();
@@ -425,15 +514,42 @@ public class AclFirewall extends NetworkObject{
   			//System.out.println(enumerateSend);
   			if(autoplace) {
   				
+  				/**
+  		    	 * This section allows the creation of the following forwarding rules:
+  		    	 * For each p_0, if recv(leftHop, fw, p_0) && behaviour && fw_is_used -> for each rightHop, send(fw, rightHop, p_0)
+  		    	 * In words:
+  		    	 * For each packet, if the firewall has received this packet from a leftHop, its rules don't block the packet itself and the firewall is used,
+  		    	 * then the firewall must send the packet to ALL its nextHops towards its destination 
+  		    	 */
+  				
   				constraints.add(ctx.mkForall(new Expr[] { p_0 },
 							ctx.mkImplies(ctx.mkAnd((BoolExpr) recv,
 									behaviour, used), ctx.mkAnd(enumerateSend)), 
 							1, null, null, null, null));
+  				
+  				/**
+  		    	 * This section allows the creation of the following forwarding rules:
+  		    	 * For each p_0, if recv(leftHop, fw, p_0) && !fw_is_used -> for each rightHop, send(fw, rightHop, p_0)
+  		    	 * In words:
+  		    	 * For each packet, if the firewall has received this packet from a leftHop and the firewall isn' used,
+  		    	 * then the firewall must send the packet to ALL its nextHops towards its destination because it is a forwarder.
+  		    	 */
+  				
   				constraints.add(ctx.mkForall(new Expr[] { p_0 },
 						ctx.mkImplies(ctx.mkAnd((BoolExpr) recv,
 								ctx.mkNot(used)), ctx.mkAnd(enumerateSend)), 
 						1, null, null, null, null));
   			}else {
+  				
+  				/**
+  		    	 * This section allows the creation of the following forwarding rules:
+  		    	 * For each p_0, if recv(leftHop, fw, p_0)  -> for each rightHop, send(fw, rightHop, p_0)
+  		    	 * In words:
+  		    	 * For each packet, if the firewall has received this packet from a leftHop and the rules don't block it.
+  		    	 * then the firewall must send the packet to ALL its nextHops towards its destination.
+  		    	 * NOTE: only without autoplacement
+  		    	 */
+  				
   				constraints.add(ctx.mkForall(new Expr[] { p_0 },
 							ctx.mkImplies(ctx.mkAnd((BoolExpr) recv,
 									behaviour), ctx.mkAnd(enumerateSend)), 
@@ -456,14 +572,44 @@ public class AclFirewall extends NetworkObject{
   			BoolExpr[] tmp2 = new BoolExpr[list.size()];
   	 		BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp2));
   	 		if(autoplace) {
+  	 			
+  	 			/**
+  		    	 * This section allows the creation of the following forwarding rules:
+  		    	 * For each p_0, if send(fw, rightHop, p_0) && fw_is_used -> exist leftHop, recv(leftHop, fw, p_0) && behaviour 
+  		    	 * In words:
+  		    	 * For each packet, if the firewall has sent the packet and it is used, it means that:
+  		    	 * 1) it has received the packet from a leftHop
+  		    	 * 2) its rules don't block the packet
+  		    	 */
+  	 			
   	 			constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
   	  					ctx.mkImplies(ctx.mkAnd((BoolExpr) send, used),
   	  									ctx.mkAnd(enumerateRecv,
   	  											behaviour)), 1, null, null, null, null));
+  	 			
+  	 			/**
+  		    	 * This section allows the creation of the following forwarding rules:
+  		    	 * For each p_0, if send(fw, rightHop, p_0) && !fw_is_used -> exist leftHop, recv(leftHop, fw, p_0)  
+  		    	 * In words:
+  		    	 * For each packet, if the firewall has sent the packet and it isn't used, it means that it simply has received the packet from a leftHop
+  		    	 * Basically it behaves as a forwarder.
+  		    	 */
+  	 			
   	 			constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
   	  					ctx.mkImplies(ctx.mkAnd((BoolExpr) send, ctx.mkNot(used)),
   	  									ctx.mkAnd(enumerateRecv)), 1, null, null, null, null));
   	 		} else {
+  	 			
+  	 			/**
+  		    	 * This section allows the creation of the following forwarding rules:
+  		    	 * For each p_0, if send(fw, rightHop, p_0) -> exist leftHop, recv(leftHop, fw, p_0) && behaviour 
+  		    	 * In words:
+  		    	 * For each packet, if the firewall has sent the packet, it means that:
+  		    	 * 1) it has received the packet from a leftHop
+  		    	 * 2) its rules don't block the packet
+  		    	 * NOTE: only without autplacement
+  		    	 */
+  	 			
   	 			constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
   	  					ctx.mkImplies((BoolExpr) send,
   	  									ctx.mkAnd(enumerateRecv,
@@ -471,6 +617,10 @@ public class AclFirewall extends NetworkObject{
   	 		}
   	 		
   		}
+  		
+  		/**
+	     * This section allows the insertion of previously created hard contraints in a list.
+	     */
   		
   		if(autoplace) {
   			BoolExpr[] tmp3 = new BoolExpr[implications1.size()];
@@ -486,21 +636,12 @@ public class AclFirewall extends NetworkObject{
     }
     
    
-    
-     		
-  
- 	public boolean isBlacklisting() {
-		return blacklisting;
-	}
 
 
-
-	public void setBlacklisting(boolean blacklisting) {
-		this.blacklisting = blacklisting;
-	}
-
-
-
+	/**
+	 * This method allows to add the contraints inside Z3 solver
+	 * @param solver Istance of Z3 solver
+	 */
 	private void aclConstraints(Optimize solver){
  		Expr p_0 = ctx.mkConst(fw+"_firewall_acl_p_0", nctx.packet);
  		Expr a_0 = ctx.mkConst(fw+"_rule_action_p_0", ctx.mkBoolSort());
@@ -548,29 +689,62 @@ public class AclFirewall extends NetworkObject{
     }
 
 
-
+	/**
+	 * This method allows to wrap the methoch which adds the contraints inside Z3 solver
+	 * @param solver Istance of Z3 solver
+	 */
 	@Override
 	public void addContraints(Optimize solver) {
 		BoolExpr[] constr = new BoolExpr[constraints.size()];
 	    solver.Add(constraints.toArray(constr));
 	    aclConstraints(solver);
 	}
+	
+	
+    /**
+	 * This method allows to know if blacklisting is used
+	 *@return the value of blacklisting boolean variable
+	 */
+ 	public boolean isBlacklisting() {
+		return blacklisting;
+	}
 
-
+ 	/**
+	 * This method allows to set blacklisting variable
+	 *@param blacklisting Value to set
+	 */
+	public void setBlacklisting(boolean blacklisting) {
+		this.blacklisting = blacklisting;
+	}
+	
+	/**
+	 * This method allows to know if autoplacement feature is used
+	 *@return the value of autoplace boolean variable
+	 */
 	public boolean isAutoplace() {
 		return autoplace;
 	}
 
-
+	/**
+	 * This method allows to set autoplace variable
+	 *@param autoplace Value to set
+	 */
 	public void setAutoplace(boolean autoplace) {
 		this.autoplace = autoplace;
 	}
 	
+	/**
+	 * This method allows to know if autoconfiguration feature is used
+	 *@return the value of autoconfigured boolean variable
+	 */
 	public boolean isAutoconfigured() {
 		return autoconfigured;
 	}
 
-
+	/**
+	 * This method allows to set autoconfigured variable
+	 *@param autoconfigured Value to set
+	 */
 	public void setAutoconfigured(boolean autoconfigured) {
 		this.autoconfigured = autoconfigured;
 	}
