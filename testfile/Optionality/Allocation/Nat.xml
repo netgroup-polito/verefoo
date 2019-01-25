@@ -10,24 +10,16 @@
       </node>
 	   <node functional_type="NAT" name="node2">
         <neighbour name="nodeA"/>
-        <neighbour name="node1"/>
+        <neighbour name="nodeB"/>
         <configuration description="A simple description" name="conf2">
           <nat>
-			<source>a</source>
+			<source>nodeA</source>
           </nat>
         </configuration>
       </node>
-      <node functional_type="FIREWALL" name="node1">
-        <neighbour name="node2"/>
-		<neighbour name="nodeB"/>
-        <configuration description="A simple description" name="conf1">
-          <firewall defaultAction="ALLOW">
-                        
-			</firewall>
-        </configuration>
-      </node>
+    
       <node functional_type="WEBSERVER" name="nodeB">
-		<neighbour name="node1"/>
+		<neighbour name="node2"/>
         <configuration description="A simple description" name="confB">
           <webserver>
           	<name>nodeB</name>
@@ -42,7 +34,7 @@
 	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
-		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 	
+		<Property graph="0" name="ReachabilityProperty" src="nodeA" dst="nodeB"/> 	
   </PropertyDefinition>
   
   <ParsingString></ParsingString>

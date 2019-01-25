@@ -271,11 +271,11 @@ public class Checker {
 		BoolExpr enumerateSendP0 = ctx.mkOr(sendNeighbours.toArray(tmp3));
 
 
-		constraintList.add(ctx.mkForall(new Expr[]{p_0},
+		/*constraintList.add(ctx.mkForall(new Expr[]{p_0},
 				ctx.mkImplies(ctx.mkAnd(enumerateSendP0),
 						ctx.mkAnd(ctx.mkEq(nctx.pf.get("lv4proto").apply(p_0), (IntExpr)ctx.mkInt(lv4proto)),
 									ctx.mkEq(nctx.pf.get("src_port").apply(p_0), nctx.pm.get(src_port)),
-									ctx.mkEq(nctx.pf.get("dest_port").apply(p_0), nctx.pm.get(dst_port)))),1,null,null,null,null));
+									ctx.mkEq(nctx.pf.get("dest_port").apply(p_0), nctx.pm.get(dst_port)))),1,null,null,null,null));*/
 	}
 	
 	public void addReachabilityProperty(AllocationNode src, AllocationNode dest, int lv4proto, String src_port, String dst_port) {
@@ -334,7 +334,7 @@ public class Checker {
 		
 		model = null;
 		assertions = solver.getAssertions();
-		//Arrays.asList(assertions).forEach(System.out::println);
+		Arrays.asList(assertions).forEach(t-> System.out.println(t+"\n\n"));
 		//System.out.println(Arrays.toString(assertions));
 		if (result == Status.SATISFIABLE) {
 			model = this.solver.getModel();

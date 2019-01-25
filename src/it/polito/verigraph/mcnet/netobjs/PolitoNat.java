@@ -199,8 +199,8 @@ public class PolitoNat extends NetworkObject {
 				ctx.mkExists(new Expr[] { p_4 },
 						ctx.mkAnd(enumerateSend(p_4,source.getRightHops().keySet()),
 								ctx.mkNot((BoolExpr) private_addr_func.apply(nctx.pf.get("dest").apply(p_4))),
-								ctx.mkEq(nctx.pf.get("src").apply(p_4), natIp),
-								ctx.mkEq(nctx.pf.get("origin").apply(p_3), nctx.pf.get("origin").apply(p_4)),
+								ctx.mkEq(nctx.pf.get("src").apply(p_4), natIp)
+								,ctx.mkEq(nctx.pf.get("origin").apply(p_3), nctx.pf.get("origin").apply(p_4)),
 								ctx.mkEq(nctx.pf.get("dest").apply(p_3), nctx.pf.get("dest").apply(p_4)),
 								ctx.mkEq(nctx.pf.get("orig_body").apply(p_3), nctx.pf.get("orig_body").apply(p_4)),
 								ctx.mkEq(nctx.pf.get("body").apply(p_3), nctx.pf.get("body").apply(p_4)),
@@ -221,7 +221,7 @@ public class PolitoNat extends NetworkObject {
 
 		);
 		//System.out.println("$$ "+expr);
-		constraints.add(ctx.mkForall(new Expr[] { p_3 }, expr, 1, null, null, null, null));
+		//constraints.add(ctx.mkForall(new Expr[] { p_3 }, expr, 1, null, null, null, null));
 
 	}
 
