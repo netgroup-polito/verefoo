@@ -95,46 +95,6 @@ public class PolitoNat extends NetworkObject {
 		// same for p_1.<dest,orig_body,body,seq,proto,emailFrom,url,options> ==
 		// p_0.<...>) "
 		
-		
-		Quantifier leftToRight2 = ctx.mkForall(
-				new Expr[] { p_0 }, ctx
-						.mkImplies(
-								ctx.mkAnd(enumerateSend(p_1,source.getLeftHops().keySet()),
-										ctx.mkNot((BoolExpr) private_addr_func.apply(nctx.pf.get("dest").apply(p_1)))),
-								ctx.mkAnd(ctx.mkEq(nctx.pf.get("src").apply(p_0), natIp), ctx.mkExists(
-										new Expr[] { p_0 },
-										ctx.mkAnd(enumerateSend(p_0,source.getRightHops().keySet()),
-												(BoolExpr) private_addr_func
-														.apply(nctx.pf.get("src").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("origin").apply(p_1),
-														nctx.pf.get("origin").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("inner_src").apply(p_1),
-														nctx.pf.get("inner_src").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("inner_dest").apply(p_1),
-														nctx.pf.get("inner_dest").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("dest").apply(p_1),
-														nctx.pf.get("dest").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("orig_body").apply(p_1),
-														nctx.pf.get("orig_body").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("body").apply(p_1),
-														nctx.pf.get("body").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("seq").apply(p_1), nctx.pf.get("seq").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("lv4proto").apply(p_1),
-														nctx.pf.get("lv4proto").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("proto").apply(p_1),
-														nctx.pf.get("proto").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("src_port").apply(p_1),
-														nctx.pf.get("src_port").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("dest_port").apply(p_1),
-														nctx.pf.get("dest_port").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("emailFrom").apply(p_1),
-														nctx.pf.get("emailFrom").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("url").apply(p_1), nctx.pf.get("url").apply(p_0)),
-												ctx.mkEq(nctx.pf.get("options").apply(p_1),
-														nctx.pf.get("options").apply(p_0))),
-										1, null, null, null, null))),
-				1, null, null, null, null);
-		
 		Quantifier leftToRight = ctx.mkForall(
 				new Expr[] { p_0 }, ctx
 						.mkImplies(
@@ -176,9 +136,8 @@ public class PolitoNat extends NetworkObject {
 												),
 										1, null, null, null, null))),
 				1, null, null, null, null);
-		System.out.println("-------------Nat leftToRight: "+leftToRight);
+		//System.out.println("-------------Nat leftToRight: "+leftToRight);
 		constraints.add(leftToRight);
-		constraints.add(leftToRight2);
 
 		// Constraint2
 		// send(nat, x, p_0) && private_addr_func(p_0.dest) ->
@@ -232,14 +191,7 @@ public class PolitoNat extends NetworkObject {
 		//System.out.println("-------------Nat rightToLeft: "+rightToLeft);
 		//constraints.add(rightToLeft);
 
-		/*List<Expr> sendNeighbours2 = neighbours.stream().map(n -> nctx.send.apply(nat, n.getZ3Node(), p_4))
-				.collect(Collectors.toList());
-		BoolExpr[] tmp5 = new BoolExpr[sendNeighbours2.size()];
-		BoolExpr enumerateSendP4 = ctx.mkOr(sendNeighbours2.toArray(tmp5));
-		List<Expr> recvNeighbours3 = neighbours.stream().map(n -> nctx.recv.apply(n.getZ3Node(), nat, p_3))
-				.collect(Collectors.toList());
-		BoolExpr[] tmp6 = new BoolExpr[recvNeighbours3.size()];
-		BoolExpr enumerateRecvP3 = ctx.mkOr(recvNeighbours3.toArray(tmp6));*/
+
 
 		// extra constraints to oblige the VNF to forward the received packets
 		BoolExpr expr = ctx.mkImplies(
