@@ -61,6 +61,7 @@ public class Translator {
 			originalNfv.getHosts().getHost().forEach(this::searchHost);
 		setAutoPlacement();
 		setAutoConfig();
+		removeOptionalNotUsed();
 		//originalNfv.setHosts(nfv.getHosts());
 		return originalNfv;
 	}
@@ -641,6 +642,154 @@ public class Translator {
 		this.originalNfv = norm.getOriginalNfv();
 	}
 	
+
+/**
+ * Remove not used optional network objects from the XML for the verifoo output
+ */
+public void removeOptionalNotUsed() {
+	
+	List<NodeMetrics> nodeMetrics = originalNfv.getConstraints().getNodeConstraints().getNodeMetrics().stream().collect(Collectors.toList());
+	
+	List<AllocationNode> optionalNodes = allocationNodes.values().stream()
+			.filter(n -> { 
+				for(NodeMetrics nm : nodeMetrics) {
+					if(n.getNode().getName().equals(nm.getNode()))
+						return true;
+				}
+				return false;
+			})
+			.collect(Collectors.toList());
+	
+	
+	optionalNodes.forEach(opNode -> {
+		
+		
+		
+		String tosearch = z3Translator.stringToSeachNetworkObjectNotUsed(opNode.getNode());
+		Pattern pattern = Pattern.compile(tosearch);
+		Matcher matcher = pattern.matcher(model);
+		
+		
+		while(matcher.find()) {
+			
+			Node n = originalNfv.getGraphs().getGraph().stream()
+					.filter(graph -> graph.getId() == g.getId())
+					.flatMap(graph -> graph.getNode().stream())
+					.filter(node -> node.getName().equals(opNode.getNode().getName())).findFirst().orElse(null);
+		
+		
+			Map<AllocationNode, Set<AllocationNode>> nodesFrom = opNode.getLeftHops();
+			Map<AllocationNode, Set<AllocationNode>> nodesTo = opNode.getRightHops();
+			
+			for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : nodesFrom.entrySet()) {
+				String precName = entry.getKey().getNode().getName();
+				Node prec = originalNfv.getGraphs().getGraph().stream()
+						.filter(graph -> graph.getId() == g.getId())
+						.flatMap(graph -> graph.getNode().stream())
+						.filter(node -> node.getName().equals(precName)).findFirst().orElse(null);
+				
+				List<Neighbour> neighboursPrec = prec.getNeighbour();
+				neighboursPrec.removeIf(neigh -> neigh.getName().equals(n.getName()));
+				AllocationNode prevNO = entry.getKey();
+				Map<AllocationNode, Set<AllocationNode>> precNodesFrom = prevNO.getLeftHops();
+				Map<AllocationNode, Set<AllocationNode>>  precNodesTo = prevNO.getRightHops();
+				
+				Set<AllocationNode> toSet = precNodesTo.get(opNode);
+				precNodesTo.remove(opNode);
+				
+				for(AllocationNode exprDest : entry.getValue()) {
+					String nextName = exprDest.getNode().getName();
+					Node next = originalNfv.getGraphs().getGraph().stream()
+							.filter(graph -> graph.getId() == g.getId())
+							.flatMap(graph -> graph.getNode().stream())
+							.filter(node -> node.getName().equals(nextName)).findFirst().orElse(null);
+
+					AllocationNode nextNO = exprDest;
+					
+					boolean presentNext = neighboursPrec.stream().anyMatch(neigh -> neigh.getName().equals(next.getName()));
+					if(!presentNext) {
+						Neighbour neigh = new Neighbour();
+						neigh.setName(next.getName());
+						neighboursPrec.add(neigh);
+					}
+					
+					precNodesTo.put(nextNO, toSet);
+				}
+					
+				
+				for(Map.Entry<AllocationNode, Set<AllocationNode>> e : precNodesFrom.entrySet()) {
+					if(e.getValue().contains(opNode)) {
+						e.getValue().remove(opNode);
+						e.getValue().addAll(entry.getValue());
+							
+					}
+						
+				}
+				
+			}
+			
+			
+			for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : nodesTo.entrySet()) {
+				String nextName = entry.getKey().getNode().getName();
+				Node next = originalNfv.getGraphs().getGraph().stream()
+						.filter(graph -> graph.getId() == g.getId())
+						.flatMap(graph -> graph.getNode().stream())
+						.filter(node -> node.getName().equals(nextName)).findFirst().orElse(null);
+				List<Neighbour> neighboursNext =  next.getNeighbour();
+				AllocationNode nextNO = entry.getKey();
+				Map<AllocationNode, Set<AllocationNode>> nextNodesFrom = nextNO.getLeftHops();
+				Map<AllocationNode, Set<AllocationNode>> nextNodesTo = nextNO.getRightHops();
+				
+				Set<AllocationNode> fromSet = nextNodesFrom.get(opNode);
+				nextNodesFrom.remove(opNode);
+				
+				for(AllocationNode exprPrec : entry.getValue()) {
+					String precName = exprPrec.getNode().getName();
+					Node prec = originalNfv.getGraphs().getGraph().stream()
+							.filter(graph -> graph.getId() == g.getId())
+							.flatMap(graph -> graph.getNode().stream())
+							.filter(node -> node.getName().equals(precName)).findFirst().orElse(null);
+					neighboursNext.removeIf(neigh -> neigh.getName().equals(n.getName()));
+					AllocationNode prevNO = exprPrec;
+					
+					boolean presentPrec = neighboursNext.stream().anyMatch(neigh -> neigh.getName().equals(prec.getName()));
+					if(!presentPrec) {
+						Neighbour neigh = new Neighbour();
+						neigh.setName(prec.getName());
+						neighboursNext.add(neigh);
+					}
+					
+					nextNodesFrom.put(prevNO, fromSet);
+					
+				}
+				
+				
+				for(Map.Entry<AllocationNode, Set<AllocationNode>> e : nextNodesTo.entrySet()) {
+					if(e.getValue().contains(opNode)) {
+						e.getValue().remove(opNode);
+						e.getValue().addAll(entry.getValue());
+		
+					}
+				}
+
+	
+			}
+			
+			Graph graphWithOptional = originalNfv.getGraphs().getGraph().stream()
+					.filter(graph -> graph.getId() == g.getId())
+					.findFirst().orElse(null);
+			List<Node> allNodes = graphWithOptional.getNode();
+			allNodes.removeIf(node -> node.getName().equals(n.getName()));
+			//removedNodes.add(n);
+		}
+		
+		
+		
+	});
+	
+	
+	
+	}
 }
 
 

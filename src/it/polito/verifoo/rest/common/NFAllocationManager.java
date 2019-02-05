@@ -95,6 +95,9 @@ public class NFAllocationManager {
 						firewall.generateAcl();
 					} 
 					
+					boolean optional = nodeMetrics.stream().anyMatch(nm -> nm.getNode().equals(node.getName()));
+					if(optional) firewall.setAutoplace(true);
+					
 					FWmanager.addFirewall(firewall,  allocationNode);
 					allocationNode.setPlacedNF(firewall);
 					allocationNode.setTypeNF(FunctionalTypes.FIREWALL);
