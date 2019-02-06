@@ -1,0 +1,670 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage[table]{xcolor}
+\usepackage{xcolor}
+\usepackage{multirow}
+\renewcommand\familydefault{\sfdefault}
+\usepackage{tgheros}
+\usepackage[defaultmono]{droidmono}
+
+\usepackage{amsmath,amssymb,amsthm,textcomp}
+\usepackage{enumerate}
+\usepackage{multicol}
+\usepackage{tikz}
+\usepackage[normalem]{ulem}
+\usepackage{enumitem}
+
+\usepackage{geometry}
+\geometry{total={210mm,297mm},
+left=25mm,right=25mm,%
+bindingoffset=0mm, top=20mm,bottom=20mm}
+
+
+\linespread{1.3}
+
+\newcommand{\linia}{\rule{\linewidth}{0.5pt}}
+
+
+% custom footers and headers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{}
+\chead{}
+\rhead{}
+\lfoot{Verifoo RestAPI and XML Docs}
+\cfoot{}
+\rfoot{Page \thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+%
+\usepackage{blindtext}
+
+
+% code listing settings
+\usepackage{listings}
+\usepackage{color}
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\definecolor{cyan}{rgb}{0.0,0.6,0.6}
+\definecolor{mygray}{HTML}{F2F3E2}
+\definecolor{mypink}{HTML}{ffe5e5}
+\definecolor{mycyan}{HTML}{e6f9ff}
+\usepackage{sectsty}
+\sectionfont{\color{darkblue}} 
+\subsectionfont{\color{blue}}
+\subsubsectionfont{\color{cyan}}
+
+\usepackage{pifont,mdframed}
+
+\newenvironment{warning}
+  {\par\begin{mdframed}[backgroundcolor=mypink,linewidth=2pt,linecolor=red]%
+    \begin{list}{}{\leftmargin=1cm
+                   \labelwidth=\leftmargin}\item[\Large\ding{43}]}
+  {\end{list}\end{mdframed}\par}
+
+\lstset{
+  backgroundcolor=\color{mygray},
+  basicstyle=\ttfamily\small,
+  aboveskip={1.0\baselineskip},
+  belowskip={1.0\baselineskip},
+  extendedchars=true,
+  tabsize=4,
+  numbers=left,
+  numberstyle=\small,
+  stepnumber=1,
+  numbersep=10pt,
+  frame=lines,
+  columns=fullflexible,
+  showstringspaces=false,
+  commentstyle=\color{gray}\upshape,
+  breaklines=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+  frame=single,
+}
+
+\lstdefinelanguage{XML}
+{
+  morestring=[b]",
+  morestring=[s]{>}{<},
+  morecomment=[s]{<?}{?>},
+  stringstyle=\color{black},
+  identifierstyle=\color{darkblue},
+  keywordstyle=\color{cyan},
+  morekeywords={xmlns,version,type}% list your attributes here
+}
+%%%----------%%%----------%%%----------%%%----------%%%
+
+\begin{document}
+
+\title{Verifoo RestAPI and XML Docs}
+
+\author{Antonio Varvara, Raffaele Sommese}
+
+\date{\date{}}
+
+\maketitle
+\tableofcontents{}
+\newpage
+\section{Preliminary Information}
+\subsection{Folder Structure}
+\begin{itemize}
+    \item docs/ -- Documentation of the code (including javadoc)
+    \begin{itemize}
+        \item VerifooDocs.pdf --- Documentation of the web service and other useful information
+        \item verigraph\_doc.pdf --- Documentation of Verigraph for further details
+    \end{itemize}
+    \item lib/ --- All the external libraries (e.g. Z3 library)
+    \begin{itemize}
+        \item junit/ --- Libraries for running tests
+        \item lib4j/ --- Libraries for managing the logging operations
+    \end{itemize}
+    \item log/ --- All the logs (for debugging purposes)
+    \item resources/ ---
+    \begin{itemize}
+        \item log4j2.xml --- Settings of the logs
+    \end{itemize}
+    \item src/ --- Java classes (for further information see the javadoc)
+    \begin{itemize}
+        \item it/polito/verifoo/components/ --- Basical Verifoo classes
+        \item it/polito/verifoo/rest/app/ --- Classes to start the Rest application
+        \item it/polito/verifoo/rest/common/ --- Classes that retrieve the informations from the JAXB class objects and pass them to Verifoo
+        \item it/polito/verifoo/rest/jaxb/ --- Automatically generated JAXB classes
+        \item it/polito/verifoo/rest/main/ --- Main class for debugging purposes
+        \item it/polito/verifoo/rest/test/ --- Classes that manage all the tests
+        \item it/polito/verifoo/rest/webservice/ --- Classes needed for the WebService
+        \item it/polito/verifoo/test --- Simple examples on how Verifoo works
+        \item it/polito/verigraph/* --- Basical Verigraph classes
+    \end{itemize}
+    \item target/ --- Folder for the war file
+    \item testfile/ --- XML files that are used to test the application
+    \item WebContent/ --- Files needed in order to deploy the service
+    \item xsd/ --- XML schemas needed for the application
+    \begin{itemize}
+        \item errorSchema.xsd -- XML schema of the response in case an error occurred
+	    \item nfvInfo.xsd  -- XML schema of Verifoo
+	    \item xml\_components.xsd -- XML schema of Verigraph (used into verifoo)
+	     \item hateoasLinks.xsd -- XML schema used by the root resource to let the client know all the links of the REST WebService
+    \end{itemize}
+    \item build.xml									--- Ant script to automate the compiling and the deployment
+    
+\end{itemize}
+\subsection{Z3 Install Note}
+For the correct functioning of the application, you must have the Z3 native library and include it to Java Library Path.
+The most convenient way to do this is add the path that the library to the dynamic linking library path.
+\begin{itemize}
+    \item In Linux is LD\_LIBRARY\_PATH
+    \item In MacOS is DYLD\_LIBRARY\_PATH
+    \item In Windows is PATH
+\end{itemize}
+Make sure that you have download the correct version of Z3 according to your OS and your JVM endianness.
+In any case a mechanism for automatically adding the Z3 library to the path when it is deployed to a WebServer, is provided.
+It is tested on Tomcat and on Websphere and it works for the following distribution:
+\begin{itemize}
+    \item Ubuntu x32
+    \item Ubuntu x64
+    \item Debian x64
+\end{itemize}
+If the automatically procedure does not work, you can do it by your own:
+\begin{itemize}
+    \item Extract the tar.gz file located in WebContent/WEB-INF/lib/jni/ in the same folder according to your OS and endianness.
+    \item Set LD\_LIBRARY\_PATH to point to the WebContent/WEB-INF/lib/jni/ folder.
+\end{itemize}
+\newpage
+\subsection{Install and Testing Note}
+This project has an Ant Script for compiling and testing purpose.
+The service is packaged into the WAR archive by issuing the command:
+\begin{lstlisting}
+$ ant war
+
+\end{lstlisting}
+To test the internal component (Verifoo Proxy and Unmarshaller):
+\begin{lstlisting}
+$ ant test
+
+\end{lstlisting}
+To test the WebService:
+\begin{lstlisting}
+$ ant testWS
+
+\end{lstlisting}
+\begin{warning}
+\textbf{Warning}: You must have Tomcat installed and you must set \$CATALINA\_HOME accrodingly.
+\end{warning}
+To start Tomcat with provided Ant Script:
+\begin{lstlisting}
+$ ant start-tomcat
+
+\end{lstlisting}
+To deploy the application and start Tomcat: 
+\begin{lstlisting}
+$ ant deploy
+
+\end{lstlisting}
+To deploy the application while Tomcat is already running: 
+\begin{lstlisting}
+$ ant redeployWS
+
+\end{lstlisting}
+\begin{warning}
+\textbf{Warning}: You must configure tomcatUsername, tomcatPassword, tomcatPort and tomcatUrl in tomcat-build.xml accodling to your configuration.
+\end{warning}
+\begin{warning}
+\textbf{Warning}: If testWS or test fail, make sure that JUnit is in your Classpath.
+\end{warning}
+To deploy application with the LAB-INF configuration (the generated war does not include the shared libraries):
+\begin{lstlisting}
+$ ant deploy_j2ee
+
+\end{lstlisting}
+
+\newpage
+\section{XML Schemas}
+\subsection{Verifoo XML Schema}
+\lstset{language=XML}
+\begin{lstlisting}[label={list:first},caption=XML Example]
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nfvInfo.xsd">
+  <graphs>
+    <graph id="0">
+      <node functional_type="FIREWALL" name="node1">
+        <neighbour name="nodeA"/>
+        <neighbour name="node2"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall>
+            <elements>
+              <source>nodeC</source>
+              <destination>nodeD</destination>
+            </elements>
+          </firewall>
+        </configuration>
+      </node>
+    </graph>
+  </graphs>
+ <CapacityDefinition>
+   	<CapacityForNode node="node1" capacity="10"/>
+ </CapacityDefinition>
+ <PropertyDefinition>
+  	<Property graph="0" name="IsolationProperty"/> 		
+ </PropertyDefinition>
+ <Hosts>
+  <Host diskStorage="10" name="host1" type="CLIENT"/>
+  <Host diskStorage="10" name="host2" type="MIDDLEBOX"/>
+  <Host diskStorage="10" name="host3" type="SERVER"/>
+ </Hosts>
+ <Connections>
+  <Connection sourceHost="host1" destHost="host2" avgLatency ="-1"/>
+  <Connection sourceHost="host1" destHost="host3" avgLatency ="-10"/>
+ </Connections>
+ <ParsingString></ParsingString>
+</NFV>
+\end{lstlisting}
+\newpage
+\subsection*{NFV}
+NFV is the root element of the XML schema, it must contain: 
+\begin{itemize}
+    \item A \textbf{Graphs} element that contains a list of \textbf{Graph}
+    \item A list of \textbf{Capacity Definition}
+    \item A list of \textbf{Property Definition} (one or more)
+    \item An \textbf{Hosts} element that contains a list of \textbf{Host}
+    \item A \textbf{Connections} element that contains a list of \textbf{Connection} between hosts
+    \item An optional \textbf{Parsing String} used for the converter service.
+\end{itemize}
+\subsection*{Graph}
+A Graph is a chain of service that will be deployed in the network, it is contained inside a list of Graphs. 
+\\Verifoo can check and deploy multiple graphs.
+\\Graph is characterised by 
+\begin{itemize}
+    \item A \textit{unique} \textbf{ID}
+    \item A list of \textbf{Nodes}
+\end{itemize}
+\begin{warning}
+\textbf{Warning}: You must define a graph that have at least 1 Client and 1 Server otherwise an exception will be thrown.
+\end{warning}
+\begin{lstlisting}[label={list:second},caption=Graphs Example]
+<graphs>
+    <graph id="0">
+      <node ....>
+    </graph>
+    <graph id="1">
+      ....
+    </graph>
+    <graph id="2">
+      ....
+    </graph>
+</graphs>
+\end{lstlisting}
+\subsection*{Node}
+A Node is a logical network element that correspond to a Network Function.
+A node is characterised by:
+\begin{itemize}
+    \item A \textit{Unique} \textbf{Name}
+    \item A \textbf{Functional Type}
+    \item A List of \textbf{Neighbour Node Names}
+    \item A \textbf{Configuration} for the Functional Type
+\end{itemize}
+\begin{warning}
+\textbf{Warning}: Pay attention when you define the neighbours of a node, remember the graph must be a chain otherwise an exception will be thrown.
+\end{warning}
+\begin{lstlisting}[label={list:third},caption=Node Example]
+<node functional_type="FIREWALL" name="node1">
+    <neighbour name="node2"/>
+    <configuration ...>
+        ....
+    </configuration>
+</node>
+\end{lstlisting}
+\subsection*{Functional Type}
+A Node can be a:
+\begin{itemize}[noitemsep]
+    \item \textbf{FIREWALL}
+    \item \textbf{ENDHOST}
+    \item \textbf{\sout{ENDPOINT}}
+    \item \textbf{ANTISPAM}
+    \item \textbf{CACHE}
+    \item \textbf{DPI}
+    \item \textbf{MAILCLIENT}
+    \item \textbf{MAILSERVER}
+    \item \textbf{NAT}
+    \item \textbf{VPNACCESS}
+    \item \textbf{VPNEXIT}
+    \item \textbf{WEBCLIENT}
+    \item \textbf{WEBSERVER}
+    \item \textbf{FIELDMODIFIER}
+\end{itemize}
+\begin{warning}
+\textbf{Warning}: ENDPOINT is not implemented in Verifoo.
+\end{warning}
+\begin{warning}
+\textbf{Warning}: You cannot have in the same graph more than one server or more than one client, or a server and a client that use different protocols. If you are not compliant with this condition an exception will be thrown.
+\end{warning}
+\subsection*{Configuration}
+In this section we describe the different type of configurations that can be provided.
+A configuration is characterized by an \textit{unique} name and by an \textit{optional} description. \textbf{For further details, please refer to the Verigraph documentation}
+\subsubsection*{Firewall}
+A Firewall Configuration contains a list of ACLs (elements).
+The ACL defines a tuple of source node and destination node that represents the connection that will be blocked.\\
+\textcolor{red}{\textbf{Due to Verigraph Schema Design, it is necessary to provide at least 1 ACL. If you don't want to set an ACL, provide a configuration with dummy node name.}}
+\begin{lstlisting}[label={list:forth},caption=Firewall Configuration Example]
+<configuration description="A simple description" name="conf1">
+  <firewall>
+    <elements>
+      <source>nodeC</source>
+      <destination>nodeD</destination>
+    </elements>
+  </firewall>
+</configuration>
+\end{lstlisting}
+\subsubsection*{Cache}
+A Cache Configuration contains a list of resources.
+A resource is a node, and cache must include all nodes behind the cache in the chain.\\
+\textcolor{red}{\textbf{Remember}: Cache needs the notion
+of internal and external networks.}
+\begin{lstlisting}[label={list:fifth},caption=Cache Configuration Example]
+<configuration description="A simple description" name="conf3">
+  <cache>
+  	<resource>nodeA</resource>
+  	<resource>node1</resource>
+  </cache>
+</configuration>
+\end{lstlisting}
+\subsubsection*{NAT}
+A NAT Configuration contains a list of internal nodes.
+The source defines the a node behind the NAT.
+\begin{lstlisting}[label={list:sixth},caption=NAT Configuration Example]
+<configuration description="A simple description" name="conf4">
+ <nat>
+  	<source>nodeA</source>
+ </nat>
+</configuration>
+\end{lstlisting}
+\subsubsection*{DPI}
+A DPI Configuration contains a list of notAllowed elements, that defines the strings that can't be present inside a packet otherwise it will be dropped.
+\begin{lstlisting}[label={list:seventh},caption=Cache Configuration Example]
+<configuration description="A simple description" name="conf2">
+  <dpi>
+  	<notAllowed>SomeString</notAllowed>
+  </dpi>
+</configuration>
+\end{lstlisting}
+\subsubsection*{Antispam}
+An Antispam Configuration contains a list of source nodes that represent the blacklisted mail clients and servers.
+\begin{lstlisting}[label={list:eighth},caption=Antispam Configuration Example]
+<configuration description="A simple description" name="conf5">
+ <antispam>
+  	<source>nodeA</source>
+ </antispam>
+</configuration>
+\end{lstlisting}
+\subsubsection*{MailServer}
+A Mail Server Configuration contains the Mail Server names.
+\begin{lstlisting}[label={list:ninth},caption=MailServer Configuration Example]
+<configuration description="A simple description" name="confB">
+  <mailserver>
+  	<name>nodeB</name>
+  </mailserver>
+</configuration>
+\end{lstlisting}
+\subsubsection*{MailClient}
+A Mail Client Configuration contains the Mail Server name.
+\begin{lstlisting}[label={list:tenth},caption=MailClient Configuration Example]
+<configuration description="A simple description" name="confB">
+    <mailclient mailserver="nodeB"/>
+</configuration>
+\end{lstlisting}
+\subsubsection*{WebServer}
+A Web Server Configuration contains the Web Server names.
+\begin{lstlisting}[label={list:eleventh},caption=WebServer Configuration Example]
+<configuration description="A simple description" name="confB">
+  <webserver>
+  	<name>nodeB</name>
+  </webserver>
+</configuration>
+\end{lstlisting}
+\subsubsection*{WebClient}
+A Web Client Configuration contains the Web Server name.
+\begin{lstlisting}[label={list:twelfth},caption=Web Client Configuration Example]
+<configuration description="A simple description" name="confB">
+    <webclient webserver="nodeB"/>
+</configuration>
+\end{lstlisting}
+\subsubsection*{VpnAccess}
+A VpnAccess Configuration contains the VpnExit name.
+\begin{lstlisting}[label={list:thirteenth},caption=VpnAccess Configuration Example]
+<configuration description="A simple description" name="conf1">
+  <vpnaccess vpnexit="node2" />
+</configuration>
+\end{lstlisting}
+\subsubsection*{VpnExit}
+A VpnExit Configuration contains the VpnAccess name.
+\begin{lstlisting}[label={list:fourteenth},caption=Vpn Exit Configuration Example]
+<configuration description="A simple description" name="conf2">
+  <vpnexit vpnaccess="node2"/>
+</configuration>
+\end{lstlisting}
+\subsubsection*{EndHost}
+An EndHost Configuration contains a Packet Model.
+\begin{lstlisting}[label={list:fifteenth},caption=End Host Configuration Example]
+<configuration description="A simple description" name="conf2">
+  <endhost body="thisisarequest"/>
+</configuration>
+\end{lstlisting}
+
+\subsection*{Capacity Definition}
+The Capacity Definition element is a list of \textbf{CapacityForNode} elements that contain the disk requirement of each node. It will be used by Verifoo as a constraint for the deployement.
+The CapacityForNode element is characterised by:
+\begin{itemize}
+    \item A \textbf{Node} attribute that refers to the name of a Node element in a graph
+    \item The \textbf{Capacity} that represents the disk requirement of the node
+\end{itemize}
+\begin{warning}
+\textbf{Warning}: If a node doesn't have a capacity associated, the web service infers that it is 0.
+\end{warning}
+\begin{lstlisting}[label={list:sixteenth},caption=Capacity Definition Example]
+<CapacityDefinition>
+   	<CapacityForNode node="node1" capacity="10"/>
+ </CapacityDefinition>
+\end{lstlisting}
+\subsection*{Property Definition}
+The Property Definition element is a list of properties that will be checked by Verifoo for a specific graph. For now, only the isolation property is supported by Verifoo.
+The Property is characterised by:
+\begin{itemize}
+    \item A \textbf{Graph} attribute that represents the graph on which the property will be checked.
+    \item A \textbf{Name} that represents the property that will be checked.
+    \item The \textbf{isSat} attribute, imposed by the web service that represents the result of the checking.
+\end{itemize}
+\begin{lstlisting}[label={list:seventeenth},caption=Property Definition Example]
+<PropertyDefinition>
+  	<Property graph="0" name="IsolationProperty" isSat="true"/> 		
+ </PropertyDefinition>
+\end{lstlisting}
+\subsection*{Host}
+An host is a physical machine present in the network infrastructure.
+An host is characterised by:
+\begin{itemize}
+    \item A \textit{Unique} \textbf{Name}
+    \item A \textbf{Type} to distinguish client and server from middleboxes
+    \item The \textbf{Disk Storage} available on the host
+    \item The \textbf{Active} attribute, imposed by the web service. It's a boolean that is true if at least one node has been deployed on the host.
+\end{itemize}
+After the Rest API has been called, the host will contain also a list of \textbf{NodeRef} elements that represent the nodes that Verifoo deployed on that host.
+\begin{warning}
+\textbf{Warning}: When you try to deploy a graph on a physical network you need to indicate one special host on which the client node will be deployed, another one on which the server node will be deployed and at least another host on which the other nodes should be deployed, otherwise an exception will be thrown.
+\end{warning}
+\begin{lstlisting}[label={list:eighteenth},caption=Hosts Example]
+<Hosts>
+  <Host diskStorage="10" name="host1" type="CLIENT"/>
+  <Host diskStorage="20" name="host2" type="MIDDLEBOX"/>
+  <Host diskStorage="10" name="host3" type="SERVER"/>
+ </Hosts>
+\end{lstlisting}
+\subsection*{Connection}
+A connection element represents the physical connection between two hosts. A connection is characterised by:
+\begin{itemize}
+    \item A \textbf{Source}
+    \item A \textbf{Destination}
+    \item The \textbf{avgLatency} that represents the average latency on the physical link between the source and the destination.
+\end{itemize}
+\begin{lstlisting}[label={list:nineteenth},caption=Connections Example]
+ <Connections>
+  <Connection sourceHost="host1" destHost="host2" avgLatency ="-1"/>
+  <Connection sourceHost="host1" destHost="host3" avgLatency ="-10"/>
+ </Connections>
+\end{lstlisting}
+\subsection*{Parsing String}
+It's the raw output of Verifoo execution (\textit{model.toString()}).
+It is used only by the converter web service.
+\begin{lstlisting}[label={list:twentieth},caption=An extract of ParsingString Example]
+<ParsingString>
+...
+(define-fun check_isolation_n_0_nodeA_nodeB () Node
+  node5)
+(define-fun integer_host1 () Int
+  1)
+(define-fun node3@host7 () Bool
+  false)
+(define-fun node3@host2 () Bool
+  true)
+  ....
+</ParsingString>
+\end{lstlisting}
+\newpage
+\subsection{Error XML Schema}
+\begin{lstlisting}[label={list:
+twenty-first},caption=Error XML Example]
+<ApplicationError type="InvalidNodeChain" message="Nodes must be in a chain"/>
+\end{lstlisting}
+\subsubsection*{ApplicationError}
+ApplicationError is the root element of this XML schema, it must contain the following attributes:
+\begin{itemize}
+    \item \textbf{type}
+    \item \textbf{message}
+\end{itemize}
+\subsubsection*{Type}
+It defines the type of error that has occured, it can be:
+\begin{itemize}
+    \item \textbf{XMLValidationError} The provided XML is invalid.
+	\item \textbf{InvalidServerClientConf} The number of server or of client is invalid.
+	\item \textbf{InvalidNodeChain} The service chain provided is not a chain.
+	\item \textbf{PHYClientServerNotConnected} There aren't a connection between physical Client and Server.
+	\item \textbf{InvalidPHYServerClientConf} The provided Hosts configuration for physical Client and Server is invalid.
+	\item \textbf{NoMiddleHostDefined} In the Hosts configuration there aren't middle host.
+	\item \textbf{InvalidNodeConfiguration} The configuration of a node mismatch with the node type.
+	\item \textbf{InvalidVPNConfiguration} The VPN configuration is invalid.	  \item \textbf{InvalidPropertyDefinition} The Property that has to be checked on a graph is invalid or missing.
+
+	\item \textbf{InvalidParsingString} The Parsing String of Z3 Output is invalid.
+	\item \textbf{InternalServerError} The service is unavailable.
+\end{itemize}
+\subsubsection*{Message}
+An human-readable error message.
+\newpage
+\subsection{Hyperlinks XML Schema}
+\begin{lstlisting}[label={list:
+twenty-first},caption=Error XML Example]
+<Hyperlinks>
+    <Link rel="self" href="http://localhost:8080/verifoo/rest/" type="application/xml" method="GET" />
+    <Link rel="deployment" href="http://localhost:8080/verifoo/rest/deployment" type="application/xml" method="POST" />
+    <Link rel="converter" href="http://localhost:8080/verifoo/rest/converter" type="application/xml" method="POST" />
+    <Link rel="log" href="http://localhost:8080/verifoo/rest/log" type="text/html" method="GET" />
+ </Hyperlinks>
+\end{lstlisting}
+\subsubsection*{Hyperlinks}
+Hyperlinks is the root element of this XML schema and it's a list of \textbf{link} elements. The \textbf{link} element represents an HTTP link to an other resource and has the following attributes:
+\begin{itemize}
+    \item \textbf{rel} expresses the type of the relationship of the resource
+    \item \textbf{href} is an HTTP link to the resource
+    \item \textbf{type} indicates the content type that a request to that resource should have
+    \item \textbf{method} indicates the required HTTP method
+\end{itemize}
+\newpage
+\section{Rest API Description}
+\subsection{Service Design}
+\subsubsection*{Resources Design}
+\begin{center}
+    \begin{tabular}{ | c | c | c | p{5cm} |}
+    \hline
+    Resources & URLs & XML Repr & Meaning \\ \hline \hline
+    ROOT & / & Hyperlinks & XML file with the hyperlinks to the other resources \\ \hline
+    deployment & /deployment & NFV & XML file with integrated deployment information \\ \hline
+    converter & /converter & NFV & XML file with integrated deployment information \\ \hline
+    log & /log &  & A limited portion of the log \\ \hline
+    \end{tabular}
+\end{center}
+\subsubsection*{Operation Design}
+\begin{center}
+    \begin{tabular}[t]{ | c | c | c | c | c | c | c |}
+    \hline
+    Resources & Method & Query Params & Req. body & Status & Resp.body & Meaning \\ \hline \hline
+    ROOT & GET & &  & 200 & Hyperlinks & OK\\ \hline
+                                            &  &  &  & 200 & NFV & OK\\
+                                            &  &  &  & 400 & ApplicationError & Bad Request\\
+     \multirow{-3}{*}{deployment} & \multirow{-3}{*}{POST} & \multirow{-3}{*}{complete:boolean} & \multirow{-3}{*}{NFV} 
+                                            & 500 & ApplicationError & Server Error\\ \hline
+                                            &  &  &  & 200 & NFV & OK\\
+                                            &  &  &  & 400 & ApplicationError & Bad Request\\
+     \multirow{-3}{*}{converter} & \multirow{-3}{*}{POST} & \multirow{-3}{*}{complete:boolean} & \multirow{-2}{*}{NFV} 
+                                            & 500 & ApplicationError & Server Error\\ \hline
+    log & GET &  &  & 200 & HTML & OK \\ \hline
+    \end{tabular}
+\end{center}
+For the two POST operations the query parameter specifies if the reply will contain the complete version of the resulting NFV object, or the shorter one. In the latter, the hosts that aren't active after the deployment are omitted from the XML (also their connections are omitted).
+\newpage
+\subsection{API Description}
+A human-readable description with all the useful links is available at base URL with the /verifoo path. This section provides only some basic description of the web services with some simple examples of request/response.
+\textbf{For complete documentation please refer to the swagger documentation. This is only a limited example}
+\subsubsection*{Deployment API}
+This is the main API for the Verifoo Web Service. It provides, for each graph, the verification of the validity of the network model and the optimised deployment on the hosts.\\
+\textit{Example request}
+\begin{itemize}
+    \item \textbf{POST} http://localhost:8080/verifoo/rest/deployment
+    \item Accept: \textbf{APPLICATION\_XML};
+    \item Content: XML file with the physical topology and the desired service chain (in an NFV element).
+\end{itemize}
+\textit{Example response}
+\begin{itemize}
+    \item 200: \textbf{OK}
+    \item Content-Type: \textbf{APPLICATION\_XML};
+    \item Content: XML file with integrated deployment information (in an NFV element).
+\end{itemize}
+\textit{Example error response}
+\begin{itemize}
+    \item 400: \textbf{BAD\_REQUEST}
+    \item Content-Type: \textbf{APPLICATION\_XML};
+    \item Content: XML file with an ApplicationError element that specifies the type of error.
+\end{itemize}
+\subsubsection*{Converter API}
+This API provides a converter for Verifoo output.
+The \textbf{<parsingstring>} element in the XML file has to be filled with the Verifoo output.\\
+\textit{Example request}
+\begin{itemize}
+    \item \textbf{POST} http://localhost:8080/verifoo/rest/converter
+    \item Accept: \textbf{APPLICATION\_XML};
+    \item Content: XML file with the physical topology, the desired service chain and the output model provided by Verifoo, in the Parsing String element.
+\end{itemize}
+\textit{Example response}
+\begin{itemize}
+    \item 200: \textbf{OK}
+    \item Content-Type: \textbf{APPLICATION\_XML};
+    \item Content: The same XML file recived in input with integrated deployment information.
+\end{itemize}
+\textit{Example error response}
+\begin{itemize}
+    \item 400: \textbf{BAD\_REQUEST}
+    \item Content-Type: \textbf{APPLICATION\_XML};
+    \item Content: XML file with an ApplicationError element that specifies the type of error.
+\end{itemize}
+\subsubsection*{Log API}
+This API provide a convenient way for accessing the log of log4j2 (for debugging purposes).\\
+\textit{Example request}
+\begin{itemize}
+    \item \textbf{GET} http://localhost:8080/verifoo/rest/log
+\end{itemize}
+\textit{Example response}
+\begin{itemize}
+    \item 200: \textbf{OK}
+    \item Content-Type: \textbf{TEXT\_HTML};
+\end{itemize}
+
+\end{document}
