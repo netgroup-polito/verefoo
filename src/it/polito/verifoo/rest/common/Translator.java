@@ -413,7 +413,7 @@ public class Translator {
 				}
 				overlap &= (last.getProtocol().equals(e.getProtocol()) || last.getProtocol().equals(L4ProtocolTypes.ANY) || e.getProtocol().equals(L4ProtocolTypes.ANY));
 				if(!overlap){
-					System.out.println("No protocol overlapping");
+					//System.out.println("No protocol overlapping");
 					/*System.out.println("Rule merged-> action: " + last.getAction() +
 							" src: " + last.getSource() +
 						    " dst: "+last.getDestination() + 

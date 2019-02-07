@@ -257,7 +257,6 @@ public class PolitoNat extends NetworkObject {
 				constr.add(ctx.mkEq(n_0, n1.getZ3Node()));
 			}
 		}
-		System.out.println(constr);
 		
 		
 		BoolExpr[] constrs = new BoolExpr[constr.size()];

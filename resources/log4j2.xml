@@ -3,8 +3,17 @@
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
-        </Console>
+        </Console> 
         <File name="DebugFile" fileName="${sys:user.dir}/log/debug.log" immediateFlush="false" append="false">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+         <File name="AssertionsFile" fileName="${sys:user.dir}/log/assertions.log" immediateFlush="false" append="false">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+        <File name="ResultFile" fileName="${sys:user.dir}/log/result.log" immediateFlush="false" append="false">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+         <File name="ModelFile" fileName="${sys:user.dir}/log/model.log" immediateFlush="false" append="false">
             <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
         <File name="ErrorFile" fileName="${sys:user.dir}/log/error.log" immediateFlush="false" append="true">
@@ -12,10 +21,18 @@
         </File>
     </Appenders>
     <Loggers>
+	     <Logger name="model" level="debug" additivity="false">
+	        <appender-ref ref="ModelFile" level="debug"/>
+	    </Logger>
+	    <Logger name="result" level="debug" additivity="false">       
+	        <appender-ref ref="ResultFile" level="debug"/>
+	    </Logger>
+	     <Logger name="assertions" level="debug" additivity="false">       
+	        <appender-ref ref="AssertionsFile" level="debug"/>
+	    </Logger>
         <Root level="debug">
-            <AppenderRef ref="Console" level="error" />
             <AppenderRef ref="DebugFile" level="debug"/>
-            <AppenderRef ref="ErrorFile" level="error"/>
+            <appender-ref ref="ErrorFile" level="error"/>
         </Root>
     </Loggers>
 </Configuration>

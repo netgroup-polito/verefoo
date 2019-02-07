@@ -44,7 +44,7 @@ public class VerifooProxy {
 	    private HashMap<AllocationNode, HashMap<String, BoolExpr>> stageConditions;
 	    private HashMap<String, Integer> countConditions;
 		public Checker check;
-		private Logger logger = LogManager.getLogger("mylog");
+		private Logger logger = LogManager.getLogger(VerifooProxy.class);
 		private List<List<String>> savedChain = new ArrayList<>();
 		private List<List<String>> savedNodeChain = new ArrayList<>();
 		private HashMap<Node, HashMap<Node, List<Node>>> routingRule = new HashMap<>();
@@ -350,7 +350,7 @@ public class VerifooProxy {
            try{
 		        for(String hostClient: clients){
 		        	for(String hostServer: servers){
-		        		//logger.debug("Calculating host chain between " + hostClient + " and " + hostServer + " composed by max " + (nodes.size()-clients.size()-servers.size()+2) + " hosts"); 
+		        		logger.debug("Calculating host chain between " + hostClient + " and " + hostServer + " composed by max " + (nodes.size()-clients.size()-servers.size()+2) + " hosts"); 
 		        		if(fixedServer)
 		        			savedChain.addAll(ChainExtractor.createHostChain(hostClient, hostServer, hosts, connections, nodes.size()-clients.size()-servers.size()+2));
 		        		else
@@ -368,11 +368,10 @@ public class VerifooProxy {
 		 * @throws BadGraphError
 		 */
 		private void checkNffg() throws BadGraphError{
-          
             try{
 				//links = (new LinkCreator(nodes)).getLinks();
             	linkProvider = new LinkProvider(nodes, paths, properties);
-				//logger.debug("Links created");
+				logger.debug("Links created");
 				//createInternalRouting(clients, servers);
             	//FWmanager.minimizeRules();
 				List<List<String>> validChain = new ArrayList<>();
@@ -382,12 +381,12 @@ public class VerifooProxy {
 					AllocationNode srcNode = allocationNodes.get(src);
 					AllocationNode dstNode = allocationNodes.get(dst);
 					if(!linkProvider.existsPath(srcNode.getNode(), dstNode.getNode())){
-						System.out.println("No path found between "+ src + " and "+ dst);
+						logger.debug("No path found between "+ src + " and "+ dst);
 						continue;
 					}
 					if(hosts.size() != 0)
 						//calculateDeploymentConditions(validChain, c, s);
-						System.out.println("not yet implemented");
+						logger.debug("not yet implemented");
 					else
 						createRoutingConditions(srcNode, dstNode);
 					}
@@ -952,15 +951,6 @@ public class VerifooProxy {
 			//System.out.println("Nr of deployment conditions: " + nrOfConditions);
 			IsolationResult ret = this.check.propertyCheck();
 			if(nrOfConditions == 0 && this.hosts.size() > 0) ret.result = Status.UNSATISFIABLE;
-			if (ret.result == Status.UNSATISFIABLE){
-				 	logger.debug("UNSAT");
-				 	
-		    }else{
-		    	 	logger.debug("SAT ");
-		     		logger.debug( ""+ret.model); //p.printModel(ret.model);
-		     		System.out.println(ret.model);
-		     		
-		    }
 			return ret;
 		}
 		/**

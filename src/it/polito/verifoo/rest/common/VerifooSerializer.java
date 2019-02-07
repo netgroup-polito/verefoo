@@ -1,5 +1,6 @@
 package it.polito.verifoo.rest.common;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
 public class VerifooSerializer {
 	private NFV nfv, result;
 	private boolean sat = false;
-	private Logger logger = LogManager.getLogger("mylog");
+	private Logger logger = LogManager.getLogger(VerifooSerializer.class);
 	private List<Node> removedNodes;
 	/**
 	 * Wraps all the Verifoo tasks, executing the z3 procedure for each graph in the NFV element
@@ -71,18 +72,19 @@ public class VerifooSerializer {
 			Marshaller m = jc.createMarshaller();
 	        m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 	        m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-			/*System.out.println("-----------------NORMALIZED INPUT-----------------");
-	        m.marshal( root, System.out ); 
-			System.out.println("--------------------------------------------------");*/
+			logger.info("-----------------NORMALIZED INPUT-----------------");
+			StringWriter stringWriter = new StringWriter();
+			m.marshal( root, stringWriter ); 
+	        logger.info(stringWriter.toString());
+	        logger.info("--------------------------------------------------");
 		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try{
 			if(root.getHosts() != null && (root.getConnections() == null || root.getConnections().getConnection().size() == 0)){
-				System.out.println("No connections found! Building full mesh topology...");
+				logger.info("No connections found! Building full mesh topology...");
 				createFullMesh(root);
-				System.out.println("Full mesh topology built");
+				logger.info("Full mesh topology built");
 				/*JAXBContext jc= JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
 				Marshaller m = jc.createMarshaller();
 	            m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
@@ -104,13 +106,6 @@ public class VerifooSerializer {
 	        		result = t.convert();
 	        		root = result;
 	        		sat = true;
-	        		//System.out.println("%%REMOVED OPTIONAL NODES %%");
-	        		/*removedNodes.forEach(n -> {
-	        			System.out.println(n.getName() + " is removed.");
-	        		});*/
-	        		System.out.println("%%%%%%%%%%%%%%%%%%%%%%");
-	        		System.out.println(res.model);
-	        		System.out.println("%%%%%%%%%%%%%%%%%%%%%%");
 	        	}
 	        	else{
 	        		sat = false;
@@ -119,8 +114,7 @@ public class VerifooSerializer {
 	        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE));
 	        }
 	    } catch (BadGraphError e) {
-			//logger.error("Graph semantically incorrect");
-			//System.out.println("Graph semantically incorrect");
+	    	logger.error("Graph semantically incorrect");
 	    	logger.error(e);
 	    	throw e;
 	    }/*catch (JAXBException e) {

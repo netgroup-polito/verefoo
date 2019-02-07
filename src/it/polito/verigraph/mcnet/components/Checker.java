@@ -8,6 +8,7 @@
  *******************************************************************************/
 package it.polito.verigraph.mcnet.components;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,6 +17,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -48,11 +52,12 @@ public class Checker {
 	NodeNetworkObject netobjs;
 	Optimize solver;
 	ArrayList<BoolExpr> constraints;
-	public BoolExpr[] assertions;
+	public BoolExpr[] assertions={};
 	public Status result;
 	public Model model;
 	private HashMap<String, AllocationNode> allocationNodes;
-	
+	private Logger logModel = LogManager.getLogger("model");
+	private Logger logAssertions = LogManager.getLogger("assertions");
 
 	
 	public enum Prop {
@@ -136,8 +141,8 @@ public class Checker {
 		for (Entry<String, Handle> handle : nctx.handles.entrySet()) {
 			temp = handle.getValue();
 		}
-		if(temp!=null) System.out.println(nctx.latencyAll-Integer.parseInt(temp.getValue()+""));
-		if(temp!=null) System.out.println("Weight of falsified constraints:"+temp.getValue());
+		//if(temp!=null) System.out.println(nctx.latencyAll-Integer.parseInt(temp.getValue()+""));
+		//if(temp!=null) System.out.println("Weight of falsified constraints:"+temp.getValue());
 		model = null;
 		// assertions = this.solver.getAssertions();
 		// assertions = new BoolExpr [1] ;
@@ -188,7 +193,6 @@ public class Checker {
 		for (Entry<String, Handle> handle : nctx.handles.entrySet()) {
 			temp = handle.getValue();
 		}
-		if (temp!=null)System.out.println(temp.getValue());
 		
 		model = null;
 		// assertions = this.solver.getAssertions();
@@ -331,16 +335,27 @@ public class Checker {
 		solver.setParameters(p);
 		result = this.solver.Check();
 		
-		
 		model = null;
-		//assertions = solver.getAssertions();
-		//Arrays.asList(assertions).forEach(t-> System.out.println(t+"\n\n"));
-		//System.out.println(Arrays.toString(assertions));
+		
 		if (result == Status.SATISFIABLE) {
 			model = this.solver.getModel();
 		}
+		
+		log();
+
 		solver.Pop();
 		return new IsolationResult(ctx, result, null, null, null, null, nctx, assertions, model);
+	}
+
+
+	private void log()  {
+			// old versions of z3 did not provide solver.getAssertions() method
+			// so if this is the case it has to be commented
+			StringWriter stringWriter = new StringWriter();
+			//assertions = solver.getAssertions();
+			Arrays.asList(assertions).forEach(t-> stringWriter.append(t+"\n\n"));
+			logAssertions.info(stringWriter.toString());
+			logModel.info(model.toString());	
 	}
 	
 
@@ -359,7 +374,6 @@ public class Checker {
 		nctx.addConstraints(l);
 		for (AllocationNode an: allocationNodes.values())
 			an.addConstraints(solver);
-		// return Arrays.asList(l.getAssertions());
 		return Arrays.asList();
 	}
 }
