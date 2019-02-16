@@ -4,6 +4,20 @@
 How to deploy Verigraph on Apache Tomcat:
 **Windows**
 -  install jdk1.8.X YY(http://www.oracle.comntechnetwork/java/javase/downloads/jdk8-downloads-2133151.html);
+-  set JAVA HOME environment variable to where you installed the jdk
+   (e.g.   ``C:\Program Files\Java\jdk1.8.XYY``);
+-  install Apache Tomcat 8 (https://tomcat.apache.org/download-80.cgi);
+	-  set CATALINA HOME ambient variable to the directory where you  installed Apache (e.g.   ``C:\Program Files\Java\apache-tomcat-8.0.30``);
+	-  (optional) configure Tomcat Manager:
+	-  open the file ``%CATALINA_HOME%\conf\tomcat-users.xml``
+	-  under the ``tomcat-users`` tag place, initialize an user with roles  "tomcat, manager-gui, manager-script".  An example is the following  content:
+   ``xml   <role rolename="manager-gui"/>  <role rolename="manager-script"/>  <role rolename="admin-gui"/>   <role rolename="admin-script"/>  <user username="admin" password="admin" roles="manager-gui,manager-script,admin-scripts"/>``
+	-  edit the "to\_be\_defined" fields in tomcat-build.xml with the before
+   defined credentials;
+-  execute the generate-war ant task in order to generate the .war;
+-  launch Tomcat 8 with the startup script  ``%CATALINA_HOME%\bin\startup.bat`` or by the start-tomcat task ant;
+-  (optional) if you previously configured Tomcat Manager you can open a  browser and navigate to `this link <http://localhost:8080/manager>`  and login using the proper username and password (e.g.,  ``admin/admin`` in the previous example);
+-  (optional) you can deploy/undeploy/redeploy the downloaded WARs   through the web interface.
 
 
 
