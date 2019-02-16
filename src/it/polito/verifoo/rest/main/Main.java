@@ -48,7 +48,7 @@ public class Main {
                 		Marshaller m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(  "./testfile/Optionality/Allocation/Nat.xml" )));
+                        VerifooSerializer test = new VerifooSerializer((NFV) u.unmarshal( new FileInputStream(  "./testfile/PerformanceTests/50Nodes/05FW10P.xml" )));
                         m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
@@ -60,6 +60,7 @@ public class Main {
 								}
                         		loggerResult.info("----------------------OUTPUT----------------------");
                         		StringWriter stringWriter = new StringWriter();
+                        		m.marshal( test.getResult(), System.out ); //for debug purpose  
                                 m.marshal( test.getResult(), stringWriter ); 
                                 loggerResult.info(stringWriter.toString());
                                 loggerResult.info("--------------------------------------------------");

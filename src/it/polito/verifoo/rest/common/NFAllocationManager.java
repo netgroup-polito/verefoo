@@ -20,6 +20,12 @@ import it.polito.verigraph.mcnet.netobjs.AclFirewall;
 import it.polito.verigraph.mcnet.netobjs.PolitoEndHost;
 import it.polito.verigraph.mcnet.netobjs.PolitoNat;
 
+/**
+ * This class has the key task to manage the allocation and deployment of Network Functions on the nodes of
+ * the Allocation Graph, accordingly to Middle Level Policies.
+ * If Low Level Network Functions are specified as well in the input, they are managed in this class too.
+ */
+
 public class NFAllocationManager {
 	private Context ctx;
     private NetContext nctx;
@@ -29,6 +35,15 @@ public class NFAllocationManager {
 	private List<Property> properties;
 	private HashMap<String, AllocationNode> nodes;
 	
+	/**
+	 * Public constructor for the NFAllocationManager class
+	 * @param ctx It is the Contect object which manages all the hard and soft contraints in Z3Opt.
+	 * @param nctx It is the NetContext object where Z3 objects and formulas are stored.
+	 * @param allocationNodes It is a map used to retrieve the nodes of the Allocation Graph by their name.
+	 * @param nodeMetrics It is a list of constraints about node (i.e. optionality of a node on the Allocation Graph)
+	 * @param properties It is the list of Middle Level Reachability and Isolation policies.
+	 * @param FWManager It is an instance of a class which manages the firewalls.
+	 */
 	 public NFAllocationManager(Context ctx, NetContext nctx, 
 	    		HashMap<String, AllocationNode> allocationNodes, List<NodeMetrics> nodeMetrics, List<Property> properties, FWAutoconfigurationManager FWmanager) {
 			super();
@@ -43,10 +58,12 @@ public class NFAllocationManager {
 		}
 
 	 
-	 /* 
-	  * This method is invoked by VerifooProxy to instanciate the Network Functions which have been specified in the input, processing the input nodes with a proper Configuration (i.e. node which isn't empty). For the moment it's able to instanciate web client/server and firewall. 
-	  * Each other NF can be added here following the same pattern (legacy class: NodeNetworkObject)
-	  */
+
+	 /**
+	  * This method is invoked by VerifooProxy to instanciate the Network Functions which have been specified in the input, processing the input nodes with a proper Configuration (i.e. node which isn't empty). 
+	  * For the moment it's able to instanciate web client/servers, firewalls and NATs. 
+	  * Each other NF can be added here following the same pattern (legacy class in older versions: NodeNetworkObject)
+	 */
 	public void instanciateDefineNF() {
 		
 		nodes.values().forEach(allocationNode -> {
@@ -83,6 +100,8 @@ public class NFAllocationManager {
 					firewall.setAutoplace(false);
 					
 					if(node.getConfiguration().getFirewall().getDefaultAction() != null) {
+						
+						//This part is used to determine the default action of the packet filter: allow or deny
 						if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
 							firewall.setDefaultAction(true);
 						}else {
@@ -90,14 +109,25 @@ public class NFAllocationManager {
 						}
 					}
 					
+					/*
+					 * This part is used to generate the Access Control Lists for Low Level Configurations specified in the input XML file.
+					 * In this case, no auto-configuration will be required.
+					 */
 					if(!node.getConfiguration().getFirewall().getElements().isEmpty()) {
 						firewall.setAutoconfigured(false);
 						firewall.generateAcl();
 					} 
 					
+					/*
+					 * This part is used to understand if the firewall configured should be optional or not.
+					 * It makes sense only if low-level configuration is already specified.
+					 * This way the framework can eliminate a wrong configuration, if necessary.
+					 */
+					
 					boolean optional = nodeMetrics.stream().anyMatch(nm -> nm.getNode().equals(node.getName()));
 					if(optional) firewall.setAutoplace(true);
 					
+					//The firewall is included in the manager.
 					FWmanager.addFirewall(firewall,  allocationNode);
 					allocationNode.setPlacedNF(firewall);
 					allocationNode.setTypeNF(FunctionalTypes.FIREWALL);
@@ -114,9 +144,11 @@ public class NFAllocationManager {
 	}
 
 	
-	/*
-	 * This method is invoked in the recursive visit of the graph inside Verifoo Proxy. It feature an heuristic algorithm to select which NF place on the node. 
-	 * The heuristic will be completed in the future, for the moment it considers just one type of NF per time.
+	/**
+	 * This method is invoked in the recursive visit of the graph inside Verifoo Proxy. 
+	 * It features an heuristic algorithm to select which NF place on the node. 
+	 * The heuristic can be collocated here in the future.
+	 * For the moment it considers just one type of NF per time (e.g. packet filter, antispam, etc. accordingly to the tests in which the framework is used)
 	 */
 	public void NFchoice(AllocationNode source, AllocationNode origin, AllocationNode finalDest) {
 		if(source.getTypeNF() == null || source.getTypeNF().equals(FunctionalTypes.FIREWALL)) {
@@ -136,9 +168,12 @@ public class NFAllocationManager {
 	
 	}
 	
-	/*
-	 * this method is invoked in Verifoo Proxy before the creation of the Checker but after the recursive visit of the graph. 
+	/**
+	 * This method is invoked in VerifooProxy before the creation of the Checker but after the recursive visit of the graph. 
 	 * It allows to create hard and soft contraints for each Network Function placed inside a node.
+	 * This way, creation of the Network Function and its installation are decoupled: 
+	 * 1) the first one (method instanciateDefineNF happens before the recursive visit;
+	 * 2) this method (NFinstall) after the recursive visit, when all the maps of the AllocationNode objects are built.
 	 */
 	
 	public void NFinstall() {
@@ -147,6 +182,8 @@ public class NFAllocationManager {
 			Node node = allocationNode.getNode();
 			FunctionalTypes type = allocationNode.getTypeNF();
 			NetworkObject no = allocationNode.getPlacedNF();
+			
+			if(no == null) return; //it means no network function has been deployed on this node
 				
 			if(type.equals(FunctionalTypes.WEBCLIENT)) {
 				PolitoEndHost endHost = (PolitoEndHost) no;

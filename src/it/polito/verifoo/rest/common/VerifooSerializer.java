@@ -101,6 +101,7 @@ public class VerifooSerializer {
 	        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(), prop, paths);
 	        	IsolationResult res=test.checkNFFGProperty();
 	        	if(res.result != Status.UNSATISFIABLE){
+	        		//System.out.println(res.model.toString());
 	        		Translator t = new Translator(res.model.toString(),root, g, test.getAllocationNodes());
 	        		t.setNormalizer(norm);
 	        		result = t.convert();
@@ -121,6 +122,7 @@ public class VerifooSerializer {
 	    	logger.error(e);
 		}*/
 	}
+	
 	/**
 	 * If no connections are declared in XML, a full mesh is created between the hosts
 	 * @param root
@@ -139,7 +141,6 @@ public class VerifooSerializer {
 			}
 		}
 	}
-
 	
 	/**
 	 * @return the original NFV object given in the constructor
@@ -147,7 +148,6 @@ public class VerifooSerializer {
 	public NFV getNfv() {
 		return nfv;
 	}
-
 
 	/**
 	 * @return the NFV object after the computation 

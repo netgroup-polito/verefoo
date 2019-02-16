@@ -8,6 +8,7 @@ public class Link {
 	String sourceNode;
 	String destNode;
 	/**
+	 * Public constructor of Link object
 	 * @param sourceNode
 	 * @param destNode
 	 */

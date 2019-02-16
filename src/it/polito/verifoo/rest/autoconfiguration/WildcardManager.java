@@ -14,6 +14,14 @@ import it.polito.verifoo.rest.jaxb.Node;
 import it.polito.verigraph.mcnet.components.Quattro;
 import it.polito.verigraph.mcnet.netobjs.AclFirewall;
 
+/**
+ * WildcardManager is the class which creates all the possible wildcards from every IP Address.
+ * They are divided into 4 levels:
+ * 1) -1.-1.-1.-1 -> /0 (includes all ip addresses)
+ * 2) x.-1.-1.-1 -> /8 (A class)
+ * 3) x.y.-1.-1 -> /16 (B class)
+ * 4) x.y.z.-1 -> /24 (C class)
+ */
 public class WildcardManager {
 	
 	private HashMap<String, HashSet<String>> wildcardLevel1;
@@ -23,7 +31,11 @@ public class WildcardManager {
 	
 	private boolean nodesWithIPAddresses;
 	
-	
+	/**
+	 * Public constructor of WildcardManager class
+	 * It builds all the possible IP addresses with wildcards, dividing them in 4 levels.
+	 * @param allocationNodes It's the map of nodes of the Allocation Graph.
+	 */
 	public WildcardManager(HashMap<String, AllocationNode> allocationNodes) {
 		
 		nodesWithIPAddresses = true;
@@ -84,6 +96,13 @@ public class WildcardManager {
 		
 	}
 	
+	/**
+	 * This method allows to understand if it's possible, starting from a set of string (toAggregate),
+	 * combine them in an address range which doesn't include any string of another set (notAggregate)
+	 * @param toAggregate It's the set of addresses to aggregate.
+	 * @param notAggregate It's the set of addresses not to aggregate.
+	 * @return true if it's possible to aggregate the addresses in toAggregate in a range which doesn't include the others in notAggregate
+	 */
 	public boolean areAggregable(Set<String> toAggregate, Set<String> notAggregate) {
 		
 		for(Map.Entry<String, HashSet<String>> entry : wildcardLevel1.entrySet()) {
@@ -113,6 +132,10 @@ public class WildcardManager {
 		return false;
 	}
 	
+	/**
+	 * This method allows to understand if in the network nodes are assigned an IP address
+	 * @return true if in the network nodes are assigned an IP address
+	 */
 	public boolean areNodesWithIPAddresses() {
 		return nodesWithIPAddresses;
 	}

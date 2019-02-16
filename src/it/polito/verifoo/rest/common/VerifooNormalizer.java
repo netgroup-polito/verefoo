@@ -59,6 +59,10 @@ public class VerifooNormalizer {
 		}
 	}
 	
+	/**
+	 * This method normalize networks and flows.
+	 * It's a wrapper of two other specific methods.
+	 */
 	private void normalize(){
 		normalizeNetworks();
 		normalizeSameFlows();
@@ -131,6 +135,11 @@ public class VerifooNormalizer {
 		});
 	}
 
+	/**
+	 * This method is used to create a copy of a property in a new object.
+	 * @param p The original property
+	 * @return the copy of the property
+	 */
 	private Property copyProperty(Property p) {
 		Property newP = new Property();
 		newP.setDst(p.getDst());
@@ -144,6 +153,7 @@ public class VerifooNormalizer {
 		newP.setSrcPort(p.getSrcPort());
 		return newP;
 	}
+	
 	/**
 	 * Translates properties with same source and destination in properties with virtual nodes
 	 */
@@ -231,6 +241,11 @@ public class VerifooNormalizer {
 		});
 	}
 	
+	/**
+	 * This method is used to create a copy of a connection in a new object.
+	 * @param conn The original connection
+	 * @return the copy of the connection
+	 */
 	private Connection copyConnection(Connection conn) {
 		Connection newC = new Connection();
 		newC.setDestHost(conn.getDestHost());
@@ -239,6 +254,11 @@ public class VerifooNormalizer {
 		return newC;
 	}
 
+	/**
+	 * This method is used to create a copy of a host in a new object.
+	 * @param host The original host
+	 * @return the copy of the host
+	 */
 	private Host copyHost(Host host) {
 		Host newH = new Host();
 		newH.setCores(host.getCores());
@@ -251,6 +271,12 @@ public class VerifooNormalizer {
 		return newH;
 	}
 
+	/**
+	 * This method helps to identify if an Ip address is present in a larger address range
+	 * @param network CIDR Address range
+	 * @param ip The specific address
+	 * @return true of the ip address is in the specified range
+	 */
 	private boolean inNetwork(String network, String ip){
     	String[] decimalNotationIp = ip.split("\\.");
     	String[] decimalNotationNetwork = network.split("\\.");
@@ -262,6 +288,7 @@ public class VerifooNormalizer {
     	}
     	return true;
 	}
+	
 	/**
 	 * Get the original NFV element received in input
 	 * @return the original NFV element received in input
@@ -269,6 +296,7 @@ public class VerifooNormalizer {
 	public NFV getOriginalNfv() {
 		return originalNfv;
 	}
+	
 	/**
 	 * Set the original NFV element received in input
 	 * @param originalRoot the original NFV element received in input
@@ -297,6 +325,7 @@ public class VerifooNormalizer {
 	public Map<String, String> getFlowGroups() {
 		return flowGroups;
 	}
+	
 	/**
 	 * Get a specific graph from the original NFV element received in input
 	 * @param id the id of the graph in the NFV element

@@ -122,6 +122,7 @@ public class VerifooProxy {
 		    check = new Checker(ctx,nctx, allocationNodes, allocationManager);
 		    setProperty(prop);
 	    }
+	    
 	    /**
 	     * Sets all the conditions for the nodes. First, it removes all the deployment condition that were not possible
 	     * for all the client/server combination. Then, it sets up the host conditions and creates 

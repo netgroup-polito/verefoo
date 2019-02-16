@@ -21,18 +21,27 @@ public class LinkProvider {
 	private List<Property> properties;
 	private int lastPathId = -1, lastNodeIndex = -1; 
 	
+	/**
+	 * Public constructor of LinkProvider
+	 * @param ns List of nodes
+	 * @param ps List of paths
+	 * @param properties List of properties
+	 */
 	public LinkProvider(List<Node> ns, List<Path> ps, List<Property> properties){
 		nodes = ns;
 		paths = ps;
 		this.properties = properties;
 		links = (new LinkCreator(ns, this.properties)).getLinks();
 	}
+	
 	/**
 	 * Get all the links between the nodes (based on the neighbours indications)
+	 * @return all the links
 	 */
 	public List<Link> getAllLinks(){
 		return new ArrayList<>(links);
 	}
+	
 	/**
 	 * Checks if exists a path between the specified client and server
 	 * @return true if exists a path, false otherwise
@@ -51,6 +60,7 @@ public class LinkProvider {
 		}
 		return false;
 	}
+	
 	/**
 	 * Based on a source node and the level of the recursion (depth of a path), returns the links towards the next node
 	 * @param n source node

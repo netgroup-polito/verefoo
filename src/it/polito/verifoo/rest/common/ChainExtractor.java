@@ -25,6 +25,7 @@ public class ChainExtractor {
 	private static Logger logger = LogManager.getLogger("mylog");
 	private static List<List<String>> savedChain;
 	private static List<Host> hosts;
+	
 	/**
 	 * Calculates all the possible paths from the host client to the host server
 	 * @param hostClient The first host of the chain
@@ -55,6 +56,7 @@ public class ChainExtractor {
 		//logger.debug("Calculated host chain " + savedChain);
 		return new ArrayList<List<String>>(savedChain);
 	}
+	
 	/**
 	 * Explores recursively all the possible paths
 	 * @param lastHost the host from which it calculate the next, for the recursion
@@ -105,6 +107,7 @@ public class ChainExtractor {
 		return true;
 		
 	}
+	
 	/**
 	 * Returns if the name of the host passed as argument is associated to a client host
 	 * @param hostName
@@ -113,6 +116,7 @@ public class ChainExtractor {
 	public static boolean hostIsClient(String hostName){
 		return hosts.stream().filter(h -> h.getName().equals(hostName) && h.getType().equals(TypeOfHost.CLIENT)).count() > 0;
 	}
+	
 	/**
 	 * Returns if the name of the host passed as argument is associated to a server host
 	 * @param hostName

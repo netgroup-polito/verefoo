@@ -12,7 +12,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
+/**
+ * This class allow to manage the autoconfiguration of the packet filters.
+ *
+ */
 
 public class FWAutoconfigurationManager {
 	
@@ -24,6 +27,12 @@ public class FWAutoconfigurationManager {
 	
 	private List<Property> policies;
 	
+	/**
+	 * Public constructor of FWAutoconfigurationManager class
+	 * @param wildcardManager It is an object of WildcardManager class
+	 * @param policies It is the list of reachability and isolation properties
+	 * @param nodes It is the list of nodes in the network
+	 */
 	public FWAutoconfigurationManager(WildcardManager wildcardManager, List<Property> policies, List<Node> nodes){
 		this.wildcardManager = wildcardManager;
 		this.policies = policies;
@@ -34,6 +43,11 @@ public class FWAutoconfigurationManager {
 		FWInterestedPolicies = new HashMap<String, List<Property>>();
 	}
 	
+	/**
+	 * This method adds in a local map a firewall, associating it with the node in which it's deployed.
+	 * @param f The firewall to deploy
+	 * @param n The node on which the firewall can be deployed
+	 */
 	public void addFirewall(AclFirewall f, AllocationNode n) {
 		
 		boolean autoplace;
@@ -49,6 +63,13 @@ public class FWAutoconfigurationManager {
 
 	}
 	
+	/**
+	 * This methods stores the information that if a firewall is present on the node specified as input,
+	 * then it should manage a reachability/isolation polity between the source and destination specified.
+	 * @param node It's the node on which a firewall may have been placed.
+	 * @param source It's the source of the policy.
+	 * @param destination It's the destination of the policy.
+	 */
 	public void setPolicy(AllocationNode node, Node source, Node destination) {
 	
 		int newRules = 0;
@@ -78,6 +99,11 @@ public class FWAutoconfigurationManager {
 		
 	}
 	
+	/**
+	 * This method implements a pruning+heuristics to minizime the number of rules which Z3Opt should evaluate.
+	 * It combines rules only if the corresponding IP Addresses can be merged in a larger address range.
+	 * WildcrdManager object in exploited in this method.
+	 */
 	public void minimizeRules() {
 		
 		if(wildcardManager.areNodesWithIPAddresses()) {
@@ -137,7 +163,11 @@ public class FWAutoconfigurationManager {
 		
 	}
 	
-	
+	/**
+	 * This method allows to know if, on a node, a firewall has been tentatively deployed.
+	 * @param n The node of interested
+	 * @return true if on the input node node a firewall has been tentatively deployed.
+	 */
 	public boolean firewallIsPresent(AllocationNode n) {
 		return autoconfFW.containsKey(n.getIpAddress());
 	}
