@@ -61,7 +61,7 @@ public class PolitoEndHost extends NetworkObject {
 
     public  void installAsWebServer(){
         //installEndHost(packet);
-        Expr p_1 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_p_1", nctx.packet);
+        //Expr p_1 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_p_1", nctx.packet);
         
         /*for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getLastHops().entrySet()) {
         	Expr lastHop = entry.getKey().getZ3Name();
@@ -91,7 +91,7 @@ public class PolitoEndHost extends NetworkObject {
     
     public  void installAsWebClient(DatatypeExpr ipServer){
         //installEndHost(packet);
-        Expr p_1 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_p_1", nctx.packet);
+       // Expr p_1 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_p_1", nctx.packet);
         
         /*for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getLastHops().entrySet()){
         	List<Expr> lastHops = entry.getValue().stream().map(an -> an.getZ3Name()).collect(Collectors.toList());

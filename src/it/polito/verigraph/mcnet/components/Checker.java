@@ -211,9 +211,20 @@ public class Checker {
 		Expr p0 = ctx.mkConst("check_isolation_p0_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
 		Expr p1 = ctx.mkConst("check_isolation_p1_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
 		
-		List<AllocationNode> srcNeighbours = src.getNode().getNeighbour().stream().map(n -> allocationNodes.get(n.getName())).distinct().collect(Collectors.toList());
-		List<AllocationNode> destNeighbours = dest.getNode().getNeighbour().stream().map(n -> allocationNodes.get(n.getName())).distinct().collect(Collectors.toList());
+		//List<AllocationNode> srcNeighbours = src.getNode().getNeighbour().stream().map(n -> allocationNodes.get(n.getName())).distinct().collect(Collectors.toList());
+		//List<AllocationNode> destNeighbours = dest.getNode().getNeighbour().stream().map(n -> allocationNodes.get(n.getName())).distinct().collect(Collectors.toList());
 		
+		Set<AllocationNode> srcNeighbours = src.getFirstHops().get(dest);
+		//for(AllocationNode d : srcNeighbours) System.out.println(d.getIpAddress());
+		Set<AllocationNode> destNeighbours = dest.getLastHops().get(src);
+		
+		/*List<Expr> recvNeighbours = srcNeighbours.stream().map(n ->  (BoolExpr) ctx.mkForall(new Expr[]{p0},
+				ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n.getZ3Name(), dest.getZ3Name(), p0)),
+						ctx.mkAnd(ctx.mkNot(ctx.mkEq(src.getZ3Name(), nctx.pf.get("origin").apply(p0))))),1,null,null,null,null)).distinct().collect(Collectors.toList());
+		BoolExpr[] tmp3 = new BoolExpr[recvNeighbours.size()];
+  	 	BoolExpr enumerateRecv = ctx.mkAnd(recvNeighbours.toArray(tmp3));
+  	 	//constraintList.add(enumerateRecv);*/
+  	 	
 		for(AllocationNode n : destNeighbours) {
 			constraintList.add(ctx.mkForall(new Expr[]{p0},
 					ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n.getZ3Name(), dest.getZ3Name(), p0)),
@@ -221,12 +232,24 @@ public class Checker {
 		}
 		
 		
-		for(AllocationNode n : srcNeighbours) {
+		List<Expr> sendNeighbours = srcNeighbours.stream().map(n ->  (BoolExpr) nctx.send.apply(src.getZ3Name(), n.getZ3Name(), p1)).distinct().collect(Collectors.toList());
+		BoolExpr[] tmp2 = new BoolExpr[srcNeighbours.size()];
+		
+		//constraintList.add((BoolExpr) ctx.mkEq(dest.getZ3Node(), nctx.pf.get("dest").apply(p0)));
+		//constraintList.add((BoolExpr) ctx.mkEq(dest.getZ3Node(), nctx.pf.get("dest").apply(p1)));
+				
+  	 	BoolExpr enumerateSend = ctx.mkAnd(sendNeighbours.toArray(tmp2));
+		constraintList.add(enumerateSend);
+		
+		
+		
+		/*for(AllocationNode n : srcNeighbours) {
 			constraintList.add((BoolExpr) nctx.send.apply(src.getZ3Name(), n.getZ3Name(), p1));
-		}
+		}*/
 		
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.pf.get("dest").apply(p1)));
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.pf.get("src").apply(p1)));
+		
 		/*constraintList.add(ctx.mkForall(new Expr[]{n_0, p0},
 		ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Name(), p0)),
 				ctx.mkAnd(ctx.mkNot(ctx.mkEq(src.getZ3Name(), nctx.pf.get("origin").apply(p0))))),1,null,null,null,null));
@@ -275,20 +298,21 @@ public class Checker {
 		BoolExpr enumerateSendP0 = ctx.mkOr(sendNeighbours.toArray(tmp3));
 
 
-		/*constraintList.add(ctx.mkForall(new Expr[]{p_0},
+		constraintList.add(ctx.mkForall(new Expr[]{p_0},
 				ctx.mkImplies(ctx.mkAnd(enumerateSendP0),
 						ctx.mkAnd(ctx.mkEq(nctx.pf.get("lv4proto").apply(p_0), (IntExpr)ctx.mkInt(lv4proto)),
-									ctx.mkEq(nctx.pf.get("src_port").apply(p_0), nctx.pm.get(src_port)),
-									ctx.mkEq(nctx.pf.get("dest_port").apply(p_0), nctx.pm.get(dst_port)))),1,null,null,null,null));*/
+								ctx.mkEq(nctx.pf.get("src_port").apply(p_0), nctx.pm.get(src_port)),
+									ctx.mkEq(nctx.pf.get("dest_port").apply(p_0), nctx.pm.get(dst_port))
+								)),1,null,null,null,null));
+		
 	}
 	
 	public void addReachabilityProperty(AllocationNode src, AllocationNode dest, int lv4proto, String src_port, String dst_port) {
-		
 		Expr p0 = ctx.mkConst("check_reach_p0_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
 		Expr p1 = ctx.mkConst("check_reach_p1_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
 		Expr n_0 = ctx.mkConst("check_reach_n_0_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
 		Expr n_1 = ctx.mkConst("check_reach_n_1_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
-
+	
 		// Constraint1recv(n_0,destNode,p0,t_0)
 		Map<AllocationNode, Set<AllocationNode>> lastHops = dest.getLastHops();
 		Set<AllocationNode> set = lastHops.get(src);
@@ -298,6 +322,8 @@ public class Checker {
   		BoolExpr[] tmp = new BoolExpr[set.size()];
   	 	BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp));
 		constraintList.add(enumerateRecv);
+		
+	
 
 		// Constraint send(srcNode,n_1,p0,t_0)
 		Map<AllocationNode, Set<AllocationNode>> firstHops = src.getFirstHops();
@@ -310,6 +336,7 @@ public class Checker {
 		//constraintList.add((BoolExpr) nctx.send.apply(src.getZ3Name(), n_1, p1));
 		// Constraint4p1.origin == srcNode
 		constraintList.add(ctx.mkEq(nctx.pf.get("origin").apply(p0), src.getZ3Name()));
+		//constraintList.add(ctx.mkEq(nctx.pf.get("origin").apply(p1), src.getZ3Name()));
 		//constraintList.add(ctx.mkEq(nctx.pf.get("src").apply(p0), src.getZ3Node()));
 		//constraintList.add(ctx.mkEq(nctx.pf.get("src").apply(p1), src.getZ3Node()));
 		//constraintList.add(ctx.mkEq(nctx.pf.get("dest").apply(p0), dest.getZ3Node()));
@@ -318,9 +345,19 @@ public class Checker {
 
 		// Constraint7nodeHasAddr(destNode, p0.destAddr)
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.pf.get("dest").apply(p1)));
-		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.pf.get("src").apply(p1)));
+		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.pf.get("src").apply(p0)));
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.pf.get("dest").apply(p0)));
+		
+		
 		//constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.pf.get("src").apply(p0)));
+	
+		constraintList.add(ctx.mkForall(new Expr[]{p0},
+				ctx.mkImplies(ctx.mkAnd(enumerateRecv),
+						ctx.mkAnd(ctx.mkEq(nctx.pf.get("lv4proto").apply(p0), (IntExpr)ctx.mkInt(lv4proto)),
+								ctx.mkEq(nctx.pf.get("src_port").apply(p0), nctx.pm.get(src_port)),
+									ctx.mkEq(nctx.pf.get("dest_port").apply(p0), nctx.pm.get(dst_port))
+								)),1,null,null,null,null));
+	
 	}
 
 	public IsolationResult propertyCheck(){

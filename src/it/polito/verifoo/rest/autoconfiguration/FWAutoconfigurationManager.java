@@ -76,8 +76,8 @@ public class FWAutoconfigurationManager {
 		AclFirewall firewall = autoconfFW.get(node.getIpAddress())._1;
 		List<Property> allProperties = policies.stream().filter(p -> p.getSrc().equals(source.getName()) && p.getDst().equals(destination.getName())).collect(Collectors.toList());		
 		List<Property> interestedProperties = allProperties.stream().filter(p ->
-				( p.getName().value().equals("IsolationProperty") && firewall.isBlacklisting()) 
-				|| (p.getName().value().equals("ReachabilityProperty") && !firewall.isBlacklisting())).collect(Collectors.toList());
+		( p.getName().value().equals("IsolationProperty") && firewall.isBlacklisting()) 
+		|| (p.getName().value().equals("ReachabilityProperty") && !firewall.isBlacklisting())).collect(Collectors.toList());
 		for(Property property : allProperties) {
 			boolean found = FWAllPolicies.get(node.getIpAddress()).stream().anyMatch(p -> p.getSrc().equals(property.getSrc()) && p.getDst().equals(property.getDst()));
 			if(!found) {
