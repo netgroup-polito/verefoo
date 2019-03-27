@@ -2,8 +2,6 @@ package it.polito.verifoo.rest.common;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import com.microsoft.z3.Context;
 
@@ -11,13 +9,14 @@ import it.polito.verifoo.rest.autoconfiguration.FWAutoconfigurationManager;
 import it.polito.verifoo.rest.jaxb.ActionTypes;
 import it.polito.verifoo.rest.jaxb.FunctionalTypes;
 import it.polito.verifoo.rest.jaxb.Node;
+import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verifoo.rest.jaxb.PName;
 import it.polito.verifoo.rest.jaxb.Property;
-import it.polito.verifoo.rest.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verigraph.mcnet.components.NetContext;
 import it.polito.verigraph.mcnet.components.NetworkObject;
 import it.polito.verigraph.mcnet.netobjs.AclFirewall;
 import it.polito.verigraph.mcnet.netobjs.PolitoEndHost;
+import it.polito.verigraph.mcnet.netobjs.PolitoForwarder;
 import it.polito.verigraph.mcnet.netobjs.PolitoNat;
 
 /**
@@ -138,6 +137,12 @@ public class NFAllocationManager {
 					allocationNode.setPlacedNF(nat);
 					allocationNode.setTypeNF(FunctionalTypes.NAT);
 				}
+				
+				else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {
+					PolitoForwarder forwarder = new PolitoForwarder(allocationNode, ctx, nctx);
+					allocationNode.setPlacedNF(forwarder);
+					allocationNode.setTypeNF(FunctionalTypes.FORWARDER);
+				}
 			}
 			
 		});
@@ -199,6 +204,10 @@ public class NFAllocationManager {
 			}else if(node.getFunctionalType() == FunctionalTypes.NAT) {	
 				PolitoNat nat = (PolitoNat) no;
 				nat.natModel(nctx.am.get(node.getName()));
+			}
+			 else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {	
+				PolitoForwarder fw = (PolitoForwarder) no;
+				fw.forwarderSendRules();
 			}
 			
 			

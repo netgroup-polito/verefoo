@@ -4,51 +4,23 @@
         <graph id="0">
             <node name="10.0.0.1" functional_type="WEBCLIENT">
                 <neighbour name="20.0.0.1"/>
-                <neighbour name="20.0.0.2"/>
                 <configuration name="confA" description="A simple description">
                     <webclient nameWebServer="30.0.5.2"/>
                 </configuration>
             </node>
-            <node name="10.0.0.2" functional_type="WEBCLIENT">
-                <neighbour name="20.0.0.2"/>
-                <neighbour name="20.0.0.1"/>
-                <configuration name="confA" description="A simple description">
-                    <webclient nameWebServer="30.0.5.2"/>
-                </configuration>
-            </node>
-            <node name="20.0.0.1" functional_type="FIREWALL">
+            <node name="20.0.0.1" functional_type="FORWARDER">
                 <neighbour name="10.0.0.1"/>
-                <neighbour name="10.0.0.2"/>
                 <neighbour name="20.0.0.2"/>
-                <neighbour name="20.0.0.3"/>
-                <neighbour name="30.0.5.2"/>
-                <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="ALLOW"/>
-                </configuration>
             </node>
-            <node name="20.0.0.2" functional_type="FIREWALL">
-                <neighbour name="10.0.0.1"/>
-                <neighbour name="10.0.0.2"/>
+            <node name="20.0.0.2" functional_type="FORWARDER">
                 <neighbour name="20.0.0.1"/>
-                <neighbour name="20.0.0.3"/>
-                <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="ALLOW"/>
-                </configuration>
-            </node>
-            <node name="20.0.0.3" functional_type="FIREWALL">
-                <neighbour name="20.0.0.1"/>
-                <neighbour name="20.0.0.2"/>
                 <neighbour name="30.0.5.2"/>
-                <configuration name="conf1" description="A simple description">
-                    <firewall defaultAction="ALLOW"/>
-                </configuration>
             </node>
             <node name="30.0.5.2" functional_type="WEBSERVER">
-                <neighbour name="20.0.0.3"/>
-                <neighbour name="20.0.0.1"/>
+                <neighbour name="20.0.0.2"/>
                 <configuration name="confB" description="A simple description">
                     <webserver>
-                        <name>b</name>
+                        <name>30.0.5.2</name>
                     </webserver>
                 </configuration>
             </node>
@@ -60,7 +32,6 @@
     </Constraints>
     <PropertyDefinition>
         <Property name="IsolationProperty" graph="0" src="10.0.0.1" dst="30.0.5.2"/>
-        <Property name="ReachabilityProperty" graph="0" src="10.0.0.2" dst="30.0.5.2"/>
     </PropertyDefinition>
     <ParsingString></ParsingString>
 </NFV>
