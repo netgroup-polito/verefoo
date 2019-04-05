@@ -204,6 +204,7 @@ public class NFAllocationManager {
 			}else if(node.getFunctionalType() == FunctionalTypes.NAT) {	
 				PolitoNat nat = (PolitoNat) no;
 				nat.natModel(nctx.am.get(node.getName()));
+				
 			}
 			 else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {	
 				PolitoForwarder fw = (PolitoForwarder) no;

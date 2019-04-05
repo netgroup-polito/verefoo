@@ -345,7 +345,7 @@ public class Checker {
 
 		// Constraint7nodeHasAddr(destNode, p0.destAddr)
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.pf.get("dest").apply(p1)));
-		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.pf.get("src").apply(p0)));
+		//constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.pf.get("src").apply(p0)));
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.pf.get("dest").apply(p0)));
 		
 		
