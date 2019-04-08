@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
+  <graphs>
+    <graph id="0">
+     <node functional_type="WEBCLIENT" name="nodeA">
+        <neighbour name="node1"/>
+        <configuration description="A simple description" name="confA">
+          <webclient nameWebServer="nodeB"/>
+        </configuration>
+      </node>
+	  <node functional_type="WEBCLIENT" name="nodeC">
+        <neighbour name="node1"/>
+        <configuration description="A simple description" name="confA">
+          <webclient nameWebServer="nodeB"/>
+        </configuration>
+      </node>
+      <node functional_type="FIREWALL" name="node1">
+        <neighbour name="nodeA"/>
+        <neighbour name="nodeC"/>
+		<neighbour name="node2"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall defaultAction="DENY"/>
+        </configuration>
+      </node>
+	   
+	   <node functional_type="FIREWALL" name="node2">
+        <neighbour name="node1"/>
+        <neighbour name="node3"/>
+        <configuration description="A simple description" name="conf1">
+          <firewall defaultAction="DENY"/>
+        </configuration>
+      </node>
+       <node functional_type="FIREWALL" name="node3">
+        <neighbour name="node2"/>
+        <neighbour name="nodeB"/>
+        <configuration description="A simple description" name="conf1">
+         <firewall defaultAction="DENY"/>
+        </configuration>
+      </node>
+      <node functional_type="WEBSERVER" name="nodeB">
+		<neighbour name="node3"/>
+        <configuration description="A simple description" name="confB">
+          <webserver>
+          	<name>nodeB</name>
+          </webserver>
+        </configuration>
+      </node>
+    </graph>
+  </graphs>
+  <Constraints>
+	  <NodeConstraints>
+		<NodeMetrics node="node2" optional="true"/>
+	  </NodeConstraints>
+	  <LinkConstraints/>
+  </Constraints>
+  <PropertyDefinition>
+		<Property graph="0" name="IsolationProperty" src="nodeA" dst="nodeB"/> 	
+  		<Property graph="0" name="ReachabilityProperty" src="nodeC" dst="nodeB"/> 			
+  </PropertyDefinition>
+  
+  <ParsingString></ParsingString>
+</NFV>
