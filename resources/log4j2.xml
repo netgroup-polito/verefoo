@@ -22,17 +22,17 @@
     </Appenders>
     <Loggers>
 	     <Logger name="model" level="debug" additivity="false">
-	        <appender-ref ref="ModelFile" level="debug"/>
+	        <appender-ref ref="Console" level="debug"/>
 	    </Logger>
 	    <Logger name="result" level="debug" additivity="false">       
-	        <appender-ref ref="ResultFile" level="debug"/>
+	        <appender-ref ref="Console" level="debug"/>
 	    </Logger>
 	     <Logger name="assertions" level="debug" additivity="false">       
-	        <appender-ref ref="AssertionsFile" level="debug"/>
+	        <appender-ref ref="Console" level="debug"/>
 	    </Logger>
         <Root level="debug">
-            <AppenderRef ref="DebugFile" level="debug"/>
-            <appender-ref ref="ErrorFile" level="error"/>
+            <AppenderRef ref="Console" level="debug"/>
+            <appender-ref ref="Console" level="error"/>
         </Root>
     </Loggers>
 </Configuration>

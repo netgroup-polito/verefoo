@@ -310,8 +310,6 @@ public class Checker {
 	public void addReachabilityProperty(AllocationNode src, AllocationNode dest, int lv4proto, String src_port, String dst_port) {
 		Expr p0 = ctx.mkConst("check_reach_p0_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
 		Expr p1 = ctx.mkConst("check_reach_p1_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packet);
-		Expr n_0 = ctx.mkConst("check_reach_n_0_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
-		Expr n_1 = ctx.mkConst("check_reach_n_1_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.node);
 	
 		// Constraint1recv(n_0,destNode,p0,t_0)
 		Map<AllocationNode, Set<AllocationNode>> lastHops = dest.getLastHops();
@@ -392,7 +390,10 @@ public class Checker {
 			//assertions = solver.getAssertions();
 			Arrays.asList(assertions).forEach(t-> stringWriter.append(t+"\n\n"));
 			logAssertions.info(stringWriter.toString());
-			logModel.info(model.toString());	
+			if(model!=null){
+				logModel.info(model.toString());	
+			}
+				
 	}
 	
 

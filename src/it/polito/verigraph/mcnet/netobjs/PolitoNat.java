@@ -117,7 +117,7 @@ public class PolitoNat extends NetworkObject {
 								ctx.mkEq(nctx.pf.get("options").apply(p_left_to_right_1), nctx.pf.get("options").apply(p_left_to_right_0))), 1,
 								null, null, null, null))),
 				1, null, null, null, null);
-		 System.out.println("-------------Nat leftToRight: "+leftToRight);
+		// System.out.println("-------------Nat leftToRight: "+leftToRight);
 		constraints.add(leftToRight);
 		
 		
@@ -166,7 +166,7 @@ public class PolitoNat extends NetworkObject {
 												1, null, null, null, null)),
 								1, null, null, null, null))),
 				1, null, null, null, null);
-		 System.out.println("-------------Nat rightToLeft: "+rightToLeft);
+		 //System.out.println("-------------Nat rightToLeft: "+rightToLeft);
 		 constraints.add(rightToLeft);
 		// "src","dest","inner_src","inner_dest","origin","orig_body","body","seq", "lv4proto", "src_port", "dest_port", "proto", "emailFrom","url","options","encrypted"};
 		 
@@ -205,8 +205,35 @@ public class PolitoNat extends NetworkObject {
 						, 1, null, null, null, null)
 
 		);
-		 System.out.println("$$ "+expr);
+		 //System.out.println("$$ "+expr);
 		 constraints.add(ctx.mkForall(new Expr[] { p_5 }, expr, 1, null, null, null,null));
+		 
+		 
+			expr =  ctx.mkImplies(
+					ctx.mkAnd(enumerateRecv(p_5, source.getLeftHops().keySet())),
+					ctx.mkExists(new Expr[] { p_4 },
+							ctx.mkAnd(enumerateSend(p_4, source.getRightHops().keySet()),
+									
+									ctx.mkEq(nctx.pf.get("src").apply(p_4), natIp),
+									ctx.mkEq(nctx.pf.get("origin").apply(p_5), nctx.pf.get("origin").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("dest").apply(p_5), nctx.pf.get("dest").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("orig_body").apply(p_5), nctx.pf.get("orig_body").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("body").apply(p_5), nctx.pf.get("body").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("seq").apply(p_5), nctx.pf.get("seq").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("lv4proto").apply(p_5), nctx.pf.get("lv4proto").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("proto").apply(p_5), nctx.pf.get("proto").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("src_port").apply(p_5), nctx.pf.get("src_port").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("dest_port").apply(p_5), nctx.pf.get("dest_port").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("emailFrom").apply(p_5), nctx.pf.get("emailFrom").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("url").apply(p_5), nctx.pf.get("url").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("inner_src").apply(p_5), nctx.pf.get("inner_src").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("inner_dest").apply(p_5), nctx.pf.get("inner_dest").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("encrypted").apply(p_5), nctx.pf.get("encrypted").apply(p_4)),
+									ctx.mkEq(nctx.pf.get("options").apply(p_5), nctx.pf.get("options").apply(p_4)))
+							, 1, null, null, null, null)
+
+			);
+		 ///constraints.add(ctx.mkForall(new Expr[] { p_5 }, expr, 1, null, null, null,null));
 
 	}
 

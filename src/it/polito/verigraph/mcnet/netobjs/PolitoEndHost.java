@@ -61,9 +61,9 @@ public class PolitoEndHost extends NetworkObject {
 
     public  void installAsWebServer(){
         //installEndHost(packet);
-        //Expr p_1 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_p_1", nctx.packet);
+       /* Expr p_1 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_p_1", nctx.packet);
         
-        /*for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getLastHops().entrySet()) {
+        for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getLastHops().entrySet()) {
         	Expr lastHop = entry.getKey().getZ3Name();
         	constraints.add( ctx.mkForall(new Expr[]{p_0},
                      ctx.mkImplies((BoolExpr) nctx.recv.apply(lastHop, politoEndHost, p_0),
@@ -204,6 +204,7 @@ public class PolitoEndHost extends NetworkObject {
                                 ctx.mkEq(nctx.pf.get("origin").apply(p_0),politoEndHost),
                                 ctx.mkEq(nctx.pf.get("inner_src").apply(p_0),nctx.am.get("null")),
                                 ctx.mkEq(nctx.pf.get("inner_dest").apply(p_0),nctx.am.get("null")),
+                                ctx.mkEq(nctx.pf.get("encrypted").apply(p_0),ctx.mkFalse()),
                                 ctx.mkEq(nctx.pf.get("encrypted").apply(p_0),ctx.mkFalse())
                                 ,(BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.pf.get("src").apply(p_0))
                                 )),1,null,null,null,null));
