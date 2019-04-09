@@ -4,21 +4,32 @@ xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
    <graphs>
      <graph id="0">
       <node functional_type="WEBCLIENT" name="10.0.0.1">
-         <neighbour name="20.0.0.1"/>
+         <neighbour name="40.0.0.7"/>
          <configuration description="A simple description" name="confA">
            <webclient nameWebServer="30.0.0.1"/>
          </configuration>
+       </node>
+       
+       <node name="40.0.0.7">
+       	<neighbour name="10.0.0.1"/>
+       	<neighbour name="20.0.0.1"/>
        </node>
    
        <node functional_type="WEBCLIENT" name="10.0.0.2">
-         <neighbour name="20.0.0.1"/>
+         <neighbour name="40.0.0.8"/>
          <configuration description="A simple description" name="confA">
            <webclient nameWebServer="30.0.0.1"/>
          </configuration>
        </node>
+       
+       <node name="40.0.0.8">
+       	<neighbour name="20.0.0.1"/>
+       	<neighbour name="10.0.0.2"/>
+       </node>
+       
            <node functional_type="NAT" name="20.0.0.1">
-         <neighbour name="10.0.0.1"/>
-         <neighbour name="10.0.0.2"/>
+         <neighbour name="40.0.0.7"/>
+         <neighbour name="40.0.0.8"/>
          <neighbour name="40.0.0.3"/>
          <configuration description="A simple description" name="conf2">
            <nat>
@@ -32,7 +43,7 @@ xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
        	<neighbour name="30.0.0.1"/>
        </node>
        <node functional_type="WEBSERVER" name="30.0.0.1">
-                <neighbour name="20.0.0.1"/>
+                <neighbour name="40.0.0.3"/>
          <configuration description="A simple description" name="confB">
            <webserver>
                 <name>30.0.0.1</name>

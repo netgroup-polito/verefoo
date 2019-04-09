@@ -74,6 +74,7 @@ public class PolitoNat extends NetworkObject {
 		Expr p_right_to_left_1 = ctx.mkConst("p_right_to_left_1", nctx.packet);
 		Expr p_4 = ctx.mkConst("p_4", nctx.packet);
 		Expr p_5 = ctx.mkConst("p_5", nctx.packet);
+		Expr p_6 = ctx.mkConst("p_5", nctx.packet);
 
 		/*
 		 * IntExpr t_0 = ctx.mkIntConst("t_0"); IntExpr t_1 = ctx.mkIntConst("t_1");
@@ -94,7 +95,7 @@ public class PolitoNat extends NetworkObject {
 		// p_0.<...>) "
 
 		System.out.print(natIp);
-		Quantifier leftToRight = ctx.mkExists(new Expr[] { p_left_to_right_0 }, ctx.mkImplies(
+		Quantifier leftToRight = ctx.mkForall(new Expr[] { p_left_to_right_0 }, ctx.mkImplies(
 				ctx.mkAnd(enumerateSend(p_left_to_right_0, source.getRightHops().keySet()),
 						ctx.mkNot((BoolExpr) private_addr_func.apply(nctx.pf.get("dest").apply(p_left_to_right_0)))),
 				ctx.mkAnd(ctx.mkEq(nctx.pf.get("src").apply(p_left_to_right_0), natIp),
@@ -131,7 +132,7 @@ public class PolitoNat extends NetworkObject {
 		// p_1.origin == p_0.origin &&
 		// same for p_1.<src,orig_body,body,seq,proto,emailFrom,url,options> ==
 		// p_0.<...>)
-		Quantifier rightToLeft = ctx.mkExists(new Expr[] { p_right_to_left_0 }, ctx.mkImplies(
+		Quantifier rightToLeft = ctx.mkForall(new Expr[] { p_right_to_left_0 }, ctx.mkImplies(
 				ctx.mkAnd(enumerateSend(p_right_to_left_0, source.getLeftHops().keySet()),
 						(BoolExpr) private_addr_func.apply(nctx.pf.get("dest").apply(p_right_to_left_0))),
 				ctx.mkAnd(
@@ -167,7 +168,7 @@ public class PolitoNat extends NetworkObject {
 								1, null, null, null, null))),
 				1, null, null, null, null);
 		 //System.out.println("-------------Nat rightToLeft: "+rightToLeft);
-		 constraints.add(rightToLeft);
+		 //constraints.add(rightToLeft);
 		// "src","dest","inner_src","inner_dest","origin","orig_body","body","seq", "lv4proto", "src_port", "dest_port", "proto", "emailFrom","url","options","encrypted"};
 		 
 		/* constraints.add(ctx.mkForall(
@@ -176,8 +177,7 @@ public class PolitoNat extends NetworkObject {
 									ctx.mkNot((BoolExpr) private_addr_func.apply(nctx.pf.get("src").apply(p_right_to_left_1)))),
 							ctx.mkNot(enumerateSend(p_right_to_left_1, source.getLeftHops().keySet()))
 							)   ,1,null,null,null,null));*/
-		 
-		 
+		
 		// extra constraints to oblige the VNF to forward the received packets
 		BoolExpr expr = ctx.mkImplies(
 				ctx.mkAnd(enumerateRecv(p_5, source.getLeftHops().keySet()),
