@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -20,6 +22,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.After;
@@ -54,7 +57,7 @@ public class TestPerformanceAutoConfigurationFW {
 	private int nSAT = 0, nUNSAT = 0, i = 0, err = 0, nrOfConditions = 0, maxNrOfConditions = 0;
 	NFV root;
 	private List<Host> pastClients = new ArrayList<>(), pastServers = new ArrayList<>();
-	private Logger logger = LogManager.getLogger("mylog");
+	private Logger logger = LogManager.getLogger("result");
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -127,11 +130,11 @@ public class TestPerformanceAutoConfigurationFW {
 		 if(test.isSat()){
 			nSAT++;
 			maxTotTime = maxTotTime<(endAll-beginAll)? (endAll-beginAll) : maxTotTime;
-			System.out.print("time: " + (endAll-beginAll) + "ms;");
+			logger.info("time: " + (endAll-beginAll) + "ms;");
 			totTime += (endAll-beginAll);
 		 }
 	 	else{
-	 		System.out.print("UNSAT");	
+	 		logger.info("UNSAT");	
 			nUNSAT++;
 	 	}
 		
@@ -829,8 +832,8 @@ public class TestPerformanceAutoConfigurationFW {
 		        		.map(n -> n.getName())
 		        		.findFirst().get();*/
 		        
-				do{
-					System.out.print("Simulation nr " + i+" ");
+		        do{
+					//logger.debug("Simulation nr " + i+" ");
 					Thread t = new Thread(){
 						public void run(){
 							try {
@@ -852,25 +855,24 @@ public class TestPerformanceAutoConfigurationFW {
 						if(root.getHosts() != null){
 							Host currClient = root.getHosts().getHost().stream().filter(h -> h.getType().equals(TypeOfHost.CLIENT)).findAny().orElse(null);
 							Host currServer = root.getHosts().getHost().stream().filter(h -> h.getType().equals(TypeOfHost.SERVER)).findAny().orElse(null);
-							System.out.println("Simulation " + i + " has deadlock with client on " + currClient.getName() + " and server on " + currServer.getName());
+							logger.debug("Simulation " + i + " has deadlock with client on " + currClient.getName() + " and server on " + currServer.getName());
 						}
 						throw new BadGraphError();
 					}
 				//}while(changeEndpoints(root.getHosts().getHost(), clientName, serverName) != null);
 				}while(i<5);
-				System.out.println("");
-				System.out.println("Simulations -> " + i + " / Errors -> " + err);
+				
 				logger.debug("Simulations -> " + i + " / Errors -> " + err);
 				//System.out.println("AVG Nr of Conditions -> " + (nrOfConditions/(i)) + " / MAX Nr Of Conditions -> " + maxNrOfConditions);
 				//System.out.println("AVG creating condition -> " + (condTime/(i-err)) + "ms");
 				//System.out.println("MAX creating condition -> " + (maxCondTime) + "ms");
-				logger.debug("AVG creating condition -> " + (condTime/(i-err)) + "ms");
-				logger.debug("MAX creating condition -> " + (maxCondTime) + "ms");
+				//logger.debug("AVG creating condition -> " + (condTime/(i-err)) + "ms");
+				//logger.debug("MAX creating condition -> " + (maxCondTime) + "ms");
 				if(nSAT > 0){
 					//System.out.println("AVG checking property when SAT -> " + (checkTimeSAT/nSAT) + "ms");
 					//System.out.println("MAX checking property when SAT -> " + (maxCheckTimeSAT) + "ms");
-					logger.debug("AVG checking property when SAT -> " + (checkTimeSAT/nSAT) + "ms");
-					logger.debug("MAX checking property when SAT -> " + (maxCheckTimeSAT) + "ms");
+					//logger.debug("AVG checking property when SAT -> " + (checkTimeSAT/nSAT) + "ms");
+					//logger.debug("MAX checking property when SAT -> " + (maxCheckTimeSAT) + "ms");
 				}
 				if(nUNSAT > 0){
 					//System.out.println("AVG checking property when UNSAT-> " + (checkTimeUNSAT/nUNSAT) + "ms");
@@ -878,12 +880,10 @@ public class TestPerformanceAutoConfigurationFW {
 					logger.debug("AVG checking property when UNSAT-> " + (checkTimeUNSAT/nUNSAT) + "ms");
 					logger.debug("MAX checking property when UNSAT-> " + (maxCheckTimeUNSAT) + "ms");
 				}
-				System.out.println("AVG total time -> " + (totTime/nSAT) + "ms");
-				System.out.println("MAX total time -> " + (maxTotTime) + "ms");
-				System.out.println("=====================================");
 				logger.debug("AVG total time -> " + (totTime/nSAT) + "ms");
 				logger.debug("MAX total time -> " + (maxTotTime) + "ms");
 				logger.debug("=====================================");
+
 
 			}
 		} catch (Exception e) {

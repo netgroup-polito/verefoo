@@ -7,10 +7,10 @@
         <File name="DebugFile" fileName="${sys:user.dir}/log/debug.log" immediateFlush="false" append="false">
             <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
-         <File name="AssertionsFile" fileName="${sys:user.dir}/log/assertions.log" immediateFlush="false" append="false">
+         <File name="AssertionsFile" fileName="${sys:user.dir}/log/assertions.log">
             <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
-        <File name="ResultFile" fileName="${sys:user.dir}/log/result.log" immediateFlush="false" append="false">
+        <File name="ResultFile" fileName="${sys:user.dir}/log/result.log" >
             <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
          <File name="ModelFile" fileName="${sys:user.dir}/log/model.log" immediateFlush="false" append="false">
@@ -22,17 +22,17 @@
     </Appenders>
     <Loggers>
 	     <Logger name="model" level="debug" additivity="false">
-	        <appender-ref ref="Console" level="debug"/>
+	        <appender-ref ref="ModelFile" level="debug"/>
 	    </Logger>
 	    <Logger name="result" level="debug" additivity="false">       
-	        <appender-ref ref="Console" level="debug"/>
+	        <appender-ref ref="ResultFile" level="debug"/>
 	    </Logger>
-	     <Logger name="assertions" level="debug" additivity="false">       
-	        <appender-ref ref="Console" level="debug"/>
+	     <Logger name="assertions" level="info" additivity="false">       
+	        <appender-ref ref="AssertionsFile" level="info"/>
 	    </Logger>
         <Root level="debug">
-            <AppenderRef ref="Console" level="debug"/>
-            <appender-ref ref="Console" level="error"/>
+            <AppenderRef ref="DebugFile" level="debug"/>
+            <appender-ref ref="ErrorFile" level="error"/>
         </Root>
     </Loggers>
 </Configuration>
