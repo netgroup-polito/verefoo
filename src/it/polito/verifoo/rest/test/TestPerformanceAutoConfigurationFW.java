@@ -192,6 +192,65 @@ public class TestPerformanceAutoConfigurationFW {
 		try {
 			List<String> files = new ArrayList<>();
 			
+			
+			//Extended
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/05FW10P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/05FW20P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/05FW30P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/05FW40P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/05FW50P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/05FW60P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/05FW70P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/05FW80P.xml");
+			
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/15FW10P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/15FW20P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/15FW30P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/15FW40P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/15FW50P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/15FW60P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/15FW70P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/15FW80P.xml");
+			
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/25FW10P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/25FW20P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/25FW30P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/25FW40P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/25FW50P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/25FW60P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/25FW70P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/25FW80P.xml");
+			
+			
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/10FW05P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/20FW05P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/30FW05P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/40FW05P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/50FW05P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/60FW05P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/70FW05P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/80FW05P.xml");
+
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/10FW10P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/20FW10P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/30FW10P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/40FW10P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/50FW10P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/60FW10P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/70FW10P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/80FW10P.xml");
+
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/10FW15P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/20FW15P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/30FW15P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/40FW15P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/50FW15P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/60FW15P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/70FW15P.xml");
+			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/80FW15P.xml");
+			
+			
+			
 			/*files.add("./testfile/PerformanceTests/FirewallPolicy/ChainSG/06FW.xml");
 			files.add("./testfile/PerformanceTests/FirewallPolicy/ChainSG/12FW.xml");
 			files.add("./testfile/PerformanceTests/FirewallPolicy/ChainSG/18FW.xml");
@@ -729,38 +788,7 @@ public class TestPerformanceAutoConfigurationFW {
 			//files.add("./testfile/PerformanceTests/100Nodes/20FW15P.xml");
 			
 			
-			//Extended
-			/*files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/05FW20P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/05FW40P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/05FW60P.xml");*/
-			//files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/05FW80P.xml");
-			//files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/05FW100P.xml");
-			/*files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/15FW20P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/15FW40P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/15FW60P.xml");*/
-			//files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/15FW80P.xml");
-			//files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/15FW100P.xml");
-			/*files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/25FW20P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/25FW40P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/25FW60P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/25FW80P.xml");*/
-			//files.add("./testfile/PerformanceTests/FirewallPolicy/Extended/25FW100P.xml");
-			
-			/*files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/20FW05P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/40FW05P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/60FW05P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/80FW05P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/100FW05P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/20FW10P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/40FW10P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/60FW10P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/80FW10P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/100FW10P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/20FW15P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/40FW15P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/60FW15P.xml");*/
-			/*files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/80FW15P.xml");
-			files.add("./testfile/PerformanceTests/FirewallPolicy/ExtendedFW/100FW15P.xml");
+		
 			*/
 			for(String f : files){
 				condTime = 0;
