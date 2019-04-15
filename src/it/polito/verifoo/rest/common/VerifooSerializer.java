@@ -65,8 +65,12 @@ public class VerifooSerializer {
 			logger.debug("Neo4j deployment FAILED: " + e.getMessage());
 			System.out.println("Neo4j deployment FAILED: " + e.getMessage());
 		}*/
+		AllocationGraphGenerator agg = new AllocationGraphGenerator(root);
+		root = agg.getAllocationGraph();
 		VerifooNormalizer norm = new VerifooNormalizer(root);
 		root = norm.getRoot();
+		
+
 		try {
 			JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
 			Marshaller m = jc.createMarshaller();
@@ -74,7 +78,7 @@ public class VerifooSerializer {
 	        m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
 			logger.info("-----------------NORMALIZED INPUT-----------------");
 			StringWriter stringWriter = new StringWriter();
-			m.marshal( root, stringWriter ); 
+			m.marshal( root, stringWriter); 
 	        logger.info(stringWriter.toString());
 	        logger.info("--------------------------------------------------");
 		} catch (JAXBException e) {
@@ -101,11 +105,18 @@ public class VerifooSerializer {
 	        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(), prop, paths);
 	        	IsolationResult res=test.checkNFFGProperty();
 	        	if(res.result != Status.UNSATISFIABLE){
-	        		//System.out.println(res.model.toString());
+	        		System.out.println(res.model.toString());
+	        		
+	        		
 	        		Translator t = new Translator(res.model.toString(),root, g, test.getAllocationNodes());
 	        		t.setNormalizer(norm);
 	        		result = t.convert();
+	        		
+	        		
 	        		root = result;
+	        		
+	        		
+	        		
 	        		sat = true;
 	        	}
 	        	else{

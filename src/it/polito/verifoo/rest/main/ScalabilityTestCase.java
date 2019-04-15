@@ -10,27 +10,27 @@ import javax.xml.bind.Marshaller;
 
 import it.polito.verifoo.rest.jaxb.*;
 
-public class ScalabilityTestGenerator {
+public class ScalabilityTestCase {
 
-	/* Set parameters for the test */
-	static int numberAllocationPlaces = 5;
-	static int numberReachPolicies = 3;
-	static int numberIsPolicies = 2;
-	static int numberPolicies = numberReachPolicies + numberIsPolicies;
-	static String path = new String("./testfile/autogentest.xml");
-	static String IPClient = new String("10.0.0.");
-	static String IPAllocationPlace = new String("20.0.0.");
-	static String IPServer = new String("30.0.0.");
+ 
+	NFV nfv;
+	String name;
 	
-	/*Additional varibles */
-	static int countC = 1;
-	static int countAP = 1;
-	static int countS = 1;
-	static int countP = 1;
+	/*Additional variables */
+	int countC = 1;
+	int countAP = 1;
+	int countS = 1;
+	int countP = 1;
 	
 	
-	public static void main(String[] args) {
+	public ScalabilityTestCase(String name, int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, String IPClient, String IPAllocationPlace, String IPServer) {
+		this.name = name;
+		nfv = generateNFV(numberAllocationPlaces, numberReachPolicies, numberIsPolicies, IPClient, IPAllocationPlace, IPServer);
+	}
+	
+	public NFV generateNFV(int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, String IPClient, String IPAllocationPlace, String IPServer) {
 		
+		int numberPolicies = numberReachPolicies + numberIsPolicies;
 		
 		/* Creation of the test */
 		NFV nfv = new NFV();
@@ -94,14 +94,14 @@ public class ScalabilityTestGenerator {
 		graph.getNode().add(server);
 		
 		for(int i = 0; i < numberReachPolicies; i++) {
-			createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, first);
+			createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, first, IPClient, IPServer);
 		}
 		for(int i = 0; i < numberIsPolicies; i++) {
-			createPolicy(PName.ISOLATION_PROPERTY, nfv, graph, first);
+			createPolicy(PName.ISOLATION_PROPERTY, nfv, graph, first, IPClient, IPServer);
 		}
 		graph.getNode().add(first);
 		nfv.getGraphs().getGraph().add(graph);
-		try {
+		/*try {
 			JAXBContext jc;
             jc= JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
 			Marshaller m = jc.createMarshaller();
@@ -113,12 +113,12 @@ public class ScalabilityTestGenerator {
             System.exit(1);
         }catch(FileNotFoundException e) {
         	System.exit(2);
-        }
+        }*/
 		
-
+		return nfv;
 	}
 
-	private static void createPolicy(PName type, NFV nfv, Graph graph, Node first) {
+	private void createPolicy(PName type, NFV nfv, Graph graph, Node first, String IPClient, String IPServer) {
 		
 		Node client = new Node();
 		client.setFunctionalType(FunctionalTypes.WEBCLIENT);
@@ -145,6 +145,22 @@ public class ScalabilityTestGenerator {
 		property.setSrc(client.getName());
 		property.setDst(IPServer + "1");
 		nfv.getPropertyDefinition().getProperty().add(property);
+	}
+
+	public NFV getNfv() {
+		return nfv;
+	}
+
+	public void setNfv(NFV nfv) {
+		this.nfv = nfv;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

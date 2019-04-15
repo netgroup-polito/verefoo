@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
+	<graphs>
+		<graph id="0" serviceGraph="true">
+			<node functional_type="WEBCLIENT" name="10.0.0.1">
+				<neighbour name="20.0.0.1" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="30.0.0.1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="10.0.0.2">
+				<neighbour name="20.0.0.1" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="30.0.0.1" />
+				</configuration>
+			</node>
+
+			
+			<node name="20.0.0.1" functional_type="FORWARDER">
+				<neighbour name="20.0.0.2" />
+				<neighbour name="10.0.0.1" />
+				<neighbour name="10.0.0.2" />
+				<configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+			</node>
+			
+			<node name="20.0.0.2" functional_type="FORWARDER">
+				<neighbour name="30.0.0.1" />
+				<neighbour name="20.0.0.1" />
+				<configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+			</node>
+			
+			
+			
+			<node functional_type="WEBSERVER" name="30.0.0.1">
+				<neighbour name="20.0.0.2" />
+				<configuration description="A simple description"
+					name="confB">
+					<webserver>
+						<name>30.0.0.1</name>
+					</webserver>
+				</configuration>
+			</node>
+			
+		
+		</graph>
+	</graphs>
+	<Constraints>
+		<NodeConstraints>
+	
+		</NodeConstraints>
+		<LinkConstraints />
+		<AllocationConstraints>
+		<ForbiddenConstrain src="" dst="">
+		</ForbiddenConstrain>
+		</AllocationConstraints>
+	</Constraints>
+	<PropertyDefinition>
+		
+			<Property graph="0" name="IsolationProperty" src="10.0.0.1"
+			dst="30.0.0.1" />
+			<Property graph="0" name="ReachabilityProperty" src="10.0.0.2"
+			dst="30.0.0.1" />
+
+				
+	</PropertyDefinition>
+	<ParsingString></ParsingString>
+</NFV>
