@@ -22,6 +22,7 @@ public class ScalabilityTestGenerator {
 	static String IPAllocationPlace = new String("20.0.0.");
 	static String IPServer = new String("30.0.0.");
 	
+	/*Additional varibles */
 	static int countC = 1;
 	static int countAP = 1;
 	static int countS = 1;

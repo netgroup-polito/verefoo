@@ -52,6 +52,7 @@
                 <xsd:element ref="node" maxOccurs="unbounded"></xsd:element>
             </xsd:sequence>
             <xsd:attribute name="id" type="xsd:long" use="optional" />
+            <xsd:attribute name="serviceGraph" type="xsd:boolean" default="false"/>
         </xsd:complexType>
         <xsd:unique name="uniqueNodeId">
             <xsd:selector xpath="node" />

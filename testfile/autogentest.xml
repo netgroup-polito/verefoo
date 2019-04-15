@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="./xsd/nfvSchema.xsd">
+    <graphs>
+        <graph id="0">
+            <node name="20.0.0.2">
+                <neighbour name="20.0.0.1"/>
+                <neighbour name="20.0.0.3"/>
+            </node>
+            <node name="20.0.0.3">
+                <neighbour name="20.0.0.2"/>
+                <neighbour name="20.0.0.4"/>
+            </node>
+            <node name="20.0.0.4">
+                <neighbour name="20.0.0.3"/>
+                <neighbour name="20.0.0.5"/>
+            </node>
+            <node name="20.0.0.5">
+                <neighbour name="20.0.0.4"/>
+                <neighbour name="30.0.0.1"/>
+            </node>
+            <node name="30.0.0.1" functional_type="WEBSERVER">
+                <neighbour name="20.0.0.5"/>
+                <configuration name="confB">
+                    <webserver>
+                        <name>30.0.0.1</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="10.0.0.1" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.1"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="30.0.0.1"/>
+                </configuration>
+            </node>
+            <node name="10.0.0.2" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.1"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="30.0.0.1"/>
+                </configuration>
+            </node>
+            <node name="10.0.0.3" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.1"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="30.0.0.1"/>
+                </configuration>
+            </node>
+            <node name="10.0.0.4" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.1"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="30.0.0.1"/>
+                </configuration>
+            </node>
+            <node name="10.0.0.5" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.1"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="30.0.0.1"/>
+                </configuration>
+            </node>
+            <node name="20.0.0.1">
+                <neighbour name="20.0.0.2"/>
+                <neighbour name="10.0.0.1"/>
+                <neighbour name="10.0.0.2"/>
+                <neighbour name="10.0.0.3"/>
+                <neighbour name="10.0.0.4"/>
+                <neighbour name="10.0.0.5"/>
+            </node>
+        </graph>
+    </graphs>
+    <Constraints>
+        <NodeConstraints/>
+        <LinkConstraints/>
+    </Constraints>
+    <PropertyDefinition>
+        <Property name="ReachabilityProperty" graph="0" src="10.0.0.1" dst="30.0.0.1"/>
+        <Property name="ReachabilityProperty" graph="0" src="10.0.0.2" dst="30.0.0.1"/>
+        <Property name="ReachabilityProperty" graph="0" src="10.0.0.3" dst="30.0.0.1"/>
+        <Property name="IsolationProperty" graph="0" src="10.0.0.4" dst="30.0.0.1"/>
+        <Property name="IsolationProperty" graph="0" src="10.0.0.5" dst="30.0.0.1"/>
+    </PropertyDefinition>
+</NFV>
