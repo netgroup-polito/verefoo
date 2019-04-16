@@ -765,7 +765,7 @@ public void removeOptionalNotUsed() {
 				
 				
 				for(Map.Entry<AllocationNode, Set<AllocationNode>> e : nextNodesTo.entrySet()) {
-					if(e.getValue().contains(opNode)) {
+					if(e.getValue() != null && e.getValue().contains(opNode)) {
 						e.getValue().remove(opNode);
 						e.getValue().addAll(entry.getValue());
 		
