@@ -227,7 +227,9 @@ public class Checker {
   	 	
 		for(AllocationNode n : destNeighbours) {
 			constraintList.add(ctx.mkForall(new Expr[]{p0},
-					ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n.getZ3Name(), dest.getZ3Name(), p0)),
+					ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n.getZ3Name(), dest.getZ3Name(), p0),
+							(BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.pf.get("dest").apply(p0))
+							),
 							ctx.mkAnd(ctx.mkNot(ctx.mkEq(src.getZ3Name(), nctx.pf.get("origin").apply(p0))))),1,null,null,null,null));
 		}
 		
@@ -254,6 +256,7 @@ public class Checker {
 		ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n_0, dest.getZ3Name(), p0)),
 				ctx.mkAnd(ctx.mkNot(ctx.mkEq(src.getZ3Name(), nctx.pf.get("origin").apply(p0))))),1,null,null,null,null));
 		constraintList.add((BoolExpr) nctx.send.apply(src.getZ3Name(), n_1, p1)); */
+		
 
 	}
 	
