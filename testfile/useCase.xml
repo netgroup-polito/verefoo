@@ -3,30 +3,30 @@
 	xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
 	<graphs>
 		<graph id="0">
-			<node functional_type="WEBCLIENT" name="10.0.0.2">
+			<node functional_type="WEBCLIENT" name="192.168.0.2">
 				<neighbour name="60.0.0.1" />
 				<configuration description="A simple description"
 					name="confA">
-					<webclient nameWebServer="20.0.0.1" />
+					<webclient nameWebServer="220.126.50.2" />
 				</configuration>
 			</node>
 
-			<node functional_type="WEBCLIENT" name="10.0.0.3">
+			<node functional_type="WEBCLIENT" name="192.168.0.3">
 				<neighbour name="60.0.0.2" />
 				<configuration description="A simple description"
 					name="confA">
-					<webclient nameWebServer="20.0.0.1" />
+					<webclient nameWebServer="220.126.50.2" />
 				</configuration>
 			</node>
 
 			<node name="60.0.0.1">
-				<neighbour name="10.0.0.2" />
+				<neighbour name="192.168.0.2" />
 				<neighbour name="20.0.0.6" />
 			</node>
 
 
 			<node name="60.0.0.2">
-				<neighbour name="10.0.0.3" />
+				<neighbour name="192.168.0.3" />
 				<neighbour name="20.0.0.6" />
 			</node>
 
@@ -52,7 +52,6 @@
 				<neighbour name="60.0.0.4" />
 				<neighbour name="60.0.0.5" />
 				<neighbour name="60.0.0.6" />
-				<neighbour name="60.0.0.7" />
 				<configuration name="ForwardConf">
 					<forwarder>
 						<name>Forwarder</name>
@@ -61,44 +60,32 @@
 			</node>
 
 			<node name="60.0.0.4">
-				<neighbour name="30.0.0.1" />
+				<neighbour name="130.192.225.-1" />
 				<neighbour name="20.0.0.5" />
 			</node>
 
-			<node functional_type="WEBCLIENT" name="30.0.0.1">
+			<node functional_type="WEBCLIENT" name="130.192.225.-1">
 				<neighbour name="60.0.0.4" />
 				<configuration description="A simple description"
 					name="confA">
-					<webclient nameWebServer="20.0.0.1" />
+					<webclient nameWebServer="220.126.50.2" />
 				</configuration>
 			</node>
 
 
 			<node name="60.0.0.5">
-				<neighbour name="40.0.0.1" />
+				<neighbour name="130.192.120.-1" />
 				<neighbour name="20.0.0.5" />
 			</node>
 
-			<node functional_type="WEBCLIENT" name="40.0.0.1">
+			<node functional_type="WEBCLIENT" name="130.192.120.-1">
 				<neighbour name="60.0.0.5" />
 				<configuration description="A simple description"
 					name="confA">
-					<webclient nameWebServer="20.0.0.1" />
+					<webclient nameWebServer="220.126.50.2" />
 				</configuration>
 			</node>
 			
-			<node name="60.0.0.7">
-				<neighbour name="50.0.0.1" />
-				<neighbour name="20.0.0.5" />
-			</node>
-
-			<node functional_type="WEBCLIENT" name="50.0.0.1">
-				<neighbour name="60.0.0.7" />
-				<configuration description="A simple description"
-					name="confA">
-					<webclient nameWebServer="20.0.0.1" />
-				</configuration>
-			</node>
 
 			<node name="60.0.0.6">
 				<neighbour name="20.0.0.4" />
@@ -107,8 +94,8 @@
 
 			<node name="20.0.0.4" functional_type="FORWARDER">
 				<neighbour name="60.0.0.6" />
-				<neighbour name="20.0.0.1" />
-				<neighbour name="20.0.0.2" />
+				<neighbour name="220.126.50.2" />
+				<neighbour name="220.126.50.3" />
 				<configuration name="ForwardConf">
 					<forwarder>
 						<name>Forwarder</name>
@@ -119,22 +106,22 @@
 
 
 
-			<node functional_type="WEBSERVER" name="20.0.0.1">
+			<node functional_type="WEBSERVER" name="220.126.50.2">
 				<neighbour name="20.0.0.4" />
 				<configuration description="A simple description"
 					name="confB">
 					<webserver>
-						<name>20.0.0.1</name>
+						<name>220.126.50.2</name>
 					</webserver>
 				</configuration>
 			</node>
 
-			<node functional_type="WEBSERVER" name="20.0.0.2">
+			<node functional_type="WEBSERVER" name="220.126.50.3">
 				<neighbour name="20.0.0.4" />
 				<configuration description="A simple description"
 					name="confB">
 					<webserver>
-						<name>20.0.0.2</name>
+						<name>220.126.50.3</name>
 					</webserver>
 				</configuration>
 			</node>
@@ -149,34 +136,28 @@
 	<PropertyDefinition>
 
 
-		<Property graph="0" name="IsolationProperty" src="10.0.0.2"
-			dst="20.0.0.1" />
-		<Property graph="0" name="IsolationProperty" src="10.0.0.2"
-			dst="20.0.0.2" />
-		<Property graph="0" name="IsolationProperty" src="10.0.0.3"
-			dst="20.0.0.1" />
-		<Property graph="0" name="IsolationProperty" src="10.0.0.3"
-			dst="20.0.0.2" />
-		<Property graph="0" name="ReachabilityProperty" src="30.0.0.1"
-			dst="20.0.0.1" />
-		<Property graph="0" name="ReachabilityProperty" src="30.0.0.1"
-			dst="20.0.0.2" />
-		<Property graph="0" name="IsolationProperty" src="40.0.0.1"
-			dst="20.0.0.1" />
-		<Property graph="0" name="IsolationProperty" src="40.0.0.1"
-			dst="20.0.0.2" />
-		<Property graph="0" name="IsolationProperty" src="40.0.0.1"
-			dst="30.0.0.1" />
-		<Property graph="0" name="IsolationProperty" src="40.0.0.1"
-			dst="50.0.0.1" />
-		<Property graph="0" name="IsolationProperty" src="50.0.0.1"
-			dst="20.0.0.1" />
-		<Property graph="0" name="IsolationProperty" src="50.0.0.1"
-			dst="20.0.0.2" />
-		<Property graph="0" name="ReachabilityProperty" src="50.0.0.1"
-			dst="30.0.0.1" />
-		<Property graph="0" name="IsolationProperty" src="50.0.0.1"
-			dst="40.0.0.1" />
+		<Property graph="0" name="IsolationProperty" src="192.168.0.2"
+			dst="220.126.50.2" />
+		<Property graph="0" name="IsolationProperty" src="192.168.0.2"
+			dst="220.126.50.3" />
+		<Property graph="0" name="IsolationProperty" src="192.168.0.3"
+			dst="220.126.50.2" />
+		<Property graph="0" name="IsolationProperty" src="192.168.0.3"
+			dst="220.126.50.3" />
+		
+		<Property graph="0" name="ReachabilityProperty" src="130.192.225.-1"
+			dst="220.126.50.2" />
+		<Property graph="0" name="IsolationProperty" src="130.192.225.-1"
+			dst="220.126.50.3" />
+		
+
+		<Property graph="0" name="IsolationProperty" src="130.192.120.-1"
+			dst="220.126.50.2" />
+		<Property graph="0" name="IsolationProperty" src="130.192.120.-1"
+			dst="220.126.50.3" />
+		<Property graph="0" name="IsolationProperty" src="130.192.120.-1"
+			dst="130.192.225.-1" />
+		
 
 
 
