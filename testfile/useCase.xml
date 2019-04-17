@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
+	<graphs>
+		<graph id="0">
+			<node functional_type="WEBCLIENT" name="192.168.0.2">
+				<neighbour name="60.0.0.1" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="220.126.50.2" />
+				</configuration>
+			</node>
+
+			<node functional_type="WEBCLIENT" name="192.168.0.3">
+				<neighbour name="60.0.0.2" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="220.126.50.2" />
+				</configuration>
+			</node>
+
+			<node name="60.0.0.1">
+				<neighbour name="192.168.0.2" />
+				<neighbour name="20.0.0.6" />
+			</node>
+
+
+			<node name="60.0.0.2">
+				<neighbour name="192.168.0.3" />
+				<neighbour name="20.0.0.6" />
+			</node>
+
+
+			<node name="20.0.0.6" functional_type="FORWARDER">
+				<neighbour name="60.0.0.1" />
+				<neighbour name="60.0.0.2" />
+				<neighbour name="60.0.0.3" />
+				<configuration name="ForwardConf">
+					<forwarder>
+						<name>Forwarder</name>
+					</forwarder>
+				</configuration>
+			</node>
+
+			<node name="60.0.0.3">
+				<neighbour name="20.0.0.6" />
+				<neighbour name="20.0.0.5" />
+			</node>
+
+			<node name="20.0.0.5" functional_type="FORWARDER">
+				<neighbour name="60.0.0.3" />
+				<neighbour name="60.0.0.4" />
+				<neighbour name="60.0.0.5" />
+				<neighbour name="60.0.0.6" />
+				<configuration name="ForwardConf">
+					<forwarder>
+						<name>Forwarder</name>
+					</forwarder>
+				</configuration>
+			</node>
+
+			<node name="60.0.0.4">
+				<neighbour name="130.192.225.-1" />
+				<neighbour name="20.0.0.5" />
+			</node>
+
+			<node functional_type="WEBCLIENT" name="130.192.225.-1">
+				<neighbour name="60.0.0.4" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="220.126.50.2" />
+				</configuration>
+			</node>
+
+
+			<node name="60.0.0.5">
+				<neighbour name="130.192.120.-1" />
+				<neighbour name="20.0.0.5" />
+			</node>
+
+			<node functional_type="WEBCLIENT" name="130.192.120.-1">
+				<neighbour name="60.0.0.5" />
+				<configuration description="A simple description"
+					name="confA">
+					<webclient nameWebServer="220.126.50.2" />
+				</configuration>
+			</node>
+			
+
+			<node name="60.0.0.6">
+				<neighbour name="20.0.0.4" />
+				<neighbour name="20.0.0.5" />
+			</node>
+
+			<node name="20.0.0.4" functional_type="FORWARDER">
+				<neighbour name="60.0.0.6" />
+				<neighbour name="220.126.50.2" />
+				<neighbour name="220.126.50.3" />
+				<configuration name="ForwardConf">
+					<forwarder>
+						<name>Forwarder</name>
+					</forwarder>
+				</configuration>
+			</node>
+
+
+
+
+			<node functional_type="WEBSERVER" name="220.126.50.2">
+				<neighbour name="20.0.0.4" />
+				<configuration description="A simple description"
+					name="confB">
+					<webserver>
+						<name>220.126.50.2</name>
+					</webserver>
+				</configuration>
+			</node>
+
+			<node functional_type="WEBSERVER" name="220.126.50.3">
+				<neighbour name="20.0.0.4" />
+				<configuration description="A simple description"
+					name="confB">
+					<webserver>
+						<name>220.126.50.3</name>
+					</webserver>
+				</configuration>
+			</node>
+		</graph>
+	</graphs>
+	<Constraints>
+		<NodeConstraints>
+
+		</NodeConstraints>
+		<LinkConstraints />
+	</Constraints>
+	<PropertyDefinition>
+
+
+		<Property graph="0" name="IsolationProperty" src="192.168.0.2"
+			dst="220.126.50.2" />
+		<Property graph="0" name="IsolationProperty" src="192.168.0.2"
+			dst="220.126.50.3" />
+		<Property graph="0" name="IsolationProperty" src="192.168.0.3"
+			dst="220.126.50.2" />
+		<Property graph="0" name="IsolationProperty" src="192.168.0.3"
+			dst="220.126.50.3" />
+		
+		<Property graph="0" name="ReachabilityProperty" src="130.192.225.-1"
+			dst="220.126.50.2" />
+		<Property graph="0" name="IsolationProperty" src="130.192.225.-1"
+			dst="220.126.50.3" />
+		
+
+		<Property graph="0" name="IsolationProperty" src="130.192.120.-1"
+			dst="220.126.50.2" />
+		<Property graph="0" name="IsolationProperty" src="130.192.120.-1"
+			dst="220.126.50.3" />
+		<Property graph="0" name="IsolationProperty" src="130.192.120.-1"
+			dst="130.192.225.-1" />
+		
+
+
+
+	</PropertyDefinition>
+	<ParsingString></ParsingString>
+</NFV>

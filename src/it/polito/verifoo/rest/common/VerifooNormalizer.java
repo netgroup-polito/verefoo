@@ -94,8 +94,10 @@ public class VerifooNormalizer {
 				List<Node> nodesInNetworkSrc = nodes.stream()
 												.filter(n -> inNetwork(e.getKey(),n.getName()) && 
 														(n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT) ||
-														 n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) ||
-														 n.getFunctionalType().equals(FunctionalTypes.ENDHOST)))
+																 n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) ||
+																 n.getFunctionalType().equals(FunctionalTypes.ENDHOST) ||
+														n.getFunctionalType().equals(FunctionalTypes.WEBSERVER) ||
+														 n.getFunctionalType().equals(FunctionalTypes.MAILSERVER)))
 												.collect(toList());
 				if(nodesInNetworkSrc.isEmpty())
 					throw new BadGraphError("You specified a network ("+e.getKey()+") in the property that contains none of the nodes declared in the service graph", EType.INVALID_PROPERTY_DEFINITION);
@@ -116,7 +118,10 @@ public class VerifooNormalizer {
 			propsDst.entrySet().forEach(e -> {
 				List<Node> nodesInNetworkDst = nodes.stream()
 													.filter(n -> inNetwork(e.getKey(),n.getName()) && 
-															(n.getFunctionalType().equals(FunctionalTypes.WEBSERVER) ||
+															(n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT) ||
+																	 n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) ||
+																	 n.getFunctionalType().equals(FunctionalTypes.ENDHOST) ||
+															n.getFunctionalType().equals(FunctionalTypes.WEBSERVER) ||
 															 n.getFunctionalType().equals(FunctionalTypes.MAILSERVER)))
 													.collect(toList());
 				if(nodesInNetworkDst.isEmpty())
@@ -166,6 +171,7 @@ public class VerifooNormalizer {
 																			.collect(groupingBy(p -> p.getSrc()+"_"+p.getDst(),toList()));
 			props.entrySet().forEach(e -> {
 				if(e.getValue().size() > 1){
+					System.out.println(e.getValue().get(0).getSrc());
 					List<String> abstractNodes = new ArrayList<>();
 					Node src = nodes.stream().filter(n -> n.getName().equals(e.getValue().get(0).getSrc())).findFirst().get();
 					Host host;
