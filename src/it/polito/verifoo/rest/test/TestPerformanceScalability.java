@@ -59,9 +59,9 @@ public class TestPerformanceScalability {
 	/* Variables to set if you want to automatically create the NFV */
 
 	String prefix = new String("Isol");
-	String IPClient[];
-	String IPAllocationPlace[] ;
-	String IPServer[] ;
+	String IPClient[] = new String[3];
+	String IPAllocationPlace[] = new String[3];
+	String IPServer[] = new String[3];
 	
 	private long condTime = 0, checkTimeSAT = 0, checkTimeUNSAT = 0, totTime = 0;
 	private long maxCondTime = 0, maxCheckTimeSAT = 0, maxCheckTimeUNSAT = 0, maxTotTime = 0;
@@ -218,25 +218,27 @@ public class TestPerformanceScalability {
 		
 		try {
 			List<ScalabilityTestCase> nfv = new ArrayList<>();
-			String IPClient = new String("1.1.1.");
-			String IPAllocationPlace = new String("2.2.2.");
-			String IPServer = new String("3.3.3.");
 			
-			logger.debug("Client: "+ IPClient+" AllocationPlace: "+ IPAllocationPlace+ " IPServer: "+IPServer);		
+			
 			
 			/* Scalability test for Allocation Places */
-			for(int i = 10; i <= 80; i += 10) { //allocation places
-				for(int j = 5; j <= 15; j += 5) //policies
-					//put 0,j for isolation, whereas j,0 for reachability
-					nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient, IPAllocationPlace, IPServer));
+			for(int k = 0; k < IPClient.length; k++) {
+				for(int i = 10; i <= 80; i += 10) { //allocation places
+					for(int j = 5; j <= 15; j += 5) //policies
+						//put 0,j for isolation, whereas j,0 for reachability
+						nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient[k], IPAllocationPlace[k], IPServer[k]));
+				}
 			}
 			
-			/* Scalability test for Policy Rules 
-			for(int j = 10; j <= 80; j += 10) { //policies
-				for(int i = 5; i <= 25; i += 10) //allocation places
-					//put 0,j for isolation, whereas j,0 for reachability
-					nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient, IPAllocationPlace, IPServer));
-			}*/
+			
+			/*Scalability test for Policy Rules */
+			for(int k = 0; k < IPClient.length; k++) {
+				for(int j = 10; j <= 80; j += 10) { //policies
+					for(int i = 5; i <= 25; i += 10) //allocation places
+						//put 0,j for isolation, whereas j,0 for reachability
+						nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient[k], IPAllocationPlace[k], IPServer[k]));
+				}
+			}
 	
 			
 			for(ScalabilityTestCase f : nfv){
@@ -254,6 +256,7 @@ public class TestPerformanceScalability {
 				err = 0;
 				System.out.println("===========FILE " + f.getName() + "===========");
 				logger.debug("===========FILE " + f.getName() + "===========");
+				logger.debug("Client: "+ f.getIPC() +" AllocationPlace: "+ f.getIPAP() + " IPServer: "+ f.getIPS());	
 				// create a JAXBContext capable of handling the generated classes
 				//long beginAll=System.currentTimeMillis();
 		        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );

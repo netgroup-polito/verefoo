@@ -22,9 +22,16 @@ public class ScalabilityTestCase {
 	int countS = 1;
 	int countP = 1;
 	
+	String IPC;
+	String IPAP;
+	String IPS;
+	
 	
 	public ScalabilityTestCase(String name, int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, String IPClient, String IPAllocationPlace, String IPServer) {
 		this.name = name;
+		IPC = IPClient;
+		IPAP = IPAllocationPlace;
+		IPS = IPServer;
 		nfv = generateNFV(numberAllocationPlaces, numberReachPolicies, numberIsPolicies, IPClient, IPAllocationPlace, IPServer);
 	}
 	
@@ -161,6 +168,30 @@ public class ScalabilityTestCase {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getIPC() {
+		return IPC;
+	}
+
+	public void setIPC(String iPC) {
+		IPC = iPC;
+	}
+
+	public String getIPAP() {
+		return IPAP;
+	}
+
+	public void setIPAP(String iPAP) {
+		IPAP = iPAP;
+	}
+
+	public String getIPS() {
+		return IPS;
+	}
+
+	public void setIPS(String iPS) {
+		IPS = iPS;
 	}
 
 }
