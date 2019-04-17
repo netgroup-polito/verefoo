@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,13 +57,11 @@ public class TestPerformanceScalability {
 	
 
 	/* Variables to set if you want to automatically create the NFV */
-	//int numberAllocationPlaces = 5;
-	//int numberReachPolicies = 3;
-	//int numberIsPolicies = 2;
+
 	String prefix = new String("Isol");
-	String IPClient = new String("10.0.0.");
-	String IPAllocationPlace = new String("20.0.0.");
-	String IPServer = new String("30.0.0.");
+	String IPClient[];
+	String IPAllocationPlace[] ;
+	String IPServer[] ;
 	
 	private long condTime = 0, checkTimeSAT = 0, checkTimeUNSAT = 0, totTime = 0;
 	private long maxCondTime = 0, maxCheckTimeSAT = 0, maxCheckTimeUNSAT = 0, maxTotTime = 0;
@@ -134,9 +133,10 @@ public class TestPerformanceScalability {
 		
 	}
 	
-	private void testCoarse(NFV root) throws Exception{
+	private NFV testCoarse(NFV root) throws Exception{
 		long beginAll=System.currentTimeMillis();
 		VerifooSerializer test = new VerifooSerializer(root);
+		
 		long endAll=System.currentTimeMillis();
 		 if(test.isSat()){
 			nSAT++;
@@ -149,7 +149,7 @@ public class TestPerformanceScalability {
 			nUNSAT++;
 	 	}
 		
-        return;
+        return test.getResult();
 	}
 	
 	private void test(NFV root) throws Exception{
@@ -202,10 +202,28 @@ public class TestPerformanceScalability {
 	
 	@Test
 	public void testScalabilityPerformance(){
+		//same IP 
+		IPClient[0]=  new String("1.1.1.");
+		IPAllocationPlace[0] =  new String("2.2.2.");
+		IPServer[0]= new String("3.3.3.");
+		//different IP
+		IPClient[1]=  new String("213.96.47.");
+		IPAllocationPlace[1] =  new String("198.65.32.");
+		IPServer[1]= new String("26.98.75.");
+		//same numbers
+		IPClient[2]=  new String("1.1.1.");
+		IPAllocationPlace[2] =  new String("11.11.11.");
+		IPServer[2]= new String("111.111.111.");
+		
+		
 		try {
 			List<ScalabilityTestCase> nfv = new ArrayList<>();
+			String IPClient = new String("1.1.1.");
+			String IPAllocationPlace = new String("2.2.2.");
+			String IPServer = new String("3.3.3.");
 			
-
+			logger.debug("Client: "+ IPClient+" AllocationPlace: "+ IPAllocationPlace+ " IPServer: "+IPServer);		
+			
 			/* Scalability test for Allocation Places */
 			for(int i = 10; i <= 80; i += 10) { //allocation places
 				for(int j = 5; j <= 15; j += 5) //policies
@@ -213,14 +231,13 @@ public class TestPerformanceScalability {
 					nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient, IPAllocationPlace, IPServer));
 			}
 			
-			/* Scalability test for Policy Rules */
+			/* Scalability test for Policy Rules 
 			for(int j = 10; j <= 80; j += 10) { //policies
-				for(int i = 5; i <= 25; j += 10) //allocation places
+				for(int i = 5; i <= 25; i += 10) //allocation places
 					//put 0,j for isolation, whereas j,0 for reachability
 					nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient, IPAllocationPlace, IPServer));
-			}
-			
-			
+			}*/
+	
 			
 			for(ScalabilityTestCase f : nfv){
 				condTime = 0;
@@ -261,17 +278,32 @@ public class TestPerformanceScalability {
 		        		.map(n -> n.getName())
 		        		.findFirst().get();*/
 		        
+		        
+		        
+		       
+                //logger.info("SAT");
+                //logger.info("----------------------OUTPUT----------------------");
+		        Marshaller m = jc.createMarshaller();
+	             m = jc.createMarshaller();
+	             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
+	             m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
+                m.marshal(f.getNfv(), System.out ); //for debug purpose  
+		        
 		        do{
 					//logger.debug("Simulation nr " + i+" ");
 					Thread t = new Thread(){
 						public void run(){
 							try {
+								 Marshaller m = jc.createMarshaller();
+					             m = jc.createMarshaller();
+					             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
+					             m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
 								root = f.getNfv();
+								//m.marshal( testCoarse(root), System.out ); //for debug purpose  
 								testCoarse(root);
 								i++;
 								if(i%50 == 0) System.out.println("");
 							} catch (Exception e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 								err++;
 							}

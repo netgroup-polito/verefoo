@@ -364,34 +364,35 @@ public class Checker {
 		Params p = ctx.mkParams();
 		p.add("maxsat_engine", ctx.mkSymbol("wmax")  );
 		p.add("maxres.wmax", true  );
-
+		//p.add("timeout", 10000);
 		
 		
 		solver.setParameters(p);
 		result = this.solver.Check();
-		
+		//System.out.println(this.solver.getReasonUnknown());
+		logger.info("---------- After Checker Print: ");	
 		model = null;
-		
+		log();
 		if (result == Status.SATISFIABLE) {
 			model = this.solver.getModel();
 		}
 		
-		log();
+		
 
 		solver.Pop();
 		return new IsolationResult(ctx, result, null, null, null, null, nctx, assertions, model);
 	}
 
-
-	private void log()  {
+	private Logger logger = LogManager.getLogger("result");
+	private void log()  {	
+		
 			// old versions of z3 did not provide solver.getAssertions() method
 			// so if this is the case it has to be commented
 			StringWriter stringWriter = new StringWriter();
-			//assertions = solver.getAssertions();
+			assertions = solver.getAssertions();
 			Arrays.asList(assertions).forEach(t-> stringWriter.append(t+"\n\n"));
-			logAssertions.info(stringWriter.toString());
 			if(model!=null){
-				logModel.info(model.toString());	
+				logger.info("---------- Assertions: "+assertions.length);	
 			}
 				
 	}
