@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 
@@ -57,17 +58,16 @@ public class TestPerformanceScalability {
 	
 
 	/* Variables to set if you want to automatically create the NFV */
-
+	private static final int N = 3;
 	String prefix = new String("Isol");
-	String IPClient[] = new String[3];
-	String IPAllocationPlace[] = new String[3];
-	String IPServer[] = new String[3];
+	String IPClient[] = new String[N];
+	String IPAllocationPlace[] = new String[N];
+	String IPServer[] = new String[N];
 	
 	private long condTime = 0, checkTimeSAT = 0, checkTimeUNSAT = 0, totTime = 0;
 	private long maxCondTime = 0, maxCheckTimeSAT = 0, maxCheckTimeUNSAT = 0, maxTotTime = 0;
 	private int nSAT = 0, nUNSAT = 0, i = 0, err = 0, nrOfConditions = 0, maxNrOfConditions = 0;
 	NFV root;
-	private List<Host> pastClients = new ArrayList<>(), pastServers = new ArrayList<>();
 	private Logger logger = LogManager.getLogger("result");
 	/**
 	 * @throws java.lang.Exception
@@ -97,41 +97,7 @@ public class TestPerformanceScalability {
 	public void tearDown() throws Exception {
 	}
 	
-	private NFV init(NFV root) throws JAXBException, SAXException, FileNotFoundException{
-		List<Path> paths = null;
-		if(root.getNetworkForwardingPaths() != null)
-			paths = root.getNetworkForwardingPaths().getPath();
-        for(Graph g:root.getGraphs().getGraph()){
-        	long beginVP=System.currentTimeMillis();
-        	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
-        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints(), prop, paths);
-        	long endVP=System.currentTimeMillis();
-        	condTime += (endVP-beginVP);
-        	maxCondTime = maxCondTime<(endVP-beginVP)? (endVP-beginVP) : condTime;
-            //System.out.println("Graph " + g.getId() + ": creating condition -> " + ((endVP-beginVP)) + "ms");
-        	IsolationResult res=test.checkNFFGProperty();
-        	nrOfConditions += test.getNrOfConditions();
-        	maxNrOfConditions = maxNrOfConditions<test.getNrOfConditions()? test.getNrOfConditions() : maxNrOfConditions;
-        	long endCheck=System.currentTimeMillis();
-            //System.out.println("Graph " + g.getId() + ": checking property -> " + ((endCheck-endVP)) + "ms");
-        	if(res.result != Status.UNSATISFIABLE){
-            	checkTimeSAT += (endCheck-endVP);
-            	maxCheckTimeSAT = maxCheckTimeSAT<(endCheck-endVP)? (endCheck-endVP) : maxCheckTimeSAT;
-        		nSAT++;
-        		new Translator(res.model.toString(),root,g).convert();
-        	}
-        	else{
-        		checkTimeUNSAT += (endCheck-endVP);
-        		maxCheckTimeUNSAT = maxCheckTimeUNSAT<(endCheck-endVP)? (endCheck-endVP) : maxCheckTimeUNSAT;
-        		nUNSAT++;
-        	}
-        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
-        	//long endT=System.currentTimeMillis();
-            //System.out.println(g.getId() + ": translating model -> " + ((endT-endCheck)/1000) + "s");
-        }
-		return root;
-		
-	}
+
 	
 	private NFV testCoarse(NFV root) throws Exception{
 		long beginAll=System.currentTimeMillis();
@@ -152,56 +118,8 @@ public class TestPerformanceScalability {
         return test.getResult();
 	}
 	
-	private void test(NFV root) throws Exception{
-		long beginAll=System.currentTimeMillis();
-		NFV rootTest = init(root);
-		long endAll=System.currentTimeMillis();
-        //System.out.println("Total time -> " + ((endAll-beginAll)/1000) + "s");
-		Property p = rootTest.getPropertyDefinition().getProperty().get(0);
-    	if(p.isIsSat()){
-			maxTotTime = maxTotTime<(endAll-beginAll)? (endAll-beginAll) : maxTotTime;
-			System.out.print("time: " + (endAll-beginAll) + "ms;");
-			totTime += (endAll-beginAll);
-    	}
-        return;
-	}
-	
-	private Host changeFixedClient(List<Host> hosts, String client){
-		Host currClient = hosts.stream().filter(h -> h.getType().equals(TypeOfHost.CLIENT) && h.getFixedEndpoint().equals(client) ).findAny().orElse(null);
 
-		pastClients.add(currClient);
-		Host newClient = hosts.stream().filter(h -> !pastClients.contains(h) && h.getType().equals(TypeOfHost.MIDDLEBOX)).findAny().orElse(null);
-		if(newClient != null){
-			currClient.setType(TypeOfHost.MIDDLEBOX);
-			currClient.setFixedEndpoint(null);
-			//System.out.println("Host client changed to " + newClient.getName());
-			newClient.setType(TypeOfHost.CLIENT);
-			newClient.setFixedEndpoint(client);
-		}
-		return newClient;
-	}
-	
-	private Host changeEndpoints(List<Host> hosts, String client, String server){
-		Host tmp = changeFixedClient(hosts, client);
-		if(tmp != null)
-			return tmp;
-		pastClients.clear();
-		tmp = changeFixedClient(hosts, client);
-		Host currServer = hosts.stream().filter(h -> h.getType().equals(TypeOfHost.SERVER) && h.getFixedEndpoint().equals(server) ).findAny().orElse(null);
-		pastServers.add(currServer);
-		currServer.setType(TypeOfHost.MIDDLEBOX);
-		currServer.setFixedEndpoint(null);
-		Host newServer = hosts.stream().filter(h -> !pastServers.contains(h) && h.getType().equals(TypeOfHost.MIDDLEBOX)).findAny().orElse(null);
-		if(newServer != null){
-			//System.out.println("Host server changed to " + newServer.getName());
-			newServer.setType(TypeOfHost.SERVER);
-			newServer.setFixedEndpoint(server);
-		}
-		return newServer;
-	}
-	
-	@Test
-	public void testScalabilityPerformance(){
+	private void setManuallyIP() {
 		//same IP 
 		IPClient[0]=  new String("1.1.1.");
 		IPAllocationPlace[0] =  new String("2.2.2.");
@@ -214,15 +132,45 @@ public class TestPerformanceScalability {
 		IPClient[2]=  new String("1.1.1.");
 		IPAllocationPlace[2] =  new String("11.11.11.");
 		IPServer[2]= new String("111.111.111.");
+	}
+	
+	private void setAutomaticallyIP() {
+		Random rand = new Random(System.currentTimeMillis());
+		int first, second, third;
+		for(int i = 0; i < N; i++) {
+			first = rand.nextInt(256);
+			if(first == 0) first++;
+			second = rand.nextInt(256);
+			third = rand.nextInt(256);
+			IPClient[i] = new String(first + "." + second + "." + third + ".");
+			
+			first = rand.nextInt(256);
+			if(first == 0) first++;
+			second = rand.nextInt(256);
+			third = rand.nextInt(256);
+			IPAllocationPlace[i] = new String(first + "." + second + "." + third + ".");
+			
+			first = rand.nextInt(256);
+			if(first == 0) first++;
+			second = rand.nextInt(256);
+			third = rand.nextInt(256);
+			IPServer[i] = new String(first + "." + second + "." + third + ".");
+		}
+	}
+	
+	@Test
+	public void testScalabilityPerformance(){
 		
+		/* Switch between automatic and manul configuration of the IP*/
+		
+		setAutomaticallyIP();
+		//setManuallyIP();
 		
 		try {
 			List<ScalabilityTestCase> nfv = new ArrayList<>();
 			
-			
-			
 			/* Scalability test for Allocation Places */
-			for(int k = 0; k < IPClient.length; k++) {
+			for(int k = 0; k < N; k++) {
 				for(int i = 10; i <= 80; i += 10) { //allocation places
 					for(int j = 5; j <= 15; j += 5) //policies
 						//put 0,j for isolation, whereas j,0 for reachability
@@ -232,9 +180,9 @@ public class TestPerformanceScalability {
 			
 			
 			/*Scalability test for Policy Rules */
-			for(int k = 0; k < IPClient.length; k++) {
+			for(int k = 0; k < N; k++) {
 				for(int j = 10; j <= 80; j += 10) { //policies
-					for(int i = 5; i <= 25; i += 10) //allocation places
+					for(int i = 5; i <= 15; i += 5) //allocation places
 						//put 0,j for isolation, whereas j,0 for reachability
 						nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient[k], IPAllocationPlace[k], IPServer[k]));
 				}
@@ -267,63 +215,30 @@ public class TestPerformanceScalability {
 		        u.setSchema(schema);
 		        // unmarshal a document into a tree of Java content objects
 		        root = f.getNfv();
-		       /* String clientName = root.getGraphs().getGraph().stream()
-		        		.flatMap(g -> g.getNode().stream())
-		        		.filter(n -> n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT) 
-		        				|| n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT)
-		        				|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST))
-		        		.map(n -> n.getName())
-		        		.findFirst().get();
-		        String serverName = root.getGraphs().getGraph().stream()
-		        		.flatMap(g -> g.getNode().stream())
-		        		.filter(n -> n.getFunctionalType().equals(FunctionalTypes.WEBSERVER) 
-		        				|| n.getFunctionalType().equals(FunctionalTypes.MAILSERVER))
-		        		.map(n -> n.getName())
-		        		.findFirst().get();*/
-		        
-		        
-		        
-		       
-                //logger.info("SAT");
-                //logger.info("----------------------OUTPUT----------------------");
+		   
 		        Marshaller m = jc.createMarshaller();
-	             m = jc.createMarshaller();
-	             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-	             m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                m.marshal(f.getNfv(), System.out ); //for debug purpose  
+	            m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
+	            m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
+	            //for debug purpose  
+                //m.marshal(f.getNfv(), System.out ); 
 		        
 		        do{
-					//logger.debug("Simulation nr " + i+" ");
-					Thread t = new Thread(){
-						public void run(){
+		        	
 							try {
-								 Marshaller m = jc.createMarshaller();
 					             m = jc.createMarshaller();
 					             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 					             m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-								root = f.getNfv();
-								//m.marshal( testCoarse(root), System.out ); //for debug purpose  
-								testCoarse(root);
-								i++;
-								if(i%50 == 0) System.out.println("");
+								 root = f.getNfv();
+								 //for debug purpose 
+								 //m.marshal( testCoarse(root), System.out );  
+								 i++;
+								 testCoarse(root);
 							} catch (Exception e) {
 								e.printStackTrace();
 								err++;
 							}
-						}
-					};
-					t.start();
-					//avoid deadlock
-					t.join(6000000);
-					if(t.isAlive()){
-						if(root.getHosts() != null){
-							Host currClient = root.getHosts().getHost().stream().filter(h -> h.getType().equals(TypeOfHost.CLIENT)).findAny().orElse(null);
-							Host currServer = root.getHosts().getHost().stream().filter(h -> h.getType().equals(TypeOfHost.SERVER)).findAny().orElse(null);
-							logger.debug("Simulation " + i + " has deadlock with client on " + currClient.getName() + " and server on " + currServer.getName());
-						}
-						throw new BadGraphError();
-					}
-				//}while(changeEndpoints(root.getHosts().getHost(), clientName, serverName) != null);
+					
+
 				}while(i<1);
 				
 				logger.debug("Simulations -> " + i + " / Errors -> " + err);
@@ -332,20 +247,11 @@ public class TestPerformanceScalability {
 				//System.out.println("MAX creating condition -> " + (maxCondTime) + "ms");
 				//logger.debug("AVG creating condition -> " + (condTime/(i-err)) + "ms");
 				//logger.debug("MAX creating condition -> " + (maxCondTime) + "ms");
-				if(nSAT > 0){
-					//System.out.println("AVG checking property when SAT -> " + (checkTimeSAT/nSAT) + "ms");
-					//System.out.println("MAX checking property when SAT -> " + (maxCheckTimeSAT) + "ms");
-					//logger.debug("AVG checking property when SAT -> " + (checkTimeSAT/nSAT) + "ms");
-					//logger.debug("MAX checking property when SAT -> " + (maxCheckTimeSAT) + "ms");
+				if(nSAT > 0) {
+					logger.debug("AVG total time -> " + (totTime/nSAT) + "ms");
+					logger.debug("MAX total time -> " + (maxTotTime) + "ms");
 				}
-				if(nUNSAT > 0){
-					//System.out.println("AVG checking property when UNSAT-> " + (checkTimeUNSAT/nUNSAT) + "ms");
-					//System.out.println("MAX checking property when UNSAT-> " + (maxCheckTimeUNSAT) + "ms");
-					logger.debug("AVG checking property when UNSAT-> " + (checkTimeUNSAT/nUNSAT) + "ms");
-					logger.debug("MAX checking property when UNSAT-> " + (maxCheckTimeUNSAT) + "ms");
-				}
-				logger.debug("AVG total time -> " + (totTime/nSAT) + "ms");
-				logger.debug("MAX total time -> " + (maxTotTime) + "ms");
+				
 				logger.debug("=====================================");
 
 
