@@ -104,8 +104,8 @@ public class VerifooSerializer {
 					throw new BadGraphError("No property defined for the Graph "+g.getId(),EType.INVALID_PROPERTY_DEFINITION);
 	        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(), prop, paths);
 	        	IsolationResult res=test.checkNFFGProperty();
-	        	if(res.result != Status.UNSATISFIABLE){
-	        		System.out.println(res.model.toString());
+	        	if(res.result != Status.UNSATISFIABLE&&res.result != Status.UNKNOWN){
+	        		//System.out.println(res.model.toString());
 	        		
 	        		
 	        		Translator t = new Translator(res.model.toString(),root, g, test.getAllocationNodes());

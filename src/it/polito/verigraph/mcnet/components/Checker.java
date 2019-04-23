@@ -368,20 +368,20 @@ public class Checker {
 		Params p = ctx.mkParams();
 		p.add("maxsat_engine", ctx.mkSymbol("wmax")  );
 		p.add("maxres.wmax", true  );
-		//p.add("timeout", 10000);
+		p.add("timeout", 3600000);
 		
 		
 		solver.setParameters(p);
-		result = this.solver.Check();
+		result = this.solver.Check(); 
 		//System.out.println(this.solver.getReasonUnknown());
 		logger.info("---------- After Checker Print: ");	
 		model = null;
-		log();
+		
 		if (result == Status.SATISFIABLE) {
 			model = this.solver.getModel();
 		}
 		
-		
+		log();
 
 		solver.Pop();
 		return new IsolationResult(ctx, result, null, null, null, null, nctx, assertions, model);
