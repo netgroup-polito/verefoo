@@ -31,7 +31,7 @@ import it.polito.verigraph.mcnet.components.IsolationResult;
 public class VerifooSerializer {
 	private NFV nfv, result;
 	private boolean sat = false;
-	private Logger logger = LogManager.getLogger(VerifooSerializer.class);
+	private Logger logger = LogManager.getLogger("model");
 	private List<Node> removedNodes;
 	/**
 	 * Wraps all the Verifoo tasks, executing the z3 procedure for each graph in the NFV element
@@ -76,11 +76,11 @@ public class VerifooSerializer {
 			Marshaller m = jc.createMarshaller();
 	        m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 	        m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-			logger.info("-----------------NORMALIZED INPUT-----------------");
+			//logger.info("-----------------NORMALIZED INPUT-----------------");
 			StringWriter stringWriter = new StringWriter();
 			m.marshal( root, stringWriter); 
-	        logger.info(stringWriter.toString());
-	        logger.info("--------------------------------------------------");
+	        //logger.info(stringWriter.toString());
+	        //logger.info("--------------------------------------------------");
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}

@@ -44,7 +44,7 @@ public class VerifooProxy {
 	    private HashMap<AllocationNode, HashMap<String, BoolExpr>> stageConditions;
 	    private HashMap<String, Integer> countConditions;
 		public Checker check;
-		private Logger logger = LogManager.getLogger(VerifooProxy.class);
+		private Logger logger = LogManager.getLogger("mylog");
 		private List<List<String>> savedChain = new ArrayList<>();
 		private List<List<String>> savedNodeChain = new ArrayList<>();
 		private HashMap<Node, HashMap<Node, List<Node>>> routingRule = new HashMap<>();

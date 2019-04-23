@@ -76,12 +76,15 @@ public class AclFirewall extends NetworkObject{
 		constraints = new ArrayList<BoolExpr>();
    		acls = new ArrayList<>();
    		whiteAcls = new ArrayList<>();
+   		// true for blacklisting, false for whitelisting
+   		//defaultAction = ctx.mkFalse();
    		defaultAction = ctx.mkFalse();
    		used = ctx.mkBoolConst(fw+"_used");
    		
 		autoplace = true; 
 		autoconfigured = true;
 		isEndHost = false;
+		//true for blacklisting, false for whitelisting
    		blacklisting = false;
 	}
 

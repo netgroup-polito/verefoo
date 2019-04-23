@@ -69,6 +69,7 @@ public class TestPerformanceScalability {
 	private int nSAT = 0, nUNSAT = 0, i = 0, err = 0, nrOfConditions = 0, maxNrOfConditions = 0;
 	NFV root;
 	private Logger logger = LogManager.getLogger("result");
+	private Logger loggerModel = LogManager.getLogger("model");
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -135,7 +136,8 @@ public class TestPerformanceScalability {
 	}
 	
 	private void setAutomaticallyIP() {
-		Random rand = new Random(System.currentTimeMillis());
+//		Random rand = new Random(System.currentTimeMillis());
+		Random rand = new Random(13423420);
 		int first, second, third;
 		for(int i = 0; i < N; i++) {
 			first = rand.nextInt(256);
@@ -202,7 +204,6 @@ public class TestPerformanceScalability {
 				nUNSAT = 0;
 				i = 0;
 				err = 0;
-				System.out.println("===========FILE " + f.getName() + "===========");
 				logger.debug("===========FILE " + f.getName() + "===========");
 				logger.debug("Client: "+ f.getIPC() +" AllocationPlace: "+ f.getIPAP() + " IPServer: "+ f.getIPS());	
 				// create a JAXBContext capable of handling the generated classes
@@ -232,14 +233,17 @@ public class TestPerformanceScalability {
 								 //for debug purpose 
 								 //m.marshal( testCoarse(root), System.out );  
 								 i++;
-								 testCoarse(root);
+								 NFV resultNFV = testCoarse(root);
+								 StringWriter stringWriter = new StringWriter();
+								 m.marshal( resultNFV, stringWriter );
+								 loggerModel.debug(stringWriter.toString());
 							} catch (Exception e) {
 								e.printStackTrace();
 								err++;
 							}
 					
 
-				}while(i<1);
+				}while(i<5);
 				
 				logger.debug("Simulations -> " + i + " / Errors -> " + err);
 				//System.out.println("AVG Nr of Conditions -> " + (nrOfConditions/(i)) + " / MAX Nr Of Conditions -> " + maxNrOfConditions);
