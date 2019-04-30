@@ -58,14 +58,14 @@ public class TestPerformanceScalability {
 	
 
 	/* Variables to set if you want to automatically create the NFV */
-	private static final int N = 3;
+	private static final int N = 20;
 	String prefix = new String("Isol");
 	String IPClient[] = new String[N];
 	String IPAllocationPlace[] = new String[N];
 	String IPServer[] = new String[N];
 	
 	private long condTime = 0, checkTimeSAT = 0, checkTimeUNSAT = 0, totTime = 0;
-	private long maxCondTime = 0, maxCheckTimeSAT = 0, maxCheckTimeUNSAT = 0, maxTotTime = 0;
+	private long maxCondTime = 0, maxCheckTimeSAT = 0, maxCheckTimeUNSAT = 0, maxTotTime = 0,minTotTime = 0;
 	private int nSAT = 0, nUNSAT = 0, i = 0, err = 0, nrOfConditions = 0, maxNrOfConditions = 0;
 	NFV root;
 	private Logger logger = LogManager.getLogger("result");
@@ -108,11 +108,12 @@ public class TestPerformanceScalability {
 		 if(test.isSat()){
 			nSAT++;
 			maxTotTime = maxTotTime<(endAll-beginAll)? (endAll-beginAll) : maxTotTime;
-			logger.info("time: " + (endAll-beginAll) + "ms;");
+			minTotTime = minTotTime>(endAll-beginAll)? (endAll-beginAll) : minTotTime;
+			logger.debug("time: " + (endAll-beginAll) + "ms;");
 			totTime += (endAll-beginAll);
 		 }
 	 	else{
-	 		logger.info("UNSAT");	
+	 		logger.debug("UNSAT");	
 			nUNSAT++;
 	 	}
 		
@@ -145,18 +146,21 @@ public class TestPerformanceScalability {
 			second = rand.nextInt(256);
 			third = rand.nextInt(256);
 			IPClient[i] = new String(first + "." + second + "." + third + ".");
+			if(rand.nextBoolean()) IPClient[i] = new String(first + "." + first + "." + first + ".");
 			
 			first = rand.nextInt(256);
 			if(first == 0) first++;
 			second = rand.nextInt(256);
 			third = rand.nextInt(256);
 			IPAllocationPlace[i] = new String(first + "." + second + "." + third + ".");
+			if(rand.nextBoolean()) IPAllocationPlace[i] = new String(first + "." + first + "." + first + ".");
 			
 			first = rand.nextInt(256);
 			if(first == 0) first++;
 			second = rand.nextInt(256);
 			third = rand.nextInt(256);
 			IPServer[i] = new String(first + "." + second + "." + third + ".");
+			if(rand.nextBoolean()) IPServer[i] = new String(first + "." + first + "." + first + ".");
 		}
 	}
 	
@@ -167,28 +171,28 @@ public class TestPerformanceScalability {
 		
 		setAutomaticallyIP();
 		//setManuallyIP();
-		
+		int k=0;
 		try {
 			List<ScalabilityTestCase> nfv = new ArrayList<>();
 			
 			/* Scalability test for Allocation Places */
-			for(int k = 0; k < N; k++) {
-				for(int i = 10; i <= 80; i += 10) { //allocation places
+			
+				for(int i = 70; i <= 80; i += 10) { //allocation places
 					for(int j = 5; j <= 15; j += 5) //policies
 						//put 0,j for isolation, whereas j,0 for reachability
-						nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient[k], IPAllocationPlace[k], IPServer[k]));
+							nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient[k], IPAllocationPlace[k], IPServer[k]));
 				}
-			}
+			
 			
 			
 			/*Scalability test for Policy Rules */
-			for(int k = 0; k < N; k++) {
-				for(int j = 10; j <= 80; j += 10) { //policies
+			
+			/*	for(int j = 10; j <= 80; j += 10) { //policies
 					for(int i = 5; i <= 15; i += 5) //allocation places
 						//put 0,j for isolation, whereas j,0 for reachability
-						nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient[k], IPAllocationPlace[k], IPServer[k]));
-				}
-			}
+							nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient[k], IPAllocationPlace[k], IPServer[k]));
+					}
+			*/
 	
 			
 			for(ScalabilityTestCase f : nfv){
@@ -200,12 +204,13 @@ public class TestPerformanceScalability {
 				maxCheckTimeSAT = 0;
 				maxCheckTimeUNSAT = 0;
 				maxTotTime = 0;
+				minTotTime = Integer.MAX_VALUE;
 				nSAT = 0;
 				nUNSAT = 0;
 				i = 0;
 				err = 0;
-				logger.debug("===========FILE " + f.getName() + "===========");
-				logger.debug("Client: "+ f.getIPC() +" AllocationPlace: "+ f.getIPAP() + " IPServer: "+ f.getIPS());	
+				logger.info("===========FILE " + f.getName() + "===========");
+					
 				// create a JAXBContext capable of handling the generated classes
 				//long beginAll=System.currentTimeMillis();
 		        JAXBContext jc = JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
@@ -215,7 +220,6 @@ public class TestPerformanceScalability {
 		        Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
 		        u.setSchema(schema);
 		        // unmarshal a document into a tree of Java content objects
-		        root = f.getNfv();
 		   
 		        Marshaller m = jc.createMarshaller();
 	            m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
@@ -224,12 +228,15 @@ public class TestPerformanceScalability {
                 //m.marshal(f.getNfv(), System.out ); 
 		        
 		        do{
-		        	
+		        	for(k = 0; k < N; k++) {
 							try {
+								
 					             m = jc.createMarshaller();
 					             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 					             m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-								 root = f.getNfv();
+								 //root = f.generateNew();
+					             root = f.changeIP(IPClient[k], IPAllocationPlace[k], IPServer[k]);
+					             logger.debug("Client: "+ IPClient[k] +" AllocationPlace: "+  IPAllocationPlace[k] + " IPServer: "+ IPServer[k]);
 								 //for debug purpose 
 								 //m.marshal( testCoarse(root), System.out );  
 								 i++;
@@ -242,21 +249,22 @@ public class TestPerformanceScalability {
 								err++;
 							}
 					
-
-				}while(i<5);
+		        	}
+				}while(i<1);
 				
-				logger.debug("Simulations -> " + i + " / Errors -> " + err);
+				logger.info("Simulations -> " + k + " / Errors -> " + err);
 				//System.out.println("AVG Nr of Conditions -> " + (nrOfConditions/(i)) + " / MAX Nr Of Conditions -> " + maxNrOfConditions);
 				//System.out.println("AVG creating condition -> " + (condTime/(i-err)) + "ms");
 				//System.out.println("MAX creating condition -> " + (maxCondTime) + "ms");
 				//logger.debug("AVG creating condition -> " + (condTime/(i-err)) + "ms");
 				//logger.debug("MAX creating condition -> " + (maxCondTime) + "ms");
 				if(nSAT > 0) {
-					logger.debug("AVG total time -> " + (totTime/nSAT) + "ms");
-					logger.debug("MAX total time -> " + (maxTotTime) + "ms");
+					logger.info("AVG total time -> " + (totTime/nSAT) + "ms");
+					logger.info("MAX total time -> " + (maxTotTime) + "ms");
+					logger.info("MIN total time -> " + (minTotTime) + "ms");
 				}
 				
-				logger.debug("=====================================");
+				//logger.debug("=====================================");
 
 
 			}

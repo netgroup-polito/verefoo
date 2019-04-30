@@ -46,6 +46,7 @@ import it.polito.verigraph.mcnet.netobjs.PolitoEndHost;
  *
  *
  */
+	
 public class Checker {
 	Context ctx;
 	NetContext nctx;
@@ -361,7 +362,7 @@ public class Checker {
 								)),1,null,null,null,null));
 	
 	}
-
+	
 	public IsolationResult propertyCheck(){
 		solver.Push();
 		addConstraints();
@@ -374,7 +375,6 @@ public class Checker {
 		solver.setParameters(p);
 		result = this.solver.Check(); 
 		//System.out.println(this.solver.getReasonUnknown());
-		logger.info("---------- After Checker Print: ");	
 		model = null;
 		
 		if (result == Status.SATISFIABLE) {
@@ -396,7 +396,7 @@ public class Checker {
 			assertions = solver.getAssertions();
 			Arrays.asList(assertions).forEach(t-> stringWriter.append(t+"\n\n"));
 			if(model!=null){
-				logger.info("---------- Assertions: "+assertions.length);	
+				logger.debug("---------- Assertions: "+assertions.length);	
 			}
 				
 	}

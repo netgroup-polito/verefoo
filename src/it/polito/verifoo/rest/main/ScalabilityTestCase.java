@@ -25,6 +25,10 @@ public class ScalabilityTestCase {
 	String IPC;
 	String IPAP;
 	String IPS;
+	 NFV originalNFV;
+	private int numberAllocationPlaces;
+	private int numberReachPolicies;
+	private int numberIsPolicies;
 	
 	
 	public ScalabilityTestCase(String name, int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, String IPClient, String IPAllocationPlace, String IPServer) {
@@ -32,8 +36,30 @@ public class ScalabilityTestCase {
 		IPC = IPClient;
 		IPAP = IPAllocationPlace;
 		IPS = IPServer;
+		
+		this.numberAllocationPlaces=numberAllocationPlaces;
+		this.numberReachPolicies = numberReachPolicies;
+		this.numberIsPolicies = numberIsPolicies;
 		nfv = generateNFV(numberAllocationPlaces, numberReachPolicies, numberIsPolicies, IPClient, IPAllocationPlace, IPServer);
 	}
+	
+	public NFV generateNew(){
+		 countC = 1;
+		 countAP = 1;
+		 countS = 1;
+		 countP = 1;
+		return generateNFV(numberAllocationPlaces, numberReachPolicies, numberIsPolicies, IPC, IPAP, IPS);
+	}
+
+	public NFV changeIP(String IPClient, String IPAllocationPlace, String IPServer) {
+		countC = 1;
+		 countAP = 1;
+		 countS = 1;
+		 countP = 1;
+		return generateNFV(numberAllocationPlaces, numberReachPolicies, numberIsPolicies, IPClient, IPAllocationPlace, IPServer);
+	}
+	
+
 	
 	public NFV generateNFV(int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, String IPClient, String IPAllocationPlace, String IPServer) {
 		

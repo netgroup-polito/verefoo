@@ -32,6 +32,7 @@ public class VerifooSerializer {
 	private NFV nfv, result;
 	private boolean sat = false;
 	private Logger logger = LogManager.getLogger("model");
+	private Logger loggerResult = LogManager.getLogger("result");
 	private List<Node> removedNodes;
 	/**
 	 * Wraps all the Verifoo tasks, executing the z3 procedure for each graph in the NFV element
@@ -103,7 +104,10 @@ public class VerifooSerializer {
 	        	if(prop.size() == 0)
 					throw new BadGraphError("No property defined for the Graph "+g.getId(),EType.INVALID_PROPERTY_DEFINITION);
 	        	VerifooProxy test = new VerifooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(), prop, paths);
+	        	long beginAll=System.currentTimeMillis();
 	        	IsolationResult res=test.checkNFFGProperty();
+	        	long endAll=System.currentTimeMillis();
+	        	loggerResult.debug("Only checker: " +(endAll-beginAll)+"ms");
 	        	if(res.result != Status.UNSATISFIABLE&&res.result != Status.UNKNOWN){
 	        		//System.out.println(res.model.toString());
 	        		

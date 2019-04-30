@@ -13,10 +13,10 @@
         <File name="ResultFile" fileName="${sys:user.dir}/log/result.log" >
             <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
-         <File name="ModelFile" fileName="${sys:user.dir}/log/model.log" immediateFlush="false" append="false">
+         <File name="ModelFile" fileName="${sys:user.dir}/log/model.log">
             <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
-        <File name="ErrorFile" fileName="${sys:user.dir}/log/error.log" immediateFlush="false" append="true">
+        <File name="ErrorFile" fileName="${sys:user.dir}/log/error.log">
             <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
     </Appenders>
@@ -26,6 +26,7 @@
 	    </Logger>
 	    <Logger name="result" level="debug" additivity="false">       
 	        <appender-ref ref="ResultFile" level="debug"/>
+	        <appender-ref ref="Console" level="info"/>
 	    </Logger>
 	     <Logger name="assertions" level="info" additivity="false">       
 	        <appender-ref ref="AssertionsFile" level="info"/>
