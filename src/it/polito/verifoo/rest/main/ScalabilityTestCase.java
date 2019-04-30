@@ -3,7 +3,9 @@ package it.polito.verifoo.rest.main;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -32,12 +34,15 @@ public class ScalabilityTestCase {
 	private int numberReachPolicies;
 	private int numberIsPolicies;
 	
+	Set<String> allIPs;
+	
 	
 	public ScalabilityTestCase(String name, int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, String IPClient, String IPAllocationPlace, String IPServer) {
 		this.name = name;
 		IPC = IPClient;
 		IPAP = IPAllocationPlace;
 		IPS = IPServer;
+		allIPs = null;
 		
 		this.numberAllocationPlaces=numberAllocationPlaces;
 		this.numberReachPolicies = numberReachPolicies;
@@ -53,6 +58,7 @@ public class ScalabilityTestCase {
 		this.numberAllocationPlaces=numberAllocationPlaces;
 		this.numberReachPolicies = numberReachPolicies;
 		this.numberIsPolicies = numberIsPolicies;
+		allIPs = new HashSet<String>();
 		nfv = generateNFV(numberAllocationPlaces, numberReachPolicies, numberIsPolicies, rand);
 	}
 	
@@ -75,11 +81,13 @@ public class ScalabilityTestCase {
 	
 	public NFV changeIP(int seed) {
 		this.rand = new Random(seed);
+		allIPs = new HashSet<String>();
 		return generateNFV(numberAllocationPlaces, numberReachPolicies, numberIsPolicies, rand);
 	}
 	
 	
-	public String createRandomIP() {
+	
+	private String createIP() {
 		String ip;
 		int first, second, third, forth;
 		first = rand.nextInt(256);
@@ -88,7 +96,7 @@ public class ScalabilityTestCase {
 		third = rand.nextInt(256);
 		forth = rand.nextInt(256);
 		ip = new String(first + "." + second + "." + third + "." + forth);
-		/*if(rand.nextBoolean()) {
+		if(rand.nextBoolean()) {
 			if(rand.nextBoolean())
 				ip = new String(first + "." + first + "." + first + "." + first);
 			else {
@@ -98,8 +106,23 @@ public class ScalabilityTestCase {
 						ip = new String(third + "." + third + "." + third + "." + third);
 				}
 			}
-		}*/
+		}
 		return ip;
+	}
+	
+	private String createRandomIP() {
+		boolean notCreated = true;
+		String ip = null;
+		while(notCreated) {
+			ip = createIP();
+			if(!allIPs.contains(ip)) {
+				notCreated = false;
+				allIPs.add(ip);
+			}
+		}
+		
+		return ip;
+		
 	}
 	
 	
