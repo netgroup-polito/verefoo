@@ -3,6 +3,7 @@ package it.polito.verifoo.rest.main;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.Random;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -21,6 +22,7 @@ public class ScalabilityTestCase {
 	int countAP = 1;
 	int countS = 1;
 	int countP = 1;
+	Random rand = null;
 	
 	String IPC;
 	String IPAP;
@@ -43,6 +45,17 @@ public class ScalabilityTestCase {
 		nfv = generateNFV(numberAllocationPlaces, numberReachPolicies, numberIsPolicies, IPClient, IPAllocationPlace, IPServer);
 	}
 	
+	
+	public ScalabilityTestCase(String name, int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, int seed) {
+		this.name = name;
+		this.rand = new Random(seed);
+
+		this.numberAllocationPlaces=numberAllocationPlaces;
+		this.numberReachPolicies = numberReachPolicies;
+		this.numberIsPolicies = numberIsPolicies;
+		nfv = generateNFV(numberAllocationPlaces, numberReachPolicies, numberIsPolicies, rand);
+	}
+	
 	public NFV generateNew(){
 		 countC = 1;
 		 countAP = 1;
@@ -59,7 +72,36 @@ public class ScalabilityTestCase {
 		return generateNFV(numberAllocationPlaces, numberReachPolicies, numberIsPolicies, IPClient, IPAllocationPlace, IPServer);
 	}
 	
-
+	
+	public NFV changeIP(int seed) {
+		this.rand = new Random(seed);
+		return generateNFV(numberAllocationPlaces, numberReachPolicies, numberIsPolicies, rand);
+	}
+	
+	
+	public String createRandomIP() {
+		String ip;
+		int first, second, third, forth;
+		first = rand.nextInt(256);
+		if(first == 0) first++;
+		second = rand.nextInt(256);
+		third = rand.nextInt(256);
+		forth = rand.nextInt(256);
+		ip = new String(first + "." + second + "." + third + "." + forth);
+		/*if(rand.nextBoolean()) {
+			if(rand.nextBoolean())
+				ip = new String(first + "." + first + "." + first + "." + first);
+			else {
+				if(rand.nextBoolean())
+					ip = new String(second + "." + second + "." + second + "." + second);
+				else {
+						ip = new String(third + "." + third + "." + third + "." + third);
+				}
+			}
+		}*/
+		return ip;
+	}
+	
 	
 	public NFV generateNFV(int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, String IPClient, String IPAllocationPlace, String IPServer) {
 		
@@ -180,6 +222,149 @@ public class ScalabilityTestCase {
 		nfv.getPropertyDefinition().getProperty().add(property);
 	}
 
+public NFV generateNFV(int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, Random rand) {
+		
+		int numberPolicies = numberReachPolicies + numberIsPolicies;
+		
+		/* Creation of the test */
+		NFV nfv = new NFV();
+		Graphs graphs = new Graphs();
+		PropertyDefinition pd = new PropertyDefinition();
+		Constraints cnst = new Constraints();
+		NodeConstraints nc = new NodeConstraints();
+		LinkConstraints lc = new LinkConstraints();
+		cnst.setNodeConstraints(nc);
+		cnst.setLinkConstraints(lc);
+		nfv.setGraphs(graphs);
+		nfv.setPropertyDefinition(pd);
+		nfv.setConstraints(cnst);
+		Graph graph = new Graph();
+		graph.setId((long) 0);
+		
+		Node first = null;
+		Node last = null;
+		
+		String prevAPIP = null, nextAPIP = null;
+		
+		String IPServer = createRandomIP();
+		
+		for(int i = 0; i < numberAllocationPlaces; i++) {
+			Node ap = new Node();
+			
+			if(i==0) {
+				String ip = createRandomIP();
+				ap.setName(ip);
+				nextAPIP = createRandomIP();
+				Neighbour nextNeigh = new Neighbour();
+				nextNeigh.setName(nextAPIP);
+				ap.getNeighbour().add(nextNeigh);
+				prevAPIP = ip;
+			}
+			
+			if(i!=0) {
+				ap.setName(nextAPIP);
+				
+				Neighbour prevNeigh = new Neighbour();
+				prevNeigh.setName(prevAPIP);
+				ap.getNeighbour().add(prevNeigh);
+				prevAPIP = nextAPIP;
+				
+				if(i != numberAllocationPlaces-1) {
+					nextAPIP = createRandomIP();
+					Neighbour nextNeigh = new Neighbour();
+					nextNeigh.setName(nextAPIP);
+					ap.getNeighbour().add(nextNeigh);
+				}
+			}
+
+			
+			countAP++;
+			
+			if(i == 0) {
+				first = ap;
+			}
+			else {
+				if(i == numberAllocationPlaces - 1) {
+					Neighbour servNeigh = new Neighbour();
+					servNeigh.setName(IPServer);
+					ap.getNeighbour().add(servNeigh);
+				}
+				graph.getNode().add(ap);
+				last = ap;
+			}
+			
+		}
+		
+		Node server = new Node();
+		server.setFunctionalType(FunctionalTypes.WEBSERVER);
+		server.setName(IPServer);
+		Neighbour prevServ = new Neighbour();
+		prevServ.setName(last.getName());
+		server.getNeighbour().add(prevServ);
+		Configuration confS = new Configuration();
+		confS.setName("confB");
+		Webserver ws = new Webserver();
+		ws.setName(server.getName());
+		confS.setWebserver(ws);
+		server.setConfiguration(confS);
+		graph.getNode().add(server);
+		
+		for(int i = 0; i < numberReachPolicies; i++) {
+			createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, first, IPServer);
+		}
+		for(int i = 0; i < numberIsPolicies; i++) {
+			createPolicy(PName.ISOLATION_PROPERTY, nfv, graph, first, IPServer);
+		}
+		graph.getNode().add(first);
+		nfv.getGraphs().getGraph().add(graph);
+		/*try {
+			JAXBContext jc;
+            jc= JAXBContext.newInstance( "it.polito.verifoo.rest.jaxb" );
+			Marshaller m = jc.createMarshaller();
+            m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
+            m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
+			OutputStream os = new FileOutputStream(path);
+			m.marshal(nfv, os);
+		} catch(JAXBException je ) {
+            System.exit(1);
+        }catch(FileNotFoundException e) {
+        	System.exit(2);
+        }*/
+		
+		return nfv;
+	}
+
+	private void createPolicy(PName type, NFV nfv, Graph graph, Node first, String IPServer) {
+		String IPClient = createRandomIP();
+		
+		Node client = new Node();
+		client.setFunctionalType(FunctionalTypes.WEBCLIENT);
+		client.setName(IPClient);
+		countC++;
+		Neighbour nextC = new Neighbour();
+		nextC.setName(first.getName());
+		client.getNeighbour().add(nextC);
+		Configuration confC = new Configuration();
+		confC.setName("confA");
+		Webclient wc = new Webclient();
+		wc.setNameWebServer(IPServer);
+		confC.setWebclient(wc);
+		client.setConfiguration(confC);
+		graph.getNode().add(client);
+		
+		Neighbour clientNeigh = new Neighbour();
+		clientNeigh.setName(client.getName());
+		first.getNeighbour().add(clientNeigh);
+		
+		Property property = new Property();
+		property.setName(type);
+		property.setGraph((long) 0);
+		property.setSrc(client.getName());
+		property.setDst(IPServer);
+		nfv.getPropertyDefinition().getProperty().add(property);
+	}
+	
+	
 	public NFV getNfv() {
 		return nfv;
 	}

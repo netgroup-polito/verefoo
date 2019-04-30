@@ -63,6 +63,8 @@ public class TestPerformanceScalability {
 	String IPClient[] = new String[N];
 	String IPAllocationPlace[] = new String[N];
 	String IPServer[] = new String[N];
+	int seed = 13423420;
+	Random rand = new Random(seed);
 	
 	private long condTime = 0, checkTimeSAT = 0, checkTimeUNSAT = 0, totTime = 0;
 	private long maxCondTime = 0, maxCheckTimeSAT = 0, maxCheckTimeUNSAT = 0, maxTotTime = 0,minTotTime = 0;
@@ -137,8 +139,6 @@ public class TestPerformanceScalability {
 	}
 	
 	private void setAutomaticallyIP() {
-//		Random rand = new Random(System.currentTimeMillis());
-		Random rand = new Random(13423420);
 		int first, second, third;
 		for(int i = 0; i < N; i++) {
 			first = rand.nextInt(256);
@@ -169,18 +169,22 @@ public class TestPerformanceScalability {
 		
 		/* Switch between automatic and manul configuration of the IP*/
 		
-		setAutomaticallyIP();
+		//setAutomaticallyIP();
 		//setManuallyIP();
 		int k=0;
 		try {
 			List<ScalabilityTestCase> nfv = new ArrayList<>();
-			
+
 			/* Scalability test for Allocation Places */
 			
-				for(int i = 70; i <= 80; i += 10) { //allocation places
+				for(int i = 10; i <= 80; i += 10) { //allocation places
 					for(int j = 5; j <= 15; j += 5) //policies
 						//put 0,j for isolation, whereas j,0 for reachability
-							nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient[k], IPAllocationPlace[k], IPServer[k]));
+						
+						//no random
+						//nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient[k], IPAllocationPlace[k], IPServer[k]));
+						//random
+						nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, seed));
 				}
 			
 			
@@ -190,11 +194,14 @@ public class TestPerformanceScalability {
 			/*	for(int j = 10; j <= 80; j += 10) { //policies
 					for(int i = 5; i <= 15; i += 5) //allocation places
 						//put 0,j for isolation, whereas j,0 for reachability
+							//no random
 							nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient[k], IPAllocationPlace[k], IPServer[k]));
+							//random
+							nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, seed));
 					}
 			*/
 	
-			
+	
 			for(ScalabilityTestCase f : nfv){
 				condTime = 0;
 				checkTimeSAT = 0;
@@ -234,10 +241,20 @@ public class TestPerformanceScalability {
 					             m = jc.createMarshaller();
 					             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 					             m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-								 //root = f.generateNew();
-					             root = f.changeIP(IPClient[k], IPAllocationPlace[k], IPServer[k]);
-					             logger.debug("Client: "+ IPClient[k] +" AllocationPlace: "+  IPAllocationPlace[k] + " IPServer: "+ IPServer[k]);
-								 //for debug purpose 
+
+					             //no random
+					             //root = f.changeIP(IPClient[k], IPAllocationPlace[k], IPServer[k]);
+					             //random
+					             root = f.changeIP(seed + k*10000);
+					             
+					             //no random
+					             //logger.debug("Client: "+ IPClient[k] +" AllocationPlace: "+  IPAllocationPlace[k] + " IPServer: "+ IPServer[k]);
+								
+					             //random
+					             int seedPrint = seed + k*10000;
+					             logger.debug("Seed:" + seedPrint);
+					             
+					             //for debug purpose 
 								 //m.marshal( testCoarse(root), System.out );  
 								 i++;
 								 NFV resultNFV = testCoarse(root);
