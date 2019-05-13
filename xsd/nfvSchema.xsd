@@ -119,7 +119,7 @@
 					<xsd:complexType>
 			            <xsd:attribute name="type" type="AllocationConstraintType" use="required" />
 			            <xsd:attribute name="nodeA" type="xsd:string" use="required" />
-			            <xsd:attribute name="nodeB" type="xsd:int" use="required"/>
+			            <xsd:attribute name="nodeB" type="xsd:string" use="required"/>
 			        </xsd:complexType>
        	 		</xsd:element>
 			</xsd:sequence>
