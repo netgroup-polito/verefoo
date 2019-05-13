@@ -78,6 +78,7 @@
 			<xsd:sequence>
 				<xsd:element ref="NodeConstraints" maxOccurs="1"/>
 				<xsd:element ref="LinkConstraints" maxOccurs="1"/>
+				<xsd:element ref="AllocationConstraints" minOccurs="0" maxOccurs="1"/>
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
@@ -111,6 +112,25 @@
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
+	<xsd:element name="AllocationConstraints">
+		<xsd:complexType>
+			<xsd:sequence>
+       	 		<xsd:element name="AllocationConstraint" minOccurs="0" maxOccurs="unbounded">
+					<xsd:complexType>
+			            <xsd:attribute name="type" type="AllocationConstraintType" use="required" />
+			            <xsd:attribute name="nodeA" type="xsd:string" use="required" />
+			            <xsd:attribute name="nodeB" type="xsd:int" use="required"/>
+			        </xsd:complexType>
+       	 		</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="AllocationConstraintType">
+  		<xsd:restriction base="xsd:string">
+		    <xsd:enumeration value="forbidden"/>
+		    <xsd:enumeration value="forced"/>
+  		</xsd:restriction>
+	</xsd:simpleType>
 	<xsd:element name="Hosts">
 		<xsd:complexType>
 			<xsd:sequence>
