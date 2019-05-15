@@ -17,7 +17,6 @@ import it.polito.verifoo.rest.jaxb.TypeOfHost;
 
 /**
  * This is the class that extract all the possible chain from a physical network
- * @author Antonio
  *
  */
 public class ChainExtractor {

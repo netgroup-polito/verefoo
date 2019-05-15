@@ -12,7 +12,6 @@ import it.polito.verifoo.rest.jaxb.Connection;
 import it.polito.verifoo.rest.jaxb.Node;
 /**
  * Sets up the enviroment to create a formatted string that represents a deployment
- * @author Antonio
  *
  */
 public class ConditionStringBuilder {

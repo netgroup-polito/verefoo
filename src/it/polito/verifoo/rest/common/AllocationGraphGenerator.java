@@ -15,11 +15,25 @@ import it.polito.verifoo.rest.jaxb.NFV;
 import it.polito.verifoo.rest.jaxb.Neighbour;
 import it.polito.verifoo.rest.jaxb.Node;
 
+/**
+ * The AllocationGraphGenerator provides an automatic generation of an Allocation Graph,
+ * if the user specifies a Service Graph as input.
+ */
 public class AllocationGraphGenerator {
 
 	private NFV nfv;
+	
+	/*
+	 * The initialAPIp variable allows to set the first three elements of the IP addresses of the Allocation Places.
+	 * If it is set a name, then wildcards won't be exploited by the framework.
+	 */
 	String initialAPIp = "20.0.0.";
 	
+	
+	/**
+	 * Public constructor of the AllocationGraphGenerator class
+	 * @param nfv it is the NFV element describing the input NFV element, potentially including some Service Graphs
+	 */
 	public AllocationGraphGenerator(NFV nfv) {
 		this.nfv = nfv;
 		for(Graph graph : nfv.getGraphs().getGraph()) {
@@ -37,7 +51,12 @@ public class AllocationGraphGenerator {
 	}
 	
 
-	void generateAllocationGraph(Graph graph, List<AllocationConstraint> list) {
+	/**
+	 * This method automatically generates an Allocation Graph with placeholders where Network Security Functions can be allocated.
+	 * @param graph it is the input Service Graph, modified by the method into an Allocation Graph
+	 * @param list it is the list of Allocation Constraints (i.e. forced and foribdden) set by the user
+	 */
+	private void generateAllocationGraph(Graph graph, List<AllocationConstraint> list) {
 		int counter = 1;
 		List<Node> newNodes = new ArrayList<Node>();
 		for(Node node : graph.getNode()) {
@@ -122,7 +141,11 @@ public class AllocationGraphGenerator {
 	}
 	
 	
-	NFV getAllocationGraph() {
+	/**
+	 * This method returns the computed NFV element.
+	 * @return the NFV element with the Allocation Graph
+	 */
+	public NFV getAllocationGraph() {
 		return nfv;
 	}
 	

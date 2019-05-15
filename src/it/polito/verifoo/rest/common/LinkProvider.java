@@ -11,7 +11,6 @@ import it.polito.verifoo.rest.jaxb.Path;
 import it.polito.verifoo.rest.jaxb.Property;
 /**
  * Wraps the choice of the outgoing links from a certain node
- * @author Antonio
  *
  */
 public class LinkProvider {
