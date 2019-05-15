@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LogParser {
-	private static final String FILE_HEADER = ",Client,Allocation,Server,CheckerTime,Time";
+	private static final String FILE_HEADER = ",Seed,Assertions,CheckerTime,Time";
 	private static final String AVG_HEADER = ",AVG,MAX,MIN";
 	private static final String COMMA_DELIMITER = ",";
 	private static final String NEW_LINE_SEPARATOR = "\n";
@@ -56,15 +56,20 @@ public class LogParser {
 					String results = s.nextLine();
 					Matcher matcher2 = p.matcher(results);
 					if (matcher2.matches()) {
-						if(matcher2.group(6).startsWith("Client")){
+						if(matcher2.group(6).startsWith("Seed")){
+							String[] splited = matcher2.group(6).split(":");
+							csvOutputFile.append(","+ splited[1]);
+						}else if(matcher2.group(6).startsWith("---")){
 							String[] splited = matcher2.group(6).split("\\s+");
-							csvOutputFile.append(","+splited[1]+","+splited[3]+","+splited[5]);
+							csvOutputFile.append(","+ splited[2]);
 						}else if(matcher2.group(6).startsWith("Only")){
 							String[] splited = matcher2.group(6).split("\\s+");
 							csvOutputFile.append(","+splited[2].replaceAll("\\D+",""));
 						}else if(matcher2.group(6).startsWith("time")){
 							String[] splited = matcher2.group(6).split("\\s+");
 							csvOutputFile.append(","+splited[1].replaceAll("\\D+",""));
+							csvOutputFile.append(NEW_LINE_SEPARATOR);
+						}else if(matcher2.group(6).startsWith("UNSAT")){
 							csvOutputFile.append(NEW_LINE_SEPARATOR);
 						}else if(matcher2.group(6).startsWith("AVG")){
 							csvAvgFile.append(matcher.group(6)+","+matcher2.group(6).split("\\s+")[4].replaceAll("\\D+",""));
