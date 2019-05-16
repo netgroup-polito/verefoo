@@ -17,11 +17,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		 <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.0</version>
-        </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-core</artifactId>
@@ -214,8 +209,8 @@
 								<include>hateoasLinks.xsd</include>
 								<include>xml_components.xsd</include>
 							</schemaIncludes>
-							<generateDirectory>src/</generateDirectory>
-							<generatePackage>it.polito.verifoo.rest.jaxb</generatePackage>
+							<generateDirectory>/gen-src</generateDirectory>
+							<generatePackage>it.polito.verefoo.jaxb</generatePackage>
 							<!-- Other configuration options -->
 						</configuration>
 					</execution>

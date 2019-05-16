@@ -6,6 +6,7 @@
   <property name="build.dir" location="build"/>
   <property name="resources.dir" location="resources"/>
   <property name="javadoc.dir" location="docs"/>
+	<property name="gen.dir" location="gen-src" />
   <property name="dist.dir" location="dist"/>
   <property name="schema.dir" location="xsd" />
   <property name="report.dir" location="log" />
@@ -42,13 +43,17 @@
 		</uptodate>
 	</target>
 	
+	
+	
+	
 	<!-- Target generate-bindings -->
-	<target name="generate-bindings" unless="generate-bindings.notRequired" depends="init,-chk-bindings" description="Generate bindings from schema">
+	<target name="generate-bindings" depends="init,-chk-bindings" description="Generate bindings from schema">
+		<mkdir dir="${gen.dir}"/>
 		<exec executable="xjc" failonerror="true" >
 			<arg value="-d" />
-			<arg value="${src.dir}" />
+			<arg value="${gen.dir}" />
 			<arg value="-p" />
-			<arg value="it.polito.verifoo.rest.jaxb" />
+			<arg value="it.polito.verefoo.jaxb" />
 			<arg value="${schema.dir}/nfvSchema.xsd" />
 		</exec>
 		<touch file="${src.dir}/.flagfile" />
