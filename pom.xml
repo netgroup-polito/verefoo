@@ -52,13 +52,7 @@
 			<systemPath>${project.basedir}/lib/junit/concurrent-junit-1.0.0.jar</systemPath>
 		</dependency>
 
-		<dependency>
-			<groupId>com.verifoo</groupId>
-			<artifactId>thriftwd</artifactId>
-			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/com.microsoft.z3.jar</systemPath>
-		</dependency>
+		
 		<dependency>
 			<groupId>com.verifoo</groupId>
 			<artifactId>thriftjunit</artifactId>
@@ -139,11 +133,14 @@
 			<type>test-jar</type>
 		</dependency>
 		<dependency>
-			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j-io</artifactId>
-			<version>2.3.2</version>
-			<type>test-jar</type>
+			<groupId>com.microsoft</groupId>
+			<artifactId>z3</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${env.Z3}/com.microsoft.z3.jar</systemPath>
 		</dependency>
+		
+				
 		<dependency>
 	<groupId>org.neo4j.driver</groupId>
 	<artifactId>neo4j-java-driver</artifactId>
@@ -205,9 +202,6 @@
 							<schemaDirectory>xsd/</schemaDirectory>
 							<schemaIncludes>
 								<include>nfvSchema.xsd</include>
-								<include>errorSchema.xsd</include>
-								<include>hateoasLinks.xsd</include>
-								<include>xml_components.xsd</include>
 							</schemaIncludes>
 							<generateDirectory>/gen-src</generateDirectory>
 							<generatePackage>it.polito.verefoo.jaxb</generatePackage>
@@ -218,4 +212,6 @@
 			</plugin>
 		</plugins>
 	</build>
+	 <repositories>
+  </repositories>
 </project>

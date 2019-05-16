@@ -78,11 +78,11 @@
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-java-driver-1.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-kernel-3.3.4.jar"/>
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-kernel-api-3.3.4.jar"/>
-	<classpathentry kind="lib" path="lib/com.microsoft.z3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/z3/z3-4.6.0-x64-win/bin/com.microsoft.z3.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
