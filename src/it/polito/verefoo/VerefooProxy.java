@@ -379,7 +379,6 @@ public class VerefooProxy {
             try{
 				//links = (new LinkCreator(nodes)).getLinks();
             	linkProvider = new LinkProvider(nodes, paths, properties);
-				logger.debug("Links created");
 				//createInternalRouting(clients, servers);
             	//FWmanager.minimizeRules();
 				List<List<String>> validChain = new ArrayList<>();
@@ -955,7 +954,6 @@ public class VerefooProxy {
 				System.out.println(f);
 			}*/
 			nrOfConditions = (int) conditionDB.entrySet().stream().flatMap(e -> e.getValue().values().stream()).count();
-			logger.debug("Nr of deployment conditions: " + nrOfConditions);
 			//System.out.println("Nr of deployment conditions: " + nrOfConditions);
 			IsolationResult ret = this.check.propertyCheck();
 			if(nrOfConditions == 0 && this.hosts.size() > 0) ret.result = Status.UNSATISFIABLE;

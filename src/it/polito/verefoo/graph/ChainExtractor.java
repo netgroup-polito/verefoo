@@ -21,7 +21,6 @@ import it.polito.verefoo.jaxb.TypeOfHost;
  */
 public class ChainExtractor {
 
-	private static Logger logger = LogManager.getLogger("mylog");
 	private static List<List<String>> savedChain;
 	private static List<Host> hosts;
 	

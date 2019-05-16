@@ -86,7 +86,6 @@ public class Main {
                     }
             		long endAll=System.currentTimeMillis();
             		loggerResult.info("time: " + (endAll-beginAll) + "ms;");
-            		System.out.println("time: " + (endAll-beginAll) + "ms");
                 }
             } catch( JAXBException je ) {
             	loggerInfo.error("Error while unmarshalling or marshalling");

@@ -24,7 +24,6 @@ import it.polito.verefoo.jaxb.Property;
  *
  */
 public class LinkCreator {
-	private Logger logger = LogManager.getLogger("mylog");
 	private List<Link> links = new ArrayList<>();
 	private List<Node> nodes;
 	private List<Path> paths;
@@ -91,8 +90,10 @@ public class LinkCreator {
 										.sorted(comparing(Link::getSourceNode).thenComparing(Link::getDestNode))
 										.distinct()
 										.collect(Collectors.toList());
-		logger.debug("Unique links:");
-		orderedLinks.forEach(l -> logger.debug(l.getSourceNode()+"->"+l.getDestNode()));
+		/*
+		 * logger.debug("Unique links:"); orderedLinks.forEach(l ->
+		 * logger.debug(l.getSourceNode()+"->"+l.getDestNode()));
+		 */
 		return orderedLinks;
 	}
 	
