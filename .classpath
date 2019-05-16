@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry including="**/*.java" kind="src" output="build" path="src">
+	<classpathentry including="**/*.java" kind="src" output="target/classes" path="src">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="resources"/>
+	<classpathentry excluding="**" kind="src" output="target/classes" path="resources">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
@@ -16,8 +20,6 @@
 	<classpathentry kind="lib" path="lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar"/>
 	<classpathentry kind="lib" path="lib/lib4j/log4j-api-2.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/lib4j/log4j-core-2.9.1.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
-	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="lib/junit/concurrent-junit-1.0.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/swagger-annotations-1.5.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/swagger-core-1.5.0.jar"/>
@@ -78,5 +80,11 @@
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-kernel-3.3.4.jar"/>
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-kernel-api-3.3.4.jar"/>
 	<classpathentry kind="lib" path="lib/com.microsoft.z3.jar"/>
-	<classpathentry kind="output" path="build"/>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

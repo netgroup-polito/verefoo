@@ -24,7 +24,6 @@ import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Sort;
 import com.microsoft.z3.Optimize.Handle;
 
-import it.polito.verigraph.mcnet.netobjs.DumbNode;
 import it.polito.verifoo.rest.autoconfiguration.WildcardManager;
 import it.polito.verifoo.rest.common.AllocationNode;
 import it.polito.verigraph.mcnet.components.Core;

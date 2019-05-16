@@ -32,7 +32,6 @@ import com.microsoft.z3.Params;
 import com.microsoft.z3.Status;
 
 import it.polito.verifoo.rest.common.AllocationNode;
-import it.polito.verifoo.rest.common.NodeNetworkObject;
 import it.polito.verifoo.rest.common.NFAllocationManager;
 import it.polito.verifoo.rest.jaxb.Property;
 import it.polito.verigraph.mcnet.components.IsolationResult;
@@ -50,7 +49,6 @@ import it.polito.verigraph.mcnet.netobjs.PolitoEndHost;
 public class Checker {
 	Context ctx;
 	NetContext nctx;
-	NodeNetworkObject netobjs;
 	Optimize solver;
 	ArrayList<BoolExpr> constraints;
 	public BoolExpr[] assertions={};
@@ -393,11 +391,11 @@ public class Checker {
 			// old versions of z3 did not provide solver.getAssertions() method
 			// so if this is the case it has to be commented
 			StringWriter stringWriter = new StringWriter();
-			assertions = solver.getAssertions();
+			/*assertions = solver.getAssertions();
 			Arrays.asList(assertions).forEach(t-> stringWriter.append(t+"\n\n"));
 			if(model!=null){
 				logger.debug("---------- Assertions: "+assertions.length);	
-			}
+			}*/
 				
 	}
 	
