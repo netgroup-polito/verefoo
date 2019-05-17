@@ -17,18 +17,15 @@ public class MedicineSimulationException extends ResourceModelException {
 	}
 
 	public MedicineSimulationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
+		super(message, cause, enableSuppression, writableStackTrace); 
 	}
 
 	public MedicineSimulationException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	public MedicineSimulationException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	public MedicineSimulationException(String message) {

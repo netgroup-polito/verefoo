@@ -32,7 +32,7 @@ public class RestLog {
 		  return ((FileAppender) appender).getFileName();
 		}
 		private static String DebugFile=RestLog.getLoggerFileName("DebugFile");
-		private static String ErrorFile=RestLog.getLoggerFileName("ErrorFile");
+		private static String ErrorFile=RestLog.getLoggerFileName("ErrorFile"); 
 		
 	    @GET
 	    @ApiOperation(value = "Get Verifoo Log", notes = "Get the last 200 log lines of Verifoo Processing"

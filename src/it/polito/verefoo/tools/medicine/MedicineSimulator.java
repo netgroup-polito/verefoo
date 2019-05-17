@@ -45,7 +45,7 @@ public class MedicineSimulator implements PhyResourceModel {
 	private String projDir = System.getProperty("user.dir");
 	private String sonEmuDir = "/home/sonata/";
 	String topologyFile = "";
-	private String projectDesc = "package:\n"
+	private String projectDesc = "package:\n" 
 							   + "  description: \"Service Package\"\n"
 							   + "  maintainer: \"Verifoo\"\n"
 							   + "  name: service\n"

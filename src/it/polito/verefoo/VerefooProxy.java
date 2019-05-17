@@ -29,7 +29,6 @@ import it.polito.verefoo.graph.LinkProvider;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.jaxb.LinkConstraints.LinkMetrics;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
-import it.polito.verefoo.translator.ConditionStringBuilder;
 import it.polito.verigraph.extra.VerificationResult;
 import it.polito.verigraph.functions.PacketFilter;
 import it.polito.verigraph.solver.*;
@@ -66,7 +65,6 @@ public class VerefooProxy {
 		private List<NodeMetrics> nodeMetrics;
 		private List<LinkMetrics> linkMetrics;
 		private int nrOfConditions;
-		private ConditionStringBuilder cb;
 		private NFAllocationManager allocationManager;
 
 		/**
@@ -114,7 +112,6 @@ public class VerefooProxy {
 		    	conditionDB.put(n, new HashMap<>());
 		    	stageConditions.put(n, new HashMap<>());
 		    });
-			cb = new ConditionStringBuilder(ctx, connections, rawDeploymentConditions);
 			//if(this.hosts.size() != 0)
 				//checkPhysicalNetwork();
 			//netobjs.attachToNet();

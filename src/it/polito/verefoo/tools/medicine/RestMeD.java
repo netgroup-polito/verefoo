@@ -1,4 +1,4 @@
-package it.polito.verefoo.rest.war;
+package it.polito.verefoo.tools.medicine;
 
 import java.net.MalformedURLException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,10 +18,6 @@ import it.polito.verefoo.jaxb.ApplicationError;
 import it.polito.verefoo.jaxb.EType;
 import it.polito.verefoo.jaxb.Hosts;
 import it.polito.verefoo.jaxb.NFV;
-import it.polito.verefoo.tools.medicine.MedicineSimulator;
-import it.polito.verefoo.tools.medicine.PhyResourceModel;
-import it.polito.verefoo.tools.medicine.ResourceModelException;
-import it.polito.verefoo.tools.medicine.TopologyDB;
 
 /**
  * 
@@ -31,7 +27,7 @@ import it.polito.verefoo.tools.medicine.TopologyDB;
 @Path("/simulation")
 @Api("/simulation")
 public class RestMeD {
-		TopologyDB db = TopologyDB.getMedicineDB();
+		TopologyDB db = TopologyDB.getMedicineDB(); 
 	    @POST
 	    @ApiOperation(value = "Deploys the network model in the MeDICINE topology simulator", notes = "",
 	    response=Integer.class)	    

@@ -26,7 +26,7 @@ public class RestFooApplication extends ResourceConfig {
     	JniFinder.extractZ3Lib(fullPath);
         // Define the package which contains the service classes.
     	this.contextpath=context.getContextPath();
-    	register(io.swagger.jaxrs.listing.ApiListingResource.class);
+    	register(io.swagger.jaxrs.listing.ApiListingResource.class); 
         register(io.swagger.jaxrs.listing.SwaggerSerializers.class);
         packages("it.polito.verifoo.rest.webservice");
     }

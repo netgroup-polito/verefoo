@@ -52,16 +52,6 @@ public class RestFoo {
 				String z3model = new String();
 				VerefooSerializer test = new VerefooSerializer(root);
 				NFV rootResult = test.getResult();
-				if(complete!=true) {
-					root.getHosts().getHost().removeIf((h)->!h.isActive());
-					root.getConnections().getConnection().removeIf((c)->{
-						return !(
-							root.getHosts().getHost().stream().filter((h)->h.getName().equals(c.getSourceHost())).findFirst().isPresent()
-							&&
-							root.getHosts().getHost().stream().filter((h)->h.getName().equals(c.getDestHost())).findFirst().isPresent()
-						);
-					});						
-				}
 				return rootResult;
 	    }
 

@@ -32,7 +32,7 @@ public class RestMain {
 	    	Hyperlinks.Link l1 = new Hyperlinks.Link();
 	    	l1.setRel("self");
 	    	l1.setHref(baseUrl);
-	    	l1.setType("application/xml");
+	    	l1.setType("application/xml"); 
 	    	l1.setMethod("GET");
 	    	Hyperlinks.Link l2 = new Hyperlinks.Link();
 	    	l2.setRel("deployment");

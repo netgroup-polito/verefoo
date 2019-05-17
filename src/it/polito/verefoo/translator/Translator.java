@@ -36,6 +36,7 @@ public class Translator {
 	protected VerefooNormalizer norm;
 	protected List<Node> removedNodes;
 	private Map<String, AllocationNode> allocationNodes;
+	
 	/**
 	 * Constructor
 	 * @param model The Verifoo output.
@@ -44,7 +45,7 @@ public class Translator {
 	 */
 	public Translator(String model,NFV nfv, Graph g){
 		this.model=model;
-		this.nfv=nfv;
+		this.nfv=nfv; 
 		this.g = g;
 	}
 
@@ -291,51 +292,7 @@ public class Translator {
 	 * @return the list of firewall rules in an "elements" object
 	 */
 	private List<Elements> mergeRules(List<Elements> listOfRules) {
-		/* TEST CASE
-		Elements e1 = new Elements();
-		e1.setSource("A");
-		e1.setDestination("s1");
-		e1.setSrcPort("7-20");
-		e1.setDstPort("85-95");
-		//e1.setProtocol(L4ProtocolTypes.ANY);
-		
-		Elements e2 = new Elements();
-		e2.setSource("A");
-		e2.setDestination("s1");
-		e2.setSrcPort("10-15");
-		e2.setDstPort("89-96");
-		//e2.setProtocol(L4ProtocolTypes.ANY);
-		
-		Elements e3 = new Elements();
-		e3.setSource("A");
-		e3.setDestination("s1");
-		e3.setSrcPort("12-30");
-		e3.setDstPort("7-98");
-		//e3.setProtocol(L4ProtocolTypes.ANY);
-		
-		Elements e4 = new Elements();
-		e4.setSource("A");
-		e4.setDestination("s1");
-		e4.setSrcPort("11");
-		e4.setDstPort("99");
-		//e3.setProtocol(L4ProtocolTypes.ANY);
-		
-		listOfRules.clear();
-		listOfRules.add(e2);
-		listOfRules.add(e1);
-		listOfRules.add(e3);
-		listOfRules.add(e4);*/
-		/*System.out.println("--------Input Rules-------");
-		listOfRules.forEach(e -> {
-			System.out.println("Rule -> action: " + e.getAction() +
-					" src: " + e.getSource() +
-				    " dst: "+e.getDestination() + 
-					" "+ e.getProtocol()+
-					"["+ e.getSrcPort() +
-					":" + e.getDstPort()+"]");
-		});
-		System.out.println("------------------------");*/
-		HashMap<String, List<Elements>> rulesMapBySource = (HashMap<String, List<Elements>>) listOfRules.stream()
+			HashMap<String, List<Elements>> rulesMapBySource = (HashMap<String, List<Elements>>) listOfRules.stream()
 														.map(e -> new Tuple<Elements,PortInterval>(e, new PortInterval(e.getSrcPort())))
 														.sorted(Comparator.comparing(t -> t._2.getEnd()))
 														.sorted(Comparator.comparing(t -> t._2.getStart()))

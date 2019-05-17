@@ -44,7 +44,7 @@ public class RestTranslator {
 	    public NFV put(@ApiParam(value = "Complete or Tiny Response")@DefaultValue("true")@QueryParam("complete") Boolean complete,@ApiParam(value = "Network Schema with parsing string", required = true)NFV root) throws MalformedURLException {
 	    	if(root.getParsingString()!=null && !root.getParsingString().isEmpty()){
 	    		root.getGraphs().getGraph().forEach(g -> {
-		            new Translator(root.getParsingString(),root,g).convert();
+		            new Translator(root.getParsingString(),root,g).convert(); 
 	    		});
 	            root.setParsingString("");
 	            if(complete!=true) {
