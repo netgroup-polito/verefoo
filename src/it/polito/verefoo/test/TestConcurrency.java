@@ -39,7 +39,6 @@ public class TestConcurrency {
 			try {
 				t.join();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		});
@@ -68,7 +67,6 @@ public class TestConcurrency {
 					System.err.println(res.readEntity(String.class));
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}			
 		}

@@ -11,8 +11,11 @@ package it.polito.verigraph.functions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -20,7 +23,8 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.Optimize;
 
-import it.polito.verigraph.solver.Core;
+import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verigraph.solver.NetContext;
 
 /** Represents a generic network object.
  *
@@ -30,7 +34,11 @@ abstract public class GenericFunction {
 
     public GenericFunction() {
     }
-
+    
+    protected List<BoolExpr> constraints; 
+    protected AllocationNode source;
+    protected Context ctx;
+    protected NetContext nctx;
     protected DatatypeExpr z3Node;
     protected boolean isEndHost;
     protected BoolExpr used;
@@ -78,7 +86,21 @@ abstract public class GenericFunction {
 
 	abstract public void addContraints(Optimize solver);
     
-  
+    protected BoolExpr createOrRecv(Entry<AllocationNode, Set<AllocationNode>> entry, Expr p_0, DatatypeExpr function) {
+			List<Expr> list = entry.getValue().stream().map(n -> n.getZ3Name()).collect(Collectors.toList());
+			List<Expr> recvNeighbours = list.stream().map(n -> (BoolExpr) nctx.recv.apply(n, function, p_0)).distinct().collect(Collectors.toList());
+			BoolExpr[] tmp = new BoolExpr[list.size()];
+	 		BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp));
+	 		return enumerateRecv;
+	}
+	
+    protected BoolExpr createAndSend(Entry<AllocationNode, Set<AllocationNode>> entry, Expr p_0, DatatypeExpr function) {
+			List<Expr> list = entry.getValue().stream().map(n -> n.getZ3Name()).collect(Collectors.toList());
+			List<Expr> sendNeighbours = list.stream().map(n -> (BoolExpr) nctx.send.apply(function, n, p_0)).distinct().collect(Collectors.toList());
+			BoolExpr[] tmp = new BoolExpr[list.size()];
+			BoolExpr enumerateSend = ctx.mkAnd(sendNeighbours.toArray(tmp));
+			return enumerateSend;
+	}
     
     
 }

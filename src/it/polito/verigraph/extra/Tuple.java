@@ -24,7 +24,7 @@ public class Tuple<T, U> {
 
     public Tuple(){
         this._1 = null;
-        this._2 = null;
+        this._2 = null; 
     }
 
     @Override

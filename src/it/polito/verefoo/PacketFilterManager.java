@@ -144,9 +144,9 @@ public class PacketFilterManager {
 				}
 				//System.out.println(value._3);
 				if(value._1.isAutoconfigured()) {
-					value._1.firewallSendRules(value._3);
+					value._1.automaticConfiguration(value._3);
 				} else {
-					value._1.firewallSendRules();
+					value._1.manualConfiguration();
 				}
 				
 			}
@@ -155,7 +155,7 @@ public class PacketFilterManager {
 			
 			for(Map.Entry<String, Quadruple<PacketFilter, AllocationNode, Integer, Boolean>> entry : autoconfFW.entrySet()) {
 				Quadruple<PacketFilter, AllocationNode, Integer, Boolean> value = entry.getValue();
-				value._1.firewallSendRules(value._3);
+				value._1.automaticConfiguration(value._3);
 			}
 			
 		}

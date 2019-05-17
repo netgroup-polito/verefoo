@@ -14,6 +14,8 @@ import it.polito.verigraph.solver.NetContext;
  *
  */
 public class PacketFilterRule {
+	private Context ctx;
+	private NetContext nctx;
 	private BoolExpr action;
 	private DatatypeExpr source;
 	private DatatypeExpr destination;
@@ -23,8 +25,6 @@ public class PacketFilterRule {
 	private IntNum end_dst_port;
 	private IntNum protocol;
 	private boolean directional;
-	private Context ctx;
-	private NetContext nctx;
 	/**
 	 * Creates a firewall rule with a set of parameters
 	 * @param nctx the z3 net context
@@ -95,13 +95,14 @@ public class PacketFilterRule {
 			String string_src_port, String string_dst_port, int protocol, boolean directional) {
 		DatatypeExpr sourceExpr = nctx.createIpAddress(source);
 		DatatypeExpr destinationExpr = nctx.createIpAddress(destination);
+		PortInterval pS = new PortInterval(string_src_port);
+		PortInterval pD = new PortInterval(string_dst_port);
+		
 		this.nctx = nctx;
 		this.ctx = ctx;
 		this.action = action? ctx.mkTrue():ctx.mkFalse();
 		this.source = sourceExpr;
 		this.destination = destinationExpr;
-		PortInterval pS = new PortInterval(string_src_port);
-		PortInterval pD = new PortInterval(string_dst_port);
 		this.start_src_port = ctx.mkInt(pS.getStart());
 		this.end_src_port = ctx.mkInt(pS.getEnd());
 		this.start_dst_port = ctx.mkInt(pD.getStart());
@@ -222,7 +223,7 @@ public class PacketFilterRule {
 	 */
 	@Override
 	public String toString() {
-		return "AclFirewallRule [action=" + action + ", source=" + source + ", destination=" + destination
+		return "PacketFilterRule [action=" + action + ", source=" + source + ", destination=" + destination
 				+ ", start_src_port=" + start_src_port + ", end_src_port=" + end_src_port + ", start_dst_port="
 				+ start_dst_port + ", end_dst_port=" + end_dst_port + ", protocol=" + protocol + ", directional="
 				+ directional + "]";
@@ -234,29 +235,23 @@ public class PacketFilterRule {
 	public BoolExpr matchPacket(Expr p0){
 		BoolExpr ipEqual;
 		if(directional){
-			ipEqual = ctx.mkAnd(nctx.equalPacketIpToFwIpRule(nctx.pf.get("src").apply(p0),this.source),
-								nctx.equalPacketIpToFwIpRule(nctx.pf.get("dest").apply(p0),this.destination));
-								//ctx.mkEq(nctx.pf.get("src").apply(p0),this.source),
-								//ctx.mkEq(nctx.pf.get("dest").apply(p0),this.destination));
+			ipEqual = ctx.mkAnd(nctx.equalPacketIpToPfIpRule(nctx.functionsMap.get("src").apply(p0),this.source),
+								nctx.equalPacketIpToPfIpRule(nctx.functionsMap.get("dest").apply(p0),this.destination));
 		}else{
-			ipEqual = ctx.mkOr(ctx.mkAnd(nctx.equalPacketIpToFwIpRule(nctx.pf.get("src").apply(p0),this.source),
-											nctx.equalPacketIpToFwIpRule(nctx.pf.get("dest").apply(p0),this.destination)
+			ipEqual = ctx.mkOr(ctx.mkAnd(nctx.equalPacketIpToPfIpRule(nctx.functionsMap.get("src").apply(p0),this.source),
+											nctx.equalPacketIpToPfIpRule(nctx.functionsMap.get("dest").apply(p0),this.destination)
 										),
-								ctx.mkAnd(nctx.equalPacketIpToFwIpRule(nctx.pf.get("src").apply(p0),this.destination),
-											nctx.equalPacketIpToFwIpRule(nctx.pf.get("dest").apply(p0),this.source)
+								ctx.mkAnd(nctx.equalPacketIpToPfIpRule(nctx.functionsMap.get("src").apply(p0),this.destination),
+											nctx.equalPacketIpToPfIpRule(nctx.functionsMap.get("dest").apply(p0),this.source)
 									)
 								);
 		}
-		ipEqual = ctx.mkAnd(ipEqual,nctx.equalPacketLv4ProtoToFwPacketLv4Proto(nctx.pf.get("lv4proto").apply(p0),this.protocol));
-		//System.out.println(ipEqual);
+		ipEqual = ctx.mkAnd(ipEqual,nctx.equalPacketLv4ProtoToFwPacketLv4Proto(nctx.functionsMap.get("lv4proto").apply(p0),this.protocol));
 		return ctx.mkAnd(ipEqual,
-						ctx.mkGe((IntExpr)nctx.port_functions.get("start").apply(nctx.pf.get("src_port").apply(p0)),(IntExpr)this.start_src_port),
-		        		ctx.mkLe((IntExpr)nctx.port_functions.get("end").apply(nctx.pf.get("src_port").apply(p0)),(IntExpr)this.end_src_port),
-		        		ctx.mkGe((IntExpr)nctx.port_functions.get("start").apply(nctx.pf.get("dest_port").apply(p0)),(IntExpr)this.start_dst_port),
-		        		ctx.mkLe((IntExpr)nctx.port_functions.get("end").apply(nctx.pf.get("dest_port").apply(p0)),(IntExpr)this.end_dst_port)
-						//ctx.mkEq(nctx.pf.get("src").apply(p_0),tp._1),ctx.mkEq(nctx.pf.get("dest").apply(p_0),tp._2),
-						//ctx.mkGe((ArithExpr) nctx.pf.get("src_port").apply(p0),this.start_src_port),ctx.mkLe((ArithExpr) nctx.pf.get("src_port").apply(p0),this.end_src_port),
-						//ctx.mkGe((ArithExpr) nctx.pf.get("dest_port").apply(p0),this.start_dst_port),ctx.mkLe((ArithExpr) nctx.pf.get("dest_port").apply(p0),this.end_dst_port)
+						ctx.mkGe((IntExpr)nctx.portFunctionsMap.get("start").apply(nctx.functionsMap.get("src_port").apply(p0)),(IntExpr)this.start_src_port),
+		        		ctx.mkLe((IntExpr)nctx.portFunctionsMap.get("end").apply(nctx.functionsMap.get("src_port").apply(p0)),(IntExpr)this.end_src_port),
+		        		ctx.mkGe((IntExpr)nctx.portFunctionsMap.get("start").apply(nctx.functionsMap.get("dest_port").apply(p0)),(IntExpr)this.start_dst_port),
+		        		ctx.mkLe((IntExpr)nctx.portFunctionsMap.get("end").apply(nctx.functionsMap.get("dest_port").apply(p0)),(IntExpr)this.end_dst_port)
 						);
 						
 					
@@ -267,4 +262,5 @@ public class PacketFilterRule {
 	public String getDst_port() {
 		return this.getStart_dst_port()+"-"+this.getEnd_dst_port();
 	}
+	
 }

@@ -45,7 +45,7 @@ import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.jaxb.TypeOfHost;
 import it.polito.verefoo.translator.Translator;
 import it.polito.verefoo.translator.TranslatorBasic;
-import it.polito.verigraph.extra.IsolationResult;
+import it.polito.verigraph.extra.VerificationResult;
 /**
  * 
  * This class runs some tests to collect some data about the performance of the tool 
@@ -98,7 +98,7 @@ public class TestPerformance {
         	condTime += (endVP-beginVP);
         	maxCondTime = maxCondTime<(endVP-beginVP)? (endVP-beginVP) : condTime;
             //System.out.println("Graph " + g.getId() + ": creating condition -> " + ((endVP-beginVP)) + "ms");
-        	IsolationResult res=test.checkNFFGProperty();
+        	VerificationResult res=test.checkNFFGProperty();
         	nrOfConditions += test.getNrOfConditions();
         	maxNrOfConditions = maxNrOfConditions<test.getNrOfConditions()? test.getNrOfConditions() : maxNrOfConditions;
         	long endCheck=System.currentTimeMillis();
@@ -339,7 +339,6 @@ public class TestPerformance {
 								i++;
 								if(i%50 == 0) System.out.println("");
 							} catch (Exception e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 								err++;
 							}

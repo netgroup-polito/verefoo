@@ -77,7 +77,6 @@ public class VerefooNormalizer {
 	        m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
 	        m.marshal( root.getPropertyDefinition(), System.out ); 
 		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
 	}

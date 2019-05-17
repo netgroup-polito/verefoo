@@ -30,7 +30,7 @@ import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.jaxb.LinkConstraints.LinkMetrics;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verefoo.translator.ConditionStringBuilder;
-import it.polito.verigraph.extra.IsolationResult;
+import it.polito.verigraph.extra.VerificationResult;
 import it.polito.verigraph.functions.PacketFilter;
 import it.polito.verigraph.solver.*;
 import it.polito.verigraph.solver.Checker.Prop;
@@ -126,7 +126,7 @@ public class VerefooProxy {
 		    
 		    //if(this.hosts.size() != 0)
 		    	//setConditions();
-		    check = new Checker(ctx,nctx, allocationNodes, allocationManager);
+		    check = new Checker(ctx,nctx, allocationNodes);
 		    setProperty(prop);
 	    }
 	    
@@ -550,7 +550,7 @@ public class VerefooProxy {
 			List<Link> nextLinks = linkProvider.getLinksFrom(srcNode.getNode(), 0);
 			if(nextLinks.size() == 0){
 				logger.error("Route: From CLIENT " + srcNode.getNode().getName() 
-									+ " to " + nctx.am.get(dstNode.getNode().getName()) 
+									+ " to " + nctx.addressMap.get(dstNode.getNode().getName()) 
 									+ " -> Dead End");
 				throw new BadGraphError("Nodes must be connected",EType.INVALID_SERVICE_GRAPH);
 			}
@@ -947,7 +947,7 @@ public class VerefooProxy {
 		 * Checks if the service graph satisfies all the imposed conditions
 		 * @return
 		 */
-		public IsolationResult checkNFFGProperty(){
+		public VerificationResult checkNFFGProperty(){
 			
 			/*System.out.println(ctx.getNumSMTLIBFormulas());
 			for(BoolExpr f : ctx.getSMTLIBFormulas()){
@@ -955,7 +955,7 @@ public class VerefooProxy {
 			}*/
 			nrOfConditions = (int) conditionDB.entrySet().stream().flatMap(e -> e.getValue().values().stream()).count();
 			//System.out.println("Nr of deployment conditions: " + nrOfConditions);
-			IsolationResult ret = this.check.propertyCheck();
+			VerificationResult ret = this.check.propertyCheck();
 			if(nrOfConditions == 0 && this.hosts.size() > 0) ret.result = Status.UNSATISFIABLE;
 			return ret;
 		}

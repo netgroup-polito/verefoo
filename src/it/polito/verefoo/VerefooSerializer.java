@@ -26,7 +26,7 @@ import it.polito.verefoo.jaxb.Path;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.tools.neo4j.Neo4jClient;
 import it.polito.verefoo.translator.Translator;
-import it.polito.verigraph.extra.IsolationResult;
+import it.polito.verigraph.extra.VerificationResult;
 
 /**
  * This class separates the Verifoo classes implementation from the actual input
@@ -108,7 +108,7 @@ public class VerefooSerializer {
 					throw new BadGraphError("No property defined for the Graph "+g.getId(),EType.INVALID_PROPERTY_DEFINITION);
 	        	VerefooProxy test = new VerefooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(), prop, paths);
 	        	long beginAll=System.currentTimeMillis();
-	        	IsolationResult res=test.checkNFFGProperty();
+	        	VerificationResult res=test.checkNFFGProperty();
 	        	long endAll=System.currentTimeMillis();
 	        	loggerResult.debug("Only checker: " +(endAll-beginAll)+"ms");
 	        	if(res.result != Status.UNSATISFIABLE&&res.result != Status.UNKNOWN){

@@ -33,7 +33,7 @@ import it.polito.verefoo.jaxb.Node;
 import it.polito.verefoo.jaxb.PName;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.translator.Translator;
-import it.polito.verigraph.extra.IsolationResult;
+import it.polito.verigraph.extra.VerificationResult;
 /**
  * 
  * This class runs some tests in order to check the correctness of the implementation of the isolation property 

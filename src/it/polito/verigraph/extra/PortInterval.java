@@ -17,7 +17,7 @@ public class PortInterval {
 		else if(range.contains("-")){
 			String strStart = range.substring(0, range.indexOf("-"));
 			String strEnd = range.substring(range.indexOf("-")+1);
-			this.start = Integer.parseInt(strStart);
+			this.start = Integer.parseInt(strStart); 
 			this.end = Integer.parseInt(strEnd);
 			
 		}else{
@@ -47,7 +47,6 @@ public class PortInterval {
 		return start + "-" + end;
 	}
 	public boolean overlapsWith(PortInterval other){
-		//System.out.println("Checking overlapping between " + this + " and " + other);
 		if(this.single && other.single){
 			return this.getStart() == other.getStart() || this.getStart()+1 == other.getStart();
 		}

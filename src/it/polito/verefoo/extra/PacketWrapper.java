@@ -24,7 +24,7 @@ public class PacketWrapper extends PacketModel {
 				if(eh.getEmailFrom()!=null && !eh.getEmailFrom().isEmpty())
 					this.setEmailFrom(String.valueOf(eh.getEmailFrom()).hashCode());
 				if(eh.getDestination()!=null && !eh.getDestination().isEmpty())
-					this.setIp_dest(nctx.am.get(eh.getDestination()));
+					this.setIp_dest(nctx.addressMap.get(eh.getDestination()));
 				if(eh.getOptions()!=null && !eh.getOptions().isEmpty())
 					this.setOptions(String.valueOf(eh.getOptions()).hashCode());
 				if(eh.getProtocol()!=null){

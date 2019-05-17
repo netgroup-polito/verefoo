@@ -21,23 +21,18 @@ import it.polito.verigraph.solver.NetContext;
  * Data structure for the response to check requests for isolation properties
  *
  */
-public class IsolationResult {
-
+public class VerificationResult {
     Context ctx;
     public NetContext nctx;
     public Status result;
     public Model model;
-    public Expr violating_packet,last_hop,last_send_time,last_recv_time,t_1;
     public BoolExpr [] assertions;
 
-    public IsolationResult(Context ctx,Status result, Expr violating_packet, Expr last_hop, Expr last_send_time, Expr last_recv_time,NetContext nctx, BoolExpr[] assertions, Model model){
+    public VerificationResult(Context ctx,Status result, NetContext nctx, BoolExpr[] assertions, Model model){
         this.ctx = ctx;
         this.result = result;
-        this.violating_packet = violating_packet;
-        this.last_hop = last_hop;
         this.model = model;
-        this.last_send_time = last_send_time;
-        this.last_recv_time = last_recv_time;
+        this.nctx = nctx;
         this.assertions = assertions;
     }
 }

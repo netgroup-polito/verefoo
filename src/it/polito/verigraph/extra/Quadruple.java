@@ -35,7 +35,7 @@ public class Quadruple<T, U, V, X> {
 	  public Quadruple(T arg1,U arg2, V arg3,X arg4) {
 	    super();
 	    this._1 = arg1;
-	    this._2 = arg2;
+	    this._2 = arg2; 
 	    this._3 = arg3;
 	    this._4 = arg4;
 	  }

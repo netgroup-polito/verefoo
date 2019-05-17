@@ -60,7 +60,6 @@ public class XMLProvider implements MessageBodyReader<Object>, MessageBodyWriter
             	e.printStackTrace();
             	throw new InvalidXMLException("Error serializing XML:"+e.toString());  
             } catch (SAXException|MalformedURLException e) {
-            	// TODO Auto-generated catch block
             	throw new ServerErrorException(503);
 			}
     }

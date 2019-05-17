@@ -12,9 +12,9 @@
         <neighbour name="10.0.0.1"/>
 		<neighbour name="20.0.0.1"/>
         <configuration description="A simple description" name="conf1">
-            <firewall defaultAction="ALLOW">
+            <firewall defaultAction="DENY">
                         <elements>
-                            <action>DENY</action>
+                            <action>ALLOW</action>
                             <source>-1.-1.-1.-1</source>
                             <destination>-1.-1.-1.-1</destination>
                             <protocol>ANY</protocol>
@@ -40,7 +40,7 @@
 	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
-		<Property graph="0" name="IsolationProperty" src="10.0.0.1" dst="20.0.0.1"/> 				
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.1" dst="20.0.0.1"/> 				
   </PropertyDefinition>
   <ParsingString></ParsingString>
 </NFV>

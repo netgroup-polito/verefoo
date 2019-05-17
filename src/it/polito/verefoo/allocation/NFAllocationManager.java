@@ -77,7 +77,7 @@ public class NFAllocationManager {
 					if(prop != null){ p.setProperties(prop, nctx);}
 					//AllocationNode server = nodes.values().stream().filter(n -> n.getIpAddress().equals(node.getConfiguration().getWebclient().getNameWebServer())).findFirst().orElse(null);
 					
-					client.installEndHost(p);
+					client.installEndHost(p); 
 					allocationNode.setPlacedNF(client);
 					allocationNode.setTypeNF(FunctionalTypes.WEBCLIENT);
 				}
@@ -115,7 +115,7 @@ public class NFAllocationManager {
 					 */
 					if(!node.getConfiguration().getFirewall().getElements().isEmpty()) {
 						firewall.setAutoconfigured(false);
-						firewall.generateAcl();
+						firewall.generateManualRules();
 					} 
 					
 					/*
@@ -184,7 +184,7 @@ public class NFAllocationManager {
 	
 	public void NFinstall() {
 		
-		nodes.values().forEach(allocationNode -> {
+		nodes.values().forEach(allocationNode -> { 
 			Node node = allocationNode.getNode();
 			FunctionalTypes type = allocationNode.getTypeNF();
 			GenericFunction no = allocationNode.getPlacedNF();
@@ -194,17 +194,12 @@ public class NFAllocationManager {
 			if(type.equals(FunctionalTypes.WEBCLIENT)) {
 				EndHost endHost = (EndHost) no;
 				AllocationNode server = nodes.values().stream().filter(n -> n.getIpAddress().equals(node.getConfiguration().getWebclient().getNameWebServer())).findFirst().orElse(null);
-				endHost.installAsWebClient(server.getZ3Node());
 			}
 			else if(type.equals(FunctionalTypes.WEBSERVER)) {
 				EndHost endHost = (EndHost) no;
-				endHost.installAsWebServer();
-			}else if(type.equals(FunctionalTypes.WEBSERVER)) {
-				EndHost endHost = (EndHost) no;
-				endHost.installAsWebServer();
 			}else if(node.getFunctionalType() == FunctionalTypes.NAT) {	
 				NAT nat = (NAT) no;
-				nat.natModel(nctx.am.get(node.getName()));
+				nat.natConfiguration(nctx.addressMap.get(node.getName()));
 				
 			}
 			 else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {	
