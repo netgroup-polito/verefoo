@@ -172,7 +172,6 @@ public class VerefooNormalizer {
 																			.collect(groupingBy(p -> p.getSrc()+"_"+p.getDst(),toList()));
 			props.entrySet().forEach(e -> {
 				if(e.getValue().size() > 1){
-					System.out.println(e.getValue().get(0).getSrc());
 					List<String> abstractNodes = new ArrayList<>();
 					Node src = nodes.stream().filter(n -> n.getName().equals(e.getValue().get(0).getSrc())).findFirst().get();
 					Host host;

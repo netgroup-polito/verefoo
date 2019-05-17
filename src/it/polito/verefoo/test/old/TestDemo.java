@@ -1,7 +1,7 @@
 /**
  * 
  */
-package it.polito.verefoo.test;
+package it.polito.verefoo.test.old;
 
 import static org.junit.Assert.*;
 
@@ -71,7 +71,7 @@ public class TestDemo {
 	
 	private NFV test(String file, boolean sat) throws Exception{
 		// create a JAXBContext capable of handling the generated classes
-        System.out.println("===========FILE " + file + "===========");
+        System.out.println("===========FILE " + file + "==========="); 
 		long beginAll=System.currentTimeMillis();
         JAXBContext jc = JAXBContext.newInstance( "it.polito.verefoo.jaxb" );
         // create an Unmarshaller

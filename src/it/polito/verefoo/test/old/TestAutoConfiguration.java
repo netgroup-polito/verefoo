@@ -1,7 +1,7 @@
 /**
  * 
  */
-package it.polito.verefoo.test;
+package it.polito.verefoo.test.old;
 
 import static org.junit.Assert.*;
 
@@ -72,7 +72,7 @@ public class TestAutoConfiguration {
 	}
 	private boolean selectCond(Node n, FunctionalTypes ft){
         if(ft.equals(FunctionalTypes.FIREWALL)){
-        	return (n.getConfiguration().getFirewall().getElements().size() > 0);
+        	return (n.getConfiguration().getFirewall().getElements().size() > 0); 
         }
         if(ft.equals(FunctionalTypes.DPI)){
         	return (n.getConfiguration().getDpi().getNotAllowed().size() > 0);
@@ -82,6 +82,7 @@ public class TestAutoConfiguration {
         }
         return false;
 	}
+	
 	private List<Node> test(String file, boolean sat, FunctionalTypes ft) throws Exception{
 		List<Node> tmp = new ArrayList<>();
 		// create a JAXBContext capable of handling the generated classes
@@ -169,98 +170,5 @@ public class TestAutoConfiguration {
 	}
 	
 	
-	@Test
-	public void testAutoDPI_RR(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-DPI-RR.xml", true, FunctionalTypes.DPI); //Working
-			assertTrue(autoNodes.size() == 0);
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoDPI_RI(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-DPI-RI.xml", true, FunctionalTypes.DPI); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<String> e = autoNodes.get(0).getConfiguration().getDpi().getNotAllowed();
-			assertTrue(e.size() == 1);
-			assertTrue(e.get(0).equals("weapons"));
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoDPI_IR(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-DPI-IR.xml", true, FunctionalTypes.DPI); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<String> e = autoNodes.get(0).getConfiguration().getDpi().getNotAllowed();
-			assertTrue(e.size() == 1);
-			assertTrue(e.get(0).equals("cats"));
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoDPI_II(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-DPI-II.xml", true, FunctionalTypes.DPI); //Working
-			assertTrue(autoNodes.size() <= 2);
-			List<String> e = autoNodes.stream().flatMap(n -> n.getConfiguration().getDpi().getNotAllowed().stream()).collect(Collectors.toList());
-			assertTrue(e.size() == 2);
-			assertTrue( (e.get(0).equals("weapons") && e.get(1).equals("cats")) || (e.get(0).equals("cats") && e.get(1).equals("weapons")) );
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	
-	
-	@Test
-	public void testAutoAntispam_RR(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-Antispam-RR.xml", true, FunctionalTypes.ANTISPAM); //Working
-			assertTrue(autoNodes.size() == 0);
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoAntispam_RI(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-Antispam-RI.xml", true, FunctionalTypes.ANTISPAM); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<String> e = autoNodes.get(0).getConfiguration().getAntispam().getSource();
-			assertTrue(e.size() == 1);
-			assertTrue(e.get(0).equals("2"));
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoAntispam_IR(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-Antispam-IR.xml", true, FunctionalTypes.ANTISPAM); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<String> e = autoNodes.get(0).getConfiguration().getAntispam().getSource();
-			assertTrue(e.size() == 1);
-			assertTrue(e.get(0).equals("1"));
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoAntispam_II(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-Antispam-II.xml", true, FunctionalTypes.ANTISPAM); //Working
-			assertTrue(autoNodes.size() <= 2);
-			List<String> e = autoNodes.stream().flatMap(n -> n.getConfiguration().getAntispam().getSource().stream()).collect(Collectors.toList());
-			assertTrue(e.size() == 2);
-			assertTrue((e.get(0).equals("1") && e.get(1).equals("2")) || (e.get(0).equals("2") && e.get(1).equals("1")));
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	
-	
+		
 }

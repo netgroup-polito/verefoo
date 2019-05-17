@@ -1,7 +1,7 @@
 /**
  * 
  */
-package it.polito.verefoo.test;
+package it.polito.verefoo.test.old;
 
 import static org.junit.Assert.*;
 
@@ -163,99 +163,6 @@ public class TestAutoPlacement {
 			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
 			assertTrue(e.size() == 1);
 			assertTrue(e.get(0).getSource().equals("node2") && e.get(0).getDestination().equals("nodeB"));
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	
-	
-	@Test
-	public void testAutoDPI_RR(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-DPI-RR.xml", true, FunctionalTypes.DPI); //Working
-			assertTrue(autoNodes.size() == 0);
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoDPI_RI(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-DPI-RI.xml", true, FunctionalTypes.DPI); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<String> e = autoNodes.get(0).getConfiguration().getDpi().getNotAllowed();
-			assertTrue(e.size() == 1);
-			assertTrue(e.get(0).equals("weapons"));
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoDPI_IR(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-DPI-IR.xml", true, FunctionalTypes.DPI); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<String> e = autoNodes.get(0).getConfiguration().getDpi().getNotAllowed();
-			assertTrue(e.size() == 1);
-			assertTrue(e.get(0).equals("cats"));
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoDPI_II(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-DPI-II.xml", true, FunctionalTypes.DPI); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<String> e = autoNodes.get(0).getConfiguration().getDpi().getNotAllowed();
-			assertTrue(e.size() == 2);
-			assertTrue( (e.get(0).equals("weapons") && e.get(1).equals("cats")) || (e.get(0).equals("cats") && e.get(1).equals("weapons")) );
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	
-	@Test
-	public void testAutoAntispam_RR(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-Antispam-RR.xml", true, FunctionalTypes.ANTISPAM); //Working
-			assertTrue(autoNodes.size() == 0);
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoAntispam_RI(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-Antispam-RI.xml", true, FunctionalTypes.ANTISPAM); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<String> e = autoNodes.get(0).getConfiguration().getAntispam().getSource();
-			assertTrue(e.size() == 1);
-			assertTrue(e.get(0).equals("2"));
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoAntispam_IR(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-Antispam-IR.xml", true, FunctionalTypes.ANTISPAM); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<String> e = autoNodes.get(0).getConfiguration().getAntispam().getSource();
-			assertTrue(e.size() == 1);
-			assertTrue(e.get(0).equals("1"));
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	@Test
-	public void testAutoAntispam_II(){
-		try {
-			List<Node> autoNodes = test( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoPlace-Antispam-II.xml", true, FunctionalTypes.ANTISPAM); //Working
-			assertTrue(autoNodes.size() == 1);
-			List<String> e = autoNodes.get(0).getConfiguration().getAntispam().getSource();
-			assertTrue(e.size() == 2);
-			assertTrue((e.get(0).equals("1") && e.get(1).equals("2")) || (e.get(0).equals("2") && e.get(1).equals("1")));
 		} catch (Exception e) {
 			fail(e.toString());
 		}

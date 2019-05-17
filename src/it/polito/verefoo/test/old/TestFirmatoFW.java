@@ -1,12 +1,13 @@
 /**
  * 
  */
-package it.polito.verefoo.test;
+package it.polito.verefoo.test.old;
 
 import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,19 +27,21 @@ import com.microsoft.z3.Status;
 import it.polito.verefoo.VerefooProxy;
 import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.extra.BadGraphError;
+import it.polito.verefoo.jaxb.Elements;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Graph;
 import it.polito.verefoo.jaxb.NFV;
+import it.polito.verefoo.jaxb.Node;
 import it.polito.verefoo.jaxb.PName;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.translator.Translator;
 import it.polito.verigraph.extra.VerificationResult;
 /**
  * 
- * This class runs some tests in order to check the correctness of the implementation of the isolation property 
+ * This class runs some tests in order to check the correctness of the new firewall model 
  *
  */
-public class TestProxyIsolation {
+public class TestFirmatoFW {
 
 	/**
 	 * @throws java.lang.Exception
@@ -67,8 +70,20 @@ public class TestProxyIsolation {
 	@After
 	public void tearDown() throws Exception {
 	}
-	
-	private NFV test(String file, boolean sat) throws Exception{
+	private boolean selectCond(Node n, FunctionalTypes ft){
+        if(ft.equals(FunctionalTypes.FIREWALL)){
+        	return (n.getConfiguration().getFirewall().getElements().size() > 0);
+        }
+        if(ft.equals(FunctionalTypes.DPI)){
+        	return (n.getConfiguration().getDpi().getNotAllowed().size() > 0);
+        }
+        if(ft.equals(FunctionalTypes.ANTISPAM)){
+        	return (n.getConfiguration().getAntispam().getSource().size() > 0);
+        }
+        return false;
+	}
+	private List<Node> test(String file, boolean sat, FunctionalTypes ft) throws Exception{
+		List<Node> tmp = new ArrayList<>();
 		// create a JAXBContext capable of handling the generated classes
         System.out.println("===========FILE " + file + "===========");
 		long beginAll=System.currentTimeMillis();
@@ -83,114 +98,62 @@ public class TestProxyIsolation {
 		//long endU=System.currentTimeMillis();
         //System.out.println("Unmarshalling -> " + ((endU-beginAll)/1000) );
         VerefooSerializer test = new VerefooSerializer(root);
+        
+        	
+        tmp.addAll(
+        		root.getGraphs().getGraph().stream().flatMap(g -> g.getNode().stream())
+        		.filter(n -> n.getFunctionalType().equals(ft) && selectCond(n, ft))
+        		.collect(Collectors.toList())
+        		);
         if(test.isSat()){
         		System.out.println("SAT");
     	}
     	else{
     		System.out.println("UNSAT");
     	}
-		long endAll=System.currentTimeMillis();
-        System.out.println("Total time -> " + (endAll-beginAll)+"ms" );
+		long endAll=System.currentTimeMillis(); 
+        System.out.println("Total time -> " + (endAll-beginAll)+"ms" );	
         test.getResult().getPropertyDefinition().getProperty().forEach(p ->{
         	org.junit.Assert.assertEquals(sat, p.isIsSat());
         });
-        return root;
+        return tmp;
 	}
 	
 	@Test
 	public void testFW_SAT(){
 		try {
-			test( "./testfile/Isolation/nfv1nodes7hostsSAT-FW.xml", true); //Working
+			test( "./testfile/FirmatoFW/nfv3policies-Verification-SAT.xml", true, FunctionalTypes.FIREWALL); //Working
 		} catch (Exception e) {
 			fail(e.toString());
 		}
 	}
 	@Test
-	public void testCACHE_SAT(){
-		
+	public void test2FW_SAT(){
 		try {
-			test( "./testfile/Isolation/nfv1nodes7hostsSAT-CACHE.xml", true); // Working
+			test( "./testfile/FirmatoFW/nfv2nodes3policiesAutoConf-NoStrict.xml", true, FunctionalTypes.FIREWALL); //Working
 		} catch (Exception e) {
 			fail(e.toString());
-		} 
+		}
+	}
+	
+	@Test
+	public void testFW_UNSAT(){
+		try {
+			List<Node> autoNodes = test( "./testfile/FirmatoFW/nfv3policies-Verification-UNSAT.xml", false, FunctionalTypes.FIREWALL); //Working
+		} catch (Exception e) {
+			fail(e.toString());
+		}
 	}
 	@Test
-	public void testDPI_SAT() {
+	public void testPreProcessingAndMerging(){
 		try {
-			test( "./testfile/Isolation/nfv1nodes7hostsSAT-DPI.xml", true); //Working
+			List<Node> autoNodes = test( "./testfile/FirmatoFW/Pre-Processing&Merging.xml", true, FunctionalTypes.FIREWALL); //Working
+			assertTrue(autoNodes.size() == 1);
+			List<Elements> e = autoNodes.get(0).getConfiguration().getFirewall().getElements();
+			assertTrue(e.size() == 1);
+			assertTrue(e.get(0).getSource().equals("-1.-1.-1.-1"));
 		} catch (Exception e) {
 			fail(e.toString());
-		}		
-	}
-	@Test
-	public void testNAT_SAT() {
-		try {
-			test( "./testfile/Isolation/nfv3nodes3hostsSAT-NAT.xml", true); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
-	@Test
-	public void testANTISPAM_SAT() {
-		try {
-			test( "./testfile/Isolation/nfv3nodes3hostsSAT-ANTISPAM.xml", true); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
-	@Test
-	public void testMAIL_UNSAT() {
-		try {
-			test( "./testfile/Isolation/nfv3nodes7hostsUNSAT-MAIL.xml", false); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
-	@Test
-	public void testWEB_UNSAT() {
-		try {
-			test( "./testfile/Isolation/nfv5nodes7hostsUNSAT-WEB.xml", false); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
-	@Test
-	public void testMAIL_PropertySpec_SAT() {
-		try {
-			test( "./testfile/Isolation/nfv5nodes7hostsSAT-MAIL-PropertySpec.xml", true); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
-	@Test
-	public void testWEB_PropertySpec_SAT() {
-		try {
-			test( "./testfile/Isolation/nfv5nodes7hostsSAT-WEB-PropertySpec.xml", true); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
-	@Test
-	public void testMAIL_PropertySpec_UNSAT() {
-		try {
-			test( "./testfile/Isolation/nfv2nodes7hostsUNSAT-MAIL-PropertySpec.xml", false); //Working
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
-	}
-	@Test
-	public void testWildcards_SAT() {
-		try {
-			NFV root = test( "./testfile/Isolation/nfv5nodes7hostsSAT-Wildcards-II.xml", true); //Working
-			List<String> firewallsRule = root.getGraphs().getGraph().get(0).getNode().stream()
-													.filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL))
-													.flatMap(n -> n.getConfiguration().getFirewall().getElements().stream())
-													.map(e -> e.getSource())
-													.collect(Collectors.toList());
-			assertTrue(firewallsRule.contains("10.0.0.-1"));
-			
-		} catch (Exception e) {
-			fail(e.toString());
-		}		
+		}
 	}
 }

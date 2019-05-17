@@ -124,20 +124,20 @@ public class Checker {
   	 	BoolExpr enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp2));
 		constraintList.add(enumerateSend);
 
-		constraintList.add(ctx.mkEq(nctx.functionsMap.get("origin").apply(p0), src.getZ3Name()));
+		constraintList.add(ctx.mkEq(nctx.functionsMap.get("origin").apply(p0), src.getZ3Name())); 
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.functionsMap.get("src").apply(p1)));
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.functionsMap.get("dest").apply(p1)));
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.functionsMap.get("dest").apply(p0)));
 	
-		constraintList.add(ctx.mkForall(new Expr[]{p0},
+		constraintList.add(ctx.mkForall(new Expr[]{p0}, 
 				ctx.mkImplies(ctx.mkAnd(enumerateRecv),
 						ctx.mkAnd(ctx.mkEq(nctx.functionsMap.get("lv4proto").apply(p0), (IntExpr)ctx.mkInt(lv4proto)),
 								ctx.mkEq(nctx.functionsMap.get("src_port").apply(p0), nctx.portMap.get(src_port)),
 									ctx.mkEq(nctx.functionsMap.get("dest_port").apply(p0), nctx.portMap.get(dst_port))
-								)),1,null,null,null,null));
+								)),1,null,null,null,null));  
 	
-	}
-	
+	} 
+	 
 
 	public void propertyAdd(AllocationNode source, AllocationNode dest, Prop property, Property otherConstr) {
 		String src_port = (otherConstr == null || otherConstr.getSrcPort() == null) ? "null":otherConstr.getSrcPort();

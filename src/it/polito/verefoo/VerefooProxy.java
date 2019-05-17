@@ -391,9 +391,11 @@ public class VerefooProxy {
 						logger.debug("No path found between "+ src + " and "+ dst);
 						continue;
 					}
-					if(hosts.size() != 0)
+					if(hosts.size() != 0) {
 						//calculateDeploymentConditions(validChain, c, s);
-						logger.debug("not yet implemented");
+						logger.debug("placement not yet implemented"); 
+						createRoutingConditions(srcNode, dstNode);
+					}
 					else
 						createRoutingConditions(srcNode, dstNode);
 					}

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package it.polito.verefoo.test;
+package it.polito.verefoo.test.old;
 
 import static org.junit.Assert.*;
 
@@ -191,7 +191,7 @@ public class TestSG {
         n1 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host2")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
         org.junit.Assert.assertEquals(true, n1.contains("node3"));
         n2 = root.getHosts().getHost().stream().filter(h-> h.getName().equals("host3")).flatMap(h -> h.getNodeRef().stream()).map(nr -> nr.getNode()).collect(Collectors.toList()); 
-        org.junit.Assert.assertEquals(true, n2.contains("node2"));
+        org.junit.Assert.assertEquals(true, n2.contains("node2")); 
         
 		//2 clients and 2 servers
         root = init("./testfile/ServiceGraphs/sg2clients4nodes2servers3hostDiffEndpoints.xml");

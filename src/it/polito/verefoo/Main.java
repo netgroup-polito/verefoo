@@ -50,7 +50,7 @@ public class Main {
                 		Marshaller m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-                        VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal( new FileInputStream( "./testfile/FWCorrectness/FWCorrect01.xml" )));
+                        VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal( new FileInputStream( "./testfile/Autoconfiguration/nfv3nodes7hostsAutoConf-FW-RR.xml" )));
                         m = jc.createMarshaller();
                         m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
                         m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");

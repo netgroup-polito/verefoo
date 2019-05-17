@@ -68,7 +68,6 @@ public class NAT extends GenericFunction {
 		// same for p_1.<dest,orig_body,body,seq,proto,emailFrom,url,options> ==
 		// p_0.<...>) "
 
-		System.out.print(natIp);
 		Quantifier leftToRight = ctx.mkForall(new Expr[] { p_left_to_right_0 }, ctx.mkImplies(
 				ctx.mkAnd(enumerateSend(p_left_to_right_0, source.getRightHops().keySet()),
 						ctx.mkNot((BoolExpr) private_addr_func.apply(nctx.functionsMap.get("dest").apply(p_left_to_right_0)))),

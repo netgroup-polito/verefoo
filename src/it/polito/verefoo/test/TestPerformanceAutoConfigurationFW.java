@@ -58,7 +58,7 @@ public class TestPerformanceAutoConfigurationFW {
 	NFV root;
 	private List<Host> pastClients = new ArrayList<>(), pastServers = new ArrayList<>();
 	private Logger logger = LogManager.getLogger("result");
-	/**
+	/** 
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass

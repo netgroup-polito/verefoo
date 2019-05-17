@@ -1,7 +1,7 @@
 /**
  * 
  */
-package it.polito.verefoo.test;
+package it.polito.verefoo.test.old;
 
 import static org.junit.Assert.*;
 
@@ -72,7 +72,7 @@ public class TestProxyBasic {
 		// create a JAXBContext capable of handling the generated classes
         System.out.println("===========FILE " + file + "===========");
 		long beginAll=System.currentTimeMillis();
-        JAXBContext jc = JAXBContext.newInstance( "it.polito.verefoo.jaxb" );
+        JAXBContext jc = JAXBContext.newInstance( "it.polito.verefoo.jaxb" ); 
         // create an Unmarshaller
         Unmarshaller u = jc.createUnmarshaller();
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
