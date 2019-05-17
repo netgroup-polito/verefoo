@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 public class LogParser {
 	private static final String FILE_HEADER = ",Seed,Assertions,CheckerTime,Time";
 	private static final String AVG_HEADER = ",AVG,MAX,MIN";
-	private static final String COMMA_DELIMITER = ",";
 	private static final String NEW_LINE_SEPARATOR = "\n";
 
 	public static void main(String[] args) throws IOException {
@@ -25,7 +24,7 @@ public class LogParser {
 		csvAvgFile.append(AVG_HEADER.toString());
 		csvAvgFile.append(NEW_LINE_SEPARATOR);
 
-		File testFile = new File("./log/result.log");
+		File testFile = new File("./log/result.log"); 
 		Scanner s = new Scanner(testFile);
 		int count = 0;
 

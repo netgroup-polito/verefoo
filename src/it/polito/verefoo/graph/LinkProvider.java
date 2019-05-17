@@ -16,7 +16,6 @@ import it.polito.verefoo.jaxb.Property;
  */
 public class LinkProvider {
 	private List<Link> links;
-	private List<Node> nodes;
 	private List<Path> paths;
 	private List<Property> properties;
 	private int lastPathId = -1, lastNodeIndex = -1; 
@@ -28,10 +27,9 @@ public class LinkProvider {
 	 * @param properties List of properties
 	 */
 	public LinkProvider(List<Node> ns, List<Path> ps, List<Property> properties){
-		nodes = ns;
 		paths = ps;
 		this.properties = properties;
-		links = (new LinkCreator(ns, this.properties)).getLinks();
+		links = (new LinkCreator(ns, this.properties)).getLinks(); 
 	}
 	
 	/**
@@ -53,7 +51,6 @@ public class LinkProvider {
 					p.getPathNode().get(p.getPathNode().size()-1).getName().equals(server.getName()) && 
 					paths.indexOf(p) > lastPathId){
 				lastPathId = paths.indexOf(p);
-				//System.out.println("Last path is: " + lastPathId);
 				lastNodeIndex = -1;
 				return true;
 			}
@@ -75,7 +72,6 @@ public class LinkProvider {
 				throw new BadGraphError("Invalid Path with id " + lastPathId,EType.INVALID_SERVICE_GRAPH);
 			List<Link> nextLinks = new ArrayList<>();
 			nextLinks.add(new Link(p.get(lastNodeIndex), p.get(lastNodeIndex+1)));
-			//System.out.println("Links from " + n.getName() + ": " + nextLinks.get(0).getSourceNode()+"->"+nextLinks.get(0).getDestNode());
 			return nextLinks;
 		}
 		return links.stream().filter(l -> l.getSourceNode().equals(n.getName())).collect(Collectors.toList());

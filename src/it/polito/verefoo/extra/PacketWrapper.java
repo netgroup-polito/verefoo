@@ -63,7 +63,7 @@ public class PacketWrapper extends PacketModel {
 			String url = prop.getHTTPDefinition().getUrl();
 			this.setBody(body.hashCode());
 			if(options != null){
-				this.setOptions(options.hashCode());
+				this.setOptions(options.hashCode()); 
 			}
 			if(url != null){
 				this.setUrl(url.hashCode());

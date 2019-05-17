@@ -26,9 +26,7 @@ import it.polito.verefoo.jaxb.Property;
 public class LinkCreator {
 	private List<Link> links = new ArrayList<>();
 	private List<Node> nodes;
-	private List<Path> paths;
 	private List<Property> properties;
-	private Map<Integer, List<Link>> pathMap = new HashMap<>();
 	/**
 	 * Public constructor of LinkCreator class
 	 * @param ns the list of the nodes in the network service
@@ -47,20 +45,7 @@ public class LinkCreator {
 		this.properties = properties;
 	}
 
-	/*public LinkCreator(List<Node> ns, List<Path> ps){
-		nodes = ns;
-		paths = ps;
-		for(Path p : ps){
-			List<Link> links = new ArrayList<>();
-			List<PathNode> pathNodes = p.getPathNode();
-			for(int i = 1; i < pathNodes.size(); i++){
-				Link l = new Link(pathNodes.get(i-1).getName(), pathNodes.get(i).getName());
-				links.add(l);
-			}
-			pathMap.put(p.getId(), links);
-		}
-	}*/
-	
+		
 	/**
 	 * Retrives the links of the service graph exploring the node's neighbours
 	 * @return the links between nodes in the service graph
@@ -82,18 +67,12 @@ public class LinkCreator {
 		        	createLink(srcNode, next, srcNode, dstNode, new ArrayList<>(), new ArrayList<>());
 		        	//logger.debug("New Link from " + client.getName() + " to "+ next.getName() +" towards server "+server.getName());
 		        }
-				//links.add(new Link(client.getName(), next.getName()));
-			
 		}
         
 		List<Link> orderedLinks = links.stream()
 										.sorted(comparing(Link::getSourceNode).thenComparing(Link::getDestNode))
 										.distinct()
 										.collect(Collectors.toList());
-		/*
-		 * logger.debug("Unique links:"); orderedLinks.forEach(l ->
-		 * logger.debug(l.getSourceNode()+"->"+l.getDestNode()));
-		 */
 		return orderedLinks;
 	}
 	
@@ -131,7 +110,6 @@ public class LinkCreator {
 										.collect(Collectors.toList());
 		converting.add(current.getName());
 		//logger.debug("From " + prec.getName() + " converting neighbours of " + current.getName() + " " + neighbours +" into links");
-		
 		for(String neighbour : neighbours){
 			if(!converting.contains(neighbour)){
 				Node next = nodes.stream().filter(n -> n.getName().equals(neighbour)).findFirst().get();
@@ -143,10 +121,6 @@ public class LinkCreator {
 					links.add(l);
 					converted.add(current.getName());
 					found = true;
-					
-					/*if(current.getFunctionalType()== FunctionalTypes.FIREWALL && current.getConfiguration().getFirewall().getElements().isEmpty() && FWmanager != null) {
-						FWmanager.setPolicy(current, client, server);
-					}*/
 				}
 				else{
 					//logger.debug("Neighbour from " + current.getName() + " (" + neighbour +") don't reach the server " + server.getName());

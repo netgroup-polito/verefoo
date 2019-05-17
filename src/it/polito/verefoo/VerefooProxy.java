@@ -22,8 +22,6 @@ import com.microsoft.z3.Status;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.allocation.NFAllocationManager;
 import it.polito.verefoo.extra.BadGraphError;
-import it.polito.verefoo.extra.NetContextGenerator;
-import it.polito.verefoo.graph.ChainExtractor;
 import it.polito.verefoo.graph.Link;
 import it.polito.verefoo.graph.LinkProvider;
 import it.polito.verefoo.jaxb.*;
@@ -95,7 +93,7 @@ public class VerefooProxy {
 		    
 		    wildcardManager = new WildcardManager(allocationNodes);
 		    
-			nctx = NetContextGenerator.generate(ctx,nodes,prop, allocationNodes);
+			nctx = nctxGenerate(ctx,nodes,prop, allocationNodes);
 			nctx.setWildcardManager(wildcardManager);
 			
 			FWmanager = new PacketFilterManager(wildcardManager, prop, nodes);
@@ -127,7 +125,24 @@ public class VerefooProxy {
 		    setProperty(prop);
 	    }
 	    
-	    /**
+	    private NetContext nctxGenerate(Context ctx2, List<Node> nodes2, List<Property> prop,
+				HashMap<String, AllocationNode> allocationNodes2) {
+	    	for(Node n : nodes){
+				if(n.getName().contains("@"))
+					throw new BadGraphError("Invalid node name "+ n.getName() + ", it can't contain @", EType.INVALID_SERVICE_GRAPH);
+			}
+			String[] nodesname={};
+			nodesname=nodes.stream().map((n)->n.getName()).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(nodesname);
+			//suppose nodename=nodeip;
+			String[] nodesip=nodesname;
+			String[] src_portRange={};
+			src_portRange=properties.stream().map(p -> p.getSrcPort()).filter(p -> p!=null).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(src_portRange);
+			String[] dst_portRange={};
+			dst_portRange=properties.stream().map(p -> p.getDstPort()).filter(p -> p!=null).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(dst_portRange);
+		    return new NetContext(ctx,allocationNodes, nodesname,nodesip,src_portRange, dst_portRange);
+		}
+
+		/**
 	     * Sets all the conditions for the nodes. First, it removes all the deployment condition that were not possible
 	     * for all the client/server combination. Then, it sets up the host conditions and creates 
 	     * the conditions to ensure that a node is deployed only on one host.
@@ -339,35 +354,7 @@ public class VerefooProxy {
 		 * Checks the physical topology of the XML, then it calls the function to calculate all the possible paths from the host client to the host server
 		 * @throws BadGraphError
 		 */
-		private void checkPhysicalNetwork() throws BadGraphError{
-            long nMiddle = hosts.stream()
-	            	 .filter((h) -> {return h.getType() == TypeOfHost.MIDDLEBOX;})
-	            	 .count();
-            if(nMiddle == 0) throw new BadGraphError("At least one middle host has to be defined",EType.NO_MIDDLE_HOST_DEFINED);
-            boolean fixedServer = true;
-            List<String> clients = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.CLIENT;}).map(h -> h.getName()).collect(Collectors.toList());
-            List<String> servers = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.SERVER;}).map(h -> h.getName()).collect(Collectors.toList());
-            if(servers.size() == 0){
-            	//the nodeServer can be deployed on a middlebox
-            	servers = hosts.stream().filter(h -> {return h.getType() == TypeOfHost.MIDDLEBOX;}).map(h -> h.getName()).collect(Collectors.toList());
-            	fixedServer = false;
-            }
-           try{
-		        for(String hostClient: clients){
-		        	for(String hostServer: servers){
-		        		logger.debug("Calculating host chain between " + hostClient + " and " + hostServer + " composed by max " + (nodes.size()-clients.size()-servers.size()+2) + " hosts"); 
-		        		if(fixedServer)
-		        			savedChain.addAll(ChainExtractor.createHostChain(hostClient, hostServer, hosts, connections, nodes.size()-clients.size()-servers.size()+2));
-		        		else
-		        			savedChain.addAll(ChainExtractor.createHostChain(hostClient, hostServer, hosts, connections, nodes.size()-clients.size()-1+2));
-		                if(savedChain.size() == 0) throw new BadGraphError("Host client " + hostClient + " and host " + hostServer +" are not connected",EType.INVALID_PHY_SERVER_CLIENT_CONF);
-		            }
-		        }
-           }catch(StackOverflowError e) {
-           		throw new BadGraphError("The service graph is too big",EType.INVALID_SERVICE_GRAPH);
-			}
-		}
-		
+	
 		/**
 		 * Calls the function to translate the node's neighbours into links and then it calls the function that creates the routing tables
 		 * @throws BadGraphError
@@ -461,80 +448,7 @@ public class VerefooProxy {
 			    });
 		}
 		
-		
-		/**
-		 * Creates all the routing rule between the internal nodes (middleboxes), currently not fully implemented
-		 * @param clients List of clients in the service graph
-		 * @param servers List of servers in the service graph
-		 */
-		private void createInternalRouting(List<Node> clients, List<Node> servers){
-			try{
-		        for(Node nodeClient: clients){
-		        	for(Node nodeServer: servers){
-		        		savedNodeChain.addAll(ChainExtractor.createNodeChain(nodeClient.getName(), nodeServer.getName(), linkProvider.getAllLinks()));
-		                if(savedNodeChain.size() == 0) throw new BadGraphError("Node client and node server are not connected",EType.INVALID_SERVICE_GRAPH);
-		            }
-		        }
-            }catch(StackOverflowError e) {
-           		throw new BadGraphError("The service graph is too big",EType.INVALID_SERVICE_GRAPH);
-			}
-            
-            for(List<String> chain:savedNodeChain){
-            	for(Node src:nodes){
-	            	int iSrc = chain.lastIndexOf(src.getName());
-	            	if(iSrc < 0){
-            			continue;
-            		}
-	            	if(!routingRule.containsKey(src)){
-            			routingRule.put(src, new HashMap<>());
-            		}
-	            	for(Node dst:nodes){
-	            		int iDst = chain.lastIndexOf(dst.getName());
-	            		if(iDst < 0 || servers.contains(dst) || src == dst){
-	            			continue;
-	            		}
-	            		int distance = iDst - iSrc;
-	            		Node nextHop = nodes.stream().filter(n1 -> n1.getName().equals(chain.get(iSrc+(distance/Math.abs(distance))))).findFirst().orElse(null);
-        				assert(nextHop != null);
-	            		/*if(clients.contains(nextHop) || servers.contains(nextHop)){
-	            			continue;
-	            		}*/
-	            		if(!routingRule.get(src).containsKey(dst)){
-	            			//System.out.println("From " + src.getName() + " (index="+iSrc+") to "+ dst.getName() + " (index="+iDst+") -> " + distance);
-	            			List<Node> newRules = new ArrayList<>();
-	            			newRules.add(nextHop);
-	            			routingRule.get(src).put(dst, newRules);
-	            			//logger.debug("From " + src.getName() + " to "+ dst.getName() + " -> NextHop: " + chain.get(iSrc+(distance/Math.abs(distance))) + " dist: " + distance);
-	            		}else{
-	            			List<Node> rules = routingRule.get(src).get(dst);
-            				if(!rules.contains(nextHop))
-        						rules.add(nextHop);
-        					//routingRule.get(src).put(dst, rules);
-        					//logger.debug("Rule ADDED: From " + src.getName() + " to "+ dst.getName() + " -> NextHop: " + chain.get(iSrc+(distance/Math.abs(distance))) + " dist: " + distance);
-        					            					            			
-	            		}
-	            			
-	            	}
-	            }
-            }
-            /*routingRule.forEach((src,rules) ->{
-            	logger.debug("From " + src.getName() + " -> ");
-            	rules.forEach((dst, rule) ->{
-            		logger.debug("\tto " + dst.getName());
-            		rule.forEach(nextHop ->{
-                		logger.debug("\t\t\t\t-> " + nextHop.getName());
-                	});
-            	});
-            	
-            });*/
-            /*routingRule.forEach((src,rules) ->{
-            	rules.forEach((dst, rule) ->{
-            		net.internalRoutingOptimizationSG(netobjs.get(src), nctx.am.get(dst.getName()), rule.stream().map(t -> netobjs.get(t._1)).collect(Collectors.toList()));
-            	});
-            	
-            });*/
-            
-		}
+	
 		/**
 		 * Explores the graph to find the path between client and server and then it builds the routing table based on those information (for an XML without physical topology)
 		 * @param client

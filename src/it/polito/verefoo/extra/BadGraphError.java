@@ -33,7 +33,6 @@ public class BadGraphError extends RuntimeException {
 		this.e=e;
 	}
 
-	
 	public EType getE() {
 		return e;
 	}
@@ -41,11 +40,5 @@ public class BadGraphError extends RuntimeException {
 	public void setE(EType e) {
 		this.e = e;
 	}
-
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7802813559016997900L;
 
 }
