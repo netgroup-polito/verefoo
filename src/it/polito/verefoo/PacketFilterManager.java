@@ -3,6 +3,7 @@ package it.polito.verefoo;
 import it.polito.verigraph.extra.Quadruple;
 import it.polito.verigraph.functions.PacketFilter;
 import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.extra.WildcardManager;
 import it.polito.verefoo.jaxb.*;
 
 import java.util.ArrayList;
@@ -18,158 +19,154 @@ import java.util.stream.Collectors;
  */
 
 public class PacketFilterManager {
-	
+
 	private WildcardManager wildcardManager;
-	private HashMap<String, Quadruple<PacketFilter, AllocationNode, Integer, Boolean>> autoconfFW;
-	private HashMap<String, List<Property>> FWAllPolicies;
-	private HashMap<String, List<Property>> FWInterestedPolicies;
-	private List<Node> nodes;
-	
+	private HashMap<String, Quadruple<PacketFilter, AllocationNode, Integer, Boolean>> autoconfPFproperties;
+	private HashMap<String, List<Property>> pfPolicies;
+	private HashMap<String, List<Property>> pfPoliciesSpecific;
+
 	private List<Property> policies;
-	
+
 	/**
 	 * Public constructor of FWAutoconfigurationManager class
+	 * 
 	 * @param wildcardManager It is an object of WildcardManager class
-	 * @param policies It is the list of reachability and isolation properties
-	 * @param nodes It is the list of nodes in the network
+	 * @param policies        It is the list of reachability and isolation
+	 *                        properties
+	 * @param nodes           It is the list of nodes in the network
 	 */
-	public PacketFilterManager(WildcardManager wildcardManager, List<Property> policies, List<Node> nodes){
+	public PacketFilterManager(WildcardManager wildcardManager, List<Property> policies) {
 		this.wildcardManager = wildcardManager;
 		this.policies = policies;
-		
-		this.nodes = nodes;
-		autoconfFW = new HashMap<String, Quadruple<PacketFilter, AllocationNode, Integer, Boolean>>();
-		FWAllPolicies = new HashMap<String, List<Property>>();
-		FWInterestedPolicies = new HashMap<String, List<Property>>();
+		autoconfPFproperties = new HashMap<String, Quadruple<PacketFilter, AllocationNode, Integer, Boolean>>();
+		pfPolicies = new HashMap<String, List<Property>>();
+		pfPoliciesSpecific = new HashMap<String, List<Property>>();
 	}
-	
+
 	/**
-	 * This method adds in a local map a firewall, associating it with the node in which it's deployed.
+	 * This method adds in a local map a firewall, associating it with the node in
+	 * which it's deployed.
+	 * 
 	 * @param f The firewall to deploy
 	 * @param n The node on which the firewall can be deployed
 	 */
 	public void addFirewall(PacketFilter f, AllocationNode n) {
-		
 		boolean autoplace;
-		
 		autoplace = true;
-		
-		if(!autoconfFW.containsKey(n.getNode().getName())) {
-			autoconfFW.put(n.getNode().getName(), new Quadruple<PacketFilter, AllocationNode, Integer, Boolean>(f, n, new Integer(0), new Boolean(autoplace)));
-			FWAllPolicies.put(n.getNode().getName(), new ArrayList<Property>());
-			FWInterestedPolicies.put(n.getNode().getName(), new ArrayList<Property>());
+		if (!autoconfPFproperties.containsKey(n.getNode().getName())) {
+			autoconfPFproperties.put(n.getNode().getName(),
+					new Quadruple<PacketFilter, AllocationNode, Integer, Boolean>(f, n, new Integer(0),
+							new Boolean(autoplace)));
+			pfPolicies.put(n.getNode().getName(), new ArrayList<Property>());
+			pfPoliciesSpecific.put(n.getNode().getName(), new ArrayList<Property>());
 		}
-		
 
 	}
-	
+
 	/**
-	 * This methods stores the information that if a firewall is present on the node specified as input,
-	 * then it should manage a reachability/isolation polity between the source and destination specified.
-	 * @param node It's the node on which a firewall may have been placed.
-	 * @param source It's the source of the policy.
+	 * This methods stores the information that if a firewall is present on the node
+	 * specified as input, then it should manage a reachability/isolation polity
+	 * between the source and destination specified.
+	 * 
+	 * @param node        It's the node on which a firewall may have been placed.
+	 * @param source      It's the source of the policy.
 	 * @param destination It's the destination of the policy.
 	 */
 	public void setPolicy(AllocationNode node, Node source, Node destination) {
-	
+
 		int newRules = 0;
-		PacketFilter firewall = autoconfFW.get(node.getIpAddress())._1;
-		List<Property> allProperties = policies.stream().filter(p -> p.getSrc().equals(source.getName()) && p.getDst().equals(destination.getName())).collect(Collectors.toList());		
-		List<Property> interestedProperties = allProperties.stream().filter(p ->
-				( p.getName().value().equals("IsolationProperty") && firewall.isBlacklisting()) 
-				|| (p.getName().value().equals("ReachabilityProperty") && !firewall.isBlacklisting())).collect(Collectors.toList());
-		for(Property property : allProperties) {
-			boolean found = FWAllPolicies.get(node.getIpAddress()).stream().anyMatch(p -> p.getSrc().equals(property.getSrc()) && p.getDst().equals(property.getDst()));
-			if(!found) {
-				FWAllPolicies.get(node.getIpAddress()).add(property);
+		PacketFilter firewall = autoconfPFproperties.get(node.getIpAddress())._1;
+		List<Property> allProperties = policies.stream()
+				.filter(p -> p.getSrc().equals(source.getName()) && p.getDst().equals(destination.getName()))
+				.collect(Collectors.toList());
+		List<Property> interestedProperties = allProperties.stream().filter(p -> {
+			boolean pruning = (p.getName().value().equals("IsolationProperty") && firewall.isBlacklisting())
+					|| (p.getName().value().equals("ReachabilityProperty") && !firewall.isBlacklisting());
+			// if the pruning must be disabled
+			// return true;
+			return pruning;
+		}).collect(Collectors.toList());
+
+		for (Property property : allProperties) {
+			boolean found = pfPolicies.get(node.getIpAddress()).stream()
+					.anyMatch(p -> p.getSrc().equals(property.getSrc()) && p.getDst().equals(property.getDst()));
+			if (!found) {
+				pfPolicies.get(node.getIpAddress()).add(property);
 			}
 		}
-		//FWAllPolicies.get(firewall.getName()).addAll(allProperties);
-		
-		for(Property property : interestedProperties) {
-			boolean found = FWInterestedPolicies.get(node.getIpAddress()).stream().anyMatch(p -> p.getSrc().equals(property.getSrc()) && p.getDst().equals(property.getDst()));
-			if(!found) {
-				FWInterestedPolicies.get(node.getIpAddress()).add(property);
+
+		for (Property property : interestedProperties) {
+			boolean found = pfPoliciesSpecific.get(node.getIpAddress()).stream()
+					.anyMatch(p -> p.getSrc().equals(property.getSrc()) && p.getDst().equals(property.getDst()));
+			if (!found) {
+				pfPoliciesSpecific.get(node.getIpAddress()).add(property);
 				newRules++;
 			}
 		}
-		//FWInterestedPolicies.get(firewall.getName()).addAll(interestedProperties);
-		
-		autoconfFW.get(node.getIpAddress())._3 += newRules;
-		
+		autoconfPFproperties.get(node.getIpAddress())._3 += newRules;
 	}
-	
+
 	/**
-	 * This method implements a pruning+heuristics to minizime the number of rules which Z3Opt should evaluate.
-	 * It combines rules only if the corresponding IP Addresses can be merged in a larger address range.
-	 * WildcrdManager object in exploited in this method.
+	 * This method implements a pruning+heuristics to minizime the number of rules
+	 * which Z3Opt should evaluate. It combines rules only if the corresponding IP
+	 * Addresses can be merged in a larger address range. WildcrdManager object in
+	 * exploited in this method.
 	 */
 	public void minimizeRules() {
-		
-		if(wildcardManager.areNodesWithIPAddresses()) {
-			for(Map.Entry<String, Quadruple<PacketFilter, AllocationNode, Integer, Boolean>> entry : autoconfFW.entrySet()) {
-				String key = entry.getKey();
-				Quadruple<PacketFilter, AllocationNode, Integer, Boolean> value = entry.getValue();
-				//System.out.println(value._2.getIpAddress() + value._3);
-				/*if(value._2.getNeighbour().size() == 2) {
-					List<Neighbour> neighbours = value._2.getNeighbour();
-					
 
-					Node n0 = nodes.stream().filter(n -> n.getName().equals(neighbours.get(0).getName())).findFirst().get();
-					Node n1 = nodes.stream().filter(n -> n.getName().equals(neighbours.get(1).getName())).findFirst().get();
-				
-					if((n0.getFunctionalType() == FunctionalTypes.FIREWALL && n1.getFunctionalType() == FunctionalTypes.FIREWALL) ||
-							(n0.getFunctionalType() == FunctionalTypes.FIREWALL && (n1.getFunctionalType() == FunctionalTypes.WEBSERVER || n1.getFunctionalType() == FunctionalTypes.MAILSERVER)) ||
-							(n1.getFunctionalType() == FunctionalTypes.FIREWALL && (n0.getFunctionalType() == FunctionalTypes.WEBSERVER || n0.getFunctionalType() == FunctionalTypes.MAILSERVER))) {
-						value._3 = 0;
-						value._1.firewallSendRules(value._3);
-						continue;
-					}
-				} */
-				
-					
-				List<Property> interestedPolicies = FWInterestedPolicies.get(value._2.getNode().getName());
-				List<Property> allPolicies = FWAllPolicies.get(value._2.getNode().getName());
-				if(!policies.isEmpty()) {
-					List<String> destinations = policies.stream().map(p -> p.getDst()).distinct().collect(Collectors.toList());
-					for(String destination : destinations) {
-						Set<String> interestedSRC = interestedPolicies.stream().filter(p -> p.getDst().equals(destination)).map(p -> p.getSrc()).distinct().collect(Collectors.toSet());
-						Set<String> notInterestedSRC = allPolicies.stream().filter(p -> p.getDst().equals(destination)).map(p -> p.getSrc()).distinct().collect(Collectors.toSet());
+		if (wildcardManager.areNodesWithIPAddresses()) {
+			for (Map.Entry<String, Quadruple<PacketFilter, AllocationNode, Integer, Boolean>> entry : autoconfPFproperties
+					.entrySet()) {
+				Quadruple<PacketFilter, AllocationNode, Integer, Boolean> value = entry.getValue();
+				List<Property> interestedPolicies = pfPoliciesSpecific.get(value._2.getNode().getName());
+				List<Property> allPolicies = pfPolicies.get(value._2.getNode().getName());
+				if (!policies.isEmpty()) {
+					List<String> destinations = policies.stream().map(p -> p.getDst()).distinct()
+							.collect(Collectors.toList());
+					for (String destination : destinations) {
+						Set<String> interestedSRC = interestedPolicies.stream()
+								.filter(p -> p.getDst().equals(destination)).map(p -> p.getSrc()).distinct()
+								.collect(Collectors.toSet());
+						Set<String> notInterestedSRC = allPolicies.stream().filter(p -> p.getDst().equals(destination))
+								.map(p -> p.getSrc()).distinct().collect(Collectors.toSet());
 						notInterestedSRC.removeAll(interestedSRC);
-						if(!interestedSRC.isEmpty() && wildcardManager.areAggregable(interestedSRC, notInterestedSRC)) {
+						if (!interestedSRC.isEmpty()
+								&& wildcardManager.areAggregable(interestedSRC, notInterestedSRC)) {
 							value._3 -= interestedSRC.size();
 							value._3 += 1;
 						}
 					}
 				}
-				//System.out.println(value._3);
-				if(value._1.isAutoconfigured()) {
+				if (value._1.isAutoconfigured()) {
 					value._1.automaticConfiguration(value._3);
 				} else {
 					value._1.manualConfiguration();
 				}
-				
+
 			}
-			
+
 		} else {
-			
-			for(Map.Entry<String, Quadruple<PacketFilter, AllocationNode, Integer, Boolean>> entry : autoconfFW.entrySet()) {
+
+			for (Map.Entry<String, Quadruple<PacketFilter, AllocationNode, Integer, Boolean>> entry : autoconfPFproperties
+					.entrySet()) {
 				Quadruple<PacketFilter, AllocationNode, Integer, Boolean> value = entry.getValue();
 				value._1.automaticConfiguration(value._3);
 			}
-			
+
 		}
-		
-		
+
 	}
-	
+
 	/**
-	 * This method allows to know if, on a node, a firewall has been tentatively deployed.
+	 * This method allows to know if, on a node, a firewall has been tentatively
+	 * deployed.
+	 * 
 	 * @param n The node of interested
-	 * @return true if on the input node node a firewall has been tentatively deployed.
+	 * @return true if on the input node node a firewall has been tentatively
+	 *         deployed.
 	 */
 	public boolean firewallIsPresent(AllocationNode n) {
-		return autoconfFW.containsKey(n.getIpAddress());
+		return autoconfPFproperties.containsKey(n.getIpAddress());
 	}
 
 }

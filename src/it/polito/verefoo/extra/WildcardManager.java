@@ -1,4 +1,4 @@
-package it.polito.verefoo;
+package it.polito.verefoo.extra;
 
 import java.util.ArrayList;
 import java.util.Collections;

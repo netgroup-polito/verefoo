@@ -26,11 +26,10 @@ import it.polito.verigraph.solver.NetContext;
  * If Low Level Network Functions are specified as well in the input, they are managed in this class too.
  */
 
-public class NFAllocationManager {
+public class AllocationManager {
 	private Context ctx;
     private NetContext nctx;
     private PacketFilterManager FWmanager;
-	private int nIsolationProp, nReachabilityProp;
 	private List<NodeMetrics> nodeMetrics;
 	private List<Property> properties;
 	private HashMap<String, AllocationNode> nodes;
@@ -44,7 +43,7 @@ public class NFAllocationManager {
 	 * @param properties It is the list of Middle Level Reachability and Isolation policies.
 	 * @param FWManager It is an instance of a class which manages the firewalls.
 	 */
-	 public NFAllocationManager(Context ctx, NetContext nctx, 
+	 public AllocationManager(Context ctx, NetContext nctx, 
 	    		HashMap<String, AllocationNode> allocationNodes, List<NodeMetrics> nodeMetrics, List<Property> properties, PacketFilterManager FWmanager) {
 			super();
 			this.ctx = ctx;
@@ -52,30 +51,26 @@ public class NFAllocationManager {
 			this.nodeMetrics = nodeMetrics;
 			this.properties = properties;
 			this.FWmanager = FWmanager;
-			nIsolationProp = (int) properties.stream().filter(p -> p.getName().equals(PName.ISOLATION_PROPERTY)).count();
-			nReachabilityProp = (int) properties.stream().filter(p -> p.getName().equals(PName.REACHABILITY_PROPERTY)).count();
 			this.nodes = allocationNodes;
 		}
 
 	 
 
 	 /**
-	  * This method is invoked by VerifooProxy to instanciate the Network Functions which have been specified in the input, processing the input nodes with a proper Configuration (i.e. node which isn't empty). 
+	  * This method is invoked by VerifooProxy to instantiate the Network Functions which have been specified in the input, processing the input nodes with a proper Configuration (i.e. node which isn't empty). 
 	  * For the moment it's able to instanciate web client/servers, firewalls and NATs. 
 	  * Each other NF can be added here following the same pattern (legacy class in older versions: NodeNetworkObject)
 	 */
-	public void instanciateDefineNF() {
+	public void instantiateFunctions() {
 		
 		nodes.values().forEach(allocationNode -> {
 			Node node = allocationNode.getNode();
 			if(node.getFunctionalType() != null) {
-				
 				if(node.getFunctionalType() == FunctionalTypes.WEBCLIENT) {
 					EndHost client = new EndHost(allocationNode, ctx, nctx);
 					PacketWrapper p = new PacketWrapper(node.getConfiguration().getEndhost(), nctx);
 					Property prop =  properties.stream().filter(pr -> pr.getSrc().equals(node.getName())).findFirst().orElse(null);
 					if(prop != null){ p.setProperties(prop, nctx);}
-					//AllocationNode server = nodes.values().stream().filter(n -> n.getIpAddress().equals(node.getConfiguration().getWebclient().getNameWebServer())).findFirst().orElse(null);
 					
 					client.installEndHost(p); 
 					allocationNode.setPlacedNF(client);
@@ -92,7 +87,6 @@ public class NFAllocationManager {
 					server.installEndHost(p);
 					allocationNode.setPlacedNF(server);
 					allocationNode.setTypeNF(FunctionalTypes.WEBSERVER);
-					;
 				}
 				
 				else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
@@ -149,14 +143,15 @@ public class NFAllocationManager {
 		});
 	}
 
+	//#TODO rename all Verifoo s to Verefoo (be careful)
 	
 	/**
-	 * This method is invoked in the recursive visit of the graph inside Verifoo Proxy. 
+	 * This method is invoked in the recursive visit of the graph inside Verefoo Proxy. 
 	 * It features an heuristic algorithm to select which NF place on the node. 
-	 * The heuristic can be collocated here in the future.
+	 * The heuristic can be introduced here in the future.
 	 * For the moment it considers just one type of NF per time (e.g. packet filter, antispam, etc. accordingly to the tests in which the framework is used)
 	 */
-	public void NFchoice(AllocationNode source, AllocationNode origin, AllocationNode finalDest) {
+	public void chooseFunctions(AllocationNode source, AllocationNode origin, AllocationNode finalDest) {
 		if(source.getTypeNF() == null || source.getTypeNF().equals(FunctionalTypes.FIREWALL)) {
 			boolean interested = properties.stream().anyMatch(p -> p.getSrc().equals(origin.getIpAddress()) && p.getDst().equals(finalDest.getIpAddress()));
 			if(interested) {
@@ -166,9 +161,7 @@ public class NFAllocationManager {
 					source.setPlacedNF(firewall);
 					source.setTypeNF(FunctionalTypes.FIREWALL);
 				}
-				
 				FWmanager.setPolicy(source, origin.getNode(), finalDest.getNode());
-				
 			}
 		}
 	
@@ -182,7 +175,7 @@ public class NFAllocationManager {
 	 * 2) this method (NFinstall) after the recursive visit, when all the maps of the AllocationNode objects are built.
 	 */
 	
-	public void NFinstall() {
+	public void configureFunctions() {
 		
 		nodes.values().forEach(allocationNode -> { 
 			Node node = allocationNode.getNode();
@@ -206,8 +199,6 @@ public class NFAllocationManager {
 				Forwarder fw = (Forwarder) no;
 				fw.forwarderSendRules();
 			}
-			
-			
 		});
 		
 	}

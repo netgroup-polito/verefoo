@@ -18,11 +18,9 @@ import it.polito.verigraph.functions.GenericFunction;
 public class AllocationNode {
 
 	private Node node;
-	//private Map<FunctionalTypes, NetworkObject> placeableVNF; now only one NF is deployed, the map isn't needed
 	private GenericFunction placedNF;
 	private FunctionalTypes typeNF;
 	private String ipAddress;
-	private List<Property> interestedProperties;
 	private DatatypeExpr z3Name;
 	private DatatypeExpr z3Node;
 	
@@ -186,8 +184,8 @@ public class AllocationNode {
 	}
 
 	/**
-	 * Setter method for the Network Object instanciated on the node
-	 * @param placedNF It is the instanciated network function.
+	 * Setter method for the Network Object instantiated on the node
+	 * @param placedNF It is the instantiated network function.
 	 */
 	public void setPlacedNF(GenericFunction placedNF) {
 		this.placedNF = placedNF;
@@ -202,8 +200,8 @@ public class AllocationNode {
 	}
 
 	/**
-	 * Setter method for the type of the Network Object instanciated on the node
-	 * @param typeNF It is the FunctionalTypes of the instanciated network function.
+	 * Setter method for the type of the Network Object instantiated on the node
+	 * @param typeNF It is the FunctionalTypes of the instantiated network function.
 	 */
 	public void setTypeNF(FunctionalTypes typeNF) {
 		this.typeNF = typeNF;
@@ -236,7 +234,7 @@ public class AllocationNode {
 
 
 	/**
-	 * Method to add contraints to Z3 Solver.
+	 * Method to add constraints to Z3 Solver.
 	 * @param solver It is the instance of Z3 solver.
 	 */
 	public void addConstraints(Optimize solver) {

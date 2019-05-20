@@ -21,112 +21,99 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 /**
- * This class hides some limitation of z3 from the final user (e.g. two properties with same source and destination)
+ * This class hides some limitation of z3 from the final user (e.g. two
+ * properties with same source and destination)
+ * 
  * @author Antonio
  *
  */
 public class VerefooNormalizer {
 	private NFV root, originalNfv;
 	private Map<String, String> networkGroups, flowGroups;
+
 	/**
 	 * Translates the input in a normalized format
+	 * 
 	 * @param root the NFV element received in input
 	 */
-	public VerefooNormalizer(NFV root){
-		try{
-			JAXBContext jc = JAXBContext.newInstance( "it.polito.verefoo.jaxb" );
-			Marshaller m = jc.createMarshaller();
-	        m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-	        m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-	        OutputStream out = new FileOutputStream("./testfile/tmp.xml");
-	        m.marshal( root, out ); 
-	        Unmarshaller u = jc.createUnmarshaller();
-	        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-	        Schema schema;
-			schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" ));
-			u.setSchema(schema);
-			
-			
+	public VerefooNormalizer(NFV root) {
+		try {
 			networkGroups = new HashMap<>();
 			flowGroups = new HashMap<>();
-
 			this.originalNfv = root;
-			this.root = (NFV) u.unmarshal( new FileInputStream( "./testfile/tmp.xml" ) );
-			//this.root = root;
+			this.root = root;
 			normalize();
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			throw new BadGraphError("Error during deserializing");
 		}
 	}
-	
+
 	/**
-	 * This method normalize networks and flows.
-	 * It's a wrapper of two other specific methods.
+	 * This method normalize networks and flows. It's a wrapper of two other
+	 * specific methods.
 	 */
-	private void normalize(){
-		normalizeNetworks();
+	private void normalize() {
+		// TODO remove both
+		normalizeProperties();
 		normalizeSameFlows();
-		//System.out.println(flowGroups);
-		//System.out.println(networkGroups);
-		/*try {
-			JAXBContext jc = JAXBContext.newInstance( "it.polito.verefoo.jaxb" );
-			Marshaller m = jc.createMarshaller();
-	        m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-	        m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-	        m.marshal( root.getPropertyDefinition(), System.out ); 
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		}*/
 	}
 
 	/**
-	 * Translates properties with a wildcard in a list of properties with the explicit enumeration of the nodes present in the graph
+	 * Translates properties with a wildcard in a list of properties with the
+	 * explicit enumeration of the nodes present in the graph
 	 */
-	private void normalizeNetworks() {
+	private void normalizeProperties() {
 		List<Property> rootProperties = root.getPropertyDefinition().getProperty();
 		root.getGraphs().getGraph().forEach((g) -> {
 			List<Node> nodes = g.getNode();
-			Map<String,List<Property>> propsSrc = root.getPropertyDefinition().getProperty().stream()
-																			.filter(p -> p.getGraph() == g.getId() && (p.getSrc().contains("-1")))
-																			.collect(groupingBy(p -> p.getSrc(),toList()));
+			Map<String, List<Property>> propsSrc = root.getPropertyDefinition().getProperty().stream()
+					.filter(p -> p.getGraph() == g.getId() && (p.getSrc().contains("-1")))
+					.collect(groupingBy(p -> p.getSrc(), toList()));
 			propsSrc.entrySet().forEach(e -> {
 				List<Node> nodesInNetworkSrc = nodes.stream()
-												.filter(n -> inNetwork(e.getKey(),n.getName()) && 
-														(n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT) ||
-																 n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) ||
-																 n.getFunctionalType().equals(FunctionalTypes.ENDHOST) ||
-														n.getFunctionalType().equals(FunctionalTypes.WEBSERVER) ||
-														 n.getFunctionalType().equals(FunctionalTypes.MAILSERVER)))
-												.collect(toList());
-				if(nodesInNetworkSrc.isEmpty())
-					throw new BadGraphError("You specified a network ("+e.getKey()+") in the property that contains none of the nodes declared in the service graph", EType.INVALID_PROPERTY_DEFINITION);
+						.filter(n -> inNetwork(e.getKey(), n.getName())
+								&& (n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)
+										|| n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT)
+										|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST)
+										|| n.getFunctionalType().equals(FunctionalTypes.WEBSERVER)
+										|| n.getFunctionalType().equals(FunctionalTypes.MAILSERVER)))
+						.collect(toList());
+				if (nodesInNetworkSrc.isEmpty())
+					throw new BadGraphError(
+							"You specified a network (" + e.getKey()
+									+ ") in the property that contains none of the nodes declared in the service graph",
+							EType.INVALID_PROPERTY_DEFINITION);
 				e.getValue().forEach(p -> {
 					nodesInNetworkSrc.forEach(n -> {
-							Property newP = copyProperty(p);
-							newP.setSrc(n.getName());
-							networkGroups.put(n.getName(), e.getKey());
-							rootProperties.add(newP);
+						Property newP = copyProperty(p);
+						newP.setSrc(n.getName());
+						networkGroups.put(n.getName(), e.getKey());
+						rootProperties.add(newP);
 					});
 					rootProperties.remove(p);
 				});
-				
+
 			});
-			Map<String,List<Property>> propsDst = root.getPropertyDefinition().getProperty().stream()
-																			.filter(p -> p.getGraph() == g.getId() && p.getDst().contains("-1"))
-																			.collect(groupingBy(p -> p.getDst(),toList()));
+			Map<String, List<Property>> propsDst = root.getPropertyDefinition().getProperty().stream()
+					.filter(p -> p.getGraph() == g.getId() && p.getDst().contains("-1"))
+					.collect(groupingBy(p -> p.getDst(), toList()));
 			propsDst.entrySet().forEach(e -> {
 				List<Node> nodesInNetworkDst = nodes.stream()
-													.filter(n -> inNetwork(e.getKey(),n.getName()) && 
-															(n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT) ||
-																	 n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT) ||
-																	 n.getFunctionalType().equals(FunctionalTypes.ENDHOST) ||
-															n.getFunctionalType().equals(FunctionalTypes.WEBSERVER) ||
-															 n.getFunctionalType().equals(FunctionalTypes.MAILSERVER)))
-													.collect(toList());
-				if(nodesInNetworkDst.isEmpty())
-					throw new BadGraphError("You specified a network ("+e.getKey()+") in the property that contains none of the nodes declared in the service graph", EType.INVALID_PROPERTY_DEFINITION);
+						.filter(n -> inNetwork(e.getKey(), n.getName())
+								&& (n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)
+										|| n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT)
+										|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST)
+										|| n.getFunctionalType().equals(FunctionalTypes.WEBSERVER)
+										|| n.getFunctionalType().equals(FunctionalTypes.MAILSERVER)))
+						.collect(toList());
+				if (nodesInNetworkDst.isEmpty())
+					throw new BadGraphError(
+							"You specified a network (" + e.getKey()
+									+ ") in the property that contains none of the nodes declared in the service graph",
+							EType.INVALID_PROPERTY_DEFINITION);
 				e.getValue().forEach(p -> {
 					nodesInNetworkDst.forEach(n -> {
 						Property newP = copyProperty(p);
@@ -136,13 +123,14 @@ public class VerefooNormalizer {
 					});
 					rootProperties.remove(p);
 				});
-				
+
 			});
 		});
 	}
 
 	/**
 	 * This method is used to create a copy of a property in a new object.
+	 * 
 	 * @param p The original property
 	 * @return the copy of the property
 	 */
@@ -159,40 +147,45 @@ public class VerefooNormalizer {
 		newP.setSrcPort(p.getSrcPort());
 		return newP;
 	}
-	
+
 	/**
-	 * Translates properties with same source and destination in properties with virtual nodes
+	 * Translates properties with same source and destination in properties with
+	 * virtual nodes
 	 */
-	private void normalizeSameFlows(){
-		
+	private void normalizeSameFlows() {
+
 		root.getGraphs().getGraph().forEach((g) -> {
 			List<Node> nodes = g.getNode();
-			Map<String,List<Property>> props = root.getPropertyDefinition().getProperty().stream()
-																			.filter(p -> p.getGraph() == g.getId())
-																			.collect(groupingBy(p -> p.getSrc()+"_"+p.getDst(),toList()));
+			Map<String, List<Property>> props = root.getPropertyDefinition().getProperty().stream()
+					.filter(p -> p.getGraph() == g.getId())
+					.collect(groupingBy(p -> p.getSrc() + "_" + p.getDst(), toList()));
 			props.entrySet().forEach(e -> {
-				if(e.getValue().size() > 1){
+				if (e.getValue().size() > 1) {
 					List<String> abstractNodes = new ArrayList<>();
-					Node src = nodes.stream().filter(n -> n.getName().equals(e.getValue().get(0).getSrc())).findFirst().get();
+					Node src = nodes.stream().filter(n -> n.getName().equals(e.getValue().get(0).getSrc())).findFirst()
+							.get();
 					Host host;
 					List<Connection> connectionsSrc;
 					List<Connection> connectionsDst;
 					List<Connection> newConnections;
-					if(root.getHosts() != null){
-						host = root.getHosts().getHost().stream().filter(h -> h.getFixedEndpoint().equals(src.getName())).findFirst().orElse(null);
-						connectionsSrc = root.getConnections().getConnection().stream().filter(c -> c.getSourceHost().equals(host.getName())).collect(toList());
-						connectionsDst = root.getConnections().getConnection().stream().filter(c -> c.getDestHost().equals(host.getName())).collect(toList());
+					if (root.getHosts() != null) {
+						host = root.getHosts().getHost().stream()
+								.filter(h -> h.getFixedEndpoint().equals(src.getName())).findFirst().orElse(null);
+						connectionsSrc = root.getConnections().getConnection().stream()
+								.filter(c -> c.getSourceHost().equals(host.getName())).collect(toList());
+						connectionsDst = root.getConnections().getConnection().stream()
+								.filter(c -> c.getDestHost().equals(host.getName())).collect(toList());
 						newConnections = new ArrayList<>();
-						
-					}else{
+
+					} else {
 						host = null;
 						connectionsSrc = null;
 						connectionsDst = null;
 						newConnections = null;
 					}
-					for(int i = 0; i < e.getValue().size(); i++){
+					for (int i = 0; i < e.getValue().size(); i++) {
 						Node abstractDuplicate = new Node();
-						abstractDuplicate.setName(src.getName()+"_"+i);
+						abstractDuplicate.setName(src.getName() + "_" + i);
 						abstractDuplicate.setFunctionalType(src.getFunctionalType());
 						abstractDuplicate.setConfiguration(src.getConfiguration());
 						abstractDuplicate.getNeighbour().addAll(src.getNeighbour());
@@ -200,9 +193,9 @@ public class VerefooNormalizer {
 						g.getNode().add(abstractDuplicate);
 						e.getValue().get(i).setSrc(abstractDuplicate.getName());
 						abstractNodes.add(abstractDuplicate.getName());
-						if(host != null){
+						if (host != null) {
 							Host newH = copyHost(host);
-							newH.setName(newH.getName()+"_"+i);
+							newH.setName(newH.getName() + "_" + i);
 							newH.setFixedEndpoint(abstractDuplicate.getName());
 							root.getHosts().getHost().add(newH);
 							connectionsSrc.forEach(conn -> {
@@ -217,19 +210,19 @@ public class VerefooNormalizer {
 							});
 						}
 					}
-					if(host != null){
+					if (host != null) {
 						root.getHosts().getHost().remove(host);
 						root.getConnections().getConnection().removeAll(connectionsSrc);
 						root.getConnections().getConnection().removeAll(connectionsDst);
 						root.getConnections().getConnection().addAll(newConnections);
 					}
-					nodes.forEach(n ->{
+					nodes.forEach(n -> {
 						List<Neighbour> neighbours = n.getNeighbour();
 						List<Neighbour> addNeighbours = new ArrayList<>();
 						List<Neighbour> removeNeighbours = new ArrayList<>();
-						for(Neighbour neigh : neighbours) {
-							if(neigh.getName().equals(src.getName())){
-								abstractNodes.forEach( absNode -> {
+						for (Neighbour neigh : neighbours) {
+							if (neigh.getName().equals(src.getName())) {
+								abstractNodes.forEach(absNode -> {
 									Neighbour newN = new Neighbour();
 									newN.setName(absNode);
 									addNeighbours.add(newN);
@@ -240,15 +233,16 @@ public class VerefooNormalizer {
 						neighbours.removeAll(removeNeighbours);
 						neighbours.addAll(addNeighbours);
 					});
-					
+
 					nodes.remove(src);
 				}
 			});
 		});
 	}
-	
+
 	/**
 	 * This method is used to create a copy of a connection in a new object.
+	 * 
 	 * @param conn The original connection
 	 * @return the copy of the connection
 	 */
@@ -262,6 +256,7 @@ public class VerefooNormalizer {
 
 	/**
 	 * This method is used to create a copy of a host in a new object.
+	 * 
 	 * @param host The original host
 	 * @return the copy of the host
 	 */
@@ -278,33 +273,37 @@ public class VerefooNormalizer {
 	}
 
 	/**
-	 * This method helps to identify if an Ip address is present in a larger address range
+	 * This method helps to identify if an Ip address is present in a larger address
+	 * range
+	 * 
 	 * @param network CIDR Address range
-	 * @param ip The specific address
+	 * @param ip      The specific address
 	 * @return true of the ip address is in the specified range
 	 */
-	private boolean inNetwork(String network, String ip){
-    	String[] decimalNotationIp = ip.split("\\.");
-    	String[] decimalNotationNetwork = network.split("\\.");
-    	int i = 0;
-    	for(String s : decimalNotationNetwork){
-    		if(!decimalNotationIp[i].equals(s) && !s.equals("-1"))
-    			return false;
-    		i++;
-    	}
-    	return true;
+	private boolean inNetwork(String network, String ip) {
+		String[] decimalNotationIp = ip.split("\\.");
+		String[] decimalNotationNetwork = network.split("\\.");
+		int i = 0;
+		for (String s : decimalNotationNetwork) {
+			if (!decimalNotationIp[i].equals(s) && !s.equals("-1"))
+				return false;
+			i++;
+		}
+		return true;
 	}
-	
+
 	/**
 	 * Get the original NFV element received in input
+	 * 
 	 * @return the original NFV element received in input
 	 */
 	public NFV getOriginalNfv() {
 		return originalNfv;
 	}
-	
+
 	/**
 	 * Set the original NFV element received in input
+	 * 
 	 * @param originalRoot the original NFV element received in input
 	 */
 	public void setOriginalNfv(NFV originalRoot) {
@@ -319,26 +318,28 @@ public class VerefooNormalizer {
 	}
 
 	/**
-	 * @return the map that tells to which network a node belongs 
+	 * @return the map that tells to which network a node belongs
 	 */
 	public Map<String, String> getNetworkGroups() {
 		return networkGroups;
 	}
 
 	/**
-	 * @return the map that tells to which original node a virtual node (flow) belongs  
+	 * @return the map that tells to which original node a virtual node (flow)
+	 *         belongs
 	 */
 	public Map<String, String> getFlowGroups() {
 		return flowGroups;
 	}
-	
+
 	/**
 	 * Get a specific graph from the original NFV element received in input
+	 * 
 	 * @param id the id of the graph in the NFV element
 	 * @return a specific graph from the original NFV element received in input
 	 */
-	public Graph getOriginalGraph(long id){
-		return originalNfv.getGraphs().getGraph().stream().filter(g -> g.getId()==id).findFirst().orElse(null);		
+	public Graph getOriginalGraph(long id) {
+		return originalNfv.getGraphs().getGraph().stream().filter(g -> g.getId() == id).findFirst().orElse(null);
 	}
 
 }
