@@ -13,7 +13,7 @@ import javax.xml.bind.Marshaller;
 
 import it.polito.verefoo.jaxb.*;
 
-
+// Auxiliary class to generate  test cases for performance tests (used by TestPerformanceScalability)
 public class TestCaseGenerator {
 
  
@@ -200,20 +200,7 @@ public class TestCaseGenerator {
 		}
 		graph.getNode().add(first);
 		nfv.getGraphs().getGraph().add(graph);
-		/*try {
-			JAXBContext jc;
-            jc= JAXBContext.newInstance( "it.polito.verefoo.jaxb" );
-			Marshaller m = jc.createMarshaller();
-            m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-            m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-			OutputStream os = new FileOutputStream(path);
-			m.marshal(nfv, os);
-		} catch(JAXBException je ) {
-            System.exit(1);
-        }catch(FileNotFoundException e) {
-        	System.exit(2);
-        }*/
-		
+				
 		return nfv;
 	}
 
@@ -248,7 +235,6 @@ public class TestCaseGenerator {
 
 public NFV generateNFV(int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, Random rand) {
 		
-		int numberPolicies = numberReachPolicies + numberIsPolicies;
 		
 		/* Creation of the test */
 		NFV nfv = new NFV();

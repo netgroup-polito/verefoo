@@ -86,10 +86,13 @@ abstract public class GenericFunction {
 
 	abstract public void addContraints(Optimize solver);
     
+	
     protected BoolExpr createOrRecv(Entry<AllocationNode, Set<AllocationNode>> entry, Expr p_0, DatatypeExpr function) {
 			List<Expr> list = entry.getValue().stream().map(n -> n.getZ3Name()).collect(Collectors.toList());
 			List<Expr> recvNeighbours = list.stream().map(n -> (BoolExpr) nctx.recv.apply(n, function, p_0)).distinct().collect(Collectors.toList());
 			BoolExpr[] tmp = new BoolExpr[list.size()];
+			// TODO comments about FOL formulas, i.e., what is enumerateRecv
+			// enumerateRecv = OR (recv(n,function,p_0) where n=leftNeighbours)
 	 		BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp));
 	 		return enumerateRecv;
 	}

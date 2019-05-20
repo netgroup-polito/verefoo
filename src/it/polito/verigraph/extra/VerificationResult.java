@@ -28,6 +28,14 @@ public class VerificationResult {
     public Model model;
     public BoolExpr [] assertions;
 
+    /**
+     * TODO complete comments
+     * @param ctx
+     * @param result
+     * @param nctx
+     * @param assertions
+     * @param model
+     */
     public VerificationResult(Context ctx,Status result, NetContext nctx, BoolExpr[] assertions, Model model){
         this.ctx = ctx;
         this.result = result;

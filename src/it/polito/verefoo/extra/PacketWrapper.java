@@ -6,12 +6,12 @@ import it.polito.verefoo.jaxb.Property;
 import it.polito.verigraph.extra.PacketModel;
 import it.polito.verigraph.solver.NetContext;
 /**
- * This class converts our EndHost Packet Model configuration in the verigraph one
+ * This class converts our EndHost Packet Model configuration in the Verefoo
  */
 public class PacketWrapper extends PacketModel {
 
 	/**
-	 * This method converts our EndHost Packet Model configuration in the verigraph one
+	 * This method converts our EndHost Packet Model configuration in the Verefoo one
 	 * @param eh EndHost Packet Model
 	 * @param nctx Network Context.
 	 * @throws BadGraphError Invalid Configuration

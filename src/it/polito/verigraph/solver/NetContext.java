@@ -129,29 +129,29 @@ public class NetContext {
         Expr p_0 = ctx.mkConst("ctx_base_p_0", packetType);
         Expr p_1 = ctx.mkConst("ctx_base_p_1", packetType);
 
-        // Constraint1 send(n_0, n_1, p_0, t_0) -> n_0 != n_1
+        // Constraint1 send(n_0, n_1, p_0 ) -> n_0 != n_1
         constraints.add(
                 ctx.mkForall(new Expr[]{n_0, n_1, p_0},
                         ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0),ctx.mkNot(ctx.mkEq( n_0, n_1))),1,null,null,null,null));
 
-        // Constraint2 recv(n_0, n_1, p_0, t_0) -> n_0 != n_1
+        // Constraint2 recv(n_0, n_1, p_0 ) -> n_0 != n_1
         constraints.add(
                 ctx.mkForall(new Expr[]{n_0, n_1, p_0},
                         ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),ctx.mkNot(ctx.mkEq( n_0, n_1))),1,null,null,null,null));
 
-        // Constraint3 send(n_0, n_1, p_0, t_0) -> p_0.src != p_0.dest
+        // Constraint3 send(n_0, n_1, p_0 ) -> p_0.src != p_0.dest
         constraints.add(
                 ctx.mkForall(new Expr[]{n_0, n_1, p_0},
                         ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0),
                                 ctx.mkNot(ctx.mkEq(  functionsMap.get("src").apply(p_0), functionsMap.get("dest").apply(p_0)))),1,null,null,null,null));
 
-        // Constraint4 recv(n_0, n_1, p_0, t_0) -> p_0.src != p_0.dest
+        // Constraint4 recv(n_0, n_1, p_0 ) -> p_0.src != p_0.dest
         constraints.add(
                 ctx.mkForall(new Expr[]{n_0, n_1, p_0 },
                         ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0 ),
                                 ctx.mkNot(ctx.mkEq(functionsMap.get("src").apply(p_0),functionsMap.get("dest").apply(p_0)))),1,null,null,null,null));
 
-        // Constraint5 recv(n_0, n_1, p ) -> send(n_0, n_1, p, t_1) && t_1 < t_0
+        // Constraint5 recv(n_0, n_1, p ) -> send(n_0, n_1, p ) 
         constraints.add(
                 ctx.mkForall(new Expr[]{n_0, n_1, p_0 },
                         ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0 ),

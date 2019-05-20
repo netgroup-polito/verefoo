@@ -59,7 +59,7 @@ public class Forwarder extends GenericFunction{
 	}
 
 	
-
+	// TODO comments about FOL formulas
     public void forwarderSendRules (){
     	Expr p_0 = ctx.mkConst(forwarder+"_forwarder_send_p_0", nctx.packetType);
     	// for each left hop

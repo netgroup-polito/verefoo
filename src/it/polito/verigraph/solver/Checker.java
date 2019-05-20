@@ -56,7 +56,7 @@ public class Checker {
 	private HashMap<String, AllocationNode> allocationNodes;
 	private List<BoolExpr> constraintList;
 
-	
+	// TODO virtual nodes
 	public Checker(Context context, NetContext nctx, HashMap<String,AllocationNode> allocationNodes) {
 		this.ctx = context;
 		this.nctx = nctx;

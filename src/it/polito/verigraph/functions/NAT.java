@@ -47,7 +47,7 @@ public class NAT extends GenericFunction {
 	}
 
 
-	// #TODO correct the formulas
+	// TODO #jalol comments about FOL formulas
 	public void natConfiguration(DatatypeExpr natIp) {
 		setInternalAddress();
 		Expr p_left_to_right_0 = ctx.mkConst("p_left_to_right_0", nctx.packetType);

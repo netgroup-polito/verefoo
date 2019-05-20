@@ -8,6 +8,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// auxiliary class for parsing the performance test output 
 public class LogParser {
 	private static final String FILE_HEADER = ",Seed,Assertions,CheckerTime,Time";
 	private static final String AVG_HEADER = ",AVG,MAX,MIN";

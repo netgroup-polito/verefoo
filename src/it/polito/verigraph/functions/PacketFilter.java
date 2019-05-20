@@ -89,6 +89,8 @@ public class PacketFilter extends GenericFunction{
 	 * This method allows to add the contraints inside Z3 solver
 	 * @param solver Istance of Z3 solver #TODO check code reachability
 	 */
+	
+	// TODO improve some comments only here
 	private void additionalConstraints(Optimize solver){
  		Expr p_0 = ctx.mkConst(pf+"_packet_filter_acl_p_0", nctx.packetType);
  		Expr n_0 = ctx.mkConst(pf+"_packet_filter_send_n_0", nctx.nodeType);
@@ -117,11 +119,8 @@ public class PacketFilter extends GenericFunction{
 								, 1, null, null, null, null));
     	        }
     	        solver.Add(ctx.mkForall(new Expr[]{p_0, n_0},
-										ctx.mkImplies(
-											//no rule matches the packet -> the acl must allow the default behaviour
-											ctx.mkAnd((BoolExpr) nctx.recv.apply(new Expr[] { n_0, pf, p_0 }),
-													ctx.mkNot(ctx.mkOr(rule_map))
-													),
+										ctx.mkImplies(//no rule matches the packet -> the acl must allow the default behaviour
+											ctx.mkAnd((BoolExpr) nctx.recv.apply(new Expr[] { n_0, pf, p_0 }),ctx.mkNot(ctx.mkOr(rule_map))),
 											ctx.mkEq(
 													filtering_function.apply(p_0),
 													this.blacklisting_z3

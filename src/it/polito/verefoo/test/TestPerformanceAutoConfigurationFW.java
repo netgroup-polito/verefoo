@@ -86,41 +86,7 @@ public class TestPerformanceAutoConfigurationFW {
 	public void tearDown() throws Exception {
 	}
 	
-	private NFV init(NFV root) throws JAXBException, SAXException, FileNotFoundException{
-		List<Path> paths = null;
-		if(root.getNetworkForwardingPaths() != null)
-			paths = root.getNetworkForwardingPaths().getPath();
-        for(Graph g:root.getGraphs().getGraph()){
-        	long beginVP=System.currentTimeMillis();
-        	List<Property> prop = root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph()==g.getId()).collect(Collectors.toList());
-        	VerefooProxy test = new VerefooProxy(g, root.getHosts(), root.getConnections(),root.getConstraints(), prop, paths);
-        	long endVP=System.currentTimeMillis();
-        	condTime += (endVP-beginVP);
-        	maxCondTime = maxCondTime<(endVP-beginVP)? (endVP-beginVP) : condTime;
-            //System.out.println("Graph " + g.getId() + ": creating condition -> " + ((endVP-beginVP)) + "ms");
-        	VerificationResult res=test.checkNFFGProperty();
-        	nrOfConditions += test.getNrOfConditions();
-        	maxNrOfConditions = maxNrOfConditions<test.getNrOfConditions()? test.getNrOfConditions() : maxNrOfConditions;
-        	long endCheck=System.currentTimeMillis();
-            //System.out.println("Graph " + g.getId() + ": checking property -> " + ((endCheck-endVP)) + "ms");
-        	if(res.result != Status.UNSATISFIABLE){
-            	checkTimeSAT += (endCheck-endVP);
-            	maxCheckTimeSAT = maxCheckTimeSAT<(endCheck-endVP)? (endCheck-endVP) : maxCheckTimeSAT;
-        		nSAT++;
-        		new Translator(res.model.toString(),root,g).convert();
-        	}
-        	else{
-        		checkTimeUNSAT += (endCheck-endVP);
-        		maxCheckTimeUNSAT = maxCheckTimeUNSAT<(endCheck-endVP)? (endCheck-endVP) : maxCheckTimeUNSAT;
-        		nUNSAT++;
-        	}
-        	root.getPropertyDefinition().getProperty().stream().filter(p->p.getGraph()==g.getId()).forEach(p -> p.setIsSat(res.result!=Status.UNSATISFIABLE)); 
-        	//long endT=System.currentTimeMillis();
-            //System.out.println(g.getId() + ": translating model -> " + ((endT-endCheck)/1000) + "s");
-        }
-		return root;
-		
-	}
+	
 	
 	private void testCoarse(NFV root) throws Exception{
 		//System.out.println("===========FILE " + file + "===========");
@@ -141,55 +107,13 @@ public class TestPerformanceAutoConfigurationFW {
         return;
 	}
 	
-	private void test(NFV root) throws Exception{
-        //System.out.println("===========FILE " + file + "===========");
-		long beginAll=System.currentTimeMillis();
-		NFV rootTest = init(root);
-		long endAll=System.currentTimeMillis();
-        //System.out.println("Total time -> " + ((endAll-beginAll)/1000) + "s");
-		Property p = rootTest.getPropertyDefinition().getProperty().get(0);
-    	if(p.isIsSat()){
-			maxTotTime = maxTotTime<(endAll-beginAll)? (endAll-beginAll) : maxTotTime;
-			System.out.print("time: " + (endAll-beginAll) + "ms;");
-			totTime += (endAll-beginAll);
-    	}
-        return;
-	}
 	
-	private Host changeFixedClient(List<Host> hosts, String client){
-		Host currClient = hosts.stream().filter(h -> h.getType().equals(TypeOfHost.CLIENT) && h.getFixedEndpoint().equals(client) ).findAny().orElse(null);
-
-		pastClients.add(currClient);
-		Host newClient = hosts.stream().filter(h -> !pastClients.contains(h) && h.getType().equals(TypeOfHost.MIDDLEBOX)).findAny().orElse(null);
-		if(newClient != null){
-			currClient.setType(TypeOfHost.MIDDLEBOX);
-			currClient.setFixedEndpoint(null);
-			//System.out.println("Host client changed to " + newClient.getName());
-			newClient.setType(TypeOfHost.CLIENT);
-			newClient.setFixedEndpoint(client);
-		}
-		return newClient;
-	}
 	
-	private Host changeEndpoints(List<Host> hosts, String client, String server){
-		Host tmp = changeFixedClient(hosts, client);
-		if(tmp != null)
-			return tmp;
-		pastClients.clear();
-		tmp = changeFixedClient(hosts, client);
-		Host currServer = hosts.stream().filter(h -> h.getType().equals(TypeOfHost.SERVER) && h.getFixedEndpoint().equals(server) ).findAny().orElse(null);
-		pastServers.add(currServer);
-		currServer.setType(TypeOfHost.MIDDLEBOX);
-		currServer.setFixedEndpoint(null);
-		Host newServer = hosts.stream().filter(h -> !pastServers.contains(h) && h.getType().equals(TypeOfHost.MIDDLEBOX)).findAny().orElse(null);
-		if(newServer != null){
-			//System.out.println("Host server changed to " + newServer.getName());
-			newServer.setType(TypeOfHost.SERVER);
-			newServer.setFixedEndpoint(server);
-		}
-		return newServer;
-	}
 	
+	/**
+	 * Performance tests based on a set of files.
+	 * Uncomment files to chech other instances
+	 */
 	@Test
 	public void testBGPerformance(){
 		try {
@@ -818,19 +742,6 @@ public class TestPerformanceAutoConfigurationFW {
 		        u.setSchema(schema);
 		        // unmarshal a document into a tree of Java content objects
 		        root = (NFV) u.unmarshal( new FileInputStream( f ) );
-		       /* String clientName = root.getGraphs().getGraph().stream()
-		        		.flatMap(g -> g.getNode().stream())
-		        		.filter(n -> n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT) 
-		        				|| n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT)
-		        				|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST))
-		        		.map(n -> n.getName())
-		        		.findFirst().get();
-		        String serverName = root.getGraphs().getGraph().stream()
-		        		.flatMap(g -> g.getNode().stream())
-		        		.filter(n -> n.getFunctionalType().equals(FunctionalTypes.WEBSERVER) 
-		        				|| n.getFunctionalType().equals(FunctionalTypes.MAILSERVER))
-		        		.map(n -> n.getName())
-		        		.findFirst().get();*/
 		        
 		        do{
 					//logger.debug("Simulation nr " + i+" ");
@@ -862,20 +773,10 @@ public class TestPerformanceAutoConfigurationFW {
 				}while(i<5);
 				
 				logger.debug("Simulations -> " + i + " / Errors -> " + err);
-				//System.out.println("AVG Nr of Conditions -> " + (nrOfConditions/(i)) + " / MAX Nr Of Conditions -> " + maxNrOfConditions);
-				//System.out.println("AVG creating condition -> " + (condTime/(i-err)) + "ms");
-				//System.out.println("MAX creating condition -> " + (maxCondTime) + "ms");
-				//logger.debug("AVG creating condition -> " + (condTime/(i-err)) + "ms");
-				//logger.debug("MAX creating condition -> " + (maxCondTime) + "ms");
 				if(nSAT > 0){
-					//System.out.println("AVG checking property when SAT -> " + (checkTimeSAT/nSAT) + "ms");
-					//System.out.println("MAX checking property when SAT -> " + (maxCheckTimeSAT) + "ms");
-					//logger.debug("AVG checking property when SAT -> " + (checkTimeSAT/nSAT) + "ms");
 					//logger.debug("MAX checking property when SAT -> " + (maxCheckTimeSAT) + "ms");
 				}
 				if(nUNSAT > 0){
-					//System.out.println("AVG checking property when UNSAT-> " + (checkTimeUNSAT/nUNSAT) + "ms");
-					//System.out.println("MAX checking property when UNSAT-> " + (maxCheckTimeUNSAT) + "ms");
 					logger.debug("AVG checking property when UNSAT-> " + (checkTimeUNSAT/nUNSAT) + "ms");
 					logger.debug("MAX checking property when UNSAT-> " + (maxCheckTimeUNSAT) + "ms");
 				}

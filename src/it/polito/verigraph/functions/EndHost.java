@@ -35,6 +35,7 @@ public class EndHost extends GenericFunction {
     PacketModel packet;
     AllocationNode source;
 
+    // TODO comments need to be updated
     public EndHost(AllocationNode source, Context ctx, NetContext nctx) { 
     	 this.source = source;
     	 this.ctx = ctx;
@@ -75,6 +76,7 @@ public class EndHost extends GenericFunction {
             if(packet.getUrl() != null)
                 predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.functionsMap.get("url").apply(p_0), ctx.mkInt(packet.getUrl())));
         }
+        
         
         //Constraint send(politoEndHost, n_0, p) ->
         //p.origin == politoEndHost && p.orig_body == p.body && nodeHasAddr(politoEndHost,p.src)

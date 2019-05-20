@@ -76,10 +76,7 @@ public class TestFirewallCorrectness {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
         Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
         u.setSchema(schema);
-        // unmarshal a document into a tree of Java content objects
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
-		//long endU=System.currentTimeMillis();
-        //System.out.println("Unmarshalling -> " + ((endU-beginAll)/1000) );
         VerefooSerializer test = new VerefooSerializer(root);
         
         
