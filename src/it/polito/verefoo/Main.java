@@ -52,6 +52,7 @@ public class Main {
 					StringWriter stringWriter = new StringWriter();
 					m.marshal(test.getResult(), stringWriter);
 					loggerResult.info(stringWriter.toString());
+					loggerResult.info(test.getZ3Model());
 					loggerResult.info("--------------------------------------------------");
 				} else {
 					loggerResult.info("UNSAT");

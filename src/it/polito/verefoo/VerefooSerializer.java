@@ -35,7 +35,7 @@ public class VerefooSerializer {
 	private boolean sat = false;
 	private Logger logger = LogManager.getLogger("model");
 	private Logger loggerResult = LogManager.getLogger("result");
-
+	private String z3Model;
 	/**
 	 * Wraps all the Verifoo tasks, executing the z3 procedure for each graph in the
 	 * NFV element
@@ -70,6 +70,7 @@ public class VerefooSerializer {
 				
 				if (res.result != Status.UNSATISFIABLE && res.result != Status.UNKNOWN) {
 					Translator t = new Translator(res.model.toString(), root, g, test.getAllocationNodes());
+					z3Model = res.model.toString();
 					t.setNormalizer(norm);
 					result = t.convert();
 					root = result;
@@ -86,6 +87,16 @@ public class VerefooSerializer {
 			logger.error(e);
 			throw e;
 		}
+	}
+
+
+	public String getZ3Model() {
+		return z3Model;
+	}
+
+
+	public void setZ3Model(String z3Model) {
+		this.z3Model = z3Model;
 	}
 
 
