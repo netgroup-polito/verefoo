@@ -167,6 +167,7 @@ public class Translator {
 	 * (bool, int, etc) in the z3 model
 	 */
 	protected String firewallAutoConfigSearchPlainAttribute(String tosearch) {
+		System.out.println(tosearch);
 		Pattern pattern = Pattern.compile(tosearch);
 		Matcher matcher = pattern.matcher(model);
 		String attribute = "null";

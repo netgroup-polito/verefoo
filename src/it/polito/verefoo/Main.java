@@ -45,14 +45,14 @@ public class Main {
 				Marshaller m = jc.createMarshaller();
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "./xsd/nfvSchema.xsd");
-				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/FWCorrectness/FWCorrect01.xml")));
+				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/FWCorrectness/FWCorrect06.xml")));
 				if (test.isSat()) {
 					loggerResult.info("SAT");
 					loggerResult.info("----------------------OUTPUT----------------------");
 					StringWriter stringWriter = new StringWriter();
 					m.marshal(test.getResult(), stringWriter);
 					loggerResult.info(stringWriter.toString());
-					loggerResult.info(test.getZ3Model());
+					System.out.println(stringWriter);
 					loggerResult.info("--------------------------------------------------");
 				} else {
 					loggerResult.info("UNSAT");

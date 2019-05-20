@@ -19,12 +19,27 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.jaxb.NFV;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ResponseHeader;
+
 //mvn clean package && java -jar target\verifoo-0.0.1-SNAPSHOT.jar
+
+// swagger can be accessed at http://localhost:8085/verefoo/swagger-ui.html 
 
 @Controller
 public class VerifooController {
 
+	@ApiOperation(value = "getGreeting", nickname = "getGreeting")
 	@RequestMapping(value = "/deployment", method = RequestMethod.POST)
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "name", value = "User's name", required = false, dataType = "string", paramType = "query", defaultValue = "Niklas") })
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success", response = VerifooController.class),
+			@ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 403, message = "Forbidden"),
+			@ApiResponse(code = 404, message = "Not Found"), @ApiResponse(code = 500, message = "Failure") })
 	public ResponseEntity<NFV> solveNFV(@RequestBody NFV nfv) {
 
 		JAXBContext jc = null;
@@ -62,7 +77,14 @@ public class VerifooController {
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
-		return  new ResponseEntity<NFV>(test.getResult(), HttpStatus.CREATED);
+		return new ResponseEntity<NFV>(test.getResult(), HttpStatus.CREATED);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/")
+	@ResponseBody
+	public String infoVerifoo() {
+		System.out.println("Info from Verifoot");
+		return "hi";
 	}
 
 }

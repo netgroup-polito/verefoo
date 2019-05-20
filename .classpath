@@ -88,6 +88,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/z3/z3-4.6.0-x64-win/bin/com.microsoft.z3.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

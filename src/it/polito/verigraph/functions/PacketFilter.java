@@ -296,7 +296,7 @@ public class PacketFilter extends GenericFunction{
 	    */
   		
   		Expr defaultAction = ctx.mkConst(pf + "_auto_default_action", ctx.mkBoolSort());
-  		Expr ruleAction = ctx.mkConst(pf + "_auto_rule_action", ctx.mkBoolSort());
+  		Expr ruleAction = ctx.mkConst(pf + "_auto_action", ctx.mkBoolSort());
 
   		BoolExpr[] tmp = new BoolExpr[automatic_rules.size()];
   		
