@@ -17,16 +17,16 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-            <version>2.3.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>2.3.0.1</version>
-        </dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-core</artifactId>
+			<version>2.3.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.3.0.1</version>
+		</dependency>
 		<dependency>
 			<groupId>org.jvnet.jaxb2.maven2</groupId>
 			<artifactId>maven-jaxb2-plugin</artifactId>
@@ -35,6 +35,15 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-xml</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-jaxb-annotations</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.woodstox</groupId>
+			<artifactId>woodstox-core</artifactId>
+			<version>5.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.verifoo</groupId>
@@ -52,7 +61,7 @@
 			<systemPath>${project.basedir}/lib/junit/concurrent-junit-1.0.0.jar</systemPath>
 		</dependency>
 
-		
+
 		<dependency>
 			<groupId>com.verifoo</groupId>
 			<artifactId>thriftjunit</artifactId>
@@ -139,19 +148,19 @@
 			<scope>system</scope>
 			<systemPath>${env.Z3}/com.microsoft.z3.jar</systemPath>
 		</dependency>
-		
-				
+
+
 		<dependency>
-	<groupId>org.neo4j.driver</groupId>
-	<artifactId>neo4j-java-driver</artifactId>
-	<version>1.2.1</version>
-</dependency>
-		
-   <dependency>
-        <groupId>javax.activation</groupId>
-        <artifactId>activation</artifactId>
-        <version>1.1.1</version>
-    </dependency>
+			<groupId>org.neo4j.driver</groupId>
+			<artifactId>neo4j-java-driver</artifactId>
+			<version>1.2.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.activation</groupId>
+			<artifactId>activation</artifactId>
+			<version>1.1.1</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<jersey2.version>2.19</jersey2.version>
@@ -180,7 +189,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -203,7 +212,7 @@
 							<schemaIncludes>
 								<include>nfvSchema.xsd</include>
 							</schemaIncludes>
-							<generateDirectory>/gen-src</generateDirectory>
+							<generateDirectory>gen-src/</generateDirectory>
 							<generatePackage>it.polito.verefoo.jaxb</generatePackage>
 							<!-- Other configuration options -->
 						</configuration>
@@ -212,6 +221,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	 <repositories>
-  </repositories>
+	<repositories>
+	</repositories>
 </project>
