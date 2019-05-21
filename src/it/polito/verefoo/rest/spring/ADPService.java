@@ -89,48 +89,48 @@ public class ADPService {
 	
 	/* Policy */ 
 
-	public long getNextPolicyId() {
-		return ADPDatabase.getNextPolicyId();
+	public long getNextRequirementsSetId() {
+		return ADPDatabase.getNextRequirementsSetId();
 	}
 
-	public PropertyDefinition createPolicy(long pid, PropertyDefinition policy) {
-		return db.createPolicy(pid, policy);
+	public PropertyDefinition createRequirementsSet(long rid, PropertyDefinition requirementsSet) {
+		return db.createRequirementsSet(rid, requirementsSet);
 	}
 
-	public Collection<PropertyDefinition> getPolicies(int beforeInclusive, int afterInclusive) {
-		return db.getPolicies(beforeInclusive, afterInclusive);
+	public Collection<PropertyDefinition> getRequirementsSet(int beforeInclusive, int afterInclusive) {
+		return db.getRequirementsSet(beforeInclusive, afterInclusive);
 	}
 
-	public boolean deletePolicies() {
-		return db.deletePolicies();
+	public boolean deleteRequirementsSets() {
+		return db.deleteRequirementsSet();
 	}
 
-	public PropertyDefinition updatePolicy(long pid, PropertyDefinition policy) {
-		return db.updatePolicy(pid, policy);
+	public PropertyDefinition updateRequirementsSet(long rid, PropertyDefinition requirementsSet) {
+		return db.updateRequirementsSet(rid, requirementsSet);
 	}
 
-	public PropertyDefinition getPolicy(long pid) {
-		return db.getPolicy(pid);
+	public PropertyDefinition getRequirementsSet(long rid) {
+		return db.getRequirementsSet(rid);
 	}
 	
-	public PropertyDefinition deletePolicy(long pid) {
-		return db.deletePolicy(pid);
+	public PropertyDefinition deleteRequirementsSet(long rid) {
+		return db.deleteRequirementsSet(rid);
 	}
 
-	public Property updateRule(long pid, long rid, Property rule) {
-		return db.updateRule(pid, rid, rule);
+	public Property updateProperty(long rid, long pid, Property property) {
+		return db.updateProperty(rid, pid, property);
 	}
 
-	public Long createRule(long pid, Property rule) {
-		return db.createRule(pid, rule);
+	public Long createProperty(long rid, Property property) {
+		return db.createProperty(rid, property);
 	}
 
-	public Property getRule(long pid, long rid) {
-		return db.getRule(pid, rid);
+	public Property getProperty(long rid, long pid) {
+		return db.getProperty(rid, pid);
 	}
 
-	public Property deleteRule(long pid, long rid) {
-		return db.deleteRule(pid, rid);
+	public Property deleteProperty(long rid, long pid) {
+		return db.deleteProperty(rid, pid);
 	}
 
 	

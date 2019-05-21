@@ -7,13 +7,13 @@ import java.util.*;
 public class ADPDatabase {
 	private static ADPDatabase db = new ADPDatabase();
 	private static long lastGraphID = 0;
-	private static long lastPolicyID = 0;
+	private static long lastRequirementsSetID = 0;
 	private static long lastSubstrateID = 0;
 	private static long lastSimulationID = 0;
 
 	private ConcurrentHashMap<Long, ConcurrentHashMap<String, Node>> nodeByGraphId;
 	private ConcurrentHashMap<Long, Constraints> constraintsByGraphId;
-	private ConcurrentHashMap<Long, ConcurrentHashMap<Long, Property>> ruleByPolicyId;
+	private ConcurrentHashMap<Long, ConcurrentHashMap<Long, Property>> propertyByRequirementsSetId;
 	private ConcurrentHashMap<Long, ConcurrentHashMap<String, Host>> hostBySubstrateId;
 	private ConcurrentHashMap<Long, Connections> connectionsBySubstrateId;
 	private ConcurrentHashMap<String, FunctionalTypes> networkFunctionMap;
@@ -24,7 +24,7 @@ public class ADPDatabase {
 	ADPDatabase() {
 		nodeByGraphId = new ConcurrentHashMap<Long, ConcurrentHashMap<String, Node>>();
 		constraintsByGraphId = new ConcurrentHashMap<Long, Constraints>();
-		ruleByPolicyId = new ConcurrentHashMap<Long, ConcurrentHashMap<Long, Property>>();
+		propertyByRequirementsSetId = new ConcurrentHashMap<Long, ConcurrentHashMap<Long, Property>>();
 		hostBySubstrateId = new ConcurrentHashMap<Long, ConcurrentHashMap<String, Host>>();
 		connectionsBySubstrateId = new ConcurrentHashMap<Long, Connections>();
 		networkFunctionMap = new ConcurrentHashMap<String, FunctionalTypes>();
@@ -48,8 +48,8 @@ public class ADPDatabase {
 	/**
 	 * @return a new unique value for the policyId
 	 */
-	public static synchronized long getNextPolicyId() {
-		return ++lastPolicyID;
+	public static synchronized long getNextRequirementsSetId() {
+		return ++lastRequirementsSetID;
 	}
 	
 	/**
@@ -539,21 +539,21 @@ public class ADPDatabase {
 
 	
 	/**
-	 * @param pid it is the id of the policy
-	 * @param policy it is the policy to create
+	 * @param rid it is the id of the requirements set
+	 * @param requirementsSet it is the requirements set to create
 	 * @return the created PropertyDefinition element in case of success, otherwise null
 	 */
-	public PropertyDefinition createPolicy(long pid, PropertyDefinition policy) {
+	public PropertyDefinition createRequirementsSet(long rid, PropertyDefinition requirementsSet) {
 		
-		List<Property> rules = policy.getProperty();
+		List<Property> rules = requirementsSet.getProperty();
 		ConcurrentHashMap<Long, Property> rulesMap = new ConcurrentHashMap<Long, Property>();
 		long i = 0;
 		for(Property rule : rules) {
 			rulesMap.put(++i, rule);
 		}
 		
-		if(ruleByPolicyId.putIfAbsent(pid, rulesMap) == null) {
-			return policy;
+		if(propertyByRequirementsSetId.putIfAbsent(rid, rulesMap) == null) {
+			return requirementsSet;
 		}
 		else 
 			return null;
@@ -562,15 +562,15 @@ public class ADPDatabase {
 	/**
 	 * @param beforeInclusive it is the starting index of the list
 	 * @param afterInclusive it is the ending index of the list
-	 * @return a collection of policies
+	 * @return a collection of requirements sets
 	 */
-	public Collection<PropertyDefinition> getPolicies(int beforeInclusive, int afterInclusive) {
+	public Collection<PropertyDefinition> getRequirementsSet(int beforeInclusive, int afterInclusive) {
 		
 		Collection<PropertyDefinition> list = new ArrayList<>();
 		
 		for(long i = beforeInclusive; i <= afterInclusive; i++){
 			PropertyDefinition p = new PropertyDefinition();
-			ConcurrentHashMap<Long, Property> rulesMap = ruleByPolicyId.get(i);
+			ConcurrentHashMap<Long, Property> rulesMap = propertyByRequirementsSetId.get(i);
 			
 			if(rulesMap != null) {
 				p.getProperty().addAll(rulesMap.values());
@@ -584,49 +584,49 @@ public class ADPDatabase {
 
 	
 	/**
-	 * @return true if at least one policy was deleted, otherwise false
+	 * @return true if at least one requirements set was deleted, otherwise false
 	 */
-	public synchronized boolean deletePolicies() {
+	public synchronized boolean deleteRequirementsSet() {
 		
-		if(ruleByPolicyId.isEmpty())
+		if(propertyByRequirementsSetId.isEmpty())
 			return false;
 		
-		ruleByPolicyId.clear();
-		lastPolicyID = 0;
+		propertyByRequirementsSetId.clear();
+		lastRequirementsSetID = 0;
 		
 		return true;
 	}
 
 	
 	/**
-	 * @param pid it is the id of the policy
-	 * @param policy it is the policy to update
+	 * @param rid it is the id of the requirements set
+	 * @param requirementsSet it is the requirements set to update
 	 * @return the updated PropertyDefinition element in case of success, otherwise null
 	 */
-	public PropertyDefinition updatePolicy(long pid, PropertyDefinition policy) {
+	public PropertyDefinition updateRequirementsSet(long rid, PropertyDefinition requirementsSet) {
 
 		ConcurrentHashMap<Long, Property> rulesMap = new ConcurrentHashMap<Long, Property>();
 		long i = 0;
-		for(Property rule : policy.getProperty()) {
+		for(Property rule : requirementsSet.getProperty()) {
 			rulesMap.put(++i, rule);
 		}
 		
-		ConcurrentHashMap<Long, Property> result = ruleByPolicyId.computeIfPresent(pid, (k, old) -> rulesMap);
+		ConcurrentHashMap<Long, Property> result = propertyByRequirementsSetId.computeIfPresent(rid, (k, old) -> rulesMap);
 		if(result == null)
 			return null;
 		
-		return policy;
+		return requirementsSet;
 	}
 
 	
 	/**
-	 * @param pid it is the id of the policy to retrieve
-	 * @return the PropertyDefinition element if exists, otherwise null
+	 * @param rid it is the id of the requirements set to retrieve
+	 * @return the PropertyDefinition element if it exists, otherwise null
 	 */
-	public PropertyDefinition getPolicy(long pid) {
+	public PropertyDefinition getRequirementsSet(long rid) {
 		
 		PropertyDefinition policy = new PropertyDefinition();
-		ConcurrentHashMap<Long, Property> rulesMap = ruleByPolicyId.get(pid);
+		ConcurrentHashMap<Long, Property> rulesMap = propertyByRequirementsSetId.get(rid);
 		
 		if(rulesMap == null)
 			return null;
@@ -638,14 +638,14 @@ public class ADPDatabase {
 	
 
 	/**
-	 * @param pid it is the id of the policy to delete
+	 * @param rid it is the id of the requirements set to delete
 	 * @return the deleted PropertyDefinition element if existed, otherwise null
 	 */
-	public PropertyDefinition deletePolicy(long pid) {
+	public PropertyDefinition deleteRequirementsSet(long rid) {
 		
 		PropertyDefinition policy = new PropertyDefinition();
 
-		ConcurrentHashMap<Long, Property> rulesMap = ruleByPolicyId.remove(pid);
+		ConcurrentHashMap<Long, Property> rulesMap = propertyByRequirementsSetId.remove(rid);
 		if(rulesMap == null)
 			return null;
 		policy.getProperty().addAll(rulesMap.values());
@@ -654,35 +654,35 @@ public class ADPDatabase {
 
 	
 	/**
-	 * @param pid it is the id of the policy
-	 * @param rule it is the rule to create
+	 * @param rid it is the id of the requirements set
+	 * @param property it is the property to create
 	 * @return the created Property element
 	 */
-	public synchronized Long createRule(long pid, Property rule) {
+	public synchronized Long createProperty(long rid, Property rule) {
 		
-		ConcurrentHashMap<Long, Property> rulesMap = ruleByPolicyId.get(pid);
+		ConcurrentHashMap<Long, Property> rulesMap = propertyByRequirementsSetId.get(rid);
 		if(rulesMap == null)
 			return new Long(0);
-		Long rid = new Long(rulesMap.size());
-		rulesMap.put(++rid, rule);
-		return rid;
+		Long pid = new Long(rulesMap.size());
+		rulesMap.put(++pid, rule);
+		return pid;
 		
 	}
 	
 	
 	/**
-	 * @param pid it is the id of the policy
-	 * @param rid it is the id of the rule to update
-	 * @param rule it is the new rule 
+	 * @param rid it is the id of the requirements set
+	 * @param pid it is the id of the property to update
+	 * @param property it is the new rule 
 	 * @return the updated Property element if existed, otherwise null
 	 */
-	public synchronized Property updateRule(long pid, long rid, Property rule) {
+	public synchronized Property updateProperty(long rid, long pid, Property property) {
 		
-		ConcurrentHashMap<Long, Property> rulesMap = ruleByPolicyId.get(pid);
+		ConcurrentHashMap<Long, Property> rulesMap = propertyByRequirementsSetId.get(rid);
 		if(rulesMap == null)
 			return null;
-		if(rulesMap.replace(rid, rule) != null)
-			return rule;
+		if(rulesMap.replace(pid, property) != null)
+			return property;
 		else 
 			return null;
 	}
@@ -690,32 +690,32 @@ public class ADPDatabase {
 	
 	
 	/**
-	 * @param pid it is the id of the policy
-	 * @param rid it is the id of the rule to retrieve
+	 * @param rid it is the id of the requirements set
+	 * @param pid it is the id of the property to retrieve
 	 * @return the Property element if exists, otherwise null
 	 */
-	public Property getRule(long pid, long rid) {
+	public Property getProperty(long rid, long pid) {
 		
-		ConcurrentHashMap<Long, Property> rulesMap = ruleByPolicyId.get(pid);
+		ConcurrentHashMap<Long, Property> rulesMap = propertyByRequirementsSetId.get(rid);
 		if(rulesMap == null)
 			return null;
 		
-		return rulesMap.get(rid);
+		return rulesMap.get(pid);
 	}
 	
 
 	/**
-	 * @param pid it is the id of the policy
-	 * @param rid it is the id of the rule to deleted
+	 * @param rid it is the id of the requirements set
+	 * @param pid it is the id of the property to deleted
 	 * @return the deleted Property element if existed, otherwise null
 	 */
-	public Property deleteRule(long pid, long rid) {
+	public Property deleteProperty(long rid, long pid) {
 		
-		ConcurrentHashMap<Long, Property> rulesMap = ruleByPolicyId.get(pid);
+		ConcurrentHashMap<Long, Property> rulesMap = propertyByRequirementsSetId.get(rid);
 		if(rulesMap == null)
 			return null;
 		
-		return rulesMap.remove(rid);
+		return rulesMap.remove(pid);
 	}
 	
 	/* Substrate networks database */
