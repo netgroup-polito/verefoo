@@ -182,7 +182,7 @@ public class GraphsController {
     		@ApiResponse(code = 404, message = "Not Found"),
     		})
     @ResponseBody
-	public Graph getItem(@PathVariable("gid") long gid) {
+	public Graph getGraph(@PathVariable("gid") long gid) {
 		Graph graph = service.getGraph(gid);
 		if (graph==null)
 			throw new ResponseStatusException(
@@ -274,7 +274,7 @@ public class GraphsController {
     		})
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @ResponseBody
-	public void updateItem(@PathVariable("gid") long gid, @PathVariable("nid") String nid, @RequestBody Node node) {
+	public void updateGraph(@PathVariable("gid") long gid, @PathVariable("nid") String nid, @RequestBody Node node) {
 		Node updated = service.updateNode(gid, nid, node);
 		if (updated == null)
 			throw new ResponseStatusException(

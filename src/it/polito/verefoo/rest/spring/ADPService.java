@@ -97,7 +97,7 @@ public class ADPService {
 		return db.createRequirementsSet(rid, requirementsSet);
 	}
 
-	public Collection<PropertyDefinition> getRequirementsSet(int beforeInclusive, int afterInclusive) {
+	public Collection<PropertyDefinition> getRequirementsSets(int beforeInclusive, int afterInclusive) {
 		return db.getRequirementsSet(beforeInclusive, afterInclusive);
 	}
 
@@ -137,7 +137,7 @@ public class ADPService {
 	/* Substrate Database*/ 
 	
 	public long getNextSubstrateId() {
-		return db.getNextSubstrateId();
+		return ADPDatabase.getNextSubstrateId();
 	}
 
 	public Hosts createSubstrate(long sid, Hosts substrate) {
