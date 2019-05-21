@@ -224,7 +224,7 @@ public class RequirementsController {
     		})
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @ResponseBody
-	public void updateRule(@PathVariable("rid") long rid, @PathVariable("pid") long pid, @RequestBody Property property) {
+	public void updateProperty(@PathVariable("rid") long rid, @PathVariable("pid") long pid, @RequestBody Property property) {
 		Property updated = service.updateProperty(rid, pid, property);
 		if (updated == null)
 			throw new ResponseStatusException(
@@ -246,7 +246,7 @@ public class RequirementsController {
     		@ApiResponse(code = 404, message = "Not Found"),
     		})
     @ResponseBody
-	public Property getRule(@PathVariable("rid") long rid, @PathVariable("pid") long pid) {
+	public Property getProperty(@PathVariable("rid") long rid, @PathVariable("pid") long pid) {
 		Property property = service.getProperty(rid, pid);
 		if (property == null)
 			throw new ResponseStatusException(
@@ -269,7 +269,7 @@ public class RequirementsController {
 	    		})
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @ResponseBody
-	public void deleteRule(@PathVariable("rid") long rid, @PathVariable("pid") long pid) {
+	public void deleteProperty(@PathVariable("rid") long rid, @PathVariable("pid") long pid) {
 		Property property = service.deleteProperty(rid, pid);
     	if (property == null) 
     		throw new ResponseStatusException(
