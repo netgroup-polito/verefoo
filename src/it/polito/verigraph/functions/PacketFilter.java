@@ -87,7 +87,7 @@ public class PacketFilter extends GenericFunction{
 
 	/**
 	 * This method allows to add the contraints inside Z3 solver
-	 * @param solver Istance of Z3 solver #TODO check code reachability
+	 * @param solver Istance of Z3 solver
 	 */
 	
 	// TODO improve some comments only here
@@ -278,15 +278,15 @@ public class PacketFilter extends GenericFunction{
   	    	 * 3) use wildcards for destination port if possible
   	    	 */
  			nctx.softConstrProtoWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
- 			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(srcp, nctx.portMap.get("null")),"fw_auto_port"));
- 			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(dstp, nctx.portMap.get("null")),"fw_auto_port"));
+ 			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(srcp, nctx.portMap.get("null")),"fw_auto_conf"));
+ 			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(dstp, nctx.portMap.get("null")),"fw_auto_conf"));
   			
  			automatic_rules.add(ctx.mkAnd(
 		  						nctx.equalNodeNameToPFRule("src", p_0, src),
 								nctx.equalNodeNameToPFRule("dest", p_0, dst),
- 			 					ctx.mkEq(nctx.functionsMap.get("lv4proto").apply(p_0), proto),
- 			 					ctx.mkEq(nctx.functionsMap.get("src_port").apply(p_0), srcp),
- 			 					ctx.mkEq(nctx.functionsMap.get("dest_port").apply(p_0), dstp)
+ 			 					nctx.equalPortRangeToRule(nctx.functionsMap.get("src_port").apply(p_0), srcp),
+ 			 					nctx.equalPortRangeToRule(nctx.functionsMap.get("dest_port").apply(p_0), dstp),
+ 			 					nctx.equalPacketLv4ProtoToFwPacketLv4Proto(nctx.functionsMap.get("lv4proto").apply(p_0), proto)
  			 					));
   		}
   		

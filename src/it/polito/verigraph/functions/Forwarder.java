@@ -44,10 +44,10 @@ import it.polito.verigraph.solver.NetContext;
 public class Forwarder extends GenericFunction{
 	DatatypeExpr forwarder;
 	/**
-	 * Public constructor for the AclFirewall
-	 * @param source It is the Allocation Node on which the firewall is put
+	 * Public constructor for the Forwarder
+	 * @param source It is the Allocation Node on which the forwarder is put
 	 * @param ctx It is the Z3 Context in which the model is generated
-	 * @param nctx It is the NetContext object to which contraints are sent
+	 * @param nctx It is the NetContext object to which constraints are sent
 	 */
 	public Forwarder(AllocationNode source, Context ctx, NetContext nctx) {
 		forwarder = source.getZ3Name();
@@ -58,11 +58,21 @@ public class Forwarder extends GenericFunction{
 		isEndHost = false;
 	}
 
-	
-	// TODO comments about FOL formulas
+
+    /**
+     * This method creates the forwarding rules for the forwarder.
+     * Since it does not provide any filtering behaviour, the forwarders sends all the received packets.
+     */
     public void forwarderSendRules (){
     	Expr p_0 = ctx.mkConst(forwarder+"_forwarder_send_p_0", nctx.packetType);
-    	// for each left hop
+    	
+    	/*
+    	 * for each leftHop lH, for each p_0,
+    	 * recv(lH, forwader, p_0) --> AND (forwader, nextHops, p_0)
+    	 * 
+    	 * Basically, for each p_0 received from a leftHop,
+    	 * it is sent to each possible rightHops depending on that specific leftHop.
+    	 */
     	for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getLeftHops().entrySet()) {
     		BoolExpr enumerateSend = createAndSend(entry, p_0, forwarder);
     		BoolExpr recv= (BoolExpr) nctx.recv.apply(entry.getKey().getZ3Name(), forwarder, p_0);
@@ -71,7 +81,15 @@ public class Forwarder extends GenericFunction{
 							 enumerateSend), 
 							1, null, null, null, null));
   		}
-    	// for each right hop
+    	
+    	
+    	/*
+    	 * for each rightHop rH, for each p_0,
+    	 * send(forwader, rH, p_0) --> OR (leftHops, forwader, p_0)
+    	 * 
+    	 * Basically, for each p_0 sent to a rightHop,
+    	 * it must have been received from at least a leftHop depending on that specific rightHop.
+    	 */
     	for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getRightHops().entrySet()){
     		BoolExpr enumerateRecv = createOrRecv(entry, p_0, forwarder);
   			BoolExpr send = (BoolExpr) nctx.send.apply(forwarder, entry.getKey().getZ3Name(), p_0);
@@ -85,7 +103,7 @@ public class Forwarder extends GenericFunction{
     
  
 	/**
-	 * This method allows to wrap the methoch which adds the contraints inside Z3 solver
+	 * This method allows to wrap the method which adds the constraints inside Z3 solver
 	 * @param solver Istance of Z3 solver
 	 */
 	@Override

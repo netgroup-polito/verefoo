@@ -56,7 +56,13 @@ public class Checker {
 	private HashMap<String, AllocationNode> allocationNodes;
 	private List<BoolExpr> constraintList;
 
-	// TODO virtual nodes
+
+	/**
+	 * Public constructor of Checker class
+	 * @param context it is the z3 context where assertions must be introduced into
+	 * @param nctx it is the NetContext which stores basic z3 variables
+	 * @param allocationNodes it is the map of allocation nodes of the Allocation Graph
+	 */
 	public Checker(Context context, NetContext nctx, HashMap<String,AllocationNode> allocationNodes) {
 		this.ctx = context;
 		this.nctx = nctx;
@@ -71,12 +77,25 @@ public class Checker {
 		solver.setParameters(p);
 	}
 	
+	
+	/**
+	 * Thus method adds hard and soft constraints in the solver
+	 */
 	public void addConstraints() {
 		allocationNodes.values().forEach(node->node.addConstraints(solver));
 		constraintList.forEach(boolExpr->this.solver.Add(boolExpr));
 		nctx.addConstraints(solver);
 	}
-	//#TODO comments in code, organize code
+	
+	
+	/**
+	 * This method defines the z3 hard constraints for an isolation property (packet filter level)
+	 * @param src it is the source node
+	 * @param dest it is the destination node
+	 * @param lv4proto it is the L4 protocol
+	 * @param src_port it is the source protocol
+	 * @param dst_port it is the destination protocol
+	 */
 	private void addIsolationProperty(AllocationNode src, AllocationNode dest, int lv4proto, String src_port, String dst_port) {
 		Expr p0 = ctx.mkConst("check_isolation_p0_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packetType);
 		Expr p1 = ctx.mkConst("check_isolation_p1_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packetType);
@@ -84,30 +103,90 @@ public class Checker {
 		Set<AllocationNode> srcNeighbours = src.getFirstHops().get(dest);
 		Set<AllocationNode> destNeighbours = dest.getLastHops().get(src);
 		
+		
+		/*
+		 * Given the isolation property rule r,
+		 * for each firstHop fp,
+		 * exists p_1 : send(src, fp, p_1) && p_1.src = r.ip && p_1.dst = r.ip && 
+		 * p_1.src_port = r.src_port && p_1.dst_port = r.dst_port && p_1.l4proto =r.l4proto
+		 */
+		List<Expr> sendNeighbours = srcNeighbours.stream().map(n ->  (BoolExpr) nctx.send.apply(src.getZ3Name(), n.getZ3Name(), p1)).distinct().collect(Collectors.toList());
+		BoolExpr[] tmp2 = new BoolExpr[srcNeighbours.size()];
+		BoolExpr enumerateSend = ctx.mkAnd(sendNeighbours.toArray(tmp2));
+		constraintList.add(enumerateSend);
+		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.functionsMap.get("dest").apply(p1)));
+		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.functionsMap.get("src").apply(p1)));
+		constraintList.add(nctx.equalPortRangeToRange(nctx.functionsMap.get("src_port").apply(p1), nctx.portMap.get(src_port))
+				); 
+		constraintList.add(nctx.equalPortRangeToRange(nctx.functionsMap.get("dest_port").apply(p1), nctx.portMap.get(dst_port))
+				); 
+		constraintList.add(ctx.mkEq(nctx.functionsMap.get("lv4proto").apply(p1), ctx.mkInt(lv4proto))
+				); 
+		
+		/*
+		 * Given the isolation property rule r,
+		 * for each lastHop lp,
+		 * for each p_0,
+		 * recv(lp, dst, p_0)  p_0.dst = dest.ip ---> not ( p_0.origin = r.src &&
+		 * p_0.src_port = r.src_port && p_0.dst_port = r.dst_port && p_0.l4proto =r.l4proto)
+		 */
+		
 		for(AllocationNode n : destNeighbours) {
 			constraintList.add(ctx.mkForall(new Expr[]{p0},
 					ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(n.getZ3Name(), dest.getZ3Name(), p0),
 							(BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.functionsMap.get("dest").apply(p0))
 							),
-							ctx.mkNot(ctx.mkAnd(ctx.mkEq(src.getZ3Name(), nctx.functionsMap.get("origin").apply(p0)), ctx.mkEq(nctx.functionsMap.get("src_port").apply(p0), nctx.portMap.get(src_port)),
-									ctx.mkEq(nctx.functionsMap.get("dest_port").apply(p0), nctx.portMap.get(dst_port)), ctx.mkEq(nctx.functionsMap.get("lv4proto").apply(p0), ctx.mkInt(lv4proto))))),1,null,null,null,null));
+							ctx.mkNot(ctx.mkAnd(ctx.mkEq(src.getZ3Name(), nctx.functionsMap.get("origin").apply(p0)),
+									nctx.equalPortRangeToRange(nctx.functionsMap.get("src_port").apply(p0), nctx.portMap.get(src_port)),
+									nctx.equalPortRangeToRange(nctx.functionsMap.get("dest_port").apply(p0), nctx.portMap.get(dst_port)),
+									ctx.mkEq(nctx.functionsMap.get("lv4proto").apply(p0), ctx.mkInt(lv4proto))
+									))),1,null,null,null,null));
 		}
 		
-		
-		List<Expr> sendNeighbours = srcNeighbours.stream().map(n ->  (BoolExpr) nctx.send.apply(src.getZ3Name(), n.getZ3Name(), p1)).distinct().collect(Collectors.toList());
-		BoolExpr[] tmp2 = new BoolExpr[srcNeighbours.size()];
-
-		BoolExpr enumerateSend = ctx.mkAnd(sendNeighbours.toArray(tmp2));
-		constraintList.add(enumerateSend);
-		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.functionsMap.get("dest").apply(p1)));
-		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.functionsMap.get("src").apply(p1)));
-	}
 	
-	//#TODO comments in code, organize code
+	}
+
+	/**
+	 * This method defines the z3 hard constraints for a reachability property (packet filter level)
+	 * @param src it is the source node
+	 * @param dest it is the destination node
+	 * @param lv4proto it is the L4 protocol
+	 * @param src_port it is the source protocol
+	 * @param dst_port it is the destination protocol
+	 */
 	public void addReachabilityProperty(AllocationNode src, AllocationNode dest, int lv4proto, String src_port, String dst_port) {
 		Expr p0 = ctx.mkConst("check_reach_p0_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packetType);
 		Expr p1 = ctx.mkConst("check_reach_p1_" + src.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packetType);
-		// Constraint1recv(n_0,destNode,p0,t_0)
+
+		
+		Map<AllocationNode, Set<AllocationNode>> firstHops = src.getFirstHops();
+		Set<AllocationNode> set2 = firstHops.get(dest);
+
+		/*
+		 * Given the reachability property rule r,
+		 * exists a firstHop fp, exists p_1 : 
+		 * send(src, fp, p_1) && p_1.src = r.ip && p_1.dst = r.ip && 
+		 * p_1.src_port = r.src_port && p_1.dst_port = r.dst_port && p_1.l4proto =r.l4proto
+		 */
+		List<Expr> sendNeighbours = set2.stream().map(n ->  (BoolExpr) nctx.send.apply(src.getZ3Name(), n.getZ3Name(), p1)).distinct().collect(Collectors.toList());
+		BoolExpr[] tmp2 = new BoolExpr[set2.size()];
+  	 	BoolExpr enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp2));
+		constraintList.add(enumerateSend);
+		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.functionsMap.get("src").apply(p1)));
+		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.functionsMap.get("dest").apply(p1)));
+		constraintList.add(nctx.equalPortRangeToRange(nctx.functionsMap.get("src_port").apply(p1), nctx.portMap.get(src_port))
+				);  	
+		constraintList.add(nctx.equalPortRangeToRange(nctx.functionsMap.get("dest_port").apply(p1), nctx.portMap.get(dst_port))
+				);  
+		constraintList.add(ctx.mkEq(nctx.functionsMap.get("lv4proto").apply(p1), ctx.mkInt(lv4proto))
+				);  
+		
+		/*
+		 * Given the reachability property rule r,
+		 * exists a lastHop lp, exists p_0:
+		 * recv(lp, dst, p_0) && p_0.origin = r.src && p_0.dst = dest.ip &&
+		 * p_0.src_port = r.src_port && p_0.dst_port = r.dst_port && p_0.l4proto =r.l4proto)
+		 */
 		Map<AllocationNode, Set<AllocationNode>> lastHops = dest.getLastHops();
 		Set<AllocationNode> set = lastHops.get(src);
 		
@@ -115,37 +194,33 @@ public class Checker {
   		BoolExpr[] tmp = new BoolExpr[set.size()];
   	 	BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp));
 		constraintList.add(enumerateRecv);
-		// Constraint send(srcNode,n_1,p0,t_0)
-		Map<AllocationNode, Set<AllocationNode>> firstHops = src.getFirstHops();
-		Set<AllocationNode> set2 = firstHops.get(dest);
-
-		List<Expr> sendNeighbours = set2.stream().map(n ->  (BoolExpr) nctx.send.apply(src.getZ3Name(), n.getZ3Name(), p1)).distinct().collect(Collectors.toList());
-		BoolExpr[] tmp2 = new BoolExpr[set2.size()];
-  	 	BoolExpr enumerateSend = ctx.mkOr(sendNeighbours.toArray(tmp2));
-		constraintList.add(enumerateSend);
-
 		constraintList.add(ctx.mkEq(nctx.functionsMap.get("origin").apply(p0), src.getZ3Name())); 
-		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(src.getZ3Name(), nctx.functionsMap.get("src").apply(p1)));
-		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.functionsMap.get("dest").apply(p1)));
 		constraintList.add((BoolExpr) nctx.nodeHasAddr.apply(dest.getZ3Name(), nctx.functionsMap.get("dest").apply(p0)));
-	
-		constraintList.add(ctx.mkForall(new Expr[]{p0}, 
-				ctx.mkImplies(ctx.mkAnd(enumerateRecv),
-						ctx.mkAnd(ctx.mkEq(nctx.functionsMap.get("lv4proto").apply(p0), (IntExpr)ctx.mkInt(lv4proto)),
-								ctx.mkEq(nctx.functionsMap.get("src_port").apply(p0), nctx.portMap.get(src_port)),
-									ctx.mkEq(nctx.functionsMap.get("dest_port").apply(p0), nctx.portMap.get(dst_port))
-								)),1,null,null,null,null));  
+		constraintList.add(nctx.equalPortRangeToRange(nctx.functionsMap.get("src_port").apply(p0), nctx.portMap.get(src_port))
+				);  
+		constraintList.add(nctx.equalPortRangeToRange(nctx.functionsMap.get("dest_port").apply(p0), nctx.portMap.get(dst_port))
+				); 
+		constraintList.add(ctx.mkEq(nctx.functionsMap.get("lv4proto").apply(p0), ctx.mkInt(lv4proto))
+				);  
 	
 	} 
 	 
 
-	public void propertyAdd(AllocationNode source, AllocationNode dest, Prop property, Property otherConstr) {
-		String src_port = (otherConstr == null || otherConstr.getSrcPort() == null) ? "null":otherConstr.getSrcPort();
-		String dst_port = (otherConstr == null || otherConstr.getDstPort() == null) ? "null":otherConstr.getDstPort();
-		int lv4proto = (otherConstr == null || otherConstr.getLv4Proto() == null) ? 0:otherConstr.getLv4Proto().ordinal();
-		Expr p_0 = ctx.mkConst("check_prop_p0_" + source.getZ3Name() + "_" + dest.getZ3Name()+"_"+lv4proto+"_"+src_port+"_"+dst_port, nctx.packetType);
-		
-		switch (property) {
+	
+	/**
+	 * This methods works as a wrapper, defining the correct values of the property elements before creating the constraints
+	 * It invokes the correct method according to the property type (isolation, reachability)
+	 * @param source it is the source node
+	 * @param dest it is the destination node
+	 * @param propertyType it is the type of property
+	 * @param property it is the property
+	 */
+	public void propertyAdd(AllocationNode source, AllocationNode dest, Prop propertyType, Property property) {
+		String src_port = (property == null || property.getSrcPort() == null) ? "null":property.getSrcPort();
+		String dst_port = (property == null || property.getDstPort() == null) ? "null":property.getDstPort();
+		int lv4proto = (property == null || property.getLv4Proto() == null) ? 0:property.getLv4Proto().ordinal();
+		    
+		switch (propertyType) {
 		case ISOLATION:
 			addIsolationProperty(source, dest, lv4proto, src_port, dst_port);
 			break;
@@ -153,22 +228,13 @@ public class Checker {
 			addReachabilityProperty(source, dest, lv4proto, src_port, dst_port);
 			break;
 		}
-	
-		// #TODO check if OR or AND 
-		List<Expr> sendNeighbours = source.getNode().getNeighbour().stream().map(n -> allocationNodes.get(n.getName())).map(n -> nctx.send.apply(source.getZ3Name(), n.getZ3Name(), p_0)).collect(Collectors.toList());
-		BoolExpr[] tmp3 = new BoolExpr[sendNeighbours.size()];
-		BoolExpr enumerateSendP0 = ctx.mkOr(sendNeighbours.toArray(tmp3));
 
-		//#TODO formula explanation
-		constraintList.add(ctx.mkForall(new Expr[]{p_0},
-				ctx.mkImplies(ctx.mkAnd(enumerateSendP0),
-						ctx.mkAnd(ctx.mkEq(nctx.functionsMap.get("lv4proto").apply(p_0), (IntExpr)ctx.mkInt(lv4proto)),
-								ctx.mkEq(nctx.functionsMap.get("src_port").apply(p_0), nctx.portMap.get(src_port)),
-									ctx.mkEq(nctx.functionsMap.get("dest_port").apply(p_0), nctx.portMap.get(dst_port))
-								)),1,null,null,null,null));
-		
 	}
 
+	/**
+	 * This method starts the z3 solver to solve the MaxSMT problem
+	 * @return
+	 */
 	public VerificationResult propertyCheck(){
 		solver.Push();
 		addConstraints();
@@ -179,19 +245,22 @@ public class Checker {
 		return new VerificationResult(ctx, result, nctx, assertions, model);
 	}
 	
+	/**
+	 * This method prints the assertions of the z3 model in the log.
+	 * old versions of z3 did not provide solver.getAssertions() method
+	 * so if you want to use, it has to be commented
+	 */
 	private void logAssertions()  {	
-		// old versions of z3 did not provide solver.getAssertions() method
-		// so if this is the case it has to be commented
 		/*
-		 * 
 		Logger logger = LogManager.getLogger("assertions");
 		StringWriter stringWriter = new StringWriter();
 		assertions = solver.getAssertions();
 		Arrays.asList(assertions).forEach(t-> stringWriter.append(t+"\n\n"));
 		if(model!=null){
 			logger.debug("---------- Assertions: "+assertions.length);	
-		}*/
-}
+		}
+		*/
+	}
 
 }
 

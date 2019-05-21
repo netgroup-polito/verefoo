@@ -73,7 +73,7 @@ public class NetContext {
     public final int WIPWILDCARD   = 100;
     public final int WAUTOCONF   = 1000;
     public final int WAUTOPLACEMENT   = 100000000;
-    public final int WPORTS   = 1;
+    public final int WPORTS   = 1000;
 
     
     
@@ -103,8 +103,18 @@ public class NetContext {
           mkTypes((String[])args[0],(String[])args[1], (String[])args[2], (String[])args[3]);
           baseCondition();
     }
+    
+    
+    
+    /*
+     * Main Methods of NetContext class
+     */
 
     
+    /**
+     * This methods adds hard and soft constraints inside the z3 solver
+     * @param solver it is the z3 solver
+     */
     protected void addConstraints(Optimize solver) {
     	setAddressMappings();
         BoolExpr[] constr = new BoolExpr[constraints.size()];
@@ -273,66 +283,18 @@ public class NetContext {
 
     }
 
-   
+  
+    
+    
+    
    
     /**
-     *#TODO jalol: organize formulas
-     * Two ip addresses are equals
-     * @param p1
-     * @param p2
-     * @return
+     * This method is in charge of creating the z3 types for ports, nodes, addresses and packets 
+     * @param nodes it is the array of node names
+     * @param addresses it is the array of IP addresses
+     * @param srcp_ranges it is the array of source ports
+     * @param dstp_ranges it is the array of destination ports
      */
-    public BoolExpr equalIp(Expr ip1, Expr ip2){
-    	return ctx.mkOr(new BoolExpr[] {
-      		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip1), ipFunctionsMap.get("ipAddr_1").apply(addressMap.get("wildcard"))),
-      					ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip1), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
-      					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip1), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
-      					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip1), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
-      		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip2), ipFunctionsMap.get("ipAddr_1").apply(addressMap.get("wildcard"))),
-      					ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip2), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
-      					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip2), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
-      					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip2), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
-      		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip2), ipFunctionsMap.get("ipAddr_1").apply(ip1)),
-      		  			ctx.mkOr(ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip1), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
-  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip1), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
-  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip1), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
-      		  					ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip2), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
-  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip2), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
-  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip2), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))))),
-      		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip2), ipFunctionsMap.get("ipAddr_1").apply(ip1)),
-      		  			ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip2), ipFunctionsMap.get("ipAddr_2").apply(ip1)),
-      		  			ctx.mkOr(ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip1), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
-  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip1), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
-      		  					ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip2), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
-  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip2), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))))),
-      		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip2), ipFunctionsMap.get("ipAddr_1").apply(ip1)),
-    		  				ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip2), ipFunctionsMap.get("ipAddr_2").apply(ip1)),
-    		  				ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip2), ipFunctionsMap.get("ipAddr_3").apply(ip1)),
-    		  				ctx.mkOr(ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip1), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard"))),
-  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip2), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard"))))),
-      		ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip2), ipFunctionsMap.get("ipAddr_1").apply(ip1)),
-	  				ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip2), ipFunctionsMap.get("ipAddr_2").apply(ip1)),
-	  				ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip2), ipFunctionsMap.get("ipAddr_3").apply(ip1)),
-	  				ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip2), ipFunctionsMap.get("ipAddr_4").apply(ip1)))
-      	});
-  
-    }
-
-
-   
-    
-    public BoolExpr equalPacketLv4ProtoToFwPacketLv4Proto(Expr proto1, Expr proto2){
-    	return ctx.mkOr(ctx.mkEq(proto1, proto2),ctx.mkEq(proto2, ctx.mkInt(0)));
-    	
-    }
-    
-    public BoolExpr equalPortRangeToInterval(Expr port_expr, PortInterval i){
-        return ctx.mkAnd(new BoolExpr[]{
-                ctx.mkEq(portFunctionsMap.get("start").apply(port_expr), ctx.mkInt(i.getStart())),
-                ctx.mkEq(portFunctionsMap.get("end").apply(port_expr), ctx.mkInt(i.getEnd()))});
-    }
- 
-    
     private void mkTypes (String[] nodes, String[] addresses, String[] srcp_ranges, String[] dstp_ranges){
     	 //----------- Port ranges for this network         
         String[] new_port_ranges = new String[srcp_ranges.length+dstp_ranges.length+1];
@@ -450,23 +412,18 @@ public class NetContext {
         // recv: node -> node -> packet-> int-> bool
         recv = ctx.mkFuncDecl("recv", new Sort[]{ nodeType, nodeType, packetType},ctx.mkBoolSort());
     }
-
-    /**
-     * Two packets have equal bodies
-     * @param p1
-     * @param p2
-     * @return
+    
+    
+    
+    /*
+     * Methods about comparison of packets (header and body)
      */
-    public BoolExpr PacketContentEqual(Expr p1, Expr p2){
-        return ctx.mkEq(functionsMap.get("body").apply(p1), functionsMap.get("body").apply(p2));
-    }
-
-
+    
     /**
      * Two packets have equal headers
-     * @param p1
-     * @param p2
-     * @return
+     * @param p1 it is the first packet
+     * @param p2 it is the second packet
+     * @return the corresponding z3 BoolExpr expression for the comparison
      */
     public BoolExpr PacketsHeadersEqual(Expr p1, Expr p2){
         return ctx.mkAnd(new BoolExpr[]{
@@ -480,51 +437,77 @@ public class NetContext {
                 ctx.mkEq(functionsMap.get("options").apply(p1),functionsMap.get("options").apply(p2))});
     }
 
-    public void setAddressMappings() {
-    	for (AllocationNode an : allocationNodes.values()) {
-			Expr a_0 = ctx.mkConst(an.getZ3Name() + "_address_mapping_a_0", addressType);
-			ArrayList<BoolExpr> or_clause = new ArrayList<BoolExpr>();
-			// Constraint 1 addrToNode(foreach ad in addr) = node
-				constraints.add(ctx.mkEq(addrToNode.apply(an.getZ3Node()), an.getZ3Name()));
-				or_clause.add(ctx.mkEq(a_0, an.getZ3Node()));
-			BoolExpr[] orClause = new BoolExpr[or_clause.size()];
-			// Constraint 2nodeHasAddr(node, a_0) == Or(foreach ad in addr (a_0
-			// == ad))
-			// Note we need the iff here to make sure that we set nodeHasAddr to
-			// false
-			// for other addresses.
-			constraints.add(ctx.mkForall(new Expr[] { a_0 },
-					ctx.mkEq(ctx.mkOr(or_clause.toArray(orClause)), nodeHasAddr.apply(an.getZ3Name(), a_0)), 1,
-					null, null, null, null));
+    /**
+     * Two packets have equal bodies
+     * @param p1 it is the first packet
+     * @param p2 it is the second packet
+     * @return the corresponding z3 BoolExpr expression for the comparison
+     */
+    public BoolExpr PacketContentEqual(Expr p1, Expr p2){
+        return ctx.mkEq(functionsMap.get("body").apply(p1), functionsMap.get("body").apply(p2));
+    }
 
-		}
+
+  
+    
+    
+    
+    /*
+     * Methods about comparison of IP Addresses and configuration of IP Addresses in Packet Filter rules
+     */
+      
+    /**
+     *#TODO jalol: organize formulas
+     * This method compares two IP addresses which exploit wildcards
+     * @param ip1 it is the first IP address
+     * @param ip2 it is the second IP address
+     * @return the corresponding z3 BoolExpr expression for the comparison
+     */
+    public BoolExpr equalIp(Expr ip1, Expr ip2){
+    	return ctx.mkOr(new BoolExpr[] {
+      		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip1), ipFunctionsMap.get("ipAddr_1").apply(addressMap.get("wildcard"))),
+      					ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip1), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
+      					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip1), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
+      					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip1), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
+      		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip2), ipFunctionsMap.get("ipAddr_1").apply(addressMap.get("wildcard"))),
+      					ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip2), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
+      					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip2), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
+      					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip2), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
+      		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip2), ipFunctionsMap.get("ipAddr_1").apply(ip1)),
+      		  			ctx.mkOr(ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip1), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
+  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip1), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
+  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip1), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
+      		  					ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip2), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
+  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip2), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
+  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip2), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))))),
+      		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip2), ipFunctionsMap.get("ipAddr_1").apply(ip1)),
+      		  			ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip2), ipFunctionsMap.get("ipAddr_2").apply(ip1)),
+      		  			ctx.mkOr(ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip1), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
+  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip1), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
+      		  					ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip2), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
+  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip2), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))))),
+      		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip2), ipFunctionsMap.get("ipAddr_1").apply(ip1)),
+    		  				ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip2), ipFunctionsMap.get("ipAddr_2").apply(ip1)),
+    		  				ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip2), ipFunctionsMap.get("ipAddr_3").apply(ip1)),
+    		  				ctx.mkOr(ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip1), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard"))),
+  	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip2), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard"))))),
+      		ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip2), ipFunctionsMap.get("ipAddr_1").apply(ip1)),
+	  				ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip2), ipFunctionsMap.get("ipAddr_2").apply(ip1)),
+	  				ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip2), ipFunctionsMap.get("ipAddr_3").apply(ip1)),
+	  				ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip2), ipFunctionsMap.get("ipAddr_4").apply(ip1)))
+      	});
+  
     }
     
-   
-    public  BoolExpr srcAddrPredicate (Expr p, DatatypeExpr address){
-        //return  ctx.mkEq(pf.get("src").apply(p),address);
-    	return equalIp(functionsMap.get("src").apply(p), address);
-    }
     
-    // to compare four separate element in IP
-    public BoolExpr equalIpToIntArray(Expr ip_expr, int[] array){
-        return ctx.mkAnd(new BoolExpr[]{
-                ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip_expr), ctx.mkInt(array[0])),
-                ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip_expr), ctx.mkInt(array[1])),
-                ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip_expr), ctx.mkInt(array[2])),
-                ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip_expr), ctx.mkInt(array[3]))});
-    }
     
-    // to compare IP address in packet filter rule with given IP of the packet
-    public BoolExpr equalNodeNameToPFRule(String index, Expr p_0, Expr rule) {
-    	if(wildcardManager != null && wildcardManager.areNodesWithIPAddresses()) {
-    		return equalPacketIpToPfIpRule(functionsMap.get(index).apply(p_0), rule);
-    	}else {
-    		return ctx.mkEq(functionsMap.get(index).apply(p_0), rule);
-    	}
-    }
-    
-    // #TODO Jalol: organize, put packet filter rules at the end
+    // #TODO Jalol: organize
+    /**
+     * This method allows to configure the IP address in a pcket filter rule
+     * @param packet_ip it is the packet IP address
+     * @param fwIpRule is is the rule IP address to configure
+     * @return the corresponding z3 BoolExpr expression for the rule configuration
+     */
     public BoolExpr equalPacketIpToPfIpRule(Expr packet_ip, Expr fwIpRule){
     	return ctx.mkOr(new BoolExpr[] {
     		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(fwIpRule), ipFunctionsMap.get("ipAddr_1").apply(addressMap.get("wildcard"))),
@@ -562,13 +545,55 @@ public class NetContext {
   
     }
     
-    public IntExpr bool_to_int(BoolExpr value) {
-		IntExpr integer = ctx.mkIntConst("integer_" + value);
-		constraints.add((ctx.mkImplies(value, ctx.mkEq(integer, ctx.mkInt(1)))));
-		constraints.add((ctx.mkImplies(ctx.mkNot(value), ctx.mkEq(integer, ctx.mkInt(0)))));
-		return integer;
-	}
-
+    
+    
+    /**
+     * This method compares four separate element in IP
+     * @param ip_expr it is the z3 IP address variable
+     * @param array it is an array with the four integer components
+     * @return the corresponding z3 BoolExpr expression for the comparison
+     */
+    public BoolExpr equalIpToIntArray(Expr ip_expr, int[] array){
+        return ctx.mkAnd(new BoolExpr[]{
+                ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(ip_expr), ctx.mkInt(array[0])),
+                ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(ip_expr), ctx.mkInt(array[1])),
+                ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(ip_expr), ctx.mkInt(array[2])),
+                ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(ip_expr), ctx.mkInt(array[3]))});
+    }
+    
+    
+    /**
+     * This methods compare IP address in packet filter rule with given IP of the packet
+     * @param index it is the index to retrieve the correct function in functionsMap
+     * @param p_0 it is the z3 packet variable
+     * @param rule it is the z3 packet filter rule
+     * @return the corresponding z3 BoolExpr expression for the comparison
+     */
+    public BoolExpr equalNodeNameToPFRule(String index, Expr p_0, Expr rule) {
+    	if(wildcardManager != null && wildcardManager.areNodesWithIPAddresses()) {
+    		return equalPacketIpToPfIpRule(functionsMap.get(index).apply(p_0), rule);
+    	}else {
+    		return ctx.mkEq(functionsMap.get(index).apply(p_0), rule);
+    	}
+    }
+    
+    
+    /**
+     * This methods compares a node with the IP address
+     * @param p it is the node
+     * @param address it is the IP address
+     * @return the corresponding z3 BoolExpr expression for the comparison
+     */
+    public  BoolExpr srcAddrPredicate (Expr p, DatatypeExpr address){
+    	return equalIp(functionsMap.get("src").apply(p), address);
+    }
+    
+    
+    /**
+     * This method creates a z3 IP address
+     * @param ip it is the String representing the IP address
+     * @return the z3 IP address variable
+     */
     public DatatypeExpr createIpAddress(String ip){
     	DatatypeExpr fd = (DatatypeExpr) ctx.mkConst(ip, addressType);
     	try{
@@ -582,6 +607,11 @@ public class NetContext {
     }
     
     
+    /**
+     * This method converts a string IP address into an array of four integer
+     * @param ipString the string IP address 
+     * @return the array of four integer
+     */
     public int[] getIpFromString(String ipString) {
     	int[] res = new int[4];
     	String[] decimalNotation = ipString.split("\\.");
@@ -594,19 +624,119 @@ public class NetContext {
     	return res;
     }
 
-    public boolean inNetwork(String network, String ip){
-    	String[] decimalNotationIp = ip.split("\\.");
-    	String[] decimalNotationNetwork = network.split("\\.");
-    	int i = 0;
-    	for(String s : decimalNotationNetwork){
-    		if(!decimalNotationIp[i].equals(s) && !s.equals("-1"))
-    			return false;
-    		i++;
-    	}
-    	return true; 
+    
+    /*
+     * Methods about comparison of ports and configuration of ports in Packet Filter rules
+     */
+    
+    
+    /**
+     * This methods compares a z3 Port expression with the PortInterval object
+     * @param port_expr it is the z3 Port expression 
+     * @param pi it is the the PortInterval object
+     * @return the corresponding z3 BoolExpr expression for the comparison
+     */
+    public BoolExpr equalPortRangeToInterval(Expr port_expr, PortInterval pi){
+        return ctx.mkAnd(new BoolExpr[]{
+                ctx.mkEq(portFunctionsMap.get("start").apply(port_expr), ctx.mkInt(pi.getStart())),
+                ctx.mkEq(portFunctionsMap.get("end").apply(port_expr), ctx.mkInt(pi.getEnd()))});
+    }
+ 
+    
+    /**
+     * This methods compares two z3 Port expressions 
+     * @param port_expr1 it is the first z3 Port expression 
+     * @param port_expr2 it is the second z3 Port expression 
+     * @return the corresponding z3 BoolExpr expression for the comparison
+     */
+    public BoolExpr equalPortRangeToRange(Expr port_expr1, Expr port_expr2){
+        return ctx.mkAnd(new BoolExpr[]{
+                ctx.mkEq(portFunctionsMap.get("start").apply(port_expr1), portFunctionsMap.get("start").apply(port_expr2)),
+                ctx.mkEq(portFunctionsMap.get("end").apply(port_expr1), portFunctionsMap.get("end").apply(port_expr2))});
+    }
+    
+    
+    
+    /**
+     * This method is used to configure the ports in a packet filter rule, which can exploits wildcards
+     * @param port_expr1 it is the first z3 Port expression 
+     * @param rule it is the second z3 Port expression, that is the packet filter rule
+     * @return the corresponding z3 BoolExpr expression for the rule configuration
+     */
+    public BoolExpr equalPortRangeToRule(Expr port_expr1, Expr rule){
+        return ctx.mkOr(
+        		ctx.mkAnd(
+        						ctx.mkEq((IntExpr)portFunctionsMap.get("start").apply(port_expr1), (IntExpr)portFunctionsMap.get("start").apply(rule)),
+        						ctx.mkEq((IntExpr)portFunctionsMap.get("end").apply(port_expr1), (IntExpr)portFunctionsMap.get("end").apply(rule))
+        				),
+        		ctx.mkEq(rule, portMap.get("null")));
+    }
+    
+    
+    
+    
+    
+    /*
+     * Methods about comparison of L4 protocols and configuration of L4 protocols in Packet Filter rules
+     */
+    
+    /**
+     * This method is used to configure the L4 protocol in a packet filter rule
+     * @param proto1 it is the packet L4 protocol
+     * @param proto2 is the rule L4 protocol
+     * @return the corresponding z3 BoolExpr expression for the rule configuration
+     */
+    public BoolExpr equalPacketLv4ProtoToFwPacketLv4Proto(Expr proto1, Expr proto2){
+    	return ctx.mkOr(ctx.mkEq(proto1, proto2),ctx.mkEq(proto2, ctx.mkInt(0)));
+    	
+    }
+    
+    /*
+     * Additional methods
+     */
+    
+    /**
+     * This methods maps each node to an address
+     */
+    public void setAddressMappings() {
+    	for (AllocationNode an : allocationNodes.values()) {
+			Expr a_0 = ctx.mkConst(an.getZ3Name() + "_address_mapping_a_0", addressType);
+			ArrayList<BoolExpr> or_clause = new ArrayList<BoolExpr>();
+			// Constraint 1 addrToNode(foreach ad in addr) = node
+				constraints.add(ctx.mkEq(addrToNode.apply(an.getZ3Node()), an.getZ3Name()));
+				or_clause.add(ctx.mkEq(a_0, an.getZ3Node()));
+			BoolExpr[] orClause = new BoolExpr[or_clause.size()];
+			// Constraint 2nodeHasAddr(node, a_0) == Or(foreach ad in addr (a_0
+			// == ad))
+			// Note we need the iff here to make sure that we set nodeHasAddr to
+			// false
+			// for other addresses.
+			constraints.add(ctx.mkForall(new Expr[] { a_0 },
+					ctx.mkEq(ctx.mkOr(or_clause.toArray(orClause)), nodeHasAddr.apply(an.getZ3Name(), a_0)), 1,
+					null, null, null, null));
+
+		}
+    }
+    
+   
+    /**
+     * This method converts a z3 boolean into a z3 integer
+     * @param value it is the z3 boolean
+     * @return the converted z3 integer
+     */
+    public IntExpr bool_to_int(BoolExpr value) {
+		IntExpr integer = ctx.mkIntConst("integer_" + value);
+		constraints.add((ctx.mkImplies(value, ctx.mkEq(integer, ctx.mkInt(1)))));
+		constraints.add((ctx.mkImplies(ctx.mkNot(value), ctx.mkEq(integer, ctx.mkInt(0)))));
+		return integer;
 	}
+
     
     
+    /**
+     * Setter of the wildcard manager
+     * @param wildcardManager it is the wildcard manager to set
+     */
     public void setWildcardManager(WildcardManager wildcardManager) {
     	this.wildcardManager = wildcardManager;
     }

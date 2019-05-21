@@ -179,8 +179,11 @@ public class TestFirewallCorrectness {
 		
 			assertTrue(node.getConfiguration().getFirewall().getElements().size() == 1);
 			Elements element =node.getConfiguration().getFirewall().getElements().get(0);
-			assertTrue(element.getSource().equals("-1.-1.-1.-1"));
-			assertTrue(element.getDestination().equals("20.-1.-1.-1"));
+			assertTrue(
+					(element.getSource().equals("-1.-1.-1.-1") && element.getDestination().equals("20.-1.-1.-1")) ||
+					(element.getSource().equals("10.-1.-1.-1") && element.getDestination().equals("-1.-1.-1.-1"))
+					);
+			
 		} catch (Exception e) {
 			fail(e.toString());
 		}
@@ -208,7 +211,10 @@ public class TestFirewallCorrectness {
 					correct1 = true;
 				} else if(elements.size() == 1) {
 					Elements element = elements.get(0);
-					if(element.getSource().equals("-1.-1.-1.-1") && element.getDestination().equals("10.-1.-1.-1")) {
+					if(
+						(element.getSource().equals("-1.-1.-1.-1") && element.getDestination().equals("10.-1.-1.-1")) ||
+						(element.getSource().equals("20.-1.-1.-1") && element.getDestination().equals("-1.-1.-1.-1"))
+						) {
 						correct2 = true;
 					}
 				}
