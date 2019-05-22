@@ -120,12 +120,6 @@ public class TestRestNodes {
 	@Test
 	public void testDeleteAbsentNode() {
 		
-		String node = "<node functional_type=\"WEBCLIENT\" name=\"10.0.0.3\">\r\n" + 
-				"        <neighbour name=\"30.0.0.1\"/>\r\n" + 
-				"        <configuration description=\"A simple description\" name=\"confA\">\r\n" + 
-				"          <webclient nameWebServer=\"20.0.0.1\"/>\r\n" + 
-				"        </configuration>\r\n" + 
-				"      </node>";
 		Response created = createGraph();		
 		Response res = ClientBuilder.newClient()
 				.target(created.getLocation() + "nodes/10.0.0.3")

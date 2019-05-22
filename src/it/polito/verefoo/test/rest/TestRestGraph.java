@@ -47,17 +47,17 @@ public class TestRestGraph {
 	@Test
 	public void testDeleteAbsentGraphs() {
 		
-		Response res1 = ClientBuilder.newClient()
+		ClientBuilder.newClient()
 				.target(target)
 				.request(MediaType.APPLICATION_XML)
 				.accept(MediaType.APPLICATION_XML)
 				.delete();
-		Response res2 = ClientBuilder.newClient()
+		Response res = ClientBuilder.newClient()
 				.target(target)
 				.request(MediaType.APPLICATION_XML)
 				.accept(MediaType.APPLICATION_XML)
 				.delete();
-		assertEquals(Status.NOT_FOUND.getStatusCode(), res2.getStatus());
+		assertEquals(Status.NOT_FOUND.getStatusCode(), res.getStatus());
 	}
 	
 	
