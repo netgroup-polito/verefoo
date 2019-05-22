@@ -1,4 +1,4 @@
-package it.polito.verefoo.rest.spring;
+package it.polito.verefoo.test.rest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
