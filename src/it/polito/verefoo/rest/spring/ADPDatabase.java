@@ -17,6 +17,7 @@ public class ADPDatabase {
 	private ConcurrentHashMap<Long, ConcurrentHashMap<String, Host>> hostBySubstrateId;
 	private ConcurrentHashMap<Long, Connections> connectionsBySubstrateId;
 	private ConcurrentHashMap<String, FunctionalTypes> networkFunctionMap;
+	private ConcurrentHashMap<Long, NFV> simulationResultsMap;
 	
 	/**
 	 * Constructor of the ADP Database class
@@ -28,6 +29,7 @@ public class ADPDatabase {
 		hostBySubstrateId = new ConcurrentHashMap<Long, ConcurrentHashMap<String, Host>>();
 		connectionsBySubstrateId = new ConcurrentHashMap<Long, Connections>();
 		networkFunctionMap = new ConcurrentHashMap<String, FunctionalTypes>();
+		simulationResultsMap = new ConcurrentHashMap<Long, NFV>();
 	}
 	
 	/**
@@ -65,6 +67,7 @@ public class ADPDatabase {
 	public static long getNextSimulationId() {
 		return ++lastSimulationID;
 	}
+
 	
 	/* Graph Database */
 
@@ -1033,5 +1036,20 @@ public class ADPDatabase {
 	}
 
 	
+	/* Simulations Database */
+	
+	/**
+	 * @param smid it is the id of the simulation
+	 * @return the NFV (simulation result) 
+	 */
+	public NFV getSimulationResult(long smid) {
+		return simulationResultsMap.get(smid);
+	}
 
+	public void addSimulationResult(NFV nfv, long smid) {
+		simulationResultsMap.put(smid, nfv);
+	}
+
+
+	
 }

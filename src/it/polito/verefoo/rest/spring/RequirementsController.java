@@ -38,7 +38,6 @@ public class RequirementsController {
 	/**
 	 * @param requirementsSet it is the policy to create
 	 * @return the created requirements set
-	 * @throws URISyntaxException 
 	 */
     @ApiOperation(value = "createRequirementSet", notes = "create a new requirements set"
 	)
@@ -47,14 +46,20 @@ public class RequirementsController {
     		@ApiResponse(code = 201, message = "Created"),
     		@ApiResponse(code = 400, message = "Bad Request"),
     		})
-	public ResponseEntity<PropertyDefinition> createRequirementsSet(@RequestBody PropertyDefinition requirementsSet) throws URISyntaxException {
+	public ResponseEntity<PropertyDefinition> createRequirementsSet(@RequestBody PropertyDefinition requirementsSet) {
 		long pid = service.getNextRequirementsSetId();
 		StringBuffer url = request.getRequestURL();
     	PropertyDefinition created = service.createRequirementsSet(pid, requirementsSet);
     	if (created != null) {
     		String responseUrl = url.toString() + "/" + pid;
     		HttpHeaders responseHeaders = new HttpHeaders();
-    		responseHeaders.setLocation(new URI(responseUrl));
+    		try {
+				responseHeaders.setLocation(new URI(responseUrl));
+			} catch (URISyntaxException e) {
+				throw new ResponseStatusException(
+						  HttpStatus.BAD_REQUEST, "bad request"
+						);
+			}
         	return new ResponseEntity<PropertyDefinition>(created, responseHeaders, HttpStatus.CREATED);
     	} else
     		throw new ResponseStatusException(
@@ -186,7 +191,6 @@ public class RequirementsController {
 	 * @param rid it is the id of the requirements set
 	 * @param property it is the property to created
 	 * @return the created property
-	 * @throws URISyntaxException 
 	 */
     @ApiOperation(value = "createProperty", notes = "create a new property"
 	)
@@ -195,13 +199,19 @@ public class RequirementsController {
     		@ApiResponse(code = 201, message = "Created"),
     		@ApiResponse(code = 400, message = "Bad Request"),
     		})
-	public ResponseEntity<Property> createProperty(@PathVariable("rid") long rid, @RequestBody Property property) throws URISyntaxException {
+	public ResponseEntity<Property> createProperty(@PathVariable("rid") long rid, @RequestBody Property property) {
     	Long idCreated = service.createProperty(rid, property);
     	String url = request.getRequestURL().toString();
     	if (idCreated != 0) {
     		String responseUrl = url + "/" + idCreated;
     		HttpHeaders responseHeaders = new HttpHeaders();
-    		responseHeaders.setLocation(new URI(responseUrl));
+    		try {
+				responseHeaders.setLocation(new URI(responseUrl));
+			} catch (URISyntaxException e) {
+				throw new ResponseStatusException(
+						  HttpStatus.BAD_REQUEST, "bad request"
+						);
+			}
     		return new ResponseEntity<Property>(property, responseHeaders, HttpStatus.CREATED);
     	} else
     		throw new ResponseStatusException(

@@ -37,7 +37,6 @@ public class SubstratesController {
 	/**
 	 * @param substrate is the substrate network to create
 	 * @return the created substrate network
-	 * @throws URISyntaxException 
 	 */
     @ApiOperation(value = "createSubstrate", notes = "create a new substrate network"
 	)
@@ -46,14 +45,20 @@ public class SubstratesController {
     		@ApiResponse(code = 201, message = "Created"),
     		@ApiResponse(code = 400, message = "Bad Request"),
     		})
-	public ResponseEntity<Hosts> createPolicy(@RequestBody Hosts substrate) throws URISyntaxException {
+	public ResponseEntity<Hosts> createPolicy(@RequestBody Hosts substrate) {
 		long sid = service.getNextSubstrateId();
 		StringBuffer url = request.getRequestURL();
     	Hosts created = service.createSubstrate(sid, substrate);
     	if (created != null) {
     		String responseUrl = url.toString() + "/" + sid;
     		HttpHeaders responseHeaders = new HttpHeaders();
-    		responseHeaders.setLocation(new URI(responseUrl));
+    		try {
+				responseHeaders.setLocation(new URI(responseUrl));
+			} catch (URISyntaxException e) {
+				throw new ResponseStatusException(
+						  HttpStatus.BAD_REQUEST, "bad request"
+						);
+			}
         	return new ResponseEntity<Hosts>(created, responseHeaders, HttpStatus.CREATED);
     	} else
     		throw new ResponseStatusException(
@@ -185,7 +190,6 @@ public class SubstratesController {
 	 * @param hid it is the name of the host to create
 	 * @param host it is the host to create
 	 * @return the created host
-	 * @throws URISyntaxException 
 	 */
     @ApiOperation(value = "createHost", notes = "create a new host"
 	)
@@ -194,7 +198,7 @@ public class SubstratesController {
     		@ApiResponse(code = 201, message = "Created"),
     		@ApiResponse(code = 400, message = "Bad Request"),
     		})
-	public ResponseEntity<Host> createHost(@PathVariable("sid") long sid, @RequestParam(name="hid") String hid, Host host) throws URISyntaxException {	
+	public ResponseEntity<Host> createHost(@PathVariable("sid") long sid, @RequestParam(name="hid") String hid, Host host) {	
 		if(hid == null)
 			throw new ResponseStatusException(
 					  HttpStatus.BAD_REQUEST, "bad request"
@@ -204,7 +208,13 @@ public class SubstratesController {
     	if (created != null) {
     		String responseUrl = url + "/" + hid;
     		HttpHeaders responseHeaders = new HttpHeaders();
-    		responseHeaders.setLocation(new URI(responseUrl));
+    		try {
+				responseHeaders.setLocation(new URI(responseUrl));
+			} catch (URISyntaxException e) {
+				throw new ResponseStatusException(
+						  HttpStatus.BAD_REQUEST, "bad request"
+						);
+			}
     		return new ResponseEntity<Host>(created, responseHeaders, HttpStatus.CREATED);
     	} else
     		throw new ResponseStatusException(
@@ -288,7 +298,6 @@ public class SubstratesController {
 	 * @param sid it is the id of the substrate network
 	 * @param connections they are the connections to add to the substrate network
 	 * @return the created connections
-	 * @throws URISyntaxException 
 	 */
 	@ApiOperation(value = "createConnections", notes = "create a set of connections for a substrate network"
 	)
@@ -298,7 +307,7 @@ public class SubstratesController {
 	    	@ApiResponse(code = 400, message = "Bad Request"),
 	    	@ApiResponse(code = 409, message = "Conflict"),
 	    	})
-	public ResponseEntity<Connections> createConnections(@PathVariable("sid") long sid, @RequestBody Connections connections) throws URISyntaxException {
+	public ResponseEntity<Connections> createConnections(@PathVariable("sid") long sid, @RequestBody Connections connections) {
 		if(connections.getConnection().isEmpty())
 			throw new ResponseStatusException(
 					  HttpStatus.BAD_REQUEST, "bad request"
@@ -312,7 +321,13 @@ public class SubstratesController {
   					);	
     		String responseUrl = url + "/" + connections;
     		HttpHeaders responseHeaders = new HttpHeaders();
-    		responseHeaders.setLocation(new URI(responseUrl));
+    		try {
+				responseHeaders.setLocation(new URI(responseUrl));
+			} catch (URISyntaxException e) {
+				throw new ResponseStatusException(
+						  HttpStatus.BAD_REQUEST, "bad request"
+						);
+			}
     		return new ResponseEntity<Connections>(created, responseHeaders, HttpStatus.CREATED);
     	} else
     		throw new ResponseStatusException(

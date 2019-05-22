@@ -84,10 +84,26 @@ public class ADPService {
 	public Configuration deleteConfiguration(long gid, String nid) {
 		return db.deleteConfiguration(gid, nid);
 	}
+	
+	public Constraints createConstraints(long gid, Constraints constraints) {
+		return db.createConstraints(gid, constraints);
+	}
+
+	public Constraints getConstraints(long gid) {
+		return db.getConstraints(gid);
+	}
+
+	public Constraints updateConstraints(long gid, Constraints constraints) {
+		return db.updateConstraints(gid, constraints);
+	}
+
+	public Constraints deleteConstraints(long gid) {
+		return db.deleteConstraints(gid);
+	}
 
 
 	
-	/* Policy */ 
+	/* Security Requirements */ 
 
 	public long getNextRequirementsSetId() {
 		return ADPDatabase.getNextRequirementsSetId();
@@ -134,7 +150,7 @@ public class ADPService {
 	}
 
 	
-	/* Substrate Database*/ 
+	/* Substrate Networks */ 
 	
 	public long getNextSubstrateId() {
 		return ADPDatabase.getNextSubstrateId();
@@ -180,45 +196,6 @@ public class ADPService {
 		return db.deleteHost(sid, hid);
 	}
 
-	/* Functions */
-	
-	public String createFunction(String function) {
-		return db.createFunction(function);
-	}
-
-	public FunctionalTypes deleteFunction(String fid) {
-		return db.deleteFunction(fid);
-	}
-	
-	public boolean getFunction(String fid) {
-		return db.getFunction(fid);
-	}
-
-
-	/* simulation */
-	
-	public long getNextSimulationId() {
-		return ADPDatabase.getNextSimulationId();
-	}
-
-	
-
-	public Constraints createConstraints(long gid, Constraints constraints) {
-		return db.createConstraints(gid, constraints);
-	}
-
-	public Constraints getConstraints(long gid) {
-		return db.getConstraints(gid);
-	}
-
-	public Constraints updateConstraints(long gid, Constraints constraints) {
-		return db.updateConstraints(gid, constraints);
-	}
-
-	public Constraints deleteConstraints(long gid) {
-		return db.deleteConstraints(gid);
-	}
-
 	public Connections createConnections(long sid, Connections connections) {
 		return db.createConnections(sid, connections);
 	}
@@ -235,5 +212,34 @@ public class ADPService {
 		return db.deleteConnections(sid);
 	}
 
+	/* Functions */
+	
+	public String createFunction(String function) {
+		return db.createFunction(function);
+	}
 
+	public FunctionalTypes deleteFunction(String fid) {
+		return db.deleteFunction(fid);
+	}
+	
+	public boolean getFunction(String fid) {
+		return db.getFunction(fid);
+	}
+
+
+	/* Simulations */
+	
+	public long getNextSimulationId() {
+		return ADPDatabase.getNextSimulationId();
+	}
+
+	public NFV getSimulationResult(long smid) {
+		return db.getSimulationResult(smid);
+	}
+
+	public void addSimulationResult(NFV nfv, long smid) {
+		db.addSimulationResult(nfv, smid);
+	}
+
+	
 }

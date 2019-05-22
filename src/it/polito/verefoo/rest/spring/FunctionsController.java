@@ -34,7 +34,6 @@ ADPService service = new ADPService();
 	/**
 	 * @param function it is the new function to created
 	 * @return the created function
-	 * @throws URISyntaxException 
 	 */
 	@ApiOperation(value = "createFunction", notes = "create a new function"
 				)
@@ -43,13 +42,19 @@ ADPService service = new ADPService();
     		@ApiResponse(code = 201, message = "Created"),
     		@ApiResponse(code = 400, message = "Bad Request"),
     		})
-	public ResponseEntity<String> createFunction(@RequestBody String function) throws URISyntaxException {
+	public ResponseEntity<String> createFunction(@RequestBody String function) {
 		StringBuffer url = request.getRequestURL();
     	String created = service.createFunction(function);
     	if (created != null) {
     		String responseUrl = url.toString() + "/" + function;
     		HttpHeaders responseHeaders = new HttpHeaders();
-    		responseHeaders.setLocation(new URI(responseUrl));
+    		try {
+				responseHeaders.setLocation(new URI(responseUrl));
+			} catch (URISyntaxException e) {
+				throw new ResponseStatusException(
+						  HttpStatus.BAD_REQUEST, "bad request"
+						);
+			}
         	return new ResponseEntity<String>(created, responseHeaders, HttpStatus.CREATED);
     	} else
     		throw new ResponseStatusException(

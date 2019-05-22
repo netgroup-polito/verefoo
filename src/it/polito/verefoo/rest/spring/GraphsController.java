@@ -42,29 +42,7 @@ public class GraphsController {
 	@Autowired
 	private HttpServletRequest request;
 
-	@ApiOperation(value = "getGreeting", nickname = "getGreeting")
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success", response = String.class),
-			@ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 403, message = "Forbidden"),
-			@ApiResponse(code = 404, message = "Not Found"), @ApiResponse(code = 500, message = "Failure") })
-	@RequestMapping(value = "/hi2", method = RequestMethod.GET)
-	@ResponseBody
-	public String infoVerifoo() {
-		System.out.println("Info from Verifoot");
-		return "hi";
-	}
-	
-	
-	@ApiOperation(value = "getGreeting", nickname = "getGreeting")
-	@RequestMapping(value = "/hi", method = RequestMethod.GET)
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Success", response = String.class),
-			@ApiResponse(code = 401, message = "Unauthorized"), @ApiResponse(code = 403, message = "Forbidden"),
-			@ApiResponse(code = 404, message = "Not Found"), @ApiResponse(code = 500, message = "Failure") })
-	@ResponseBody
-	public String getBiblio() {
-		System.out.println("Info from Verifoot");
-		return new String("ciao");
-	}
-	
+
 	
 	/* 
 	 * Graphs 
@@ -73,7 +51,6 @@ public class GraphsController {
 	/**
 	 * @param graph it is the graph to store
 	 * @return the created graph
-	 * @throws URISyntaxException 
 	 */
     @ApiOperation(value = "createGraph", notes = "create a new graph"
 	)
@@ -82,7 +59,7 @@ public class GraphsController {
     		@ApiResponse(code = 201, message = "Created"),
     		@ApiResponse(code = 400, message = "Bad Request"),
     		})
-	public ResponseEntity<Graph> createGraph(@RequestBody Graph graph) throws URISyntaxException {
+	public ResponseEntity<Graph> createGraph(@RequestBody Graph graph) {
 		long id = service.getNextGraphId();
     	StringBuffer url = request.getRequestURL();
     	Graph created = service.createGraph(id, graph);
@@ -90,7 +67,13 @@ public class GraphsController {
     		String responseUrl = url.toString() + "/" + id;
     		created.setId(id);
     		HttpHeaders responseHeaders = new HttpHeaders();
-    		responseHeaders.setLocation(new URI(responseUrl));
+    		try {
+				responseHeaders.setLocation(new URI(responseUrl));
+			} catch (URISyntaxException e) {
+				throw new ResponseStatusException(
+						  HttpStatus.BAD_REQUEST, "bad request"
+						);
+			}
         	return new ResponseEntity<Graph>(created, responseHeaders, HttpStatus.CREATED);
     	} else
     		throw new ResponseStatusException(
@@ -233,7 +216,7 @@ public class GraphsController {
     		@ApiResponse(code = 400, message = "Bad Request"),
     		@ApiResponse(code = 409, message = "Conflict"),
     		})
-    public ResponseEntity<Node> createNode(@PathVariable("gid") long gid, @RequestParam(name="nid") String nid, @RequestBody Node node) throws URISyntaxException {
+    public ResponseEntity<Node> createNode(@PathVariable("gid") long gid, @RequestParam(name="nid") String nid, @RequestBody Node node) {
 		if(nid == null)
 			throw new ResponseStatusException(
 					  HttpStatus.BAD_REQUEST, "bad request"
@@ -247,7 +230,13 @@ public class GraphsController {
   					);
     		String responseUrl = url + "/" + nid;
     		HttpHeaders responseHeaders = new HttpHeaders();
-    		responseHeaders.setLocation(new URI(responseUrl));
+    		try {
+				responseHeaders.setLocation(new URI(responseUrl));
+			} catch (URISyntaxException e) {
+				throw new ResponseStatusException(
+						  HttpStatus.BAD_REQUEST, "bad request"
+						);
+			}
     		return new ResponseEntity<Node>(created, responseHeaders, HttpStatus.CREATED);
     	} else
     		throw new ResponseStatusException(
@@ -455,8 +444,7 @@ public class GraphsController {
     /**
 	 * @param gid it is the id of the graph
 	 * @param constraints they are the constraints to add to the graph
-	 * @return the created constraints
-     * @throws URISyntaxException 
+	 * @return the created constraints 
 	 */
 	@ApiOperation(value = "createConstraints", notes = "create a set of constraints for a graph"
 	)
@@ -466,7 +454,7 @@ public class GraphsController {
 	    	@ApiResponse(code = 400, message = "Bad Request"),
 	    	@ApiResponse(code = 409, message = "Conflict"),
 	    	})
-	public ResponseEntity<Constraints> createConstraints(@PathVariable("gid") long gid, @RequestBody Constraints constraints) throws URISyntaxException {
+	public ResponseEntity<Constraints> createConstraints(@PathVariable("gid") long gid, @RequestBody Constraints constraints) {
 		if(constraints.getLinkConstraints().getLinkMetrics().isEmpty() && constraints.getNodeConstraints().getNodeMetrics().isEmpty())
 			throw new ResponseStatusException(
 					  HttpStatus.BAD_REQUEST, "bad request"
@@ -480,7 +468,13 @@ public class GraphsController {
    					 HttpStatus.CONFLICT, "conflict"
    				);
     		HttpHeaders responseHeaders = new HttpHeaders();
-    		responseHeaders.setLocation(new URI(responseUrl));
+    		try {
+				responseHeaders.setLocation(new URI(responseUrl));
+			} catch (URISyntaxException e) {
+				throw new ResponseStatusException(
+						  HttpStatus.BAD_REQUEST, "bad request"
+						);
+			}
     		return new ResponseEntity<Constraints>(created, responseHeaders, HttpStatus.CREATED);
     	} else
     		throw new ResponseStatusException(
