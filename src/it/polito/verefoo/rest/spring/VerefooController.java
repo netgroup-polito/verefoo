@@ -82,9 +82,21 @@ public class VerefooController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/")
 	@ResponseBody
-	public String infoVerifoo() {
-		System.out.println("Info from Verifoot");
-		return "hi";
+	public String infoVerefoo() {
+		return "<h1 style=\"color: #5e9ca0;\">VEREFOO Spring Boot Rest APIs</h1>\r\n" + 
+				"<h2>Some useful features:</h2>\r\n" + 
+				"<ol>\r\n" + 
+				"<li>&nbsp;Store and retrieve Service Graphs and Allocation Graphs</li>\r\n" + 
+				"<li>&nbsp;Store and retrieve the constraints related to a Service Graph</li>\r\n" + 
+				"<li>&nbsp;Store and retrieve the Network Security Requirements to satisfy</li>\r\n" + 
+				"<li>&nbsp;Store and retrieve the Substrate Networks where VNFs can be deployed</li>\r\n" + 
+				"<li>&nbsp;Store and retrieve the Network Security Functions which can be allocated by the framework</li>\r\n" + 
+				"<li>&nbsp;Run simulations and retrieve the results</li>\r\n" + 
+				"</ol>\r\n" + 
+				"<h2 style=\"color: #2e6c80;\">How to use the Rest APIs:</h2>\r\n" + 
+				"<p>You can read the Swagger documentation clicking <a href=\"./swagger-ui.html \">HERE</a>&nbsp;</p>\r\n" + 
+				"<h2 style=\"color: #2e6c80;\">&nbsp;</h2>\r\n" + 
+				"<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</p>";
 	}
 
 }
