@@ -64,7 +64,9 @@ public class GraphsController {
     	StringBuffer url = request.getRequestURL();
     	Graph created = service.createGraph(id, graph);
     	if (created!=null) {
-    		String responseUrl = url.toString() + "/" + id;
+    		String responseUrl;
+    		if(url.toString().endsWith("/")) responseUrl = url.toString() + id;
+    		else responseUrl = url.toString() + "/" + id;
     		created.setId(id);
     		HttpHeaders responseHeaders = new HttpHeaders();
     		try {
@@ -221,14 +223,16 @@ public class GraphsController {
 			throw new ResponseStatusException(
 					  HttpStatus.BAD_REQUEST, "bad request"
 					);
-		String url = request.getRequestURL().toString();
+		StringBuffer url = request.getRequestURL();
     	Node created = service.createNode(gid, node, nid);
     	if (created != null) {
     		if(created.getName() == null)
     			throw new ResponseStatusException(
   					  HttpStatus.CONFLICT, "conflict"
   					);
-    		String responseUrl = url + "/" + nid;
+    		String responseUrl;
+    		if(url.toString().endsWith("/")) responseUrl = url.toString() + nid;
+    		else responseUrl = url.toString() + "/" + nid;
     		HttpHeaders responseHeaders = new HttpHeaders();
     		try {
 				responseHeaders.setLocation(new URI(responseUrl));
@@ -460,7 +464,9 @@ public class GraphsController {
 					  HttpStatus.BAD_REQUEST, "bad request"
 					);
 		StringBuffer url = request.getRequestURL();
-		String responseUrl = url.toString() + "/constraints";
+		String responseUrl;
+		if(url.toString().endsWith("/")) responseUrl = url.toString() + "constraints";
+		else responseUrl = url.toString() + "/constraints";
     	Constraints created = service.createConstraints(gid, constraints);
     	if (created != null) {
     		if(created.getLinkConstraints().getLinkMetrics().isEmpty() && created.getNodeConstraints().getNodeMetrics().isEmpty())

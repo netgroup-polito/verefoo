@@ -50,7 +50,9 @@ public class SubstratesController {
 		StringBuffer url = request.getRequestURL();
     	Hosts created = service.createSubstrate(sid, substrate);
     	if (created != null) {
-    		String responseUrl = url.toString() + "/" + sid;
+    		String responseUrl;
+    		if(url.toString().endsWith("/")) responseUrl = url.toString() + sid;
+    		else responseUrl = url.toString() + "/" + sid;
     		HttpHeaders responseHeaders = new HttpHeaders();
     		try {
 				responseHeaders.setLocation(new URI(responseUrl));
@@ -206,7 +208,9 @@ public class SubstratesController {
     	String url = request.getRequestURL().toString();
     	Host created = service.createHost(sid, hid, host);
     	if (created != null) {
-    		String responseUrl = url + "/" + hid;
+    		String responseUrl;
+    		if(url.toString().endsWith("/")) responseUrl = url.toString() + hid;
+    		else responseUrl = url.toString() + "/" + hid;
     		HttpHeaders responseHeaders = new HttpHeaders();
     		try {
 				responseHeaders.setLocation(new URI(responseUrl));
@@ -319,7 +323,9 @@ public class SubstratesController {
     			throw new ResponseStatusException(
   					  HttpStatus.CONFLICT, "conflict"
   					);	
-    		String responseUrl = url + "/" + connections;
+    		String responseUrl;
+    		if(url.toString().endsWith("/")) responseUrl = url.toString() + "connections";
+    		else responseUrl = url.toString() + "/" + "connections";
     		HttpHeaders responseHeaders = new HttpHeaders();
     		try {
 				responseHeaders.setLocation(new URI(responseUrl));

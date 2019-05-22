@@ -46,7 +46,9 @@ ADPService service = new ADPService();
 		StringBuffer url = request.getRequestURL();
     	String created = service.createFunction(function);
     	if (created != null) {
-    		String responseUrl = url.toString() + "/" + function;
+    		String responseUrl;
+    		if(url.toString().endsWith("/")) responseUrl = url.toString() + function;
+    		else responseUrl = url.toString() + "/" + function;
     		HttpHeaders responseHeaders = new HttpHeaders();
     		try {
 				responseHeaders.setLocation(new URI(responseUrl));

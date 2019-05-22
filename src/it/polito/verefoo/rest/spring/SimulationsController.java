@@ -62,7 +62,9 @@ public class SimulationsController {
 		
 		long smid = service.getNextSimulationId();
 		service.addSimulationResult(nfv, smid);
-		String responseUrl = url.toString() + "/" + smid;
+		String responseUrl;
+		if(url.toString().endsWith("/")) responseUrl = url.toString() + smid;
+		else responseUrl = url.toString() + "/" + smid;
 		HttpHeaders responseHeaders = new HttpHeaders();
 		try {
 			responseHeaders.setLocation(new URI(responseUrl));
@@ -133,7 +135,9 @@ public class SimulationsController {
 		
 		long smid = service.getNextSimulationId();
 		service.addSimulationResult(nfv, smid);
-		String responseUrl = url.toString() + "/" + smid;
+		String responseUrl;
+		if(url.toString().endsWith("/")) responseUrl = url.toString() + smid;
+		else responseUrl = url.toString() + "/" + smid;
 		HttpHeaders responseHeaders = new HttpHeaders();
 		try {
 			responseHeaders.setLocation(new URI(responseUrl));

@@ -51,7 +51,9 @@ public class RequirementsController {
 		StringBuffer url = request.getRequestURL();
     	PropertyDefinition created = service.createRequirementsSet(pid, requirementsSet);
     	if (created != null) {
-    		String responseUrl = url.toString() + "/" + pid;
+    		String responseUrl;
+    		if(url.toString().endsWith("/")) responseUrl = url.toString() + pid;
+    		else responseUrl = url.toString() + "/" + pid;
     		HttpHeaders responseHeaders = new HttpHeaders();
     		try {
 				responseHeaders.setLocation(new URI(responseUrl));
@@ -203,7 +205,9 @@ public class RequirementsController {
     	Long idCreated = service.createProperty(rid, property);
     	String url = request.getRequestURL().toString();
     	if (idCreated != 0) {
-    		String responseUrl = url + "/" + idCreated;
+    		String responseUrl;
+    		if(url.toString().endsWith("/")) responseUrl = url.toString() + idCreated;
+    		else responseUrl = url.toString() + "/" + idCreated;
     		HttpHeaders responseHeaders = new HttpHeaders();
     		try {
 				responseHeaders.setLocation(new URI(responseUrl));
