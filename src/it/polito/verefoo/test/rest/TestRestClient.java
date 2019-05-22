@@ -18,7 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 /**
  * 
- * This class tests the connectivty of the client to the web server
+ * This class tests the connectivity of the client to the web server
  *
  */
 public class TestRestClient {
