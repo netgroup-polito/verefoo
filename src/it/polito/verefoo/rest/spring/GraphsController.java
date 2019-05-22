@@ -469,7 +469,7 @@ public class GraphsController {
 		else responseUrl = url.toString() + "/constraints";
     	Constraints created = service.createConstraints(gid, constraints);
     	if (created != null) {
-    		if(created.getLinkConstraints().getLinkMetrics().isEmpty() && created.getNodeConstraints().getNodeMetrics().isEmpty())
+    		if(created.getLinkConstraints() == null && created.getNodeConstraints() == null)
     			throw new ResponseStatusException(
    					 HttpStatus.CONFLICT, "conflict"
    				);
