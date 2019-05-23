@@ -1,18 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2017 Politecnico di Torino and others.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Apache License, Version 2.0
- * which accompanies this distribution, and is available at
- * http://www.apache.org/licenses/LICENSE-2.0
- *******************************************************************************/
 package it.polito.verigraph.functions;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -20,7 +11,6 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
-import com.microsoft.z3.IntNum;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Sort;
 
@@ -31,7 +21,6 @@ import it.polito.verefoo.jaxb.EType;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Node;
 import it.polito.verigraph.extra.PacketFilterRule;
-import it.polito.verigraph.extra.Quadruple;
 import it.polito.verigraph.extra.Tuple;
 import it.polito.verigraph.solver.NetContext;
 
@@ -54,9 +43,9 @@ public class PacketFilter extends GenericFunction{
 
 	/**
 	 * Public constructor for the Packet Filter
-	 * @param source It is the Allocation Node on which the packet_filter is put
+	 * @param source It is the Allocation Node on which the packet filter is put
 	 * @param ctx It is the Z3 Context in which the model is generated
-	 * @param nctx It is the NetContext object to which contraints are sent
+	 * @param nctx It is the NetContext object to which constraints are sent
 	 */
 	public PacketFilter(AllocationNode source, Context ctx, NetContext nctx) {
 		this.source = source;
@@ -77,20 +66,19 @@ public class PacketFilter extends GenericFunction{
    		used = ctx.mkBoolConst(pf+"_used");
 		autoplace = true; 
 		
+		//function can be autoConfigured is z3 must establish the firewall filtering policy
 		autoConfigured = true;
 		
-		// main z3 function
+		// main z3 fitlering function
 		filtering_function = ctx.mkFuncDecl(pf + "_filt_func", new Sort[] { nctx.packetType}, ctx.mkBoolSort());
 	}
 
 	
 
 	/**
-	 * This method allows to add the contraints inside Z3 solver
-	 * @param solver Istance of Z3 solver
+	 * This method allows to add the constraints inside z3 solver
+	 * @param solver it is istance of z3 solver
 	 */
-	
-	// TODO improve some comments only here
 	private void additionalConstraints(Optimize solver){
  		Expr p_0 = ctx.mkConst(pf+"_packet_filter_acl_p_0", nctx.packetType);
  		Expr n_0 = ctx.mkConst(pf+"_packet_filter_send_n_0", nctx.nodeType);
@@ -98,6 +86,8 @@ public class PacketFilter extends GenericFunction{
  		// if automatic configuration enabled, if is true
  		if (rules.size() == 0){
     		//If the size of the ACL list is empty then by default acl_func must be false
+ 			//for each p_0, the filtering_function which is applied to p_0 can be
+ 			//blacklisting or whitelisting, according to the value of blacklisting_z3 variable
     		 solver.Add(ctx.mkForall(new Expr[]{p_0},
 								ctx.mkEq(filtering_function.apply(p_0), blacklisting_z3)
 						,1,null,null,null,null));
@@ -106,6 +96,13 @@ public class PacketFilter extends GenericFunction{
     	        for(int y=0;y<rules.size();y++){
     	        	PacketFilterRule rule = rules.get(y);
     	        	rule_map[y] = rule.matchPacket(p_0);
+    	        	
+    	        	
+    	        	/*
+    	        	 * for each p_0, n_0,
+    	        	 * recv(n_0, pf, p_0) && rule.match(p_0)
+    	        	 * --> filtering_function(p_0) == rule.action
+    	        	 */
 					solver.Add(ctx.mkForall(new Expr[]{p_0, n_0},
 											// at this point we assume that the rules are conflict free
 											ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(new Expr[] { n_0, pf, p_0 }),
@@ -118,6 +115,16 @@ public class PacketFilter extends GenericFunction{
 													  )
 								, 1, null, null, null, null));
     	        }
+    	        
+    	        
+    	        /*
+	        	 * for each p_0, n_0,
+	        	 * recv(n_0, pf, p_0) && not exists rule.match(p_0)
+	        	 * --> filtering_function(p_0) == blacklisting_z3 (default action)
+	        	 * 
+	        	 * Basically, if no specific rules are configured on the packet filter,
+	        	 * then the default action is applied.
+	        	 */
     	        solver.Add(ctx.mkForall(new Expr[]{p_0, n_0},
 										ctx.mkImplies(//no rule matches the packet -> the acl must allow the default behaviour
 											ctx.mkAnd((BoolExpr) nctx.recv.apply(new Expr[] { n_0, pf, p_0 }),ctx.mkNot(ctx.mkOr(rule_map))),
@@ -133,10 +140,8 @@ public class PacketFilter extends GenericFunction{
 	
 	
 
-
-
 	/**
-	 * This method allows to generate the Acl for a manually configured packet_filter
+	 * This method allows to generate the filtering rules for a manually configured packet_filter
 	 */
 	public void generateManualRules(){
 		Node n = source.getNode();
@@ -173,7 +178,7 @@ public class PacketFilter extends GenericFunction{
 							throw new BadGraphError(n.getName()+" has invalid configuration: "+ex.getMessage(), EType.INVALID_NODE_CONFIGURATION);
 						}
 						
-						if(!autoConfigured){	// if not an autoconfiguration packet_filter
+						if(!autoConfigured){	// if not an auto_configuration packet_filter
 							this.rules.addAll(rules_manual);
 						}	
 				});
@@ -184,7 +189,7 @@ public class PacketFilter extends GenericFunction{
     
 	
 	/**
-	 * This method allows to create SOFT and HARD constraints for an auto-configured packet_filter
+	 * This method allows to create SOFT and HARD constraints for an auto_configured packet filter
 	 *@param nRules It is the number of MAXIMUM rules the packet_filter should try to configure
 	 */
     public void automaticConfiguration(Integer nRules) {
@@ -198,6 +203,7 @@ public class PacketFilter extends GenericFunction{
   			// packet filter should not be used if possible
   			nctx.softConstrAutoPlace.add(new Tuple<BoolExpr, String>(ctx.mkNot(used), "fw_auto_conf"));
   		}
+  		
   		for(int i = 0; i < nRules; i++){
   			Expr src = ctx.mkConst(pf + "_auto_src_"+i, nctx.addressType);
   			Expr dst = ctx.mkConst(pf + "_auto_dst_"+i, nctx.addressType);
@@ -212,6 +218,7 @@ public class PacketFilter extends GenericFunction{
   			IntExpr dstAuto2 = ctx.mkIntConst(pf + "_auto_dst_ip_2_"+i);
   			IntExpr dstAuto3 = ctx.mkIntConst(pf + "_auto_dst_ip_3_"+i);
   			IntExpr dstAuto4 = ctx.mkIntConst(pf + "_auto_dst_ip_4_"+i);
+  			
   			/**
   	    	 * This section allows the creation of the following hard constraints:
   	    	 * 1) if in a rule the source isn't NULL, then also the destination shouldn't be NULL
@@ -241,6 +248,7 @@ public class PacketFilter extends GenericFunction{
 						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_4").apply(dst), dstAuto4)
 						)
 				); 
+  			
   			/**
   	    	 * This section allows the creation of the following soft constraints:
   	    	 * If possible, the source/destination IP address components should be equal to the wildcard.
@@ -281,6 +289,11 @@ public class PacketFilter extends GenericFunction{
  			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(srcp, nctx.portMap.get("null")),"fw_auto_conf"));
  			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(dstp, nctx.portMap.get("null")),"fw_auto_conf"));
   			
+ 			/*
+ 			 * For each rule which must be potentially configured by z3,
+ 			 * all the fields are matched with the packet p_0,
+ 			 * through formulas involving wildcards and defined in NetContext class.
+ 			 */
  			automatic_rules.add(ctx.mkAnd(
 		  						nctx.equalNodeNameToPFRule("src", p_0, src),
 								nctx.equalNodeNameToPFRule("dest", p_0, dst),
@@ -290,11 +303,11 @@ public class PacketFilter extends GenericFunction{
  			 					));
   		}
   		
+  		
   		/**
 	     * This section allow the creation of Z3 variables for defaultAction and rules.
 	     * behaviour variables is the combination of the auto-configured rules.
 	    */
-  		
   		Expr defaultAction = ctx.mkConst(pf + "_auto_default_action", ctx.mkBoolSort());
   		Expr ruleAction = ctx.mkConst(pf + "_auto_action", ctx.mkBoolSort());
 
@@ -311,7 +324,7 @@ public class PacketFilter extends GenericFunction{
   		}
   		
   		/**
-	     * This section allows the insertion of previously created hard contraints in a list.
+	     * This section allows the insertion of previously created hard constraints in a list.
 	     */
   		if(autoplace) {
   			BoolExpr[] implications_tmp = new BoolExpr[implications1.size()];
@@ -334,7 +347,7 @@ public class PacketFilter extends GenericFunction{
   			if(autoplace) {
   				/**
   		    	 * This section allows the creation of the following forwarding rules:
-  		    	 * For each p_0, if recv(leftHop, fw, p_0) && behaviour && fw_is_used -> for each rightHop, send(fw, rightHop, p_0)
+  		    	 * For each p_0, if recv(leftHop, pf, p_0) && behaviour && pf_is_used -> for each rightHop, send(pf, rightHop, p_0)
   		    	 * In words:
   		    	 * For each packet, if the packet_filter has received this packet from a leftHop, its rules don't block the packet itself and the packet_filter is used,
   		    	 * then the packet_filter must send the packet to ALL its nextHops towards its destination 
@@ -346,9 +359,9 @@ public class PacketFilter extends GenericFunction{
 										),1, null, null, null, null));
   				/**
   		    	 * This section allows the creation of the following forwarding rules:
-  		    	 * For each p_0, if recv(leftHop, fw, p_0) && !fw_is_used -> for each rightHop, send(fw, rightHop, p_0)
+  		    	 * For each p_0, if recv(leftHop, pf, p_0) && !pf_is_used -> for each rightHop, send(pf, rightHop, p_0)
   		    	 * In words:
-  		    	 * For each packet, if the packet_filter has received this packet from a leftHop and the packet_filter isn' used,
+  		    	 * For each packet, if the packet_filter has received this packet from a leftHop and the packet_filter isn't used,
   		    	 * then the packet_filter must send the packet to ALL its nextHops towards its destination because it is a forwarder.
   		    	 */
   				constraints.add(ctx.mkForall(new Expr[] { p_0 },
@@ -359,7 +372,7 @@ public class PacketFilter extends GenericFunction{
   				
   				/**
   		    	 * This section allows the creation of the following forwarding rules:
-  		    	 * For each p_0, if recv(leftHop, fw, p_0)  -> for each rightHop, send(fw, rightHop, p_0)
+  		    	 * For each p_0, if recv(leftHop, pf, p_0)  -> for each rightHop, send(pf, rightHop, p_0)
   		    	 * In words:
   		    	 * For each packet, if the packet_filter has received this packet from a leftHop and the rules don't block it.
   		    	 * then the packet_filter must send the packet to ALL its nextHops towards its destination.
@@ -380,7 +393,7 @@ public class PacketFilter extends GenericFunction{
   	 		if(autoplace) { 
   	 			/**
   		    	 * This section allows the creation of the following forwarding rules:
-  		    	 * For each p_0, if send(fw, rightHop, p_0) && fw_is_used -> exist leftHop, recv(leftHop, fw, p_0) && behaviour 
+  		    	 * For each p_0, if send(pf, rightHop, p_0) && pf_is_used -> exist leftHop, recv(leftHop, pf, p_0) && behaviour 
   		    	 * In words:
   		    	 * For each packet, if the packet_filter has sent the packet and it is used, it means that:
   		    	 * 1) it has received the packet from a leftHop
@@ -394,7 +407,7 @@ public class PacketFilter extends GenericFunction{
   	 			
   	 			/**
   		    	 * This section allows the creation of the following forwarding rules:
-  		    	 * For each p_0, if send(fw, rightHop, p_0) && !fw_is_used -> exist leftHop, recv(leftHop, fw, p_0)  
+  		    	 * For each p_0, if send(pf, rightHop, p_0) && !pf_is_used -> exist leftHop, recv(leftHop, pf, p_0)  
   		    	 * In words:
   		    	 * For each packet, if the packet_filter has sent the packet and it isn't used, it means that it simply has received the packet from a leftHop
   		    	 * Basically it behaves as a forwarder.
@@ -407,12 +420,12 @@ public class PacketFilter extends GenericFunction{
   	 			
   	 			/**
   		    	 * This section allows the creation of the following forwarding rules:
-  		    	 * For each p_0, if send(fw, rightHop, p_0) -> exist leftHop, recv(leftHop, fw, p_0) && behaviour 
+  		    	 * For each p_0, if send(pf, rightHop, p_0) -> exist leftHop, recv(leftHop, pf, p_0) && behaviour 
   		    	 * In words:
   		    	 * For each packet, if the packet_filter has sent the packet, it means that:
   		    	 * 1) it has received the packet from a leftHop
   		    	 * 2) its rules don't block the packet
-  		    	 * NOTE: only without autplacement
+  		    	 * NOTE: only without autoplacement
   		    	 */
   	 			
   	 			constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
@@ -435,7 +448,7 @@ public class PacketFilter extends GenericFunction{
 
     	/**
     	 * This section allows the creation of the following forwarding rules:
-    	 * For each p_0, if recv(leftHop, fw, p_0) && acl_func.apply(p_0) -> for each rightHop, send(fw, rightHop, p_0)
+    	 * For each p_0, if recv(leftHop, pf, p_0) && acl_func.apply(p_0) -> for each rightHop, send(pf, rightHop, p_0)
     	 * In words:
     	 * For each packet, if the packet_filter has received this packet from a leftHop and its ACLs don't block the packet itself,
     	 * then the packet_filter must send the packet to ALL its nextHops towards its destination 
@@ -452,7 +465,7 @@ public class PacketFilter extends GenericFunction{
     	
     	/**
     	 * This section allows the creation of the following forwarding rules:
-    	 * For each p_0, for each rightHop, send(fw, rightHop, p_0) -> exist at least one leftHop that recv(leftHop, fw, p_0) && acl_func.apply(p_0) -> 
+    	 * For each p_0, for each rightHop, send(pf, rightHop, p_0) -> exist at least one leftHop that recv(leftHop, pf, p_0) && acl_func.apply(p_0) -> 
     	 * In words:
     	 * For each packet, if the packet_filter has sent this packet to a nextHop, that it means that:
     	 * 1) this packet has been received by at least one leftHop
@@ -531,7 +544,7 @@ public class PacketFilter extends GenericFunction{
 
 	
 	/**
-	 * This method allows to wrap the methoch which adds the contraints inside Z3 solver
+	 * This method allows to wrap the method which adds the constraints inside Z3 solver
 	 * @param solver Istance of Z3 solver
 	 */
 	@Override

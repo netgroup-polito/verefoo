@@ -13,20 +13,17 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 
-import com.microsoft.z3.Expr;
-
 import it.polito.verefoo.VerefooNormalizer;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
-import it.polito.verefoo.translator.z3Translator.Datatype;
 import it.polito.verigraph.extra.PortInterval;
 import it.polito.verigraph.extra.Tuple;
 import it.polito.verigraph.functions.GenericFunction;
 import it.polito.verigraph.functions.PacketFilter;
 
 /**
- * This class implements a parser for verifoo output (the z3 model), in order to
+ * This class implements a parser for Verefoo output (the z3 model), in order to
  * translate it into the correct XML
  */
 public class Translator {
@@ -42,7 +39,7 @@ public class Translator {
 	/**
 	 * Constructor
 	 * 
-	 * @param model The Verifoo output.
+	 * @param model The Verefoo output.
 	 * @param nfv   The NFV model to complete.
 	 * @param g     the specific network service graph that is considered
 	 */
@@ -76,7 +73,7 @@ public class Translator {
 
 	/**
 	 * Wraps the translation for all the VNFs that can be auto configurated by
-	 * Verifoo
+	 * Verefoo
 	 */
 	public void setAutoConfig() {
 		setPacketFilterAutoConfig();
@@ -178,7 +175,7 @@ public class Translator {
 	}
 
 	/**
-	 * Set the firewall auto-configurated rules in the XML according to the verifoo
+	 * Set the firewall auto-configurated rules in the XML according to the Verefoo
 	 * output
 	 */
 	public void setPacketFilterAutoConfig() {
@@ -371,7 +368,7 @@ public class Translator {
 	}
 
 	/**
-	 * Remove not used optional network objects from the XML for the verifoo output
+	 * Remove not used optional network objects from the XML for the Verefoo output
 	 */
 	public void setAutoPlacement() {
 		List<AllocationNode> usableNodes = allocationNodes.values().stream()
@@ -473,7 +470,7 @@ public class Translator {
 	}
 
 	/**
-	 * Remove not used optional network objects from the XML for the verifoo output
+	 * Remove not used optional network objects from the XML for the Verefoo output
 	 */
 	public void removeOptionalNotUsed() {
 

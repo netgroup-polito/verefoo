@@ -1,26 +1,13 @@
-/*******************************************************************************
- * Copyright (c) 2017 Politecnico di Torino and others.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Apache License, Version 2.0
- * which accompanies this distribution, and is available at
- * http://www.apache.org/licenses/LICENSE-2.0
- *******************************************************************************/
 package it.polito.verigraph.functions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
-import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Optimize;
-import com.microsoft.z3.Solver;
 
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verigraph.extra.PacketModel;
@@ -34,8 +21,15 @@ public class EndHost extends GenericFunction {
     NetContext nctx;
     PacketModel packet;
     AllocationNode source;
+    Expr n_0;
+    Expr p_0;
 
-    // TODO comments need to be updated
+    /**
+     * Public constructor of EndHost class
+     * @param source it is the AllocationNode on which a client or server is installed
+     * @param ctx it is the z3 Context variable
+     * @param nctx it is the NetContext object storing the needed information about z3 IP address variables
+     */
     public EndHost(AllocationNode source, Context ctx, NetContext nctx) { 
     	 this.source = source;
     	 this.ctx = ctx;
@@ -47,19 +41,31 @@ public class EndHost extends GenericFunction {
     }
 
 
+	/* (non-Javadoc)
+	 * @see it.polito.verigraph.functions.GenericFunction#addContraints(com.microsoft.z3.Optimize)
+	 * This method allows to add all the constraints in the z3 solver
+	 */
 	@Override
 	public void addContraints(Optimize solver) {
 		 BoolExpr[] constr = new BoolExpr[constraints.size()];
 	        solver.Add(constraints.toArray(constr));
 	}
 
-    /*
+
+    
+    /**
+     * This method sets some constraints about which packet can be configured
      * Fields that can be configured -> "dest","body","seq","proto","emailFrom","url","options"
+     * @param packet it is the packet whose fields, if defined, must match with the z3 predicates
      */
-    Expr n_0;
-    Expr p_0;
     public void installEndHost (PacketModel packet){
+    	
         BoolExpr predicatesOnPktFields = ctx.mkTrue();
+        
+        /*
+         * If the packet has some configured elements, they must match the corresponding packet elements.
+         * predicatesOnPktFields is the AND of these correspondences 
+         */
         if(packet!=null){
         	if(packet.getIp_dest() != null)
                 predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.functionsMap.get("dest").apply(p_0), packet.getIp_dest()));
@@ -78,8 +84,13 @@ public class EndHost extends GenericFunction {
         }
         
         
-        //Constraint send(politoEndHost, n_0, p) ->
-        //p.origin == politoEndHost && p.orig_body == p.body && nodeHasAddr(politoEndHost,p.src)
+        /*
+         * Constraint send(politoEndHost, n_0, p_0) -> predicatesOnPktFields &&
+         * p_0.origin == politoEndHost && p_0.orig_body == p_0.body && 
+         * p_0.inner_src == null && p_0.inner_dest == null &&
+         * p_0.encrypted == null && nodeHasAddr(politoEndHost,p.src)
+         * (no encapsulated packet inside)
+         */
         constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
                 ctx.mkImplies((BoolExpr)nctx.send.apply(politoEndHost, n_0, p_0),
                         ctx.mkAnd(predicatesOnPktFields,
@@ -88,14 +99,11 @@ public class EndHost extends GenericFunction {
                                 ctx.mkEq(nctx.functionsMap.get("inner_src").apply(p_0),nctx.addressMap.get("null")),
                                 ctx.mkEq(nctx.functionsMap.get("inner_dest").apply(p_0),nctx.addressMap.get("null")),
                                 ctx.mkEq(nctx.functionsMap.get("encrypted").apply(p_0),ctx.mkFalse()),
-                                ctx.mkEq(nctx.functionsMap.get("encrypted").apply(p_0),ctx.mkFalse())
-                                ,(BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.functionsMap.get("src").apply(p_0))
+                                (BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.functionsMap.get("src").apply(p_0))
                                 )),1,null,null,null,null));
 
         return;
     }
-
-
 
 
 

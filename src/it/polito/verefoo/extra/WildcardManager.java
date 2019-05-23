@@ -4,15 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.jaxb.Node;
-import it.polito.verigraph.extra.Quadruple;
-import it.polito.verigraph.functions.PacketFilter;
+
 
 /**
  * WildcardManager is the class which creates all the possible wildcards from every IP Address.

@@ -13,17 +13,15 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import it.polito.verefoo.*;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.jaxb.*;
 
 /**
- * This is the main class only for testing the Verifoo execution
+ * This is the main class only for testing the Verefoo execution
  *
  */
 public class Main {
