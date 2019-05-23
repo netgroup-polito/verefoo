@@ -5,19 +5,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.microsoft.z3.ArithExpr;
-import com.microsoft.z3.BoolExpr;
-import com.microsoft.z3.IntExpr;
+
 import com.microsoft.z3.Context;
-import com.microsoft.z3.DatatypeExpr;
-import com.microsoft.z3.Expr;
-import com.microsoft.z3.Status;
+
 
 import it.polito.verefoo.allocation.AllocationManager;
 import it.polito.verefoo.allocation.AllocationNode;
@@ -26,16 +21,14 @@ import it.polito.verefoo.extra.WildcardManager;
 import it.polito.verefoo.graph.Link;
 import it.polito.verefoo.graph.LinkProvider;
 import it.polito.verefoo.jaxb.*;
-import it.polito.verefoo.jaxb.LinkConstraints.LinkMetrics;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verigraph.extra.VerificationResult;
-import it.polito.verigraph.functions.PacketFilter;
 import it.polito.verigraph.solver.*;
 import it.polito.verigraph.solver.Checker.Prop;
 
 /**
  * 
- * This is the main class that will interface with the Verifoo classes
+ * This is the main class that will interface with the Verefoo classes
  *
  */
 public class VerefooProxy {
@@ -56,7 +49,7 @@ public class VerefooProxy {
 	
 	private Logger logger = LogManager.getLogger("mylog");
 	/**
-	 * Public constructor for the verifoo proxy service
+	 * Public constructor for the Verefoo proxy service
 	 * 
 	 * @param graph              The graph that will be deployed on the network
 	 * @param hosts              The list of hosts in the network

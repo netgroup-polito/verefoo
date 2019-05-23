@@ -22,13 +22,11 @@ import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Sort;
-import com.microsoft.z3.Optimize.Handle;
 
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.WildcardManager;
 import it.polito.verigraph.extra.PortInterval;
 import it.polito.verigraph.extra.Tuple;
-import it.polito.verigraph.functions.GenericFunction;
 
 /**
  * Basic fields and other things required for model checking.

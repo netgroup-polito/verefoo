@@ -16,9 +16,6 @@ import java.util.HashMap;
 /**
  * This class hides some limitation of z3 from the final user (e.g. two
  * properties with same source and destination)
- * 
- * @author Antonio
- *
  */
 public class VerefooNormalizer {
 	private NFV root, originalNfv;
@@ -47,7 +44,6 @@ public class VerefooNormalizer {
 	 * specific methods.
 	 */
 	private void normalize() {
-		// TODO remove both
 		normalizeProperties();
 	}
 

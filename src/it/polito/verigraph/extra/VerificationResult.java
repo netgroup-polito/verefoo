@@ -1,16 +1,7 @@
-/*******************************************************************************
- * Copyright (c) 2017 Politecnico di Torino and others.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Apache License, Version 2.0
- * which accompanies this distribution, and is available at
- * http://www.apache.org/licenses/LICENSE-2.0
- *******************************************************************************/
 package it.polito.verigraph.extra;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
-import com.microsoft.z3.Expr;
 import com.microsoft.z3.Model;
 import com.microsoft.z3.Status;
 
@@ -18,7 +9,7 @@ import it.polito.verigraph.solver.NetContext;
 
 
 /**
- * Data structure for the response to check requests for isolation properties
+ * Data structure for the response to check requests for verification of security properties
  *
  */
 public class VerificationResult {
@@ -29,12 +20,12 @@ public class VerificationResult {
     public BoolExpr [] assertions;
 
     /**
-     * TODO complete comments
-     * @param ctx
-     * @param result
-     * @param nctx
-     * @param assertions
-     * @param model
+     * Public constructor of VerificationResult, whose instances wrap all the information about the z3 simulation result
+     * @param ctx it is the z3 Context instance
+     * @param result it is the result status
+     * @param nctx it is the NetContext instance defined in the z3 model
+     * @param assertions it is the set of assertion of the result model
+     * @param model it is the z3 model of the MaxSMT problem
      */
     public VerificationResult(Context ctx,Status result, NetContext nctx, BoolExpr[] assertions, Model model){
         this.ctx = ctx;

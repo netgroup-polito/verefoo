@@ -1,15 +1,10 @@
 package it.polito.verefoo.extra;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import it.polito.verefoo.jaxb.*;
 
@@ -128,8 +123,7 @@ public class TestCaseGenerator {
 	
 	
 	public NFV generateNFV(int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, String IPClient, String IPAllocationPlace, String IPServer) {
-		
-		int numberPolicies = numberReachPolicies + numberIsPolicies;
+	
 		
 		/* Creation of the test */
 		NFV nfv = new NFV();

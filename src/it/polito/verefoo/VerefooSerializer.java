@@ -1,13 +1,7 @@
 package it.polito.verefoo;
 
-import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,19 +10,16 @@ import com.microsoft.z3.Status;
 
 import it.polito.verefoo.allocation.AllocationGraphGenerator;
 import it.polito.verefoo.extra.BadGraphError;
-import it.polito.verefoo.jaxb.Connection;
 import it.polito.verefoo.jaxb.EType;
 import it.polito.verefoo.jaxb.Graph;
-import it.polito.verefoo.jaxb.Host;
 import it.polito.verefoo.jaxb.NFV;
-import it.polito.verefoo.jaxb.Node;
 import it.polito.verefoo.jaxb.Path;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.translator.Translator;
 import it.polito.verigraph.extra.VerificationResult;
 
 /**
- * This class separates the Verifoo classes implementation from the actual input
+ * This class separates the Verefoo classes implementation from the actual input
  */
 public class VerefooSerializer {
 	private NFV nfv, result;
@@ -37,7 +28,7 @@ public class VerefooSerializer {
 	private Logger loggerResult = LogManager.getLogger("result");
 	private String z3Model;
 	/**
-	 * Wraps all the Verifoo tasks, executing the z3 procedure for each graph in the
+	 * Wraps all the Verefoo tasks, executing the z3 procedure for each graph in the
 	 * NFV element
 	 * 
 	 * @param root the NFV element received as input

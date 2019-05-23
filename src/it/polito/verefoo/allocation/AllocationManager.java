@@ -57,7 +57,7 @@ public class AllocationManager {
 	 
 
 	 /**
-	  * This method is invoked by VerifooProxy to instantiate the Network Functions which have been specified in the input, processing the input nodes with a proper Configuration (i.e. node which isn't empty). 
+	  * This method is invoked by VerefooProxy to instantiate the Network Functions which have been specified in the input, processing the input nodes with a proper Configuration (i.e. node which isn't empty). 
 	  * For the moment it's able to instanciate web client/servers, firewalls and NATs. 
 	  * Each other NF can be added here following the same pattern (legacy class in older versions: NodeNetworkObject)
 	 */
@@ -143,7 +143,6 @@ public class AllocationManager {
 		});
 	}
 
-	//#TODO rename all Verifoo s to Verefoo (be careful)
 	
 	/**
 	 * This method is invoked in the recursive visit of the graph inside Verefoo Proxy. 
@@ -168,7 +167,7 @@ public class AllocationManager {
 	}
 	
 	/**
-	 * This method is invoked in VerifooProxy before the creation of the Checker but after the recursive visit of the graph. 
+	 * This method is invoked in VerefooProxy before the creation of the Checker but after the recursive visit of the graph. 
 	 * It allows to create hard and soft contraints for each Network Function placed inside a node.
 	 * This way, creation of the Network Function and its installation are decoupled: 
 	 * 1) the first one (method instanciateDefineNF happens before the recursive visit;

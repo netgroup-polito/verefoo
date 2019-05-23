@@ -1,41 +1,16 @@
-/*******************************************************************************
- * Copyright (c) 2017 Politecnico di Torino and others.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Apache License, Version 2.0
- * which accompanies this distribution, and is available at
- * http://www.apache.org/licenses/LICENSE-2.0
- *******************************************************************************/
 package it.polito.verigraph.functions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
-import com.microsoft.z3.FuncDecl;
-import com.microsoft.z3.IntExpr;
-import com.microsoft.z3.IntNum;
 import com.microsoft.z3.Optimize;
-import com.microsoft.z3.Sort;
 
 import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.extra.BadGraphError;
-import it.polito.verefoo.jaxb.ActionTypes;
-import it.polito.verefoo.jaxb.EType;
-import it.polito.verefoo.jaxb.FunctionalTypes;
-import it.polito.verefoo.jaxb.Node;
-import it.polito.verigraph.extra.Quadruple;
-import it.polito.verigraph.extra.Tuple;
 import it.polito.verigraph.solver.NetContext;
 
 /** Represents a Forwarder
