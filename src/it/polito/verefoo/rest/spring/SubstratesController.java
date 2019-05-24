@@ -45,7 +45,7 @@ public class SubstratesController {
     		@ApiResponse(code = 201, message = "Created"),
     		@ApiResponse(code = 400, message = "Bad Request"),
     		})
-	public ResponseEntity<Hosts> createPolicy(@RequestBody Hosts substrate) {
+	public ResponseEntity<Hosts> createSubstrate(@RequestBody Hosts substrate) {
 		long sid = service.getNextSubstrateId();
 		StringBuffer url = request.getRequestURL();
     	Hosts created = service.createSubstrate(sid, substrate);
