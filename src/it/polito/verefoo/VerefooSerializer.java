@@ -57,7 +57,7 @@ public class VerefooSerializer {
 				long beginAll = System.currentTimeMillis();
 				VerificationResult res = test.checkNFFGProperty();
 				long endAll = System.currentTimeMillis();
-				loggerResult.debug("Only checker: " + (endAll - beginAll) + "ms");
+				//loggerResult.debug("Only checker: " + (endAll - beginAll) + "ms");
 				
 				if (res.result != Status.UNSATISFIABLE && res.result != Status.UNKNOWN) {
 					Translator t = new Translator(res.model.toString(), root, g, test.getAllocationNodes());

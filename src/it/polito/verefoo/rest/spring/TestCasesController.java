@@ -68,7 +68,7 @@ public class TestCasesController {
 							@RequestParam(value="seed", required = true) Integer seed,
 							@RequestParam(value="logfile", required = true) String logfile
 							) {
-		String pathfile = "log/" + logfile;
+		String pathfile = "/home/verefoo/log/" + logfile;
 		logger = Package1LoggingClass.createLoggerFor(logfile, pathfile);
 		rand = new Random(seed);
 		int k=0;
@@ -110,29 +110,13 @@ public class TestCasesController {
 				err = 0;
 				logger.info("===========FILE " + f.getName() + "===========");
 					
-				// create a JAXBContext capable of handling the generated classes
-				//long beginAll=System.currentTimeMillis();
-		        JAXBContext jc = JAXBContext.newInstance( "it.polito.verefoo.jaxb" );
-		        // create an Unmarshaller
-		        Unmarshaller u = jc.createUnmarshaller();
-		        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI); 
-		        Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
-		        u.setSchema(schema);
-		        // unmarshal a document into a tree of Java content objects
-		   
-		        Marshaller m = jc.createMarshaller();
-	            m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-	            m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
-	            //for debug purpose  
-                //m.marshal(f.getNfv(), System.out ); 
+
 		        
 		        do{
 		        	for(k = 0; k < N; k++) {
 							try {
 								
-					             m = jc.createMarshaller();
-					             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-					             m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
+					         
 
 					             //no random
 					             //root = f.changeIP(IPClient[k], IPAllocationPlace[k], IPServer[k]);
@@ -145,14 +129,10 @@ public class TestCasesController {
 					             //random
 					             int seedPrint = seed + k*10000;
 					             logger.debug("Seed:" + seedPrint);
-					             
 					             //for debug purpose 
 								 //m.marshal( testCoarse(root), System.out );  
 								 i++;
 								 NFV resultNFV = testCoarse(root);
-								 StringWriter stringWriter = new StringWriter();
-								 m.marshal( resultNFV, stringWriter );
-								 loggerModel.debug(stringWriter.toString());
 							} catch (Exception e) {
 								e.printStackTrace();
 								err++;
@@ -161,16 +141,15 @@ public class TestCasesController {
 		        	}
 				}while(i<1);
 				
-				logger.info("Simulations -> " + k + " / Errors -> " + err);
+				logger.info("Ok -> " + k + " / Error -> " + err);
 				if(nSAT > 0) {
-					logger.info("AVG total time -> " + (totTime/nSAT) + "ms");
-					logger.info("MAX total time -> " + (maxTotTime) + "ms");
-					logger.info("MIN total time -> " + (minTotTime) + "ms");
+					logger.info("Total time -> " + (totTime/nSAT) + "ms");
 				}
 
 			}
 
 		}catch(Exception e) {
+			e.printStackTrace();
 			throw new ResponseStatusException(
 					  HttpStatus.BAD_REQUEST, "bad request"
 					);
@@ -190,7 +169,6 @@ public class TestCasesController {
 			nSAT++;
 			maxTotTime = maxTotTime<(endAll-beginAll)? (endAll-beginAll) : maxTotTime;
 			minTotTime = minTotTime>(endAll-beginAll)? (endAll-beginAll) : minTotTime;
-			logger.debug("time: " + (endAll-beginAll) + "ms;");
 			totTime += (endAll-beginAll);
 		 }
 	 	else{

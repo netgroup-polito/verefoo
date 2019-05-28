@@ -18,11 +18,11 @@ public class Package1LoggingClass {
          LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
          PatternLayoutEncoder ple = new PatternLayoutEncoder();
 
-         ple.setPattern("%date %level [%thread] %logger{10} [%file:%line] %msg%n");
+         ple.setPattern("%date [%thread] %logger{10} %msg%n");
          ple.setContext(lc);
          ple.start();
          FileAppender<ILoggingEvent> fileAppender = new FileAppender<ILoggingEvent>();
-         fileAppender.setFile("log/test.log");
+         fileAppender.setFile(file);
          fileAppender.setEncoder(ple);
          fileAppender.setContext(lc);
          fileAppender.start();
