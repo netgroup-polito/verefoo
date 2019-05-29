@@ -66,6 +66,8 @@ public class TestCasesController {
 	@ResponseBody
 	public void runtestCase(@RequestParam(value="id", required = true) Integer id, //0 only allocation, 1 only policies, 2 both
 							@RequestParam(value="seed", required = true) Integer seed,
+							@RequestParam(value="i", required = true) Integer i,
+							@RequestParam(value="j", required = true) Integer j,
 							@RequestParam(value="logfile", required = true) String logfile
 							) {
 		String pathfile = "/home/verefoo/log/" + logfile;
@@ -76,27 +78,13 @@ public class TestCasesController {
 
 			List<TestCaseGenerator> nfv = new ArrayList<>();
 
-			/* Scalability test for Allocation Places */
-			
-			if(id == 0 || id == 2) {
-				for(int i = 10; i <= 80; i += 10) { //allocation places
-					for(int j = 5; j <= 15; j += 5) //policies
-						//put 0,j for isolation, whereas j,0 for reachability
-						nfv.add(new TestCaseGenerator(prefix + i + "AP" + j + "PR", i, 0, j, seed));
-				}
+	
+			if(id == 0) {
+				nfv.add(new TestCaseGenerator(prefix + i + "AP" + j + "PR", i, 0, j, seed));
+			} else if(id == 1) {
+				nfv.add(new TestCaseGenerator(prefix + i + "AP" + j + "PR", i, j, 0, seed));
 			}
 			
-			
-			
-			
-			/*Scalability test for Policy Rules */
-			if(id == 1 || id == 2) {
-				for(int j = 10; j <= 80; j += 10) { //policies
-						for(int i = 5; i <= 15; i += 5) //allocation places
-							//put 0,j for isolation, whereas j,0 for reachability
-							nfv.add(new TestCaseGenerator(prefix + i + "AP" + j + "PR", i, 0, j, seed));
-						}
-			}
 			
 			
 			

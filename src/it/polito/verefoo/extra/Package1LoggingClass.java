@@ -1,5 +1,8 @@
 package it.polito.verefoo.extra;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
@@ -11,27 +14,32 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
 
 public class Package1LoggingClass {
-	
-	
 
-   public static Logger createLoggerFor(String string, String file) {
-         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-         PatternLayoutEncoder ple = new PatternLayoutEncoder();
+	private static Set<String> files = new HashSet<String>();
 
-         ple.setPattern("%date [%thread] %logger{10} %msg%n");
-         ple.setContext(lc);
-         ple.start();
-         FileAppender<ILoggingEvent> fileAppender = new FileAppender<ILoggingEvent>();
-         fileAppender.setFile(file);
-         fileAppender.setEncoder(ple);
-         fileAppender.setContext(lc);
-         fileAppender.start();
+	public static Logger createLoggerFor(String string, String file) {
+		if (files.contains(file)) {
+			return (Logger) LoggerFactory.getLogger(string);
+		}
+		files.add(file);
+		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+		PatternLayoutEncoder ple = new PatternLayoutEncoder();
 
-         Logger logger = (Logger) LoggerFactory.getLogger(string);
-         logger.addAppender(fileAppender);
-         logger.setLevel(Level.DEBUG);
-         logger.setAdditive(false); /* set to true if root should log too */
+		ple.setPattern("%date [%thread] %logger{10} %msg%n");
+		ple.setContext(lc);
+		ple.start();
+		FileAppender<ILoggingEvent> fileAppender = new FileAppender<ILoggingEvent>();
+		fileAppender.setFile(file);
+		fileAppender.setEncoder(ple);
+		fileAppender.setContext(lc);
+		fileAppender.start();
 
-         return logger;
-   }
+		Logger logger = (Logger) LoggerFactory.getLogger(string);
+		logger.addAppender(fileAppender);
+		logger.setLevel(Level.DEBUG);
+		logger.setAdditive(false); /* set to true if root should log too */
+
+		return logger;
+	}
+
 }
