@@ -46,3 +46,11 @@ Swagger documentation can be accessed at [localhost:8085/verefoo](localhost:8085
 ## Resources:
 
  * [VerifooDocs.pdf](https://github.com/netgroup-polito/verifoo/blob/master/docs/VerifooDocs.pdf) for documentation.
+
+
+## TODO
+mvn clean compile assembly:single
+
+java -jar target\verifoo-0.0.1-SNAPSHOT-jar-with-dependencies.jar 25154 60 10 100
+
+mvn clean package && java -jar target\verifoo-0.0.1-SNAPSHOT.jar
