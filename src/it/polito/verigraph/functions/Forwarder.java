@@ -11,6 +11,7 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.Optimize;
 
 import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verigraph.solver.NetContext;
 
 /** Represents a Forwarder
@@ -31,6 +32,7 @@ public class Forwarder extends GenericFunction{
 		this.nctx = nctx;
 		constraints = new ArrayList<BoolExpr>();
 		isEndHost = false;
+		used = ctx.mkTrue();
 	}
 
 
@@ -39,40 +41,10 @@ public class Forwarder extends GenericFunction{
      * Since it does not provide any filtering behaviour, the forwarders sends all the received packets.
      */
     public void forwarderSendRules (){
-    	Expr p_0 = ctx.mkConst(forwarder+"_forwarder_send_p_0", nctx.packetType);
     	
-    	/*
-    	 * for each leftHop lH, for each p_0,
-    	 * recv(lH, forwader, p_0) --> AND (forwader, nextHops, p_0)
-    	 * 
-    	 * Basically, for each p_0 received from a leftHop,
-    	 * it is sent to each possible rightHops depending on that specific leftHop.
-    	 */
-    	for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getLeftHops().entrySet()) {
-    		BoolExpr enumerateSend = createAndSend(entry, p_0, forwarder);
-    		BoolExpr recv= (BoolExpr) nctx.recv.apply(entry.getKey().getZ3Name(), forwarder, p_0);
-  			constraints.add(ctx.mkForall(new Expr[] { p_0 },
-							ctx.mkImplies((BoolExpr) recv,
-							 enumerateSend), 
-							1, null, null, null, null));
-  		}
-    	
-    	
-    	/*
-    	 * for each rightHop rH, for each p_0,
-    	 * send(forwader, rH, p_0) --> OR (leftHops, forwader, p_0)
-    	 * 
-    	 * Basically, for each p_0 sent to a rightHop,
-    	 * it must have been received from at least a leftHop depending on that specific rightHop.
-    	 */
-    	for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getRightHops().entrySet()){
-    		BoolExpr enumerateRecv = createOrRecv(entry, p_0, forwarder);
-  			BoolExpr send = (BoolExpr) nctx.send.apply(forwarder, entry.getKey().getZ3Name(), p_0);
-  	 		constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
-  	  					ctx.mkImplies((BoolExpr) send,
-  	  									enumerateRecv
-  	  										), 1, null, null, null, null)); 
-  		}
+    	for(SecurityRequirement sr : source.getRequirements().values()) {
+    		constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdRequirement())), ctx.mkFalse()));
+    	}
     	
     }
     

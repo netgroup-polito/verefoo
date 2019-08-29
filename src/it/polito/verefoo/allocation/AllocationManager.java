@@ -5,8 +5,9 @@ import java.util.List;
 
 import com.microsoft.z3.Context;
 
-import it.polito.verefoo.PacketFilterManager;
+
 import it.polito.verefoo.extra.PacketWrapper;
+import it.polito.verefoo.extra.WildcardManager;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Node;
@@ -29,10 +30,10 @@ import it.polito.verigraph.solver.NetContext;
 public class AllocationManager {
 	private Context ctx;
     private NetContext nctx;
-    private PacketFilterManager FWmanager;
 	private List<NodeMetrics> nodeMetrics;
 	private List<Property> properties;
 	private HashMap<String, AllocationNode> nodes;
+	private WildcardManager wildcardManager;
 	
 	/**
 	 * Public constructor for the NFAllocationManager class
@@ -44,13 +45,13 @@ public class AllocationManager {
 	 * @param FWManager It is an instance of a class which manages the firewalls.
 	 */
 	 public AllocationManager(Context ctx, NetContext nctx, 
-	    		HashMap<String, AllocationNode> allocationNodes, List<NodeMetrics> nodeMetrics, List<Property> properties, PacketFilterManager FWmanager) {
+	    		HashMap<String, AllocationNode> allocationNodes, List<NodeMetrics> nodeMetrics, List<Property> properties, WildcardManager wildcardManager) {
 			super();
 			this.ctx = ctx;
 			this.nctx = nctx;
 			this.nodeMetrics = nodeMetrics;
 			this.properties = properties;
-			this.FWmanager = FWmanager;
+			this.wildcardManager = wildcardManager;
 			this.nodes = allocationNodes;
 		}
 
@@ -90,7 +91,7 @@ public class AllocationManager {
 				}
 				
 				else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
-					PacketFilter firewall = new PacketFilter(allocationNode, ctx, nctx);
+					PacketFilter firewall = new PacketFilter(allocationNode, ctx, nctx, wildcardManager);
 					firewall.setAutoplace(false);
 					
 					if(node.getConfiguration().getFirewall().getDefaultAction() != null) {
@@ -98,7 +99,7 @@ public class AllocationManager {
 						//This part is used to determine the default action of the packet filter: allow or deny
 						if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
 							firewall.setDefaultAction(true);
-						}else {
+						}else if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.DENY)){
 							firewall.setDefaultAction(false);
 						}
 					}
@@ -109,7 +110,6 @@ public class AllocationManager {
 					 */
 					if(!node.getConfiguration().getFirewall().getElements().isEmpty()) {
 						firewall.setAutoconfigured(false);
-						firewall.generateManualRules();
 					} 
 					
 					/*
@@ -120,9 +120,6 @@ public class AllocationManager {
 					
 					boolean optional = nodeMetrics.stream().anyMatch(nm -> nm.getNode().equals(node.getName()));
 					if(optional) firewall.setAutoplace(true);
-					
-					//The firewall is included in the manager.
-					FWmanager.addFirewall(firewall,  allocationNode);
 					allocationNode.setPlacedNF(firewall);
 					allocationNode.setTypeNF(FunctionalTypes.FIREWALL);
 				}
@@ -151,17 +148,13 @@ public class AllocationManager {
 	 * For the moment it considers just one type of NF per time (e.g. packet filter, antispam, etc. accordingly to the tests in which the framework is used)
 	 */
 	public void chooseFunctions(AllocationNode source, AllocationNode origin, AllocationNode finalDest) {
-		if(source.getTypeNF() == null || source.getTypeNF().equals(FunctionalTypes.FIREWALL)) {
-			boolean interested = properties.stream().anyMatch(p -> p.getSrc().equals(origin.getIpAddress()) && p.getDst().equals(finalDest.getIpAddress()));
-			if(interested) {
-				if(!FWmanager.firewallIsPresent(source)) {
-					PacketFilter firewall = new PacketFilter(source, ctx, nctx);
-					FWmanager.addFirewall(firewall, source);
+		if(source.getTypeNF() == null ) {
+
+					PacketFilter firewall = new PacketFilter(source, ctx, nctx, wildcardManager);
 					source.setPlacedNF(firewall);
 					source.setTypeNF(FunctionalTypes.FIREWALL);
-				}
-				FWmanager.setPolicy(source, origin.getNode(), finalDest.getNode());
-			}
+
+			
 		}
 	
 	}
@@ -180,15 +173,17 @@ public class AllocationManager {
 			Node node = allocationNode.getNode();
 			FunctionalTypes type = allocationNode.getTypeNF();
 			GenericFunction no = allocationNode.getPlacedNF();
-			
+
 			if(no == null) return; //it means no network function has been deployed on this node
 				
 			if(type.equals(FunctionalTypes.WEBCLIENT)) {
 				EndHost endHost = (EndHost) no;
 				AllocationNode server = nodes.values().stream().filter(n -> n.getIpAddress().equals(node.getConfiguration().getWebclient().getNameWebServer())).findFirst().orElse(null);
+				endHost.configureEndHost();
 			}
 			else if(type.equals(FunctionalTypes.WEBSERVER)) {
 				EndHost endHost = (EndHost) no;
+				endHost.configureEndHost();
 			}else if(node.getFunctionalType() == FunctionalTypes.NAT) {	
 				NAT nat = (NAT) no;
 				nat.natConfiguration(nctx.addressMap.get(node.getName()));
@@ -197,6 +192,10 @@ public class AllocationManager {
 			 else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {	
 				Forwarder fw = (Forwarder) no;
 				fw.forwarderSendRules();
+			}else if(type.equals(FunctionalTypes.FIREWALL)) {
+				PacketFilter fw = (PacketFilter) no;
+				if(fw.isAutoconfigured()) fw.automaticConfiguration();
+				else fw.manualConfiguration();
 			}
 		});
 		

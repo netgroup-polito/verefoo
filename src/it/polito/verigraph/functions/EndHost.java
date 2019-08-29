@@ -10,6 +10,7 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.Optimize;
 
 import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verigraph.extra.PacketModel;
 import it.polito.verigraph.solver.NetContext;
 
@@ -38,6 +39,8 @@ public class EndHost extends GenericFunction {
          politoEndHost = source.getZ3Name();
          n_0 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_n_0", nctx.nodeType);
          p_0 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_p_0", nctx.packetType);
+         used = ctx.mkTrue();
+ 
     }
 
 
@@ -66,7 +69,7 @@ public class EndHost extends GenericFunction {
          * If the packet has some configured elements, they must match the corresponding packet elements.
          * predicatesOnPktFields is the AND of these correspondences 
          */
-        if(packet!=null){
+        /*if(packet!=null){
         	if(packet.getIp_dest() != null)
                 predicatesOnPktFields = ctx.mkAnd(predicatesOnPktFields, ctx.mkEq(nctx.functionsMap.get("dest").apply(p_0), packet.getIp_dest()));
             if(packet.getBody() != null)
@@ -90,7 +93,7 @@ public class EndHost extends GenericFunction {
          * p_0.inner_src == null && p_0.inner_dest == null &&
          * p_0.encrypted == null && nodeHasAddr(politoEndHost,p.src)
          * (no encapsulated packet inside)
-         */
+         
         constraints.add( ctx.mkForall(new Expr[]{n_0, p_0},
                 ctx.mkImplies((BoolExpr)nctx.send.apply(politoEndHost, n_0, p_0),
                         ctx.mkAnd(predicatesOnPktFields,
@@ -100,9 +103,15 @@ public class EndHost extends GenericFunction {
                                 ctx.mkEq(nctx.functionsMap.get("inner_dest").apply(p_0),nctx.addressMap.get("null")),
                                 ctx.mkEq(nctx.functionsMap.get("encrypted").apply(p_0),ctx.mkFalse()),
                                 (BoolExpr)nctx.nodeHasAddr.apply(politoEndHost,nctx.functionsMap.get("src").apply(p_0))
-                                )),1,null,null,null,null));
+                                )),1,null,null,null,null));*/
 
         return;
+    }
+    
+    public void configureEndHost() {
+    	for(SecurityRequirement sr : source.getRequirements().values()) {
+    		constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdRequirement())), ctx.mkFalse()));
+    	}
     }
 
 

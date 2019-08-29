@@ -20,7 +20,7 @@
         <neighbour name="10.0.0.2"/>
 		<neighbour name="20.0.0.1"/>
         <configuration description="A simple description" name="conf1">
-            <firewall defaultAction="ALLOW" />
+            <firewall defaultAction="DENY" />
         </configuration>
       </node>
       <node functional_type="WEBSERVER" name="20.0.0.1">
@@ -39,8 +39,8 @@
 	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
-		<Property graph="0" name="IsolationProperty" src="10.0.0.1" dst="20.0.0.1"/>
-		<Property graph="0" name="IsolationProperty" src="10.0.0.2" dst="20.0.0.1"/> 		 				
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.1" dst="20.0.0.1"/>	 
+ 						
   </PropertyDefinition>
   <ParsingString></ParsingString>
 </NFV>

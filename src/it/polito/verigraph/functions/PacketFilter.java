@@ -1,9 +1,11 @@
 package it.polito.verigraph.functions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -16,13 +18,19 @@ import com.microsoft.z3.Sort;
 
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
+import it.polito.verefoo.extra.WildcardManager;
+import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.EType;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Node;
+import it.polito.verefoo.jaxb.PName;
+import it.polito.verefoo.jaxb.Property;
 import it.polito.verigraph.extra.PacketFilterRule;
+import it.polito.verigraph.extra.Quadruple;
 import it.polito.verigraph.extra.Tuple;
 import it.polito.verigraph.solver.NetContext;
+import it.polito.verigraph.solver.Checker.Prop;
 
 /** Represents a Packet Filter with the associated Access Control List
  *
@@ -37,8 +45,18 @@ public class PacketFilter extends GenericFunction{
 	// blacklisting and defaultAction must match
 	private BoolExpr blacklisting_z3;
 	boolean blacklisting;
-	DatatypeExpr pf;
+	boolean defaultActionSet;
+	private WildcardManager wildcardManager;
 	
+	DatatypeExpr pf;
+	Expr defaultAction;
+	int nRules;
+	Map<Integer, BoolExpr> notConfiguredConditions = new HashMap<>();
+	Map<Integer, Expr> srcConditions = new HashMap<>();
+	Map<Integer, Expr> dstConditions = new HashMap<>();
+	Map<Integer, Expr> portSConditions = new HashMap<>();
+	Map<Integer, Expr> portDConditions = new HashMap<>();
+	Map<Integer, Expr> l4Conditions = new HashMap<>();
 	
 
 	/**
@@ -46,11 +64,13 @@ public class PacketFilter extends GenericFunction{
 	 * @param source It is the Allocation Node on which the packet filter is put
 	 * @param ctx It is the Z3 Context in which the model is generated
 	 * @param nctx It is the NetContext object to which constraints are sent
+	 * @param wildcardManager 
 	 */
-	public PacketFilter(AllocationNode source, Context ctx, NetContext nctx) {
+	public PacketFilter(AllocationNode source, Context ctx, NetContext nctx, WildcardManager wildcardManager) {
 		this.source = source;
 		this.ctx = ctx;
 		this.nctx = nctx;
+		this.wildcardManager = wildcardManager;
 		
 		pf = source.getZ3Name();
 		constraints = new ArrayList<BoolExpr>();
@@ -61,6 +81,7 @@ public class PacketFilter extends GenericFunction{
    		// this is the default, but it can be changed
    		blacklisting_z3 = ctx.mkFalse();
    		blacklisting = false;
+   		defaultActionSet = false;
    		
    		// function can be used or not, autoplace follows it
    		used = ctx.mkBoolConst(pf+"_used");
@@ -73,77 +94,10 @@ public class PacketFilter extends GenericFunction{
 		filtering_function = ctx.mkFuncDecl(pf + "_filt_func", new Sort[] { nctx.packetType}, ctx.mkBoolSort());
 	}
 
-	
-
-	/**
-	 * This method allows to add the constraints inside z3 solver
-	 * @param solver it is istance of z3 solver
-	 */
-	private void additionalConstraints(Optimize solver){
- 		Expr p_0 = ctx.mkConst(pf+"_packet_filter_acl_p_0", nctx.packetType);
- 		Expr n_0 = ctx.mkConst(pf+"_packet_filter_send_n_0", nctx.nodeType);
-
- 		// if automatic configuration enabled, if is true
- 		if (rules.size() == 0){
-    		//If the size of the ACL list is empty then by default acl_func must be false
- 			//for each p_0, the filtering_function which is applied to p_0 can be
- 			//blacklisting or whitelisting, according to the value of blacklisting_z3 variable
-    		 solver.Add(ctx.mkForall(new Expr[]{p_0},
-								ctx.mkEq(filtering_function.apply(p_0), blacklisting_z3)
-						,1,null,null,null,null));
-    	}else{
-    			BoolExpr[] rule_map = new BoolExpr[rules.size()];
-    	        for(int y=0;y<rules.size();y++){
-    	        	PacketFilterRule rule = rules.get(y);
-    	        	rule_map[y] = rule.matchPacket(p_0);
-    	        	
-    	        	
-    	        	/*
-    	        	 * for each p_0, n_0,
-    	        	 * recv(n_0, pf, p_0) && rule.match(p_0)
-    	        	 * --> filtering_function(p_0) == rule.action
-    	        	 */
-					solver.Add(ctx.mkForall(new Expr[]{p_0, n_0},
-											// at this point we assume that the rules are conflict free
-											ctx.mkImplies(ctx.mkAnd((BoolExpr) nctx.recv.apply(new Expr[] { n_0, pf, p_0 }),
-																rule.matchPacket(p_0))
-														,ctx.mkAnd(ctx.mkEq(
-																			filtering_function.apply(p_0),
-																			rule.getAction()
-																			)
-																	)
-													  )
-								, 1, null, null, null, null));
-    	        }
-    	        
-    	        
-    	        /*
-	        	 * for each p_0, n_0,
-	        	 * recv(n_0, pf, p_0) && not exists rule.match(p_0)
-	        	 * --> filtering_function(p_0) == blacklisting_z3 (default action)
-	        	 * 
-	        	 * Basically, if no specific rules are configured on the packet filter,
-	        	 * then the default action is applied.
-	        	 */
-    	        solver.Add(ctx.mkForall(new Expr[]{p_0, n_0},
-										ctx.mkImplies(//no rule matches the packet -> the acl must allow the default behaviour
-											ctx.mkAnd((BoolExpr) nctx.recv.apply(new Expr[] { n_0, pf, p_0 }),ctx.mkNot(ctx.mkOr(rule_map))),
-											ctx.mkEq(
-													filtering_function.apply(p_0),
-													this.blacklisting_z3
-													))
-								, 1, null, null, null, null));
-
-    	}
-    }
-	
-	
-	
-
 	/**
 	 * This method allows to generate the filtering rules for a manually configured packet_filter
 	 */
-	public void generateManualRules(){
+	public void manualConfiguration(){
 		Node n = source.getNode();
 		if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
 				n.getConfiguration().getFirewall().getElements().forEach((e)->{
@@ -184,6 +138,60 @@ public class PacketFilter extends GenericFunction{
 				});
 		}
 		
+		
+		if(!autoplace) constraints.add(ctx.mkEq(used, ctx.mkTrue()));
+		
+		nRules = rules.size();
+		for(PacketFilterRule rule : rules) {
+			int i = 0;
+			Expr src = ctx.mkConst(pf + "_manual_src_"+i, nctx.addressType);
+  			Expr dst = ctx.mkConst(pf + "_manual_dst_"+i, nctx.addressType);
+  			Expr proto = ctx.mkConst(pf + "_manual_proto_"+i, ctx.mkIntSort());
+  			Expr srcp = ctx.mkConst(pf + "_manual_srcp_"+i, nctx.portType);
+  			Expr dstp = ctx.mkConst(pf + "_manual_dstp_"+i, nctx.portType);
+ 			
+ 			
+ 			constraints.add(ctx.mkEq(src, rule.getSource()));
+ 			constraints.add(ctx.mkEq(dst, rule.getDestination()));
+ 			constraints.add(ctx.mkEq((IntExpr)nctx.portFunctionsMap.get("start").apply(srcp),(IntExpr)rule.getStart_src_port()));
+ 			constraints.add(ctx.mkEq((IntExpr)nctx.portFunctionsMap.get("end").apply(srcp),(IntExpr)rule.getEnd_src_port()));
+ 			constraints.add(ctx.mkEq((IntExpr)nctx.portFunctionsMap.get("start").apply(dstp),(IntExpr)rule.getStart_dst_port()));
+ 			constraints.add(ctx.mkEq((IntExpr)nctx.portFunctionsMap.get("end").apply(dstp),(IntExpr)rule.getEnd_dst_port()));
+ 			constraints.add(ctx.mkEq(proto,rule.getProtocol()));
+ 			
+ 			srcConditions.put(i,  src);
+ 			dstConditions.put(i, dst);
+ 			portSConditions.put(i,  srcp);
+ 			portDConditions.put(i, dstp);
+ 			l4Conditions.put(i, proto) ;
+ 			i++;
+		}
+		
+		
+		/**
+	     * This section allow the creation of Z3 variables for defaultAction and rules.
+	     * behaviour variables is the combination of the auto-configured rules.
+	    */
+  		defaultAction = ctx.mkConst(pf + "_manual_default_action", ctx.mkBoolSort());
+  		Expr ruleAction = ctx.mkConst(pf + "_manual_action", ctx.mkBoolSort());
+  		
+  		if(this.blacklisting_z3.equals(ctx.mkTrue())){
+  			constraints.add(ctx.mkEq(defaultAction, ctx.mkTrue()));
+  			constraints.add(ctx.mkEq(ruleAction, ctx.mkFalse()));
+  		}else{
+  			constraints.add(ctx.mkEq(defaultAction, ctx.mkFalse()));
+  			constraints.add(ctx.mkEq(ruleAction, ctx.mkTrue()));
+  		}
+  	
+	
+  		/**
+  		 * This sections generates all the constraints to satisfy reachability and isolation requirements.
+  		 */
+  		
+  		for(SecurityRequirement sr : source.getRequirements().values()) {
+  			generateManualSatifiabilityConstraint(sr);
+  		}
+		
 	}
     
     
@@ -192,16 +200,30 @@ public class PacketFilter extends GenericFunction{
 	 * This method allows to create SOFT and HARD constraints for an auto_configured packet filter
 	 *@param nRules It is the number of MAXIMUM rules the packet_filter should try to configure
 	 */
-    public void automaticConfiguration(Integer nRules) {
-    	Expr p_0 = ctx.mkConst(pf + "_packet_filter_send_p_0", nctx.packetType);
-
-    	List<BoolExpr> automatic_rules = new ArrayList<>();
+    public void automaticConfiguration() {
+    	
         List<BoolExpr> implications1 = new ArrayList<BoolExpr>();
   		List<BoolExpr> implications2 = new ArrayList<BoolExpr>();
+  		
+  		if(!defaultActionSet) {
+  			long nReachability = source.getRequirements().values().stream().filter(r -> r.getProperty().getName().equals(PName.REACHABILITY_PROPERTY)).count();
+  			long nIsolation = source.getRequirements().values().stream().filter(r -> r.getProperty().getName().equals(PName.ISOLATION_PROPERTY)).count();
+  			if(nIsolation >= nReachability) setDefaultAction(false);
+  			else setDefaultAction(true);
+  			//leave uncommented if you want "whitelisting" approach
+  	  		setDefaultAction(false);
+  		}
+  		
+  		
+  		
+  		nRules = minizimePlaceholderRules();
   		
   		if(autoplace) {
   			// packet filter should not be used if possible
   			nctx.softConstrAutoPlace.add(new Tuple<BoolExpr, String>(ctx.mkNot(used), "fw_auto_conf"));
+  		}else {
+  			used = ctx.mkTrue();
+  			constraints.add(ctx.mkEq(used, ctx.mkTrue()));
   		}
   		
   		for(int i = 0; i < nRules; i++){
@@ -268,16 +290,19 @@ public class PacketFilter extends GenericFunction{
   	    	 * If possible, the source/destination IP address components should be NULL at the same time.
   	    	 * This way the rule isn't generated.
   	    	 */
-  			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkAnd(
- 						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_1").apply(nctx.addressMap.get("null")), srcAuto1),
- 						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_2").apply(nctx.addressMap.get("null")), srcAuto2),
- 						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_3").apply(nctx.addressMap.get("null")), srcAuto3),
- 						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_4").apply(nctx.addressMap.get("null")), srcAuto4),
- 						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_1").apply(nctx.addressMap.get("null")), dstAuto1),
- 						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_2").apply(nctx.addressMap.get("null")), dstAuto2),
- 						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_3").apply(nctx.addressMap.get("null")), dstAuto3),
- 						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_4").apply(nctx.addressMap.get("null")), dstAuto4)
- 						), "fw_auto_conf"));
+  			
+  			BoolExpr notConfiguredRule = ctx.mkAnd(
+						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_1").apply(nctx.addressMap.get("null")), srcAuto1),
+						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_2").apply(nctx.addressMap.get("null")), srcAuto2),
+						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_3").apply(nctx.addressMap.get("null")), srcAuto3),
+						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_4").apply(nctx.addressMap.get("null")), srcAuto4),
+						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_1").apply(nctx.addressMap.get("null")), dstAuto1),
+						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_2").apply(nctx.addressMap.get("null")), dstAuto2),
+						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_3").apply(nctx.addressMap.get("null")), dstAuto3),
+						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_4").apply(nctx.addressMap.get("null")), dstAuto4)
+						);
+  			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(notConfiguredRule, "fw_auto_conf"));
+  			notConfiguredConditions.put(i, notConfiguredRule);
   			
   			/**
   	    	 * This section allows the creation of the following soft constraints:
@@ -294,13 +319,12 @@ public class PacketFilter extends GenericFunction{
  			 * all the fields are matched with the packet p_0,
  			 * through formulas involving wildcards and defined in NetContext class.
  			 */
- 			automatic_rules.add(ctx.mkAnd(
-		  						nctx.equalNodeNameToPFRule("src", p_0, src),
-								nctx.equalNodeNameToPFRule("dest", p_0, dst),
- 			 					nctx.equalPortRangeToRule(nctx.functionsMap.get("src_port").apply(p_0), srcp),
- 			 					nctx.equalPortRangeToRule(nctx.functionsMap.get("dest_port").apply(p_0), dstp),
- 			 					nctx.equalPacketLv4ProtoToFwPacketLv4Proto(nctx.functionsMap.get("lv4proto").apply(p_0), proto)
- 			 					));
+ 			srcConditions.put(i,  src);
+ 			dstConditions.put(i, dst);
+ 			portSConditions.put(i,  srcp);
+ 			portDConditions.put(i, dstp);
+ 			l4Conditions.put(i, proto) ;
+ 			
   		}
   		
   		
@@ -308,17 +332,13 @@ public class PacketFilter extends GenericFunction{
 	     * This section allow the creation of Z3 variables for defaultAction and rules.
 	     * behaviour variables is the combination of the auto-configured rules.
 	    */
-  		Expr defaultAction = ctx.mkConst(pf + "_auto_default_action", ctx.mkBoolSort());
+  		defaultAction = ctx.mkConst(pf + "_auto_default_action", ctx.mkBoolSort());
   		Expr ruleAction = ctx.mkConst(pf + "_auto_action", ctx.mkBoolSort());
-
-  		BoolExpr[] tmp = new BoolExpr[automatic_rules.size()];
   		
   		if(this.blacklisting_z3.equals(ctx.mkTrue())){
-  			behaviour = ctx.mkNot(ctx.mkOr(automatic_rules.toArray(tmp)));
   			constraints.add(ctx.mkEq(defaultAction, ctx.mkTrue()));
   			constraints.add(ctx.mkEq(ruleAction, ctx.mkFalse()));
   		}else{
-  			behaviour = ctx.mkOr(automatic_rules.toArray(tmp));
   			constraints.add(ctx.mkEq(defaultAction, ctx.mkFalse()));
   			constraints.add(ctx.mkEq(ruleAction, ctx.mkTrue()));
   		}
@@ -334,155 +354,127 @@ public class PacketFilter extends GenericFunction{
   			constraints.add(ctx.mkImplies(ctx.mkNot(used), ctx.mkAnd(implications2.toArray(implications_tmp))));
   		}
   		
-  		generateForwardingRules(p_0);
+  		
+  		/**
+  		 * This sections generates all the constraints to satisfy reachability and isolation requirements.
+  		 */
+  		
+  		for(SecurityRequirement sr : source.getRequirements().values()) {
+  			generateSatifiabilityConstraint(sr);
+  		}
+  	
+
     }
 
+	/**
+	 * This method exploits pruning strategies to minimize the number of placeholder rules in a firewall to be automatically configured
+	 * @return the maximum number of placeholder rules that are needed after the pruning
+	 */
+	private int minizimePlaceholderRules() {
+		
+		List<SecurityRequirement> allProperties = source.getRequirements().values().stream().collect(Collectors.toList());
+		List<SecurityRequirement> interestedProperties = allProperties.stream().filter(p -> {
+			boolean pruning = (p.getProperty().getName().value().equals("IsolationProperty") && blacklisting)
+					|| (p.getProperty().getName().value().equals("ReachabilityProperty") && !blacklisting);
+			// if the pruning must be disabled
+			// return true;
+			return pruning;
+		}).collect(Collectors.toList());
+		
+		int minimizedRules = interestedProperties.size();
+		
+		if (!allProperties.isEmpty()) {
+			List<String> destinations = allProperties.stream().map(p -> p.getProperty().getDst()).distinct()
+					.collect(Collectors.toList());
+			for (String destination : destinations) {
+				Set<String> interestedSRC = interestedProperties.stream()
+						.filter(p -> p.getProperty().getDst().equals(destination)).map(p -> p.getProperty().getSrc()).distinct()
+						.collect(Collectors.toSet());
+				Set<String> notInterestedSRC = allProperties.stream().filter(p -> p.getProperty().getDst().equals(destination))
+						.map(p -> p.getProperty().getSrc()).distinct().collect(Collectors.toSet());
+				notInterestedSRC.removeAll(interestedSRC);
+				if (!interestedSRC.isEmpty()
+						&& wildcardManager.areAggregable(interestedSRC, notInterestedSRC)) {
+					minimizedRules -= interestedSRC.size();
+					minimizedRules += 1;
+				}
+			}
+		}
+	
+		return minimizedRules;
+	}
 
 
-	private void generateForwardingRules(Expr p_0) {
-		// forwarding rules are created for each left hop
-  		for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getLeftHops().entrySet()) {
-  			BoolExpr enumerateSend = createAndSend(entry, p_0, pf); 
-  			BoolExpr recv= (BoolExpr) nctx.recv.apply(entry.getKey().getZ3Name(), pf, p_0);
-  			if(autoplace) {
-  				/**
-  		    	 * This section allows the creation of the following forwarding rules:
-  		    	 * For each p_0, if recv(leftHop, pf, p_0) && behaviour && pf_is_used -> for each rightHop, send(pf, rightHop, p_0)
-  		    	 * In words:
-  		    	 * For each packet, if the packet_filter has received this packet from a leftHop, its rules don't block the packet itself and the packet_filter is used,
-  		    	 * then the packet_filter must send the packet to ALL its nextHops towards its destination 
-  		    	 */
-  				constraints.add(ctx.mkForall(new Expr[] { p_0 },
-							ctx.mkImplies(
-										ctx.mkAnd((BoolExpr) recv,
-										behaviour, used), ctx.mkAnd(enumerateSend)
-										),1, null, null, null, null));
-  				/**
-  		    	 * This section allows the creation of the following forwarding rules:
-  		    	 * For each p_0, if recv(leftHop, pf, p_0) && !pf_is_used -> for each rightHop, send(pf, rightHop, p_0)
-  		    	 * In words:
-  		    	 * For each packet, if the packet_filter has received this packet from a leftHop and the packet_filter isn't used,
-  		    	 * then the packet_filter must send the packet to ALL its nextHops towards its destination because it is a forwarder.
-  		    	 */
-  				constraints.add(ctx.mkForall(new Expr[] { p_0 },
-						ctx.mkImplies(ctx.mkAnd((BoolExpr) recv,
-								ctx.mkNot(used)), ctx.mkAnd(enumerateSend)), 
-						1, null, null, null, null));
-  			}else {
-  				
-  				/**
-  		    	 * This section allows the creation of the following forwarding rules:
-  		    	 * For each p_0, if recv(leftHop, pf, p_0)  -> for each rightHop, send(pf, rightHop, p_0)
-  		    	 * In words:
-  		    	 * For each packet, if the packet_filter has received this packet from a leftHop and the rules don't block it.
-  		    	 * then the packet_filter must send the packet to ALL its nextHops towards its destination.
-  		    	 * NOTE: only without autoplacement
-  		    	 */
-  				constraints.add(ctx.mkForall(new Expr[] { p_0 },
-							ctx.mkImplies(ctx.mkAnd((BoolExpr) recv,
-									behaviour), ctx.mkAnd(enumerateSend)), 
-							1, null, null, null, null));
-  			}
-  			
-  		}
-  		
-  		// forwarding rules are created for each right hop
-  		for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getRightHops().entrySet()){
-  	 		BoolExpr enumerateRecv = createOrRecv(entry, p_0, pf);
-  	 		BoolExpr send = (BoolExpr) nctx.send.apply(pf, entry.getKey().getZ3Name(), p_0);
-  	 		if(autoplace) { 
-  	 			/**
-  		    	 * This section allows the creation of the following forwarding rules:
-  		    	 * For each p_0, if send(pf, rightHop, p_0) && pf_is_used -> exist leftHop, recv(leftHop, pf, p_0) && behaviour 
-  		    	 * In words:
-  		    	 * For each packet, if the packet_filter has sent the packet and it is used, it means that:
-  		    	 * 1) it has received the packet from a leftHop
-  		    	 * 2) its rules don't block the packet
-  		    	 */
-  	 			
-  	 			constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
-  	  					ctx.mkImplies(ctx.mkAnd((BoolExpr) send, used),
-  	  									ctx.mkAnd(enumerateRecv,
-  	  											behaviour)), 1, null, null, null, null));
-  	 			
-  	 			/**
-  		    	 * This section allows the creation of the following forwarding rules:
-  		    	 * For each p_0, if send(pf, rightHop, p_0) && !pf_is_used -> exist leftHop, recv(leftHop, pf, p_0)  
-  		    	 * In words:
-  		    	 * For each packet, if the packet_filter has sent the packet and it isn't used, it means that it simply has received the packet from a leftHop
-  		    	 * Basically it behaves as a forwarder.
-  		    	 */
-  	 			
-  	 			constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
-  	  					ctx.mkImplies(ctx.mkAnd((BoolExpr) send, ctx.mkNot(used)),
-  	  									ctx.mkAnd(enumerateRecv)), 1, null, null, null, null));
-  	 		} else {
-  	 			
-  	 			/**
-  		    	 * This section allows the creation of the following forwarding rules:
-  		    	 * For each p_0, if send(pf, rightHop, p_0) -> exist leftHop, recv(leftHop, pf, p_0) && behaviour 
-  		    	 * In words:
-  		    	 * For each packet, if the packet_filter has sent the packet, it means that:
-  		    	 * 1) it has received the packet from a leftHop
-  		    	 * 2) its rules don't block the packet
-  		    	 * NOTE: only without autoplacement
-  		    	 */
-  	 			
-  	 			constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
-  	  					ctx.mkImplies((BoolExpr) send,
-  	  									ctx.mkAnd(enumerateRecv,
-  	  											behaviour)), 1, null, null, null, null));
-  	 		}
-  	 		
-  		}
+
+	/**
+	 * This method generates the hard constraint to satisfy a requirement for an automatically configured firewall.
+	 * @param sr it is the security requirement
+	 */
+	private void generateSatifiabilityConstraint(SecurityRequirement sr) {
+		
+		BoolExpr firstA = used;
+		BoolExpr secondA = sr.getProperty().getName().equals(PName.ISOLATION_PROPERTY) ? 
+				ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdRequirement())), ctx.mkTrue()):
+				ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdRequirement())), ctx.mkFalse());
+		BoolExpr firstC = blacklisting? ctx.mkEq(defaultAction, ctx.mkTrue()) : ctx.mkEq(defaultAction, ctx.mkFalse());
+		
+		List<BoolExpr> listSecondC = new ArrayList<>();
+		for(int i = 0; i < nRules; i++) {
+			BoolExpr component1 = ctx.mkNot(notConfiguredConditions.get(i));
+			BoolExpr component2 = ctx.mkAnd(
+						nctx.equalIpAddressToPFRule(sr.getProperty().getSrc(), srcConditions.get(i)),
+						nctx.equalIpAddressToPFRule(sr.getProperty().getDst(), dstConditions.get(i)),
+	 					nctx.equalPortRangeToPFRule(sr.getProperty().getSrcPort(), portSConditions.get(i)),
+	 					nctx.equalPortRangeToPFRule(sr.getProperty().getDstPort(), portDConditions.get(i)),
+	 					nctx.equalLv4ProtoToFwLv4Proto(sr.getProperty().getLv4Proto().ordinal(), l4Conditions.get(i))
+	 					);
+			BoolExpr secondCPart = ((blacklisting && sr.getProperty().getName().equals(PName.ISOLATION_PROPERTY)) || (!blacklisting && sr.getProperty().getName().equals(PName.REACHABILITY_PROPERTY))) ?
+					ctx.mkAnd(component1, component2) : ctx.mkNot(ctx.mkAnd(component1, component2));
+			listSecondC.add(secondCPart);
+		}
+		
+		BoolExpr[] tmp = new BoolExpr[listSecondC.size()];
+		BoolExpr secondC = ((blacklisting && sr.getProperty().getName().equals(PName.ISOLATION_PROPERTY)) || (!blacklisting && sr.getProperty().getName().equals(PName.REACHABILITY_PROPERTY))) ?
+				ctx.mkOr(listSecondC.toArray(tmp)) : ctx.mkAnd(listSecondC.toArray(tmp));
+		
+		constraints.add(ctx.mkImplies(ctx.mkAnd(firstA, secondA), ctx.mkAnd(firstC, secondC)));
+		constraints.add(ctx.mkImplies(ctx.mkAnd(firstC, secondC, firstA), secondA));
 	}
 	
 	
-	
-    /**
-	 * This method allows to create HARD constraints for a manually configured packet_filter, basing on its ACLs precedently computed
+	/**
+	 * This method generates the hard constraint to satisfy a requirement for an manually configured firewall.
+	 * @param sr it is the security requirement
 	 */
-    public void manualConfiguration (){
-    	Expr p_0 = ctx.mkConst(pf+"_packet_filter_send_p_0", nctx.packetType);
-    	rule_func = ctx.mkFuncDecl(pf+"_rule_func", new Sort[]{nctx.packetType},ctx.mkBoolSort());
-
-    	/**
-    	 * This section allows the creation of the following forwarding rules:
-    	 * For each p_0, if recv(leftHop, pf, p_0) && acl_func.apply(p_0) -> for each rightHop, send(pf, rightHop, p_0)
-    	 * In words:
-    	 * For each packet, if the packet_filter has received this packet from a leftHop and its ACLs don't block the packet itself,
-    	 * then the packet_filter must send the packet to ALL its nextHops towards its destination 
-    	 */
-    	
-    	for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getLeftHops().entrySet()) {
-  			BoolExpr enumerateSend =createAndSend(entry, p_0, pf);
-  			BoolExpr recv= (BoolExpr) nctx.recv.apply(entry.getKey().getZ3Name(), pf, p_0);
-  			constraints.add(ctx.mkForall(new Expr[] { p_0 },
-							ctx.mkImplies(ctx.mkAnd((BoolExpr) recv,
-							(BoolExpr)filtering_function.apply(p_0)), ctx.mkAnd(enumerateSend)), 
-							1, null, null, null, null));
-  		}
-    	
-    	/**
-    	 * This section allows the creation of the following forwarding rules:
-    	 * For each p_0, for each rightHop, send(pf, rightHop, p_0) -> exist at least one leftHop that recv(leftHop, pf, p_0) && acl_func.apply(p_0) -> 
-    	 * In words:
-    	 * For each packet, if the packet_filter has sent this packet to a nextHop, that it means that:
-    	 * 1) this packet has been received by at least one leftHop
-    	 * 2) this packet isn't blocked by ACLs
-    	 */
-    	for(Map.Entry<AllocationNode, Set<AllocationNode>> entry : source.getRightHops().entrySet()){
-  	 		BoolExpr enumerateRecv = createOrRecv(entry, p_0, pf);
-  			BoolExpr send = (BoolExpr) nctx.send.apply(pf, entry.getKey().getZ3Name(), p_0);
-  	 		constraints.add(ctx.mkForall(new Expr[] {p_0 }, 
-  	  					ctx.mkImplies((BoolExpr) send,
-  	  									ctx.mkAnd(enumerateRecv,
-  	  										(BoolExpr)filtering_function.apply(p_0))), 1, null, null, null, null));
-  		}
-    	
-    }
-
-
+	private void generateManualSatifiabilityConstraint(SecurityRequirement sr) {
+		
+		BoolExpr firstA = used;
+		BoolExpr secondA = sr.getProperty().getName().equals(PName.ISOLATION_PROPERTY) ? 
+				ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdRequirement())), ctx.mkTrue()):
+				ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdRequirement())), ctx.mkFalse());
+		BoolExpr firstC = blacklisting? ctx.mkEq(defaultAction, ctx.mkTrue()) : ctx.mkEq(defaultAction, ctx.mkFalse());
+		
+		List<BoolExpr> listSecondC = new ArrayList<>();
+		for(int i = 0; i < nRules; i++) {
+			BoolExpr component2 = ctx.mkAnd(
+						nctx.equalIpAddressToPFRule(sr.getProperty().getSrc(), srcConditions.get(i)),
+						nctx.equalIpAddressToPFRule(sr.getProperty().getDst(), dstConditions.get(i)),
+	 					nctx.equalPortRangeToPFRule(sr.getProperty().getSrcPort(), portSConditions.get(i)),
+	 					nctx.equalPortRangeToPFRule(sr.getProperty().getDstPort(), portDConditions.get(i)),
+	 					nctx.equalLv4ProtoToFwLv4Proto(sr.getProperty().getLv4Proto().ordinal(), l4Conditions.get(i))
+	 					);
+			BoolExpr secondCPart = ((blacklisting && sr.getProperty().getName().equals(PName.ISOLATION_PROPERTY)) || (!blacklisting && sr.getProperty().getName().equals(PName.REACHABILITY_PROPERTY))) ?
+					component2 : ctx.mkNot(component2);
+			listSecondC.add(secondCPart);
+		}
+		
+		BoolExpr[] tmp = new BoolExpr[listSecondC.size()];
+		BoolExpr secondC = ((blacklisting && sr.getProperty().getName().equals(PName.ISOLATION_PROPERTY)) || (!blacklisting && sr.getProperty().getName().equals(PName.REACHABILITY_PROPERTY))) ?
+				ctx.mkOr(listSecondC.toArray(tmp)) : ctx.mkAnd(listSecondC.toArray(tmp));
+		
+		constraints.add(ctx.mkImplies(ctx.mkAnd(firstA, secondA), ctx.mkAnd(firstC, secondC)));
+		constraints.add(ctx.mkImplies(ctx.mkAnd(firstC, secondC, firstA), secondA));
+	}
 
 	/**
 	 * This method allows to know if autoconfiguration feature is used
@@ -531,6 +523,7 @@ public class PacketFilter extends GenericFunction{
 	 */
 	public void setBlacklisting(boolean blacklisting) {
 		this.blacklisting = blacklisting;
+		defaultActionSet = true;
 	}
 	
 	/**
@@ -551,6 +544,6 @@ public class PacketFilter extends GenericFunction{
 	public void addContraints(Optimize solver) {
 		BoolExpr[] constr = new BoolExpr[constraints.size()];
 	    solver.Add(constraints.toArray(constr));
-	    additionalConstraints(solver);
+	    //additionalConstraints(solver);
 	}
 }

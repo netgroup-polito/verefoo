@@ -6,6 +6,7 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.Optimize;
 
+import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verigraph.functions.GenericFunction;
 
@@ -23,18 +24,8 @@ public class AllocationNode {
 	private String ipAddress;
 	private DatatypeExpr z3Name;
 	private DatatypeExpr z3Node;
+	private Map<Integer, SecurityRequirement> requirements= new HashMap<>();
 	
-	/*
-	 * These maps are used to store:
-	 * 1) leftHop towards a destination
-	 * 2) rightHop (i.e. nextHop) towards a destination
-	 * 3) the last hop for a destination
-	 * 4) the first hop for a destination
-	 */
-	private Map<AllocationNode, Set<AllocationNode>> leftHops = new HashMap<>();
-	private Map<AllocationNode, Set<AllocationNode>> rightHops = new HashMap<>();
-	private Map<AllocationNode, Set<AllocationNode>> lastHops = new HashMap<>();
-	private Map<AllocationNode, Set<AllocationNode>> firstHops = new HashMap<>();
 	
 	/**
 	 * Public constructor for the AllocationNode class
@@ -111,69 +102,6 @@ public class AllocationNode {
 		this.ipAddress = ipAddress;
 	}
 
-	/**
-	 * Getter method for the leftHops map
-	 * @return the leftHops map
-	 */
-	public Map<AllocationNode, Set<AllocationNode>> getLeftHops() {
-		return leftHops;
-	}
-
-	/**
-	 * Setter method for the leftHops map
-	 * @param leftHops It is a Map<AllocationNode, Set<AllocationNode>
-	 */
-	public void setLeftHops(Map<AllocationNode, Set<AllocationNode>> leftHops) {
-		this.leftHops = leftHops;
-	}
-
-	/**
-	 * Getter method for the rightHops map
-	 * @return the rightHops map
-	 */
-	public Map<AllocationNode, Set<AllocationNode>> getRightHops() {
-		return rightHops;
-	}
-
-	/**
-	 * Setter method for the rightHops map
-	 * @param rightHops It is a Map<AllocationNode, Set<AllocationNode>
-	 */
-	public void setRightHops(Map<AllocationNode, Set<AllocationNode>> rightHops) {
-		this.rightHops = rightHops;
-	}
-
-	/**
-	 * Getter method for the lastHops map
-	 * @return the lastHops map
-	 */
-	public Map<AllocationNode, Set<AllocationNode>> getLastHops() {
-		return lastHops;
-	}
-
-	/**
-	 * Setter method for the lastHops map
-	 * @param lastHops It is a Map<AllocationNode, Set<AllocationNode>
-	 */
-	public void setLastHops(Map<AllocationNode, Set<AllocationNode>> lastHops) {
-		this.lastHops = lastHops;
-	}
-
-	/**
-	 * Getter method for the firstHops map
-	 * @return the firstHops map
-	 */
-	public Map<AllocationNode, Set<AllocationNode>> getFirstHops() {
-		return firstHops;
-	}
-
-	/**
-	 * Setter method for the firstHops map
-	 * @param firstHops It is a Map<AllocationNode, Set<AllocationNode>
-	 */
-	public void setFirstHops(Map<AllocationNode, Set<AllocationNode>> firstHops) {
-		this.firstHops = firstHops;
-	}
 
 	/**
 	 * Getter method for the placed Network Function
@@ -242,6 +170,29 @@ public class AllocationNode {
 			placedNF.addContraints(solver);
 		}
 	}
+
+	/**
+	 * This method allows to distribute a requirement in this allocation node.
+	 * @param sr It is the requirement to store in the node
+	 */
+	public void addRequirement(SecurityRequirement sr) {
+		requirements.put(sr.getIdRequirement(), sr);
+	}
 	
-	
+	/**
+	 * Getter method for the map of requirements
+	 * @return the map of requirements
+	 */
+	public Map<Integer, SecurityRequirement> getRequirements() {
+		return requirements;
+	}
+
+	/**
+	 * Setter method for the map of requirements
+	 * @param requirements the map of requirements
+	 */
+	public void setRequirements(Map<Integer, SecurityRequirement> requirements) {
+		this.requirements = requirements;
+	}
+
 }

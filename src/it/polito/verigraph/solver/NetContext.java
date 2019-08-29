@@ -35,7 +35,7 @@ import it.polito.verigraph.extra.Tuple;
 public class NetContext {
 	public Context ctx;
 	public WildcardManager wildcardManager;
-	public FuncDecl nodeHasAddr,addrToNode,send,recv;
+	public FuncDecl nodeHasAddr,addrToNode,send,recv,deny;
 	private HashMap<String, AllocationNode> allocationNodes;
 	
     public List<BoolExpr> constraints;
@@ -68,7 +68,7 @@ public class NetContext {
 
     // weights
     public final int WPROTOWILDCARD   = 1000;
-    public final int WIPWILDCARD   = 100;
+    public final int WIPWILDCARD   = -100;
     public final int WAUTOCONF   = 1000;
     public final int WAUTOPLACEMENT   = 100000000;
     public final int WPORTS   = 1000;
@@ -123,6 +123,7 @@ public class NetContext {
         softConstrAutoConf.forEach(t->solver.AssertSoft(t._1, WAUTOCONF, t._2));
         softConstrAutoPlace.forEach(t->solver.AssertSoft(t._1, WAUTOPLACEMENT, t._2));
         softConstrPorts.forEach(t->solver.AssertSoft(t._1, WPORTS, t._2));
+
     }
     
     
@@ -130,154 +131,7 @@ public class NetContext {
      * Set up base conditions for the network
      */
     private void baseCondition(){
-        // Basic constraints for the overall model
-        Expr n_0 = ctx.mkConst("ctx_base_n_0", nodeType);
-        Expr n_1 = ctx.mkConst("ctx_base_n_1", nodeType);
-        Expr n_2 = ctx.mkConst("ctx_base_n_2", nodeType);
-        Expr p_0 = ctx.mkConst("ctx_base_p_0", packetType);
-        Expr p_1 = ctx.mkConst("ctx_base_p_1", packetType);
-
-        // Constraint1 send(n_0, n_1, p_0 ) -> n_0 != n_1
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
-                        ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0),ctx.mkNot(ctx.mkEq( n_0, n_1))),1,null,null,null,null));
-
-        // Constraint2 recv(n_0, n_1, p_0 ) -> n_0 != n_1
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
-                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),ctx.mkNot(ctx.mkEq( n_0, n_1))),1,null,null,null,null));
-
-        // Constraint3 send(n_0, n_1, p_0 ) -> p_0.src != p_0.dest
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
-                        ctx.mkImplies((BoolExpr)send.apply(n_0, n_1, p_0),
-                                ctx.mkNot(ctx.mkEq(  functionsMap.get("src").apply(p_0), functionsMap.get("dest").apply(p_0)))),1,null,null,null,null));
-
-        // Constraint4 recv(n_0, n_1, p_0 ) -> p_0.src != p_0.dest
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0 },
-                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0 ),
-                                ctx.mkNot(ctx.mkEq(functionsMap.get("src").apply(p_0),functionsMap.get("dest").apply(p_0)))),1,null,null,null,null));
-
-        // Constraint5 recv(n_0, n_1, p ) -> send(n_0, n_1, p ) 
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0 },
-                        ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0 ),
-                                        ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0)
-                                                )),1,null,null,null,null));
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0 },
-                        ctx.mkImplies(ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0)
-                                                ),(BoolExpr)recv.apply(n_0, n_1, p_0 )),1,null,null,null,null));
-
-        // Extra constriants for supporting the VPN gateway
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
-                        ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0),
-                                        ctx.mkNot(ctx.mkEq(this.functionsMap.get("inner_src").apply(p_0), this.addressMap.get("null")))),
-                                ctx.mkNot(ctx.mkEq(this.functionsMap.get("inner_src").apply(p_0), this.functionsMap.get("inner_dest").apply(p_0)))),1,null,null,null,null));
-
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
-                        ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0),
-                                        ctx.mkEq(this.functionsMap.get("inner_src").apply(p_0), this.addressMap.get("null"))),
-                                ctx.mkEq(this.functionsMap.get("inner_src").apply(p_0), this.functionsMap.get("inner_dest").apply(p_0))),1,null,null,null,null));
-
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
-                        ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)send.apply(n_0, n_1, p_0),
-                                        ctx.mkEq(this.functionsMap.get("inner_dest").apply(p_0), this.addressMap.get("null"))),
-                                ctx.mkEq(this.functionsMap.get("inner_src").apply(p_0), this.functionsMap.get("inner_dest").apply(p_0))),1,null,null,null,null));
-
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
-                        ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)recv.apply(n_0, n_1, p_0),
-                                        ctx.mkNot(ctx.mkEq(this.functionsMap.get("inner_src").apply(p_0), this.addressMap.get("null")))),
-                                ctx.mkNot(ctx.mkEq(this.functionsMap.get("inner_src").apply(p_0), this.functionsMap.get("inner_dest").apply(p_0)))),1,null,null,null,null));
-
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
-                        ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)recv.apply(n_0, n_1, p_0),
-                                        ctx.mkEq(this.functionsMap.get("inner_src").apply(p_0), this.addressMap.get("null"))),
-                                ctx.mkEq(this.functionsMap.get("inner_src").apply(p_0), this.functionsMap.get("inner_dest").apply(p_0))),1,null,null,null,null));
-
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0},
-                        ctx.mkImplies(
-                                ctx.mkAnd((BoolExpr)recv.apply(n_0, n_1, p_0),
-                                        ctx.mkEq(this.functionsMap.get("inner_dest").apply(p_0), this.addressMap.get("null"))),
-                                ctx.mkEq(this.functionsMap.get("inner_src").apply(p_0), this.functionsMap.get("inner_dest").apply(p_0))),1,null,null,null,null));
-
-        constraints.add(
-                ctx.mkForall(new Expr[]{n_0, n_1, p_0, n_2, p_1},
-                        ctx.mkImplies(
-                                ctx.mkAnd(
-                                        
-                                        (BoolExpr)send.apply(n_0, n_1, p_0),
-                                        (BoolExpr)this.functionsMap.get("encrypted").apply(p_1),
-                                        (BoolExpr)recv.apply(n_2, n_0, p_1),
-                                        (BoolExpr)this.functionsMap.get("encrypted").apply(p_0)),
-                                ctx.mkAnd(
-                                        ctx.mkEq(this.functionsMap.get("inner_src").apply(p_1), this.functionsMap.get("inner_src").apply(p_0)),
-                                        ctx.mkEq(this.functionsMap.get("inner_dest").apply(p_1), this.functionsMap.get("inner_dest").apply(p_0)),
-                                        ctx.mkEq(this.functionsMap.get("origin").apply(p_1), this.functionsMap.get("origin").apply(p_0)),
-                                        ctx.mkEq(this.functionsMap.get("orig_body").apply(p_1), this.functionsMap.get("orig_body").apply(p_0)),
-                                        ctx.mkEq(this.functionsMap.get("body").apply(p_1), this.functionsMap.get("body").apply(p_0)),
-                                        ctx.mkEq(this.functionsMap.get("seq").apply(p_1), this.functionsMap.get("seq").apply(p_0)),
-                                        ctx.mkEq(this.functionsMap.get("lv4proto").apply(p_1), this.functionsMap.get("lv4proto").apply(p_0)),
-                                        ctx.mkEq(this.functionsMap.get("proto").apply(p_1), this.functionsMap.get("proto").apply(p_0)),
-                                        ctx.mkEq(this.functionsMap.get("src_port").apply(p_1), this.functionsMap.get("src_port").apply(p_0)),
-                                        ctx.mkEq(this.functionsMap.get("dest_port").apply(p_1), this.functionsMap.get("dest_port").apply(p_0)),
-                                        ctx.mkEq(this.functionsMap.get("emailFrom").apply(p_1), this.functionsMap.get("emailFrom").apply(p_0)),
-                                        ctx.mkEq(this.functionsMap.get("url").apply(p_1), this.functionsMap.get("url").apply(p_0)),
-                                        ctx.mkEq(this.functionsMap.get("options").apply(p_1), this.functionsMap.get("options").apply(p_0)))),1,null,null,null,null)
-                );
-		constraints.add(ctx.mkForall(new Expr[]{n_0, n_1, p_0},
-                                	ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
-                                				ctx.mkAnd( 
-						                        		ctx.mkGe((IntExpr)ipFunctionsMap.get("ipAddr_1").apply(functionsMap.get("src").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
-						                                ctx.mkLe((IntExpr)ipFunctionsMap.get("ipAddr_1").apply(functionsMap.get("src").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                        		ctx.mkGe((IntExpr)ipFunctionsMap.get("ipAddr_2").apply(functionsMap.get("src").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
-						                                ctx.mkLe((IntExpr)ipFunctionsMap.get("ipAddr_2").apply(functionsMap.get("src").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                        		ctx.mkGe((IntExpr)ipFunctionsMap.get("ipAddr_3").apply(functionsMap.get("src").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
-						                                ctx.mkLe((IntExpr)ipFunctionsMap.get("ipAddr_3").apply(functionsMap.get("src").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                        		ctx.mkGe((IntExpr)ipFunctionsMap.get("ipAddr_4").apply(functionsMap.get("src").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
-						                                ctx.mkLe((IntExpr)ipFunctionsMap.get("ipAddr_4").apply(functionsMap.get("src").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                                ctx.mkGe((IntExpr)ipFunctionsMap.get("ipAddr_1").apply(functionsMap.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
-						                                ctx.mkLe((IntExpr)ipFunctionsMap.get("ipAddr_1").apply(functionsMap.get("dest").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                        		ctx.mkGe((IntExpr)ipFunctionsMap.get("ipAddr_2").apply(functionsMap.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
-						                                ctx.mkLe((IntExpr)ipFunctionsMap.get("ipAddr_2").apply(functionsMap.get("dest").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                        		ctx.mkGe((IntExpr)ipFunctionsMap.get("ipAddr_3").apply(functionsMap.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
-						                                ctx.mkLe((IntExpr)ipFunctionsMap.get("ipAddr_3").apply(functionsMap.get("dest").apply(p_0)),(IntExpr) ctx.mkInt(255)),
-						                        		ctx.mkGe((IntExpr)ipFunctionsMap.get("ipAddr_4").apply(functionsMap.get("dest").apply(p_0)),(IntExpr)ctx.mkInt(-1)),
-						                                ctx.mkLe((IntExpr)ipFunctionsMap.get("ipAddr_4").apply(functionsMap.get("dest").apply(p_0)),(IntExpr) ctx.mkInt(255))
-							                              )
-                                				 )
-                
-        ,1,null,null,null,null));
-		constraints.add(ctx.mkForall(new Expr[]{n_0, n_1, p_0},
-            	ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
-            				ctx.mkAnd( 
-	                        		ctx.mkGe((IntExpr)portFunctionsMap.get("start").apply(functionsMap.get("src_port").apply(p_0)),(IntExpr)ctx.mkInt(0)),
-	                        		ctx.mkLe((IntExpr)portFunctionsMap.get("end").apply(functionsMap.get("src_port").apply(p_0)),(IntExpr)ctx.mkInt(this.MAX_PORT)),
-	                        		ctx.mkGe((IntExpr)portFunctionsMap.get("start").apply(functionsMap.get("dest_port").apply(p_0)),(IntExpr)ctx.mkInt(0)),
-	                        		ctx.mkLe((IntExpr)portFunctionsMap.get("end").apply(functionsMap.get("dest_port").apply(p_0)),(IntExpr)ctx.mkInt(this.MAX_PORT))
-		                              )
-            				 )
-            	,1,null,null,null,null));
-		constraints.add(ctx.mkForall(new Expr[]{n_0, n_1, p_0},
-            	ctx.mkImplies((BoolExpr)recv.apply(n_0, n_1, p_0),
-            				ctx.mkAnd( 
-	                        		ctx.mkGe((IntExpr)functionsMap.get("lv4proto").apply(p_0),(IntExpr)ctx.mkInt(0)),
-	                        		ctx.mkLe((IntExpr)functionsMap.get("lv4proto").apply(p_0),(IntExpr)ctx.mkInt(3))
-		                              )
-            				 )
-            	,1,null,null,null,null));
+    
 
     }
 
@@ -409,6 +263,8 @@ public class NetContext {
         send = ctx.mkFuncDecl("send", new Sort[]{ nodeType, nodeType, packetType},ctx.mkBoolSort());
         // recv: node -> node -> packet-> int-> bool
         recv = ctx.mkFuncDecl("recv", new Sort[]{ nodeType, nodeType, packetType},ctx.mkBoolSort());
+        // recv: node -> node -> packet-> int-> bool
+        deny = ctx.mkFuncDecl("deny", new Sort[]{ nodeType, ctx.mkIntSort()},ctx.mkBoolSort());
     }
     
     
@@ -738,5 +594,61 @@ public class NetContext {
     public void setWildcardManager(WildcardManager wildcardManager) {
     	this.wildcardManager = wildcardManager;
     }
+
+
+    
+    
+    /* NEW */
+
+	public BoolExpr equalIpAddressToPFRule(String IPAddress, Expr fwIpRule) {
+		int[] parts = getIpFromString(IPAddress);
+		return ctx.mkOr(new BoolExpr[] {
+	    		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(fwIpRule), ipFunctionsMap.get("ipAddr_1").apply(addressMap.get("wildcard"))),
+	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(fwIpRule), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
+	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(fwIpRule), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
+	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(fwIpRule), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
+	    		  
+	    		  ctx.mkAnd(ctx.mkEq(ctx.mkInt(parts[0]), ipFunctionsMap.get("ipAddr_1").apply(fwIpRule)),
+	    		  			ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(fwIpRule), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
+		    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(fwIpRule), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
+		    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(fwIpRule), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
+	    		  					
+	    		  ctx.mkAnd(ctx.mkEq(ctx.mkInt(parts[0]), ipFunctionsMap.get("ipAddr_1").apply(fwIpRule)),
+	    		  			ctx.mkEq(ctx.mkInt(parts[1]), ipFunctionsMap.get("ipAddr_2").apply(fwIpRule)),
+	    		  			ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(fwIpRule), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
+		    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(fwIpRule), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
+	    		  					
+	    		  ctx.mkAnd(ctx.mkEq(ctx.mkInt(parts[0]), ipFunctionsMap.get("ipAddr_1").apply(fwIpRule)),
+	  		  				ctx.mkEq(ctx.mkInt(parts[1]), ipFunctionsMap.get("ipAddr_2").apply(fwIpRule)),
+	  		  				ctx.mkEq(ctx.mkInt(parts[2]), ipFunctionsMap.get("ipAddr_3").apply(fwIpRule)),
+	  		  				ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(fwIpRule), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
+		    	    					
+	    		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(fwIpRule), ctx.mkInt(parts[0])),
+	  	  				ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(fwIpRule), ctx.mkInt(parts[1])),
+	  	  				ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(fwIpRule), ctx.mkInt(parts[2])),
+	  	  				ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(fwIpRule), ctx.mkInt(parts[3])))
+
+	    	}); 
+		
+	}
+
+
+
+	public BoolExpr equalPortRangeToPFRule(String srcPort, Expr rule) {
+		
+		Expr port_expr1 = portMap.get(srcPort);
+		return ctx.mkOr(
+        		ctx.mkAnd(
+        						ctx.mkEq((IntExpr)portFunctionsMap.get("start").apply(port_expr1), (IntExpr)portFunctionsMap.get("start").apply(rule)),
+        						ctx.mkEq((IntExpr)portFunctionsMap.get("end").apply(port_expr1), (IntExpr)portFunctionsMap.get("end").apply(rule))
+        				),
+        		ctx.mkEq(rule, portMap.get("null")));
+	}
+
+
+
+	public BoolExpr equalLv4ProtoToFwLv4Proto(int proto1, Expr proto2) {
+		return ctx.mkOr(ctx.mkEq(ctx.mkInt(proto1), proto2),ctx.mkEq(proto2, ctx.mkInt(0)));
+	}
 
 }

@@ -28,7 +28,16 @@ abstract public class GenericFunction {
     protected DatatypeExpr z3Node;
     protected boolean isEndHost;
     protected BoolExpr used;
-    protected boolean autoplace;
+    public BoolExpr getUsed() {
+		return used;
+	}
+
+
+	public void setUsed(BoolExpr used) {
+		this.used = used;
+	}
+
+	protected boolean autoplace;
 	public BoolExpr enumerateRecvP0;
 	public BoolExpr enumerateSendP0;
 	public BoolExpr enumerateRecvP1;

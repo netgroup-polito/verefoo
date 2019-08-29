@@ -18,8 +18,8 @@ import it.polito.verefoo.allocation.AllocationManager;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
-import it.polito.verefoo.graph.Link;
-import it.polito.verefoo.graph.LinkProvider;
+import it.polito.verefoo.graph.RequirementPath;
+import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verigraph.extra.VerificationResult;
@@ -36,18 +36,17 @@ public class VerefooProxy {
 	private NetContext nctx;
 	private List<Property> properties;
 	private WildcardManager wildcardManager;
-	private PacketFilterManager pfManager;
 	private HashMap<String, AllocationNode> allocationNodes;
+	private HashMap<Integer, SecurityRequirement> requirementsMap;
 	public Checker check;
 	private List<Node> nodes;
-	private LinkProvider linkProvider;
-	private List<Path> paths;
 	int clientServerCombinations = 0;
 	private List<NodeMetrics> nodeMetrics;
-	private int nrOfConditions;
 	private AllocationManager allocationManager;
 	
 	private Logger logger = LogManager.getLogger("mylog");
+	
+	
 	/**
 	 * Public constructor for the Verefoo proxy service
 	 * 
@@ -69,26 +68,157 @@ public class VerefooProxy {
 		properties = prop;
 		nodes = graph.getNode();
 		nodes.forEach(n -> allocationNodes.put(n.getName(), new AllocationNode(n)));
-
 		this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
-		this.paths = paths;
-
+		requirementsMap = generateRequirementPaths();
 		wildcardManager = new WildcardManager(allocationNodes);
 
 		nctx = nctxGenerate(ctx, nodes, prop, allocationNodes);
 		nctx.setWildcardManager(wildcardManager);
 
-		pfManager = new PacketFilterManager(wildcardManager, prop);
-		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, pfManager);
+		
+		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
 
 		allocationManager.instantiateFunctions();
-		checkNffg();
-		pfManager.minimizeRules();
+
+		allocateFunctions();
+		distributeRequirements();
 		allocationManager.configureFunctions();
 		check = new Checker(ctx, nctx, allocationNodes);
-		setProperty(prop);
+		formalizeRequirements();
+		
+	}
+	
+	
+	/**
+	 * This method allocates the functions on allocation nodes that are empty.
+	 * At the moment only packet-filtering capability is allocated, in the future the decision will depend on the type of requirement.
+	 */
+	private void allocateFunctions() {
+		for(SecurityRequirement sr : requirementsMap.values()) {
+			List<AllocationNode> nodes = sr.getPath().getNodes();
+			int lengthList = nodes.size();
+			AllocationNode source = nodes.get(0);
+			AllocationNode last = nodes.get(lengthList-1);
+			for(int i = 1; i < lengthList-1; i++) {
+				allocationManager.chooseFunctions(nodes.get(i), source, last);
+			}
+		}
+		
 	}
 
+
+	/**
+	 * This method creates the constraint in the z3 model for reachability and isolation requirements.
+	 */
+	private void formalizeRequirements() {
+		
+		for(SecurityRequirement sr : requirementsMap.values()) {
+			switch (sr.getProperty().getName()) {
+			case ISOLATION_PROPERTY:
+				check.createRequirementConstraints(sr, Prop.ISOLATION);
+				break;
+			case REACHABILITY_PROPERTY:
+				check.createRequirementConstraints(sr, Prop.REACHABILITY);
+				break;
+			default:
+				throw new BadGraphError("Error in the property definition", EType.INVALID_PROPERTY_DEFINITION);
+			}
+			
+			
+		}
+		
+	}
+
+
+	/**
+	 * This method distributes into each Allocation Node the requirements whose traffic flow pass through it.
+	 */
+	private void distributeRequirements() {
+		
+		for(SecurityRequirement sr : requirementsMap.values()) {
+			for(AllocationNode node : sr.getPath().getNodes()) {
+				node.addRequirement(sr);
+			}
+		}
+		
+	}
+
+
+	/**
+	 * For each requirement, this method identifies the path of nodes that must be crossed by the traffic flow.
+	 * @return the map of all the security requirements
+	 */
+	private HashMap<Integer, SecurityRequirement> generateRequirementPaths(){
+		
+		HashMap<Integer, SecurityRequirement> SRMap = new HashMap<>();
+		int id = 0;
+		for(Property property : properties) {
+			List<AllocationNode> nodes = new ArrayList<>();
+			Set<String> visited = new HashSet<>();
+			AllocationNode source = allocationNodes.get(property.getSrc());
+			AllocationNode destination = allocationNodes.get(property.getDst());
+			boolean found = recursivePathGeneration(nodes, source, destination, source, visited, 0);
+			visited.clear();
+			if(found) {
+				RequirementPath rp = new RequirementPath(nodes);
+				SecurityRequirement sr = new SecurityRequirement(property, rp, id);
+				SRMap.put(id, sr);
+				id++;
+			} else {
+				System.out.println("ERROR");
+			}
+		}
+		
+		return SRMap;
+		
+	}
+
+	/**
+	 * This method is recursively called to generate the path of nodes for each requirement.
+	 * @param nodes it is the list of nodes that compose the correct path
+	 * @param source it is the source of the path
+	 * @param destination it is the destination of the path
+	 * @param current it is the current node in the recursive visit
+	 * @param visited it is a list of nodes that have been already visited
+	 * @param level it is the recursion level of the visit
+	 * @return true if a path has been identified, false otherwise
+	 */
+	private boolean recursivePathGeneration(List<AllocationNode> nodes, AllocationNode source,
+			AllocationNode destination, AllocationNode current, Set<String> visited, int level) {
+		
+		nodes.add(level, current);
+		visited.add(current.getNode().getName());
+		List<Neighbour> listNeighbours = current.getNode().getNeighbour();
+		if(destination.getNode().getName().equals(current.getNode().getName())) return true;
+		
+		
+		for(Neighbour n : listNeighbours) {
+			if(!visited.contains(n.getName())) {
+				AllocationNode neighbourNode = allocationNodes.get(n.getName());
+				level++;
+				boolean result = recursivePathGeneration(nodes, source, destination, neighbourNode, visited, level);
+				if(result) return true;
+				level--;
+			}
+			
+			
+		}
+		
+		visited.remove(current.getNode().getName());
+		nodes.remove(nodes.size()-1);
+		return false;
+	}
+
+
+	
+	/**
+	 * This method generared the NetContext object for the inizialitation of z3 model.
+	 * @param ctx2 it is the z3 Context object
+	 * @param nodes2 is is the list of nodes of the Allocation Graph
+	 * @param prop it is the list of properties to be satisfied
+	 * @param allocationNodes2 it is the list of allocation nodes
+	 * @return the NetContext object
+	 */
 	private NetContext nctxGenerate(Context ctx2, List<Node> nodes2, List<Property> prop,
 			HashMap<String, AllocationNode> allocationNodes2) {
 		for (Node n : nodes) {
@@ -107,168 +237,6 @@ public class VerefooProxy {
 		dst_portRange = properties.stream().map(p -> p.getDstPort()).filter(p -> p != null)
 				.collect(Collectors.toCollection(ArrayList<String>::new)).toArray(dst_portRange);
 		return new NetContext(ctx, allocationNodes, nodesname, nodesip, src_portRange, dst_portRange);
-	}
-
-	/**
-	 * Calls the function to translate the node's neighbours into links and then it
-	 * calls the function that creates the routing tables
-	 * 
-	 * @throws BadGraphError
-	 */
-	private void checkNffg() throws BadGraphError {
-		try {
-			linkProvider = new LinkProvider(nodes, paths, properties);
-			for (Property property : properties) {
-				String src = property.getSrc();
-				String dst = property.getDst();
-				AllocationNode srcNode = allocationNodes.get(src);
-				AllocationNode dstNode = allocationNodes.get(dst);
-				if (!linkProvider.existsPath(srcNode.getNode(), dstNode.getNode())) {
-					logger.debug("No path found between " + src + " and " + dst);
-					continue;
-				}
-					createRoutingConditions(srcNode, dstNode);
-			}
-		} catch (StackOverflowError e) {
-			throw new BadGraphError("The graph of nodes is invalid", EType.INVALID_SERVICE_GRAPH);
-		}
-	}
-
-	/**
-	 * Explores the graph to find the path between client and server and then it
-	 * builds the routing table based on those information (for an XML without
-	 * physical topology)
-	 * 
-	 * @param client
-	 * @param server
-	 * @throws BadGraphError
-	 */
-	private void createRoutingConditions(AllocationNode srcNode, AllocationNode dstNode) throws BadGraphError {
-		List<Link> nextLinks = linkProvider.getLinksFrom(srcNode.getNode(), 0);
-		if (nextLinks.size() == 0) {
-			logger.error("Route: From CLIENT " + srcNode.getNode().getName() + " to "
-					+ nctx.addressMap.get(dstNode.getNode().getName()) + " -> Dead End");
-			throw new BadGraphError("Nodes must be connected", EType.INVALID_SERVICE_GRAPH);
-		}
-		for (Link link : nextLinks) {
-			AllocationNode next = allocationNodes.values().stream()
-					.filter(n -> n.getNode().getName().equals(link.getDestNode())).findFirst().get();
-			if (setNextHop(srcNode, srcNode, next, dstNode, 1, new HashMap<>())) {
-				Map<AllocationNode, Set<AllocationNode>> firstHops = srcNode.getFirstHops();
-				if (firstHops.containsKey(dstNode)) {
-					firstHops.get(dstNode).add(next);
-				} else {
-					Set<AllocationNode> set = new HashSet<>();
-					set.add(next);
-					firstHops.put(dstNode, set);
-				}
-
-			}
-
-		}
-	}
-
-	/**
-	 * Explores recursively the graph in order to know the right sequence of nodes
-	 * (for an XML without physical topology)
-	 * 
-	 * @param prec               the node that precedes source in this exploration
-	 * @param source             the node from which is exploring the solutions
-	 * @param server             the destination node
-	 * @param nodeRecursionLevel the current level of the recursion
-	 * @param visited            the list of the nodes already visited
-	 * @return
-	 * @throws BadGraphError
-	 */
-	private boolean setNextHop(AllocationNode origin, AllocationNode prec, AllocationNode source,
-			AllocationNode finalDest, int nodeRecursionLevel, HashMap<AllocationNode, List<String>> visited)
-			throws BadGraphError {
-		if (source.getNode().getName().equals(finalDest.getNode().getName())) {
-			Map<AllocationNode, Set<AllocationNode>> lastHops = finalDest.getLastHops();
-			if (lastHops.containsKey(origin)) {
-				lastHops.get(origin).add(prec);
-			} else {
-				Set<AllocationNode> set = new HashSet<>();
-				set.add(prec);
-				lastHops.put(origin, set);
-			}
-			return true;
-		}
-		List<String> nextDest = linkProvider.getLinksFrom(source.getNode(), nodeRecursionLevel).stream()
-				.map(l -> l.getDestNode()).collect(Collectors.toList());
-		if (nextDest.size() == 0) {
-			return false;
-		}
-
-		if (!visited.containsKey(source)) {
-			visited.put(source, new ArrayList<>());
-		}
-
-		boolean found = false;
-		for (String dest : nextDest) {
-			AllocationNode next = allocationNodes.values().stream().filter(n -> n.getNode().getName().equals(dest))
-					.findFirst().orElse(null);
-			assert (next != null);
-			if (visited.get(source).contains(dest) || dest.equals(prec.getNode().getName())) {
-				continue;
-			}
-			visited.get(source).add(dest);
-			if (setNextHop(origin, source, next, finalDest, nodeRecursionLevel + 1, visited)) {
-				found = true;
-
-				Map<AllocationNode, Set<AllocationNode>> leftHops = source.getLeftHops();
-				if (leftHops.containsKey(prec)) {
-					leftHops.get(prec).add(next);
-				} else {
-					Set<AllocationNode> set = new HashSet<>();
-					set.add(next);
-					leftHops.put(prec, set);
-				}
-
-				Map<AllocationNode, Set<AllocationNode>> rightHops = source.getRightHops();
-				if (rightHops.containsKey(next)) {
-					rightHops.get(next).add(prec);
-				} else {
-					Set<AllocationNode> set = new HashSet<>();
-					set.add(prec);
-					rightHops.put(next, set);
-				}
-
-				allocationManager.chooseFunctions(source, origin, finalDest);
-
-			}
-			visited.get(source).remove(dest);
-		}
-		return found;
-	}
-
-	/**
-	 * Adds the condition related to a requested policy
-	 */
-
-	public void setProperty(List<Property> prop) {
-		prop.forEach(p -> {
-			String src = p.getSrc(), dst = p.getDst();
-			AllocationNode source = allocationNodes.values().stream().filter(n -> {
-				return n.getNode().getName().equals(src);
-			}).findFirst().orElse(null);
-			AllocationNode dest = allocationNodes.values().stream().filter(n -> {
-				return n.getNode().getName().equals(dst);
-			}).findFirst().orElse(null);
-			if (source == null || dest == null)
-				throw new BadGraphError("Error in the property definition", EType.INVALID_PROPERTY_DEFINITION);
-
-			switch (p.getName()) {
-			case ISOLATION_PROPERTY:
-				check.propertyAdd(source, dest, Prop.ISOLATION, p);
-				break;
-			case REACHABILITY_PROPERTY:
-				check.propertyAdd(source, dest, Prop.REACHABILITY, p);
-				break;
-			default:
-				throw new BadGraphError("Error in the property definition", EType.INVALID_PROPERTY_DEFINITION);
-			}
-		});
 	}
 
 	/**
@@ -309,16 +277,19 @@ public class VerefooProxy {
 
 	}
 
-	/**
-	 * @return the total number of deployment conditions, which is correlated with
-	 *         the complexity of the problem
-	 */
-	public int getNrOfConditions() {
-		return nrOfConditions;
-	}
 
+	/**
+	 * @return all the allocation nodes
+	 */
 	public Map<String, AllocationNode> getAllocationNodes() {
 		return allocationNodes;
 	}
 
+	
+	/**
+	 * @return all the requirements
+	 */
+	public Map<Integer, SecurityRequirement> getRequirementsMap(){
+		return requirementsMap;
+	}
 }

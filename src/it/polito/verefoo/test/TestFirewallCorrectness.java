@@ -121,7 +121,7 @@ public class TestFirewallCorrectness {
 	
 	
 	/**
-	 * This test checks if an auto-configured firewall configures only a rule which blocks all the traffic.
+	 * This test checks if an auto-configured firewall configures only a rule which allows only a communication.
 	 */
 	@Test
 	public void testFWCorrectness03(){
@@ -134,8 +134,8 @@ public class TestFirewallCorrectness {
 		
 			assertTrue(node.getConfiguration().getFirewall().getElements().size() == 1);
 			Elements element =node.getConfiguration().getFirewall().getElements().get(0);
-			assertTrue(element.getSource().equals("-1.-1.-1.-1"));
-			assertTrue(element.getDestination().equals("-1.-1.-1.-1"));
+			assertTrue(element.getSource().equals("10.0.0.1"));
+			assertTrue(element.getDestination().equals("20.0.0.1"));
 		} catch (Exception e) {
 			fail(e.toString());
 		}
@@ -143,7 +143,7 @@ public class TestFirewallCorrectness {
 	
 	
 	/**
-	 * This test checks if an auto-configured firewall configures only a rule which blocks traffic coming ONLY forum
+	 * This test checks if an auto-configured firewall configures only a rule which blocks traffic coming ONLY from 10.0.0.1
 	 */
 	@Test
 	public void testFWCorrectness04(){
@@ -157,7 +157,7 @@ public class TestFirewallCorrectness {
 			assertTrue(node.getConfiguration().getFirewall().getElements().size() == 1);
 			Elements element =node.getConfiguration().getFirewall().getElements().get(0);
 			assertTrue(element.getSource().equals("10.0.0.1"));
-			assertTrue(element.getDestination().equals("-1.-1.-1.-1"));
+			assertTrue(element.getDestination().equals("20.0.0.1"));
 		} catch (Exception e) {
 			fail(e.toString());
 		}
@@ -166,7 +166,7 @@ public class TestFirewallCorrectness {
 	
 	/**
 	 * Test about policies from clients and from server at the same time
-	 * is test checks if an auto-configured firewall configures only a rule which blocks traffic coming ONLY towards 20.*.*.*
+	 * is test checks if an auto-configured firewall configures only a rule which blocks traffic coming ONLY coming from 10.0.0.*
 	 */
 	@Test
 	public void testFWCorrectness05(){
@@ -181,7 +181,7 @@ public class TestFirewallCorrectness {
 			Elements element =node.getConfiguration().getFirewall().getElements().get(0);
 			assertTrue(
 					(element.getSource().equals("-1.-1.-1.-1") && element.getDestination().equals("20.-1.-1.-1")) ||
-					(element.getSource().equals("10.-1.-1.-1") && element.getDestination().equals("-1.-1.-1.-1"))
+					(element.getSource().equals("10.0.0.-1") && element.getDestination().equals("20.0.0.1"))
 					);
 			
 		} catch (Exception e) {
@@ -213,7 +213,7 @@ public class TestFirewallCorrectness {
 					Elements element = elements.get(0);
 					if(
 						(element.getSource().equals("-1.-1.-1.-1") && element.getDestination().equals("10.-1.-1.-1")) ||
-						(element.getSource().equals("20.-1.-1.-1") && element.getDestination().equals("-1.-1.-1.-1"))
+						(element.getSource().equals("20.0.0.1") && element.getDestination().equals("10.0.0.1"))
 						) {
 						correct2 = true;
 					}
@@ -261,13 +261,13 @@ public class TestFirewallCorrectness {
 			boolean correct3 = true;
 			
 			for(Node fw : listFW) {
-				if(fw.getName().equals("node1")) {
+				if(fw.getName().equals("30.0.0.1")) {
 					correct1 = true;
 				}
-				if(fw.getName().equals("node3")) {
+				if(fw.getName().equals("30.0.0.3")) {
 					correct2 = true;
 				}
-				if(fw.getName().equals("node2")) {
+				if(fw.getName().equals("30.0.0.2")) {
 					correct3 = false;
 				}
 			}
@@ -295,54 +295,16 @@ public class TestFirewallCorrectness {
 			boolean correct = false;
 			
 			for(Node fw : listFW) {
-				if(fw.getName().equals("node2")) {
+				if(fw.getName().equals("30.0.0.2")) {
 					correct = true;
 				}
 			}
 		
 			assertTrue(correct);
 			
-			Node client = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getName().equals("nodeA")).findAny().orElse(null);
+			Node client = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getName().equals("10.0.0.1")).findAny().orElse(null);
 			assertTrue(client != null);
-			assertTrue(client.getNeighbour().get(0).getName().equals("nodeB"));
-		} catch (Exception e) {
-			fail(e.toString());
-		}
-	}
-	
-	
-	
-	/**
-	 * Important test = loops + all the end points are connected to multiple nodes
-	 */
-	@Test
-	public void testFWCorrectnessLoop(){
-		try {
-			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrectLoop.xml"); 
-			assertTrue(result.isSat());
-			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
-			assertTrue(listFW.size() == 3);
-			
-			boolean correct1 = false;
-			boolean correct2 = false;
-			boolean correct3 = false;
-			
-			for(Node fw : listFW) {
-				List<Elements> elements = fw.getConfiguration().getFirewall().getElements();
-				if(elements.size() == 0) {
-					correct1 = true;
-				} else if(elements.size() == 1) {
-					Elements element = elements.get(0);
-					if(element.getSource().equals("-1.-1.-1.-1") && element.getDestination().equals("-1.-1.-1.-1")) {
-						correct2 = true;
-					}
-					if(element.getSource().equals("10.0.0.1") && element.getDestination().equals("-1.-1.-1.-1")) {
-						correct3 = true;
-					}
-				}
-			}
-		
-			assertTrue(correct1 && correct2 && correct3);
+			assertTrue(client.getNeighbour().get(0).getName().equals("20.0.0.1"));
 		} catch (Exception e) {
 			fail(e.toString());
 		}
