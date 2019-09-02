@@ -12,11 +12,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar"/>
 	<classpathentry kind="lib" path="lib/lib4j/log4j-api-2.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/lib4j/log4j-core-2.9.1.jar"/>
@@ -76,6 +71,7 @@
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-graphdb-api-3.3.4.jar"/>
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-java-driver-1.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-kernel-3.3.4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-kernel-api-3.3.4.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>

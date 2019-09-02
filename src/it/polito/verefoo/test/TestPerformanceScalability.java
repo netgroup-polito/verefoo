@@ -1,6 +1,3 @@
-/**
- * 
- */
 package it.polito.verefoo.test;
 
 import static org.junit.Assert.*;
@@ -9,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -28,7 +24,6 @@ import javax.xml.validation.SchemaFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.tools.ant.types.CommandlineJava.SysProperties;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -60,40 +55,23 @@ import it.polito.verigraph.extra.VerificationResult;
 public class TestPerformanceScalability {
 	
 
-	//seed , numberAP, numberPR, runs
-	public static void main(String[] args)  {
-		System.out.println(args.length);
-		if(args.length!=4) return;
-		
-        seed  = Integer.parseInt(args[0]);
-        numberAP  = Integer.parseInt(args[1]);
-        numberPR  = Integer.parseInt(args[2]);
-        runs = Integer.parseInt(args[3]);
-        testScalabilityPerformance();
-	}
-	
 	/* Variables to set if you want to automatically create the NFV */
-	private static int runs;
-	static String prefix = new String("Isol");
-	String IPClient[] = new String[runs];
-	String IPAllocationPlace[] = new String[runs];
-	String IPServer[] = new String[runs];
-	static int seed = 1967;
-	static Random rand;
+	private static final int N = 100;
+	String prefix = new String("Isol");
+	String IPClient[] = new String[N];
+	String IPAllocationPlace[] = new String[N];
+	String IPServer[] = new String[N];
+	int seed = 1967;
+	Random rand = new Random(seed);
 	
-	private static long condTime = 0;
-	private static long checkTimeSAT = 0;
-	private static long checkTimeUNSAT = 0;
-	private static long totTime = 0;
-	private static long maxCondTime = 0, maxCheckTimeSAT = 0, maxCheckTimeUNSAT = 0, maxTotTime = 0,minTotTime = 0;
-	private  static int nSAT = 0, nUNSAT = 0, i = 0, err = 0, nrOfConditions = 0, maxNrOfConditions = 0;
-	static NFV root;
-	static String pathfile;
-	private static ch.qos.logback.classic.Logger logger;
+	private long condTime = 0, checkTimeSAT = 0, checkTimeUNSAT = 0, totTime = 0;
+	private long maxCondTime = 0, maxCheckTimeSAT = 0, maxCheckTimeUNSAT = 0, maxTotTime = 0,minTotTime = 0;
+	private int nSAT = 0, nUNSAT = 0, i = 0, err = 0, nrOfConditions = 0, maxNrOfConditions = 0;
+	NFV root;
+	String pathfile = "name.log" ;
+	private ch.qos.logback.classic.Logger logger = Package1LoggingClass.createLoggerFor(pathfile, "log/name.log");
 	private Logger loggerModel = LogManager.getLogger("model");
 	private int newSeed;
-	private static int numberAP;
-	private static int numberPR;
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -124,7 +102,7 @@ public class TestPerformanceScalability {
 	
 
 	
-	private static NFV testCoarse(NFV root) throws Exception{
+	private NFV testCoarse(NFV root) throws Exception{
 		long beginAll=System.currentTimeMillis();
 		VerefooSerializer test = new VerefooSerializer(root);
 		
@@ -162,7 +140,7 @@ public class TestPerformanceScalability {
 	
 	private void setAutomaticallyIP() {
 		int first, second, third;
-		for(int i = 0; i < runs; i++) {
+		for(int i = 0; i < N; i++) {
 			first = rand.nextInt(256);
 			if(first == 0) first++;
 			second = rand.nextInt(256);
@@ -187,11 +165,7 @@ public class TestPerformanceScalability {
 	}
 	
 	@Test
-	public static void testScalabilityPerformance(){
-		
-		    rand= new Random(seed);
-	        pathfile =  seed+"_"+numberAP+"_"+numberPR+"_"+runs+"_"+"name.log";
-	        logger =  Package1LoggingClass.createLoggerFor(pathfile, "log/"+pathfile);
+	public void testScalabilityPerformance(){
 		
 		   Runtime rt = Runtime.getRuntime();
 	        long totalMem = rt.totalMemory();
@@ -204,12 +178,59 @@ public class TestPerformanceScalability {
 	        System.out.println ("Free Memory:  " + freeMem + " (" + (freeMem/megs) + " MiB)");
 		
 	
-	        int[] seeds = new int[runs];
-	        
-		  for(int m=0;m<runs;m++) { 
-			  seeds[m]=Math.abs(rand.nextInt()); 
-			}
-		 
+	        int[] seeds = {3263771	,
+	        		16732555	,
+	        		30691880	,
+	        		82099074	,
+	        		89512933	,
+	        		125373162	,
+	        		159691330	,
+	        		164757118	,
+	        		165306755	,
+	        		167451038	,
+	        		185698089	,
+	        		189129162	,
+	        		201382884	,
+	        		204894282	,
+	        		232245300	,
+	        		283987185	,
+	        		307047482	,
+	        		316109782	,
+	        		341073549	,
+	        		352433015	,
+	        		382144212	,
+	        		427509305	,
+	        		440400889	,
+	        		482067466	,
+	        		483226890	,
+	        		490207606	,
+	        		555910719	,
+	        		613476386	,
+	        		661038538	,
+	        		661406783	,
+	        		726097708	,
+	        		749249898	,
+	        		754831166	,
+	        		779573373	,
+	        		829252279	,
+	        		835317888	,
+	        		840806581	,
+	        		896526641	,
+	        		899966616	,
+	        		918207226	,
+	        		973218858	,
+	        		990365427	,
+	        		1016956473	,
+	        		1018082824	,
+	        		1023704156	,
+	        		1112299723	,
+	        		1154993508	,
+	        		1160617290	,
+	        		1163913733	,
+	        		1227773091	};
+		/*
+		 * for(int m=0;m<N;m++) { seeds[m]=Math.abs(rand.nextInt()); }
+		 */
 	        
 	        /* Switch between automatic and manul configuration of the IP*/
 		
@@ -218,11 +239,35 @@ public class TestPerformanceScalability {
 		int k=0;
 		try {
 			List<TestCaseGenerator> nfv = new ArrayList<>();
+
+			/* Scalability test for Allocation Places */
+				//nfv.add(new TestCaseGenerator(prefix + 50 + "AP" + 10 + "PR", 50, 0, 10, seed));
+				//nfv.add(new TestCaseGenerator(prefix + 50 + "AP" + 15 + "PR", 50, 0, 15, seed));
 			
-			 nfv.add(new TestCaseGenerator(prefix + numberAP + "AP" + numberPR + "PR", numberAP, 0, numberPR, 1));
+		
+			 
+			
+			 for(int j = 15; j <= 15; j += 5) { //allocation places 
+				 for(int i = 10; i <=80; i += 10) //policies //put 0,j for isolation, whereas j,0 for reachability
+					 //no random 
+					// nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR",i, 0, j, IPClient[k], IPAllocationPlace[k], IPServer[k])); //random
+			  nfv.add(new TestCaseGenerator(prefix + i + "AP" + j + "PR", i, 0, j, seed));
+			  }
 			
 			
 			
+			
+			/*Scalability test for Policy Rules */
+			
+			/*	for(int j = 10; j <= 80; j += 10) { //policies
+					for(int i = 5; i <= 15; i += 5) //allocation places
+						//put 0,j for isolation, whereas j,0 for reachability
+							//no random
+							nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, IPClient[k], IPAllocationPlace[k], IPServer[k]));
+							//random
+							nfv.add(new ScalabilityTestCase(prefix + i + "AP" + j + "PR", i, 0, j, seed));
+					}
+			*/
 	
 	
 			for(TestCaseGenerator f : nfv){
@@ -258,7 +303,7 @@ public class TestPerformanceScalability {
                 //m.marshal(f.getNfv(), System.out ); 
 		        
 		        do{
-		        	for(k = 0; k < runs; k++) {
+		        	for(k = 0; k < N; k++) {
 							try {
 								
 					             m = jc.createMarshaller();
