@@ -19,7 +19,7 @@ import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
 import it.polito.verefoo.graph.RequirementPath;
-import it.polito.verefoo.graph.SecurityRequirement;
+import it.polito.verefoo.graph.TrafficFlow;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verigraph.extra.VerificationResult;
@@ -37,7 +37,7 @@ public class VerefooProxy {
 	private List<Property> properties;
 	private WildcardManager wildcardManager;
 	private HashMap<String, AllocationNode> allocationNodes;
-	private HashMap<Integer, SecurityRequirement> requirementsMap;
+	private HashMap<Integer, TrafficFlow> trafficFlowsMap;
 	public Checker check;
 	private List<Node> nodes;
 	int clientServerCombinations = 0;
@@ -69,19 +69,16 @@ public class VerefooProxy {
 		nodes = graph.getNode();
 		nodes.forEach(n -> allocationNodes.put(n.getName(), new AllocationNode(n)));
 		this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
-		requirementsMap = generateRequirementPaths();
+		trafficFlowsMap = generateRequirementPaths();
 		wildcardManager = new WildcardManager(allocationNodes);
 
 		nctx = nctxGenerate(ctx, nodes, prop, allocationNodes);
 		nctx.setWildcardManager(wildcardManager);
-
 		
 		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
-
 		allocationManager.instantiateFunctions();
-
 		allocateFunctions();
-		distributeRequirements();
+		distributeTrafficFlows();
 		allocationManager.configureFunctions();
 		check = new Checker(ctx, nctx, allocationNodes);
 		formalizeRequirements();
@@ -94,7 +91,7 @@ public class VerefooProxy {
 	 * At the moment only packet-filtering capability is allocated, in the future the decision will depend on the type of requirement.
 	 */
 	private void allocateFunctions() {
-		for(SecurityRequirement sr : requirementsMap.values()) {
+		for(TrafficFlow sr : trafficFlowsMap.values()) {
 			List<AllocationNode> nodes = sr.getPath().getNodes();
 			int lengthList = nodes.size();
 			AllocationNode source = nodes.get(0);
@@ -112,7 +109,7 @@ public class VerefooProxy {
 	 */
 	private void formalizeRequirements() {
 		
-		for(SecurityRequirement sr : requirementsMap.values()) {
+		for(TrafficFlow sr : trafficFlowsMap.values()) {
 			switch (sr.getProperty().getName()) {
 			case ISOLATION_PROPERTY:
 				check.createRequirementConstraints(sr, Prop.ISOLATION);
@@ -133,11 +130,45 @@ public class VerefooProxy {
 	/**
 	 * This method distributes into each Allocation Node the requirements whose traffic flow pass through it.
 	 */
-	private void distributeRequirements() {
+	private void distributeTrafficFlows() {
 		
-		for(SecurityRequirement sr : requirementsMap.values()) {
-			for(AllocationNode node : sr.getPath().getNodes()) {
-				node.addRequirement(sr);
+		
+		for(TrafficFlow tf : trafficFlowsMap.values()) {
+			
+			boolean natIsPresent = false;
+			List<AllocationNode> nodesList = tf.getPath().getNodes();
+			
+			for(AllocationNode node : nodesList) {
+				node.addRequirement(tf);
+				if(node.getTypeNF().equals(FunctionalTypes.NAT)) {
+					natIsPresent = true;
+				}
+			}
+			
+			if(natIsPresent) {
+				Property p = TrafficFlow.copyProperty(tf.getProperty());
+				int listLength = nodesList.size();
+				String lastBack = tf.getProperty().getSrc();
+				for(int i = 0; i < listLength; i++) {
+					AllocationNode current = nodesList.get(i);
+					if(current.getTypeNF().equals(FunctionalTypes.NAT) && current.getNode().getConfiguration().getNat().getSource().contains(p.getSrc())) {
+						tf.addModifiedProperty(current.getNode().getName(), p);
+						Property forwardProperty = TrafficFlow.copyProperty(p);
+						forwardProperty.setSrc(current.getNode().getName());
+						p = forwardProperty;
+					}else if(current.getTypeNF().equals(FunctionalTypes.NAT) && current.getNode().getConfiguration().getNat().getSource().contains(p.getDst())) {
+						Property backwardProperty = TrafficFlow.copyProperty(p);
+						backwardProperty.setDst(current.getNode().getName());
+						for(int j = i-1; j >= 0; j--) {
+							AllocationNode backwardNode = nodesList.get(j);
+							tf.addModifiedProperty(backwardNode.getNode().getName(), backwardProperty);
+							if(backwardNode.getNode().getName().equals(lastBack)) break;
+						}
+						lastBack = current.getNode().getName();
+					}else {
+						tf.addModifiedProperty(current.getNode().getName(), p);
+					}
+				}
 			}
 		}
 		
@@ -148,9 +179,9 @@ public class VerefooProxy {
 	 * For each requirement, this method identifies the path of nodes that must be crossed by the traffic flow.
 	 * @return the map of all the security requirements
 	 */
-	private HashMap<Integer, SecurityRequirement> generateRequirementPaths(){
+	private HashMap<Integer, TrafficFlow> generateRequirementPaths(){
 		
-		HashMap<Integer, SecurityRequirement> SRMap = new HashMap<>();
+		HashMap<Integer, TrafficFlow> SRMap = new HashMap<>();
 		int id = 0;
 		for(Property property : properties) {
 			List<AllocationNode> nodes = new ArrayList<>();
@@ -161,7 +192,7 @@ public class VerefooProxy {
 			visited.clear();
 			if(found) {
 				RequirementPath rp = new RequirementPath(nodes);
-				SecurityRequirement sr = new SecurityRequirement(property, rp, id);
+				TrafficFlow sr = new TrafficFlow(property, rp, id);
 				SRMap.put(id, sr);
 				id++;
 			} else {
@@ -289,7 +320,7 @@ public class VerefooProxy {
 	/**
 	 * @return all the requirements
 	 */
-	public Map<Integer, SecurityRequirement> getRequirementsMap(){
-		return requirementsMap;
+	public Map<Integer, TrafficFlow> getTrafficFlowsMap(){
+		return trafficFlowsMap;
 	}
 }

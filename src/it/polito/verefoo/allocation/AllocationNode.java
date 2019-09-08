@@ -6,7 +6,7 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.Optimize;
 
-import it.polito.verefoo.graph.SecurityRequirement;
+import it.polito.verefoo.graph.TrafficFlow;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verigraph.functions.GenericFunction;
 
@@ -24,7 +24,7 @@ public class AllocationNode {
 	private String ipAddress;
 	private DatatypeExpr z3Name;
 	private DatatypeExpr z3Node;
-	private Map<Integer, SecurityRequirement> requirements= new HashMap<>();
+	private Map<Integer, TrafficFlow> requirements= new HashMap<>();
 	
 	
 	/**
@@ -175,7 +175,7 @@ public class AllocationNode {
 	 * This method allows to distribute a requirement in this allocation node.
 	 * @param sr It is the requirement to store in the node
 	 */
-	public void addRequirement(SecurityRequirement sr) {
+	public void addRequirement(TrafficFlow sr) {
 		requirements.put(sr.getIdRequirement(), sr);
 	}
 	
@@ -183,7 +183,7 @@ public class AllocationNode {
 	 * Getter method for the map of requirements
 	 * @return the map of requirements
 	 */
-	public Map<Integer, SecurityRequirement> getRequirements() {
+	public Map<Integer, TrafficFlow> getRequirements() {
 		return requirements;
 	}
 
@@ -191,7 +191,7 @@ public class AllocationNode {
 	 * Setter method for the map of requirements
 	 * @param requirements the map of requirements
 	 */
-	public void setRequirements(Map<Integer, SecurityRequirement> requirements) {
+	public void setRequirements(Map<Integer, TrafficFlow> requirements) {
 		this.requirements = requirements;
 	}
 

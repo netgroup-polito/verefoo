@@ -25,7 +25,7 @@ import com.microsoft.z3.Params;
 import com.microsoft.z3.Status;
 
 import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.graph.SecurityRequirement;
+import it.polito.verefoo.graph.TrafficFlow;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verigraph.extra.VerificationResult;
 
@@ -121,7 +121,7 @@ public class Checker {
 	 * @param sr It is the requirement that must be modeled in z3 language
 	 * @param propType It is the type of the security requirement
 	 */
-	public void createRequirementConstraints(SecurityRequirement sr, Prop propType) {
+	public void createRequirementConstraints(TrafficFlow sr, Prop propType) {
 		
 		switch (propType) {
 			case ISOLATION:
@@ -139,7 +139,7 @@ public class Checker {
 	 * @param sr It is the requirement that must be modeled in z3 language
 	 * @param propType It is the type of the security requirement
 	 */
-	private void createReachabilityConstraint(SecurityRequirement sr) {
+	private void createReachabilityConstraint(TrafficFlow sr) {
 		
 	List<BoolExpr> singleConstraints = new ArrayList<>();
 		
@@ -159,7 +159,7 @@ public class Checker {
 	 * @param sr It is the requirement that must be modeled in z3 language
 	 * @param propType It is the type of the security requirement
 	 */
-	private void createIsolationConstraints(SecurityRequirement sr) {
+	private void createIsolationConstraints(TrafficFlow sr) {
 		
 		List<BoolExpr> singleConstraints = new ArrayList<>();
 		

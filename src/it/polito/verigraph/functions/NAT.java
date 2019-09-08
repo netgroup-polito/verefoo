@@ -14,6 +14,8 @@ import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Quantifier;
 
 import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.graph.TrafficFlow;
+import it.polito.verefoo.jaxb.Property;
 import it.polito.verigraph.solver.NetContext;
 
 /**
@@ -22,7 +24,7 @@ import it.polito.verigraph.solver.NetContext;
  */
 public class NAT extends GenericFunction {
 	DatatypeExpr nat;
-	List<DatatypeExpr> private_addresses;
+	List<String> private_addresses;
 	List<GenericFunction> private_node;
 	FuncDecl private_addr_func;
 
@@ -35,18 +37,57 @@ public class NAT extends GenericFunction {
 		nat = source.getZ3Name();
 		constraints = new ArrayList<BoolExpr>();
 		private_addr_func = ctx.mkFuncDecl(nat + "_nat_func", nctx.addressType, ctx.mkBoolSort()); 
+		used = ctx.mkTrue();
+		private_addresses = source.getNode().getConfiguration().getNat().getSource().stream().collect(Collectors.toList());	
 	}
 
 
 
 	public void natConfiguration(DatatypeExpr natIp) {
+		for(TrafficFlow tf : source.getRequirements().values()) {
+    		//constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdRequirement())), ctx.mkFalse()));
+			Property property = tf.getCrossedTrafficFlow(source.getNode().getName());
+			if(private_addresses.contains(property.getSrc())) {
+				constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(tf.getIdRequirement())), ctx.mkFalse()));
+			} else {
+				
+				boolean statusFound = false;
+				TrafficFlow status = null;
+				for(TrafficFlow tf2 : source.getRequirements().values()) {
+					Property property2 = tf2.getCrossedTrafficFlow(source.getNode().getName());
+					if(property.getSrc().equals(property2.getDst()) && property.getDst().equals(property2.getSrc()) && property.getSrcPort().equals(property2.getDstPort())) {
+						statusFound = true;
+						status = tf2;
+					}
+				}
+				
+				if(statusFound) {
+
+					List<BoolExpr> singleConstraints = new ArrayList<>();
+					for(AllocationNode node : status.getPath().getNodes()) {
+						singleConstraints.add(ctx.mkImplies(node.getPlacedNF().getUsed(), ctx.mkEq( (BoolExpr)nctx.deny.apply(node.getZ3Name(), ctx.mkInt(status.getIdRequirement())), ctx.mkFalse())));
+						if(node.getNode().getName().equals(source.getNode().getName())) break;
+					}
+					
+					BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
+					BoolExpr andConstraint = ctx.mkAnd(singleConstraints.toArray(arrayConstraints));
+					
+					constraints.add(ctx.mkImplies(andConstraint, ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(tf.getIdRequirement())), ctx.mkFalse())));
+					constraints.add(ctx.mkImplies(ctx.mkNot(andConstraint), ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(tf.getIdRequirement())), ctx.mkTrue())));
+				}else {
+					constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(tf.getIdRequirement())), ctx.mkTrue()));
+				}
+				
+				
+			}
 		
-		// to be changed
+		}
+	
 
 	}
 
 
-	public void setInternalAddress() {
+	/*public void setInternalAddress() {
 		ArrayList<DatatypeExpr> address = source.getNode().getConfiguration().getNat().getSource().stream()
 				.map((s) -> nctx.addressMap.get(s)).filter(e -> e != null).collect(Collectors.toCollection(ArrayList::new));
 		if (address.size() > 0) {
@@ -61,7 +102,7 @@ public class NAT extends GenericFunction {
 					ctx.mkEq(private_addr_func.apply(n_0), ctx.mkOr(constr.toArray(constrs))), 1, null, null, null,
 					null));
 		}
-	}
+	}*/
 
 	
 	@Override

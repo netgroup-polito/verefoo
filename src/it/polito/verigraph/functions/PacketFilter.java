@@ -19,7 +19,7 @@ import com.microsoft.z3.Sort;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
-import it.polito.verefoo.graph.SecurityRequirement;
+import it.polito.verefoo.graph.TrafficFlow;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.EType;
 import it.polito.verefoo.jaxb.FunctionalTypes;
@@ -47,6 +47,7 @@ public class PacketFilter extends GenericFunction{
 	boolean blacklisting;
 	boolean defaultActionSet;
 	private WildcardManager wildcardManager;
+	private String ipAddress;
 	
 	DatatypeExpr pf;
 	Expr defaultAction;
@@ -73,6 +74,7 @@ public class PacketFilter extends GenericFunction{
 		this.wildcardManager = wildcardManager;
 		
 		pf = source.getZ3Name();
+		ipAddress = source.getNode().getName();
 		constraints = new ArrayList<BoolExpr>();
    		rules = new ArrayList<>();
 		isEndHost = false;
@@ -188,7 +190,7 @@ public class PacketFilter extends GenericFunction{
   		 * This sections generates all the constraints to satisfy reachability and isolation requirements.
   		 */
   		
-  		for(SecurityRequirement sr : source.getRequirements().values()) {
+  		for(TrafficFlow sr : source.getRequirements().values()) {
   			generateManualSatifiabilityConstraint(sr);
   		}
 		
@@ -206,8 +208,8 @@ public class PacketFilter extends GenericFunction{
   		List<BoolExpr> implications2 = new ArrayList<BoolExpr>();
   		
   		if(!defaultActionSet) {
-  			long nReachability = source.getRequirements().values().stream().filter(r -> r.getProperty().getName().equals(PName.REACHABILITY_PROPERTY)).count();
-  			long nIsolation = source.getRequirements().values().stream().filter(r -> r.getProperty().getName().equals(PName.ISOLATION_PROPERTY)).count();
+  			long nReachability = source.getRequirements().values().stream().filter(r -> r.getCrossedTrafficFlow(ipAddress).getName().equals(PName.REACHABILITY_PROPERTY)).count();
+  			long nIsolation = source.getRequirements().values().stream().filter(r -> r.getCrossedTrafficFlow(ipAddress).getName().equals(PName.ISOLATION_PROPERTY)).count();
   			if(nIsolation >= nReachability) setDefaultAction(false);
   			else setDefaultAction(true);
   			//leave uncommented if you want "whitelisting" approach
@@ -359,7 +361,7 @@ public class PacketFilter extends GenericFunction{
   		 * This sections generates all the constraints to satisfy reachability and isolation requirements.
   		 */
   		
-  		for(SecurityRequirement sr : source.getRequirements().values()) {
+  		for(TrafficFlow sr : source.getRequirements().values()) {
   			generateSatifiabilityConstraint(sr);
   		}
   	
@@ -372,10 +374,10 @@ public class PacketFilter extends GenericFunction{
 	 */
 	private int minizimePlaceholderRules() {
 		
-		List<SecurityRequirement> allProperties = source.getRequirements().values().stream().collect(Collectors.toList());
-		List<SecurityRequirement> interestedProperties = allProperties.stream().filter(p -> {
-			boolean pruning = (p.getProperty().getName().value().equals("IsolationProperty") && blacklisting)
-					|| (p.getProperty().getName().value().equals("ReachabilityProperty") && !blacklisting);
+		List<TrafficFlow> allProperties = source.getRequirements().values().stream().collect(Collectors.toList());
+		List<TrafficFlow> interestedProperties = allProperties.stream().filter(p -> {
+			boolean pruning = (p.getCrossedTrafficFlow(ipAddress).getName().value().equals("IsolationProperty") && blacklisting)
+					|| (p.getCrossedTrafficFlow(ipAddress).getName().value().equals("ReachabilityProperty") && !blacklisting);
 			// if the pruning must be disabled
 			// return true;
 			return pruning;
@@ -384,14 +386,14 @@ public class PacketFilter extends GenericFunction{
 		int minimizedRules = interestedProperties.size();
 		
 		if (!allProperties.isEmpty()) {
-			List<String> destinations = allProperties.stream().map(p -> p.getProperty().getDst()).distinct()
+			List<String> destinations = allProperties.stream().map(p -> p.getCrossedTrafficFlow(ipAddress).getDst()).distinct()
 					.collect(Collectors.toList());
 			for (String destination : destinations) {
 				Set<String> interestedSRC = interestedProperties.stream()
-						.filter(p -> p.getProperty().getDst().equals(destination)).map(p -> p.getProperty().getSrc()).distinct()
+						.filter(p -> p.getCrossedTrafficFlow(ipAddress).getDst().equals(destination)).map(p -> p.getCrossedTrafficFlow(ipAddress).getSrc()).distinct()
 						.collect(Collectors.toSet());
-				Set<String> notInterestedSRC = allProperties.stream().filter(p -> p.getProperty().getDst().equals(destination))
-						.map(p -> p.getProperty().getSrc()).distinct().collect(Collectors.toSet());
+				Set<String> notInterestedSRC = allProperties.stream().filter(p -> p.getCrossedTrafficFlow(ipAddress).getDst().equals(destination))
+						.map(p -> p.getCrossedTrafficFlow(ipAddress).getSrc()).distinct().collect(Collectors.toSet());
 				notInterestedSRC.removeAll(interestedSRC);
 				if (!interestedSRC.isEmpty()
 						&& wildcardManager.areAggregable(interestedSRC, notInterestedSRC)) {
@@ -410,10 +412,10 @@ public class PacketFilter extends GenericFunction{
 	 * This method generates the hard constraint to satisfy a requirement for an automatically configured firewall.
 	 * @param sr it is the security requirement
 	 */
-	private void generateSatifiabilityConstraint(SecurityRequirement sr) {
+	private void generateSatifiabilityConstraint(TrafficFlow sr) {
 		
 		BoolExpr firstA = used;
-		BoolExpr secondA = sr.getProperty().getName().equals(PName.ISOLATION_PROPERTY) ? 
+		BoolExpr secondA = sr.getCrossedTrafficFlow(ipAddress).getName().equals(PName.ISOLATION_PROPERTY) ? 
 				ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdRequirement())), ctx.mkTrue()):
 				ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdRequirement())), ctx.mkFalse());
 		BoolExpr firstC = blacklisting? ctx.mkEq(defaultAction, ctx.mkTrue()) : ctx.mkEq(defaultAction, ctx.mkFalse());
@@ -422,19 +424,19 @@ public class PacketFilter extends GenericFunction{
 		for(int i = 0; i < nRules; i++) {
 			BoolExpr component1 = ctx.mkNot(notConfiguredConditions.get(i));
 			BoolExpr component2 = ctx.mkAnd(
-						nctx.equalIpAddressToPFRule(sr.getProperty().getSrc(), srcConditions.get(i)),
-						nctx.equalIpAddressToPFRule(sr.getProperty().getDst(), dstConditions.get(i)),
-	 					nctx.equalPortRangeToPFRule(sr.getProperty().getSrcPort(), portSConditions.get(i)),
-	 					nctx.equalPortRangeToPFRule(sr.getProperty().getDstPort(), portDConditions.get(i)),
-	 					nctx.equalLv4ProtoToFwLv4Proto(sr.getProperty().getLv4Proto().ordinal(), l4Conditions.get(i))
+						nctx.equalIpAddressToPFRule(sr.getCrossedTrafficFlow(ipAddress).getSrc(), srcConditions.get(i)),
+						nctx.equalIpAddressToPFRule(sr.getCrossedTrafficFlow(ipAddress).getDst(), dstConditions.get(i)),
+	 					nctx.equalPortRangeToPFRule(sr.getCrossedTrafficFlow(ipAddress).getSrcPort(), portSConditions.get(i)),
+	 					nctx.equalPortRangeToPFRule(sr.getCrossedTrafficFlow(ipAddress).getDstPort(), portDConditions.get(i)),
+	 					nctx.equalLv4ProtoToFwLv4Proto(sr.getCrossedTrafficFlow(ipAddress).getLv4Proto().ordinal(), l4Conditions.get(i))
 	 					);
-			BoolExpr secondCPart = ((blacklisting && sr.getProperty().getName().equals(PName.ISOLATION_PROPERTY)) || (!blacklisting && sr.getProperty().getName().equals(PName.REACHABILITY_PROPERTY))) ?
+			BoolExpr secondCPart = ((blacklisting && sr.getCrossedTrafficFlow(ipAddress).getName().equals(PName.ISOLATION_PROPERTY)) || (!blacklisting && sr.getCrossedTrafficFlow(ipAddress).getName().equals(PName.REACHABILITY_PROPERTY))) ?
 					ctx.mkAnd(component1, component2) : ctx.mkNot(ctx.mkAnd(component1, component2));
 			listSecondC.add(secondCPart);
 		}
 		
 		BoolExpr[] tmp = new BoolExpr[listSecondC.size()];
-		BoolExpr secondC = ((blacklisting && sr.getProperty().getName().equals(PName.ISOLATION_PROPERTY)) || (!blacklisting && sr.getProperty().getName().equals(PName.REACHABILITY_PROPERTY))) ?
+		BoolExpr secondC = ((blacklisting && sr.getCrossedTrafficFlow(ipAddress).getName().equals(PName.ISOLATION_PROPERTY)) || (!blacklisting && sr.getCrossedTrafficFlow(ipAddress).getName().equals(PName.REACHABILITY_PROPERTY))) ?
 				ctx.mkOr(listSecondC.toArray(tmp)) : ctx.mkAnd(listSecondC.toArray(tmp));
 		
 		constraints.add(ctx.mkImplies(ctx.mkAnd(firstA, secondA), ctx.mkAnd(firstC, secondC)));
@@ -446,10 +448,10 @@ public class PacketFilter extends GenericFunction{
 	 * This method generates the hard constraint to satisfy a requirement for an manually configured firewall.
 	 * @param sr it is the security requirement
 	 */
-	private void generateManualSatifiabilityConstraint(SecurityRequirement sr) {
+	private void generateManualSatifiabilityConstraint(TrafficFlow sr) {
 		
 		BoolExpr firstA = used;
-		BoolExpr secondA = sr.getProperty().getName().equals(PName.ISOLATION_PROPERTY) ? 
+		BoolExpr secondA = sr.getCrossedTrafficFlow(ipAddress).getName().equals(PName.ISOLATION_PROPERTY) ? 
 				ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdRequirement())), ctx.mkTrue()):
 				ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdRequirement())), ctx.mkFalse());
 		BoolExpr firstC = blacklisting? ctx.mkEq(defaultAction, ctx.mkTrue()) : ctx.mkEq(defaultAction, ctx.mkFalse());
@@ -457,19 +459,19 @@ public class PacketFilter extends GenericFunction{
 		List<BoolExpr> listSecondC = new ArrayList<>();
 		for(int i = 0; i < nRules; i++) {
 			BoolExpr component2 = ctx.mkAnd(
-						nctx.equalIpAddressToPFRule(sr.getProperty().getSrc(), srcConditions.get(i)),
-						nctx.equalIpAddressToPFRule(sr.getProperty().getDst(), dstConditions.get(i)),
-	 					nctx.equalPortRangeToPFRule(sr.getProperty().getSrcPort(), portSConditions.get(i)),
-	 					nctx.equalPortRangeToPFRule(sr.getProperty().getDstPort(), portDConditions.get(i)),
-	 					nctx.equalLv4ProtoToFwLv4Proto(sr.getProperty().getLv4Proto().ordinal(), l4Conditions.get(i))
+						nctx.equalIpAddressToPFRule(sr.getCrossedTrafficFlow(ipAddress).getSrc(), srcConditions.get(i)),
+						nctx.equalIpAddressToPFRule(sr.getCrossedTrafficFlow(ipAddress).getDst(), dstConditions.get(i)),
+	 					nctx.equalPortRangeToPFRule(sr.getCrossedTrafficFlow(ipAddress).getSrcPort(), portSConditions.get(i)),
+	 					nctx.equalPortRangeToPFRule(sr.getCrossedTrafficFlow(ipAddress).getDstPort(), portDConditions.get(i)),
+	 					nctx.equalLv4ProtoToFwLv4Proto(sr.getCrossedTrafficFlow(ipAddress).getLv4Proto().ordinal(), l4Conditions.get(i))
 	 					);
-			BoolExpr secondCPart = ((blacklisting && sr.getProperty().getName().equals(PName.ISOLATION_PROPERTY)) || (!blacklisting && sr.getProperty().getName().equals(PName.REACHABILITY_PROPERTY))) ?
+			BoolExpr secondCPart = ((blacklisting && sr.getCrossedTrafficFlow(ipAddress).getName().equals(PName.ISOLATION_PROPERTY)) || (!blacklisting && sr.getCrossedTrafficFlow(ipAddress).getName().equals(PName.REACHABILITY_PROPERTY))) ?
 					component2 : ctx.mkNot(component2);
 			listSecondC.add(secondCPart);
 		}
 		
 		BoolExpr[] tmp = new BoolExpr[listSecondC.size()];
-		BoolExpr secondC = ((blacklisting && sr.getProperty().getName().equals(PName.ISOLATION_PROPERTY)) || (!blacklisting && sr.getProperty().getName().equals(PName.REACHABILITY_PROPERTY))) ?
+		BoolExpr secondC = ((blacklisting && sr.getCrossedTrafficFlow(ipAddress).getName().equals(PName.ISOLATION_PROPERTY)) || (!blacklisting && sr.getCrossedTrafficFlow(ipAddress).getName().equals(PName.REACHABILITY_PROPERTY))) ?
 				ctx.mkOr(listSecondC.toArray(tmp)) : ctx.mkAnd(listSecondC.toArray(tmp));
 		
 		constraints.add(ctx.mkImplies(ctx.mkAnd(firstA, secondA), ctx.mkAnd(firstC, secondC)));

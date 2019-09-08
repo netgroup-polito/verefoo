@@ -10,7 +10,7 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.Optimize;
 
 import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.graph.SecurityRequirement;
+import it.polito.verefoo.graph.TrafficFlow;
 import it.polito.verigraph.extra.PacketModel;
 import it.polito.verigraph.solver.NetContext;
 
@@ -109,7 +109,7 @@ public class EndHost extends GenericFunction {
     }
     
     public void configureEndHost() {
-    	for(SecurityRequirement sr : source.getRequirements().values()) {
+    	for(TrafficFlow sr : source.getRequirements().values()) {
     		constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdRequirement())), ctx.mkFalse()));
     	}
     }
