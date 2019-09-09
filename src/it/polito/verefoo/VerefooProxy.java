@@ -22,6 +22,7 @@ import it.polito.verefoo.graph.RequirementPath;
 import it.polito.verefoo.graph.TrafficFlow;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
+import it.polito.verefoo.jaxb.Path.PathNode;
 import it.polito.verigraph.extra.VerificationResult;
 import it.polito.verigraph.solver.*;
 import it.polito.verigraph.solver.Checker.Prop;
@@ -35,6 +36,7 @@ public class VerefooProxy {
 	private Context ctx;
 	private NetContext nctx;
 	private List<Property> properties;
+	private List<Path> paths;
 	private WildcardManager wildcardManager;
 	private HashMap<String, AllocationNode> allocationNodes;
 	private HashMap<Integer, TrafficFlow> trafficFlowsMap;
@@ -66,6 +68,7 @@ public class VerefooProxy {
 		cfg.put("model", "true");
 		ctx = new Context(cfg);
 		properties = prop;
+		this.paths = paths;
 		nodes = graph.getNode();
 		nodes.forEach(n -> allocationNodes.put(n.getName(), new AllocationNode(n)));
 		this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
@@ -185,19 +188,47 @@ public class VerefooProxy {
 		int id = 0;
 		for(Property property : properties) {
 			List<AllocationNode> nodes = new ArrayList<>();
-			Set<String> visited = new HashSet<>();
-			AllocationNode source = allocationNodes.get(property.getSrc());
-			AllocationNode destination = allocationNodes.get(property.getDst());
-			boolean found = recursivePathGeneration(nodes, source, destination, source, visited, 0);
-			visited.clear();
+			
+			//first, this method finds if a forwarding path has been defined by the user
+			Path definedPath = null;
+			if(paths != null) {
+				for(Path p : paths) {
+					String first = p.getPathNode().get(0).getName();
+					String last = p.getPathNode().get(p.getPathNode().size()-1).getName();
+					if(first.equals(property.getSrc()) && last.equals(property.getDst())) {
+						definedPath = p;
+					}	
+				}
+			}
+			
+			
+			boolean found = false;
+			//if no forwarding path has been defined by the user, the framework searches for at least an existing path
+			if(definedPath == null) {
+				Set<String> visited = new HashSet<>();
+				AllocationNode source = allocationNodes.get(property.getSrc());
+				AllocationNode destination = allocationNodes.get(property.getDst());
+				found = recursivePathGeneration(nodes, source, destination, source, visited, 0);
+				visited.clear();
+			}else {
+				//otherwise, the nodes of the path are simply put in the list
+				found = true;
+				for(PathNode pn : definedPath.getPathNode()) {
+					AllocationNode an = allocationNodes.get(pn.getName());
+					nodes.add(an);
+				}
+			}
+			
 			if(found) {
 				RequirementPath rp = new RequirementPath(nodes);
 				TrafficFlow sr = new TrafficFlow(property, rp, id);
 				SRMap.put(id, sr);
 				id++;
 			} else {
-				System.out.println("ERROR");
+				throw new BadGraphError("There is no path between " + property.getSrc() + " and " + property.getDst(),
+						EType.INVALID_SERVICE_GRAPH);
 			}
+		
 		}
 		
 		return SRMap;

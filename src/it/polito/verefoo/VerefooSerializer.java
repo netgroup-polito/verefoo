@@ -53,7 +53,7 @@ public class VerefooSerializer {
 							EType.INVALID_PROPERTY_DEFINITION);
 				VerefooProxy test = new VerefooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(),
 						prop, paths);
-				
+
 				long beginAll = System.currentTimeMillis();
 				VerificationResult res = test.checkNFFGProperty();
 				long endAll = System.currentTimeMillis();
