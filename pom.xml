@@ -141,7 +141,13 @@
 			<version>2.3.2</version>
 			<type>test-jar</type>
 		</dependency>
-
+		<dependency>
+			<groupId>com.microsoft</groupId>
+			<artifactId>z3</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${env.Z3}/com.microsoft.z3.jar</systemPath>
+		</dependency>
 
 
 		<dependency>
@@ -155,15 +161,6 @@
 			<artifactId>activation</artifactId>
 			<version>1.1.1</version>
 		</dependency>
-
-       <dependency>
-			<groupId>com.microsoft</groupId>
-			<artifactId>z3</artifactId>
-			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${env.Z3}/com.microsoft.z3.jar</systemPath>
-		</dependency>
-		
 	</dependencies>
 	<properties>
 		<jersey2.version>2.19</jersey2.version>
@@ -201,23 +198,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>it.polito.verefoo.test.TestPerformanceScalability</mainClass>
-						</manifest>
-					</archive>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-				
-			</plugin>
-			
-
-			
-			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
 				<version>0.13.2</version>
@@ -239,7 +219,28 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.13.2</version>
+				<executions>
+					<execution>
+						<id>add-source-for-murcia</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<schemaDirectory>xsd/</schemaDirectory>
+							<schemaIncludes>
+								<include>murcia.xsd</include>
+							</schemaIncludes>
+							<generateDirectory>gen-src/</generateDirectory>
+							<generatePackage>it.polito.verefoo.murcia.jaxb</generatePackage>
+							<!-- Other configuration options -->
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<repositories>
