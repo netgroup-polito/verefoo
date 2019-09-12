@@ -635,20 +635,20 @@ public class NetContext {
 
 
 	public BoolExpr equalPortRangeToPFRule(String srcPort, Expr rule) {
-		
 		Expr port_expr1 = portMap.get(srcPort);
 		return ctx.mkOr(
         		ctx.mkAnd(
         						ctx.mkEq((IntExpr)portFunctionsMap.get("start").apply(port_expr1), (IntExpr)portFunctionsMap.get("start").apply(rule)),
         						ctx.mkEq((IntExpr)portFunctionsMap.get("end").apply(port_expr1), (IntExpr)portFunctionsMap.get("end").apply(rule))
         				),
-        		ctx.mkEq(rule, portMap.get("null")));
+        		ctx.mkEq(rule, portMap.get("null")),
+        		ctx.mkEq(portMap.get(srcPort), portMap.get("null")));
 	}
 
 
 
 	public BoolExpr equalLv4ProtoToFwLv4Proto(int proto1, Expr proto2) {
-		return ctx.mkOr(ctx.mkEq(ctx.mkInt(proto1), proto2),ctx.mkEq(proto2, ctx.mkInt(0)));
+		return ctx.mkOr(ctx.mkEq(ctx.mkInt(proto1), proto2),ctx.mkEq(proto2, ctx.mkInt(0)), ctx.mkEq(ctx.mkInt(proto1), ctx.mkInt(0)));
 	}
 
 }

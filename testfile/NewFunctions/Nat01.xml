@@ -36,7 +36,7 @@
 		        </configuration>
 			</node>
 			
-				<node functional_type="FORWARDER" name="20.0.0.2">
+				<node functional_type="FIREWALL" name="20.0.0.2">
 				<neighbour name="20.0.0.1" />
 				<neighbour name="30.0.5.2" />
 				<configuration description="A simple description" name="conf1">
@@ -69,7 +69,8 @@
 			dst="30.0.5.2" />
 			<Property graph="0" name="IsolationProperty" src="30.0.5.2"
 			dst="10.0.0.1" />
-			
+			<Property graph="0" name="IsolationProperty" src="10.0.0.2"
+			dst="30.0.5.2" />
 
 
 	</PropertyDefinition>
