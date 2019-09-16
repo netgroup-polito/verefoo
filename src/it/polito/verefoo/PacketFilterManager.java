@@ -83,7 +83,7 @@ public class PacketFilterManager {
 			boolean pruning = (p.getName().value().equals("IsolationProperty") && firewall.isBlacklisting())
 					|| (p.getName().value().equals("ReachabilityProperty") && !firewall.isBlacklisting());
 			// if the pruning must be disabled
-			// return true;
+			//return true;
 			return pruning;
 		}).collect(Collectors.toList());
 
@@ -139,12 +139,19 @@ public class PacketFilterManager {
 				}
 				if (value._1.isAutoconfigured()) {
 					if(value._2.getNode().getName().equals("1.0.0.12")) {
-						value._1.automaticConfiguration(value._3);
+						value._1.automaticConfiguration(7);
 						System.out.println(value._3);
 					}
-					else
+					else if(value._2.getNode().getName().equals("1.0.0.8")) {
+						value._1.automaticConfiguration(value._3);
+						System.out.println(value._3);
+					}else {
+						System.out.println(value._3);
 						value._1.automaticConfiguration(1);
 
+					}
+					
+					
 				} else {
 					value._1.manualConfiguration();
 				}

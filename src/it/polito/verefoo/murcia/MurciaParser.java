@@ -37,14 +37,16 @@ public class MurciaParser {
 
 	public void parseNFV() {
 		
+		int number_node = 1;
+		
 		for(Node node : result.getGraphs().getGraph().get(0).getNode()) {
 			if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
 				Firewall verefooFirewall = node.getConfiguration().getFirewall();
 				ITResourceType resource = new ITResourceType();
 				RuleSetConfiguration configuration = new RuleSetConfiguration();
 				configuration.setResolutionStrategy(new ResolutionStrategy());
-				configuration.setName("ConfFW");
-				
+				configuration.setName("ConfFW" + number_node);
+				number_node++;
 				
 				/* Create packet fitlering capability */
 				FilteringCapability filteringCapability = new FilteringCapability();

@@ -63,12 +63,12 @@ public class TestPerformanceScalability {
 	//seed , numberAP, numberPR, runs
 	public static void main(String[] args)  {
 		System.out.println(args.length);
-		if(args.length!=4) return;
+		//if(args.length!=4) return;
 		
-        seed  = Integer.parseInt(args[0]);
-        numberAP  = Integer.parseInt(args[1]);
-        numberPR  = Integer.parseInt(args[2]);
-        runs = Integer.parseInt(args[3]);
+        seed  = 214365;
+        numberAP  = 5;
+        numberPR  = 80;
+        runs = 30;
         testScalabilityPerformance();
 	}
 	

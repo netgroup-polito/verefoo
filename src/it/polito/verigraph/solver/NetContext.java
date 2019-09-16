@@ -68,7 +68,7 @@ public class NetContext {
 
     // weights
     public final int WPROTOWILDCARD   = 1000;
-    public final int WIPWILDCARD   = 100;
+    public final int WIPWILDCARD   = -100;
     public final int WAUTOCONF   = 1000;
     public final int WAUTOPLACEMENT   = 100000000;
     public final int WPORTS   = 1000;
@@ -512,28 +512,20 @@ public class NetContext {
     					ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(fwIpRule), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
     					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(fwIpRule), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
     					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(fwIpRule), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
-    		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(packet_ip), ipFunctionsMap.get("ipAddr_1").apply(addressMap.get("wildcard"))),
-    					ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(packet_ip), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
-    					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(packet_ip), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
-    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(packet_ip), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
     		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(packet_ip), ipFunctionsMap.get("ipAddr_1").apply(fwIpRule)),
-    		  			ctx.mkOr(ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(fwIpRule), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
+    		  			ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(fwIpRule), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
 	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(fwIpRule), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
-	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(fwIpRule), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
-    		  					ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(packet_ip), ipFunctionsMap.get("ipAddr_2").apply(addressMap.get("wildcard"))),
-	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(packet_ip), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
-	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(packet_ip), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))))),
+	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(fwIpRule), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard"))))),
+    		  				
     		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(packet_ip), ipFunctionsMap.get("ipAddr_1").apply(fwIpRule)),
     		  			ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(packet_ip), ipFunctionsMap.get("ipAddr_2").apply(fwIpRule)),
-    		  			ctx.mkOr(ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(fwIpRule), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
-	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(fwIpRule), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
-    		  					ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(packet_ip), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
-	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(packet_ip), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))))),
+    		  			ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(fwIpRule), ipFunctionsMap.get("ipAddr_3").apply(addressMap.get("wildcard"))),
+	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(fwIpRule), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard"))))),
+    		  					
     		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(packet_ip), ipFunctionsMap.get("ipAddr_1").apply(fwIpRule)),
   		  				ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(packet_ip), ipFunctionsMap.get("ipAddr_2").apply(fwIpRule)),
   		  				ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(packet_ip), ipFunctionsMap.get("ipAddr_3").apply(fwIpRule)),
-  		  				ctx.mkOr(ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(fwIpRule), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard"))),
-	    	    					ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(packet_ip), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard"))))),
+  		  				ctx.mkEq(ipFunctionsMap.get("ipAddr_4").apply(fwIpRule), ipFunctionsMap.get("ipAddr_4").apply(addressMap.get("wildcard")))),
     		  ctx.mkAnd(ctx.mkEq(ipFunctionsMap.get("ipAddr_1").apply(fwIpRule), ipFunctionsMap.get("ipAddr_1").apply(packet_ip)),
   	  				ctx.mkEq(ipFunctionsMap.get("ipAddr_2").apply(fwIpRule), ipFunctionsMap.get("ipAddr_2").apply(packet_ip)),
   	  				ctx.mkEq(ipFunctionsMap.get("ipAddr_3").apply(fwIpRule), ipFunctionsMap.get("ipAddr_3").apply(packet_ip)),

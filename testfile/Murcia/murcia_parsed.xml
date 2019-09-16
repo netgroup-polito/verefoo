@@ -19,15 +19,29 @@
                 <configurationCondition xsi:type="FilteringConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
-                        <SourceAddress>220.126.19.0/24</SourceAddress>
-                        <DestinationAddress>220.126.18.4</DestinationAddress>
+                        <SourceAddress>17.56.26.0/24</SourceAddress>
+                        <DestinationAddress>17.56.27.0/24</DestinationAddress>
                     </packetFilterCondition>
                 </configurationCondition>
                 <Name>Rule 0</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
+            <configurationRule>
+                <configurationRuleAction xsi:type="FilteringAction">
+                    <FilteringActionType>ALLOW</FilteringActionType>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>17.56.27.0/24</SourceAddress>
+                        <DestinationAddress>17.56.26.0/24</DestinationAddress>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <Name>Rule 1</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
             <resolutionStrategy/>
-            <Name>ConfFW</Name>
+            <Name>ConfFW1</Name>
         </configuration>
     </ITResource>
     <ITResource>
@@ -49,16 +63,98 @@
                 <configurationCondition xsi:type="FilteringConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
-                        <SourceAddress>220.126.18.9</SourceAddress>
-                        <DestinationAddress>176.58.64.0/24</DestinationAddress>
-                        <DestinationPort>80</DestinationPort>
+                        <SourceAddress>94.142.250.0/24</SourceAddress>
+                        <DestinationAddress>165.165.167.0/24</DestinationAddress>
                     </packetFilterCondition>
                 </configurationCondition>
                 <Name>Rule 0</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
+            <configurationRule>
+                <configurationRuleAction xsi:type="FilteringAction">
+                    <FilteringActionType>ALLOW</FilteringActionType>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>165.165.167.0/24</SourceAddress>
+                        <DestinationAddress>220.220.223.0/24</DestinationAddress>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <Name>Rule 1</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <configurationRule>
+                <configurationRuleAction xsi:type="FilteringAction">
+                    <FilteringActionType>ALLOW</FilteringActionType>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>165.165.167.0/24</SourceAddress>
+                        <DestinationAddress>94.142.250.0/24</DestinationAddress>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <Name>Rule 2</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <configurationRule>
+                <configurationRuleAction xsi:type="FilteringAction">
+                    <FilteringActionType>ALLOW</FilteringActionType>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>94.142.250.0/24</SourceAddress>
+                        <DestinationAddress>220.220.223.0/24</DestinationAddress>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <Name>Rule 3</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <configurationRule>
+                <configurationRuleAction xsi:type="FilteringAction">
+                    <FilteringActionType>ALLOW</FilteringActionType>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>94.142.249.1</SourceAddress>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <Name>Rule 4</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <configurationRule>
+                <configurationRuleAction xsi:type="FilteringAction">
+                    <FilteringActionType>ALLOW</FilteringActionType>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>220.220.223.0/24</SourceAddress>
+                        <DestinationAddress>165.165.167.0/24</DestinationAddress>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <Name>Rule 5</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <configurationRule>
+                <configurationRuleAction xsi:type="FilteringAction">
+                    <FilteringActionType>ALLOW</FilteringActionType>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>220.220.223.0/24</SourceAddress>
+                        <DestinationAddress>94.142.250.0/24</DestinationAddress>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <Name>Rule 6</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
             <resolutionStrategy/>
-            <Name>ConfFW</Name>
+            <Name>ConfFW2</Name>
         </configuration>
     </ITResource>
 </ITResourceOrchestration>
