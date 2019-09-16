@@ -52,7 +52,7 @@ public class Main {
 					loggerResult.info(stringWriter.toString());
 					loggerResult.info("--------------------------------------------------");
 					//System.out.println(stringWriter);
-					System.out.println(test.getZ3Model());
+					//System.out.println(test.getZ3Model());
 				} else {
 					loggerResult.info("UNSAT");
 					loggerResult.info("----------------------OUTPUT----------------------");

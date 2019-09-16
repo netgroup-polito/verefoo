@@ -6,115 +6,115 @@
 		
 			<!-- CompanyA -->
 			
-			<node functional_type="WEBCLIENT" name="220.220.220.1">
+			<node functional_type="WEBCLIENT" name="220.220.220.-1">
 				<neighbour name="1.0.0.1" />
 				<configuration description="A simple description" name="officeA1">
-					<webclient nameWebServer="17.56.26.1" />
+					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 		
-			<node functional_type="WEBCLIENT" name="220.220.220.2">
+			<node functional_type="WEBCLIENT" name="220.220.221.-1">
 				<neighbour name="1.0.0.2" />
 				<configuration description="A simple description" name="officeA2">
-					<webclient nameWebServer="17.56.26.1" />
+					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 			
-			<node functional_type="WEBCLIENT" name="220.220.220.3">
+			<node functional_type="WEBCLIENT" name="220.220.223.-1">
 				<neighbour name="1.0.0.3" />
 				<configuration description="A simple description" name="businessOfficeBA">
-					<webclient nameWebServer="17.56.26.1" />
+					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 			
-			<node functional_type="WEBCLIENT" name="220.220.220.4">
-				<neighbour name="220.220.220.6" />
+			<node functional_type="WEBCLIENT" name="220.220.224.1">
+				<neighbour name="220.220.224.3" />
 				<configuration description="A simple description" name="bycicle">
-					<webclient nameWebServer="17.56.26.1" />
+					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 			
-			<node functional_type="WEBCLIENT" name="220.220.220.5">
-				<neighbour name="220.220.220.6" />
+			<node functional_type="WEBCLIENT" name="220.220.224.2">
+				<neighbour name="220.220.224.3" />
 				<configuration description="A simple description" name="car">
-					<webclient nameWebServer="17.56.26.1" />
+					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 			
 			<node name="1.0.0.1">
-				<neighbour name="220.220.220.1" />
-				<neighbour name="220.220.220.6" />
+				<neighbour name="220.220.220.-1" />
+				<neighbour name="220.220.224.3" />
 			</node>
 			
 			<node name="1.0.0.2">
-				<neighbour name="220.220.220.2" />
-				<neighbour name="220.220.220.6" />
+				<neighbour name="220.220.221.-1" />
+				<neighbour name="220.220.224.3" />
 			</node>
 			
 			<node name="1.0.0.3">
-				<neighbour name="220.220.220.3" />
-				<neighbour name="220.220.220.6" />
+				<neighbour name="220.220.223.-1" />
+				<neighbour name="220.220.224.3" />
 			</node>
 			
 			
-			<node functional_type="FORWARDER" name="220.220.220.6">
+			<node functional_type="FORWARDER" name="220.220.224.3">
 				<neighbour name="1.0.0.1" />
 				<neighbour name="1.0.0.2" />
 				<neighbour name="1.0.0.3" />
-				<neighbour name="220.220.220.4" />
-				<neighbour name="220.220.220.5" />
+				<neighbour name="220.220.224.1" />
+				<neighbour name="220.220.224.2" />
 				<neighbour name="1.0.0.12" />
 			</node>
 			
 			
 			<!--  Company B --> 
 			
-			<node functional_type="WEBCLIENT" name="165.165.165.1">
+			<node functional_type="WEBCLIENT" name="165.165.165.-1">
 				<neighbour name="1.0.0.4" />
 				<configuration description="A simple description" name="officeB1">
-					<webclient nameWebServer="17.56.26.1" />
+					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 		
-			<node functional_type="WEBCLIENT" name="165.165.165.2">
+			<node functional_type="WEBCLIENT" name="165.165.166.-1">
 				<neighbour name="1.0.0.4" />
 				<configuration description="A simple description" name="officeB2">
-					<webclient nameWebServer="17.56.26.1" />
+					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 			
-			<node functional_type="WEBCLIENT" name="165.165.165.3">
+			<node functional_type="WEBCLIENT" name="165.165.167.-1">
 				<neighbour name="1.0.0.5" />
 				<configuration description="A simple description" name="businessOfficeBB">
-					<webclient nameWebServer="17.56.26.1" />
+					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 			
-			<node functional_type="WEBCLIENT" name="165.165.165.4">
+			<node functional_type="WEBCLIENT" name="165.165.168.1">
 				<neighbour name="1.0.0.4" />
 				<configuration description="A simple description" name="car">
-					<webclient nameWebServer="17.56.26.1" />
+					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 			
-			<node functional_type="WEBCLIENT" name="165.165.165.5">
+			<node functional_type="WEBCLIENT" name="165.165.168.2">
 				<neighbour name="1.0.0.4" />
 				<configuration description="A simple description" name="bicycle">
-					<webclient nameWebServer="17.56.26.1" />
+					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 			
 			<node  name="1.0.0.4">
-				<neighbour name="165.165.165.1" />
-				<neighbour name="165.165.165.2" />
-				<neighbour name="165.165.165.4" />
-				<neighbour name="165.165.165.5" />
+				<neighbour name="165.165.165.-1" />
+				<neighbour name="165.165.166.-1" />
+				<neighbour name="165.165.168.1" />
+				<neighbour name="165.165.168.2" />
 				<neighbour name="1.0.0.5" />
 				<neighbour name="1.0.0.12" />
 			</node>
 			
 			<node name="1.0.0.5">
-				<neighbour name="165.165.165.3" />
+				<neighbour name="165.165.167.-1" />
 				<neighbour name="1.0.0.4" />
 			</node>
 			
@@ -124,14 +124,14 @@
 			<node functional_type="WEBCLIENT" name="94.142.249.1">
 				<neighbour name="1.0.0.6" />
 				<configuration description="A simple description" name="iotController">
-					<webclient nameWebServer="17.56.26.1" />
+					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 		
-			<node functional_type="WEBCLIENT" name="94.142.249.2">
+			<node functional_type="WEBCLIENT" name="94.142.250.-1">
 				<neighbour name="1.0.0.7" />
 				<configuration description="A simple description" name="businessOfficeBI">
-					<webclient nameWebServer="17.56.26.1" />
+					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 			
@@ -143,66 +143,62 @@
 			</node>
 			
 			<node  name="1.0.0.7">
-				<neighbour name="94.142.249.2" />
+				<neighbour name="94.142.250.-1" />
 				<neighbour name="1.0.0.6" />
 			</node>
 			
 			
 			<!-- Company S -->
 			
-			<node functional_type="WEBSERVER" name="17.56.26.1">
-				<neighbour name="17.56.26.5" />
+			<node functional_type="WEBSERVER" name="17.56.26.-1">
+				<neighbour name="17.56.29.2" />
 				<configuration description="A simple description" name="serverRoomS1">
 					<webserver>
-						<name>17.56.26.1</name>
+						<name>17.56.26.-1</name>
 					</webserver>
 				</configuration>
 			</node>
 			
-			<node functional_type="WEBSERVER" name="17.56.26.2">
-				<neighbour name="17.56.26.6" />
+			<node functional_type="WEBSERVER" name="17.56.27.-1">
+				<neighbour name="1.0.0.9" />
 				<configuration description="A simple description" name="serverRoomS2">
 					<webserver>
-						<name>17.56.26.2</name>
+						<name>17.56.27.-1</name>
 					</webserver>
 				</configuration>
 			</node>
 			
-			<node functional_type="WEBSERVER" name="17.56.26.3">
-				<neighbour name="17.56.26.6" />
+			<node functional_type="WEBSERVER" name="17.56.28.-1">
+				<neighbour name="1.0.0.9" />
 				<configuration description="A simple description" name="serverRoomS3">
 					<webserver>
-						<name>17.56.26.3</name>
+						<name>17.56.28.-1</name>
 					</webserver>
 				</configuration>
 			</node>
 			
-			<node functional_type="WEBCLIENT" name="17.56.26.4">
+			<node functional_type="WEBCLIENT" name="17.56.29.1">
 				<neighbour name="1.0.0.10" />
 				<configuration description="A simple description" name="thermostat">
-					<webclient nameWebServer="17.56.26.1" />
+					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 			
-			<node functional_type="FORWARDER" name="17.56.26.5">
-				<neighbour name="17.56.26.1" />
+			<node functional_type="FORWARDER" name="17.56.29.2">
+				<neighbour name="17.56.26.-1" />
 				<neighbour name="1.0.0.8" />
 			</node>
 			
-			<node functional_type="FORWARDER" name="17.56.26.6">
-				<neighbour name="17.56.26.2" />
-				<neighbour name="17.56.26.3" />
-				<neighbour name="1.0.0.9" />
-			</node>
-			
+		
 			
 			<node name="1.0.0.8">
-				<neighbour name="17.56.26.5" />
+				<neighbour name="17.56.29.2" />
 				<neighbour name="1.0.0.10" />
 			</node>
 			
 			<node name="1.0.0.9">
-				<neighbour name="17.56.26.6" />
+				<neighbour name="17.56.27.-1" />
+				<neighbour name="17.56.28.-1" />
 				<neighbour name="1.0.0.10" />
 			</node>
 			
@@ -210,7 +206,7 @@
 				<neighbour name="1.0.0.8" />
 				<neighbour name="1.0.0.9" />
 				<neighbour name="1.0.0.12" />
-				<neighbour name="17.56.26.4" />
+				<neighbour name="17.56.29.1" />
 			</node>
 			
 			
@@ -235,7 +231,7 @@
 			<!-- Central -->
 			
 			<node name="1.0.0.12">
-				<neighbour name="220.220.220.6" />
+				<neighbour name="220.220.224.3" />
 				<neighbour name="1.0.0.4" />
 				<neighbour name="1.0.0.6" />
 				<neighbour name="1.0.0.10" />
@@ -252,41 +248,41 @@
 	<PropertyDefinition>
 		
 			<!-- First Policy -->
-			<Property graph="0" name="ReachabilityProperty" src="220.220.220.1" dst="220.220.220.2" />
-			<Property graph="0" name="ReachabilityProperty" src="165.165.165.1" dst="165.165.165.2" />
+			<Property graph="0" name="ReachabilityProperty" src="220.220.220.-1" dst="220.220.221.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="165.165.165.-1" dst="165.165.166.-1" />
 			
 			
 			<!-- Second Policy -->
-			<Property graph="0" name="ReachabilityProperty" src="220.220.220.3" dst="165.165.165.3" />
-			<Property graph="0" name="ReachabilityProperty" src="220.220.220.3" dst="94.142.249.2" />
-			<Property graph="0" name="ReachabilityProperty" src="165.165.165.3" dst="220.220.220.3" />
-			<Property graph="0" name="ReachabilityProperty" src="165.165.165.3" dst="94.142.249.2" />
-			<Property graph="0" name="ReachabilityProperty" src="94.142.249.2" dst="220.220.220.3" />
-			<Property graph="0" name="ReachabilityProperty" src="94.142.249.2" dst="165.165.165.3" />
+			<Property graph="0" name="ReachabilityProperty" src="220.220.223.-1" dst="165.165.167.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="220.220.223.-1" dst="94.142.250.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="165.165.167.-1" dst="220.220.223.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="165.165.167.-1" dst="94.142.250.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="94.142.250.-1" dst="220.220.223.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="94.142.250.-1" dst="165.165.167.-1" />
 			
 			
-			<Property graph="0" name="IsolationProperty" src="220.220.220.3" dst="165.165.165.1" />
-			<Property graph="0" name="IsolationProperty" src="220.220.220.3" dst="94.142.249.1" />
-			<Property graph="0" name="IsolationProperty" src="165.165.165.3" dst="220.220.220.1" />
-			<Property graph="0" name="IsolationProperty" src="165.165.165.3" dst="94.142.249.1" />
-			<Property graph="0" name="IsolationProperty" src="94.142.249.2" dst="220.220.220.1" />
-			<Property graph="0" name="IsolationProperty" src="94.142.249.2" dst="165.165.165.1" />
-			<Property graph="0" name="IsolationProperty" src="220.220.220.1" dst="165.165.165.3" />
-			<Property graph="0" name="IsolationProperty" src="220.220.220.1" dst="94.142.249.2" />
-			<Property graph="0" name="IsolationProperty" src="165.165.165.1" dst="220.220.220.3" />
+			<Property graph="0" name="IsolationProperty" src="220.220.223.-1" dst="165.165.165.-1" />
+			<Property graph="0" name="IsolationProperty" src="220.220.223.-1" dst="94.142.249.1" />
+			<Property graph="0" name="IsolationProperty" src="165.165.167.-1" dst="220.220.220.-1" />
+			<Property graph="0" name="IsolationProperty" src="165.165.167.-1" dst="94.142.249.1" />
+			<Property graph="0" name="IsolationProperty" src="94.142.250.-1" dst="220.220.220.-1" />
+			<Property graph="0" name="IsolationProperty" src="94.142.250.-1" dst="165.165.165.-1" />
+			<Property graph="0" name="IsolationProperty" src="220.220.220.-1" dst="165.165.167.-1" />
+			<Property graph="0" name="IsolationProperty" src="220.220.220.-1" dst="94.142.250.-1" />
+			<Property graph="0" name="IsolationProperty" src="165.165.165.-1" dst="220.220.223.-1" />
 			
 			
 			
 			
 				<!-- Seventh Policy -->
-			<Property graph="0" name="ReachabilityProperty" src="94.142.249.1" dst="220.220.220.4" />
-			<Property graph="0" name="ReachabilityProperty" src="94.142.249.1" dst="165.165.165.4" />
+			<Property graph="0" name="ReachabilityProperty" src="94.142.249.1" dst="220.220.224.1" />
+			<Property graph="0" name="ReachabilityProperty" src="94.142.249.1" dst="165.165.168.1" />
 			
 			
 			<!--  New Policy  -->
-			<Property graph="0" name="ReachabilityProperty" src="17.56.26.1" dst="17.56.26.2" />
-			<Property graph="0" name="ReachabilityProperty" src="17.56.26.2" dst="17.56.26.1" />
-			<Property graph="0" name="IsolationProperty" src="17.56.26.3" dst="17.56.26.1" />
-			<Property graph="0" name="IsolationProperty" src="94.142.249.1" dst="17.56.26.1" />
+			<Property graph="0" name="ReachabilityProperty" src="17.56.26.-1" dst="17.56.27.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="17.56.27.-1" dst="17.56.26.-1" />
+			<Property graph="0" name="IsolationProperty" src="17.56.28.-1" dst="17.56.26.-1" />
+			<Property graph="0" name="IsolationProperty" src="94.142.249.1" dst="17.56.26.-1" />
 	</PropertyDefinition>
 </NFV>
