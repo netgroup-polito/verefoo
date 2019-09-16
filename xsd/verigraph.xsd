@@ -24,6 +24,7 @@
             <xsd:enumeration value="WEBSERVER" />
             <xsd:enumeration value="FIELDMODIFIER" />
             <xsd:enumeration value="FORWARDER" />
+            <xsd:enumeration value="LOADBALANCER" />
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="protocolTypes">
@@ -275,4 +276,11 @@
             </xsd:sequence>
         </xsd:complexType>
        </xsd:element>
+    <xsd:element name="loadbalancer">
+        <xsd:complexType>
+            <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+                <xsd:element name="pool" type="xsd:string" />
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
 </xsd:schema>
