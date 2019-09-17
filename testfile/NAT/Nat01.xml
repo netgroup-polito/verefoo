@@ -18,16 +18,18 @@
 				</configuration>
 			</node>
 			
-				<node   name="20.0.0.3">
+				<node  functional_type="FIREWALL"  name="20.0.0.3">
 				<neighbour name="10.0.0.1" />
 				<neighbour name="10.0.0.2" />
 				<neighbour name="20.0.0.1" />
-				
+				<configuration description="A simple description" name="conf1">
+            		<firewall defaultAction="DENY" />
+        		</configuration>
 			</node>
 			
 			<node functional_type="NAT" name="20.0.0.1">
 				<neighbour name="20.0.0.3" />
-				<neighbour name="20.0.0.5" />
+				<neighbour name="20.0.0.2" />
 				 <configuration description="A simple description" name="conf2">
 		          <nat>
 					<source>10.0.0.1</source>
@@ -35,26 +37,15 @@
 		          </nat>
 		        </configuration>
 			</node>
-			
-			<node functional_type="NAT" name="20.0.0.5">
+	
+			<node functional_type="FIREWALL" name="20.0.0.2">
 				<neighbour name="20.0.0.1" />
-				<neighbour name="20.0.0.2" />
-				 <configuration description="A simple description" name="conf2">
-		          <nat>
-					<source>30.0.5.2</source>
-		          </nat>
-		        </configuration>
-			</node>
-			
-				<node functional_type="FIREWALL" name="20.0.0.2">
-				<neighbour name="20.0.0.5" />
 				<neighbour name="30.0.5.2" />
 				<configuration description="A simple description" name="conf1">
-            <firewall defaultAction="DENY" />
-        </configuration>
+            		<firewall defaultAction="DENY" />
+        		</configuration>
 			</node>
-			
-
+		
 			
 			<node functional_type="WEBSERVER" name="30.0.5.2">
 				<neighbour name="20.0.0.2" />
@@ -77,10 +68,7 @@
 		
 			<Property graph="0" name="ReachabilityProperty" src="10.0.0.1"
 			dst="30.0.5.2" />
-			<Property graph="0" name="ReachabilityProperty" src="30.0.5.2"
-			dst="10.0.0.1" />
-			<Property graph="0" name="IsolationProperty" src="10.0.0.2"
-			dst="30.0.5.2" />
+		
 
 
 	</PropertyDefinition>
