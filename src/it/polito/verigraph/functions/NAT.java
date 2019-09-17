@@ -47,6 +47,7 @@ public class NAT extends GenericFunction {
 		for(TrafficFlow tf : source.getRequirements().values()) {
     		//constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdRequirement())), ctx.mkFalse()));
 			Property property = tf.getCrossedTrafficFlow(source.getNode().getName());
+			System.out.println(property.getSrc() + "-->" + property.getDst());
 			if(private_addresses.contains(property.getSrc())) {
 				constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(tf.getIdRequirement())), ctx.mkFalse()));
 			} else {

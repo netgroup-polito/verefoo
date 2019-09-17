@@ -145,7 +145,7 @@ public class VerefooProxy {
 			
 			for(AllocationNode node : nodesList) {
 				node.addRequirement(tf);
-				if((node.getTypeNF().equals(FunctionalTypes.NAT) && node.getNode().getConfiguration().getNat().getSource().contains(tf.getProperty().getSrc()))){
+				if((node.getTypeNF().equals(FunctionalTypes.NAT) && node.getNode().getConfiguration().getNat().getSource().contains(tf.getProperty().getSrc())) || (node.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && node.getNode().getConfiguration().getLoadbalancer().getPool().contains(tf.getProperty().getSrc()))){
 					forwardUpdate = true;
 				}
 				else if((node.getTypeNF().equals(FunctionalTypes.NAT) && node.getNode().getConfiguration().getNat().getSource().contains(tf.getProperty().getDst()) ) 
@@ -164,7 +164,6 @@ public class VerefooProxy {
 				if(forwardUpdate) {
 					Property p = TrafficFlow.copyProperty(tf.getProperty());
 					int listLength = nodesList.size();
-					String lastNodeThatModifiedIPSrc = tf.getProperty().getSrc();
 					String currentSrc = p.getSrc();
 					//loop for modifications of IP addresses from source to destination 
 					for(int i = 0; i < listLength; i++) {
@@ -180,7 +179,6 @@ public class VerefooProxy {
 				if(backwardUpdate) {
 					Property p = TrafficFlow.copyProperty(tf.getProperty());
 					int listLength = nodesList.size();
-					String lastNodeThatModifiedIPDst = tf.getProperty().getDst();
 					String currentDst = p.getDst();
 					//loop for modifications of IP addresses from source to destination 
 					for(int i = listLength-1; i >= 0; i--) {
@@ -191,6 +189,8 @@ public class VerefooProxy {
 							currentDst = currentNode.getNode().getName();
 						}
 					}
+					
+					
 				}
 				
 				

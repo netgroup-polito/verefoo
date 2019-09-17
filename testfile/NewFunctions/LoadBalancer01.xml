@@ -77,9 +77,9 @@
 		
 			<Property graph="0" name="ReachabilityProperty" src="10.0.0.1"
 			dst="30.0.5.2" />
-			<Property graph="0" name="IsolationProperty" src="10.0.0.2"
-			dst="30.0.5.2" />
-
+		
+			<Property graph="0" name="ReachabilityProperty" src="30.0.5.2"
+			dst="10.0.0.1" />
 
 	</PropertyDefinition>
 	<ParsingString></ParsingString>
