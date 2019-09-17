@@ -114,6 +114,7 @@
                 <xsd:element ref="webserver" />
                 <xsd:element ref="fieldmodifier" />
                 <xsd:element ref="forwarder" />
+                <xsd:element ref="loadbalancer" />
             </xsd:choice>
             <xsd:attribute name="id" type="xsd:long" use="optional" />
             <xsd:attribute name="name" type="xsd:string"

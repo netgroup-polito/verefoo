@@ -18,6 +18,7 @@ import it.polito.verigraph.functions.EndHost;
 import it.polito.verigraph.functions.Forwarder;
 import it.polito.verigraph.functions.NAT;
 import it.polito.verigraph.functions.GenericFunction;
+import it.polito.verigraph.functions.LoadBalancer;
 import it.polito.verigraph.functions.PacketFilter;
 import it.polito.verigraph.solver.NetContext;
 
@@ -130,6 +131,12 @@ public class AllocationManager {
 					allocationNode.setTypeNF(FunctionalTypes.NAT);
 				}
 				
+				else if(node.getFunctionalType() == FunctionalTypes.LOADBALANCER) {
+					LoadBalancer lb = new LoadBalancer(allocationNode, ctx, nctx);
+					allocationNode.setPlacedNF(lb);
+					allocationNode.setTypeNF(FunctionalTypes.LOADBALANCER);
+				}
+				
 				else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {
 					Forwarder forwarder = new Forwarder(allocationNode, ctx, nctx);
 					allocationNode.setPlacedNF(forwarder);
@@ -188,8 +195,10 @@ public class AllocationManager {
 				NAT nat = (NAT) no;
 				nat.natConfiguration(nctx.addressMap.get(node.getName()));
 				
-			}
-			 else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {	
+			}else if(node.getFunctionalType() == FunctionalTypes.LOADBALANCER) {	
+				LoadBalancer lb = (LoadBalancer) no;
+				lb.loadBalancerConfiguration(nctx.addressMap.get(node.getName()));		
+			}else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {	
 				Forwarder fw = (Forwarder) no;
 				fw.forwarderSendRules();
 			}else if(type.equals(FunctionalTypes.FIREWALL)) {

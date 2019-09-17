@@ -36,13 +36,13 @@
 		        </configuration>
 			</node>
 			
-			<node functional_type="NAT" name="20.0.0.5">
+			<node functional_type="LOADBALANCER" name="20.0.0.5">
 				<neighbour name="20.0.0.1" />
 				<neighbour name="20.0.0.2" />
 				 <configuration description="A simple description" name="conf2">
-		          <nat>
-					<source>30.0.5.2</source>
-		          </nat>
+		          <loadbalancer>
+					<pool>30.0.5.2</pool>
+		          </loadbalancer>
 		        </configuration>
 			</node>
 			
@@ -77,8 +77,6 @@
 		
 			<Property graph="0" name="ReachabilityProperty" src="10.0.0.1"
 			dst="30.0.5.2" />
-			<Property graph="0" name="ReachabilityProperty" src="30.0.5.2"
-			dst="10.0.0.1" />
 			<Property graph="0" name="IsolationProperty" src="10.0.0.2"
 			dst="30.0.5.2" />
 

@@ -138,41 +138,68 @@ public class VerefooProxy {
 		
 		for(TrafficFlow tf : trafficFlowsMap.values()) {
 			
-			boolean natIsPresent = false;
+			boolean forwardUpdate = false;
+			boolean backwardUpdate = false;
+			
 			List<AllocationNode> nodesList = tf.getPath().getNodes();
 			
 			for(AllocationNode node : nodesList) {
 				node.addRequirement(tf);
-				if(node.getTypeNF().equals(FunctionalTypes.NAT)) {
-					natIsPresent = true;
+				if((node.getTypeNF().equals(FunctionalTypes.NAT) && node.getNode().getConfiguration().getNat().getSource().contains(tf.getProperty().getSrc()))){
+					forwardUpdate = true;
+				}
+				else if((node.getTypeNF().equals(FunctionalTypes.NAT) && node.getNode().getConfiguration().getNat().getSource().contains(tf.getProperty().getDst()) ) 
+						|| (node.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && node.getNode().getConfiguration().getLoadbalancer().getPool().contains(tf.getProperty().getDst()))) {
+					backwardUpdate = true;
 				}
 			}
 			
-			if(natIsPresent) {
-				Property p = TrafficFlow.copyProperty(tf.getProperty());
-				int listLength = nodesList.size();
-				String lastBack = tf.getProperty().getSrc();
-				for(int i = 0; i < listLength; i++) {
+			if(forwardUpdate || backwardUpdate) {
+				for(int i = 0; i < nodesList.size(); i++) {
+					Property p = TrafficFlow.copyProperty(tf.getProperty());
 					AllocationNode current = nodesList.get(i);
-					if(current.getTypeNF().equals(FunctionalTypes.NAT) && current.getNode().getConfiguration().getNat().getSource().contains(p.getSrc())) {
-						tf.addModifiedProperty(current.getNode().getName(), p);
-						Property forwardProperty = TrafficFlow.copyProperty(p);
-						forwardProperty.setSrc(current.getNode().getName());
-						p = forwardProperty;
-					}else if(current.getTypeNF().equals(FunctionalTypes.NAT) && current.getNode().getConfiguration().getNat().getSource().contains(p.getDst())) {
-						Property backwardProperty = TrafficFlow.copyProperty(p);
-						backwardProperty.setDst(current.getNode().getName());
-						for(int j = i-1; j >= 0; j--) {
-							AllocationNode backwardNode = nodesList.get(j);
-							tf.addModifiedProperty(backwardNode.getNode().getName(), backwardProperty);
-							if(backwardNode.getNode().getName().equals(lastBack)) break;
+					tf.addModifiedProperty(current.getNode().getName(), p);
+				}
+				
+				if(forwardUpdate) {
+					Property p = TrafficFlow.copyProperty(tf.getProperty());
+					int listLength = nodesList.size();
+					String lastNodeThatModifiedIPSrc = tf.getProperty().getSrc();
+					String currentSrc = p.getSrc();
+					//loop for modifications of IP addresses from source to destination 
+					for(int i = 0; i < listLength; i++) {
+						AllocationNode currentNode = nodesList.get(i);
+						Property crossed = tf.getCrossedTrafficFlow(currentNode.getNode().getName());
+						crossed.setSrc(currentSrc);
+						if((currentNode.getTypeNF().equals(FunctionalTypes.NAT) && currentNode.getNode().getConfiguration().getNat().getSource().contains(crossed.getSrc())) ||(currentNode.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && currentNode.getNode().getConfiguration().getLoadbalancer().getPool().contains(tf.getProperty().getSrc())) ){
+							currentSrc = currentNode.getNode().getName();
 						}
-						lastBack = current.getNode().getName();
-					}else {
-						tf.addModifiedProperty(current.getNode().getName(), p);
 					}
 				}
+				
+				if(backwardUpdate) {
+					Property p = TrafficFlow.copyProperty(tf.getProperty());
+					int listLength = nodesList.size();
+					String lastNodeThatModifiedIPDst = tf.getProperty().getDst();
+					String currentDst = p.getDst();
+					//loop for modifications of IP addresses from source to destination 
+					for(int i = listLength-1; i >= 0; i--) {
+						AllocationNode currentNode = nodesList.get(i);
+						Property crossed = tf.getCrossedTrafficFlow(currentNode.getNode().getName());
+						crossed.setDst(currentDst);
+						if((currentNode.getTypeNF().equals(FunctionalTypes.NAT) && currentNode.getNode().getConfiguration().getNat().getSource().contains(crossed.getDst())) ||(currentNode.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && currentNode.getNode().getConfiguration().getLoadbalancer().getPool().contains(tf.getProperty().getDst())) ){
+							currentDst = currentNode.getNode().getName();
+						}
+					}
+				}
+				
+				
+				
 			}
+			
+			
+			
+			
 		}
 		
 	}
