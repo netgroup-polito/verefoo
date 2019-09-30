@@ -138,18 +138,13 @@ public class PacketFilterManager {
 					}
 				}
 				if (value._1.isAutoconfigured()) {
-					if(value._2.getNode().getName().equals("1.0.0.12")) {
-						value._1.automaticConfiguration(7);
-						System.out.println(value._3);
-					}
-					else if(value._2.getNode().getName().equals("1.0.0.8")) {
-						value._1.automaticConfiguration(value._3);
-						System.out.println(value._3);
-					}else {
-						System.out.println(value._3);
-						value._1.automaticConfiguration(1);
-
-					}
+					System.out.println(value._3);
+					if(value._2.getNode().getName().equals("1.0.0.3") || value._2.getNode().getName().equals("1.0.0.6") || value._2.getNode().getName().equals("1.0.0.9"))
+						value._1.automaticConfiguration(3);
+					else
+						value._1.automaticConfiguration(0);
+						
+					
 					
 					
 				} else {
