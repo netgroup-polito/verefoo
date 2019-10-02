@@ -3,12 +3,11 @@ package it.polito.verefoo.allocation;
 import java.util.*;
 
 import com.microsoft.z3.DatatypeExpr;
-import com.microsoft.z3.Expr;
 import com.microsoft.z3.Optimize;
 
-import it.polito.verefoo.graph.TrafficFlow;
+import it.polito.verefoo.functions.GenericFunction;
+import it.polito.verefoo.graph.Flow;
 import it.polito.verefoo.jaxb.*;
-import it.polito.verigraph.functions.GenericFunction;
 
 
 /*
@@ -24,7 +23,7 @@ public class AllocationNode {
 	private String ipAddress;
 	private DatatypeExpr z3Name;
 	private DatatypeExpr z3Node;
-	private Map<Integer, TrafficFlow> requirements= new HashMap<>();
+	private Map<Integer, Flow> crossingFlows = new HashMap<>();
 	
 	
 	/**
@@ -175,24 +174,24 @@ public class AllocationNode {
 	 * This method allows to distribute a requirement in this allocation node.
 	 * @param sr It is the requirement to store in the node
 	 */
-	public void addRequirement(TrafficFlow sr) {
-		requirements.put(sr.getIdRequirement(), sr);
+	public void addFlow(Flow sr) {
+		crossingFlows.put(sr.getIdFlow(), sr);
 	}
 	
 	/**
 	 * Getter method for the map of requirements
 	 * @return the map of requirements
 	 */
-	public Map<Integer, TrafficFlow> getRequirements() {
-		return requirements;
+	public Map<Integer, Flow> getFlows() {
+		return crossingFlows;
 	}
 
 	/**
 	 * Setter method for the map of requirements
 	 * @param requirements the map of requirements
 	 */
-	public void setRequirements(Map<Integer, TrafficFlow> requirements) {
-		this.requirements = requirements;
+	public void setFlows(Map<Integer, Flow> requirements) {
+		this.crossingFlows = requirements;
 	}
 
 }

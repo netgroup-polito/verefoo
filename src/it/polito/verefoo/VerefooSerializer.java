@@ -16,7 +16,7 @@ import it.polito.verefoo.jaxb.NFV;
 import it.polito.verefoo.jaxb.Path;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.translator.Translator;
-import it.polito.verigraph.extra.VerificationResult;
+import it.polito.verefoo.utils.VerificationResult;
 
 /**
  * This class separates the Verefoo classes implementation from the actual input
@@ -25,8 +25,8 @@ public class VerefooSerializer {
 	private NFV nfv, result;
 	private boolean sat = false;
 	private Logger logger = LogManager.getLogger("model");
-	private Logger loggerResult = LogManager.getLogger("result");
 	private String z3Model;
+	
 	/**
 	 * Wraps all the Verefoo tasks, executing the z3 procedure for each graph in the
 	 * NFV element
@@ -42,7 +42,6 @@ public class VerefooSerializer {
 
 		try {
 			List<Path> paths = null;
-			//TODO if it works
 			if (root.getNetworkForwardingPaths() != null)
 				paths = root.getNetworkForwardingPaths().getPath();
 			for (Graph g : root.getGraphs().getGraph()) {
@@ -54,9 +53,9 @@ public class VerefooSerializer {
 				VerefooProxy test = new VerefooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(),
 						prop, paths);
 
-				long beginAll = System.currentTimeMillis();
+				//long beginAll = System.currentTimeMillis();
 				VerificationResult res = test.checkNFFGProperty();
-				long endAll = System.currentTimeMillis();
+				//long endAll = System.currentTimeMillis();
 				//loggerResult.debug("Only checker: " + (endAll - beginAll) + "ms");
 				
 				if (res.result != Status.UNSATISFIABLE && res.result != Status.UNKNOWN) {

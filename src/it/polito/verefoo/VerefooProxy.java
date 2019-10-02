@@ -7,25 +7,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 
 import com.microsoft.z3.Context;
-
 
 import it.polito.verefoo.allocation.AllocationManager;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
-import it.polito.verefoo.graph.RequirementPath;
-import it.polito.verefoo.graph.TrafficFlow;
+import it.polito.verefoo.graph.FlowPath;
+import it.polito.verefoo.graph.SecurityRequirement;
+import it.polito.verefoo.graph.Traffic;
+import it.polito.verefoo.graph.Flow;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verefoo.jaxb.Path.PathNode;
-import it.polito.verigraph.extra.VerificationResult;
-import it.polito.verigraph.solver.*;
-import it.polito.verigraph.solver.Checker.Prop;
+import it.polito.verefoo.solver.*;
+import it.polito.verefoo.solver.Checker.Prop;
+import it.polito.verefoo.utils.VerificationResult;
 
 /**
  * 
@@ -39,14 +37,12 @@ public class VerefooProxy {
 	private List<Path> paths;
 	private WildcardManager wildcardManager;
 	private HashMap<String, AllocationNode> allocationNodes;
-	private HashMap<Integer, TrafficFlow> trafficFlowsMap;
+	private HashMap<Integer, Flow> trafficFlowsMap;
+	private HashMap<Integer, SecurityRequirement> securityRequirements;
 	public Checker check;
 	private List<Node> nodes;
-	int clientServerCombinations = 0;
 	private List<NodeMetrics> nodeMetrics;
 	private AllocationManager allocationManager;
-	
-	private Logger logger = LogManager.getLogger("mylog");
 	
 	
 	/**
@@ -63,21 +59,44 @@ public class VerefooProxy {
 	 */
 	public VerefooProxy(Graph graph, Hosts hosts, Connections conns, Constraints constraints, List<Property> prop,
 			List<Path> paths) throws BadGraphError {
+		
+		// Initialitation of the variables related to the nodes
 		allocationNodes = new HashMap<>();
+		nodes = graph.getNode();
+		nodes.forEach(n -> allocationNodes.put(n.getName(), new AllocationNode(n)));
+		wildcardManager = new WildcardManager(allocationNodes);
+		
+		// Initialitation of the variables related to the requirements
+		properties = prop;
+		securityRequirements = new HashMap<>();
+		int idRequirement = 0;
+		for(Property p : properties) {
+			securityRequirements.put(idRequirement, new SecurityRequirement(p, idRequirement));
+			idRequirement++;
+		}
+		
+		this.paths = paths;
+		this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
+		
+		//Creation of the z3 context
 		HashMap<String, String> cfg = new HashMap<String, String>();
 		cfg.put("model", "true");
 		ctx = new Context(cfg);
-		properties = prop;
-		this.paths = paths;
-		nodes = graph.getNode();
-		nodes.forEach(n -> allocationNodes.put(n.getName(), new AllocationNode(n)));
-		this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
-		trafficFlowsMap = generateRequirementPaths();
-		wildcardManager = new WildcardManager(allocationNodes);
-
+				
+		//Creation of the NetContext (z3 variables)
 		nctx = nctxGenerate(ctx, nodes, prop, allocationNodes);
 		nctx.setWildcardManager(wildcardManager);
 		
+		/*
+		 * Main sequence of methods in VerefooProxy:
+		 * 1) given every requirement, all the possible paths of the related flows are computed;
+		 * 2) the existing functions are istanciated
+		 * 3) the functions to be allocated are associated to Allocation Places
+		 * 4) the possible traffic in input to each node is computed
+		 * 5) soft and hard constraints are defined for each function
+		 * 6) the hard constraints for the requirements are defined
+		 */
+		trafficFlowsMap = generateFlowPaths();
 		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
 		allocationManager.instantiateFunctions();
 		allocateFunctions();
@@ -94,7 +113,7 @@ public class VerefooProxy {
 	 * At the moment only packet-filtering capability is allocated, in the future the decision will depend on the type of requirement.
 	 */
 	private void allocateFunctions() {
-		for(TrafficFlow sr : trafficFlowsMap.values()) {
+		for(Flow sr : trafficFlowsMap.values()) {
 			List<AllocationNode> nodes = sr.getPath().getNodes();
 			int lengthList = nodes.size();
 			AllocationNode source = nodes.get(0);
@@ -108,12 +127,12 @@ public class VerefooProxy {
 
 
 	/**
-	 * This method creates the constraint in the z3 model for reachability and isolation requirements.
+	 * This method creates the hard constraints in the z3 model for reachability and isolation requirements.
 	 */
 	private void formalizeRequirements() {
 		
-		for(TrafficFlow sr : trafficFlowsMap.values()) {
-			switch (sr.getProperty().getName()) {
+		for(SecurityRequirement sr : securityRequirements.values()) {
+			switch (sr.getOriginalProperty().getName()) {
 			case ISOLATION_PROPERTY:
 				check.createRequirementConstraints(sr, Prop.ISOLATION);
 				break;
@@ -131,61 +150,61 @@ public class VerefooProxy {
 
 
 	/**
-	 * This method distributes into each Allocation Node the requirements whose traffic flow pass through it.
+	 * This method distributes into each Allocation Node the traffic flows and computes the characteristics of each ingress traffic
 	 */
 	private void distributeTrafficFlows() {
 		
 		
-		for(TrafficFlow tf : trafficFlowsMap.values()) {
+		for(Flow flow : trafficFlowsMap.values()) {
 			
 			boolean forwardUpdate = false;
 			boolean backwardUpdate = false;
 			
-			List<AllocationNode> nodesList = tf.getPath().getNodes();
+			List<AllocationNode> nodesList = flow.getPath().getNodes();
 			
 			for(AllocationNode node : nodesList) {
-				node.addRequirement(tf);
-				if((node.getTypeNF().equals(FunctionalTypes.NAT) && node.getNode().getConfiguration().getNat().getSource().contains(tf.getProperty().getSrc())) || (node.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && node.getNode().getConfiguration().getLoadbalancer().getPool().contains(tf.getProperty().getSrc()))){
+				node.addFlow(flow);
+				if((node.getTypeNF().equals(FunctionalTypes.NAT) && node.getNode().getConfiguration().getNat().getSource().contains(flow.getOriginalTraffic().getIPSrc())) || (node.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && node.getNode().getConfiguration().getLoadbalancer().getPool().contains(flow.getOriginalTraffic().getIPSrc()))){
 					forwardUpdate = true;
 				}
-				else if((node.getTypeNF().equals(FunctionalTypes.NAT) && node.getNode().getConfiguration().getNat().getSource().contains(tf.getProperty().getDst()) ) 
-						|| (node.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && node.getNode().getConfiguration().getLoadbalancer().getPool().contains(tf.getProperty().getDst()))) {
+				else if((node.getTypeNF().equals(FunctionalTypes.NAT) && node.getNode().getConfiguration().getNat().getSource().contains(flow.getOriginalTraffic().getIPDst()) ) 
+						|| (node.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && node.getNode().getConfiguration().getLoadbalancer().getPool().contains(flow.getOriginalTraffic().getIPDst()))) {
 					backwardUpdate = true;
 				}
 			}
 			
 			if(forwardUpdate || backwardUpdate) {
 				for(int i = 0; i < nodesList.size(); i++) {
-					Property p = TrafficFlow.copyProperty(tf.getProperty());
+					Traffic t = Traffic.copyTraffic(flow.getOriginalTraffic());
 					AllocationNode current = nodesList.get(i);
-					tf.addModifiedProperty(current.getNode().getName(), p);
+					flow.addModifiedTraffic(current.getNode().getName(), t);
 				}
 				
 				if(forwardUpdate) {
-					Property p = TrafficFlow.copyProperty(tf.getProperty());
+					Traffic t = Traffic.copyTraffic(flow.getOriginalTraffic());
 					int listLength = nodesList.size();
-					String currentSrc = p.getSrc();
+					String currentSrc = t.getIPSrc();
 					//loop for modifications of IP addresses from source to destination 
 					for(int i = 0; i < listLength; i++) {
 						AllocationNode currentNode = nodesList.get(i);
-						Property crossed = tf.getCrossedTrafficFlow(currentNode.getNode().getName());
-						crossed.setSrc(currentSrc);
-						if((currentNode.getTypeNF().equals(FunctionalTypes.NAT) && currentNode.getNode().getConfiguration().getNat().getSource().contains(crossed.getSrc())) ||(currentNode.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && currentNode.getNode().getConfiguration().getLoadbalancer().getPool().contains(tf.getProperty().getSrc())) ){
+						Traffic crossed = flow.getCrossedTraffic(currentNode.getNode().getName());
+						crossed.setIPSrc(currentSrc);
+						if((currentNode.getTypeNF().equals(FunctionalTypes.NAT) && currentNode.getNode().getConfiguration().getNat().getSource().contains(crossed.getIPSrc())) ||(currentNode.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && currentNode.getNode().getConfiguration().getLoadbalancer().getPool().contains(crossed.getIPSrc())) ){
 							currentSrc = currentNode.getNode().getName();
 						}
 					}
 				}
 				
 				if(backwardUpdate) {
-					Property p = TrafficFlow.copyProperty(tf.getProperty());
+					Traffic t = Traffic.copyTraffic(flow.getOriginalTraffic());
 					int listLength = nodesList.size();
-					String currentDst = p.getDst();
+					String currentDst = t.getIPDst();
 					//loop for modifications of IP addresses from source to destination 
 					for(int i = listLength-1; i >= 0; i--) {
 						AllocationNode currentNode = nodesList.get(i);
-						Property crossed = tf.getCrossedTrafficFlow(currentNode.getNode().getName());
-						crossed.setDst(currentDst);
-						if((currentNode.getTypeNF().equals(FunctionalTypes.NAT) && currentNode.getNode().getConfiguration().getNat().getSource().contains(crossed.getDst())) ||(currentNode.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && currentNode.getNode().getConfiguration().getLoadbalancer().getPool().contains(tf.getProperty().getDst())) ){
+						Traffic crossed = flow.getCrossedTraffic(currentNode.getNode().getName());
+						crossed.setIPDst(currentDst);
+						if((currentNode.getTypeNF().equals(FunctionalTypes.NAT) && currentNode.getNode().getConfiguration().getNat().getSource().contains(crossed.getIPDst())) ||(currentNode.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && currentNode.getNode().getConfiguration().getLoadbalancer().getPool().contains(crossed.getIPDst())) ){
 							currentDst = currentNode.getNode().getName();
 						}
 					}
@@ -194,10 +213,7 @@ public class VerefooProxy {
 				}
 				
 				
-				
 			}
-			
-			
 			
 			
 		}
@@ -206,17 +222,21 @@ public class VerefooProxy {
 
 
 	/**
-	 * For each requirement, this method identifies the path of nodes that must be crossed by the traffic flow.
-	 * @return the map of all the security requirements
+	 * For each requirement, this method identifies all the possible the paths of nodes that must be crossed by the traffic flows that are related to the requirement.
+	 * @return the map of all the traffic flows
 	 */
-	private HashMap<Integer, TrafficFlow> generateRequirementPaths(){
+	private HashMap<Integer, Flow> generateFlowPaths(){
 		
-		HashMap<Integer, TrafficFlow> SRMap = new HashMap<>();
+		HashMap<Integer, Flow> flowsMap = new HashMap<>();
 		int id = 0;
-		for(Property property : properties) {
-			List<AllocationNode> nodes = new ArrayList<>();
+		
+		for(SecurityRequirement sr : securityRequirements.values()) {
 			
-			//first, this method finds if a forwarding path has been defined by the user
+			Property property = sr.getOriginalProperty();
+			
+			//first, this method finds if a forwarding path has been defined by the user for the requirement
+			//in that case, the research is not performed for that specific requirement
+			
 			Path definedPath = null;
 			if(paths != null) {
 				for(Path p : paths) {
@@ -230,27 +250,37 @@ public class VerefooProxy {
 			
 			
 			boolean found = false;
-			//if no forwarding path has been defined by the user, the framework searches for at least an existing path
+			List<List<AllocationNode>> allPaths = new ArrayList<>();
+			List<AllocationNode> localPath = new ArrayList<>();
+			//if no forwarding path has been defined by the user, the framework searches for ALL the possible existing path.
+			//for each path, a corresponding flow is defined. The traffic characterization will be made in a different moment.
 			if(definedPath == null) {
 				Set<String> visited = new HashSet<>();
 				AllocationNode source = allocationNodes.get(property.getSrc());
 				AllocationNode destination = allocationNodes.get(property.getDst());
-				found = recursivePathGeneration(nodes, source, destination, source, visited, 0);
+				recursivePathGeneration(allPaths, localPath, source, destination, source, visited, 0);
+				found = allPaths.isEmpty()? false : true;
 				visited.clear();
 			}else {
 				//otherwise, the nodes of the path are simply put in the list
 				found = true;
 				for(PathNode pn : definedPath.getPathNode()) {
 					AllocationNode an = allocationNodes.get(pn.getName());
-					nodes.add(an);
+					localPath.add(an);
 				}
+				allPaths.add(localPath);
 			}
 			
 			if(found) {
-				RequirementPath rp = new RequirementPath(nodes);
-				TrafficFlow sr = new TrafficFlow(property, rp, id);
-				SRMap.put(id, sr);
-				id++;
+			
+				for(List<AllocationNode> singlePath : allPaths) {
+					FlowPath fp = new FlowPath(singlePath);
+					Flow flow = new Flow(sr, fp, id);
+					flowsMap.put(id, flow);
+					sr.getFlowsMap().put(id, flow);
+					id++;
+				}
+				
 			} else {
 				throw new BadGraphError("There is no path between " + property.getSrc() + " and " + property.getDst(),
 						EType.INVALID_SERVICE_GRAPH);
@@ -258,13 +288,14 @@ public class VerefooProxy {
 		
 		}
 		
-		return SRMap;
+		return flowsMap;
 		
 	}
 
 	/**
 	 * This method is recursively called to generate the path of nodes for each requirement.
-	 * @param nodes it is the list of nodes that compose the correct path
+	 * @param allPaths it is the list of all the paths that have been computed for the requirement
+	 * @param currentPath it is the current path that the method is building 
 	 * @param source it is the source of the path
 	 * @param destination it is the destination of the path
 	 * @param current it is the current node in the recursive visit
@@ -272,36 +303,44 @@ public class VerefooProxy {
 	 * @param level it is the recursion level of the visit
 	 * @return true if a path has been identified, false otherwise
 	 */
-	private boolean recursivePathGeneration(List<AllocationNode> nodes, AllocationNode source,
+	private void recursivePathGeneration(List<List<AllocationNode>> allPaths, List<AllocationNode> currentPath, AllocationNode source,
 			AllocationNode destination, AllocationNode current, Set<String> visited, int level) {
 		
-		nodes.add(level, current);
+		currentPath.add(level, current);
 		visited.add(current.getNode().getName());
 		List<Neighbour> listNeighbours = current.getNode().getNeighbour();
-		if(destination.getNode().getName().equals(current.getNode().getName())) return true;
+		if(destination.getNode().getName().equals(current.getNode().getName())) {
+			//I save the completed path and search for others
+			List<AllocationNode> pathToStore = new ArrayList<>();
+			for(int i = 0; i < currentPath.size(); i++) {
+				pathToStore.add(i, currentPath.get(i));
+			}
+			allPaths.add(pathToStore);
+			visited.remove(current.getNode().getName());
+			currentPath.remove(level);
+			return;
+		}
 		
-		
+
 		for(Neighbour n : listNeighbours) {
 			if(!visited.contains(n.getName())) {
 				AllocationNode neighbourNode = allocationNodes.get(n.getName());
 				level++;
-				boolean result = recursivePathGeneration(nodes, source, destination, neighbourNode, visited, level);
-				if(result) return true;
+				recursivePathGeneration(allPaths, currentPath, source, destination, neighbourNode, visited, level);
 				level--;
 			}
-			
-			
+					
 		}
 		
 		visited.remove(current.getNode().getName());
-		nodes.remove(nodes.size()-1);
-		return false;
+		currentPath.remove(level);
+		return;
 	}
 
 
 	
 	/**
-	 * This method generared the NetContext object for the inizialitation of z3 model.
+	 * This method generates the NetContext object for the initialization of z3 model.
 	 * @param ctx2 it is the z3 Context object
 	 * @param nodes2 is is the list of nodes of the Allocation Graph
 	 * @param prop it is the list of properties to be satisfied
@@ -347,25 +386,6 @@ public class VerefooProxy {
 		return nctx;
 	}
 
-	/**
-	 * Returns true if the node is a client
-	 */
-	public boolean nodeIsClient(Node n) {
-		return n.getFunctionalType().equals(FunctionalTypes.MAILCLIENT)
-				|| n.getFunctionalType().equals(FunctionalTypes.WEBCLIENT)
-				|| n.getFunctionalType().equals(FunctionalTypes.ENDHOST);
-
-	}
-
-	/**
-	 * Returns true if the node is a server
-	 */
-	public boolean nodeIsServer(Node n) {
-		return n.getFunctionalType().equals(FunctionalTypes.MAILSERVER)
-				|| n.getFunctionalType().equals(FunctionalTypes.WEBSERVER);
-
-	}
-
 
 	/**
 	 * @return all the allocation nodes
@@ -378,7 +398,7 @@ public class VerefooProxy {
 	/**
 	 * @return all the requirements
 	 */
-	public Map<Integer, TrafficFlow> getTrafficFlowsMap(){
+	public Map<Integer, Flow> getTrafficFlowsMap(){
 		return trafficFlowsMap;
 	}
 }

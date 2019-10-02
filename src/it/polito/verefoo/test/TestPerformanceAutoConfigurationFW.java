@@ -45,7 +45,7 @@ import it.polito.verefoo.jaxb.Path;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.jaxb.TypeOfHost;
 import it.polito.verefoo.translator.Translator;
-import it.polito.verigraph.extra.VerificationResult;
+import it.polito.verefoo.utils.VerificationResult;
 /**
  * 
  * This class runs some tests to collect some data about the performance of the tool 

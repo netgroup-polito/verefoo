@@ -27,7 +27,7 @@ import it.polito.verefoo.jaxb.NFV;
 import it.polito.verefoo.jaxb.PName;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.translator.Translator;
-import it.polito.verigraph.extra.VerificationResult;
+import it.polito.verefoo.utils.VerificationResult;
 
 /**
  * 

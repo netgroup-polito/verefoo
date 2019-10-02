@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.apache.org/licenses/LICENSE-2.0
  *******************************************************************************/
-package it.polito.verigraph.extra;
+package it.polito.verefoo.utils;
 
 /** A data structure which is an utility to make a generic couple of objects with different types in Java
  *

@@ -3,8 +3,8 @@ package it.polito.verefoo.extra;
 import it.polito.verefoo.jaxb.EType;
 import it.polito.verefoo.jaxb.Endhost;
 import it.polito.verefoo.jaxb.Property;
-import it.polito.verigraph.extra.PacketModel;
-import it.polito.verigraph.solver.NetContext;
+import it.polito.verefoo.solver.NetContext;
+import it.polito.verefoo.utils.PacketModel;
 /**
  * This class converts our EndHost Packet Model configuration in the Verefoo
  */

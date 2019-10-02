@@ -29,7 +29,7 @@ import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.translator.Translator;
-import it.polito.verigraph.extra.VerificationResult;
+import it.polito.verefoo.utils.VerificationResult;
 /**
  * 
  * This class runs some tests in order to check the correctness of the auto-configuration module

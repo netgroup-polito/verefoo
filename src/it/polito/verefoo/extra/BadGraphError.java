@@ -8,6 +8,8 @@ import it.polito.verefoo.jaxb.EType;
  *
  */
 public class BadGraphError extends RuntimeException {
+	
+	private static final long serialVersionUID = 1L;
 	private EType e;
 	public BadGraphError() {
 		super();

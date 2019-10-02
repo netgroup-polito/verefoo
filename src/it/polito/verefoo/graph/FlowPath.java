@@ -4,7 +4,7 @@ import java.util.*;
 
 import it.polito.verefoo.allocation.*;
 
-public class RequirementPath {
+public class FlowPath {
 	
 	private List<AllocationNode> nodes;
 	
@@ -12,7 +12,7 @@ public class RequirementPath {
 	 * Constructor of RequirementPath class
 	 * @param nodes it is the list of nodes that must be crossed by the flow related to a requirement
 	 */
-	public RequirementPath(List<AllocationNode> nodes) {
+	public FlowPath(List<AllocationNode> nodes) {
 		this.nodes = nodes;
 	}
 

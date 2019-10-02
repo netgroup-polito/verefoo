@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,13 +14,13 @@ import org.apache.logging.log4j.LogManager;
 
 import it.polito.verefoo.VerefooNormalizer;
 import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.graph.TrafficFlow;
+import it.polito.verefoo.functions.GenericFunction;
+import it.polito.verefoo.functions.PacketFilter;
+import it.polito.verefoo.graph.Flow;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
-import it.polito.verigraph.extra.PortInterval;
-import it.polito.verigraph.extra.Tuple;
-import it.polito.verigraph.functions.GenericFunction;
-import it.polito.verigraph.functions.PacketFilter;
+import it.polito.verefoo.utils.PortInterval;
+import it.polito.verefoo.utils.Tuple;
 
 /**
  * This class implements a parser for Verefoo output (the z3 model), in order to
@@ -36,7 +35,7 @@ public class Translator {
 	protected VerefooNormalizer norm;
 	protected List<Node> removedNodes;
 	private Map<String, AllocationNode> allocationNodes;
-	private Map<Integer, TrafficFlow> requirementsMap;
+	private Map<Integer, Flow> requirementsMap;
 
 	/**
 	 * Constructor
@@ -51,7 +50,7 @@ public class Translator {
 		this.g = g;
 	}
 
-	public Translator(String model, NFV nfv, Graph g, Map<String, AllocationNode> allocationNodes, Map<Integer, TrafficFlow> requirementsMap) {
+	public Translator(String model, NFV nfv, Graph g, Map<String, AllocationNode> allocationNodes, Map<Integer, Flow> requirementsMap) {
 		this.model = model;
 		this.nfv = nfv;
 		this.g = g;
@@ -497,7 +496,7 @@ public class Translator {
 			
 			while (matcher.find()) {
 
-				for(TrafficFlow sr : requirementsMap.values()) {
+				for(Flow sr : requirementsMap.values()) {
 					List<AllocationNode> nodesPath = sr.getPath().getNodes();
 					int opNodeIndex = -1;
 					for(int i = 0; i < nodesPath.size(); i++) {

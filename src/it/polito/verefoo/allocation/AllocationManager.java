@@ -8,19 +8,18 @@ import com.microsoft.z3.Context;
 
 import it.polito.verefoo.extra.PacketWrapper;
 import it.polito.verefoo.extra.WildcardManager;
+import it.polito.verefoo.functions.EndHost;
+import it.polito.verefoo.functions.Forwarder;
+import it.polito.verefoo.functions.GenericFunction;
+import it.polito.verefoo.functions.LoadBalancer;
+import it.polito.verefoo.functions.NAT;
+import it.polito.verefoo.functions.PacketFilter;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Node;
-import it.polito.verefoo.jaxb.PName;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
-import it.polito.verigraph.functions.EndHost;
-import it.polito.verigraph.functions.Forwarder;
-import it.polito.verigraph.functions.NAT;
-import it.polito.verigraph.functions.GenericFunction;
-import it.polito.verigraph.functions.LoadBalancer;
-import it.polito.verigraph.functions.PacketFilter;
-import it.polito.verigraph.solver.NetContext;
+import it.polito.verefoo.solver.NetContext;
 
 /**
  * This class has the key task to manage the allocation and deployment of Network Functions on the nodes of
@@ -185,7 +184,6 @@ public class AllocationManager {
 				
 			if(type.equals(FunctionalTypes.WEBCLIENT)) {
 				EndHost endHost = (EndHost) no;
-				AllocationNode server = nodes.values().stream().filter(n -> n.getIpAddress().equals(node.getConfiguration().getWebclient().getNameWebServer())).findFirst().orElse(null);
 				endHost.configureEndHost();
 			}
 			else if(type.equals(FunctionalTypes.WEBSERVER)) {

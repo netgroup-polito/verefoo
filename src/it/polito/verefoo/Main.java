@@ -43,7 +43,7 @@ public class Main {
 				Marshaller m = jc.createMarshaller();
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "./xsd/nfvSchema.xsd");
-				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/NewFunctions/LoadBalancer01.xml")));
+				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/Murcia/alternative2.xml")));
 				if (test.isSat()) {
 					loggerResult.info("SAT");
 					loggerResult.info("----------------------OUTPUT----------------------");
@@ -52,7 +52,7 @@ public class Main {
 					loggerResult.info(stringWriter.toString());
 					loggerResult.info("--------------------------------------------------");
 					//System.out.println(stringWriter);
-					//System.out.println(test.getZ3Model());
+					System.out.println(test.getZ3Model());
 				} else {
 					loggerResult.info("UNSAT");
 					loggerResult.info("----------------------OUTPUT----------------------");
