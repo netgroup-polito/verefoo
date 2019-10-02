@@ -65,11 +65,34 @@ public class TestPerformanceScalability {
 		System.out.println(args.length);
 		//if(args.length!=4) return;
 		
-        seed  = 214365;
-        numberAP  = 5;
-        numberPR  = 80;
-        runs = 30;
-        testScalabilityPerformance();
+        //seed  = 38783;
+		//seed  = 7415;
+		//seed = 92538;
+		//seed = 82538;
+		//seed = 172839;
+		//seed = 4444;
+		seed = 111115;
+		
+		
+        for(int i = 40; i <=50; i+=10) {
+        	for(int j = 50; j <=50; j+=10) {
+        		numberAP  = i;
+                numberPR  = j;
+                runs = 30;
+                testScalabilityPerformance();
+        	}
+        }
+        
+        
+        for(int i = 30; i <=30; i+=10) {
+        	for(int j = 40; j <=40; j+=10) {
+        		numberAP  = i;
+                numberPR  = j;
+                runs = 30;
+                testScalabilityPerformance();
+        	}
+        }
+        
 	}
 	
 	/* Variables to set if you want to automatically create the NFV */
@@ -260,7 +283,7 @@ public class TestPerformanceScalability {
 		        do{
 		        	for(k = 0; k < runs; k++) {
 							try {
-								
+								if(seeds[k] != 2124639057) {
 					             m = jc.createMarshaller();
 					             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 					             m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
@@ -283,7 +306,7 @@ public class TestPerformanceScalability {
 								 StringWriter stringWriter = new StringWriter();
 								 m.marshal( resultNFV, stringWriter );
 								 //loggerModel.debug(stringWriter.toString());
-							} catch (Exception e) {
+								}} catch (Exception e) {
 								e.printStackTrace();
 								err++;
 							}
