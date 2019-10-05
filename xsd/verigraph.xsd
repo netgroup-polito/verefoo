@@ -25,6 +25,7 @@
             <xsd:enumeration value="FIELDMODIFIER" />
             <xsd:enumeration value="FORWARDER" />
             <xsd:enumeration value="LOADBALANCER" />
+            <xsd:enumeration value="STATEFUL_FIREWALL" />
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="protocolTypes">
@@ -115,6 +116,7 @@
                 <xsd:element ref="fieldmodifier" />
                 <xsd:element ref="forwarder" />
                 <xsd:element ref="loadbalancer" />
+                <xsd:element ref="stateful_firewall" />
             </xsd:choice>
             <xsd:attribute name="id" type="xsd:long" use="optional" />
             <xsd:attribute name="name" type="xsd:string"
@@ -154,6 +156,14 @@
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:element name="firewall">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="elements" minOccurs="0" maxOccurs="unbounded" />
+            </xsd:sequence>
+             <xsd:attribute name="defaultAction" type="ActionTypes"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="stateful_firewall">
         <xsd:complexType>
             <xsd:sequence>
                 <xsd:element ref="elements" minOccurs="0" maxOccurs="unbounded" />

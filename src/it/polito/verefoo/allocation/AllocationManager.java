@@ -14,6 +14,7 @@ import it.polito.verefoo.functions.GenericFunction;
 import it.polito.verefoo.functions.LoadBalancer;
 import it.polito.verefoo.functions.NAT;
 import it.polito.verefoo.functions.PacketFilter;
+import it.polito.verefoo.functions.StatefulPacketFilter;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Node;
@@ -141,6 +142,11 @@ public class AllocationManager {
 					allocationNode.setPlacedNF(forwarder);
 					allocationNode.setTypeNF(FunctionalTypes.FORWARDER);
 				}
+				else if(node.getFunctionalType() == FunctionalTypes.STATEFUL_FIREWALL) {
+					StatefulPacketFilter spf = new StatefulPacketFilter(allocationNode, ctx, nctx);
+					allocationNode.setPlacedNF(spf);
+					allocationNode.setTypeNF(FunctionalTypes.STATEFUL_FIREWALL);
+				}
 			}
 			
 		});
@@ -203,6 +209,10 @@ public class AllocationManager {
 				PacketFilter fw = (PacketFilter) no;
 				if(fw.isAutoconfigured()) fw.automaticConfiguration();
 				else fw.manualConfiguration();
+			}
+			else if(type.equals(FunctionalTypes.STATEFUL_FIREWALL)) {
+				StatefulPacketFilter fw = (StatefulPacketFilter) no;
+				fw.manualConfiguration();
 			}
 		});
 		
