@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
+	<graphs>
+		<graph id="0">
+		
+			<!-- A Department -->
+			
+			<node functional_type="WEBCLIENT" name="220.220.220.-1">
+				<neighbour name="1.0.0.1" />
+				<configuration description="A simple description" name="officeA1">
+					<webclient nameWebServer="17.56.26.-1" />
+				</configuration>
+			</node>
+		
+			<node functional_type="WEBCLIENT" name="220.220.221.-1">
+				<neighbour name="1.0.0.2" />
+				<configuration description="A simple description" name="officeA2">
+					<webclient nameWebServer="17.56.26.-1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="220.220.222.-1">
+				<neighbour name="1.0.0.3" />
+				<configuration description="A simple description" name="businessOfficeBA">
+					<webclient nameWebServer="17.56.26.-1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="200.0.0.-1">
+				<neighbour name="1.0.0.1" />
+				<configuration description="A simple description" name="bycicle">
+					<webclient nameWebServer="17.56.26.-1" />
+				</configuration>
+			</node>
+			
+
+			<node name="1.0.0.1" functional_type="FIREWALL">
+				<neighbour name="220.220.220.-1" />
+				<neighbour name="200.0.0.-1" />
+				<neighbour name="1.0.0.12" />
+				 <configuration description="A simple description" name="conf1">
+            		<firewall defaultAction="DENY" />
+       			 </configuration>
+			</node>
+			
+			<node name="1.0.0.2" functional_type="FIREWALL">
+				<neighbour name="220.220.221.-1" />
+				<neighbour name="1.0.0.12" />
+				 <configuration description="A simple description" name="conf1">
+            		<firewall defaultAction="DENY" />
+       			 </configuration>
+			</node>
+			
+			<node name="1.0.0.3" functional_type="FIREWALL">
+				<neighbour name="220.220.222.-1" />
+				<neighbour name="1.0.0.12" />
+				 <configuration description="A simple description" name="conf1">
+            		<firewall defaultAction="DENY" />
+       			 </configuration>
+			</node>
+			
+			
+	
+			
+			<!--  Company B --> 
+			
+			<node functional_type="WEBCLIENT" name="165.165.165.-1">
+				<neighbour name="1.0.0.4" />
+				<configuration description="A simple description" name="officeB1">
+					<webclient nameWebServer="17.56.26.-1" />
+				</configuration>
+			</node>
+		
+			<node functional_type="WEBCLIENT" name="165.165.166.-1">
+				<neighbour name="1.0.0.5" />
+				<configuration description="A simple description" name="officeB2">
+					<webclient nameWebServer="17.56.26.-1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="165.165.167.-1">
+				<neighbour name="1.0.0.6" />
+				<configuration description="A simple description" name="businessOfficeBB">
+					<webclient nameWebServer="17.56.26.-1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="201.0.0.-1">
+				<neighbour name="1.0.0.4" />
+				<configuration description="A simple description" name="car">
+					<webclient nameWebServer="17.56.26.-1" />
+				</configuration>
+			</node>
+			
+			
+			<node  name="1.0.0.4" functional_type="FIREWALL">
+				<neighbour name="165.165.165.-1" />
+				<neighbour name="201.0.0.-1" />
+				<neighbour name="1.0.0.12" />
+				 <configuration description="A simple description" name="conf1">
+            		<firewall defaultAction="DENY" />
+       			 </configuration>
+			</node>
+			
+			<node name="1.0.0.5" functional_type="FIREWALL">
+				<neighbour name="165.165.166.-1" />
+				<neighbour name="1.0.0.12" />
+				 <configuration description="A simple description" name="conf1">
+            		<firewall defaultAction="DENY" />
+       			 </configuration>
+			</node>
+			
+			<node name="1.0.0.6" functional_type="FIREWALL">
+				<neighbour name="165.165.167.-1" />
+				<neighbour name="1.0.0.12" />
+				 <configuration description="A simple description" name="conf1">
+            		<firewall defaultAction="DENY" />
+       			 </configuration>
+			</node>
+			
+			
+			<!-- IT Department -->
+			
+			<node functional_type="WEBCLIENT" name="204.0.0.1">
+				<neighbour name="1.0.0.7" />
+				<configuration description="A simple description" name="iotController">
+					<webclient nameWebServer="17.56.26.-1" />
+				</configuration>
+			</node>
+		
+			<node functional_type="WEBCLIENT" name="94.142.249.-1">
+				<neighbour name="1.0.0.8" />
+				<configuration description="A simple description" name="businessOfficeBI">
+					<webclient nameWebServer="17.56.26.-1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBSERVER" name="94.142.251.1">
+				<neighbour name="1.0.0.12" />
+				<configuration description="A simple description" name="serverRoomS1">
+					<webserver>
+						<name>17.56.26.-1</name>
+					</webserver>
+				</configuration>
+			</node>
+			
+			<node name="1.0.0.7" functional_type="FIREWALL">
+				<neighbour name="204.0.0.1" />
+				<neighbour name="1.0.0.12" />
+				 <configuration description="A simple description" name="conf1">
+            		<firewall defaultAction="DENY" />
+       			 </configuration>
+			</node>
+			
+			<node  name="1.0.0.8" functional_type="FIREWALL">
+				<neighbour name="94.142.249.-1" />
+				<neighbour name="1.0.0.12" />
+				 <configuration description="A simple description" name="conf1">
+            		<firewall defaultAction="DENY" />
+       			 </configuration>
+			</node>
+			
+			
+			<!-- C Department -->
+			
+			<node functional_type="WEBSERVER" name="17.56.26.-1">
+				<neighbour name="1.0.0.9" />
+				<configuration description="A simple description" name="serverRoomS2">
+					<webserver>
+						<name>17.56.27.-1</name>
+					</webserver>
+				</configuration>
+			</node>
+			
+
+			<node functional_type="WEBSERVER" name="17.56.27.-1">
+				<neighbour name="1.0.0.10" />
+				<configuration description="A simple description" name="serverRoomS2">
+					<webserver>
+						<name>17.56.27.-1</name>
+					</webserver>
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBSERVER" name="17.56.28.-1">
+				<neighbour name="1.0.0.11" />
+				<configuration description="A simple description" name="serverRoomS3">
+					<webserver>
+						<name>17.56.28.-1</name>
+					</webserver>
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="202.0.0.-1" >
+				<neighbour name="1.0.0.9" />
+				<configuration description="A simple description" name="thermostat">
+					<webclient nameWebServer="17.56.26.-1" />
+				</configuration>
+			</node>
+			
+			
+	
+			<node name="1.0.0.9" functional_type="FIREWALL">
+				<neighbour name="17.56.26.-1" />
+				<neighbour name="202.0.0.-1" />
+				<neighbour name="1.0.0.12" />
+				 <configuration description="A simple description" name="conf1">
+            		<firewall defaultAction="DENY" />
+       			 </configuration>
+			</node>
+			
+			<node name="1.0.0.10" functional_type="FIREWALL">
+				<neighbour name="17.56.27.-1" />
+				<neighbour name="1.0.0.12" />
+				 <configuration description="A simple description" name="conf1">
+            		<firewall defaultAction="DENY" />
+       			 </configuration>
+			</node>
+			
+			<node name="1.0.0.11" functional_type="FIREWALL">
+				<neighbour name="17.56.28.-1" />
+				<neighbour name="1.0.0.12" />
+				 <configuration description="A simple description" name="conf1">
+            		<firewall defaultAction="DENY" />
+       			 </configuration>
+			</node>
+
+			
+			<!-- Central -->
+			
+			<node functional_type="FORWARDER"  name="1.0.0.12">
+				<neighbour name="1.0.0.1" />
+				<neighbour name="1.0.0.2" />
+				<neighbour name="1.0.0.3" />
+				<neighbour name="1.0.0.4" />
+				<neighbour name="1.0.0.5" />
+				<neighbour name="1.0.0.6" />
+				<neighbour name="1.0.0.7" />
+				<neighbour name="1.0.0.8" />
+				<neighbour name="1.0.0.9" />
+				<neighbour name="1.0.0.10" />
+				<neighbour name="1.0.0.11" />
+				<neighbour name="94.142.251.1" />
+			</node>
+			
+			
+		</graph>
+	</graphs>
+	<Constraints>
+		<NodeConstraints/>
+		<LinkConstraints />
+	</Constraints>
+	<PropertyDefinition>
+	
+			<!-- First Policy: About Department A, A1 and A2 can only communicate between them and with A3. The same is for Department B. -->
+		
+			<Property graph="0" name="ReachabilityProperty" src="220.220.220.-1" dst="220.220.221.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="220.220.220.-1" dst="220.220.222.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="220.220.222.-1" dst="220.220.221.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="220.220.221.-1" dst="220.220.222.-1" />
+			
+			<Property graph="0" name="ReachabilityProperty" src="165.165.167.-1" dst="165.165.166.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="165.165.166.-1" dst="165.165.167.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="165.165.165.-1" dst="165.165.166.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="165.165.166.-1" dst="165.165.165.-1" />
+			
+			
+			<!-- Second Policy: Office A3 and B3 must be able to communicate to exchange information about the departments. However, A1 and A2 cannot contact B3, while B1 and B2 cannot contact A3. -->
+			<Property graph="0" name="ReachabilityProperty" src="220.220.222.-1" dst="165.165.167.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="165.165.167.-1" dst="220.220.222.-1" />
+			<Property graph="0" name="IsolationProperty" src="165.165.165.-1" dst="220.220.220.-1" />
+			<Property graph="0" name="IsolationProperty" src="165.165.167.-1" dst="220.220.220.-1" />
+			<Property graph="0" name="IsolationProperty" src="220.220.222.-1" dst="165.165.166.-1" />
+			<Property graph="0" name="IsolationProperty" dst="165.165.167.-1" src="220.220.220.-1" />
+			<Property graph="0" name="IsolationProperty" dst="220.220.222.-1" src="165.165.166.-1" />
+			
+			
+			<!-- Third Policy : IoT controller must be able to contact IoT devices -->
+			
+			<Property graph="0" name="ReachabilityProperty" src="204.0.0.1" dst="200.0.0.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="204.0.0.1" dst="201.0.0.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="204.0.0.1" dst="202.0.0.-1" />
+			<Property graph="0" name="IsolationProperty" dst="220.220.220.-1" src="204.0.0.1" />
+			<Property graph="0" name="IsolationProperty" dst="165.165.165.-1" src="204.0.0.1" />
+			<Property graph="0" name="IsolationProperty" src="165.165.167.-1" dst="94.142.251.1" />
+			<Property graph="0" name="IsolationProperty" dst="165.165.167.-1" src="94.142.251.1" />
+			<Property graph="0" name="IsolationProperty" src="220.220.222.-1" dst="94.142.251.1" />
+			<Property graph="0" name="IsolationProperty" dst="220.220.222.-1" src="94.142.251.1" />
+			
+			<!-- Fourth Policy: In department C, C2 has been victim of an attack and must be isolated from any other office or device in the company. -->
+			
+			
+			
+			
+			<!-- Fifth Policy: Server Room is a private room for offices only in Department C, so the only authorized office to contact it is Office C1. It must anyway be reachable also for IT office. -->
+			
+			
+			
+			
+			<Property graph="0" name="IsolationProperty" src="17.56.27.-1" dst="17.56.28.-1" />
+			<Property graph="0" name="IsolationProperty" src="17.56.28.-1" dst="17.56.27.-1" />
+			<Property graph="0" name="IsolationProperty" src="17.56.28.-1" dst="17.56.26.-1" />
+			<Property graph="0" name="IsolationProperty" src="220.220.220.-1" dst="17.56.26.-1" />
+			<Property graph="0" name="IsolationProperty" src="94.142.251.-1" dst="17.56.26.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="94.142.249.-1" dst="17.56.26.-1" />
+			<Property graph="0" name="ReachabilityProperty" dst="94.142.249.-1" src="17.56.26.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="17.56.27.-1" dst="17.56.26.-1" />
+			<Property graph="0" name="ReachabilityProperty" dst="17.56.27.-1" src="17.56.26.-1" />
+	
+	
+			<Property graph="0" name="IsolationProperty" src="94.142.249.-1" dst="94.142.251.1" />
+	
+			
+	</PropertyDefinition>
+</NFV>
