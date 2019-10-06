@@ -7,7 +7,7 @@
 			<!-- A Department -->
 			
 			<node functional_type="WEBCLIENT" name="220.220.220.-1">
-				<neighbour name="1.0.0.1" />
+				<neighbour name="1.0.0.01" />
 				<configuration description="A simple description" name="officeA1">
 					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
@@ -28,14 +28,14 @@
 			</node>
 			
 			<node functional_type="WEBCLIENT" name="200.0.0.-1">
-				<neighbour name="1.0.0.1" />
+				<neighbour name="1.0.0.01" />
 				<configuration description="A simple description" name="bycicle">
 					<webclient nameWebServer="17.56.26.-1" />
 				</configuration>
 			</node>
 			
 
-			<node name="1.0.0.1" functional_type="FIREWALL">
+			<node name="1.0.0.01" functional_type="FIREWALL">
 				<neighbour name="220.220.220.-1" />
 				<neighbour name="200.0.0.-1" />
 				<neighbour name="1.0.0.12" />
@@ -122,7 +122,7 @@
 			
 			<!-- IT Department -->
 			
-			<node functional_type="WEBCLIENT" name="204.0.0.1">
+			<node functional_type="WEBCLIENT" name="204.0.0.2">
 				<neighbour name="1.0.0.7" />
 				<configuration description="A simple description" name="iotController">
 					<webclient nameWebServer="17.56.26.-1" />
@@ -146,7 +146,7 @@
 			</node>
 			
 			<node name="1.0.0.7" functional_type="FIREWALL">
-				<neighbour name="204.0.0.1" />
+				<neighbour name="204.0.0.2" />
 				<neighbour name="1.0.0.12" />
 				 <configuration description="A simple description" name="conf1">
             		<firewall defaultAction="DENY" />
@@ -230,7 +230,7 @@
 			<!-- Central -->
 			
 			<node functional_type="FORWARDER"  name="1.0.0.12">
-				<neighbour name="1.0.0.1" />
+				<neighbour name="1.0.0.01" />
 				<neighbour name="1.0.0.2" />
 				<neighbour name="1.0.0.3" />
 				<neighbour name="1.0.0.4" />
@@ -257,6 +257,7 @@
 		
 			<Property graph="0" name="ReachabilityProperty" src="220.220.220.-1" dst="220.220.221.-1" />
 			<Property graph="0" name="ReachabilityProperty" src="220.220.220.-1" dst="220.220.222.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="220.220.222.-1" dst="220.220.220.-1" />
 			<Property graph="0" name="ReachabilityProperty" src="220.220.222.-1" dst="220.220.221.-1" />
 			<Property graph="0" name="ReachabilityProperty" src="220.220.221.-1" dst="220.220.222.-1" />
 			
@@ -278,11 +279,11 @@
 			
 			<!-- Third Policy : IoT controller must be able to contact IoT devices -->
 			
-			<Property graph="0" name="ReachabilityProperty" src="204.0.0.1" dst="200.0.0.-1" />
-			<Property graph="0" name="ReachabilityProperty" src="204.0.0.1" dst="201.0.0.-1" />
-			<Property graph="0" name="ReachabilityProperty" src="204.0.0.1" dst="202.0.0.-1" />
-			<Property graph="0" name="IsolationProperty" dst="220.220.220.-1" src="204.0.0.1" />
-			<Property graph="0" name="IsolationProperty" dst="165.165.165.-1" src="204.0.0.1" />
+			<Property graph="0" name="ReachabilityProperty" src="204.0.0.2" dst="200.0.0.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="204.0.0.2" dst="201.0.0.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="204.0.0.2" dst="202.0.0.-1" />
+			<Property graph="0" name="IsolationProperty" dst="220.220.220.-1" src="204.0.0.2" />
+			<Property graph="0" name="IsolationProperty" dst="165.165.165.-1" src="204.0.0.2" />
 			<Property graph="0" name="IsolationProperty" src="165.165.167.-1" dst="94.142.251.1" />
 			<Property graph="0" name="IsolationProperty" dst="165.165.167.-1" src="94.142.251.1" />
 			<Property graph="0" name="IsolationProperty" src="220.220.222.-1" dst="94.142.251.1" />
@@ -302,6 +303,7 @@
 			<Property graph="0" name="IsolationProperty" src="17.56.28.-1" dst="17.56.27.-1" />
 			<Property graph="0" name="IsolationProperty" src="17.56.28.-1" dst="17.56.26.-1" />
 			<Property graph="0" name="IsolationProperty" src="220.220.220.-1" dst="17.56.26.-1" />
+			<Property graph="0" name="IsolationProperty" dst="220.220.220.-1" src="17.56.26.-1" />
 			<Property graph="0" name="IsolationProperty" src="94.142.251.-1" dst="17.56.26.-1" />
 			<Property graph="0" name="ReachabilityProperty" src="94.142.249.-1" dst="17.56.26.-1" />
 			<Property graph="0" name="ReachabilityProperty" dst="94.142.249.-1" src="17.56.26.-1" />

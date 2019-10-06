@@ -3,455 +3,1078 @@
     <ITResource>
         <configuration xsi:type="RuleSetConfiguration">
             <capability xsi:type="FilteringCapability">
-                <Name>Filtering_L4</Name>
+                <Name>Traffic_Divert</Name>
                 <stateful>false</stateful>
                 <applicationLayerFiltering>false</applicationLayerFiltering>
                 <httpFiltering>false</httpFiltering>
                 <contentInspection>false</contentInspection>
             </capability>
-            <defaultAction xsi:type="FilteringAction">
-                <FilteringActionType>DENY</FilteringActionType>
-            </defaultAction>
             <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000001/1</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
                 </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
-                    <isCNF>false</isCNF>
-                    <packetFilterCondition>
-                        <SourceAddress>17.56.0.0/16</SourceAddress>
-                        <DestinationAddress>220.220.0.0/16</DestinationAddress>
-                    </packetFilterCondition>
-                </configurationCondition>
-                <Name>Rule 0</Name>
-                <isCNF>false</isCNF>
-            </configurationRule>
-            <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
-                </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
-                    <isCNF>false</isCNF>
-                    <packetFilterCondition>
-                        <SourceAddress>204.0.0.1</SourceAddress>
-                        <DestinationAddress>200.0.0.0/24</DestinationAddress>
-                    </packetFilterCondition>
-                </configurationCondition>
-                <Name>Rule 1</Name>
-                <isCNF>false</isCNF>
-            </configurationRule>
-            <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
-                </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
-                    <isCNF>false</isCNF>
-                    <packetFilterCondition>
-                        <SourceAddress>220.220.220.0/24</SourceAddress>
-                        <DestinationAddress>220.220.0.0/16</DestinationAddress>
-                    </packetFilterCondition>
-                </configurationCondition>
-                <Name>Rule 2</Name>
-                <isCNF>false</isCNF>
-            </configurationRule>
-            <resolutionStrategy/>
-            <Name>ConfFW1</Name>
-        </configuration>
-    </ITResource>
-    <ITResource>
-        <configuration xsi:type="RuleSetConfiguration">
-            <capability xsi:type="FilteringCapability">
-                <Name>Filtering_L4</Name>
-                <stateful>false</stateful>
-                <applicationLayerFiltering>false</applicationLayerFiltering>
-                <httpFiltering>false</httpFiltering>
-                <contentInspection>false</contentInspection>
-            </capability>
-            <defaultAction xsi:type="FilteringAction">
-                <FilteringActionType>DENY</FilteringActionType>
-            </defaultAction>
-            <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
-                </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
                         <SourceAddress>220.220.0.0/16</SourceAddress>
                         <DestinationAddress>220.220.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000001/2</Interface>
                     </packetFilterCondition>
                 </configurationCondition>
-                <Name>Rule 0</Name>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule0</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
-            <resolutionStrategy/>
-            <Name>ConfFW2</Name>
+            <Name>Conf0</Name>
         </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
     </ITResource>
     <ITResource>
         <configuration xsi:type="RuleSetConfiguration">
             <capability xsi:type="FilteringCapability">
-                <Name>Filtering_L4</Name>
+                <Name>Traffic_Divert</Name>
                 <stateful>false</stateful>
                 <applicationLayerFiltering>false</applicationLayerFiltering>
                 <httpFiltering>false</httpFiltering>
                 <contentInspection>false</contentInspection>
             </capability>
-            <defaultAction xsi:type="FilteringAction">
-                <FilteringActionType>DENY</FilteringActionType>
-            </defaultAction>
             <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000001/2</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
                 </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
-                    <isCNF>false</isCNF>
-                    <packetFilterCondition>
-                        <SourceAddress>220.220.222.0/24</SourceAddress>
-                        <DestinationAddress>165.165.167.0/24</DestinationAddress>
-                    </packetFilterCondition>
-                </configurationCondition>
-                <Name>Rule 0</Name>
-                <isCNF>false</isCNF>
-            </configurationRule>
-            <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
-                </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
-                    <isCNF>false</isCNF>
-                    <packetFilterCondition>
-                        <SourceAddress>165.165.167.0/24</SourceAddress>
-                        <DestinationAddress>220.220.222.0/24</DestinationAddress>
-                    </packetFilterCondition>
-                </configurationCondition>
-                <Name>Rule 1</Name>
-                <isCNF>false</isCNF>
-            </configurationRule>
-            <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
-                </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
                         <SourceAddress>220.220.0.0/16</SourceAddress>
                         <DestinationAddress>220.220.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000001/1</Interface>
                     </packetFilterCondition>
                 </configurationCondition>
-                <Name>Rule 2</Name>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule1</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
-            <resolutionStrategy/>
-            <Name>ConfFW3</Name>
+            <Name>Conf0</Name>
         </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
     </ITResource>
     <ITResource>
         <configuration xsi:type="RuleSetConfiguration">
             <capability xsi:type="FilteringCapability">
-                <Name>Filtering_L4</Name>
+                <Name>Traffic_Divert</Name>
                 <stateful>false</stateful>
                 <applicationLayerFiltering>false</applicationLayerFiltering>
                 <httpFiltering>false</httpFiltering>
                 <contentInspection>false</contentInspection>
             </capability>
-            <defaultAction xsi:type="FilteringAction">
-                <FilteringActionType>DENY</FilteringActionType>
-            </defaultAction>
             <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000001/3</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
                 </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
-                        <SourceAddress>204.0.0.1</SourceAddress>
-                        <DestinationAddress>201.0.0.0/24</DestinationAddress>
+                        <SourceAddress>200d::2/128</SourceAddress>
+                        <DestinationAddress>200a::/64</DestinationAddress>
+                        <Interface>of:0000000000000001/1</Interface>
                     </packetFilterCondition>
                 </configurationCondition>
-                <Name>Rule 0</Name>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule2</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
-            <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
-                </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
-                    <isCNF>false</isCNF>
-                    <packetFilterCondition>
-                        <SourceAddress>165.165.0.0/16</SourceAddress>
-                        <DestinationAddress>165.165.0.0/16</DestinationAddress>
-                    </packetFilterCondition>
-                </configurationCondition>
-                <Name>Rule 1</Name>
-                <isCNF>false</isCNF>
-            </configurationRule>
-            <resolutionStrategy/>
-            <Name>ConfFW4</Name>
+            <Name>Conf0</Name>
         </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
     </ITResource>
     <ITResource>
         <configuration xsi:type="RuleSetConfiguration">
             <capability xsi:type="FilteringCapability">
-                <Name>Filtering_L4</Name>
+                <Name>Traffic_Divert</Name>
                 <stateful>false</stateful>
                 <applicationLayerFiltering>false</applicationLayerFiltering>
                 <httpFiltering>false</httpFiltering>
                 <contentInspection>false</contentInspection>
             </capability>
-            <defaultAction xsi:type="FilteringAction">
-                <FilteringActionType>DENY</FilteringActionType>
-            </defaultAction>
             <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000002/2</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
                 </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
-                        <SourceAddress>165.165.0.0/16</SourceAddress>
-                        <DestinationAddress>165.165.0.0/16</DestinationAddress>
+                        <SourceAddress>220.220.0.0/16</SourceAddress>
+                        <DestinationAddress>220.220.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000002/1</Interface>
                     </packetFilterCondition>
                 </configurationCondition>
-                <Name>Rule 0</Name>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule0</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
-            <resolutionStrategy/>
-            <Name>ConfFW5</Name>
+            <Name>Conf1</Name>
         </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
     </ITResource>
     <ITResource>
         <configuration xsi:type="RuleSetConfiguration">
             <capability xsi:type="FilteringCapability">
-                <Name>Filtering_L4</Name>
+                <Name>Traffic_Divert</Name>
                 <stateful>false</stateful>
                 <applicationLayerFiltering>false</applicationLayerFiltering>
                 <httpFiltering>false</httpFiltering>
                 <contentInspection>false</contentInspection>
             </capability>
-            <defaultAction xsi:type="FilteringAction">
-                <FilteringActionType>DENY</FilteringActionType>
-            </defaultAction>
             <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000002/1</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
                 </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>220.220.0.0/16</SourceAddress>
+                        <DestinationAddress>220.220.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000002/2</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule1</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf1</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000003/1</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
                         <SourceAddress>220.220.222.0/24</SourceAddress>
                         <DestinationAddress>165.165.167.0/24</DestinationAddress>
+                        <Interface>of:0000000000000003/2</Interface>
                     </packetFilterCondition>
                 </configurationCondition>
-                <Name>Rule 0</Name>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule0</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
+            <Name>Conf2</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
             <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000003/2</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
                 </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
                         <SourceAddress>165.165.167.0/24</SourceAddress>
                         <DestinationAddress>220.220.222.0/24</DestinationAddress>
+                        <Interface>of:0000000000000003/1</Interface>
                     </packetFilterCondition>
                 </configurationCondition>
-                <Name>Rule 1</Name>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule1</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
+            <Name>Conf2</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
             <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000003/1</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
                 </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>220.220.0.0/16</SourceAddress>
+                        <DestinationAddress>220.220.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000003/2</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule2</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf2</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000003/2</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>220.220.0.0/16</SourceAddress>
+                        <DestinationAddress>220.220.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000003/1</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule3</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf2</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000004/3</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>200d::2/128</SourceAddress>
+                        <DestinationAddress>200b::/64</DestinationAddress>
+                        <Interface>of:0000000000000004/1</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule0</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf3</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000004/1</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
                         <SourceAddress>165.165.0.0/16</SourceAddress>
                         <DestinationAddress>165.165.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000004/2</Interface>
                     </packetFilterCondition>
                 </configurationCondition>
-                <Name>Rule 2</Name>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule1</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
-            <resolutionStrategy/>
-            <Name>ConfFW6</Name>
+            <Name>Conf3</Name>
         </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
     </ITResource>
     <ITResource>
         <configuration xsi:type="RuleSetConfiguration">
             <capability xsi:type="FilteringCapability">
-                <Name>Filtering_L4</Name>
+                <Name>Traffic_Divert</Name>
                 <stateful>false</stateful>
                 <applicationLayerFiltering>false</applicationLayerFiltering>
                 <httpFiltering>false</httpFiltering>
                 <contentInspection>false</contentInspection>
             </capability>
-            <defaultAction xsi:type="FilteringAction">
-                <FilteringActionType>DENY</FilteringActionType>
-            </defaultAction>
             <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000004/2</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
                 </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
-                        <SourceAddress>204.0.0.1</SourceAddress>
+                        <SourceAddress>165.165.0.0/16</SourceAddress>
+                        <DestinationAddress>165.165.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000004/1</Interface>
                     </packetFilterCondition>
                 </configurationCondition>
-                <Name>Rule 0</Name>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule2</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
-            <resolutionStrategy/>
-            <Name>ConfFW7</Name>
+            <Name>Conf3</Name>
         </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
     </ITResource>
     <ITResource>
         <configuration xsi:type="RuleSetConfiguration">
             <capability xsi:type="FilteringCapability">
-                <Name>Filtering_L4</Name>
+                <Name>Traffic_Divert</Name>
                 <stateful>false</stateful>
                 <applicationLayerFiltering>false</applicationLayerFiltering>
                 <httpFiltering>false</httpFiltering>
                 <contentInspection>false</contentInspection>
             </capability>
-            <defaultAction xsi:type="FilteringAction">
-                <FilteringActionType>DENY</FilteringActionType>
-            </defaultAction>
             <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000005/2</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
                 </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>165.165.0.0/16</SourceAddress>
+                        <DestinationAddress>165.165.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000005/1</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule0</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf4</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000005/1</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>165.165.0.0/16</SourceAddress>
+                        <DestinationAddress>165.165.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000005/2</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule1</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf4</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000006/2</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>220.220.222.0/24</SourceAddress>
+                        <DestinationAddress>165.165.167.0/24</DestinationAddress>
+                        <Interface>of:0000000000000006/1</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule0</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf5</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000006/1</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>165.165.167.0/24</SourceAddress>
+                        <DestinationAddress>220.220.222.0/24</DestinationAddress>
+                        <Interface>of:0000000000000006/2</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule1</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf5</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000006/2</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>165.165.0.0/16</SourceAddress>
+                        <DestinationAddress>165.165.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000006/1</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule2</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf5</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000006/1</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>165.165.0.0/16</SourceAddress>
+                        <DestinationAddress>165.165.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000006/2</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule3</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf5</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:000000000000000b/2</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>200d::2/128</SourceAddress>
+                        <Interface>of:000000000000000b/3</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule0</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf6</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:000000000000000a/1</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
                         <SourceAddress>94.142.249.0/24</SourceAddress>
                         <DestinationAddress>17.56.26.0/24</DestinationAddress>
+                        <Interface>of:000000000000000a/2</Interface>
                     </packetFilterCondition>
                 </configurationCondition>
-                <Name>Rule 0</Name>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule0</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
+            <Name>Conf7</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
             <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:000000000000000a/2</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
                 </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
                         <SourceAddress>17.56.26.0/24</SourceAddress>
                         <DestinationAddress>94.142.249.0/24</DestinationAddress>
+                        <Interface>of:000000000000000a/1</Interface>
                     </packetFilterCondition>
                 </configurationCondition>
-                <Name>Rule 1</Name>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule1</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
-            <resolutionStrategy/>
-            <Name>ConfFW8</Name>
+            <Name>Conf7</Name>
         </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
     </ITResource>
     <ITResource>
         <configuration xsi:type="RuleSetConfiguration">
             <capability xsi:type="FilteringCapability">
-                <Name>Filtering_L4</Name>
+                <Name>Traffic_Divert</Name>
                 <stateful>false</stateful>
                 <applicationLayerFiltering>false</applicationLayerFiltering>
                 <httpFiltering>false</httpFiltering>
                 <contentInspection>false</contentInspection>
             </capability>
-            <defaultAction xsi:type="FilteringAction">
-                <FilteringActionType>DENY</FilteringActionType>
-            </defaultAction>
             <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000007/3</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
                 </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>200d::2/128</SourceAddress>
+                        <DestinationAddress>200c::/64</DestinationAddress>
+                        <Interface>of:0000000000000007/1</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule0</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf8</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000007/2</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
                         <SourceAddress>94.142.249.0/24</SourceAddress>
                         <DestinationAddress>17.56.26.0/24</DestinationAddress>
+                        <Interface>of:0000000000000007/1</Interface>
                     </packetFilterCondition>
                 </configurationCondition>
-                <Name>Rule 0</Name>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule1</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
-            <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
-                </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
-                    <isCNF>false</isCNF>
-                    <packetFilterCondition>
-                        <SourceAddress>204.0.0.1</SourceAddress>
-                        <DestinationAddress>202.0.0.0/24</DestinationAddress>
-                    </packetFilterCondition>
-                </configurationCondition>
-                <Name>Rule 1</Name>
-                <isCNF>false</isCNF>
-            </configurationRule>
-            <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
-                </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
-                    <isCNF>false</isCNF>
-                    <packetFilterCondition>
-                        <SourceAddress>17.56.0.0/16</SourceAddress>
-                    </packetFilterCondition>
-                </configurationCondition>
-                <Name>Rule 2</Name>
-                <isCNF>false</isCNF>
-            </configurationRule>
-            <resolutionStrategy/>
-            <Name>ConfFW9</Name>
+            <Name>Conf8</Name>
         </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
     </ITResource>
     <ITResource>
         <configuration xsi:type="RuleSetConfiguration">
             <capability xsi:type="FilteringCapability">
-                <Name>Filtering_L4</Name>
+                <Name>Traffic_Divert</Name>
                 <stateful>false</stateful>
                 <applicationLayerFiltering>false</applicationLayerFiltering>
                 <httpFiltering>false</httpFiltering>
                 <contentInspection>false</contentInspection>
             </capability>
-            <defaultAction xsi:type="FilteringAction">
-                <FilteringActionType>DENY</FilteringActionType>
-            </defaultAction>
             <configurationRule>
-                <configurationRuleAction xsi:type="FilteringAction">
-                    <FilteringActionType>ALLOW</FilteringActionType>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000007/1</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
                 </configurationRuleAction>
-                <configurationCondition xsi:type="FilteringConfigurationCondition">
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>17.56.0.0/16</SourceAddress>
+                        <Interface>of:0000000000000007/2</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule2</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf8</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000007/2</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>17.56.0.0/16</SourceAddress>
+                        <Interface>of:0000000000000007/1</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule3</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf8</Name>
+        </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
+    </ITResource>
+    <ITResource>
+        <configuration xsi:type="RuleSetConfiguration">
+            <capability xsi:type="FilteringCapability">
+                <Name>Traffic_Divert</Name>
+                <stateful>false</stateful>
+                <applicationLayerFiltering>false</applicationLayerFiltering>
+                <httpFiltering>false</httpFiltering>
+                <contentInspection>false</contentInspection>
+            </capability>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000008/1</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
                     <isCNF>false</isCNF>
                     <packetFilterCondition>
                         <SourceAddress>17.56.0.0/16</SourceAddress>
                         <DestinationAddress>17.56.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000008/2</Interface>
                     </packetFilterCondition>
                 </configurationCondition>
-                <Name>Rule 0</Name>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule0</Name>
                 <isCNF>false</isCNF>
             </configurationRule>
-            <resolutionStrategy/>
-            <Name>ConfFW10</Name>
+            <Name>Conf9</Name>
         </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
     </ITResource>
     <ITResource>
         <configuration xsi:type="RuleSetConfiguration">
             <capability xsi:type="FilteringCapability">
-                <Name>Filtering_L4</Name>
+                <Name>Traffic_Divert</Name>
                 <stateful>false</stateful>
                 <applicationLayerFiltering>false</applicationLayerFiltering>
                 <httpFiltering>false</httpFiltering>
                 <contentInspection>false</contentInspection>
             </capability>
-            <defaultAction xsi:type="FilteringAction">
-                <FilteringActionType>DENY</FilteringActionType>
-            </defaultAction>
-            <resolutionStrategy/>
-            <Name>ConfFW11</Name>
+            <configurationRule>
+                <configurationRuleAction xsi:type="TrafficDivertAction">
+                    <TrafficDivertActionType>FORWARD</TrafficDivertActionType>
+                    <packetDivertAction>
+                        <isCNF>false</isCNF>
+                        <packetFilterCondition>
+                            <Interface>of:0000000000000008/2</Interface>
+                        </packetFilterCondition>
+                    </packetDivertAction>
+                </configurationRuleAction>
+                <configurationCondition xsi:type="TrafficDivertConfigurationCondition">
+                    <isCNF>false</isCNF>
+                    <packetFilterCondition>
+                        <SourceAddress>17.56.0.0/16</SourceAddress>
+                        <DestinationAddress>17.56.0.0/16</DestinationAddress>
+                        <Interface>of:0000000000000008/1</Interface>
+                    </packetFilterCondition>
+                </configurationCondition>
+                <externalData xsi:type="Priority">
+                    <value>60000</value>
+                </externalData>
+                <Name>Rule1</Name>
+                <isCNF>false</isCNF>
+            </configurationRule>
+            <Name>Conf9</Name>
         </configuration>
+        <priority>1000</priority>
+        <enablerCandidates>
+            <enabler>onos_nb</enabler>
+        </enablerCandidates>
     </ITResource>
 </ITResourceOrchestration>

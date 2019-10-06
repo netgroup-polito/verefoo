@@ -76,6 +76,12 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/lib/lib4j/log4j-core-2.9.1.jar</systemPath>
 		</dependency>
+		
+		<dependency>
+    		<groupId>com.googlecode.json-simple</groupId>
+    		<artifactId>json-simple</artifactId>
+    		<version>1.1.1</version>
+		</dependency>
 
 		<!-- Jersey 2.19 -->
 		<dependency>
