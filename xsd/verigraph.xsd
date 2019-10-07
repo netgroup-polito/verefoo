@@ -26,6 +26,8 @@
             <xsd:enumeration value="FORWARDER" />
             <xsd:enumeration value="LOADBALANCER" />
             <xsd:enumeration value="STATEFUL_FIREWALL" />
+            <xsd:enumeration value="PRIORITY_FIREWALL" />
+            <xsd:enumeration value="TRAFFIC_MONITOR" />
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="protocolTypes">
@@ -164,6 +166,14 @@
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="stateful_firewall">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="elements" minOccurs="0" maxOccurs="unbounded" />
+            </xsd:sequence>
+             <xsd:attribute name="defaultAction" type="ActionTypes"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="priority_firewall">
         <xsd:complexType>
             <xsd:sequence>
                 <xsd:element ref="elements" minOccurs="0" maxOccurs="unbounded" />

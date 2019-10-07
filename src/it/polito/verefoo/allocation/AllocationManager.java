@@ -14,6 +14,7 @@ import it.polito.verefoo.functions.GenericFunction;
 import it.polito.verefoo.functions.LoadBalancer;
 import it.polito.verefoo.functions.NAT;
 import it.polito.verefoo.functions.PacketFilter;
+import it.polito.verefoo.functions.PriorityPacketFilter;
 import it.polito.verefoo.functions.StatefulPacketFilter;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.FunctionalTypes;
@@ -146,7 +147,29 @@ public class AllocationManager {
 					StatefulPacketFilter spf = new StatefulPacketFilter(allocationNode, ctx, nctx);
 					allocationNode.setPlacedNF(spf);
 					allocationNode.setTypeNF(FunctionalTypes.STATEFUL_FIREWALL);
+					
+					if(node.getConfiguration().getFirewall().getDefaultAction() != null) {
+						if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
+							spf.setDefaultAction(true);
+						}else if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.DENY)){
+							spf.setDefaultAction(false);
+						}
+					}
 				}
+				else if(node.getFunctionalType() == FunctionalTypes.PRIORITY_FIREWALL) {
+					PriorityPacketFilter ppf = new PriorityPacketFilter(allocationNode, ctx, nctx);
+					allocationNode.setPlacedNF(ppf);
+					allocationNode.setTypeNF(FunctionalTypes.PRIORITY_FIREWALL);
+					
+					if(node.getConfiguration().getFirewall().getDefaultAction() != null) {
+						if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
+							ppf.setDefaultAction(true);
+						}else if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.DENY)){
+							ppf.setDefaultAction(false);
+						}
+					}
+				}
+
 			}
 			
 		});
@@ -212,6 +235,10 @@ public class AllocationManager {
 			}
 			else if(type.equals(FunctionalTypes.STATEFUL_FIREWALL)) {
 				StatefulPacketFilter fw = (StatefulPacketFilter) no;
+				fw.manualConfiguration();
+			}
+			else if(type.equals(FunctionalTypes.PRIORITY_FIREWALL)) {
+				PriorityPacketFilter fw = (PriorityPacketFilter) no;
 				fw.manualConfiguration();
 			}
 		});
