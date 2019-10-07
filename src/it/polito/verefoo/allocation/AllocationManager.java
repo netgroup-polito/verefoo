@@ -16,6 +16,7 @@ import it.polito.verefoo.functions.NAT;
 import it.polito.verefoo.functions.PacketFilter;
 import it.polito.verefoo.functions.PriorityPacketFilter;
 import it.polito.verefoo.functions.StatefulPacketFilter;
+import it.polito.verefoo.functions.TrafficMonitor;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Node;
@@ -143,6 +144,13 @@ public class AllocationManager {
 					allocationNode.setPlacedNF(forwarder);
 					allocationNode.setTypeNF(FunctionalTypes.FORWARDER);
 				}
+				
+				else if(node.getFunctionalType() == FunctionalTypes.TRAFFIC_MONITOR) {
+					TrafficMonitor tm = new TrafficMonitor(allocationNode, ctx, nctx);
+					allocationNode.setPlacedNF(tm);
+					allocationNode.setTypeNF(FunctionalTypes.FORWARDER);
+				}
+				
 				else if(node.getFunctionalType() == FunctionalTypes.STATEFUL_FIREWALL) {
 					StatefulPacketFilter spf = new StatefulPacketFilter(allocationNode, ctx, nctx);
 					allocationNode.setPlacedNF(spf);
@@ -156,6 +164,7 @@ public class AllocationManager {
 						}
 					}
 				}
+				
 				else if(node.getFunctionalType() == FunctionalTypes.PRIORITY_FIREWALL) {
 					PriorityPacketFilter ppf = new PriorityPacketFilter(allocationNode, ctx, nctx);
 					allocationNode.setPlacedNF(ppf);
@@ -228,6 +237,9 @@ public class AllocationManager {
 			}else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {	
 				Forwarder fw = (Forwarder) no;
 				fw.forwarderSendRules();
+			}else if(node.getFunctionalType() == FunctionalTypes.TRAFFIC_MONITOR) {	
+				TrafficMonitor tm = (TrafficMonitor) no;
+				tm.trafficMonitorSendRules();
 			}else if(type.equals(FunctionalTypes.FIREWALL)) {
 				PacketFilter fw = (PacketFilter) no;
 				if(fw.isAutoconfigured()) fw.automaticConfiguration();

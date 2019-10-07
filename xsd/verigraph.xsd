@@ -289,14 +289,22 @@
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
-     <xsd:element name="forwarder">
+    <xsd:element name="forwarder">
      <xsd:complexType>
             <xsd:sequence>
                 <xsd:element name="name" type="xsd:string" default="Forwarder"
                     nillable="true" />
             </xsd:sequence>
         </xsd:complexType>
-       </xsd:element>
+     </xsd:element>
+     <xsd:element name="traffic_monitor">
+	     <xsd:complexType>
+	            <xsd:sequence>
+	                <xsd:element name="name" type="xsd:string" default="TrafficMonitor"
+	                    nillable="true" />
+	            </xsd:sequence>
+	        </xsd:complexType>
+     </xsd:element>
     <xsd:element name="loadbalancer">
         <xsd:complexType>
             <xsd:sequence minOccurs="1" maxOccurs="unbounded">
