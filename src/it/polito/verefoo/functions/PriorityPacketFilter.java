@@ -55,6 +55,7 @@ public class PriorityPacketFilter extends GenericFunction{
 	Map<Integer, Expr> portSConditions = new HashMap<>();
 	Map<Integer, Expr> portDConditions = new HashMap<>();
 	Map<Integer, Expr> l4Conditions = new HashMap<>();
+	Map<Integer, ActionTypes> typeRule = new HashMap<>();
 	
 
 	/**
@@ -157,7 +158,9 @@ public class PriorityPacketFilter extends GenericFunction{
  			constraints.add(ctx.mkEq((IntExpr)nctx.portFunctionsMap.get("start").apply(dstp),(IntExpr)rule.getStart_dst_port()));
  			constraints.add(ctx.mkEq((IntExpr)nctx.portFunctionsMap.get("end").apply(dstp),(IntExpr)rule.getEnd_dst_port()));
  			constraints.add(ctx.mkEq(proto,rule.getProtocol()));
- 			
+ 		
+ 			ActionTypes at = rule.getAction().equals(ctx.mkTrue())? ActionTypes.ALLOW: ActionTypes.DENY;
+ 			typeRule.put(i, at);
  			srcConditions.put(i,  src);
  			dstConditions.put(i, dst);
  			portSConditions.put(i,  srcp);
@@ -199,19 +202,23 @@ public class PriorityPacketFilter extends GenericFunction{
 	 */
 	private void generateManualSatifiabilityConstraint(Flow sr) {
 		
-		BoolExpr decision = blacklisting? ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdFlow())), ctx.mkTrue()) : ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdFlow())), ctx.mkFalse());
-		BoolExpr constraint = recursiveGeneration(sr, decision, 0);
+		//BoolExpr finalDecision = blacklisting? ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdFlow())), ctx.mkTrue()) : ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdFlow())), ctx.mkFalse());
+		BoolExpr constraint = recursiveGeneration(sr, 0);
 		constraints.add(constraint);
 
 	}
 	
-	private BoolExpr recursiveGeneration(Flow flow, BoolExpr decision, int i) {
+	private BoolExpr recursiveGeneration(Flow flow, int i) {
 
 		if(i == nRules) {
-			return ctx.mkNot(decision);
+			BoolExpr decision = blacklisting? ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse()) : ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkTrue());
+			return decision;
 		}
 		
-		BoolExpr condition = ctx.mkAnd(
+		
+		BoolExpr decision = typeRule.get(i) == ActionTypes.ALLOW? ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse()) : ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkTrue());
+
+		BoolExpr condition = ctx.mkAnd( 
 				nctx.equalIpAddressToPFRule(flow.getCrossedTraffic(ipAddress).getIPSrc(), srcConditions.get(i)),
 				nctx.equalIpAddressToPFRule(flow.getCrossedTraffic(ipAddress).getIPDst(), dstConditions.get(i)),
 					nctx.equalPortRangeToPFRule(flow.getCrossedTraffic(ipAddress).getpSrc(), portSConditions.get(i)),
@@ -220,7 +227,7 @@ public class PriorityPacketFilter extends GenericFunction{
 					);
 		
 		BoolExpr firstPart = ctx.mkImplies(condition, decision);
-		BoolExpr secondPart = ctx.mkImplies(ctx.mkNot(condition), recursiveGeneration(flow, decision, i+1));
+		BoolExpr secondPart = ctx.mkImplies(ctx.mkNot(condition), recursiveGeneration(flow,i+1));
 		
 		return ctx.mkAnd(firstPart, secondPart);
 	}
