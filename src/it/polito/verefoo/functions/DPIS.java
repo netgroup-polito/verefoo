@@ -22,7 +22,7 @@ import it.polito.verefoo.utils.PacketFilterRule;
 /** Represents a Packet Filter with the associated Access Control List
  *
  */
-public class DPI extends GenericFunction{
+public class DPIS extends GenericFunction{
 
 	FuncDecl filtering_function;
 	ArrayList<PacketFilterRule> rules; 
@@ -47,7 +47,7 @@ public class DPI extends GenericFunction{
 	 * @param ctx It is the Z3 Context in which the model is generated
 	 * @param nctx It is the NetContext object to which constraints are sent
 	 */
-	public DPI(AllocationNode source, Context ctx, NetContext nctx) {
+	public DPIS(AllocationNode source, Context ctx, NetContext nctx) {
 		this.source = source;
 		this.ctx = ctx;
 		this.nctx = nctx;
@@ -105,7 +105,7 @@ public class DPI extends GenericFunction{
   			}else {
   				String body = flow.getCrossedTraffic(ipAddress).getBody();
   				
-  				BoolExpr z3condition = generateRulesCondition(body.hashCode());
+  				BoolExpr z3condition = generateRulesCondition(body);
   				
   				decision = blacklisting ?
   						ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), z3condition) :
@@ -120,14 +120,14 @@ public class DPI extends GenericFunction{
 		
 	}
 
-	private BoolExpr generateRulesCondition(int hashBody) {
+	private BoolExpr generateRulesCondition(String body) {
 		
-		IntExpr z3HashBody = ctx.mkInt(hashBody);
+		SeqExpr z3HashBody = ctx.mkString(body);
 		
 		List<BoolExpr> exprList = new ArrayList<>();
 		for(String condition : conditions) {
-			IntExpr z3ToCompare = ctx.mkInt(condition.hashCode());
-			exprList.add(ctx.mkEq(z3HashBody, z3ToCompare));
+			SeqExpr z3ToCompare = ctx.mkString(condition);
+			exprList.add(ctx.mkContains(z3HashBody, z3ToCompare));
 		}
 		
 		BoolExpr[] tmpArray = new BoolExpr[exprList.size()];

@@ -7,6 +7,7 @@ import com.microsoft.z3.Context;
 
 import it.polito.verefoo.extra.WildcardManager;
 import it.polito.verefoo.functions.DPI;
+import it.polito.verefoo.functions.DPIS;
 import it.polito.verefoo.functions.EndHost;
 import it.polito.verefoo.functions.Forwarder;
 import it.polito.verefoo.functions.GenericFunction;
@@ -202,6 +203,20 @@ public class AllocationManager {
 						}
 					}
 				}
+				
+				else if(node.getFunctionalType() == FunctionalTypes.DPI_S) {
+					DPIS dpi = new DPIS(allocationNode, ctx, nctx);
+					allocationNode.setPlacedNF(dpi);
+					allocationNode.setTypeNF(FunctionalTypes.DPI_S);
+					
+					if(node.getConfiguration().getDpi().getDefaultAction() != null) {
+						if(node.getConfiguration().getDpi().getDefaultAction().equals(ActionTypes.ALLOW)) {
+							dpi.setDefaultAction(true);
+						}else if(node.getConfiguration().getDpi().getDefaultAction().equals(ActionTypes.DENY)){
+							dpi.setDefaultAction(false);
+						}
+					}
+				}
 
 
 			}
@@ -275,6 +290,9 @@ public class AllocationManager {
 				waf.manualConfiguration();
 			}else if(type.equals(FunctionalTypes.DPI)) {
 				DPI dpi = (DPI) no;
+				dpi.manualConfiguration();
+			}else if(type.equals(FunctionalTypes.DPI_S)) {
+				DPIS dpi = (DPIS) no;
 				dpi.manualConfiguration();
 			}
 		});
