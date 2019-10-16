@@ -1,7 +1,6 @@
 package it.polito.verefoo.murcia;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -14,8 +13,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -26,10 +23,8 @@ import org.json.simple.parser.ParseException;
 import org.xml.sax.SAXException;
 
 
-import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.murcia.jaxb.*;
-import it.polito.verefoo.murcia.jaxb.Configuration;
 import it.polito.verefoo.murcia.jaxb.ObjectFactory;
 import it.polito.verefoo.utils.Tuple;
 

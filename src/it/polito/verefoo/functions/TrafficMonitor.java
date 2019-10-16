@@ -48,7 +48,7 @@ public class TrafficMonitor extends GenericFunction{
  
 	/**
 	 * This method allows to wrap the method which adds the constraints inside Z3 solver
-	 * @param solver Istance of Z3 solver
+	 * @param solver instance of Z3 solver
 	 */
 	@Override
 	public void addContraints(Optimize solver) {

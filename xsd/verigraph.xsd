@@ -27,6 +27,7 @@
             <xsd:enumeration value="LOADBALANCER" />
             <xsd:enumeration value="STATEFUL_FIREWALL" />
             <xsd:enumeration value="PRIORITY_FIREWALL" />
+            <xsd:enumeration value="WEB_APPLICATION_FIREWALL" />
             <xsd:enumeration value="TRAFFIC_MONITOR" />
         </xsd:restriction>
     </xsd:simpleType>
@@ -119,6 +120,7 @@
                 <xsd:element ref="forwarder" />
                 <xsd:element ref="loadbalancer" />
                 <xsd:element ref="stateful_firewall" />
+                <xsd:element ref="web_application_firewall" />
             </xsd:choice>
             <xsd:attribute name="id" type="xsd:long" use="optional" />
             <xsd:attribute name="name" type="xsd:string"
@@ -181,6 +183,22 @@
              <xsd:attribute name="defaultAction" type="ActionTypes"/>
         </xsd:complexType>
     </xsd:element>
+      <xsd:element name="web_application_firewall">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="waf_elements" minOccurs="0" maxOccurs="unbounded" />
+            </xsd:sequence>
+             <xsd:attribute name="defaultAction" type="ActionTypes"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="dpi">
+        <xsd:complexType>
+            <xsd:sequence minOccurs="1" maxOccurs="unbounded">
+                <xsd:element ref="dpi_elements" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+            <xsd:attribute name="defaultAction" type="ActionTypes"/>
+        </xsd:complexType>
+    </xsd:element>
     <xsd:element name="elements">
         <xsd:complexType>
             <xsd:sequence>
@@ -191,6 +209,25 @@
                 <xsd:element name="src_port" type="xsd:string" minOccurs="0"/>
                 <xsd:element name="dst_port" type="xsd:string" minOccurs="0"/>
                 <xsd:element name="directional" type="xsd:boolean" minOccurs="0" default="true"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="waf_elements">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="action" type="ActionTypes" minOccurs="0" default="DENY"/>
+                <xsd:choice minOccurs="1" maxOccurs="1">
+   					<xsd:element name="url" type="xsd:string"/>
+                	<xsd:element name="domain" type="xsd:string" />
+				</xsd:choice>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="dpi_elements">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="action" type="ActionTypes" minOccurs="0" default="DENY"/>
+               	<xsd:element name="condition" type="xsd:string" minOccurs="1" maxOccurs="1"/>
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
@@ -224,13 +261,6 @@
         <xsd:complexType>
             <xsd:sequence minOccurs="1" maxOccurs="unbounded">
                 <xsd:element name="resource" type="xsd:string" />
-            </xsd:sequence>
-        </xsd:complexType>
-    </xsd:element>
-    <xsd:element name="dpi">
-        <xsd:complexType>
-            <xsd:sequence minOccurs="1" maxOccurs="unbounded">
-                <xsd:element name="notAllowed" type="xsd:string" minOccurs="0"/>
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>

@@ -220,14 +220,18 @@
 				<xsd:attribute name="src_port" type="xsd:string"/>
 				<xsd:attribute name="dst_port" type="xsd:string"/>
 				<xsd:attribute name="isSat" type="xsd:boolean"/>
+				<xsd:attribute name="body" type="xsd:string"/>
 	</xsd:complexType>
 	<xsd:complexType name="HTTPDefinition">
             <xsd:attribute name="url" type="xsd:string" />
-            <xsd:attribute name="body" type="xsd:string" use="required"/>
+            <xsd:attribute name="domain" type="xsd:string" />
             <xsd:attribute name="options" type="xsd:string" />
 	</xsd:complexType>
 	<xsd:complexType name="POP3Definition">
-				<xsd:attribute name="email_from" type="xsd:string" use="required"/>
-           		<xsd:attribute name="body" type="xsd:string" use="required"/>
+			<xsd:attribute name="from" type="xsd:string"/>
+			<xsd:attribute name="sender" type="xsd:string"/>
+			<xsd:attribute name="to" type="xsd:string"/>
+			<xsd:attribute name="subject" type="xsd:string"/>
+			<xsd:attribute name="content-type" type="xsd:string"/>
 	</xsd:complexType>
 </xsd:schema>

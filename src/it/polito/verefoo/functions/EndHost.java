@@ -12,7 +12,6 @@ import com.microsoft.z3.Optimize;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.graph.Flow;
 import it.polito.verefoo.solver.NetContext;
-import it.polito.verefoo.utils.PacketModel;
 
 public class EndHost extends GenericFunction {
 
@@ -20,7 +19,6 @@ public class EndHost extends GenericFunction {
     Context ctx;
     DatatypeExpr politoEndHost;
     NetContext nctx;
-    PacketModel packet;
     AllocationNode source;
     Expr n_0;
     Expr p_0;
@@ -60,7 +58,7 @@ public class EndHost extends GenericFunction {
      * Fields that can be configured -> "dest","body","seq","proto","emailFrom","url","options"
      * @param packet it is the packet whose fields, if defined, must match with the z3 predicates
      */
-    public void installEndHost (PacketModel packet){
+    public void installEndHost (){
    
         return;
     }

@@ -5,9 +5,8 @@ import java.util.List;
 
 import com.microsoft.z3.Context;
 
-
-import it.polito.verefoo.extra.PacketWrapper;
 import it.polito.verefoo.extra.WildcardManager;
+import it.polito.verefoo.functions.DPI;
 import it.polito.verefoo.functions.EndHost;
 import it.polito.verefoo.functions.Forwarder;
 import it.polito.verefoo.functions.GenericFunction;
@@ -17,6 +16,7 @@ import it.polito.verefoo.functions.PacketFilter;
 import it.polito.verefoo.functions.PriorityPacketFilter;
 import it.polito.verefoo.functions.StatefulPacketFilter;
 import it.polito.verefoo.functions.TrafficMonitor;
+import it.polito.verefoo.functions.WAF;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Node;
@@ -72,11 +72,9 @@ public class AllocationManager {
 			if(node.getFunctionalType() != null) {
 				if(node.getFunctionalType() == FunctionalTypes.WEBCLIENT) {
 					EndHost client = new EndHost(allocationNode, ctx, nctx);
-					PacketWrapper p = new PacketWrapper(node.getConfiguration().getEndhost(), nctx);
 					Property prop =  properties.stream().filter(pr -> pr.getSrc().equals(node.getName())).findFirst().orElse(null);
-					if(prop != null){ p.setProperties(prop, nctx);}
 					
-					client.installEndHost(p); 
+					client.installEndHost();
 					allocationNode.setPlacedNF(client);
 					allocationNode.setTypeNF(FunctionalTypes.WEBCLIENT);
 				}
@@ -84,11 +82,9 @@ public class AllocationManager {
 			
 				else if(node.getFunctionalType() == FunctionalTypes.WEBSERVER) {
 					EndHost server = new EndHost(allocationNode, ctx, nctx);
-					PacketWrapper p = new PacketWrapper(node.getConfiguration().getEndhost(), nctx);
 					Property prop =  properties.stream().filter(pr -> pr.getDst().equals(node.getName())).findFirst().orElse(null);
-					if(prop != null){ p.setProperties(prop, nctx);}
 					
-					server.installEndHost(p);
+					server.installEndHost();
 					allocationNode.setPlacedNF(server);
 					allocationNode.setTypeNF(FunctionalTypes.WEBSERVER);
 				}
@@ -178,6 +174,35 @@ public class AllocationManager {
 						}
 					}
 				}
+				
+				else if(node.getFunctionalType() == FunctionalTypes.WEB_APPLICATION_FIREWALL) {
+					WAF waf = new WAF(allocationNode, ctx, nctx);
+					allocationNode.setPlacedNF(waf);
+					allocationNode.setTypeNF(FunctionalTypes.WEB_APPLICATION_FIREWALL);
+					
+					if(node.getConfiguration().getWebApplicationFirewall().getDefaultAction() != null) {
+						if(node.getConfiguration().getWebApplicationFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
+							waf.setDefaultAction(true);
+						}else if(node.getConfiguration().getWebApplicationFirewall().getDefaultAction().equals(ActionTypes.DENY)){
+							waf.setDefaultAction(false);
+						}
+					}
+				}
+				
+				else if(node.getFunctionalType() == FunctionalTypes.DPI) {
+					DPI dpi = new DPI(allocationNode, ctx, nctx);
+					allocationNode.setPlacedNF(dpi);
+					allocationNode.setTypeNF(FunctionalTypes.DPI);
+					
+					if(node.getConfiguration().getDpi().getDefaultAction() != null) {
+						if(node.getConfiguration().getDpi().getDefaultAction().equals(ActionTypes.ALLOW)) {
+							dpi.setDefaultAction(true);
+						}else if(node.getConfiguration().getDpi().getDefaultAction().equals(ActionTypes.DENY)){
+							dpi.setDefaultAction(false);
+						}
+					}
+				}
+
 
 			}
 			
@@ -193,12 +218,9 @@ public class AllocationManager {
 	 */
 	public void chooseFunctions(AllocationNode source, AllocationNode origin, AllocationNode finalDest) {
 		if(source.getTypeNF() == null ) {
-
 					PacketFilter firewall = new PacketFilter(source, ctx, nctx, wildcardManager);
 					source.setPlacedNF(firewall);
 					source.setTypeNF(FunctionalTypes.FIREWALL);
-
-			
 		}
 	
 	}
@@ -223,14 +245,12 @@ public class AllocationManager {
 			if(type.equals(FunctionalTypes.WEBCLIENT)) {
 				EndHost endHost = (EndHost) no;
 				endHost.configureEndHost();
-			}
-			else if(type.equals(FunctionalTypes.WEBSERVER)) {
+			}else if(type.equals(FunctionalTypes.WEBSERVER)) {
 				EndHost endHost = (EndHost) no;
 				endHost.configureEndHost();
 			}else if(node.getFunctionalType() == FunctionalTypes.NAT) {	
 				NAT nat = (NAT) no;
-				nat.natConfiguration(nctx.addressMap.get(node.getName()));
-				
+				nat.natConfiguration(nctx.addressMap.get(node.getName()));	
 			}else if(node.getFunctionalType() == FunctionalTypes.LOADBALANCER) {	
 				LoadBalancer lb = (LoadBalancer) no;
 				lb.loadBalancerConfiguration(nctx.addressMap.get(node.getName()));		
@@ -244,14 +264,18 @@ public class AllocationManager {
 				PacketFilter fw = (PacketFilter) no;
 				if(fw.isAutoconfigured()) fw.automaticConfiguration();
 				else fw.manualConfiguration();
-			}
-			else if(type.equals(FunctionalTypes.STATEFUL_FIREWALL)) {
+			}else if(type.equals(FunctionalTypes.STATEFUL_FIREWALL)) {
 				StatefulPacketFilter fw = (StatefulPacketFilter) no;
 				fw.manualConfiguration();
-			}
-			else if(type.equals(FunctionalTypes.PRIORITY_FIREWALL)) {
+			}else if(type.equals(FunctionalTypes.PRIORITY_FIREWALL)) {
 				PriorityPacketFilter fw = (PriorityPacketFilter) no;
 				fw.manualConfiguration();
+			}else if(type.equals(FunctionalTypes.WEB_APPLICATION_FIREWALL)) {
+				WAF waf = (WAF) no;
+				waf.manualConfiguration();
+			}else if(type.equals(FunctionalTypes.DPI)) {
+				DPI dpi = (DPI) no;
+				dpi.manualConfiguration();
 			}
 		});
 		

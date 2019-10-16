@@ -24,7 +24,18 @@ public class Flow {
 		this.requirement.getOriginalProperty().setLv4Proto((this.requirement.getOriginalProperty() == null || this.requirement.getOriginalProperty().getLv4Proto() == null) ? L4ProtocolTypes.ANY:this.requirement.getOriginalProperty().getLv4Proto());
 		this.functionTrafficMap = new HashMap<String, Traffic>();
 		Property originalProperty = this.requirement.getOriginalProperty();
-		this.originalTraffic = new Traffic(originalProperty.getName(), originalProperty.getSrc(), originalProperty.getDst(), originalProperty.getSrcPort(), originalProperty.getDstPort(), originalProperty.getLv4Proto());
+		this.originalTraffic = new Traffic(originalProperty.getName(), originalProperty.getSrc(), originalProperty.getDst());
+		this.originalTraffic.setpSrc(originalProperty.getSrcPort());
+		this.originalTraffic.setpDst(originalProperty.getDstPort());
+		this.originalTraffic.settProto(originalProperty.getLv4Proto());
+		
+		if(originalProperty.getHTTPDefinition() != null) {
+			HTTPDefinition webPart = originalProperty.getHTTPDefinition();
+			if(webPart.getUrl() != null) this.originalTraffic.setUrl(webPart.getUrl());
+			if(webPart.getDomain() != null) this.originalTraffic.setDomain(webPart.getDomain());
+		}
+		
+		if(originalProperty.getBody() != null) this.originalTraffic.setBody(originalProperty.getBody());
 	}
 
 

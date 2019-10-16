@@ -79,8 +79,6 @@ public class PriorityPacketFilter extends GenericFunction{
 
    		// true for blacklisting, false for whitelisting
    		// this is the default, but it can be changed
-   		blacklisting_z3 = ctx.mkFalse();
-   		blacklisting = false;
    		defaultActionSet = false;
    		
    		// function can be used or not, autoplace follows it

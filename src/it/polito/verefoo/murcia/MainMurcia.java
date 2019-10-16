@@ -33,6 +33,8 @@ public class MainMurcia {
 	
 	public static void main(String[] args) throws MalformedURLException {
 		System.setProperty("log4j.configuration", new File("resources", "log4j2.xml").toURI().toURL().toString());
+		//MurciaParser murciaParser = new MurciaParser(null);
+		//System.exit(0);
 		try {
 			JAXBContext jc;
 			jc = JAXBContext.newInstance("it.polito.verefoo.jaxb");
@@ -49,6 +51,8 @@ public class MainMurcia {
 				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/Murcia/alternative2fix.xml")));
 				if (test.isSat()) {
 					loggerResult.info("SAT");
+					long endAll = System.currentTimeMillis();
+					loggerResult.info("time: " + (endAll - beginAll) + "ms;");
 					loggerResult.info("----------------------OUTPUT----------------------");
 					StringWriter stringWriter = new StringWriter();
 					m.marshal(test.getResult(), stringWriter);
@@ -76,8 +80,6 @@ public class MainMurcia {
 				loggerInfo.error(e);
 				System.exit(1);
 			}
-			long endAll = System.currentTimeMillis();
-			loggerResult.info("time: " + (endAll - beginAll) + "ms;");
 		} catch (JAXBException je) {
 			loggerInfo.error("Error while unmarshalling or marshalling");
 			loggerInfo.error(je);

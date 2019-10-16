@@ -225,7 +225,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
+			<!--<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
 				<version>0.13.2</version>
@@ -242,11 +242,10 @@
 							</schemaIncludes>
 							<generateDirectory>gen-src/</generateDirectory>
 							<generatePackage>it.polito.verefoo.murcia.jaxb</generatePackage>
-							<!-- Other configuration options -->
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>-->
 		</plugins>
 	</build>
 	<repositories>

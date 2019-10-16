@@ -6,20 +6,33 @@ import it.polito.verefoo.jaxb.Property;
 
 public class Traffic {
 	
+	//type of the requirement related to the traffic
 	PName type;
+	
+	//IP 5-tuple - packet filtering level
 	String IPSrc;
 	String IPDst;
 	String pSrc;
 	String pDst;
 	L4ProtocolTypes tProto;
 	
-	public Traffic(PName type, String iPSrc, String iPDst, String pSrc, String pDst, L4ProtocolTypes tProto) {
+	//Web-application level
+	String url;
+	String domain;
+	
+	//body
+	String body;
+	
+	
+	public Traffic(PName type, String iPSrc, String iPDst) {
 		this.type = type;
 		IPSrc = iPSrc;
 		IPDst = iPDst;
-		this.pSrc = pSrc;
-		this.pDst = pDst;
-		this.tProto = tProto;
+		this.pSrc = "null";
+		this.pDst = "null";
+		this.tProto = L4ProtocolTypes.ANY;
+		this.url = "null";
+		this.domain = "null";
 	}
 
 	public Traffic() {
@@ -73,7 +86,30 @@ public class Traffic {
 		this.tProto = tProto;
 	}
 	
-	
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getDomain() {
+		return domain;
+	}
+
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
+	}
+
 	static public Traffic copyTraffic(Traffic original) {
 		Traffic copy = new Traffic();
 		copy.setType(original.getType());

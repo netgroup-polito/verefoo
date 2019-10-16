@@ -19,18 +19,18 @@
         <neighbour name="10.0.0.2"/>
 		<neighbour name="20.0.0.1"/>
         <configuration description="A simple description" name="conf1">
-            <firewall defaultAction="DENY">
+            <firewall defaultAction="ALLOW">
                         <elements>
-                            <action>ALLOW</action>
-                            <source>10.0.0.-1</source>
+                            <action>DENY</action>
+                            <source>10.0.0.6</source>
                             <destination>20.0.0.1</destination>
                             <protocol>ANY</protocol>
                             <src_port>*</src_port>
                             <dst_port>*</dst_port>
                         </elements>
-                        <elements>
+                         <elements>
                             <action>ALLOW</action>
-                            <source>10.0.0.2</source>
+                            <source>10.0.0.7</source>
                             <destination>20.0.0.1</destination>
                             <protocol>ANY</protocol>
                             <src_port>*</src_port>
@@ -55,7 +55,7 @@
 	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
-		<Property graph="0" name="ReachabilityProperty" src="10.0.0.-1" dst="20.0.0.1"/> 	
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.1" dst="20.0.0.1"/> 	
   </PropertyDefinition>
   <ParsingString></ParsingString>
 </NFV>
