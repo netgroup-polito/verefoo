@@ -129,7 +129,7 @@ public class TestFirewallCorrectness {
 			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect03.xml"); 
 			assertTrue(result.isSat());
 			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
-			assertTrue(listFW.size() == 1);
+			assertTrue(listFW.size() == 2);
 			Node node = listFW.get(0);
 		
 			assertTrue(node.getConfiguration().getFirewall().getElements().size() == 1);
