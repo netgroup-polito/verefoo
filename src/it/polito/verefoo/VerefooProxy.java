@@ -193,23 +193,29 @@ public class VerefooProxy {
 							currentSrc = currentNode.getNode().getName();
 						}
 					}
+					
+				
 				}
+				
+				
 				
 				if(backwardUpdate) {
 					Traffic t = Traffic.copyTraffic(flow.getOriginalTraffic());
 					int listLength = nodesList.size();
 					String currentDst = t.getIPDst();
-					//loop for modifications of IP addresses from source to destination 
+					//loop for modifications of IP addresses from destination to source
+					
 					for(int i = listLength-1; i >= 0; i--) {
 						AllocationNode currentNode = nodesList.get(i);
 						Traffic crossed = flow.getCrossedTraffic(currentNode.getNode().getName());
-						crossed.setIPDst(currentDst);
 						if((currentNode.getTypeNF().equals(FunctionalTypes.NAT) && currentNode.getNode().getConfiguration().getNat().getSource().contains(crossed.getIPDst())) ||(currentNode.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && currentNode.getNode().getConfiguration().getLoadbalancer().getPool().contains(crossed.getIPDst())) ){
 							currentDst = currentNode.getNode().getName();
 						}
+						crossed.setIPDst(currentDst);
+						//System.out.println(currentDst + "----->" + currentNode.getIpAddress());
+				
 					}
-					
-					
+
 				}
 				
 				

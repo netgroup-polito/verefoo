@@ -26,6 +26,12 @@ public class NAT extends GenericFunction {
 	FuncDecl private_addr_func;
 
 	
+	/**
+	 * Constructor method of the NAT class
+	 * @param source it is the node where the NAT is installed
+	 * @param ctx it is the z3 context
+	 * @param nctx it is the NetContext object
+	 */
 	public NAT(AllocationNode source, Context ctx, NetContext nctx) {
 		isEndHost = false;
 		this.source = source;
@@ -40,24 +46,60 @@ public class NAT extends GenericFunction {
 
 
 
+	/**
+	 * This method creates the hard constraints for the NAT configuration and status
+	 * @param natIp
+	 */
 	public void natConfiguration(DatatypeExpr natIp) {
+		
 		for(Flow flow : source.getFlows().values()) {
 			Traffic traffic = flow.getCrossedTraffic(source.getNode().getName());
 			if(private_addresses.contains(traffic.getIPSrc())) {
+				
+				/*
+				 * First case: the source IP address belongs to an internal node
+				 * In this case: deny(nat, t) = false
+				 */
 				constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse()));
 			} else {
+				
+				/*
+				 * Second case: the source IP address does not belong to an internal node
+				 * A possible opposite flow is researched.
+				 */
+				
+				AllocationNode next = null;
+				boolean after = false;
+				for(AllocationNode an : flow.getPath().getNodes()) {
+					if(after) {
+						next = an;
+						break;
+					}
+					if(an.equals(source)) after = true;
+				}
+				
+				Traffic traffic1 = flow.getCrossedTraffic(next.getNode().getName());
 				
 				boolean statusFound = false;
 				Flow status = null;
 				for(Flow flow2 : source.getFlows().values()) {
+	
 					Traffic traffic2 = flow2.getCrossedTraffic(source.getNode().getName());
-					if(traffic.getIPSrc().equals(traffic2.getIPDst()) && traffic.getIPDst().equals(traffic2.getIPSrc()) && traffic.getpSrc().equals(traffic2.getpDst())) {
+					if(traffic1.getIPSrc().equals(traffic2.getIPDst()) && traffic1.getIPDst().equals(traffic2.getIPSrc()) && traffic1.getpSrc().equals(traffic2.getpDst())) {
+						System.out.println(traffic.getIPSrc() + " " + traffic.getIPDst() );
+						System.out.println(traffic2.getIPSrc() + " " + traffic2.getIPDst());
 						statusFound = true;
 						status = flow2;
 					}
 				}
+					
+			
 				
 				if(statusFound) {
+					
+					/*
+					 * It if is found, a hard constraint to check if the opposite traffic is not blocked must be defined.
+					 */
 
 					List<BoolExpr> singleConstraints = new ArrayList<>();
 					for(AllocationNode node : status.getPath().getNodes()) {

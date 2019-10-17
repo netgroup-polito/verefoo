@@ -36,6 +36,7 @@ public class Forwarder extends GenericFunction{
     /**
      * This method creates the forwarding rules for the forwarder.
      * Since it does not provide any filtering behaviour, the forwarders sends all the received packets.
+     * deny(forwarder, t) = false
      */
     public void forwarderSendRules (){
     	

@@ -43,6 +43,7 @@ public class DPI extends GenericFunction{
 
 	/**
 	 * Public constructor for the DPI
+	 * This is a version that simply compares integer hashes of strings.
 	 * @param source It is the Allocation Node on which the dpi is put
 	 * @param ctx It is the Z3 Context in which the model is generated
 	 * @param nctx It is the NetContext object to which constraints are sent
@@ -84,7 +85,6 @@ public class DPI extends GenericFunction{
 		
 		/**
 	     * This section allow the creation of Z3 variables for defaultAction and rules.
-	     * behaviour variables is the combination of the auto-configured rules.
 	    */
   		defaultAction = ctx.mkConst(dpi + "_manual_default_action", ctx.mkBoolSort());
   		Expr ruleAction = ctx.mkConst(dpi + "_manual_action", ctx.mkBoolSort());
@@ -99,6 +99,13 @@ public class DPI extends GenericFunction{
   		
   		for(Flow flow : source.getFlows().values()) {
   		
+  			/*
+  			 * deny(dpi, t) = (whitelisting(n) && !inSentenceList(t.body)) || (!whitelisting(n) && inSentenceList(t.body))
+  			 * where
+  			 * inSentenceList(t.body) is an or of comparisons between the hash of the body and the hash of each sentence by which the DPI is configured
+  			 * inSentenceList(t.body) = (hash(t.Body) == hash(dpi.sentence1) || (hash(t.Body) == hash(dpi.sentence2) || ...
+  			 * 
+  			 */
   			BoolExpr decision;
   			if(flow.getCrossedTraffic(ipAddress).getBody().equals("null")) {
   				decision = blacklisting ? ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse()) : ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkTrue()); 
@@ -120,6 +127,11 @@ public class DPI extends GenericFunction{
 		
 	}
 
+	/**
+	 * This method generate the formula for the inSentenceList(t.body) predicate
+	 * @param hashBody the integer hash of the traffic body
+	 * @return the z3 condition
+	 */
 	private BoolExpr generateRulesCondition(int hashBody) {
 		
 		IntExpr z3HashBody = ctx.mkInt(hashBody);
@@ -174,22 +186,14 @@ public class DPI extends GenericFunction{
 	public void setAutoplace(boolean autoplace) {
 		this.autoplace = autoplace;
 	}
-
-	/**
-	 * This method allows to set blacklisting variable
-	 *@param blacklisting Value to set
-	 */
-	public void setBlacklisting(boolean blacklisting) {
-		this.blacklisting = blacklisting;
-		defaultActionSet = true;
-	}
 	
 	/**
 	 * This method allows to change the default behaviour of the packet_filter: blacklisting (true) or whitelisting (false)
 	 * @param action The boolean is true for blacklisting, false for whitelisting.
 	 */
 	public void setDefaultAction(boolean action){
-		this.setBlacklisting(action);
+		this.blacklisting = action;
+		defaultActionSet = true;
 	}
 
 	
@@ -201,6 +205,5 @@ public class DPI extends GenericFunction{
 	public void addContraints(Optimize solver) {
 		BoolExpr[] constr = new BoolExpr[constraints.size()];
 	    solver.Add(constraints.toArray(constr));
-	    //additionalConstraints(solver);
 	}
 }

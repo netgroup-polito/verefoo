@@ -43,6 +43,7 @@ public class DPIS extends GenericFunction{
 
 	/**
 	 * Public constructor for the DPI
+	 * This version checks if the body of the traffic is containes in at least one sentence of the DPI's configuration
 	 * @param source It is the Allocation Node on which the dpi is put
 	 * @param ctx It is the Z3 Context in which the model is generated
 	 * @param nctx It is the NetContext object to which constraints are sent
@@ -103,6 +104,14 @@ public class DPIS extends GenericFunction{
   			if(flow.getCrossedTraffic(ipAddress).getBody().equals("null")) {
   				decision = blacklisting ? ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse()) : ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkTrue()); 
   			}else {
+  				
+  				/*
+  	  			 * deny(dpi, t) = (whitelisting(n) && !inSentenceList(t.body)) || (!whitelisting(n) && inSentenceList(t.body))
+  	  			 * where
+  	  			 * inSentenceList(t.body) is an or of statements, where each statement checks if the body is contained in a sentence of the DPI configuration
+  	  			 * inSentenceList(t.body) = contains(dpi.sentence1, t.body) || contains(dpi.sentence2, t.body) || ...
+  	  			 * 
+  	  			 */
   				String body = flow.getCrossedTraffic(ipAddress).getBody();
   				
   				BoolExpr z3condition = generateRulesCondition(body);
@@ -120,14 +129,19 @@ public class DPIS extends GenericFunction{
 		
 	}
 
+	/**
+	 * This method generate the formula for the inSentenceList(t.body) predicate
+	 * @param body it is the string to be checked if it is contained
+	 * @return the z3 condition
+	 */
 	private BoolExpr generateRulesCondition(String body) {
 		
-		SeqExpr z3HashBody = ctx.mkString(body);
+		SeqExpr z3Body = ctx.mkString(body);
 		
 		List<BoolExpr> exprList = new ArrayList<>();
 		for(String condition : conditions) {
 			SeqExpr z3ToCompare = ctx.mkString(condition);
-			exprList.add(ctx.mkContains(z3HashBody, z3ToCompare));
+			exprList.add(ctx.mkContains(z3Body, z3ToCompare));
 		}
 		
 		BoolExpr[] tmpArray = new BoolExpr[exprList.size()];
@@ -176,23 +190,14 @@ public class DPIS extends GenericFunction{
 	}
 
 	/**
-	 * This method allows to set blacklisting variable
-	 *@param blacklisting Value to set
-	 */
-	public void setBlacklisting(boolean blacklisting) {
-		this.blacklisting = blacklisting;
-		defaultActionSet = true;
-	}
-	
-	/**
 	 * This method allows to change the default behaviour of the packet_filter: blacklisting (true) or whitelisting (false)
 	 * @param action The boolean is true for blacklisting, false for whitelisting.
 	 */
 	public void setDefaultAction(boolean action){
-		this.setBlacklisting(action);
+		this.blacklisting = action;
+		defaultActionSet = true;
 	}
 
-	
 	/**
 	 * This method allows to wrap the method which adds the constraints inside Z3 solver
 	 * @param solver Istance of Z3 solver

@@ -87,8 +87,6 @@
 		
 			<Property graph="0" name="ReachabilityProperty" src="10.0.0.1"
 			dst="30.0.5.2" />
-		
-
 
 	</PropertyDefinition>
 	<ParsingString></ParsingString>
