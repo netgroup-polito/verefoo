@@ -10,6 +10,7 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Optimize;
 
 import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.graph.Flow;
 import it.polito.verefoo.solver.NetContext;
 
 /**
@@ -44,9 +45,10 @@ public class LoadBalancer extends GenericFunction {
 	 * @param lbIp it is the IP address of the load balancer
 	 */
 	public void loadBalancerConfiguration(DatatypeExpr lbIp) {
-		/*
-		 * Configuration is empty, because the load balancer simply translates IP addresses in our model.
-		 */
+		
+		for(Flow flow : source.getFlows().values()) {
+    		constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse()));
+    	}
 	}
 
 	/**

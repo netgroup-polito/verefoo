@@ -86,8 +86,6 @@ public class NAT extends GenericFunction {
 	
 					Traffic traffic2 = flow2.getCrossedTraffic(source.getNode().getName());
 					if(traffic1.getIPSrc().equals(traffic2.getIPDst()) && traffic1.getIPDst().equals(traffic2.getIPSrc()) && traffic1.getpSrc().equals(traffic2.getpDst())) {
-						System.out.println(traffic.getIPSrc() + " " + traffic.getIPDst() );
-						System.out.println(traffic2.getIPSrc() + " " + traffic2.getIPDst());
 						statusFound = true;
 						status = flow2;
 					}

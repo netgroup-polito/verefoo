@@ -212,7 +212,6 @@ public class VerefooProxy {
 							currentDst = currentNode.getNode().getName();
 						}
 						crossed.setIPDst(currentDst);
-						//System.out.println(currentDst + "----->" + currentNode.getIpAddress());
 				
 					}
 
