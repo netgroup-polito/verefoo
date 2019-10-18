@@ -65,29 +65,16 @@
 		        </configuration>
 			</node>
 			
-			<node name="60.0.0.4">
-				<neighbour name="130.10.0.4" />
-				<neighbour name="33.33.33.3" />
-			</node>
+	
 
 			<node name="60.0.0.5">
 				<neighbour name="130.10.0.4" />
 				<neighbour name="33.33.33.1" />
 			</node>
 			
-			<node name="33.33.33.3" functional_type="FORWARDER">
-				<neighbour name="60.0.0.4" />
-				<neighbour name="60.0.0.6" />
-				<configuration name="ForwardConf">
-					<forwarder>
-						<name>Forwarder</name>
-					</forwarder>
-				</configuration>
-			</node>
-			
 			<node name="33.33.33.1" functional_type="FORWARDER">
 				<neighbour name="60.0.0.5" />
-				<neighbour name="60.0.0.11" />
+				<neighbour name="60.0.0.7" />
 				<neighbour name="60.0.0.9" />
 				<neighbour name="60.0.0.10" />
 				<configuration name="ForwardConf">
@@ -96,6 +83,7 @@
 					</forwarder>
 				</configuration>
 			</node>
+			
 			
 			
 			<node name="60.0.0.9">
@@ -124,10 +112,7 @@
 				</configuration>
 			</node>
 			
-			<node name="60.0.0.6">
-				<neighbour name="33.33.33.3" />
-				<neighbour name="33.33.33.2" />
-			</node>
+		
 
 			<node name="60.0.0.11">
 				<neighbour name="33.33.33.1" />
@@ -135,7 +120,6 @@
 			</node>
 	
 			<node name="33.33.33.2" functional_type="FORWARDER">
-				<neighbour name="60.0.0.6" />
 				<neighbour name="60.0.0.7" />
 				<neighbour name="60.0.0.8" />
 				<neighbour name="60.0.0.11" />
@@ -210,7 +194,51 @@
 		<LinkConstraints />
 	</Constraints>
 	<PropertyDefinition>
+		<Property graph="0" name="ReachabilityProperty" src="192.168.1.-1" dst="192.168.2.-1" />
+		<Property graph="0" name="ReachabilityProperty" src="192.168.2.-1" dst="192.168.1.-1" />
 		
+		<Property graph="0" name="ReachabilityProperty" src="192.168.1.-1" dst="130.10.0.1" dst_port="80" lv4proto="TCP" />
+		<Property graph="0" name="ReachabilityProperty" src="192.168.1.-1" dst="130.10.0.2" dst_port="80" lv4proto="TCP" />
+		<Property graph="0" name="ReachabilityProperty" src="192.168.1.-1" dst="130.10.0.3" dst_port="80" lv4proto="TCP" />
+		<Property graph="0" name="IsolationProperty" src="192.168.1.-1" dst="130.10.0.1" dst_port="90" lv4proto="TCP" />
+		<Property graph="0" name="IsolationProperty" src="192.168.1.-1" dst="130.10.0.2" dst_port="90" lv4proto="TCP" />
+		<Property graph="0" name="IsolationProperty" src="192.168.1.-1" dst="130.10.0.3" dst_port="90" lv4proto="TCP" />
+		<Property graph="0" name="IsolationProperty" src="192.168.1.-1" dst="130.10.0.1" lv4proto="UDP" />
+		<Property graph="0" name="IsolationProperty" src="192.168.1.-1" dst="130.10.0.2"  lv4proto="UDP" />
+		<Property graph="0" name="IsolationProperty" src="192.168.1.-1" dst="130.10.0.3"  lv4proto="UDP" />
+		
+		<Property graph="0" name="IsolationProperty" src="192.168.2.-1" dst="130.10.0.1"  />
+		<Property graph="0" name="IsolationProperty" src="192.168.2.-1" dst="130.10.0.2"  />
+		<Property graph="0" name="IsolationProperty" src="192.168.2.-1" dst="130.10.0.3" />
+		
+		<Property graph="0" name="ReachabilityProperty" src="40.40.41.-1" dst="130.10.0.1" dst_port="80" lv4proto="TCP" />
+		<Property graph="0" name="ReachabilityProperty" src="40.40.41.-1" dst="130.10.0.2" dst_port="80" lv4proto="TCP" />
+		<Property graph="0" name="ReachabilityProperty" src="40.40.41.-1" dst="130.10.0.3" dst_port="80" lv4proto="TCP" />
+		<Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.1" dst_port="90" lv4proto="TCP" />
+		<Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.2" dst_port="90" lv4proto="TCP" />
+		<Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.3" dst_port="90" lv4proto="TCP" />
+		<Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.1" lv4proto="UDP" />
+		<Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.2"  lv4proto="UDP" />
+		<Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.3"  lv4proto="UDP" />
+		
+		<Property graph="0" name="IsolationProperty" src="40.40.42.-1" dst="130.10.0.1"  />
+		<Property graph="0" name="IsolationProperty" src="40.40.42.-1" dst="130.10.0.2"  />
+		<Property graph="0" name="IsolationProperty" src="40.40.42.-1" dst="130.10.0.3" />
+		
+		<Property graph="0" name="ReachabilityProperty" src="40.40.42.-1" dst="40.40.41.-1"/>
+		<Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="40.40.42.-1"/>
+		
+		
+		
+		<Property graph="0" name="ReachabilityProperty" src="88.80.84.-1" dst="40.40.41.-1"/>
+		<Property graph="0" name="ReachabilityProperty" src="88.80.84.-1" dst="40.40.42.-1"/>
+		<Property graph="0" name="ReachabilityProperty" src="88.80.84.-1" dst="192.168.1.-1"/>
+		<Property graph="0" name="ReachabilityProperty" src="88.80.84.-1" dst="192.168.2.-1"/>
+		<Property graph="0" name="ReachabilityProperty" dst="88.80.84.-1" src="192.168.1.-1"/>
+		<Property graph="0" name="ReachabilityProperty" dst="88.80.84.-1" src="192.168.2.-1"/>
+		<Property graph="0" name="IsolationProperty" src="88.80.84.-1" dst="130.10.0.1"/>
+		<Property graph="0" name="IsolationProperty" src="88.80.84.-1" dst="130.10.0.2"/>
+		<Property graph="0" name="IsolationProperty" src="88.80.84.-1" dst="130.10.0.3"/>
 	</PropertyDefinition>
 	<ParsingString></ParsingString>
 </NFV>
