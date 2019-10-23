@@ -1,6 +1,8 @@
 package it.polito.verefoo.extra;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
@@ -15,84 +17,51 @@ public class LogParser {
 
 	public static void main(String[] args) throws IOException {
 
+		//here you have to set the name of the output csv file
 		FileWriter csvOutputFile = new FileWriter("./log/result.csv");
-		FileWriter csvAvgFile = new FileWriter("./log/average.csv");
-		// Write the CSV file header
-		//csvOutputFile.append(FILE_HEADER.toString());
-		// Add a new line separator after the header
-		//csvOutputFile.append(NEW_LINE_SEPARATOR);
-		csvAvgFile.append(AVG_HEADER.toString());
-		csvAvgFile.append(NEW_LINE_SEPARATOR);
+		
+		//here you have to set the name of the input log file
+		File testFile = new File("./log/66365_AP40_PR60_N0_L0_20_name.log"); 
+		
+		
+		
+		try (BufferedReader br = new BufferedReader(new FileReader(testFile))) {
+		    String logEntryLine;
+		    while ((logEntryLine = br.readLine()) != null) {
+	
+				String[] splitedLine = logEntryLine.split("\\s+");
+				System.out.println(logEntryLine);
 
-		File testFile = new File("./log/result.log"); 
-		Scanner s = new Scanner(testFile);
-		int count = 0;
 
-		String fileName = "(\\d{4}-\\d{2}-\\d{2}) (\\d{2}:\\d{2}:\\d{2}.\\d{3}) \\[(.*)\\] ([^ ]*) +([^ ]*) - (.*)$";
-		while (s.hasNextLine()) {
-			String logEntryLine = s.nextLine();
-
-			Pattern p = Pattern.compile(fileName);
-			Matcher matcher = p.matcher(logEntryLine);
-			System.out.println(matcher.matches());
-			if (!matcher.matches()) {
-				System.err.println("Bad log entry (or problem with RE?):");
-				System.err.println(logEntryLine);
-				return;
-			}
-
-			/*
-			 * System.out.println("Date&Time: " + matcher.group(1));
-			 * System.out.println("Hostname: " + matcher.group(2));
-			 * System.out.println("Program Name: " + matcher.group(3));
-			 * System.out.println("Log: " + matcher.group(4));
-			 */
-
-			if (matcher.group(6).startsWith("===========FILE ")) {
-				csvOutputFile.append(matcher.group(6)+" "+FILE_HEADER.toString());
-				csvOutputFile.append(NEW_LINE_SEPARATOR);
-				while (s.hasNextLine()) {
-					String results = s.nextLine();
-					Matcher matcher2 = p.matcher(results);
-					if (matcher2.matches()) {
-						if(matcher2.group(6).startsWith("Seed")){
-							String[] splited = matcher2.group(6).split(":");
-							csvOutputFile.append(","+ splited[1]);
-						}else if(matcher2.group(6).startsWith("---")){
-							String[] splited = matcher2.group(6).split("\\s+");
-							csvOutputFile.append(","+ splited[2]);
-						}else if(matcher2.group(6).startsWith("Only")){
-							String[] splited = matcher2.group(6).split("\\s+");
-							csvOutputFile.append(","+splited[2].replaceAll("\\D+",""));
-						}else if(matcher2.group(6).startsWith("time")){
-							String[] splited = matcher2.group(6).split("\\s+");
-							csvOutputFile.append(","+splited[1].replaceAll("\\D+",""));
-							csvOutputFile.append(NEW_LINE_SEPARATOR);
-						}else if(matcher2.group(6).startsWith("UNSAT")){
-							csvOutputFile.append(NEW_LINE_SEPARATOR);
-						}else if(matcher2.group(6).startsWith("AVG")){
-							csvAvgFile.append(matcher.group(6)+","+matcher2.group(6).split("\\s+")[4].replaceAll("\\D+",""));
-						}else if(matcher2.group(6).startsWith("MAX")){
-							csvAvgFile.append(","+matcher2.group(6).split("\\s+")[4].replaceAll("\\D+",""));
-						}else if(matcher2.group(6).startsWith("MIN")){
-							csvAvgFile.append(","+matcher2.group(6).split("\\s+")[4].replaceAll("\\D+",""));
-							csvAvgFile.append(NEW_LINE_SEPARATOR);
-							break;
-						}
+				if (splitedLine[4].startsWith("===========FILE ")) {
+					csvOutputFile.append(splitedLine[4]+" "+FILE_HEADER.toString());
+					csvOutputFile.append(NEW_LINE_SEPARATOR); 
+					}else if(splitedLine[4].startsWith("Seed")){
+								String[] splited = splitedLine[4].split(":");
+								csvOutputFile.append(","+ splited[1]);
+							}else if(splitedLine[4].startsWith("time")){
+								String[] splited = splitedLine[5].split("m");
+								float time = Float.parseFloat(splited[0])/1000;
+								csvOutputFile.append(","+ time);
+								csvOutputFile.append(NEW_LINE_SEPARATOR);
+							}else if(splitedLine[4].startsWith("UNSAT")){
+								csvOutputFile.append(NEW_LINE_SEPARATOR);
+							}else if(splitedLine[4].startsWith("AVG")){
+								break;
+							}else if(splitedLine[4].startsWith("MAX")){
+								break;
+							}else if(splitedLine[4].startsWith("MIN")){
+								break;
+							}
+						
 					}
-				}
-			}
-			
-
+				
 		}
-		csvOutputFile.flush();
-		csvAvgFile.flush();
-		
-		csvOutputFile.close();
-		csvAvgFile.close();
-		
 
-		s.close();
+
+		csvOutputFile.flush();
+		csvOutputFile.close();
+		
 
 	}
 

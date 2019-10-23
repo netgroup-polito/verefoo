@@ -226,13 +226,17 @@ public class TestCaseGeneratorBudapest {
 		}
 		
 		//attach the APs
-		int factorPAP = numberPolicies/numberAllocationPlaces;
-		if(factorPAP==0) factorPAP++;
+		int factorPAP = numberAllocationPlaces/numberPolicies;
+		int resto = numberAllocationPlaces%numberPolicies;
+		if(resto>0) factorPAP++;
+		//if(factorPAP==0) factorPAP++;
+		
 		boolean createdAllAPs = false;
 		int numAP = 0;
 		int numC = 0;
-		
+
 		while(!createdAllAPs) {
+			//System.out.println(numC);
 			Node client = allClients.get(numC);
 			Node prev = client;
 			for(int j = 0; j < factorPAP; j++) {
