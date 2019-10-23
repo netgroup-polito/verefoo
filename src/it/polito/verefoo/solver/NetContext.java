@@ -68,7 +68,7 @@ public class NetContext {
 
     // weights
     public final int WPROTOWILDCARD   = 1000;
-    public final int WIPWILDCARD   = -100;
+    public final int WIPWILDCARD   = -10;
     public final int WAUTOCONF   = 1000;
     public final int WAUTOPLACEMENT   = 100000000;
     public final int WPORTS   = 1000;
@@ -113,9 +113,10 @@ public class NetContext {
     	setAddressMappings();
         BoolExpr[] constr = new BoolExpr[constraints.size()];
         solver.Add(constraints.toArray(constr));
-
-        softConstrProtoWildcard.forEach(t->solver.AssertSoft(t._1, WPROTOWILDCARD, t._2));
+        
         softConstrWildcard.forEach(t->solver.AssertSoft(t._1, WIPWILDCARD, t._2));
+        softConstrProtoWildcard.forEach(t->solver.AssertSoft(t._1, WPROTOWILDCARD, t._2));
+       
         
        int i = 1000;
        /* for(Tuple<BoolExpr,String> t : softConstrAutoConf) {
