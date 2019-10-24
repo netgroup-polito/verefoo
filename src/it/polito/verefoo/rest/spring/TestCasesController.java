@@ -33,7 +33,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import it.polito.verefoo.VerefooSerializer;
-import it.polito.verefoo.extra.TestCaseGenerator;
+import it.polito.verefoo.extra.TestCaseGeneratorAmsterdam;
 import it.polito.verefoo.jaxb.NFV;
 
 @Controller
@@ -76,19 +76,19 @@ public class TestCasesController {
 		int k=0;
 		try {
 
-			List<TestCaseGenerator> nfv = new ArrayList<>();
+			List<TestCaseGeneratorAmsterdam> nfv = new ArrayList<>();
 
 	
 			if(id == 0) {
-				nfv.add(new TestCaseGenerator(prefix + i + "AP" + j + "PR", i, 0, j, seed));
+				nfv.add(new TestCaseGeneratorAmsterdam(prefix + i + "AP" + j + "PR", i, 0, j, seed));
 			} else if(id == 1) {
-				nfv.add(new TestCaseGenerator(prefix + i + "AP" + j + "PR", i, j, 0, seed));
+				nfv.add(new TestCaseGeneratorAmsterdam(prefix + i + "AP" + j + "PR", i, j, 0, seed));
 			}
 			
 			
 			
 			
-			for(TestCaseGenerator f : nfv){
+			for(TestCaseGeneratorAmsterdam f : nfv){
 				totTime = 0;
 				maxTotTime = 0;
 				minTotTime = Integer.MAX_VALUE;

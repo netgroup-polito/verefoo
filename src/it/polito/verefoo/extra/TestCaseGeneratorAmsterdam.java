@@ -9,7 +9,7 @@ import java.util.Set;
 import it.polito.verefoo.jaxb.*;
 
 // Auxiliary class to generate  test cases for performance tests (used by TestPerformanceScalability)
-public class TestCaseGenerator {
+public class TestCaseGeneratorAmsterdam {
 
  
 	NFV nfv;
@@ -33,7 +33,7 @@ public class TestCaseGenerator {
 	Set<String> allIPs;
 	
 	
-	public TestCaseGenerator(String name, int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, String IPClient, String IPAllocationPlace, String IPServer) {
+	public TestCaseGeneratorAmsterdam(String name, int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, String IPClient, String IPAllocationPlace, String IPServer) {
 		this.name = name;
 		IPC = IPClient;
 		IPAP = IPAllocationPlace;
@@ -47,7 +47,7 @@ public class TestCaseGenerator {
 	}
 	
 	
-	public TestCaseGenerator(String name, int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, int seed) {
+	public TestCaseGeneratorAmsterdam(String name, int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, int seed) {
 		this.name = name;
 		this.rand = new Random(seed); 
 
