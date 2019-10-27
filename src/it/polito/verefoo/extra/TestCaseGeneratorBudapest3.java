@@ -26,7 +26,7 @@ import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.utils.Tuple;
 
 // Auxiliary class to generate  test cases for performance tests (used by TestPerformanceScalability)
-public class TestCaseGeneratorBudapest2 {
+public class TestCaseGeneratorBudapest3 {
 
  
 	NFV nfv;
@@ -59,7 +59,7 @@ public class TestCaseGeneratorBudapest2 {
 	List<Tuple<String, Node>> lastAPs;
 	
 	
-	public TestCaseGeneratorBudapest2(String name, int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberLB, int seed) {
+	public TestCaseGeneratorBudapest3(String name, int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberLB, int seed) {
 		this.name = name;
 		this.rand = new Random(seed); 
 
@@ -117,6 +117,7 @@ public class TestCaseGeneratorBudapest2 {
 		return ip;
 	}
 	
+	
 	private String createRandomIP() {
 		boolean notCreated = true;
 		String ip = null;
@@ -131,6 +132,8 @@ public class TestCaseGeneratorBudapest2 {
 		return ip;
 		
 	}
+	
+	
 	
 
 
@@ -156,8 +159,8 @@ public class TestCaseGeneratorBudapest2 {
 		
 		
 		
-		//creation of the servers 
-		for(int i = 0; i < numberAllocationPlaces; i++) {
+		//creation of the server
+		for(int i = 0; i < 1; i++) {
 			String IPServer = createRandomIP();
 			Node server = new Node();
 			server.setFunctionalType(FunctionalTypes.WEBSERVER);
@@ -172,9 +175,10 @@ public class TestCaseGeneratorBudapest2 {
 		}
 		
 		String firstIPServer = allServers.get(0).getName();
+		Node server = allServers.get(0);
 		
 		//creation of the clients
-		for(int i = 0; i < numberAllocationPlaces; i++) {
+		for(int i = 0; i < numberPolicies; i++) {
 			String IPClient = createRandomIP();
 			Node client = new Node();
 			client.setFunctionalType(FunctionalTypes.WEBCLIENT);
@@ -190,38 +194,26 @@ public class TestCaseGeneratorBudapest2 {
 		}
 		
 		
-		//central forwarder
+		//central AP
 		Node central = new Node();
 		String ipCentral = createRandomIP();
 		central.setName(ipCentral);
-		central.setFunctionalType(FunctionalTypes.FORWARDER);
-	
 		
-		//creation of the APs attached to servers
-		for(int i = 0; i < numberAllocationPlaces; i++) {
-			String ip = createRandomIP();
-			Node ap = new Node();
-			ap.setName(ip);
-			allAPS.add(ap);
-		}
 		
+		//attach the server 
+		Neighbour nextNeigh4 = new Neighbour();
+		nextNeigh4.setName(central.getName());
+		server.getNeighbour().add(nextNeigh4);
+		Neighbour prevNeigh4 = new Neighbour();
+		prevNeigh4.setName(server.getName());
+		central.getNeighbour().add(prevNeigh4);
 
-		//attach everything
-		for(int i = 0; i < numberAllocationPlaces; i++) {
+		//attach ethe clients
+		for(int i = 0; i < numberPolicies; i++) {
 			Node c = allClients.get(i);
-			Node s = allServers.get(i);
-			Node apS = allAPS.get(i);
+
 			
-		
-			//attach the forwarder to the APS
-			Neighbour nextNeigh2 = new Neighbour();
-			nextNeigh2.setName(central.getName());
-			apS.getNeighbour().add(nextNeigh2);
-			Neighbour prevNeigh2 = new Neighbour();
-			prevNeigh2.setName(apS.getName());
-			central.getNeighbour().add(prevNeigh2);
-			
-			//attach the client to the forwarder
+			//attach the client 
 			Neighbour nextNeigh3 = new Neighbour();
 			nextNeigh3.setName(central.getName());
 			c.getNeighbour().add(nextNeigh3);
@@ -229,13 +221,7 @@ public class TestCaseGeneratorBudapest2 {
 			prevNeigh3.setName(c.getName());
 			central.getNeighbour().add(prevNeigh3);
 			
-			//attach the server to the APS
-			Neighbour nextNeigh4 = new Neighbour();
-			nextNeigh4.setName(apS.getName());
-			s.getNeighbour().add(nextNeigh4);
-			Neighbour prevNeigh4 = new Neighbour();
-			prevNeigh4.setName(s.getName());
-			apS.getNeighbour().add(prevNeigh4);
+			
 			
 			
 			
@@ -243,16 +229,18 @@ public class TestCaseGeneratorBudapest2 {
 				
 				
 
-		for(int i = 0; i < numberPolicies/2; i++) {
-			createPolicy(PName.ISOLATION_PROPERTY, nfv, graph, allClients.get(i).getName(), allServers.get(i).getName());
-			createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, allServers.get(i).getName(), allClients.get(i).getName());
+		for(int i = 0; i < numberIsPolicies; i++) {
+			createPolicy(PName.ISOLATION_PROPERTY, nfv, graph, allClients.get(i).getName(), server.getName());
 		}
+		
+		for(int i = numberIsPolicies; i < numberPolicies; i++) {
+			createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, allClients.get(i).getName(), server.getName());
+		}
+		
 
 
 		graph.getNode().addAll(allClients);
 		graph.getNode().addAll(allServers);
-		graph.getNode().addAll(allAPC);
-		graph.getNode().addAll(allAPS);
 		graph.getNode().add(central);
 		nfv.getGraphs().getGraph().add(graph);
 			
