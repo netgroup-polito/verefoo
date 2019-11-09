@@ -42,7 +42,7 @@ import it.polito.verefoo.VerefooProxy;
 import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.Package1LoggingClass;
-import it.polito.verefoo.extra.TestCaseGenerator;
+import it.polito.verefoo.extra.TestCaseGeneratorAmsterdam;
 import it.polito.verefoo.extra.TestCaseGeneratorBudapest;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Graph;
@@ -59,22 +59,43 @@ import it.polito.verefoo.utils.VerificationResult;
  *
  */
 public class TestPerformanceScalabilityBudapest {
-	
 
-	//seed , numberAP, numberPR, runs
 	public static void main(String[] args)  {
 		//System.out.println(args.length);
 		//if(args.length!=4) return;
 		
-        seed  = 99998;
-        numberAP  = 100;
-        numberIPR  = 0;
-        numberRPR = 100;
-        numberPR = numberIPR + numberRPR;
-        numberNAT = 0;
-        numberLB = 0;
-        runs = 5;
-        testScalabilityPerformance();
+	
+		for(int i = 70; i <= 70; i+=10) {
+			for(int j = 80; j <= 100; j+=10) {
+				seed  = 66361;
+		        numberAP  = i;
+		        numberIPR  = j/2;
+		        numberRPR = j/2;
+		        numberPR = numberIPR + numberRPR;
+		        numberNAT = 0;
+		        numberLB = 0;
+		        runs = 80;
+		        testScalabilityPerformance();
+			}
+		}
+		
+		for(int i = 80; i <= 100; i+=10) {
+			for(int j = 10; j <= 100; j+=10) {
+				seed  = 66361;
+		        numberAP  = i;
+		        numberIPR  = j/2;
+		        numberRPR = j/2;
+		        numberPR = numberIPR + numberRPR;
+		        numberNAT = 0;
+		        numberLB = 0;
+		        runs = 80;
+		        testScalabilityPerformance();
+			}
+		}
+		
+		
+
+        
 	}
 	
 	/* Variables to set if you want to automatically create the NFV */
@@ -225,14 +246,14 @@ public class TestPerformanceScalabilityBudapest {
 	            m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 	            m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
 	            //for debug purpose  
-                m.marshal(f.getNfv(), System.out ); 
+              //  m.marshal(f.getNfv(), System.out ); 
 		        
               
 		        
 		        do{
 		        	for(k = 0; k < runs; k++) {
 							try {
-								
+								if(seeds[k] == 1820037872 && numberAP == 80 && numberPR == 50) continue;
 					             m = jc.createMarshaller();
 					             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 					             m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
@@ -250,11 +271,11 @@ public class TestPerformanceScalabilityBudapest {
 					             System.out.println("Seed:" + seeds[k]);
 					             
 					             //for debug purpose 
-								 m.marshal( root, System.out );  
+								 //m.marshal( root, System.out );  
 								 i++;
 								 NFV resultNFV = testCoarse(root);
-								 StringWriter stringWriter = new StringWriter();
-								 m.marshal( resultNFV, stringWriter );
+								// StringWriter stringWriter = new StringWriter();
+								// m.marshal( resultNFV, System.out );
 								 //loggerModel.debug(stringWriter.toString());
 							} catch (Exception e) {
 								e.printStackTrace();

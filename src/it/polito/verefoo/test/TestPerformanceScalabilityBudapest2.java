@@ -65,16 +65,18 @@ public class TestPerformanceScalabilityBudapest2 {
 		//System.out.println(args.length);
 		//if(args.length!=4) return;
 		
-		for(int i = 50; i <= 200; i+=10) {
+		
+		
+		for(int i = 110; i <= 200; i+=10) {
 		 {
 				seed  = 66365;
-		        numberAP  = i;
+		        numberAP  = i/2;
 		        numberIPR  = i/2;
 		        numberRPR = i/2;
 		        numberPR = numberIPR + numberRPR;
 		        numberNAT = 0;
 		        numberLB = 0;
-		        runs = 21;
+		        runs = 5;
 		        testScalabilityPerformance();
 			}
 		}
@@ -164,7 +166,7 @@ public class TestPerformanceScalabilityBudapest2 {
 	public static void testScalabilityPerformance(){
 		
 		    rand= new Random(seed);
-	        pathfile =  "MultFir"+seed+"_AP"+numberAP+"_PR"+numberPR+"_N"+numberNAT+"_L"+numberLB+"_"+runs+"_"+"name.log";
+	        pathfile =  "MultFirSecond"+seed+"_AP"+numberAP+"_PR"+numberPR+"_N"+numberNAT+"_L"+numberLB+"_"+runs+"_"+"name.log";
 	        logger =  Package1LoggingClass.createLoggerFor(pathfile, "log/"+pathfile);
 		
 	        Runtime rt = Runtime.getRuntime();
@@ -258,7 +260,7 @@ public class TestPerformanceScalabilityBudapest2 {
 								 i++;
 								 NFV resultNFV = testCoarse(root);
 								// StringWriter stringWriter = new StringWriter();
-								 //m.marshal( resultNFV, System.out );
+								// m.marshal( resultNFV, System.out );
 								 //loggerModel.debug(stringWriter.toString());
 							} catch (Exception e) {
 								e.printStackTrace();

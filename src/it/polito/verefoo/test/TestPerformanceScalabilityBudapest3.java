@@ -66,16 +66,16 @@ public class TestPerformanceScalabilityBudapest3 {
 		//System.out.println(args.length);
 		//if(args.length!=4) return;
 		
-		for(int i = 9; i <= 9; i+=10) {
+		for(int i = 10; i <= 100; i+=10) {
 		 {
-				seed  = 66365;
+				seed  = 999;
 		        numberAP  = 1;
 		        numberIPR  = 1;
 		        numberRPR = i;
 		        numberPR = numberIPR + numberRPR;
 		        numberNAT = 0;
 		        numberLB = 0;
-		        runs = 1;
+		        runs = 6;
 		        testScalabilityPerformance();
 			}
 		}
@@ -237,7 +237,7 @@ public class TestPerformanceScalabilityBudapest3 {
 		        do{
 		        	for(k = 0; k < runs; k++) {
 							try {
-								if(seeds[k] == 1820037872 && numberAP == 40 && numberPR == 40) continue;
+								if(seeds[k] == 1820037872) continue;
 					             m = jc.createMarshaller();
 					             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 					             m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
@@ -259,7 +259,7 @@ public class TestPerformanceScalabilityBudapest3 {
 								 i++;
 								 NFV resultNFV = testCoarse(root);
 								// StringWriter stringWriter = new StringWriter();
-								 m.marshal( resultNFV, System.out );
+								// m.marshal( resultNFV, System.out );
 								 //loggerModel.debug(stringWriter.toString());
 							} catch (Exception e) {
 								e.printStackTrace();

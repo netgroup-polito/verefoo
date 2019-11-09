@@ -14,6 +14,7 @@ import it.polito.verefoo.allocation.AllocationManager;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
+import it.polito.verefoo.functions.Forwarder;
 import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verefoo.graph.Traffic;
@@ -325,6 +326,13 @@ public class VerefooProxy {
 			currentPath.remove(level);
 			return;
 		}
+		if(level != 0) {
+			if(current.getNode().getFunctionalType() == FunctionalTypes.WEBCLIENT || current.getNode().getFunctionalType() == FunctionalTypes.WEBSERVER) {
+				//traffic is not forwarded anymore
+				return;
+			}
+		}
+		
 		
 
 		for(Neighbour n : listNeighbours) {

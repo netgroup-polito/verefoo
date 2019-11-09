@@ -65,9 +65,9 @@ public class TestPerformanceScalabilityAmsterdam {
 		System.out.println(args.length);
 		//if(args.length!=4) return;
 		
-        seed  = 0123;
-        numberAP  = 300;
-        numberPR  = 300;
+        seed  = 64564;
+        numberAP  = 200;
+        numberPR  = 200;
         runs = 2;
         testScalabilityPerformance();
 	}

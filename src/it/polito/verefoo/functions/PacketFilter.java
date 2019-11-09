@@ -394,16 +394,33 @@ public class PacketFilter extends GenericFunction{
 	 * This method exploits pruning strategies to minimize the number of placeholder rules in a firewall to be automatically configured
 	 * @return the maximum number of placeholder rules that are needed after the pruning
 	 */
-	private int minizimePlaceholderRules() {
+private int minizimePlaceholderRules() {
 		
 		List<Flow> allProperties = source.getFlows().values().stream().collect(Collectors.toList());
-		List<Flow> interestedProperties = allProperties.stream().filter(p -> {
+		List<Flow> interestedProperties = new ArrayList<>();
+		for(Flow p : allProperties) {
+				boolean pruning = (p.getCrossedTraffic(ipAddress).getType().value().equals("IsolationProperty") && blacklisting)
+						|| (p.getCrossedTraffic(ipAddress).getType().value().equals("ReachabilityProperty") && !blacklisting);
+				if(pruning) {
+					boolean toAdd = true;
+					for(Flow p2: interestedProperties) {
+						if(p.getRequirement().getIdRequirement() == p2.getRequirement().getIdRequirement()) {
+							toAdd = false;
+						}
+					}
+					if(toAdd) {
+						interestedProperties.add(p);
+					}
+				}
+				
+		}
+		/*List<Flow> interestedProperties = allProperties.stream().filter(p -> {
 			boolean pruning = (p.getCrossedTraffic(ipAddress).getType().value().equals("IsolationProperty") && blacklisting)
 					|| (p.getCrossedTraffic(ipAddress).getType().value().equals("ReachabilityProperty") && !blacklisting);
 			// if the pruning must be disabled
 			// return true;
 			return pruning;
-		}).collect(Collectors.toList());
+		}).collect(Collectors.toList());*/
 		
 		int minimizedRules = interestedProperties.size();
 		
@@ -424,7 +441,8 @@ public class PacketFilter extends GenericFunction{
 				}
 			}
 		}
-	
+
+		System.out.println(minimizedRules);
 		return minimizedRules;
 	}
 
