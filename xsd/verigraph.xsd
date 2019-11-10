@@ -217,10 +217,10 @@
         <xsd:complexType>
             <xsd:sequence>
                 <xsd:element name="action" type="ActionTypes" minOccurs="0" default="DENY"/>
-                <xsd:choice minOccurs="1" maxOccurs="1">
-   					<xsd:element name="url" type="xsd:string"/>
-                	<xsd:element name="domain" type="xsd:string" />
-				</xsd:choice>
+                <xsd:sequence>
+   					<xsd:element name="url" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                	<xsd:element name="domain" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+				</xsd:sequence>
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>

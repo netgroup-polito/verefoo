@@ -1,7 +1,10 @@
 package it.polito.verefoo.functions;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -36,10 +39,9 @@ public class WAF extends GenericFunction{
 	
 	DatatypeExpr waf;
 	Expr defaultAction;
-	int nUrls;
-	int nDomains;
-	List<String> urls;
-	List<String> domains;
+	int nRules;
+	Map<Integer, String> urls;
+	Map<Integer, String> domains;
 	
 	
 
@@ -58,8 +60,8 @@ public class WAF extends GenericFunction{
 		waf = source.getZ3Name();
 		ipAddress = source.getNode().getName();
 		constraints = new ArrayList<BoolExpr>();
-   		urls = new ArrayList<>();
-   		domains = new ArrayList<>();
+   		urls = new HashMap<>();
+   		domains = new HashMap<>();
 		isEndHost = false;
 
    		// true for blacklisting, false for whitelisting
@@ -83,13 +85,16 @@ public class WAF extends GenericFunction{
 		
 		Node n = source.getNode();
 		
+		int nRules = 0;
 		for(WafElements rule : n.getConfiguration().getWebApplicationFirewall().getWafElements()) {
-			if(rule.getUrl() != null) urls.add(rule.getUrl());
-			else if(rule.getDomain() != null) domains.add(rule.getDomain());
+			String url = rule.getUrl() != null ? rule.getUrl() : "null";
+			String domain = rule.getDomain() != null ? rule.getDomain() : "null";
+			urls.put(nRules, url);
+			domains.put(nRules, domain);
+			nRules++;
 		}
-		
-		nUrls = urls.size();
-		nDomains = domains.size();
+
+
 		
 		/**
 	     * This section allow the creation of Z3 variables for defaultAction and rules.
@@ -115,12 +120,26 @@ public class WAF extends GenericFunction{
   				String url = flow.getCrossedTraffic(ipAddress).getUrl();
   				String domain = flow.getCrossedTraffic(ipAddress).getDomain();
   				
-  				BoolExpr firstPart = url.equals("null") ? ctx.mkFalse() : generateRulesCondition(url, urls);
-  				BoolExpr secondPart = domain.equals("null") ? ctx.mkFalse() : generateRulesCondition(domain, domains);
+  				List<BoolExpr> constraintConditions = new ArrayList<>();
+  				BoolExpr finalConstraint;
+  				if(domain.equals("null") && url.equals("null")){
+  					finalConstraint = ctx.mkFalse();
+  				} else if(!domain.equals("null") && url.equals("null")) {
+  					finalConstraint = generateRulesCondition(domain, domains.values());
+  				} else if(domain.equals("null") && !url.equals("null")) {
+  					finalConstraint = generateRulesCondition(url, urls.values());
+  				}else {
+  					for(int i=0; i < nRules; i++) {
+  						constraintConditions.add(ctx.mkAnd(generateRulesCondition(domain, domains.get(i)), generateRulesCondition(url, urls.get(i))));
+  					}
+  					BoolExpr[] tmp = new BoolExpr[constraintConditions.size()];
+  					finalConstraint = ctx.mkOr(constraintConditions.toArray(tmp));
+  				}
   				
+  			
   				decision = blacklisting ?
-  						ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkOr(firstPart, secondPart)) :
-  						ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkNot(ctx.mkOr(firstPart, secondPart)));
+  						ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), finalConstraint) :
+  						ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkNot(finalConstraint));
   	
   			}
   			
@@ -130,10 +149,33 @@ public class WAF extends GenericFunction{
   		}
 		
 	}
+	
+	
+	private BoolExpr generateRulesCondition(String element, String toCompare) {
+		
+			int z3Element = element.hashCode();
+			int z3ToCompare = toCompare.equals("null") ? element.hashCode() : toCompare.hashCode();
+			return ctx.mkEq(ctx.mkInt(z3Element), ctx.mkInt(z3ToCompare));
+		}
+	
+	
+	private BoolExpr generateRulesCondition(String element, Collection<String> elementsList) {
+		
+		int z3Element = element.hashCode();
+		
+		List<BoolExpr> exprList = new ArrayList<>();
+		for(String toCompare : elementsList) {
+			int z3ToCompare = toCompare.equals("null") ? element.hashCode() : toCompare.hashCode();
+			exprList.add(ctx.mkEq(ctx.mkInt(z3Element), ctx.mkInt(z3ToCompare)));
+		}
+		
+		BoolExpr[] tmpArray = new BoolExpr[exprList.size()];
+		return ctx.mkOr(exprList.toArray(tmpArray));
+	}
 
 
 
-	private BoolExpr generateRulesCondition(String element, List<String> elementsList) {
+	private BoolExpr generateRulesConditionWithString(String element, List<String> elementsList) {
 		
 		SeqExpr z3Element = ctx.mkString(element);
 		
@@ -217,4 +259,6 @@ public class WAF extends GenericFunction{
 	    solver.Add(constraints.toArray(constr));
 	    //additionalConstraints(solver);
 	}
+	
+
 }

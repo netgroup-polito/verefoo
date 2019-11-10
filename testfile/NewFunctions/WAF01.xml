@@ -15,10 +15,6 @@
             <web_application_firewall defaultAction="ALLOW">
                         <waf_elements>
                             <action>DENY</action>
-                            <url>https://tools.ietf.org/html/rfc3198</url>
-                        </waf_elements>
-                        <waf_elements>
-                            <action>DENY</action>
                             <domain>google.com</domain>
                         </waf_elements>
                     </web_application_firewall>
@@ -40,7 +36,8 @@
 	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
-		<Property graph="0" name="IsolationProperty" src="10.0.0.1" dst="20.0.0.1"> 	
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.1" dst="20.0.0.1"> 	
+			<HTTPDefinition domain="google.com" url="ehi"/>
 		</Property>
  			
   </PropertyDefinition>
