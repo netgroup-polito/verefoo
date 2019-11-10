@@ -442,7 +442,7 @@ private int minizimePlaceholderRules() {
 			}
 		}
 
-		System.out.println(minimizedRules);
+		//System.out.println(minimizedRules);
 		return minimizedRules;
 	}
 
