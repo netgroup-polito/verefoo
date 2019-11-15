@@ -66,16 +66,20 @@ public class TestPerformanceScalabilityVerigraph {
 		//if(args.length!=4) return;
 		// 10,100,1000
 		// isolation with 1000 rules 
-		chainsize=10;
+		chainsize=108;
         numberAP  = 0;
         numberPR  = 1000;
         runs = 1;
-		for (int i = 1; i < 102; i=i+1) {
+        
+        int[] sizes = {9,19,29,31,41,53,54,65,64,74,75,86,87,98,108};
+
+		for (int i : sizes) {
+			seed=1967;
+			chainsize=i;
 			totTime=0;
     		totTimeChecker=0;
-    		seed=1967*i;
 			testScalabilityPerformance();
-			chainsize=64;
+			
 			
 		}
 		
@@ -178,7 +182,7 @@ public class TestPerformanceScalabilityVerigraph {
 	public static void testScalabilityPerformance(){
 		
 		    rand= new Random(seed);
-	        pathfile =  chainsize+"_"+numberPR+"_"+runs+"_"+seed+"_"+"name.log";
+	        pathfile =  "Verigraph" + chainsize+"_"+numberPR+"_"+runs+"_"+seed+"_"+"name.log";
 	        logger =  Package1LoggingClass.createLoggerFor(pathfile, "log/"+pathfile);
 		
 		   Runtime rt = Runtime.getRuntime();
@@ -214,6 +218,10 @@ public class TestPerformanceScalabilityVerigraph {
 	
 	
 			for(TestCaseGeneratorVerigraph f : nfv){
+				
+				//System.out.println(" size ->  " + (f.getNfv().getGraphs().getGraph().get(0).getNode().size()) );
+				//System.exit(0);
+				
 				condTime = 0;
 				checkTimeSAT = 0;
 				checkTimeUNSAT = 0;
@@ -268,8 +276,8 @@ public class TestPerformanceScalabilityVerigraph {
 								 //m.marshal( testCoarse(root), System.out );  
 								 i++;
 								 NFV resultNFV = testCoarse(root);
-								 StringWriter stringWriter = new StringWriter();
-								 m.marshal( resultNFV, System.out );
+								 
+								 //m.marshal( resultNFV, System.out );
 								 //loggerModel.debug(stringWriter.toString());
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -294,7 +302,7 @@ public class TestPerformanceScalabilityVerigraph {
 				
 				//logger.debug("=====================================");
 				logger.info(" total time checker -> " + (totTimeChecker) + "ms");
-				logger.info(" size ->  " + (f.getNfv().getGraphs().getGraph().get(0).getNode().size()) + "ms");
+				logger.info(" size ->  " + (f.getNfv().getGraphs().getGraph().get(0).getNode().size()) + " VNFs");
 				System.out.println(" total time checker -> " + (totTimeChecker) + "ms");
 
 
