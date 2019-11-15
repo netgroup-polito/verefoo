@@ -12,11 +12,11 @@
         <neighbour name="10.0.0.1"/>
 		<neighbour name="20.0.0.1"/>
         <configuration description="A simple description" name="conf1">
-            <firewall defaultAction="DENY">
+            <firewall defaultAction="ALLOW">
                         <elements>
-                            <action>ALLOW</action>
-                            <source>-1.-1.-1.-1</source>
-                            <destination>-1.-1.-1.-1</destination>
+                            <action>DENY</action>
+                            <source>10.0.0.1</source>
+                            <destination>20.0.0.1</destination>
                             <protocol>ANY</protocol>
                             <src_port>*</src_port>
                             <dst_port>*</dst_port>

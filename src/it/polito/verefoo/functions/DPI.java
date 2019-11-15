@@ -11,7 +11,6 @@ import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.IntNum;
 import com.microsoft.z3.Optimize;
-import com.microsoft.z3.SeqExpr;
 
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.graph.Flow;

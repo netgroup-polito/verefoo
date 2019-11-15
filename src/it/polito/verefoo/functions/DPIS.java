@@ -11,7 +11,6 @@ import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.IntNum;
 import com.microsoft.z3.Optimize;
-import com.microsoft.z3.SeqExpr;
 
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.graph.Flow;
@@ -136,12 +135,12 @@ public class DPIS extends GenericFunction{
 	 */
 	private BoolExpr generateRulesCondition(String body) {
 		
-		SeqExpr z3Body = ctx.mkString(body);
+		//SeqExpr z3Body = ctx.mkString(body);
 		
 		List<BoolExpr> exprList = new ArrayList<>();
 		for(String condition : conditions) {
-			SeqExpr z3ToCompare = ctx.mkString(condition);
-			exprList.add(ctx.mkContains(z3Body, z3ToCompare));
+			//SeqExpr z3ToCompare = ctx.mkString(condition);
+			//exprList.add(ctx.mkContains(z3Body, z3ToCompare));
 		}
 		
 		BoolExpr[] tmpArray = new BoolExpr[exprList.size()];

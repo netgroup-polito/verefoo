@@ -13,8 +13,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar"/>
-	<classpathentry kind="lib" path="lib/lib4j/log4j-api-2.9.1.jar"/>
-	<classpathentry kind="lib" path="lib/lib4j/log4j-core-2.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/junit/concurrent-junit-1.0.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/swagger-annotations-1.5.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/swagger-core-1.5.0.jar"/>
@@ -58,8 +56,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-media-sse-2.25.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jersey-server-2.25.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jsr250-api-1.0.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/log4j-api-2.9.1.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/log4j-core-2.9.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.eclipse.persistence.moxy-2.6.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/org.osgi.core-4.2.0.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/osgi-resource-locator-1.0.1.jar"/>
@@ -72,6 +68,12 @@
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-java-driver-1.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-kernel-3.3.4.jar"/>
 	<classpathentry kind="lib" path="lib/neo4j/neo4j-kernel-api-3.3.4.jar"/>
+	<classpathentry kind="lib" path="lib/lib4j/log4j-api-2.9.1.jar"/>
+	<classpathentry kind="lib" path="lib/lib4j/log4j-core-2.9.1.jar"/>
+	<classpathentry kind="lib" path="lib/lib4j/logback-classic-1.2.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/lib4j/logback-classic-1.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/lib4j/logback-core-1.2.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/lib4j/logback-core-1.2.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>

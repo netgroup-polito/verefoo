@@ -35,6 +35,7 @@ public class TestCaseGeneratorVerigraph {
 	private int numberOfRules;
 	
 	
+	private static int totTimeChecker=0;
 	
 	
 	
@@ -102,10 +103,10 @@ public class TestCaseGeneratorVerigraph {
 		chainSize = sizeChain; //10 
 		numberOfRules =numberRules;
 		
-		int numberDPI = chainSize*20/100; //20%
-		int numberWaf = chainSize*20/100;//20%
-		int numberPf = chainSize*40/100;//40%
-		int numberForwarder = chainSize*30/100;//20%
+		int numberDPI = chainSize*15/100;      //20%   
+		int numberWaf = chainSize*15/100;      //20%
+		int numberPf = chainSize*40/100;       //40%
+		int numberForwarder = chainSize*20/100;//20%
 		
 
 		
@@ -325,7 +326,7 @@ public class TestCaseGeneratorVerigraph {
 		graph.getNode().add(server);
 		prev=server;
 		
-		
+		//isolation
 		createPolicy(PName.REACHABILITY_PROPERTY, nfv, ipClient, ipServer);
 		
 		

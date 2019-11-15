@@ -16,10 +16,10 @@ import ch.qos.logback.core.FileAppender;
 public class Package1LoggingClass {
 
 	private static Set<String> files = new HashSet<String>();
-
+	static LoggerContext context = new LoggerContext();
 	public static Logger createLoggerFor(String string, String file) {
 		if (files.contains(file)) {
-			return (Logger) LoggerFactory.getLogger(string);
+			return (Logger) context.getLogger(string);
 		}
 		files.add(file);
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();

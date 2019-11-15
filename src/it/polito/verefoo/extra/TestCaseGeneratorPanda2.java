@@ -44,10 +44,12 @@ public class TestCaseGeneratorPanda2 {
 	List<Node> allClients;
 	List<Node> allServers;
 
-	
+	// type 0 for public 1 for private 2 for quarantine
+	// numbers
+
 	public TestCaseGeneratorPanda2(String name, int type, int numberPublic, int numberPrivate, int numberQuarantined, int seed) {
 		this.name = name;
-		this.rand = new Random(seed); 
+		this.rand = new Random(seed);  
 
 		allClients = new ArrayList<Node>();
 		allServers = new ArrayList<Node>();
@@ -58,7 +60,7 @@ public class TestCaseGeneratorPanda2 {
 	
 	
 	
-	public NFV changeIP(int numberPublic, int type, int numberPrivate, int numberQuarantined, int seed) {
+	public NFV changeIP(int type,int numberPublic,  int numberPrivate, int numberQuarantined, int seed) {
 		this.rand = new Random(seed);
 		allClients = new ArrayList<Node>();
 		allServers = new ArrayList<Node>();
@@ -163,10 +165,10 @@ public class TestCaseGeneratorPanda2 {
 		Node fw = new Node();
 		String ipCentral = createRandomIP();
 		fw.setName(ipCentral);
-		fw.setFunctionalType(FunctionalTypes.STATEFUL_FIREWALL);
+		fw.setFunctionalType(FunctionalTypes.FIREWALL);
 		Configuration confF = new Configuration();
 		confF.setName("conf");
-		StatefulFirewall sf = new StatefulFirewall();
+        Firewall sf = new Firewall();
 		sf.setDefaultAction(ActionTypes.ALLOW);
 		
 		//type 0 : public, no DENY rules
@@ -191,11 +193,13 @@ public class TestCaseGeneratorPanda2 {
 			el.setAction(ActionTypes.DENY);
 			el.setSource(client.getName());
 			el.setDestination(server.getName());
+			
 			sf.getElements().add(el);
 			el = new Elements();
 			el.setAction(ActionTypes.DENY);
 			el.setDestination(client.getName());
 			el.setSource(server.getName());
+			
 			sf.getElements().add(el);
 			numberQuarantined--;
 		}
@@ -204,21 +208,24 @@ public class TestCaseGeneratorPanda2 {
 		for(int i = 0; i < numberPrivate; i++) {
 			Elements el = new Elements();
 			el.setAction(ActionTypes.DENY);
-			el.setSource("10.0.0.1");
-			el.setDestination("20.0.0.1");
+			el.setSource(createRandomIP());
+			el.setDestination(createRandomIP());
 			sf.getElements().add(el);
 		}
 		
 		for(int i = 0; i < numberQuarantined; i++) {
+			String ipv1 = createRandomIP();
+			String ipv2 = createRandomIP();
+			
 			Elements el = new Elements();
 			el.setAction(ActionTypes.DENY);
-			el.setSource("10.0.0.1");
-			el.setDestination("20.0.0.1");
+			el.setSource(ipv1);
+			el.setDestination(ipv2);
 			sf.getElements().add(el);
 			el = new Elements();
 			el.setAction(ActionTypes.DENY);
-			el.setDestination("10.0.0.1");
-			el.setSource("20.0.0.1");
+			el.setDestination(ipv1);
+			el.setSource(ipv2);
 			sf.getElements().add(el);
 		}
 		
@@ -226,12 +233,12 @@ public class TestCaseGeneratorPanda2 {
 			//add at least one rule
 			Elements el = new Elements();
 			el.setAction(ActionTypes.DENY);
-			el.setSource("10.0.0.1");
-			el.setDestination("20.0.0.1");
+			el.setSource("5.5.5.5");
+			el.setDestination("6.6.6.6");
 			sf.getElements().add(el);
 		}
 		
-		confF.setStatefulFirewall(sf);
+		confF.setFirewall(sf);
 		fw.setConfiguration(confF);
 		
 		//creation of the forwarder

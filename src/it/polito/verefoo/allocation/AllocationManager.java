@@ -153,10 +153,10 @@ public class AllocationManager {
 					allocationNode.setPlacedNF(spf);
 					allocationNode.setTypeNF(FunctionalTypes.STATEFUL_FIREWALL);
 					
-					if(node.getConfiguration().getFirewall().getDefaultAction() != null) {
-						if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
+					if(node.getConfiguration().getStatefulFirewall().getDefaultAction() != null) { 
+						if(node.getConfiguration().getStatefulFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
 							spf.setDefaultAction(true);
-						}else if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.DENY)){
+						}else if(node.getConfiguration().getStatefulFirewall().getDefaultAction().equals(ActionTypes.DENY)){
 							spf.setDefaultAction(false);
 						}
 					}
