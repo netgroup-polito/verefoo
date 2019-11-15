@@ -163,7 +163,7 @@ public class TestPerformanceScalabilityVerigraph {
 	public static void testScalabilityPerformance(){
 		
 		    rand= new Random(seed);
-	        pathfile =  seed+"_AP"+numberAP+"_PR"+numberPR+"_N"+numberNAT+"_L"+numberLB+"_"+runs+"_"+"name.log";
+	        pathfile =  "Verigraph" + nRules + "R" + chainSize + "CS" +"_"+runs+"_"+"name.log";
 	        logger =  Package1LoggingClass.createLoggerFor(pathfile, "log/"+pathfile);
 		
 	        Runtime rt = Runtime.getRuntime();
@@ -257,7 +257,7 @@ public class TestPerformanceScalabilityVerigraph {
 								 i++;
 								 NFV resultNFV = testCoarse(root);
 								// StringWriter stringWriter = new StringWriter();
-								 m.marshal( resultNFV, System.out );
+								 //m.marshal( resultNFV, System.out );
 								 //loggerModel.debug(stringWriter.toString());
 							} catch (Exception e) {
 								e.printStackTrace();

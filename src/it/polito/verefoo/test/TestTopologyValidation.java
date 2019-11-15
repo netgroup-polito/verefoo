@@ -64,8 +64,9 @@ public class TestTopologyValidation {
 	public static void main(String[] args)  {
 
 		String path = "./testfile/NetworkTopology/Internet2.xml";
-		seed = 95485;
+		//seed = 95485;
 		//seed = 1413;
+		seed = 6789;
 		Random random = new Random(seed);
 		String prefix = "1.0.0.";
 		int min = 1;

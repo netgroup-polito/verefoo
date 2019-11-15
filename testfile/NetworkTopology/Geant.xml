@@ -179,7 +179,7 @@
 				<neighbour name="2.0.0.8" />
 				<neighbour name="2.0.0.10" />
 				<neighbour name="2.0.0.13" />
-			</node>75
+			</node>
 			<node name="3.0.0.10">
 				<neighbour name="2.0.0.19" />
 				<neighbour name="2.0.0.14" />
