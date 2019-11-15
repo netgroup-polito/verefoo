@@ -28,7 +28,6 @@ import javax.xml.validation.SchemaFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.tools.ant.types.CommandlineJava.SysProperties;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
