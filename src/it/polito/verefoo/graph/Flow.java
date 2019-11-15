@@ -88,6 +88,7 @@ public class Flow {
 		copy.setDst(original.getDst());
 		copy.setSrcPort(original.getSrcPort());
 		copy.setDstPort(original.getDstPort());
+		copy.setBody(original.getBody());
 		return copy;
 	}
 

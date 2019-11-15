@@ -118,6 +118,9 @@ public class Traffic {
 		copy.setpSrc(original.getpSrc());
 		copy.setpDst(original.getpDst());
 		copy.settProto(original.gettProto());
+		copy.setBody(original.getBody());
+		copy.setDomain(original.getDomain());
+		copy.setUrl(original.getUrl());
 		return copy;
 	}
 

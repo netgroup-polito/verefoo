@@ -379,6 +379,7 @@ public class VerefooProxy {
 	 */
 	public VerificationResult checkNFFGProperty() {
 		VerificationResult ret = this.check.propertyCheck();
+		ret.time = this.check.getTimeChecker();
 		return ret;
 	}
 

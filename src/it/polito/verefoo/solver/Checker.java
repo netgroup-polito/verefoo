@@ -45,6 +45,7 @@ public class Checker {
 	public Model model;
 	private HashMap<String, AllocationNode> allocationNodes;
 	private List<BoolExpr> constraintList;
+	private long timeChecker;
 
 
 	/**
@@ -65,7 +66,7 @@ public class Checker {
 		p.add("maxsat_engine", ctx.mkSymbol("wmax"));
 		p.add("maxres.wmax", true  );
 		p.add("timeout", 1800000);
-		solver.setParameters(p);
+		//solver.setParameters(p);
 	}
 	
 	
@@ -86,13 +87,29 @@ public class Checker {
 	public VerificationResult propertyCheck(){
 		solver.Push();
 		addConstraints();
+		  long startTime = System.currentTimeMillis();
+
 		result = this.solver.Check(); 
+		long stopTime = System.currentTimeMillis();
+	    long elapsedTime = stopTime - startTime;
+	     timeChecker = elapsedTime;
+	     System.out.println("single checker time " +timeChecker);
 		model = (result == Status.SATISFIABLE) ? this.solver.getModel() : null;
 		logAssertions();
 		solver.Pop();
 		return new VerificationResult(ctx, result, nctx, assertions, model);
 	}
 	
+	public long getTimeChecker() {
+		return timeChecker;
+	}
+
+
+	public void setTimeChecker(long timeChecker) {
+		this.timeChecker = timeChecker;
+	}
+
+
 	/**
 	 * This method prints the assertions of the z3 model in the log.
 	 * old versions of z3 did not provide solver.getAssertions() method

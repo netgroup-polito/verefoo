@@ -3,8 +3,6 @@ package it.polito.verefoo;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import com.microsoft.z3.Status;
 
@@ -24,9 +22,20 @@ import it.polito.verefoo.utils.VerificationResult;
 public class VerefooSerializer {
 	private NFV nfv, result;
 	private boolean sat = false;
-	private Logger logger = LogManager.getLogger("model");
 	private String z3Model;
 	
+	int time = 0;
+	
+	public int getTime() {
+		return time;
+	}
+
+
+	public void setTime(int time) {
+		this.time = time;
+	}
+
+
 	/**
 	 * Wraps all the Verefoo tasks, executing the z3 procedure for each graph in the
 	 * NFV element
@@ -53,10 +62,12 @@ public class VerefooSerializer {
 				VerefooProxy test = new VerefooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(),
 						prop, paths);
 
-				//long beginAll = System.currentTimeMillis();
+				long beginAll = System.currentTimeMillis();
 				VerificationResult res = test.checkNFFGProperty();
-				//long endAll = System.currentTimeMillis();
+				long endAll = System.currentTimeMillis();
 				//loggerResult.debug("Only checker: " + (endAll - beginAll) + "ms");
+				//System.out.println("Only checker: " + (endAll - beginAll) + "ms");
+				time =  (int) res.getTime(); 
 				
 				if (res.result != Status.UNSATISFIABLE && res.result != Status.UNKNOWN) {
 					Translator t = new Translator(res.model.toString(), root, g, test.getAllocationNodes(), test.getTrafficFlowsMap());
@@ -64,7 +75,7 @@ public class VerefooSerializer {
 					t.setNormalizer(norm);
 					result = t.convert();
 					root = result;
-					sat = true;
+					sat = true; 
 				} else {
 					sat = false;
 					result = root;
@@ -73,8 +84,6 @@ public class VerefooSerializer {
 						.forEach(p -> p.setIsSat(res.result != Status.UNSATISFIABLE));
 			}
 		} catch (BadGraphError e) {
-			logger.error("Graph semantically incorrect");
-			logger.error(e);
 			throw e;
 		}
 	}

@@ -2,24 +2,27 @@
 <project name="Verifoo Project" default="compile" basedir=".">
 
 	<!-- set global properties for this build -->
-	<property name="src.dir" location="src"/>
-	<property name="build.dir" location="build"/>
-	<property name="resources.dir" location="resources"/>
-	<property name="javadoc.dir" location="docs"/>
+	<property name="src.dir" location="src" />
+	<property name="build.dir" location="build" />
+	<property name="resources.dir" location="resources" />
+	<property name="javadoc.dir" location="docs" />
 	<property name="gen.dir" location="gen-src" />
-	<property name="dist.dir" location="dist"/>
+	<property name="dist.dir" location="dist" />
 	<property name="schema.dir" location="xsd" />
 	<property name="report.dir" location="log" />
 	<property name="lib.dir" location="WebContent/WEB-INF/lib" />
 	<property name="target.dir" location="target" />
-	<property name="PORT" value="8080"/>
-	<property name="URL" value="http://localhost:${PORT}/verifoo/rest"/>
-	<property name="URL_j2ee" value="http://localhost:${PORT}/verifoo_j2ee/rest"/>
-	<property name="neo4jURL" value="bolt://127.0.0.1:7687"/>
-	<property name="neo4jUsername" value="neo4j"/>
-	<property name="neo4jPassword" value="password"/>
+	<property name="PORT" value="8080" />
+	<property name="URL" value="http://localhost:${PORT}/verifoo/rest" />
+	<property name="URL_j2ee" value="http://localhost:${PORT}/verifoo_j2ee/rest" />
+	<property name="neo4jURL" value="bolt://127.0.0.1:7687" />
+	<property name="neo4jUsername" value="neo4j" />
+	<property name="neo4jPassword" value="password" />
 	<path id="class.path">
 		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="lib/lib4j/">
 			<include name="**/*.jar" />
 		</fileset>
 		<fileset dir="lib/junit/">
@@ -28,12 +31,12 @@
 	</path>
 	<target name="init">
 		<!-- Create the time stamp -->
-		<tstamp/>
+		<tstamp />
 		<!-- Create the build directory structure used
          by compile -->
-		<mkdir dir="${build.dir}"/>
-		<mkdir dir="${report.dir}"/>
-		<mkdir dir="${javadoc.dir}"/>
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${report.dir}" />
+		<mkdir dir="${javadoc.dir}" />
 	</target>
 
 	<!-- Target chk-bindings -->
@@ -48,8 +51,8 @@
 
 	<!-- Target generate-bindings -->
 	<target name="generate-bindings" depends="init,-chk-bindings" description="Generate bindings from schema">
-		<mkdir dir="${gen.dir}"/>
-		<exec executable="xjc" failonerror="true" >
+		<mkdir dir="${gen.dir}" />
+		<exec executable="xjc" failonerror="true">
 			<arg value="-d" />
 			<arg value="${gen.dir}" />
 			<arg value="-p" />
@@ -58,29 +61,178 @@
 		</exec>
 		<touch file="${src.dir}/.flagfile" />
 	</target>
+
+
 	<target name="compile" depends="init, generate-bindings" description="compile the source ">
-		<property name="debug" value="off"/>
-		<property name="debuglevel" value="lines,vars,source"/>
+		<property name="debug" value="off" />
+		<property name="debuglevel" value="lines,vars,source" />
 		<!-- Compile the code from ${src} into ${build} -->
-		<javac 
-    	encoding="ISO-8859-1"
-    	includeantruntime="false" 
-    	srcdir="${src.dir}" 
-		includes="${gen.dir}"
-    	destdir="${build.dir}" 
-    	debug="${debug.dir}" 
-    	debuglevel="${debuglevel}">
+		<javac encoding="ISO-8859-1" includeantruntime="false" srcdir="${src.dir}" includes="${gen.dir}" destdir="${build.dir}" debug="${debug.dir}" debuglevel="${debuglevel}">
+			<src path="${gen.dir}" />
+			<include name="it/polito/verefoo/test/**" />
+			<include name="it/polito/verefoo/jaxb/**" />
 			<classpath refid="class.path" />
 		</javac>
 	</target>
 	<!-- Automatically generate the javadoc -->
 	<target name="javadoc" depends="compile" description="generate the javadoc">
-		<javadoc access="public" author="false" 
-       			classpath="WebContent/WEB-INF/lib/com.microsoft.z3.jar;WebContent/WEB-INF/lib/hk2-api-2.5.0-b42.jar;lib/junit/junit.jar;WebContent/WEB-INF/lib/yasson-1.0.jar;WebContent/WEB-INF/lib/jersey-common.jar;WebContent/WEB-INF/lib/jersey-server.jar;WebContent/WEB-INF/lib/javassist-3.22.0-CR2.jar;WebContent/WEB-INF/lib/swagger-jaxrs-1.5.0.jar;WebContent/WEB-INF/lib/persistence-api-1.0.jar;WebContent/WEB-INF/lib/jersey-media-json-binding.jar;WebContent/WEB-INF/lib/swagger-jersey2-jaxrs-1.5.0.jar;WebContent/WEB-INF/lib/javax.inject-1.jar;WebContent/WEB-INF/lib/jaxb-api-2.2.7.jar;WebContent/WEB-INF/lib/hk2-utils-2.5.0-b42.jar;WebContent/WEB-INF/lib/javax.json-1.1.jar;WebContent/WEB-INF/lib/jersey-media-sse.jar;WebContent/WEB-INF/lib/jsr250-api-1.0.jar;WebContent/WEB-INF/lib/hk2-locator-2.5.0-b42.jar;WebContent/WEB-INF/lib/org.osgi.core-4.2.0.jar;lib/com.microsoft.z3.jar;WebContent/WEB-INF/lib/jersey-container-servlet.jar;WebContent/WEB-INF/lib/validation-api-1.1.0.Final.jar;lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar;WebContent/WEB-INF/lib/jersey-media-jaxb.jar;WebContent/WEB-INF/lib/javax.inject-2.5.0-b42.jar;lib/lib4j/log4j-api-2.9.1.jar;WebContent/WEB-INF/lib/jackson-annotations-2.9.3.jar;WebContent/WEB-INF/lib/jackson-core-2.9.3.jar;WebContent/WEB-INF/lib/jboss-interceptors-api_1.1_spec-1.0.0.Beta1.jar;WebContent/WEB-INF/lib/javax.annotation-api-1.2.jar;WebContent/WEB-INF/lib/swagger-annotations-1.5.0.jar;WebContent/WEB-INF/lib/javax.json.bind-api-1.0.jar;WebContent/WEB-INF/lib/commons-lang3-3.7.jar;WebContent/WEB-INF/lib/osgi-resource-locator-1.0.1.jar;WebContent/WEB-INF/lib/jersey-hk2.jar;WebContent/WEB-INF/lib/swagger-core-1.5.0.jar;WebContent/WEB-INF/lib/jersey-container-servlet-core.jar;WebContent/WEB-INF/lib/javax.servlet-api-3.0.1.jar;WebContent/WEB-INF/lib/jersey-client.jar;WebContent/WEB-INF/lib/reflections-0.9.11.jar;WebContent/WEB-INF/lib/slf4j-simple-1.7.25.jar;lib/lib4j/log4j-core-2.9.1.jar;WebContent/WEB-INF/lib/log4j-api-2.9.1.jar;WebContent/WEB-INF/lib/slf4j-api-1.7.25.jar;WebContent/WEB-INF/lib/el-api-2.2.jar;WebContent/WEB-INF/lib/swagger-models-1.5.0.jar;lib/junit/concurrent-junit-1.0.0.jar;WebContent/WEB-INF/lib/javax.ws.rs-api-2.1.jar;WebContent/WEB-INF/lib/jackson-databind-2.9.3.jar;WebContent/WEB-INF/lib/aopalliance-repackaged-2.5.0-b42.jar;WebContent/WEB-INF/lib/jersey-media-multipart-2.26.jar;WebContent/WEB-INF/lib/javax.json-api-1.1.jar;WebContent/WEB-INF/lib/log4j-core-2.9.1.jar;WebContent/WEB-INF/lib/guava-23.6-jre.jar;WebContent/WEB-INF/lib/cdi-api-1.1.jar" 
-       			destdir="${javadoc.dir}" nodeprecated="false" nodeprecatedlist="false" 
-       			noindex="false" nonavbar="false" notree="false" 
-       			packagenames="it.polito.verigraph.mcnet.components,it.polito.verifoo.rest.app,it.polito.verifoo.rest.medicine,it.polito.verifoo.rest.neo4j,it.polito.verifoo.rest.test,it.polito.verifoo.rest.jaxb,it.polito.verifoo.rest.logger,it.polito.verifoo.test,it.polito.verifoo.rest.common,it.polito.verifoo.rest.main,it.polito.verigraph.mcnet.netobjs,it.polito.verifoo.rest.webservice,it.polito.verifoo.random" source="1.8" sourcepath="src;resources" splitindex="true" use="true" version="true"/>
+		<javadoc access="public" author="false" classpath="WebContent/WEB-INF/lib/com.microsoft.z3.jar;WebContent/WEB-INF/lib/hk2-api-2.5.0-b42.jar;lib/junit/junit.jar;WebContent/WEB-INF/lib/yasson-1.0.jar;WebContent/WEB-INF/lib/jersey-common.jar;WebContent/WEB-INF/lib/jersey-server.jar;WebContent/WEB-INF/lib/javassist-3.22.0-CR2.jar;WebContent/WEB-INF/lib/swagger-jaxrs-1.5.0.jar;WebContent/WEB-INF/lib/persistence-api-1.0.jar;WebContent/WEB-INF/lib/jersey-media-json-binding.jar;WebContent/WEB-INF/lib/swagger-jersey2-jaxrs-1.5.0.jar;WebContent/WEB-INF/lib/javax.inject-1.jar;WebContent/WEB-INF/lib/jaxb-api-2.2.7.jar;WebContent/WEB-INF/lib/hk2-utils-2.5.0-b42.jar;WebContent/WEB-INF/lib/javax.json-1.1.jar;WebContent/WEB-INF/lib/jersey-media-sse.jar;WebContent/WEB-INF/lib/jsr250-api-1.0.jar;WebContent/WEB-INF/lib/hk2-locator-2.5.0-b42.jar;WebContent/WEB-INF/lib/org.osgi.core-4.2.0.jar;lib/com.microsoft.z3.jar;WebContent/WEB-INF/lib/jersey-container-servlet.jar;WebContent/WEB-INF/lib/validation-api-1.1.0.Final.jar;lib/junit/org.hamcrest.core_1.3.0.v201303031735.jar;WebContent/WEB-INF/lib/jersey-media-jaxb.jar;WebContent/WEB-INF/lib/javax.inject-2.5.0-b42.jar;lib/lib4j/log4j-api-2.9.1.jar;WebContent/WEB-INF/lib/jackson-annotations-2.9.3.jar;WebContent/WEB-INF/lib/jackson-core-2.9.3.jar;WebContent/WEB-INF/lib/jboss-interceptors-api_1.1_spec-1.0.0.Beta1.jar;WebContent/WEB-INF/lib/javax.annotation-api-1.2.jar;WebContent/WEB-INF/lib/swagger-annotations-1.5.0.jar;WebContent/WEB-INF/lib/javax.json.bind-api-1.0.jar;WebContent/WEB-INF/lib/commons-lang3-3.7.jar;WebContent/WEB-INF/lib/osgi-resource-locator-1.0.1.jar;WebContent/WEB-INF/lib/jersey-hk2.jar;WebContent/WEB-INF/lib/swagger-core-1.5.0.jar;WebContent/WEB-INF/lib/jersey-container-servlet-core.jar;WebContent/WEB-INF/lib/javax.servlet-api-3.0.1.jar;WebContent/WEB-INF/lib/jersey-client.jar;WebContent/WEB-INF/lib/reflections-0.9.11.jar;WebContent/WEB-INF/lib/slf4j-simple-1.7.25.jar;lib/lib4j/log4j-core-2.9.1.jar;WebContent/WEB-INF/lib/log4j-api-2.9.1.jar;WebContent/WEB-INF/lib/slf4j-api-1.7.25.jar;WebContent/WEB-INF/lib/el-api-2.2.jar;WebContent/WEB-INF/lib/swagger-models-1.5.0.jar;lib/junit/concurrent-junit-1.0.0.jar;WebContent/WEB-INF/lib/javax.ws.rs-api-2.1.jar;WebContent/WEB-INF/lib/jackson-databind-2.9.3.jar;WebContent/WEB-INF/lib/aopalliance-repackaged-2.5.0-b42.jar;WebContent/WEB-INF/lib/jersey-media-multipart-2.26.jar;WebContent/WEB-INF/lib/javax.json-api-1.1.jar;WebContent/WEB-INF/lib/log4j-core-2.9.1.jar;WebContent/WEB-INF/lib/guava-23.6-jre.jar;WebContent/WEB-INF/lib/cdi-api-1.1.jar" destdir="${javadoc.dir}" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="it.polito.verigraph.mcnet.components,it.polito.verifoo.rest.app,it.polito.verifoo.rest.medicine,it.polito.verifoo.rest.neo4j,it.polito.verifoo.rest.test,it.polito.verifoo.rest.jaxb,it.polito.verifoo.rest.logger,it.polito.verifoo.test,it.polito.verifoo.rest.common,it.polito.verifoo.rest.main,it.polito.verigraph.mcnet.netobjs,it.polito.verifoo.rest.webservice,it.polito.verifoo.random" source="1.8" sourcepath="src;resources" splitindex="true" use="true" version="true" />
 	</target>
+
+	<target name="VerigraphTest" depends="compile" description="Run the sample application">
+
+			<for param="letter" list="10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40">
+				<sequential>
+					<java classname="it.polito.verefoo.test.TestPerformanceScalabilityVerigraph" failonerror="true" fork="yes">
+						<sysproperty key="it.polito.verefoo.test.seed" value="@{letter}" />
+						<classpath>
+							<path refid="class.path" />
+							<pathelement path="${build.dir}" />
+						</classpath>
+					</java>
+				</sequential>
+			</for>
+
+		</target>
+
+	<target name="PandaTest" depends="compile" description="Run the sample application">
+
+		<for param="letter" list="76663
+			,185022
+			,183979
+			,773180
+			,542673
+			,489438
+			,490154
+			,144042
+			,750992
+			,583862
+			,409432
+			,204801
+			,749927
+			,722017
+			,157905
+			,248126
+			,370997
+			,450103
+			,680760
+			,653542
+			,551880
+			,614321
+			,726822
+			,431176
+			,246929
+			,548602
+			,94493
+			,75552
+			,489051
+			,72235
+			,476398
+			,56421
+			,429204
+			,279421
+			,337135
+			,277337
+			,770954
+			,380231
+			,265228
+			,742828
+			,627803
+			,124434
+			,170741
+			,572808
+			,222717
+			,744692
+			,779104
+			,2428
+			,780556
+			,238247
+			,655249
+			,603514
+			,465274
+			,340897
+			,109811
+			,254882
+			,210581
+			,638845
+			,74750
+			,678552
+			,26869
+			,339418
+			,706898
+			,721250
+			,534976
+			,236093
+			,607191
+			,333006
+			,155294
+			,507941
+			,241825
+			,68705
+			,355224
+			,616062
+			,599124
+			,781932
+			,282936
+			,75804
+			,773532
+			,86645
+			,769076
+			,619394
+			,694405
+			,443307
+			,487671
+			,781592
+			,274670
+			,3671
+			,9735
+			,11540
+			,388277
+			,722761
+			,27556
+			,691296
+			,766834
+			,531792
+			,716951
+			,292642
+			,354082
+			,458801">
+			<sequential>
+				<java classname="it.polito.verefoo.test.TestPerformanceScalabilityPanda" failonerror="true" fork="yes">
+					<sysproperty key="it.polito.verefoo.test.seed" value="@{letter}" />
+					<classpath>
+						<path refid="class.path" />
+						<pathelement path="${build.dir}" />
+					</classpath>
+				</java>
+			</sequential>
+		</for>
+
+	</target>
+	
+	<target name="PandaTest2" depends="compile" description="Run the sample application">
+
+					<java classname="it.polito.verefoo.test.TestPerformanceScalabilityPanda2" failonerror="true" fork="yes">
+						<classpath>
+							<path refid="class.path" />
+							<pathelement path="${build.dir}" />
+						</classpath>
+					</java>
+
+		</target>
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<fileset dir="lib" />
+		</classpath>
+	</taskdef>
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<fileset dir="lib" />
+		</classpath>
+	</taskdef>
+
 	<target name="test" depends="compile">
 		<junit printsummary="yes" haltonfailure="no" showoutput="true">
 			<!-- Project classpath, must include junit.jar -->
@@ -97,91 +249,89 @@
 			</classpath>
 			<!-- test class -->
 			<classpath location="${build.dir}" />
-			<test name="it.polito.verifoo.rest.test.TestXML"
-			haltonfailure="no" todir="${report.dir}">
+			<test name="it.polito.verifoo.rest.test.TestXML" haltonfailure="no" todir="${report.dir}">
 				<formatter type="plain" />
 				<formatter type="xml" />
 			</test>
-			<test name="it.polito.verifoo.rest.test.TestProxy"
-    				haltonfailure="no" todir="${report.dir}">
+			<test name="it.polito.verifoo.rest.test.TestProxy" haltonfailure="no" todir="${report.dir}">
 				<formatter type="plain" />
 				<formatter type="xml" />
 			</test>
 		</junit>
-		<fail if="test_failed" message="*** Some Tests FAILED ***"/>
+		<fail if="test_failed" message="*** Some Tests FAILED ***" />
 		<echo>*** All Tests PASSED  ***</echo>
 	</target>
 	<target name="war" depends="compile">
 		<war destfile="${target.dir}/verifoo.war" webxml="WebContent/WEB-INF/web.xml">
-			<fileset dir = "WebContent">
-				<include name = "**/*.*"/>
+			<fileset dir="WebContent">
+				<include name="**/*.*" />
 			</fileset>
-			<classes dir="${build.dir}"/>
-			<classes dir="${resources.dir}"/>
+			<classes dir="${build.dir}" />
+			<classes dir="${resources.dir}" />
 		</war>
 	</target>
 	<target name="war_j2ee" depends="compile">
 		<war destfile="${target.dir}/verifoo_j2ee.war" webxml="WebContent/WEB-INF/web.xml">
-			<fileset dir = "WebContent">
-				<exclude name = "WEB-INF/lib/aopalliance-repackaged-2.5.0-b32.jar"/>
-				<exclude name = "WEB-INF/lib/commons-lang3-3.2.1.jar"/>
-				<exclude name = "WEB-INF/lib/guava-15.0.jar"/>
-				<exclude name = "WEB-INF/lib/hk2-api-2.5.0-b32.jar"/>
-				<exclude name = "WEB-INF/lib/hk2-locator-2.5.0-b32.jar"/>
-				<exclude name = "WEB-INF/lib/hk2-utils-2.5.0-b32.jar"/>
-				<exclude name = "WEB-INF/lib/jackson-annotations-2.4.0.jar"/>
-				<exclude name = "WEB-INF/lib/jackson-core-2.4.2.jar"/>
-				<exclude name = "WEB-INF/lib/jackson-databind-2.4.2.jar"/>
-				<exclude name = "WEB-INF/lib/javassist-3.20.0-GA.jar"/>
-				<exclude name = "WEB-INF/lib/javax.annotation-api-1.2.jar"/>
-				<exclude name = "WEB-INF/lib/javax.inject-2.5.0-b32.jar"/>
-				<exclude name = "WEB-INF/lib/javax.ws.rs-api-2.0.1.jar"/>
-				<exclude name = "WEB-INF/lib/jaxb-api-2.2.12-b140109.1041.jar"/>
-				<exclude name = "WEB-INF/lib/jersey-client-2.25.1.jar"/>
-				<exclude name = "WEB-INF/lib/jersey-common-2.25.1.jar"/>
-				<exclude name = "WEB-INF/lib/jersey-container-servlet-2.25.1.jar"/>
-				<exclude name = "WEB-INF/lib/jersey-container-servlet-core-2.25.1.jar"/>
-				<exclude name = "WEB-INF/lib/jersey-core-1.19.1.jar"/>
-				<exclude name = "WEB-INF/lib/jersey-entity-filtering-2.25.1.jar"/>
-				<exclude name = "WEB-INF/lib/jersey-guava-2.25.1.jar"/>
-				<exclude name = "WEB-INF/lib/jersey-media-jaxb-2.25.1.jar"/>
-				<exclude name = "WEB-INF/lib/jersey-media-moxy-2.25.1.jar"/>
-				<exclude name = "WEB-INF/lib/jersey-media-multipart-2.25.1.jar"/>
-				<exclude name = "WEB-INF/lib/jersey-server-2.25.1.jar"/>
-				<exclude name = "WEB-INF/lib/org.eclipse.persistence.moxy-2.6.0.jar"/>
-				<exclude name = "WEB-INF/lib/osgi-resource-locator-1.0.1.jar"/>
-				<exclude name = "WEB-INF/lib/reflections-0.9.9.jar"/>
-				<exclude name = "WEB-INF/lib/swagger-annotations-1.5.0.jar"/>
-				<exclude name = "WEB-INF/lib/swagger-core-1.5.0.jar"/>
-				<exclude name = "WEB-INF/lib/swagger-jaxrs-1.5.0.jar"/>
-				<exclude name = "WEB-INF/lib/swagger-jersey2-jaxrs-1.5.0.jar"/>
-				<exclude name = "WEB-INF/lib/swagger-models-1.5.0.jar"/>
-				<exclude name = "WEB-INF/lib/validation-api-1.1.0.Final.jar"/>
+			<fileset dir="WebContent">
+				<exclude name="WEB-INF/lib/aopalliance-repackaged-2.5.0-b32.jar" />
+				<exclude name="WEB-INF/lib/commons-lang3-3.2.1.jar" />
+				<exclude name="WEB-INF/lib/guava-15.0.jar" />
+				<exclude name="WEB-INF/lib/hk2-api-2.5.0-b32.jar" />
+				<exclude name="WEB-INF/lib/hk2-locator-2.5.0-b32.jar" />
+				<exclude name="WEB-INF/lib/hk2-utils-2.5.0-b32.jar" />
+				<exclude name="WEB-INF/lib/jackson-annotations-2.4.0.jar" />
+				<exclude name="WEB-INF/lib/jackson-core-2.4.2.jar" />
+				<exclude name="WEB-INF/lib/jackson-databind-2.4.2.jar" />
+				<exclude name="WEB-INF/lib/javassist-3.20.0-GA.jar" />
+				<exclude name="WEB-INF/lib/javax.annotation-api-1.2.jar" />
+				<exclude name="WEB-INF/lib/javax.inject-2.5.0-b32.jar" />
+				<exclude name="WEB-INF/lib/javax.ws.rs-api-2.0.1.jar" />
+				<exclude name="WEB-INF/lib/jaxb-api-2.2.12-b140109.1041.jar" />
+				<exclude name="WEB-INF/lib/jersey-client-2.25.1.jar" />
+				<exclude name="WEB-INF/lib/jersey-common-2.25.1.jar" />
+				<exclude name="WEB-INF/lib/jersey-container-servlet-2.25.1.jar" />
+				<exclude name="WEB-INF/lib/jersey-container-servlet-core-2.25.1.jar" />
+				<exclude name="WEB-INF/lib/jersey-core-1.19.1.jar" />
+				<exclude name="WEB-INF/lib/jersey-entity-filtering-2.25.1.jar" />
+				<exclude name="WEB-INF/lib/jersey-guava-2.25.1.jar" />
+				<exclude name="WEB-INF/lib/jersey-media-jaxb-2.25.1.jar" />
+				<exclude name="WEB-INF/lib/jersey-media-moxy-2.25.1.jar" />
+				<exclude name="WEB-INF/lib/jersey-media-multipart-2.25.1.jar" />
+				<exclude name="WEB-INF/lib/jersey-server-2.25.1.jar" />
+				<exclude name="WEB-INF/lib/org.eclipse.persistence.moxy-2.6.0.jar" />
+				<exclude name="WEB-INF/lib/osgi-resource-locator-1.0.1.jar" />
+				<exclude name="WEB-INF/lib/reflections-0.9.9.jar" />
+				<exclude name="WEB-INF/lib/swagger-annotations-1.5.0.jar" />
+				<exclude name="WEB-INF/lib/swagger-core-1.5.0.jar" />
+				<exclude name="WEB-INF/lib/swagger-jaxrs-1.5.0.jar" />
+				<exclude name="WEB-INF/lib/swagger-jersey2-jaxrs-1.5.0.jar" />
+				<exclude name="WEB-INF/lib/swagger-models-1.5.0.jar" />
+				<exclude name="WEB-INF/lib/validation-api-1.1.0.Final.jar" />
 			</fileset>
-			<classes dir="${build.dir}"/>
-			<classes dir="${resources.dir}"/>
+			<classes dir="${build.dir}" />
+			<classes dir="${resources.dir}" />
 		</war>
 	</target>
 	<target name="deploy" depends="war">
 		<sequential>
-			<antcall target="stop-tomcat"/>
-			<antcall target="start-tomcat"/>
-			<antcall target="redeployWS"/>
+			<antcall target="stop-tomcat" />
+			<antcall target="start-tomcat" />
+			<antcall target="redeployWS" />
 		</sequential>
 	</target>
 	<target name="deploy_j2ee" depends="war_j2ee">
 		<sequential>
-			<antcall target="stop-tomcat"/>
-			<antcall target="start-tomcat"/>
+			<antcall target="stop-tomcat" />
+			<antcall target="start-tomcat" />
 			<antcall target="redeployWS">
 				<param name="service.name" value="verifoo_j2ee" />
 			</antcall>
 		</sequential>
 	</target>
 	<!-- Ant Script for controlling Tomcat-->
-	<property name="service.name" value="verifoo"/>
-	<property name="root.location" value="${basedir}"/>
-	<import file="tomcat-build.xml"/>
+	<property name="service.name" value="verifoo" />
+	<property name="root.location" value="${basedir}" />
+	<import file="tomcat-build.xml" />
 	<target name="testWS" depends="deploy">
 		<junit printsummary="yes" haltonfailure="no" showoutput="true">
 			<!-- Project classpath, must include junit.jar -->
@@ -197,37 +347,32 @@
 				</fileset>
 			</classpath>
 			<!-- test class -->
-			<sysproperty key="it.polito.rest.test.URL" value="${URL}"/>
+			<sysproperty key="it.polito.rest.test.URL" value="${URL}" />
 			<classpath location="${build.dir}" />
-			<test name="it.polito.verifoo.rest.test.TestRestConcurrency"
-			haltonfailure="no" todir="${report.dir}">
+			<test name="it.polito.verifoo.rest.test.TestRestConcurrency" haltonfailure="no" todir="${report.dir}">
 				<formatter type="plain" />
 				<formatter type="xml" />
 			</test>
-			<test name="it.polito.verifoo.rest.test.TestRestConverter"
-			haltonfailure="no" todir="${report.dir}">
+			<test name="it.polito.verifoo.rest.test.TestRestConverter" haltonfailure="no" todir="${report.dir}">
 				<formatter type="plain" />
 				<formatter type="xml" />
 			</test>
-			<test name="it.polito.verifoo.rest.test.TestRestDeployment"
-			haltonfailure="no" todir="${report.dir}">
+			<test name="it.polito.verifoo.rest.test.TestRestDeployment" haltonfailure="no" todir="${report.dir}">
 				<formatter type="plain" />
 				<formatter type="xml" />
 			</test>
-			<test name="it.polito.verifoo.rest.test.TestRestLog"
-			haltonfailure="no" todir="${report.dir}">
+			<test name="it.polito.verifoo.rest.test.TestRestLog" haltonfailure="no" todir="${report.dir}">
 				<formatter type="plain" />
 				<formatter type="xml" />
 			</test>
-			<test name="it.polito.verifoo.rest.test.TestRestClient"
-    	    				haltonfailure="no" todir="${report.dir}">
+			<test name="it.polito.verifoo.rest.test.TestRestClient" haltonfailure="no" todir="${report.dir}">
 				<formatter type="plain" />
 				<formatter type="xml" />
 			</test>
 		</junit>
-		<fail if="test_failed" message="*** Some Tests FAILED ***"/>
+		<fail if="test_failed" message="*** Some Tests FAILED ***" />
 		<echo>*** All Tests PASSED  ***</echo>
-		<antcall target="stop-tomcat"/>
+		<antcall target="stop-tomcat" />
 	</target>
 	<target name="testWS_j2ee" depends="deploy_j2ee">
 		<junit printsummary="yes" haltonfailure="no" showoutput="true">
@@ -244,59 +389,54 @@
 				</fileset>
 			</classpath>
 			<!-- test class -->
-			<sysproperty key="it.polito.rest.test.URL" value="${URL_j2ee}"/>
+			<sysproperty key="it.polito.rest.test.URL" value="${URL_j2ee}" />
 			<classpath location="${build.dir}" />
-			<test name="it.polito.verifoo.rest.test.TestRestConcurrency"
-				haltonfailure="no" todir="${report.dir}">
+			<test name="it.polito.verifoo.rest.test.TestRestConcurrency" haltonfailure="no" todir="${report.dir}">
 				<formatter type="plain" />
 				<formatter type="xml" />
 			</test>
-			<test name="it.polito.verifoo.rest.test.TestRestConverter"
-				haltonfailure="no" todir="${report.dir}">
+			<test name="it.polito.verifoo.rest.test.TestRestConverter" haltonfailure="no" todir="${report.dir}">
 				<formatter type="plain" />
 				<formatter type="xml" />
 			</test>
-			<test name="it.polito.verifoo.rest.test.TestRestDeployment"
-				haltonfailure="no" todir="${report.dir}">
+			<test name="it.polito.verifoo.rest.test.TestRestDeployment" haltonfailure="no" todir="${report.dir}">
 				<formatter type="plain" />
 				<formatter type="xml" />
 			</test>
-			<test name="it.polito.verifoo.rest.test.TestRestLog"
-				haltonfailure="no" todir="${report.dir}">
+			<test name="it.polito.verifoo.rest.test.TestRestLog" haltonfailure="no" todir="${report.dir}">
 				<formatter type="plain" />
 				<formatter type="xml" />
 			</test>
-			<test name="it.polito.verifoo.rest.test.TestRestClient"
-	    	    				haltonfailure="no" todir="${report.dir}">
+			<test name="it.polito.verifoo.rest.test.TestRestClient" haltonfailure="no" todir="${report.dir}">
 				<formatter type="plain" />
 				<formatter type="xml" />
 			</test>
 		</junit>
-		<fail if="test_failed" message="*** Some Tests FAILED ***"/>
+		<fail if="test_failed" message="*** Some Tests FAILED ***" />
 		<echo>*** All Tests PASSED  ***</echo>
-		<antcall target="stop-tomcat"/>
+		<antcall target="stop-tomcat" />
 	</target>
 	<target name="clean" description="clean up">
 		<!-- Delete the ${build} and ${dist} directories -->
-		<delete dir="${build.dir}"/>
-		<delete dir="${dist.dir}"/>
+		<delete dir="${build.dir}" />
+		<delete dir="${dist.dir}" />
 		<delete>
-			<fileset dir="${report.dir}" includes="**/*.txt,**/*.xml"/>
+			<fileset dir="${report.dir}" includes="**/*.txt,**/*.xml" />
 		</delete>
-		<delete file="${target.dir}/verifoo.war"/>
+		<delete file="${target.dir}/verifoo.war" />
 	</target>
 
 	<!-- Target for executing the main with some defined properties -->
 	<target name="main" description="Run main">
 		<java classname="it.polito.verifoo.rest.main.Main" failonerror="true" fork="yes">
-			<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jURL" value="${neo4jURL}"/>
-			<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jUsername" value="${neo4jUsername}"/>
-			<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jPassword" value="${neo4jPassword}"/>
+			<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jURL" value="${neo4jURL}" />
+			<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jUsername" value="${neo4jUsername}" />
+			<sysproperty key="it.polito.verifoo.rest.neo4j.neo4jPassword" value="${neo4jPassword}" />
 			<classpath>
-				<pathelement path="${build.dir}"/>
-				<pathelement path="lib/lib4j/*"/>
-				<pathelement path="lib/neo4j/*"/>
-				<pathelement path="lib/*"/>
+				<pathelement path="${build.dir}" />
+				<pathelement path="lib/lib4j/*" />
+				<pathelement path="lib/neo4j/*" />
+				<pathelement path="lib/*" />
 			</classpath>
 		</java>
 	</target>

@@ -96,7 +96,7 @@ public class StatefulPacketFilter extends GenericFunction{
 	public void manualConfiguration(){
 		Node n = source.getNode();
 		if(n.getFunctionalType().equals(FunctionalTypes.STATEFUL_FIREWALL)){
-				n.getConfiguration().getFirewall().getElements().forEach((e)->{
+				n.getConfiguration().getStatefulFirewall().getElements().forEach((e)->{ 
 					
 						ArrayList<PacketFilterRule> rules_manual = new ArrayList<>();
 						String src_port = e.getSrcPort()!=null? e.getSrcPort():"*";
@@ -109,10 +109,10 @@ public class StatefulPacketFilter extends GenericFunction{
 						}else{
 							// if not specified the action of the rule is the opposite of the 
 							// default behaviour otherwise the rule would not be necessary
-							if(n.getConfiguration().getFirewall().getDefaultAction() == null){
+							if(n.getConfiguration().getStatefulFirewall().getDefaultAction() == null){
 								action = false;
 							}else
-							action = n.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW) ? false : true;
+							action = n.getConfiguration().getStatefulFirewall().getDefaultAction().equals(ActionTypes.ALLOW) ? false : true;
 						}
 						try{
 

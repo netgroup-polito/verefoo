@@ -28,7 +28,6 @@ import javax.xml.validation.SchemaFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.tools.ant.types.CommandlineJava.SysProperties;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -66,8 +65,8 @@ public class TestPerformanceScalabilityAmsterdam {
 		//if(args.length!=4) return;
 		
         seed  = 0123;
-        numberAP  = 300;
-        numberPR  = 300;
+        numberAP  = 10;
+        numberPR  = 5;
         runs = 2;
         testScalabilityPerformance();
 	}
@@ -281,7 +280,7 @@ public class TestPerformanceScalabilityAmsterdam {
 								 i++;
 								 NFV resultNFV = testCoarse(root);
 								 StringWriter stringWriter = new StringWriter();
-								 m.marshal( resultNFV, stringWriter );
+								 m.marshal( resultNFV, System.out );
 								 //loggerModel.debug(stringWriter.toString());
 							} catch (Exception e) {
 								e.printStackTrace();

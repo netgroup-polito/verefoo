@@ -41,7 +41,10 @@ import it.polito.verefoo.VerefooProxy;
 import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.Package1LoggingClass;
-import it.polito.verefoo.extra.TestCaseGeneratorBudapest;
+import it.polito.verefoo.extra.TestCaseGeneratorAmsterdam;
+import it.polito.verefoo.extra.TestCaseGeneratorPanda;
+import it.polito.verefoo.extra.TestCaseGeneratorPanda2;
+import it.polito.verefoo.extra.TestCaseGeneratorPandaIterative;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Graph;
 import it.polito.verefoo.jaxb.Host;
@@ -56,32 +59,53 @@ import it.polito.verefoo.utils.VerificationResult;
  * This class runs some tests to collect some data about the performance of the tool 
  *
  */
-public class TestPerformanceScalabilityBudapest {
-	
+
+// type 0 for public 1 for private 2 for quarantine
+// numbers 
+
+// when 25 25 25 for 75
+public class TestPerformanceScalabilityPanda2 {
+	static int[] data = {5,15,25};
 
 	//seed , numberAP, numberPR, runs
 	public static void main(String[] args)  {
-		//System.out.println(args.length);
+		System.out.println(args.length);
 		//if(args.length!=4) return;
+
+		//783327
+				seed=783327;
+				Random random=new Random(seed);
+		        numberAP  = 0;
 		
-        seed  = 99998;
-        numberAP  = 100;
-        numberIPR  = 0;
-        numberRPR = 100;
-        numberPR = numberIPR + numberRPR;
-        numberNAT = 0;
-        numberLB = 0;
-        runs = 5;
-        testScalabilityPerformance();
+		
+		  
+        for(int k =2; k<3;k++) {
+        	for (int i = 0; i < 3; i++) {
+        		
+        		for (int m = 0; m < 101; m++) {
+        			totTime=0;
+            		totTimeChecker=0;
+        			 seed  = random.nextInt(999999);
+        			 numberAP  = 2;
+            		 runs =data[i];
+            	     numberPR  = 1500;
+            	     type=k;
+            	     testScalabilityPerformance();
+        		}
+        		
+			}
+        }
+       
+        
 	}
-	
+	private static int type;
 	/* Variables to set if you want to automatically create the NFV */
 	private static int runs;
 	static String prefix = new String("Isol");
 	String IPClient[] = new String[runs];
 	String IPAllocationPlace[] = new String[runs];
 	String IPServer[] = new String[runs];
-	static int seed;
+	static int seed = 1967;
 	static Random rand;
 	
 	private static long condTime = 0;
@@ -96,11 +120,12 @@ public class TestPerformanceScalabilityBudapest {
 	private Logger loggerModel = LogManager.getLogger("model");
 	private int newSeed;
 	private static int numberAP;
-	private static int numberIPR;
-	private static int numberRPR;
 	private static int numberPR;
-	private static int numberNAT;
-	private static int numberLB;
+	
+	
+	static int counter = 0;
+	private static int totTimeChecker=0;
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -130,6 +155,7 @@ public class TestPerformanceScalabilityBudapest {
 	}
 	
 
+	
 	private static NFV testCoarse(NFV root) throws Exception{
 		long beginAll=System.currentTimeMillis();
 		VerefooSerializer test = new VerefooSerializer(root);
@@ -140,28 +166,69 @@ public class TestPerformanceScalabilityBudapest {
 			maxTotTime = maxTotTime<(endAll-beginAll)? (endAll-beginAll) : maxTotTime;
 			minTotTime = minTotTime>(endAll-beginAll)? (endAll-beginAll) : minTotTime;
 			logger.debug("time: " + (endAll-beginAll) + "ms;");
+			System.out.println("time each: " + (endAll-beginAll) + "ms;");
 			totTime += (endAll-beginAll);
+			totTimeChecker +=test.getTime();
 		 }
 	 	else{
 	 		logger.debug("UNSAT");	
+	 		totTime += (endAll-beginAll);
+			totTimeChecker +=test.getTime();
 			nUNSAT++;
 	 	}
-		
         return test.getResult();
 	}
 	
 
-
+	private void setManuallyIP() {
+		//same IP 
+		IPClient[0]=  new String("1.1.1.");
+		IPAllocationPlace[0] =  new String("2.2.2.");
+		IPServer[0]= new String("3.3.3.");
+		//different IP
+		IPClient[1]=  new String("213.96.47.");
+		IPAllocationPlace[1] =  new String("198.65.32.");
+		IPServer[1]= new String("26.98.75.");
+		//same numbers
+		IPClient[2]=  new String("1.1.1.");
+		IPAllocationPlace[2] =  new String("11.11.11.");
+		IPServer[2]= new String("111.111.111.");
+	}
 	
+	private void setAutomaticallyIP() {
+		int first, second, third;
+		for(int i = 0; i < runs; i++) {
+			first = rand.nextInt(256);
+			if(first == 0) first++;
+			second = rand.nextInt(256);
+			third = rand.nextInt(256);
+			IPClient[i] = new String(first + "." + second + "." + third + ".");
+			if(rand.nextBoolean()) IPClient[i] = new String(first + "." + first + "." + first + ".");
+			
+			first = rand.nextInt(256);
+			if(first == 0) first++;
+			second = rand.nextInt(256);
+			third = rand.nextInt(256);
+			IPAllocationPlace[i] = new String(first + "." + second + "." + third + ".");
+			if(rand.nextBoolean()) IPAllocationPlace[i] = new String(first + "." + first + "." + first + ".");
+			
+			first = rand.nextInt(256);
+			if(first == 0) first++;
+			second = rand.nextInt(256);
+			third = rand.nextInt(256);
+			IPServer[i] = new String(first + "." + second + "." + third + ".");
+			if(rand.nextBoolean()) IPServer[i] = new String(first + "." + first + "." + first + ".");
+		}
+	}
 	
 	@Test
 	public static void testScalabilityPerformance(){
 		
 		    rand= new Random(seed);
-	        pathfile =  seed+"_AP"+numberAP+"_PR"+numberPR+"_N"+numberNAT+"_L"+numberLB+"_"+runs+"_"+"name.log";
+	        pathfile =  type+"_"+runs+"_"+seed+"_"+"name.log";
 	        logger =  Package1LoggingClass.createLoggerFor(pathfile, "log/"+pathfile);
 		
-	        Runtime rt = Runtime.getRuntime();
+		   Runtime rt = Runtime.getRuntime();
 	        long totalMem = rt.totalMemory();
 	        long maxMem = rt.maxMemory();
 	        long freeMem = rt.freeMemory();
@@ -181,18 +248,29 @@ public class TestPerformanceScalabilityBudapest {
 	        
 	        /* Switch between automatic and manul configuration of the IP*/
 		
-
+		//setAutomaticallyIP();
+		//setManuallyIP();
 		int k=0;
 		try {
-			List<TestCaseGeneratorBudapest> nfv = new ArrayList<>();
+			List<TestCaseGeneratorPanda2> nfv = new ArrayList<>();
 			
-			 nfv.add(new TestCaseGeneratorBudapest(prefix + numberAP + "AP" + numberPR + "PR" + numberNAT + "N" + numberLB + "L", numberAP, numberRPR, numberIPR, numberNAT, numberLB, 1));
+			 //nfv.add(new TestCaseGeneratorPandaIterative("panda_1",  numberPR, 1));
 			
+			// type 0 17 5 5 5
+			// type 1 17 5 5 5
+			// type 2 17 5 5 5
+			
+			// type 0 15 15 15
+			
+			// type 0 17 25 25 25
+			
+			
+			 nfv.add(new TestCaseGeneratorPanda2("panda_1", type,runs,runs,runs, 1));
 			
 			
 	
 	
-			for(TestCaseGeneratorBudapest f : nfv){
+			for(TestCaseGeneratorPanda2 f : nfv){
 				condTime = 0;
 				checkTimeSAT = 0;
 				checkTimeUNSAT = 0;
@@ -218,14 +296,11 @@ public class TestPerformanceScalabilityBudapest {
 		        u.setSchema(schema);
 		        // unmarshal a document into a tree of Java content objects
 		   
-		        
 		        Marshaller m = jc.createMarshaller();
 	            m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 	            m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
 	            //for debug purpose  
-                m.marshal(f.getNfv(), System.out ); 
-		        
-              
+                //m.marshal(f.getNfv(), System.out ); 
 		        
 		        do{
 		        	for(k = 0; k < runs; k++) {
@@ -239,22 +314,23 @@ public class TestPerformanceScalabilityBudapest {
 					             //root = f.changeIP(IPClient[k], IPAllocationPlace[k], IPServer[k]);
 					             //random
 					           
-					             root = f.changeIP(numberAP, numberRPR, numberIPR, numberNAT, numberLB,seeds[k]);
+					             root = f.changeIP( type,runs,runs,runs, 1);
 					             
-					   
-					           
-					             //random
-					             logger.debug("Seed:" + seeds[k]);
-					             System.out.println("Seed:" + seeds[k]);
-					             
-					             //for debug purpose 
-								 m.marshal( root, System.out );  
-								 i++;
-								 NFV resultNFV = testCoarse(root);
-								 StringWriter stringWriter = new StringWriter();
-								 m.marshal( resultNFV, stringWriter );
-								 //loggerModel.debug(stringWriter.toString());
-							} catch (Exception e) {
+					            	 
+						             //random
+						             logger.debug("Seed:" + seeds[k]);
+						            // System.out.println("Seed:" + seeds[k]);
+						             
+						             //for debug purpose 
+									// m.marshal( testCoarse(root), System.out );  
+									 i++;
+									 NFV resultNFV = testCoarse(root);
+									 StringWriter stringWriter = new StringWriter();
+									// m.marshal( resultNFV,  System.out );
+									 //loggerModel.debug(stringWriter.toString());
+					            
+					          
+							} catch (Exception e) { 
 								e.printStackTrace();
 								err++;
 							}
@@ -268,14 +344,22 @@ public class TestPerformanceScalabilityBudapest {
 				//System.out.println("MAX creating condition -> " + (maxCondTime) + "ms");
 				//logger.debug("AVG creating condition -> " + (condTime/(i-err)) + "ms");
 				//logger.debug("MAX creating condition -> " + (maxCondTime) + "ms");
+				//System.out.println("AVG total time -> " + (totTime/nSAT) + "ms");
 				if(nSAT > 0) {
-					System.out.println("AVG total time -> " + (totTime/nSAT) + "ms");
+					//System.out.println("AVG total time -> " + (totTime/nSAT) + "ms");
 					logger.info("AVG total time -> " + (totTime/nSAT) + "ms");
 					logger.info("MAX total time -> " + (maxTotTime) + "ms");
 					logger.info("MIN total time -> " + (minTotTime) + "ms");
 				}
 				
-				//logger.debug("=====================================");
+				logger.info("=====================================");
+				logger.info("rules: "+numberPR+" fwRules: "+ runs + " iteration: ");
+				logger.info(" total time -> " + (totTime) + "ms");
+				System.out.println(" total time -> " + (totTime) + "ms");
+				logger.info(" total time checker -> " + (totTimeChecker) + "ms");
+				System.out.println(" total time checker -> " + (totTimeChecker) + "ms");
+				
+				logger.info("=====================================");
 
 
 			}
@@ -283,5 +367,10 @@ public class TestPerformanceScalabilityBudapest {
 			e.printStackTrace();
 			fail(e.toString());
 		}
+	}
+
+	private static void changePolicies() {
+		// TODO Auto-generated method stub
+		
 	}
 }

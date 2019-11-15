@@ -18,8 +18,17 @@ public class VerificationResult {
     public Status result;
     public Model model;
     public BoolExpr [] assertions;
+	public long time;
 
-    /**
+    public long getTime() {
+		return time;
+	}
+
+	public void setTime(long time) {
+		this.time = time;
+	}
+
+	/**
      * Public constructor of VerificationResult, whose instances wrap all the information about the z3 simulation result
      * @param ctx it is the z3 Context instance
      * @param result it is the result status
