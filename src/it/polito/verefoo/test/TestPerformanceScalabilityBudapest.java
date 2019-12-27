@@ -64,22 +64,11 @@ public class TestPerformanceScalabilityBudapest {
 		//if(args.length!=4) return;
 		
 	
-		for(int i = 70; i <= 70; i+=10) {
-			for(int j = 80; j <= 100; j+=10) {
-				seed  = 66361;
-		        numberAP  = i;
-		        numberIPR  = j/2;
-		        numberRPR = j/2;
-		        numberPR = numberIPR + numberRPR;
-		        numberNAT = 0;
-		        numberLB = 0;
-		        runs = 80;
-		        testScalabilityPerformance();
-			}
-		}
+		int i = 100;
+		int j = 90;
 		
-		for(int i = 80; i <= 100; i+=10) {
-			for(int j = 10; j <= 100; j+=10) {
+		//for(int i = 80; i <= 100; i+=10) {
+			//for(int j = 10; j <= 100; j+=10) {
 				seed  = 66361;
 		        numberAP  = i;
 		        numberIPR  = j/2;
@@ -87,10 +76,10 @@ public class TestPerformanceScalabilityBudapest {
 		        numberPR = numberIPR + numberRPR;
 		        numberNAT = 0;
 		        numberLB = 0;
-		        runs = 80;
+		        runs = 1;
 		        testScalabilityPerformance();
-			}
-		}
+			//}
+		//}
 		
 		
 
@@ -180,7 +169,7 @@ public class TestPerformanceScalabilityBudapest {
 	public static void testScalabilityPerformance(){
 		
 		    rand= new Random(seed);
-	        pathfile =  seed+"_AP"+numberAP+"_PR"+numberPR+"_N"+numberNAT+"_L"+numberLB+"_"+runs+"_"+"name.log";
+	        pathfile =  "VerefooMemory.log";
 	        logger =  Package1LoggingClass.createLoggerFor(pathfile, "log/"+pathfile);
 		
 	        Runtime rt = Runtime.getRuntime();

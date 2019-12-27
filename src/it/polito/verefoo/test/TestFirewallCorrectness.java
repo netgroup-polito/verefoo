@@ -99,7 +99,7 @@ public class TestFirewallCorrectness {
 	public void testFWCorrectness01(){
 		try {
 			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect01.xml"); 
-			assertTrue(result.isSat());
+			assertTrue(!result.isSat());
 		} catch (Exception e) {
 			fail(e.toString());
 		}

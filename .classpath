@@ -71,7 +71,6 @@
 	<classpathentry kind="lib" path="lib/lib4j/log4j-api-2.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/lib4j/log4j-core-2.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/lib4j/logback-classic-1.2.3-sources.jar"/>
-	<classpathentry kind="lib" path="lib/lib4j/logback-classic-1.2.3.jar"/>
 	<classpathentry kind="lib" path="lib/lib4j/logback-core-1.2.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/lib4j/logback-core-1.2.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
