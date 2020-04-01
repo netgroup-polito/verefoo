@@ -443,6 +443,7 @@ private int minizimePlaceholderRules() {
 		}
 
 		//System.out.println(minimizedRules);
+		
 		return minimizedRules;
 	}
 
