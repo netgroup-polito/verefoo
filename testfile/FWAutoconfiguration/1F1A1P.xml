@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../xsd/nfvSchema.xsd">
   <graphs>
     <graph id="0">
      <node functional_type="WEBCLIENT" name="10.0.0.1">
@@ -13,9 +13,6 @@
         <neighbour name="10.0.0.1"/>
         <neighbour name="20.0.0.3"/>
         <neighbour name="20.0.0.4"/>
-        <configuration description="A simple description" name="conf2">
-        
-        </configuration>
       </node>
       
           <node functional_type="FIREWALL" name="20.0.0.4">
