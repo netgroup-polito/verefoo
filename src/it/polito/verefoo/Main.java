@@ -3,6 +3,7 @@ package it.polito.verefoo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import javax.xml.XMLConstants;
@@ -18,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import it.polito.verefoo.extra.BadGraphError;
+import it.polito.verefoo.firewall.FirewallSerializer;
 import it.polito.verefoo.jaxb.*;
 
 /**
@@ -43,13 +45,21 @@ public class Main {
 				Marshaller m = jc.createMarshaller();
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "./xsd/nfvSchema.xsd");
-				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/FWCorrectness/FWCorrect03.xml")));
+				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/FWAutoconfiguration/8FW5P.xml")));
 				if (test.isSat()) {
 					loggerResult.info("SAT");
 					loggerResult.info("----------------------OUTPUT----------------------");
 					StringWriter stringWriter = new StringWriter();
 					m.marshal(test.getResult(), stringWriter);
 					loggerResult.info(stringWriter.toString());
+					loggerResult.info("--------------------------------------------------");
+					
+					//inizia da qui stronzo
+					FirewallSerializer fs = new FirewallSerializer((NFV) u.unmarshal(new StringReader(stringWriter.toString())));
+					loggerResult.info("----------------------OUTPUTFIREWALL---------------");
+					//StringWriter stringWriterfw = new StringWriter();
+
+					//loggerResult.info(fs.getMappa().toString());
 					loggerResult.info("--------------------------------------------------");
 					//System.out.println(stringWriter);
 					//System.out.println(test.getZ3Model());
