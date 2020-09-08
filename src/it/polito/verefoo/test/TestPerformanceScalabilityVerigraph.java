@@ -62,25 +62,32 @@ public class TestPerformanceScalabilityVerigraph {
 
 	//seed , numberAP, numberPR, runs
 	public static void main(String[] args)  {
-		System.out.println(args.length);
+		//System.out.println(args.length);
 		//if(args.length!=4) return;
 		// 10,100,1000
 		// isolation with 1000 rules 
 		chainsize=108;
         numberAP  = 0;
         numberPR  = 1000;
-        runs = 1;
+        runs = 100;
         
-        int[] sizes = {9,19,29,31,41,53,54,65,64,74,75,86,87,98,108};
+        int[] sizes = {48, 48, 47, 48, 47, 49, 48, 48, 48, 48};
+        int[] percDPIs =  {20,17,15,12,11,8,5,3,1};
+        int[] percWafs =  {20,18,15,13,11,8,5,3,1};
+        int[] percPfs =    {50,45,40,35,28,24,20,14,8};
+        int[] percForws = {10,20,30,40,50,60,70,80,90};
 
-		for (int i : sizes) {
+
+		for (int k = 8; k >= 0; k--) {
 			seed=1967;
-			chainsize=i;
+			chainsize= sizes[k];
+			percDPI = percDPIs[k];
+			percWaf = percWafs[k];
+			percPf = percPfs[k];
+			percForw = percForws[k];
 			totTime=0;
     		totTimeChecker=0;
 			testScalabilityPerformance();
-			
-			
 		}
 		
         
@@ -110,6 +117,13 @@ public class TestPerformanceScalabilityVerigraph {
 	private static int numberAP;
 	private static int numberPR;
 	private static int chainsize;
+	
+
+	private static int percDPI;
+	private static int percWaf;
+	private static int percPf;
+	private static int percForw;
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -151,6 +165,7 @@ public class TestPerformanceScalabilityVerigraph {
 			logger.debug("time: " + (endAll-beginAll) + "ms;");
 			totTime += (endAll-beginAll);
 			totTimeChecker +=test.getTime(); 
+			logger.debug("checker time: " + test.getTime() + "ms;");
 		 }
 	 	else{
 	 		logger.debug("UNSAT");	
@@ -182,7 +197,8 @@ public class TestPerformanceScalabilityVerigraph {
 	public static void testScalabilityPerformance(){
 		
 		    rand= new Random(seed);
-	        pathfile =  "Verigraph" + chainsize+"_"+numberPR+"_"+runs+"_"+seed+"_"+"name.log";
+		    //pathfile =  "VerigraphRev1Test"+"_"+numberPR+"_"+runs+"_"+seed+"_"+"name.log";
+		    pathfile =  "VerigraphRevision1" + chainsize+"_" + "percNoFilt"+ percForw + "_" + numberPR+"_"+runs+"_"+seed+"_"+"name.log";
 	        logger =  Package1LoggingClass.createLoggerFor(pathfile, "log/"+pathfile);
 		
 		   Runtime rt = Runtime.getRuntime();
@@ -211,7 +227,7 @@ public class TestPerformanceScalabilityVerigraph {
 		try {
 			List<TestCaseGeneratorVerigraph> nfv = new ArrayList<>();
 			
-			 nfv.add(new TestCaseGeneratorVerigraph(prefix + numberAP + "AP" + numberPR + "PR", numberPR,  chainsize, 1 ));
+			 nfv.add(new TestCaseGeneratorVerigraph(prefix + numberAP + "AP" + numberPR + "PR", numberPR,  chainsize, 1, percDPI, percWaf, percPf, percForw ));
 			
 			
 			
@@ -303,6 +319,7 @@ public class TestPerformanceScalabilityVerigraph {
 				//logger.debug("=====================================");
 				logger.info(" total time checker -> " + (totTimeChecker) + "ms");
 				logger.info(" size ->  " + (f.getNfv().getGraphs().getGraph().get(0).getNode().size()) + " VNFs");
+				System.out.println(" size ->  " + (f.getNfv().getGraphs().getGraph().get(0).getNode().size()) + " VNFs");
 				System.out.println(" total time checker -> " + (totTimeChecker) + "ms");
 
 

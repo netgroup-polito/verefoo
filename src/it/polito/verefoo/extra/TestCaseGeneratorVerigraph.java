@@ -37,12 +37,19 @@ public class TestCaseGeneratorVerigraph {
 	
 	private static int totTimeChecker=0;
 	
+	private int percDPI;
+	private int percWaf;
+	private int percPf;
+	private int percForw;
 	
-	
-	public TestCaseGeneratorVerigraph(String name, int numberRules, int sizeChain, int seed) {
+	public TestCaseGeneratorVerigraph(String name, int numberRules, int sizeChain, int seed, int percDPI, int percWaf, int percPf, int percForw) {
 		this.name = name;
 		this.rand = new Random(seed); 
-		chainSize = sizeChain; //10 
+		this.percDPI = percDPI;
+		this.percWaf = percWaf;
+		this.percPf = percPf;
+		this.percForw = percForw;
+		chainSize = sizeChain;  
 		numberOfRules =numberRules;
 
 		allIPs = new HashSet<String>();
@@ -103,12 +110,11 @@ public class TestCaseGeneratorVerigraph {
 		chainSize = sizeChain; //10 
 		numberOfRules =numberRules;
 		
-		int numberDPI = chainSize*15/100;      //20%   
-		int numberWaf = chainSize*15/100;      //20%
-		int numberPf = chainSize*40/100;       //40%
-		int numberForwarder = chainSize*20/100;//20%
+		int numberDPI = chainSize*percDPI/100; //15%   
+		int numberWaf = chainSize*percWaf/100;      //15%
+		int numberPf = chainSize*percPf/100;       //40%
+		int numberForwarder = chainSize*percForw/100;//30%
 		
-
 		
 		/* Creation of the test */
 		NFV nfv = new NFV();
