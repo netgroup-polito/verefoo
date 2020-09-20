@@ -54,12 +54,14 @@ public class Main {
 					loggerResult.info(stringWriter.toString());
 					loggerResult.info("--------------------------------------------------");
 					
-					//inizia da qui stronzo
-					FirewallSerializer fs = new FirewallSerializer((NFV) u.unmarshal(new StringReader(stringWriter.toString())));
 					loggerResult.info("----------------------OUTPUTFIREWALL---------------");
+					//local debug
+					FirewallSerializer fs = new FirewallSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/FWAutoconfiguration/prova.xml")));
+					//uncomment for link to ADP module output
+					//FirewallSerializer fs = new FirewallSerializer((NFV) u.unmarshal(new StringReader(stringWriter.toString())));
+					
 					//StringWriter stringWriterfw = new StringWriter();
 
-					//loggerResult.info(fs.getMappa().toString());
 					loggerResult.info("--------------------------------------------------");
 					//System.out.println(stringWriter);
 					//System.out.println(test.getZ3Model());

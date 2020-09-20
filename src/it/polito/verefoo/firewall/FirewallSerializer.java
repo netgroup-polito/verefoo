@@ -29,6 +29,7 @@ public class FirewallSerializer {
 	
 	//private List<Fortinet> Firewalls= new LinkedList<>();
 	private List<IpFirewall> Firewalls= new LinkedList<>();
+	//private List<BPFFirewall> Firewalls= new LinkedList<>();
 //	int time = 0;
 //
 //	public int getTime() {
@@ -46,8 +47,9 @@ public class FirewallSerializer {
 			List<Node> nodes;
 			nodes = g.getNode().stream()
 					.filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)
-							|| n.getFunctionalType().equals(FunctionalTypes.PRIORITY_FIREWALL)
-							|| n.getFunctionalType().equals(FunctionalTypes.STATEFUL_FIREWALL))
+							//|| n.getFunctionalType().equals(FunctionalTypes.PRIORITY_FIREWALL)
+							//|| n.getFunctionalType().equals(FunctionalTypes.STATEFUL_FIREWALL)
+							)
 					.collect(toList());
 			if(nodes.isEmpty())
 				throw new BadGraphError("You specified a network ("+g.getId()+") that contains no firewalls");
