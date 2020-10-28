@@ -209,6 +209,7 @@
                 <xsd:element name="protocol" type="L4ProtocolTypes" minOccurs="0" default="ANY"/>
                 <xsd:element name="src_port" type="xsd:string" minOccurs="0"/>
                 <xsd:element name="dst_port" type="xsd:string" minOccurs="0"/>
+                <xsd:element name="priority" type="xsd:string" minOccurs="0" default="*"/>
                 <xsd:element name="directional" type="xsd:boolean" minOccurs="0" default="true"/>
             </xsd:sequence>
         </xsd:complexType>

@@ -22,6 +22,7 @@ public class IpFirewall {
 	private int endSrcPort;
 	private int startDstPort;
 	private int endDstPort;
+	private int priority;
 	//private int ruleId;
 	private String filename;
 	private String srcAddresses;
@@ -47,7 +48,7 @@ public class IpFirewall {
 		 if (configuration.canWrite())
 		 configurationWriter = new FileWriter(filename);
 		 else {
-		 // errore
+			 throw new Exception();
 		 }
 
 		System.out.println("\n" + this.node.getName() + "\t" + filename + "\n\n\n");
@@ -66,13 +67,21 @@ public class IpFirewall {
 		if (!(policies = this.node.getConfiguration().getFirewall().getElements()).isEmpty()) {
 
 			for (int index = 0; index < policies.size(); index++) {
-
+				priority=1;
+if(!(policies.get(index).getPriority()==null))
+	if(!policies.get(0).getPriority().equals("*"))
+		priority=Integer.valueOf(policies.get(0).getPriority());
+String[] srcAddr=null;
+if(policies.get(index).getSource()==null) {
+	scrNetmask = -1;
+}else {
 				scrNetmask = 4;
-				String[] srcAddr = policies.get(index).getSource().split("\\.");
+				srcAddr = policies.get(index).getSource().split("\\.");
 				for (int indexadd = 0; indexadd < srcAddr.length; indexadd++) {
 					if (Integer.valueOf(srcAddr[indexadd]) == -1)
 						scrNetmask += -1;
 				}
+}
 
 				switch (scrNetmask) {
 				case 1:
@@ -88,6 +97,7 @@ public class IpFirewall {
 					srcAddresses = new String(policies.get(index).getSource() + "/32");
 					break;
 				default:
+					srcAddr=null;
 					throw new IOException();
 				}
 
@@ -153,11 +163,23 @@ public class IpFirewall {
 
 				String action = (policies.get(index).getAction().equals(ActionTypes.ALLOW)) ? "allow" : "deny";
 				//or use ruleID for different order
-				 configurationWriter.write("${cmd} add 1 set 1 "+action+" "+protocol+" from "+srcAddresses+" "+
+				
+				 configurationWriter.write("${cmd} add "+priority+" set 1 "+action+" "+protocol+" from "+srcAddresses+" "+
 				 startSrcPort+"-"+endSrcPort+" to "+dstAddresses+" "+startDstPort+"-"+endDstPort+"\n");
-				System.out.println("${cmd} add 1 set 1 " + action + " " + protocol + " from "
+				System.out.println("${cmd} add "+priority+" set 1 " + action + " " + protocol + " from "
 						+ srcAddresses + " " + startSrcPort + "-" + endSrcPort + " to " + dstAddresses + " "
 						+ startDstPort + "-" + endDstPort + "\n");
+				if(policies.get(index).isDirectional()!=null)
+				if(policies.get(index).isDirectional()) {
+					configurationWriter.write("${cmd} add " + priority + " set 1 " + action + " " + protocol + " from "
+
+							+ dstAddresses + " " + startDstPort + "-" + endDstPort + " to " + srcAddresses + " "
+							+ startSrcPort + "-" + endSrcPort + "\n");
+							System.out.println("${cmd} add " + priority + " set 1 " + action + " " + protocol + " from "
+
+							+ dstAddresses + " " + startDstPort + "-" + endDstPort + " to " + srcAddresses + " "
+							+ startSrcPort + "-" + endSrcPort + "\n");
+				}
 
 			}
 		}

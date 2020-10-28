@@ -4,7 +4,9 @@ import java.io.File;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.Elements;
@@ -41,6 +43,7 @@ public class BPFFirewall {
 	private boolean isFirst = true;
 	private boolean srcRanged = false;
 	private boolean dstRanged = false;
+	//private boolean isPriority=false;
 
 	public BPFFirewall(long id, Node node) throws Exception {
 		this.id = id;
@@ -56,7 +59,8 @@ public class BPFFirewall {
 		if (configuration.canWrite())
 			configurationWriter = new FileWriter(filename);
 		else {
-			// errore
+			throw new Exception();
+		
 		}
 
 		System.out.println("\n" + this.node.getName() + "\t" + filename + "\n\n\n");
@@ -82,8 +86,19 @@ public class BPFFirewall {
 			System.out.println(
 					"${cmd} INPUT set default=ACCEPT\n${cmd} FORWARD set default=ACCEPT\n${cmd} OUTPUT set default=ACCEPT\n");
 		}
+		
+		
+	
+		
 		if (!(policies = node.getConfiguration().getFirewall().getElements()).isEmpty()) {
 
+			if(!(policies.get(0).getPriority()==null)) {
+				
+				if(!policies.get(0).getPriority().equals("*"))
+					//isPriority =true;
+					policies = policies.stream().sorted(Comparator.comparing(Elements::getPriority).reversed()).collect(Collectors.toList());
+			}
+			
 			for (int index = 0; index < policies.size(); index++) {
 
 				scrNetmask = 4;
@@ -160,17 +175,18 @@ public class BPFFirewall {
 				}
 
 				String action = (policies.get(index).getAction().equals(ActionTypes.ALLOW)) ? "ACCEPT" : "DROP";
+				boolean direction = (policies.get(index).isDirectional()!=null) ? policies.get(index).isDirectional() : false;
 
 				switch (policies.get(index).getProtocol()) {
 				case ANY:
-					insertRule("tcp", startSrcPort, startDstPort, action, srcRanged, dstRanged);
-					insertRule("udp", startSrcPort, startDstPort, action, srcRanged, dstRanged);
+					insertRule("tcp",srcAddresses , dstAddresses, startSrcPort, startDstPort, action, srcRanged, dstRanged,direction);
+					insertRule("udp",srcAddresses , dstAddresses, startSrcPort, startDstPort, action, srcRanged, dstRanged,direction);
 					break;
 				case TCP:
-					insertRule("tcp", startSrcPort, startDstPort, action, srcRanged, dstRanged);
+					insertRule("tcp",srcAddresses , dstAddresses, startSrcPort, startDstPort, action, srcRanged, dstRanged,direction);
 					break;
 				case UDP:
-					insertRule("udp", startSrcPort, startDstPort, action, srcRanged, dstRanged);
+					insertRule("udp",srcAddresses , dstAddresses, startSrcPort, startDstPort, action, srcRanged, dstRanged,direction);
 					break;
 				default:
 					throw new IOException();
@@ -185,8 +201,8 @@ public class BPFFirewall {
 
 	}
 
-	private void insertRule(String protocol, int srcPort, int dstPort, String action, boolean srcRangePort,
-			boolean dstRangePort) throws IOException {
+	private void insertRule(String protocol,String srcAddresses ,String dstAddresses, int srcPort, int dstPort, String action, boolean srcRangePort,
+			boolean dstRangePort,boolean isDirectional) throws IOException {
 		String sport, dport;
 
 		if (srcPort == -1) {
@@ -201,6 +217,7 @@ public class BPFFirewall {
 		}
 
 		if (isFirst) {
+
 			configurationWriter.write("${cmd} FORWARD insert id=0 src=" + srcAddresses + " dst=" + dstAddresses
 					+ " l4proto=" + protocol + sport + dport + " action=" + action + "\n");
 			System.out.println("${cmd} FORWARD insert id=0 src=" + srcAddresses + " dst=" + dstAddresses + " l4proto="
@@ -213,16 +230,21 @@ public class BPFFirewall {
 			System.out.println("${cmd} FORWARD append src=" + srcAddresses + " dst=" + dstAddresses + " l4proto="
 					+ protocol + sport + dport + " action=" + action + "\n");
 		}
+		 
+		if(isDirectional) {
+			insertRule(protocol,dstAddresses , srcAddresses, dstPort, srcPort, action, dstRangePort, srcRangePort,false);
+			isDirectional =false;
+		}
 
 		if (srcRangePort) {
 			for (int port = srcPort + 1; port <= endSrcPort; port++) {
-				insertRule(protocol, port, dstPort, action, false, dstRangePort);
+				insertRule(protocol,srcAddresses , dstAddresses, port, dstPort, action, false, dstRangePort,isDirectional);
 			}
 			srcRangePort = false;
 		}
 		if (dstRangePort) {
 			for (int port = dstPort + 1; port <= endDstPort; port++) {
-				insertRule(protocol, srcPort, port, action, srcRangePort, false);
+				insertRule(protocol,srcAddresses , dstAddresses, srcPort, port, action, srcRangePort, false,isDirectional);
 			}
 
 		}

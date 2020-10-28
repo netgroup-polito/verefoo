@@ -3,8 +3,10 @@ package it.polito.verefoo.firewall;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.Elements;
@@ -44,7 +46,7 @@ public class Fortinet {
 		if (configuration.canWrite())
 			configurationWriter = new FileWriter(filename);
 		else {
-			// errore
+			throw new Exception();
 		}
 
 		System.out.println("\n" + this.node.getName() + "\t" + filename + "\n\n\n");
@@ -81,6 +83,12 @@ public class Fortinet {
 
 		if (!(policies = this.node.getConfiguration().getFirewall().getElements()).isEmpty()) {
 
+			if(!(policies.get(0).getPriority()==null)) {
+				
+				if(!policies.get(0).getPriority().equals("*"))
+					policies = policies.stream().sorted(Comparator.comparing(Elements::getPriority).reversed()).collect(Collectors.toList());
+			}
+			
 			for (int index = 0; index < policies.size(); index++) {
 
 				scrNetmask = 4;
@@ -263,8 +271,8 @@ public class Fortinet {
 
 	private String generateUUID() {
 
-		// terzo campo a che fare con l'id del firewall
+		
 		return UUID.randomUUID().toString();
 	}
-	// crea file e scrivi
+	
 }
