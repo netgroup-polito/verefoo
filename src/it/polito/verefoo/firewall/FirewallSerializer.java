@@ -30,6 +30,7 @@ public class FirewallSerializer {
 	//private List<Fortinet> Firewalls= new LinkedList<>();
 	private List<IpFirewall> Firewalls= new LinkedList<>();
 	//private List<BPFFirewall> Firewalls= new LinkedList<>();
+	//private List<OpenvSwitch> Firewalls= new LinkedList<>();
 //	int time = 0;
 //
 //	public int getTime() {
