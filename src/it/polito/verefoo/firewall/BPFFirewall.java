@@ -249,5 +249,7 @@ public class BPFFirewall {
 
 		}
 	}
-
+	public String getFilename() {
+		return filename;
+	}
 }

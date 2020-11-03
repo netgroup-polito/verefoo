@@ -274,5 +274,7 @@ public class Fortinet {
 		
 		return UUID.randomUUID().toString();
 	}
-	
+	public String getFilename() {
+		return filename;
+	}
 }

@@ -60,7 +60,7 @@ public class Iptables {
 		// set default action of INPUT and OUTPUT to deny and permit ssh traffic (?)
 		if (node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.DENY)) {
 			configurationWriter.write(
-					"${cmd} -P INPUT DROP\n${cmd} -P FORWARD DROP\n${cmd} -P OUTPUT set DROP\n");
+					"${cmd} -P INPUT DROP\n${cmd} -P FORWARD DROP\n${cmd} -P OUTPUT DROP\n");
 			System.out.println(
 					"${cmd} -P INPUT DROP\n${cmd} -P FORWARD DROP\n${cmd} -P OUTPUT DROP\n");
 		} else {
@@ -74,8 +74,7 @@ public class Iptables {
 	
 		
 		if (!(policies = node.getConfiguration().getFirewall().getElements()).isEmpty()) {
-
-			if(!(policies.get(0).getPriority()==null)) {
+			if(policies.get(0).getPriority()!=null) {
 				
 				if(!policies.get(0).getPriority().equals("*"))
 					//isPriority =true;
@@ -161,7 +160,9 @@ public class Iptables {
 boolean isDirectional = (policies.get(index).isDirectional()!=null) ? policies.get(index).isDirectional() : false;
 				switch (policies.get(index).getProtocol()) {
 				case ANY:
-					insertRule(null,srcAddresses,dstAddresses, startSrcPort, startDstPort, endSrcPort, endDstPort, action,isDirectional);
+					insertRule("tcp",srcAddresses,dstAddresses, startSrcPort, startDstPort, endSrcPort, endDstPort, action,isDirectional);
+					insertRule("udp",srcAddresses,dstAddresses, startSrcPort, startDstPort, endSrcPort, endDstPort, action,isDirectional);
+					
 					break;
 				case TCP:
 					insertRule("tcp",srcAddresses,dstAddresses, startSrcPort, startDstPort, endSrcPort, endDstPort, action,isDirectional);
@@ -176,8 +177,8 @@ boolean isDirectional = (policies.get(index).isDirectional()!=null) ? policies.g
 			}
 
 		}
-		configurationWriter.write("sudo iptables-save > /etc/iptables/iptables.rules\n");
-		System.out.println("sudo iptables-save > /etc/iptables/iptables.rules\n");
+		//configurationWriter.write("sudo iptables-save > /etc/iptables/iptables.rules\n");
+		//System.out.println("sudo iptables-save > /etc/iptables/iptables.rules\n");
 		configurationWriter.close();
 
 	}
@@ -185,7 +186,7 @@ boolean isDirectional = (policies.get(index).isDirectional()!=null) ? policies.g
 	private void insertRule(String protocol,String srcAddresses ,String dstAddresses,  int startSrcPort, int startDstPort, int endSrcPort, int endDstPort,
 			String action, boolean isDirectional) throws IOException{
 		String sport, dport,sprotocol;
-		if(protocol!=null) {
+		if(protocol==null) {
 			sprotocol="";
 		}else {
 			sprotocol=new String(" -p "+protocol);
@@ -207,9 +208,10 @@ boolean isDirectional = (policies.get(index).isDirectional()!=null) ? policies.g
 				}
 
 				if (isFirst) {
-					configurationWriter.write("${cmd} -I FORWARD 0"+sprotocol +" -s "+ srcAddresses + " -d " + dstAddresses
+					//check
+					configurationWriter.write("${cmd} -A FORWARD"+sprotocol +" -s "+ srcAddresses + " -d " + dstAddresses
 							 + sport + dport + " -j " + action + "\n");
-					System.out.println("${cmd} -I FORWARD 0"+sprotocol +" -s "+ srcAddresses + " -d " + dstAddresses
+					System.out.println("${cmd} -A FORWARD"+sprotocol +" -s "+ srcAddresses + " -d " + dstAddresses
 							 + sport + dport + " -j " + action + "\n");
 					isFirst = false;
 
@@ -225,6 +227,8 @@ boolean isDirectional = (policies.get(index).isDirectional()!=null) ? policies.g
 				}
 		
 	}
-
+	public String getFilename() {
+		return filename;
+	}
 
 }

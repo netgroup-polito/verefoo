@@ -44,14 +44,14 @@ public class OpenvSwitch {
 		this.node = node;
 		// node.getId();
 
-//		File configuration = new File(filename);
-//		if (!configuration.exists())
-//			configuration.createNewFile();
-//		if (configuration.canWrite())
-//			configurationWriter = new FileWriter(filename);
-//		else {
-//			throw new Exception();
-//		}
+		File configuration = new File(filename);
+		if (!configuration.exists())
+			configuration.createNewFile();
+		if (configuration.canWrite())
+			configurationWriter = new FileWriter(filename);
+		else {
+			throw new Exception();
+		}
 		if(!node.getConfiguration().getDescription().isEmpty())
 				this.bridgeName=node.getConfiguration().getDescription().split(":")[0];
 				//or use name without "."
@@ -179,9 +179,9 @@ public class OpenvSwitch {
 				}
 			}
 	//last priority
-		addPolicy(-1,null,null, 1, (node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) ? "NORMAL" : "drop", null, null,false);
+		addPolicy(-1,null,null, 65535, (node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) ? "NORMAL" : "drop", null, null,false);
 
-//			configurationWriter.close();
+			configurationWriter.close();
 
 		
 	}
@@ -231,7 +231,7 @@ public class OpenvSwitch {
 		return "0x" + Integer.toHexString(port & portBitMasks[maskLen][1]) + "/0x"
 				+ Integer.toHexString(portBitMasks[maskLen][1]);
 	}
- private void addPolicy(int proto,String srcAddresses , String dstAddresses, int priority,String action, String[] srcports, String[] dstports,boolean isDirectional) {
+ private void addPolicy(int proto,String srcAddresses , String dstAddresses, int priority,String action, String[] srcports, String[] dstports,boolean isDirectional) throws IOException {
 	 String priString,srcport,dstport;
 		if(isDirectional) {
 			 addPolicy(proto,dstAddresses , srcAddresses,priority,action,dstports ,srcports,false);
@@ -240,7 +240,7 @@ public class OpenvSwitch {
 	 if(priority==-1)
 		 priString="";
 	 else {
-		 priString=new String("priority="+priority+",");
+		 priString=new String("priority="+(65535 - priority)+",");
 	 }
 	 if(srcports==null)
 		 srcport="";
@@ -260,15 +260,20 @@ public class OpenvSwitch {
 		 }
 	 }
 	 if(proto==-1) {
-		 
-		 System.out.println( "sudo ovs-ofctr add-flow "+bridgeName+" "+priString+"dl_type=0x800"+
+		 configurationWriter.write( "sudo ovs-ofctl add-flow "+bridgeName+" "+priString+"dl_type=0x800"+
+				 ",action="+action+"\n"); 
+		 System.out.println( "sudo ovs-ofctl add-flow "+bridgeName+" "+priString+"dl_type=0x800"+
 				 ",action="+action+"\n"); 
 	 }else {
-		 System.out.println( "sudo ovs-ofctr add-flow "+bridgeName+" "+priString+"dl_type=0x800,nw_src="+srcAddresses+",nw_dst="+dstAddresses+
+		 configurationWriter.write( "sudo ovs-ofctl add-flow "+bridgeName+" "+priString+"dl_type=0x800,nw_src="+srcAddresses+",nw_dst="+dstAddresses+
+				 ",nw_proto="+proto+srcport+dstport+",action="+action+"\n");
+		 System.out.println( "sudo ovs-ofctl add-flow "+bridgeName+" "+priString+"dl_type=0x800,nw_src="+srcAddresses+",nw_dst="+dstAddresses+
 				 ",nw_proto="+proto+srcport+dstport+",action="+action+"\n");
 	 }
 
 	// sudo ovs-ofctr dump-flows bridge
  }
-
+	public String getFilename() {
+		return filename;
+	}
 }

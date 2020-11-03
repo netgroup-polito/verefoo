@@ -70,7 +70,7 @@ public class IpFirewall {
 				priority=1;
 if(!(policies.get(index).getPriority()==null))
 	if(!policies.get(0).getPriority().equals("*"))
-		priority=Integer.valueOf(policies.get(0).getPriority());
+		priority=Integer.valueOf(policies.get(index).getPriority());
 String[] srcAddr=null;
 if(policies.get(index).getSource()==null) {
 	scrNetmask = -1;
@@ -201,5 +201,9 @@ if(policies.get(index).getSource()==null) {
 
 		 configurationWriter.close();
 
+	}
+	
+	public String getFilename() {
+		return filename;
 	}
 }
