@@ -203,6 +203,7 @@
     <xsd:element name="elements">
         <xsd:complexType>
             <xsd:sequence>
+             	<xsd:element name="id" type="xsd:long" minOccurs="0" />
                 <xsd:element name="action" type="ActionTypes" minOccurs="0" default="DENY"/>
                 <xsd:element name="source" type="xsd:string"/>
                 <xsd:element name="destination" type="xsd:string" />
