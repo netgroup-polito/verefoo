@@ -331,7 +331,7 @@
 	<!-- Ant Script for controlling Tomcat-->
 	<property name="service.name" value="verifoo" />
 	<property name="root.location" value="${basedir}" />
-	<import file="tomcat-build.xml" />
+	<!-- <import file="tomcat-build.xml" /> -->
 	<target name="testWS" depends="deploy">
 		<junit printsummary="yes" haltonfailure="no" showoutput="true">
 			<!-- Project classpath, must include junit.jar -->

@@ -24,6 +24,8 @@ import it.polito.verefoo.jaxb.*;
  * This is the main class only for testing the Verefoo execution
  *
  */
+
+/* Push nuovo branch per gli atomic predicates */
 public class Main {
 	static Logger loggerInfo = LogManager.getLogger(Main.class);
 	static Logger loggerResult = LogManager.getLogger("result");
