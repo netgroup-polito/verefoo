@@ -1,0 +1,35 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "hyperlinks",
+    "type": "object",
+    "definitions": {
+        "link": {
+            "type": "object",
+            "properties": {
+                "rel": {
+                    "type": "string"
+                },
+                "href": {
+                    "type": "string"
+                },
+                "method": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "properties": {
+        "$schema": true,
+        "links": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/link"
+            }
+        }
+    },
+    "additionalProperties": false
+}

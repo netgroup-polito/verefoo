@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "definitions": {
+        "ciao": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "iji": {
+            "type": "object",
+            "properties": {
+                "name2": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "properties": {
+        "ehi": {
+            "anyOf": [
+                {
+                    "$ref": "#/definitions/ciao"
+                },
+                {
+                    "$ref": "#/definitions/iji"
+                }
+            ]
+        }
+    }
+}

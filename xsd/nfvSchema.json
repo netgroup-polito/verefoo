@@ -1,0 +1,338 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "NFV",
+    "definitions": {
+        "allocationConstraintType": {
+            "enum": [
+                "forbidden",
+                "forced"
+            ]
+        },
+        "nodeConstraints": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "node": {
+                        "type": "string"
+                    },
+                    "numberOfOperations": {
+                        "type": "number"
+                    },
+                    "maxNodeLatency": {
+                        "type": "number"
+                    },
+                    "requestStorage": {
+                        "type": "number",
+                        "default": 0
+                    },
+                    "cores": {
+                        "type": "number",
+                        "default": 0
+                    },
+                    "memory": {
+                        "type": "number",
+                        "default": 0
+                    },
+                    "optional": {
+                        "type": "boolean",
+                        "default": false
+                    }
+                },
+                "required": [
+                    "node"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "linkConstraints": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "source": {
+                        "type": "string"
+                    },
+                    "destination": {
+                        "type": "string"
+                    },
+                    "requestLatency": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "source",
+                    "destination",
+                    "requestLatency"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "allocationConstraints": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "$ref": "#/definitions/allocationConstraintType"
+                    },
+                    "nodeA": {
+                        "type": "string"
+                    },
+                    "nodeB": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "type",
+                    "nodeA",
+                    "nodeB"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "hosts": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "supportedVNFTypes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/functionalTypes"
+                        }
+                    },
+                    "nodeRefs": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "cpu": {
+                        "type": "integer"
+                    },
+                    "cores": {
+                        "type": "integer"
+                    },
+                    "diskStorage": {
+                        "type": "integer"
+                    },
+                    "memory": {
+                        "type": "integer"
+                    },
+                    "maxVNF": {
+                        "type": "integer"
+                    },
+                    "type": {
+                        "enum": [
+                            "CLIENT",
+                            "SERVER",
+                            "MIDDLEBOX"
+                        ]
+                    },
+                    "fixedEndPoint": {
+                        "type": "string"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "default": "false"
+                    }
+                },
+                "required": [
+                    "name",
+                    "cpu",
+                    "cores",
+                    "diskStorage",
+                    "memory"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "connections": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "sourceHost": {
+                        "type": "string"
+                    },
+                    "destinationHost": {
+                        "type": "string"
+                    },
+                    "averageLatency": {
+                        "type": "integer"
+                    }
+                },
+                "required": [
+                    "sourceHost",
+                    "destinationHost"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "networkForwardingPaths": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "pathNodes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "minItems": 2
+                    }
+                },
+                "required": [
+                    "id"
+                ],
+                "additionalProperties": false
+            }
+        },
+        "property": {
+            "type": "object",
+            "properties": {
+                "HTTPDefinition": {
+                    "type": "object",
+                    "properties": {
+                        "url": {
+                            "type": "string"
+                        },
+                        "domain": {
+                            "type": "string"
+                        },
+                        "options": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "POP3Definition": {
+                    "type": "object",
+                    "properties": {
+                        "from": {
+                            "type": "string"
+                        },
+                        "sender": {
+                            "type": "string"
+                        },
+                        "to": {
+                            "type": "string"
+                        },
+                        "subject": {
+                            "type": "string"
+                        },
+                        "contentType": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "propertyName": {
+                    "enum": [
+                        "Isolation",
+                        "Reachability"
+                    ]
+                },
+                "graphId": {
+                    "type": "integer"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "destination": {
+                    "type": "string"
+                },
+                "level4Protocol": {
+                    "$ref": "#/definitions/level4ProtocolTypes",
+                    "default": "ANY"
+                },
+                "sourcePort": {
+                    "type": "string"
+                },
+                "destinationPort": {
+                    "type": "string"
+                },
+                "isSat": {
+                    "type": "boolean"
+                },
+                "body": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "propertyName",
+                "graph",
+                "source",
+                "destination"
+            ],
+            "oneOf": [
+                {
+                    "required": [
+                        "HTTPDefinition"
+                    ]
+                },
+                {
+                    "required": [
+                        "POP3Definition"
+                    ]
+                }
+            ],
+            "additionalProperties": false
+        }
+    },
+    "type": "object",
+    "properties": {
+        "graphs": {
+            "$ref": "./verigraphSchema.json/#/properties/graphs"
+        },
+        "constraints": {
+            "type": "object",
+            "properties": {
+                "nodeConstraints": {
+                    "$ref": "#/definitions/nodeConstraints"
+                },
+                "linkConstraints": {
+                    "$ref": "#/definitions/linkConstraints"
+                },
+                "allocationConstraints": {
+                    "$ref": "#/definitions/allocationConstraints"
+                }
+            },
+            "required": [
+                "nodeConstraints",
+                "linkConstraints"
+            ]
+        },
+        "propertyDefinitions": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/property"
+            },
+            "minItems": 1
+        },
+        "hosts": {
+            "$ref": "#/definitions/hosts"
+        },
+        "connections": {
+            "$ref": "#/definitions/connections"
+        },
+        "networkForwardingPaths": {
+            "$ref": "#/definitions/networkForwardingPaths"
+        },
+        "parsingString": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "graphs",
+        "propertyDefinitions"
+    ]
+}
