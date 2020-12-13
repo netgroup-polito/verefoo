@@ -1,0 +1,909 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "title": "verigraph",
+    "definitions": {
+        "functionalTypes": {
+            "enum": [
+                "FIREWALL",
+                "ENDHOST",
+                "ENDPOINT",
+                "ANTISPAM",
+                "CACHE",
+                "DPI",
+                "MAILCLIENT",
+                "MAILSERVER",
+                "NAT",
+                "VPNACCESS",
+                "VPNEXIT",
+                "WEBCLIENT",
+                "WEBSERVER",
+                "FIELDMODIFIER",
+                "FORWARDER",
+                "LOADBALANCER",
+                "STATEFUL_FIREWALL",
+                "PRIORITY_FIREWALL",
+                "WEB_APPLICATION_FIREWALL",
+                "TRAFFIC_MONITOR"
+            ]
+        },
+        "protocolTypes": {
+            "enum": [
+                "HTTP_REQUEST",
+                "HTTP_RESPONSE",
+                "POP3_REQUEST",
+                "POP3_RESPONSE"
+            ]
+        },
+        "actionTypes": {
+            "enum": [
+                "ALLOW",
+                "DENY"
+            ]
+        },
+        "level4ProtocolTypes": {
+            "enum": [
+                "ANY",
+                "TCP",
+                "UDP",
+                "OTHER"
+            ]
+        },
+        "graph": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "serviceGraph": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/node"
+                    },
+                    "minItems": 1
+                }
+            },
+            "required": [
+                "id",
+                "nodes"
+            ],
+            "additionalProperties": false
+        },
+        "node": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "address": {
+                    "type": "string",
+                    "pattern": "^([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))([.]([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))){3}$"
+                },
+                "functionalType": {
+                    "$ref": "#/definitions/functionalTypes",
+                    "$comment": "This value is optional because the network function of the node can be derived from the name of the pertinent property inside the configuration property. Nevertheless, having the network function's name as a value rather than as a property name is more comfortable."
+                },
+                "configuration": {
+                    "$ref": "#/definitions/configuration"
+                },
+                "neighbours": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/neighbour"
+                    }
+                }
+            },
+            "required": [
+                "id",
+                "address"
+            ],
+            "additionalProperties": false
+        },
+        "neighbour": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "address": {
+                    "type": "string",
+                    "pattern": "^([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))([.]([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))){3}$"
+                }
+            },
+            "$comment": "The address property is optional here, unlike the node's definition, because it can be easily retrieved from the node itself.",
+            "required": [
+                "id"
+            ],
+            "additionalProperties": false
+        },
+        "configuration": {
+            "type": "object",
+            "oneOf": [
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "firewall": {
+                            "$ref": "#/definitions/firewall"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "statefulFirewall": {
+                            "$ref": "#/definitions/statefulFirewall"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "priorityFirewall": {
+                            "$ref": "#/definitions/priorityFirewall"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "webApplicationFirewall": {
+                            "$ref": "#/definitions/webApplicationFirewall"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "endHost": {
+                            "$ref": "#/definitions/endHost"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "endPoint": {
+                            "$ref": "#/definitions/endPoint"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "antispam": {
+                            "$ref": "#/definitions/antispam"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "cache": {
+                            "$ref": "#/definitions/cache"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "dpi": {
+                            "$ref": "#/definitions/dpi"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "mailClient": {
+                            "$ref": "#/definitions/mailClient"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "mailServer": {
+                            "$ref": "#/definitions/mailServer"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "nat": {
+                            "$ref": "#/definitions/nat"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "vpnAccess": {
+                            "$ref": "#/definitions/vpnAccess"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "vpnExit": {
+                            "$ref": "#/definitions/vpnExit"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "webClient": {
+                            "$ref": "#/definitions/webClient"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "webServer": {
+                            "$ref": "#/definitions/webServer"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "fieldModifier": {
+                            "$ref": "#/definitions/fieldModifier"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "forwarder": {
+                            "$ref": "#/definitions/forwarder"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "loadBalancer": {
+                            "$ref": "#/definitions/loadBalancer"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "string"
+                        },
+                        "trafficMonitor": {
+                            "$ref": "#/definitions/trafficMonitor"
+                        }
+                    },
+                    "required": [
+                        "id"
+                    ],
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "paths": {
+            "type": "object",
+            "oneOf": [
+                {
+                    "properties": {
+                        "source": {
+                            "type": "string",
+                            "pattern": "^([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))([.]([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))){3}$"
+                        },
+                        "destination": {
+                            "type": "string",
+                            "pattern": "^([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))([.]([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))){3}$"
+                        },
+                        "direction": {
+                            "type": "string"
+                        },
+                        "paths": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            },
+                            "minLength": 1
+                        }
+                    },
+                    "required": [
+                        "source",
+                        "destination",
+                        "direction"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "source": {
+                            "type": "string",
+                            "pattern": "^([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))([.]([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))){3}$"
+                        },
+                        "destination": {
+                            "type": "string",
+                            "pattern": "^([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))([.]([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))){3}$"
+                        },
+                        "direction": {
+                            "type": "string"
+                        },
+                        "message": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "source",
+                        "destination",
+                        "direction"
+                    ],
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "firewall": {
+            "type": "object",
+            "properties": {
+                "rules": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "action": {
+                                "$ref": "#/definitions/actionTypes",
+                                "default": "DENY"
+                            },
+                            "sourceAddress": {
+                                "type": "string",
+                                "pattern": "^([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))([.]([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))){3}$"
+                            },
+                            "destinationAddress": {
+                                "type": "string",
+                                "pattern": "^([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))([.]([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))){3}$"
+                            },
+                            "protocol": {
+                                "$ref": "#/definitions/level4ProtocolTypes",
+                                "default": "ANY"
+                            },
+                            "sourcePort": {
+                                "type": "number"
+                            },
+                            "destinationPort": {
+                                "type": "number"
+                            },
+                            "directional": {
+                                "type": "boolean",
+                                "default": true
+                            }
+                        },
+                        "required": [
+                            "source",
+                            "destination"
+                        ],
+                        "additionalProperties": false
+                    },
+                    "minItems": 1
+                },
+                "defaultAction": {
+                    "$ref": "#/definitions/actionTypes"
+                }
+            },
+            "additionalProperties": false
+        },
+        "statefulFirewall": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/firewall"
+                }
+            ],
+            "additionalProperties": false
+        },
+        "priorityFirewall": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/firewall"
+                }
+            ],
+            "additionalProperties": false
+        },
+        "webApplicationFirewall": {
+            "type": "object",
+            "properties": {
+                "rules": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "action": {
+                                "$ref": "#/definitions/actionTypes",
+                                "default": "DENY"
+                            },
+                            "url": {
+                                "type": "string"
+                            },
+                            "domain": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "defaultAction": {
+                    "$ref": "#/definitions/actionTypes"
+                }
+            },
+            "additionalProperties": false
+        },
+        "dpi": {
+            "type": "object",
+            "properties": {
+                "rules": {
+                    "type": "array",
+                    "$comment": "The set of actions to take when a certain condition string is present in the packet",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "action": {
+                                "$ref": "#/definitions/actionTypes",
+                                "default": "DENY"
+                            },
+                            "condition": {
+                                "$comment": "Which string is not allowed in a packet",
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "defaultAction": {
+                    "$ref": "#/definitions/actionTypes"
+                }
+            },
+            "additionalProperties": false
+        },
+        "endHost": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "sequence": {
+                    "type": "integer"
+                },
+                "protocol": {
+                    "$ref": "#/definitions/protocolTypes"
+                },
+                "emailFrom": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "options": {
+                    "type": "string"
+                },
+                "destination": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        },
+        "endPoint": {
+            "type": "array",
+            "items": {
+                "type": [
+                    "null",
+                    "string"
+                ]
+            }
+        },
+        "antispam": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "source": {
+                        "type": "string",
+                        "pattern": ".+@.+"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        "cache": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "resource": {
+                        "$comment": "A resource is a node, denoted by its name.",
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1
+        },
+        "mailClient": {
+            "type": "object",
+            "properties": {
+                "mailServerAddress": {
+                    "type": "string",
+                    "pattern": "^([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))([.]([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))){3}$"
+                }
+            },
+            "required": [
+                "mailServerAddress"
+            ],
+            "additionalProperties": false
+        },
+        "mailServer": {
+            "$comment": "A mail server is characterized by the set of its names.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    }
+                }
+            }
+        },
+        "nat": {
+            "$comment": "A nat configuration holds a set of private addresses that represents the hosts in the internal network",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "privateAddress": {
+                        "type": "string",
+                        "pattern": "^([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))([.]([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))){3}$"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1
+        },
+        "vpnAccess": {
+            "type": "object",
+            "properties": {
+                "vpnexit": {
+                    "type": "string",
+                    "pattern": "^([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))([.]([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))){3}$"
+                }
+            },
+            "required": [
+                "vpnexit"
+            ],
+            "additionalProperties": false
+        },
+        "vpnExit": {
+            "type": "object",
+            "properties": {
+                "vpnaccess": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "vpnaccess"
+            ],
+            "additionalProperties": false
+        },
+        "webClient": {
+            "type": "object",
+            "properties": {
+                "webServerAddress": {
+                    "type": "string",
+                    "pattern": "^([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))([.]([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))){3}$"
+                }
+            },
+            "required": [
+                "webServerAddress"
+            ],
+            "additionalProperties": false
+        },
+        "webServer": {
+            "$comment": "A web server is characterized by the set of its names.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    }
+                }
+            }
+        },
+        "fieldModifier": {
+            "type": "array",
+            "items": {
+                "type": [
+                    "null",
+                    "string"
+                ]
+            }
+        },
+        "forwarder": {
+            "type": "array",
+            "items": {
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "default": "forwarder"
+            }
+        },
+        "trafficMonitor": {
+            "type": "array",
+            "items": {
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "default": "trafficMonitor"
+            }
+        },
+        "loadBalancer": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "pool": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1
+        }
+    },
+    "$comment": "Do NOT add properties to this schema: the plugin pojo2 should have a single root element among all schemas, otherwise duplicated classes are generated because referenced twice (or more).",
+    "additionalProperties": false
+}

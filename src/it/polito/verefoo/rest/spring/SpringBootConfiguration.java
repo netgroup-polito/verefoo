@@ -15,11 +15,11 @@ import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+// import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 // TODO #jalol separate config from rest api
 @SpringBootApplication
-@EnableSwagger2
+// @EnableSwagger2
 public class SpringBootConfiguration {
 
     public static void main(String[] args) {
@@ -48,12 +48,12 @@ public class SpringBootConfiguration {
         );
     }
     
-    @Bean
+    /* @Bean
     public Docket apiDocket() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("it.polito.verefoo.rest.spring"))
                 .paths(PathSelectors.any())
                 .build(); 
-    }
+    } */
 }

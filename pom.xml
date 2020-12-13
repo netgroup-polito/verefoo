@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>verifoo</groupId>
 	<artifactId>verifoo</artifactId>
@@ -17,6 +15,19 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
+		<!-- Dependencies to generate Java classes from JSON schemas -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.9</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.9.2</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-core</artifactId>
@@ -76,11 +87,11 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/lib/lib4j/log4j-core-2.9.1.jar</systemPath>
 		</dependency>
-		
+
 		<dependency>
-    		<groupId>com.googlecode.json-simple</groupId>
-    		<artifactId>json-simple</artifactId>
-    		<version>1.1.1</version>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
 		</dependency>
 
 		<!-- Jersey 2.19 -->
@@ -106,10 +117,16 @@
 			<version>1.5.13</version>
 		</dependency>
 		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger2</artifactId>
-			<version>2.9.2</version>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.2.32</version>
 		</dependency>
+		<!-- This dependency has been commented because it furnishes the swagger version 2, while the dependency springdoc-openapi-ui provides the version 3.0.2 -->
+		<!-- <dependency> -->
+		<!-- <groupId>io.springfox</groupId> -->
+		<!-- <artifactId>springfox-swagger2</artifactId> -->
+		<!-- <version>2.9.2</version> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
@@ -120,6 +137,7 @@
 			<artifactId>javax.ws.rs-api</artifactId>
 			<version>2.0</version>
 		</dependency>
+
 
 		<dependency>
 			<groupId>org.hamcrest</groupId>
@@ -172,6 +190,8 @@
 		<jersey2.version>2.19</jersey2.version>
 		<jaxrs.version>2.0.1</jaxrs.version>
 		<java.version>1.8</java.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
 	<build>
@@ -225,6 +245,26 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- Plugin to convert JSON schemas into Java entities (classes) -->
+			<plugin>
+				<groupId>org.jsonschema2pojo</groupId>
+				<artifactId>jsonschema2pojo-maven-plugin</artifactId>
+				<version>1.0.2</version>
+				<configuration>
+					<sourceDirectory>${project.basedir}/entities/jsonSchemas/</sourceDirectory>
+					<outputDirectory>${project.basedir}/entities/jsonEntitiesFromSchemas/</outputDirectory>
+					<targetPackage>it.polito.verefoo.pojo</targetPackage>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 			<!--<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
@@ -248,6 +288,5 @@
 			</plugin>-->
 		</plugins>
 	</build>
-	<repositories>
-	</repositories>
+	<repositories></repositories>
 </project>

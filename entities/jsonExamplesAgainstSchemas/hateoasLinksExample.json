@@ -1,0 +1,17 @@
+{
+    "$schema": "./hateoasLinks.json",
+    "links": [
+        {
+            "rel": "myRel1",
+            "href": "myHref1",
+            "method": "myMethod1",
+            "type": "myType1"
+        },
+        {
+            "rel": "rel2",
+            "href": "myHref2",
+            "method": "myMethod2",
+            "type": "myType2"
+        }
+    ]
+}

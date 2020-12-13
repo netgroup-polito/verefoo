@@ -1,0 +1,5 @@
+{
+    "$schema": "./errorSchema.json",
+    "message": "This error occured because of that problem. You can try to solve it in these ways.",
+    "type": "PHYClientServerNotConnected"
+}

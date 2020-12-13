@@ -1,0 +1,115 @@
+{
+    "$schema": "./verigraphSchema.json",
+    "graphs": [
+        {
+            "id": 1,
+            "serviceGraph": false,
+            "nodes": [
+                {
+                    "id": 0,
+                    "address": "10.0.0.1",
+                    "functionalType": "FIREWALL",
+                    "configuration": {
+                        "id": 0,
+                        "firewall": {
+                            "defaultAction": "ALLOW",
+                            "rules": [
+                                {
+                                    "source": "12.34.56.78",
+                                    "destination": "87.65.43.21",
+                                    "action": "DENY",
+                                    "protocol": "UDP",
+                                    "directional": false,
+                                    "sourcePort": 1234,
+                                    "destinationPort": 4321
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "id": 1,
+                    "address": "20.0.0.1",
+                    "functionalType": "LOADBALANCER",
+                    "configuration": {
+                        "id": 1,
+                        "loadBalancer": [
+                            {
+                                "pool": "myPool"
+                            }
+                        ]
+                    },
+                    "neighbours": [
+                        {
+                            "id": 0,
+                            "address": "130.23.3.2"
+                        }
+                    ]
+                },
+                {
+                    "id": 4,
+                    "address": "30.0.0.1",
+                    "functionalType": "TRAFFIC_MONITOR",
+                    "configuration": {
+                        "id": 3,
+                        "trafficMonitor": [
+                            "trafficMonitor"
+                        ]
+                    },
+                    "neighbours": [
+                        {
+                            "id": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 1,
+            "serviceGraph": true,
+            "nodes": [
+                {
+                    "id": 0,
+                    "address": "11.0.0.1",
+                    "functionalType": "DPI",
+                    "configuration": {
+                        "id": 11,
+                        "dpi": {
+                            "defaultAction": "DENY",
+                            "rules": [
+                                {
+                                    "action": "ALLOW",
+                                    "condition": "condition1"
+                                },
+                                {
+                                    "action": "ALLOW",
+                                    "condition": "condition2"
+                                },
+                                {
+                                    "action": "ALLOW",
+                                    "condition": "condition3"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "id": 4,
+                    "address": "21.0.0.1",
+                    "functionalType": "VPNACCESS",
+                    "configuration": {
+                        "id": 15,
+                        "vpnAccess": {
+                            "vpnexit": "exit"
+                        }
+                    },
+                    "neighbours": [
+                        {
+                            "id": 0
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
