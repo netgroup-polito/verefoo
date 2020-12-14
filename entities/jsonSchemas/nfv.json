@@ -99,7 +99,7 @@
                     "supportedVNFTypes": {
                         "type": "array",
                         "items": {
-                            "$ref": "./verigraphSchema.json/#/definitions/functionalTypes"
+                            "$ref": "./verigraph.json/#/definitions/functionalTypes"
                         }
                     },
                     "nodeRefs": {
@@ -239,7 +239,7 @@
                             "type": "string"
                         },
                         "level4Protocol": {
-                            "$ref": "./verigraphSchema.json/#/definitions/level4ProtocolTypes",
+                            "$ref": "./verigraph.json/#/definitions/level4ProtocolTypes",
                             "default": "ANY"
                         },
                         "sourcePort": {
@@ -302,7 +302,7 @@
                             "type": "string"
                         },
                         "level4Protocol": {
-                            "$ref": "./verigraphSchema.json/#/definitions/level4ProtocolTypes",
+                            "$ref": "./verigraph.json/#/definitions/level4ProtocolTypes",
                             "default": "ANY"
                         },
                         "sourcePort": {
@@ -334,7 +334,7 @@
         "graphs": {
             "type": "array",
             "items": {
-                "$ref": "./verigraphSchema.json/#/definitions/graph"
+                "$ref": "./verigraph.json/#/definitions/graph"
             }
         },
         "constraints": {

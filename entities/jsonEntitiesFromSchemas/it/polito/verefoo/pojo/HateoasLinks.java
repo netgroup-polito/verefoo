@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
     "links"
 })
-public class HateoasLinksSchema {
+public class HateoasLinks {
 
     @JsonProperty("links")
     private List<Link> links = new ArrayList<Link>();
@@ -36,7 +36,7 @@ public class HateoasLinksSchema {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(HateoasLinksSchema.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
+        sb.append(HateoasLinks.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
         sb.append("links");
         sb.append('=');
         sb.append(((this.links == null)?"<null>":this.links));
@@ -61,10 +61,10 @@ public class HateoasLinksSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof HateoasLinksSchema) == false) {
+        if ((other instanceof HateoasLinks) == false) {
             return false;
         }
-        HateoasLinksSchema rhs = ((HateoasLinksSchema) other);
+        HateoasLinks rhs = ((HateoasLinks) other);
         return ((this.links == rhs.links)||((this.links!= null)&&this.links.equals(rhs.links)));
     }
 

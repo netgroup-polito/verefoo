@@ -21,12 +21,12 @@ import com.fasterxml.jackson.annotation.JsonValue;
     "message",
     "type"
 })
-public class ErrorSchema {
+public class ApplicationError {
 
     @JsonProperty("message")
     private String message;
     @JsonProperty("type")
-    private ErrorSchema.ErrorType type;
+    private ApplicationError.ErrorType type;
 
     @JsonProperty("message")
     public String getMessage() {
@@ -39,19 +39,19 @@ public class ErrorSchema {
     }
 
     @JsonProperty("type")
-    public ErrorSchema.ErrorType getType() {
+    public ApplicationError.ErrorType getType() {
         return type;
     }
 
     @JsonProperty("type")
-    public void setType(ErrorSchema.ErrorType type) {
+    public void setType(ApplicationError.ErrorType type) {
         this.type = type;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(ErrorSchema.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
+        sb.append(ApplicationError.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
         sb.append("message");
         sb.append('=');
         sb.append(((this.message == null)?"<null>":this.message));
@@ -81,10 +81,10 @@ public class ErrorSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof ErrorSchema) == false) {
+        if ((other instanceof ApplicationError) == false) {
             return false;
         }
-        ErrorSchema rhs = ((ErrorSchema) other);
+        ApplicationError rhs = ((ApplicationError) other);
         return (((this.message == rhs.message)||((this.message!= null)&&this.message.equals(rhs.message)))&&((this.type == rhs.type)||((this.type!= null)&&this.type.equals(rhs.type))));
     }
 
@@ -102,10 +102,10 @@ public class ErrorSchema {
         INVALID_PARSING_STRING("InvalidParsingString"),
         INTERNAL_SERVER_ERROR("InternalServerError");
         private final String value;
-        private final static Map<String, ErrorSchema.ErrorType> CONSTANTS = new HashMap<String, ErrorSchema.ErrorType>();
+        private final static Map<String, ApplicationError.ErrorType> CONSTANTS = new HashMap<String, ApplicationError.ErrorType>();
 
         static {
-            for (ErrorSchema.ErrorType c: values()) {
+            for (ApplicationError.ErrorType c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
@@ -125,8 +125,8 @@ public class ErrorSchema {
         }
 
         @JsonCreator
-        public static ErrorSchema.ErrorType fromValue(String value) {
-            ErrorSchema.ErrorType constant = CONSTANTS.get(value);
+        public static ApplicationError.ErrorType fromValue(String value) {
+            ApplicationError.ErrorType constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {

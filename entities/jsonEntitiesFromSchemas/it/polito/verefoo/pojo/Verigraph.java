@@ -15,13 +15,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
 
 })
-public class VerigraphSchema {
+public class Verigraph {
 
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(VerigraphSchema.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
+        sb.append(Verigraph.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');
         } else {
@@ -41,10 +41,10 @@ public class VerigraphSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof VerigraphSchema) == false) {
+        if ((other instanceof Verigraph) == false) {
             return false;
         }
-        VerigraphSchema rhs = ((VerigraphSchema) other);
+        Verigraph rhs = ((Verigraph) other);
         return true;
     }
 

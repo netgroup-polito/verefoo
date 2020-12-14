@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "networkForwardingPaths",
     "parsingString"
 })
-public class NfvSchema {
+public class Nfv {
 
     /**
      * 
@@ -144,7 +144,7 @@ public class NfvSchema {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(NfvSchema.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
+        sb.append(Nfv.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
         sb.append("graphs");
         sb.append('=');
         sb.append(((this.graphs == null)?"<null>":this.graphs));
@@ -199,10 +199,10 @@ public class NfvSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof NfvSchema) == false) {
+        if ((other instanceof Nfv) == false) {
             return false;
         }
-        NfvSchema rhs = ((NfvSchema) other);
+        Nfv rhs = ((Nfv) other);
         return ((((((((this.propertyDefinitions == rhs.propertyDefinitions)||((this.propertyDefinitions!= null)&&this.propertyDefinitions.equals(rhs.propertyDefinitions)))&&((this.graphs == rhs.graphs)||((this.graphs!= null)&&this.graphs.equals(rhs.graphs))))&&((this.hosts == rhs.hosts)||((this.hosts!= null)&&this.hosts.equals(rhs.hosts))))&&((this.networkForwardingPaths == rhs.networkForwardingPaths)||((this.networkForwardingPaths!= null)&&this.networkForwardingPaths.equals(rhs.networkForwardingPaths))))&&((this.parsingString == rhs.parsingString)||((this.parsingString!= null)&&this.parsingString.equals(rhs.parsingString))))&&((this.constraints == rhs.constraints)||((this.constraints!= null)&&this.constraints.equals(rhs.constraints))))&&((this.connections == rhs.connections)||((this.connections!= null)&&this.connections.equals(rhs.connections))));
     }
 

@@ -1,20 +1,30 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "title": "hyperlinks",
+    "title": "HATEOAS hyperlink descriptor",
     "definitions": {
         "link": {
             "type": "object",
             "properties": {
-                "rel": {
+                "relationship": {
                     "type": "string"
                 },
-                "href": {
+                "URI": {
                     "type": "string"
                 },
                 "method": {
-                    "type": "string"
+                    "enum": [
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "DELETE",
+                        "PATCH",
+                        "HEAD",
+                        "CONNECT",
+                        "OPTIONS",
+                        "TRACE"
+                    ]
                 },
-                "type": {
+                "contentType": {
                     "type": "string"
                 }
             },
