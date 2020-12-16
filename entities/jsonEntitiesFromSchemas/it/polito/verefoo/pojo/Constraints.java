@@ -2,12 +2,7 @@
 package it.polito.verefoo.pojo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -36,8 +31,6 @@ public class Constraints {
     private List<LinkConstraint> linkConstraints = new ArrayList<LinkConstraint>();
     @JsonProperty("allocationConstraints")
     private List<AllocationConstraint> allocationConstraints = new ArrayList<AllocationConstraint>();
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * 
@@ -89,16 +82,6 @@ public class Constraints {
         this.allocationConstraints = allocationConstraints;
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -115,10 +98,6 @@ public class Constraints {
         sb.append('=');
         sb.append(((this.allocationConstraints == null)?"<null>":this.allocationConstraints));
         sb.append(',');
-        sb.append("additionalProperties");
-        sb.append('=');
-        sb.append(((this.additionalProperties == null)?"<null>":this.additionalProperties));
-        sb.append(',');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');
         } else {
@@ -131,7 +110,6 @@ public class Constraints {
     public int hashCode() {
         int result = 1;
         result = ((result* 31)+((this.nodeConstraints == null)? 0 :this.nodeConstraints.hashCode()));
-        result = ((result* 31)+((this.additionalProperties == null)? 0 :this.additionalProperties.hashCode()));
         result = ((result* 31)+((this.linkConstraints == null)? 0 :this.linkConstraints.hashCode()));
         result = ((result* 31)+((this.allocationConstraints == null)? 0 :this.allocationConstraints.hashCode()));
         return result;
@@ -146,7 +124,7 @@ public class Constraints {
             return false;
         }
         Constraints rhs = ((Constraints) other);
-        return (((((this.nodeConstraints == rhs.nodeConstraints)||((this.nodeConstraints!= null)&&this.nodeConstraints.equals(rhs.nodeConstraints)))&&((this.additionalProperties == rhs.additionalProperties)||((this.additionalProperties!= null)&&this.additionalProperties.equals(rhs.additionalProperties))))&&((this.linkConstraints == rhs.linkConstraints)||((this.linkConstraints!= null)&&this.linkConstraints.equals(rhs.linkConstraints))))&&((this.allocationConstraints == rhs.allocationConstraints)||((this.allocationConstraints!= null)&&this.allocationConstraints.equals(rhs.allocationConstraints))));
+        return ((((this.nodeConstraints == rhs.nodeConstraints)||((this.nodeConstraints!= null)&&this.nodeConstraints.equals(rhs.nodeConstraints)))&&((this.linkConstraints == rhs.linkConstraints)||((this.linkConstraints!= null)&&this.linkConstraints.equals(rhs.linkConstraints))))&&((this.allocationConstraints == rhs.allocationConstraints)||((this.allocationConstraints!= null)&&this.allocationConstraints.equals(rhs.allocationConstraints))));
     }
 
 }

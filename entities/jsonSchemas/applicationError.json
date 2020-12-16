@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "title": "applicationError",
     "definitions": {
-        "errorType": {
+        "cause": {
             "enum": [
                 "JSONValidationError",
                 "InvalidServerClientConf",
@@ -20,12 +20,20 @@
     },
     "type": "object",
     "properties": {
-        "message": {
+        "detailedCause": {
             "type": "string"
         },
-        "type": {
-            "$ref": "#/definitions/errorType"
+        "cause": {
+            "$ref": "#/definitions/cause"
+        },
+        "recoveryActions": {
+            "$comment": "Which actions the user can adopt to recover from the error.",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
         }
     },
-    "additionalProperties": false
+    "additionalProperties": false,
+    "required": ["cause"]
 }

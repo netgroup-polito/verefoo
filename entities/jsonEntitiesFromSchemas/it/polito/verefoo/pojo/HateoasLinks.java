@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 
 /**
- * hyperlinks
+ * HATEOAS hyperlink descriptor
  * <p>
  * 
  * 

@@ -2,95 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "title": "NFV",
     "definitions": {
-        "allocationConstraintType": {
-            "enum": [
-                "forbidden",
-                "forced"
-            ]
-        },
-        "nodeConstraints": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "node": {
-                        "type": "string"
-                    },
-                    "numberOfOperations": {
-                        "type": "number"
-                    },
-                    "maxNodeLatency": {
-                        "type": "number"
-                    },
-                    "requestStorage": {
-                        "type": "number",
-                        "default": 0
-                    },
-                    "cores": {
-                        "type": "number",
-                        "default": 0
-                    },
-                    "memory": {
-                        "type": "number",
-                        "default": 0
-                    },
-                    "optional": {
-                        "type": "boolean",
-                        "default": false
-                    }
-                },
-                "required": [
-                    "node"
-                ],
-                "additionalProperties": false
-            }
-        },
-        "linkConstraints": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "source": {
-                        "type": "string"
-                    },
-                    "destination": {
-                        "type": "string"
-                    },
-                    "requestLatency": {
-                        "type": "number"
-                    }
-                },
-                "required": [
-                    "source",
-                    "destination",
-                    "requestLatency"
-                ],
-                "additionalProperties": false
-            }
-        },
-        "allocationConstraints": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "type": {
-                        "$ref": "#/definitions/allocationConstraintType"
-                    },
-                    "nodeA": {
-                        "type": "string"
-                    },
-                    "nodeB": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "type",
-                    "nodeA",
-                    "nodeB"
-                ],
-                "additionalProperties": false
-            }
-        },
+
         "hosts": {
             "type": "array",
             "items": {
@@ -203,7 +115,7 @@
                 "additionalProperties": false
             }
         },
-        "property": {
+        "requirement": {
             "type": "object",
             "oneOf": [
                 {
@@ -223,13 +135,14 @@
                             },
                             "additionalProperties": false
                         },
-                        "propertyName": {
+                        "name": {
                             "enum": [
                                 "Isolation",
                                 "Reachability"
                             ]
                         },
                         "graphId": {
+                            "$comment": "The id which this requirement refers to.",
                             "type": "integer"
                         },
                         "source": {
@@ -256,7 +169,7 @@
                         }
                     },
                     "required": [
-                        "propertyName",
+                        "name",
                         "graph",
                         "source",
                         "destination"
@@ -286,7 +199,7 @@
                             },
                             "additionalProperties": false
                         },
-                        "propertyName": {
+                        "name": {
                             "enum": [
                                 "Isolation",
                                 "Reachability"
@@ -319,7 +232,7 @@
                         }
                     },
                     "required": [
-                        "propertyName",
+                        "name",
                         "graph",
                         "source",
                         "destination"
@@ -337,37 +250,33 @@
                 "$ref": "./verigraph.json/#/definitions/graph"
             }
         },
-        "constraints": {
-            "type": "object",
-            "properties": {
-                "nodeConstraints": {
-                    "$ref": "#/definitions/nodeConstraints"
-                },
-                "linkConstraints": {
-                    "$ref": "#/definitions/linkConstraints"
-                },
-                "allocationConstraints": {
-                    "$ref": "#/definitions/allocationConstraints"
-                }
-            },
-            "required": [
-                "nodeConstraints",
-                "linkConstraints"
-            ]
-        },
-        "propertyDefinitions": {
+        "requirements": {
             "type": "array",
             "items": {
-                "$ref": "#/definitions/property"
+                "$ref": "#/definitions/requirement"
             },
             "minItems": 1
         },
-        "hosts": {
-            "$ref": "#/definitions/hosts"
-        },
-        "connections": {
-            "$comment": "List of connections between hosts.",
-            "$ref": "#/definitions/connections"
+        "substrates": {
+            "$comment": "Multiple physical networks may be needed so as to lunch different simulations on different substrates.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "hosts": {
+                        "$ref": "#/definitions/hosts"
+                    },
+                    "connections": {
+                        "$comment": "List of connections between hosts.",
+                        "$ref": "#/definitions/connections"
+                    }
+                },
+                "additionalProperties": false,
+                "required": ["id"]
+            }
         },
         "networkForwardingPaths": {
             "$ref": "#/definitions/networkForwardingPaths"
@@ -380,6 +289,6 @@
     "additionalProperties": false,
     "required": [
         "graphs",
-        "propertyDefinitions"
+        "requirements"
     ]
 }

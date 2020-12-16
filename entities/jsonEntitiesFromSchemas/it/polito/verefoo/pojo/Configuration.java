@@ -1,40 +1,102 @@
 
 package it.polito.verefoo.pojo;
 
-import java.util.HashMap;
-import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-
+    "id",
+    "name",
+    "description",
+    "type"
 })
 public class Configuration {
 
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("id")
+    private Integer id;
+    @JsonProperty("name")
+    private String name;
+    @JsonProperty("description")
+    private String description;
+    @JsonProperty("type")
+    private it.polito.verefoo.pojo.Node.FunctionalTypes type;
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("id")
+    public Integer getId() {
+        return id;
     }
 
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("id")
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    @JsonProperty("name")
+    public String getName() {
+        return name;
+    }
+
+    @JsonProperty("name")
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @JsonProperty("description")
+    public String getDescription() {
+        return description;
+    }
+
+    @JsonProperty("description")
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @JsonProperty("type")
+    public it.polito.verefoo.pojo.Node.FunctionalTypes getType() {
+        return type;
+    }
+
+    @JsonProperty("type")
+    public void setType(it.polito.verefoo.pojo.Node.FunctionalTypes type) {
+        this.type = type;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(Configuration.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
-        sb.append("additionalProperties");
+        sb.append("id");
         sb.append('=');
-        sb.append(((this.additionalProperties == null)?"<null>":this.additionalProperties));
+        sb.append(((this.id == null)?"<null>":this.id));
+        sb.append(',');
+        sb.append("name");
+        sb.append('=');
+        sb.append(((this.name == null)?"<null>":this.name));
+        sb.append(',');
+        sb.append("description");
+        sb.append('=');
+        sb.append(((this.description == null)?"<null>":this.description));
+        sb.append(',');
+        sb.append("type");
+        sb.append('=');
+        sb.append(((this.type == null)?"<null>":this.type));
         sb.append(',');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');
@@ -47,7 +109,10 @@ public class Configuration {
     @Override
     public int hashCode() {
         int result = 1;
-        result = ((result* 31)+((this.additionalProperties == null)? 0 :this.additionalProperties.hashCode()));
+        result = ((result* 31)+((this.name == null)? 0 :this.name.hashCode()));
+        result = ((result* 31)+((this.description == null)? 0 :this.description.hashCode()));
+        result = ((result* 31)+((this.id == null)? 0 :this.id.hashCode()));
+        result = ((result* 31)+((this.type == null)? 0 :this.type.hashCode()));
         return result;
     }
 
@@ -60,7 +125,7 @@ public class Configuration {
             return false;
         }
         Configuration rhs = ((Configuration) other);
-        return ((this.additionalProperties == rhs.additionalProperties)||((this.additionalProperties!= null)&&this.additionalProperties.equals(rhs.additionalProperties)));
+        return (((((this.name == rhs.name)||((this.name!= null)&&this.name.equals(rhs.name)))&&((this.description == rhs.description)||((this.description!= null)&&this.description.equals(rhs.description))))&&((this.id == rhs.id)||((this.id!= null)&&this.id.equals(rhs.id))))&&((this.type == rhs.type)||((this.type!= null)&&this.type.equals(rhs.type))));
     }
 
 }

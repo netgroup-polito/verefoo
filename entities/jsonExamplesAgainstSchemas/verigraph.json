@@ -1,5 +1,5 @@
 {
-    "$schema": "./verigraphSchema.json",
+    "$schema": "../jsonSchemas/verigraph.json",
     "graphs": [
         {
             "id": 1,

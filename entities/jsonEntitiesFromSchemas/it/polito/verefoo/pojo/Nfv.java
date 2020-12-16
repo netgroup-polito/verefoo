@@ -17,10 +17,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "graphs",
-    "constraints",
-    "propertyDefinitions",
-    "hosts",
-    "connections",
+    "requirements",
+    "substrates",
     "networkForwardingPaths",
     "parsingString"
 })
@@ -33,19 +31,15 @@ public class Nfv {
      */
     @JsonProperty("graphs")
     private List<Graph> graphs = new ArrayList<Graph>();
-    @JsonProperty("constraints")
-    private Constraints constraints;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("propertyDefinitions")
-    private List<Property> propertyDefinitions = new ArrayList<Property>();
-    @JsonProperty("hosts")
-    private List<Host> hosts = new ArrayList<Host>();
-    @JsonProperty("connections")
-    private List<Connection> connections = new ArrayList<Connection>();
+    @JsonProperty("requirements")
+    private List<Requirement> requirements = new ArrayList<Requirement>();
+    @JsonProperty("substrates")
+    private List<Substrate> substrates = new ArrayList<Substrate>();
     @JsonProperty("networkForwardingPaths")
     private List<NetworkForwardingPath> networkForwardingPaths = new ArrayList<NetworkForwardingPath>();
     @JsonProperty("parsingString")
@@ -71,14 +65,14 @@ public class Nfv {
         this.graphs = graphs;
     }
 
-    @JsonProperty("constraints")
-    public Constraints getConstraints() {
-        return constraints;
-    }
-
-    @JsonProperty("constraints")
-    public void setConstraints(Constraints constraints) {
-        this.constraints = constraints;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("requirements")
+    public List<Requirement> getRequirements() {
+        return requirements;
     }
 
     /**
@@ -86,39 +80,19 @@ public class Nfv {
      * (Required)
      * 
      */
-    @JsonProperty("propertyDefinitions")
-    public List<Property> getPropertyDefinitions() {
-        return propertyDefinitions;
+    @JsonProperty("requirements")
+    public void setRequirements(List<Requirement> requirements) {
+        this.requirements = requirements;
     }
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("propertyDefinitions")
-    public void setPropertyDefinitions(List<Property> propertyDefinitions) {
-        this.propertyDefinitions = propertyDefinitions;
+    @JsonProperty("substrates")
+    public List<Substrate> getSubstrates() {
+        return substrates;
     }
 
-    @JsonProperty("hosts")
-    public List<Host> getHosts() {
-        return hosts;
-    }
-
-    @JsonProperty("hosts")
-    public void setHosts(List<Host> hosts) {
-        this.hosts = hosts;
-    }
-
-    @JsonProperty("connections")
-    public List<Connection> getConnections() {
-        return connections;
-    }
-
-    @JsonProperty("connections")
-    public void setConnections(List<Connection> connections) {
-        this.connections = connections;
+    @JsonProperty("substrates")
+    public void setSubstrates(List<Substrate> substrates) {
+        this.substrates = substrates;
     }
 
     @JsonProperty("networkForwardingPaths")
@@ -149,21 +123,13 @@ public class Nfv {
         sb.append('=');
         sb.append(((this.graphs == null)?"<null>":this.graphs));
         sb.append(',');
-        sb.append("constraints");
+        sb.append("requirements");
         sb.append('=');
-        sb.append(((this.constraints == null)?"<null>":this.constraints));
+        sb.append(((this.requirements == null)?"<null>":this.requirements));
         sb.append(',');
-        sb.append("propertyDefinitions");
+        sb.append("substrates");
         sb.append('=');
-        sb.append(((this.propertyDefinitions == null)?"<null>":this.propertyDefinitions));
-        sb.append(',');
-        sb.append("hosts");
-        sb.append('=');
-        sb.append(((this.hosts == null)?"<null>":this.hosts));
-        sb.append(',');
-        sb.append("connections");
-        sb.append('=');
-        sb.append(((this.connections == null)?"<null>":this.connections));
+        sb.append(((this.substrates == null)?"<null>":this.substrates));
         sb.append(',');
         sb.append("networkForwardingPaths");
         sb.append('=');
@@ -184,13 +150,11 @@ public class Nfv {
     @Override
     public int hashCode() {
         int result = 1;
-        result = ((result* 31)+((this.propertyDefinitions == null)? 0 :this.propertyDefinitions.hashCode()));
+        result = ((result* 31)+((this.substrates == null)? 0 :this.substrates.hashCode()));
         result = ((result* 31)+((this.graphs == null)? 0 :this.graphs.hashCode()));
-        result = ((result* 31)+((this.hosts == null)? 0 :this.hosts.hashCode()));
+        result = ((result* 31)+((this.requirements == null)? 0 :this.requirements.hashCode()));
         result = ((result* 31)+((this.networkForwardingPaths == null)? 0 :this.networkForwardingPaths.hashCode()));
         result = ((result* 31)+((this.parsingString == null)? 0 :this.parsingString.hashCode()));
-        result = ((result* 31)+((this.constraints == null)? 0 :this.constraints.hashCode()));
-        result = ((result* 31)+((this.connections == null)? 0 :this.connections.hashCode()));
         return result;
     }
 
@@ -203,7 +167,7 @@ public class Nfv {
             return false;
         }
         Nfv rhs = ((Nfv) other);
-        return ((((((((this.propertyDefinitions == rhs.propertyDefinitions)||((this.propertyDefinitions!= null)&&this.propertyDefinitions.equals(rhs.propertyDefinitions)))&&((this.graphs == rhs.graphs)||((this.graphs!= null)&&this.graphs.equals(rhs.graphs))))&&((this.hosts == rhs.hosts)||((this.hosts!= null)&&this.hosts.equals(rhs.hosts))))&&((this.networkForwardingPaths == rhs.networkForwardingPaths)||((this.networkForwardingPaths!= null)&&this.networkForwardingPaths.equals(rhs.networkForwardingPaths))))&&((this.parsingString == rhs.parsingString)||((this.parsingString!= null)&&this.parsingString.equals(rhs.parsingString))))&&((this.constraints == rhs.constraints)||((this.constraints!= null)&&this.constraints.equals(rhs.constraints))))&&((this.connections == rhs.connections)||((this.connections!= null)&&this.connections.equals(rhs.connections))));
+        return ((((((this.substrates == rhs.substrates)||((this.substrates!= null)&&this.substrates.equals(rhs.substrates)))&&((this.graphs == rhs.graphs)||((this.graphs!= null)&&this.graphs.equals(rhs.graphs))))&&((this.requirements == rhs.requirements)||((this.requirements!= null)&&this.requirements.equals(rhs.requirements))))&&((this.networkForwardingPaths == rhs.networkForwardingPaths)||((this.networkForwardingPaths!= null)&&this.networkForwardingPaths.equals(rhs.networkForwardingPaths))))&&((this.parsingString == rhs.parsingString)||((this.parsingString!= null)&&this.parsingString.equals(rhs.parsingString))));
     }
 
 }

@@ -4,24 +4,17 @@ package it.polito.verefoo.pojo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-
-/**
- * verigraph
- * <p>
- * 
- * 
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
 
 })
-public class Verigraph {
+public class Requirement {
 
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(Verigraph.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
+        sb.append(Requirement.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');
         } else {
@@ -41,10 +34,10 @@ public class Verigraph {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Verigraph) == false) {
+        if ((other instanceof Requirement) == false) {
             return false;
         }
-        Verigraph rhs = ((Verigraph) other);
+        Requirement rhs = ((Requirement) other);
         return true;
     }
 

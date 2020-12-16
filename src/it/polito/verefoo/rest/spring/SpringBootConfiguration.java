@@ -11,6 +11,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -46,6 +50,18 @@ public class SpringBootConfiguration {
                 new MappingJackson2HttpMessageConverter(),
                 new Jaxb2RootElementHttpMessageConverter())
         );
+    }
+
+    /*
+    *   This bean customizes the creation of the openapi UI in Swagger version 3
+    */
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .components(new Components())
+                .info(new Info().title("Verefoo API documentation").description(
+                        "This is the automatically-generated document of Verefoo's REST APIs."))
+                ;
     }
     
     /* @Bean

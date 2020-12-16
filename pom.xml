@@ -4,6 +4,13 @@
 	<artifactId>verifoo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
+	
+	<pluginRepositories>
+		<pluginRepository>
+			<id>localrepository</id>
+			<url>file:///${project.basedir}\lib</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -17,7 +24,7 @@
 		</dependency>
 
 		<!-- Dependencies to generate Java classes from JSON schemas -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.9</version>
@@ -26,6 +33,11 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>2.9.9.2</version>
+		</dependency> -->
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>org.eclipse.persistence.moxy</artifactId>
+			<version>3.0.0</version>
 		</dependency>
 
 		<dependency>
@@ -138,7 +150,7 @@
 			<version>2.0</version>
 		</dependency>
 
-
+		<!-- Matchers framework, used with JUnit -->
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-all</artifactId>
@@ -194,6 +206,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
+
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
@@ -214,8 +227,22 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<!-- Linked to springdoc-openapi-maven-plugin
+					<executions>
+					<execution>
+						<id>pre-integration-test</id>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>post-integration-test</id>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions> -->
 			</plugin>
-
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -223,6 +250,27 @@
 					<includeSystemScope>true</includeSystemScope>
 				</configuration>
 			</plugin>
+
+			<!-- NOT WORKING FOR NOW: Plugin to generate docs into an openapi.json file -->
+			<!-- <plugin>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-maven-plugin</artifactId>
+				<version>0.2</version>
+				<executions>
+					<execution>
+						<phase>integration-test</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration> 
+					<apiDocsUrl>http://localhost:8080/v3/api-docs</apiDocsUrl> 
+					<outputFileName>openapi.json</outputFileName> 
+					<outputDir>${project.basedir}/docs</outputDir> 
+				</configuration>
+			</plugin> -->
+
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
@@ -261,10 +309,30 @@
 						<goals>
 							<goal>generate</goal>
 						</goals>
+						<configuration>
+							<annotationStyle>jackson2</annotationStyle>
+							<includeAdditionalProperties>false</includeAdditionalProperties>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
- 
+			
+			<plugin>
+				<groupId>Verefoo</groupId>
+				<artifactId>generator-maven-plugin</artifactId>
+				<version>1.0-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>
+								generate-pojos
+							</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 			<!--<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
@@ -288,5 +356,7 @@
 			</plugin>-->
 		</plugins>
 	</build>
-	<repositories></repositories>
+	
+	
+	
 </project>

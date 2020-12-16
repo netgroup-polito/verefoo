@@ -1,7 +1,9 @@
 
 package it.polito.verefoo.pojo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -18,47 +20,79 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "message",
-    "type"
+    "detailedCause",
+    "cause",
+    "recoveryActions"
 })
 public class ApplicationError {
 
-    @JsonProperty("message")
-    private String message;
-    @JsonProperty("type")
-    private ApplicationError.ErrorType type;
+    @JsonProperty("detailedCause")
+    private String detailedCause;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("cause")
+    private ApplicationError.Cause cause;
+    @JsonProperty("recoveryActions")
+    private List<String> recoveryActions = new ArrayList<String>();
 
-    @JsonProperty("message")
-    public String getMessage() {
-        return message;
+    @JsonProperty("detailedCause")
+    public String getDetailedCause() {
+        return detailedCause;
     }
 
-    @JsonProperty("message")
-    public void setMessage(String message) {
-        this.message = message;
+    @JsonProperty("detailedCause")
+    public void setDetailedCause(String detailedCause) {
+        this.detailedCause = detailedCause;
     }
 
-    @JsonProperty("type")
-    public ApplicationError.ErrorType getType() {
-        return type;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("cause")
+    public ApplicationError.Cause getCause() {
+        return cause;
     }
 
-    @JsonProperty("type")
-    public void setType(ApplicationError.ErrorType type) {
-        this.type = type;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("cause")
+    public void setCause(ApplicationError.Cause cause) {
+        this.cause = cause;
+    }
+
+    @JsonProperty("recoveryActions")
+    public List<String> getRecoveryActions() {
+        return recoveryActions;
+    }
+
+    @JsonProperty("recoveryActions")
+    public void setRecoveryActions(List<String> recoveryActions) {
+        this.recoveryActions = recoveryActions;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(ApplicationError.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
-        sb.append("message");
+        sb.append("detailedCause");
         sb.append('=');
-        sb.append(((this.message == null)?"<null>":this.message));
+        sb.append(((this.detailedCause == null)?"<null>":this.detailedCause));
         sb.append(',');
-        sb.append("type");
+        sb.append("cause");
         sb.append('=');
-        sb.append(((this.type == null)?"<null>":this.type));
+        sb.append(((this.cause == null)?"<null>":this.cause));
+        sb.append(',');
+        sb.append("recoveryActions");
+        sb.append('=');
+        sb.append(((this.recoveryActions == null)?"<null>":this.recoveryActions));
         sb.append(',');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');
@@ -71,8 +105,9 @@ public class ApplicationError {
     @Override
     public int hashCode() {
         int result = 1;
-        result = ((result* 31)+((this.message == null)? 0 :this.message.hashCode()));
-        result = ((result* 31)+((this.type == null)? 0 :this.type.hashCode()));
+        result = ((result* 31)+((this.cause == null)? 0 :this.cause.hashCode()));
+        result = ((result* 31)+((this.detailedCause == null)? 0 :this.detailedCause.hashCode()));
+        result = ((result* 31)+((this.recoveryActions == null)? 0 :this.recoveryActions.hashCode()));
         return result;
     }
 
@@ -85,10 +120,10 @@ public class ApplicationError {
             return false;
         }
         ApplicationError rhs = ((ApplicationError) other);
-        return (((this.message == rhs.message)||((this.message!= null)&&this.message.equals(rhs.message)))&&((this.type == rhs.type)||((this.type!= null)&&this.type.equals(rhs.type))));
+        return ((((this.cause == rhs.cause)||((this.cause!= null)&&this.cause.equals(rhs.cause)))&&((this.detailedCause == rhs.detailedCause)||((this.detailedCause!= null)&&this.detailedCause.equals(rhs.detailedCause))))&&((this.recoveryActions == rhs.recoveryActions)||((this.recoveryActions!= null)&&this.recoveryActions.equals(rhs.recoveryActions))));
     }
 
-    public enum ErrorType {
+    public enum Cause {
 
         JSON_VALIDATION_ERROR("JSONValidationError"),
         INVALID_SERVER_CLIENT_CONF("InvalidServerClientConf"),
@@ -102,15 +137,15 @@ public class ApplicationError {
         INVALID_PARSING_STRING("InvalidParsingString"),
         INTERNAL_SERVER_ERROR("InternalServerError");
         private final String value;
-        private final static Map<String, ApplicationError.ErrorType> CONSTANTS = new HashMap<String, ApplicationError.ErrorType>();
+        private final static Map<String, ApplicationError.Cause> CONSTANTS = new HashMap<String, ApplicationError.Cause>();
 
         static {
-            for (ApplicationError.ErrorType c: values()) {
+            for (ApplicationError.Cause c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
 
-        private ErrorType(String value) {
+        private Cause(String value) {
             this.value = value;
         }
 
@@ -125,8 +160,8 @@ public class ApplicationError {
         }
 
         @JsonCreator
-        public static ApplicationError.ErrorType fromValue(String value) {
-            ApplicationError.ErrorType constant = CONSTANTS.get(value);
+        public static ApplicationError.Cause fromValue(String value) {
+            ApplicationError.Cause constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {
