@@ -12,7 +12,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "id",
     "serviceGraph",
     "nodes",
-    "constraints"
+    "constraints",
+    "requirements"
 })
 public class Graph {
 
@@ -34,6 +35,8 @@ public class Graph {
     private List<Node> nodes = new ArrayList<Node>();
     @JsonProperty("constraints")
     private Constraints constraints;
+    @JsonProperty("requirements")
+    private List<Requirement> requirements = new ArrayList<Requirement>();
 
     /**
      * 
@@ -95,6 +98,16 @@ public class Graph {
         this.constraints = constraints;
     }
 
+    @JsonProperty("requirements")
+    public List<Requirement> getRequirements() {
+        return requirements;
+    }
+
+    @JsonProperty("requirements")
+    public void setRequirements(List<Requirement> requirements) {
+        this.requirements = requirements;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -115,6 +128,10 @@ public class Graph {
         sb.append('=');
         sb.append(((this.constraints == null)?"<null>":this.constraints));
         sb.append(',');
+        sb.append("requirements");
+        sb.append('=');
+        sb.append(((this.requirements == null)?"<null>":this.requirements));
+        sb.append(',');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');
         } else {
@@ -126,6 +143,7 @@ public class Graph {
     @Override
     public int hashCode() {
         int result = 1;
+        result = ((result* 31)+((this.requirements == null)? 0 :this.requirements.hashCode()));
         result = ((result* 31)+((this.id == null)? 0 :this.id.hashCode()));
         result = ((result* 31)+((this.serviceGraph == null)? 0 :this.serviceGraph.hashCode()));
         result = ((result* 31)+((this.nodes == null)? 0 :this.nodes.hashCode()));
@@ -142,7 +160,7 @@ public class Graph {
             return false;
         }
         Graph rhs = ((Graph) other);
-        return (((((this.id == rhs.id)||((this.id!= null)&&this.id.equals(rhs.id)))&&((this.serviceGraph == rhs.serviceGraph)||((this.serviceGraph!= null)&&this.serviceGraph.equals(rhs.serviceGraph))))&&((this.nodes == rhs.nodes)||((this.nodes!= null)&&this.nodes.equals(rhs.nodes))))&&((this.constraints == rhs.constraints)||((this.constraints!= null)&&this.constraints.equals(rhs.constraints))));
+        return ((((((this.requirements == rhs.requirements)||((this.requirements!= null)&&this.requirements.equals(rhs.requirements)))&&((this.id == rhs.id)||((this.id!= null)&&this.id.equals(rhs.id))))&&((this.serviceGraph == rhs.serviceGraph)||((this.serviceGraph!= null)&&this.serviceGraph.equals(rhs.serviceGraph))))&&((this.nodes == rhs.nodes)||((this.nodes!= null)&&this.nodes.equals(rhs.nodes))))&&((this.constraints == rhs.constraints)||((this.constraints!= null)&&this.constraints.equals(rhs.constraints))));
     }
 
 }

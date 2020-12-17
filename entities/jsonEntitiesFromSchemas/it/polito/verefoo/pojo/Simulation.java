@@ -5,84 +5,44 @@ import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-
-/**
- * NFV
- * <p>
- * 
- * 
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "graphs",
-    "requirements",
+    "graph",
     "substrates",
+    "networkFunctions",
     "networkForwardingPaths",
     "parsingString"
 })
-public class Nfv {
+public class Simulation {
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("graphs")
-    private List<Graph> graphs = new ArrayList<Graph>();
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("requirements")
-    private List<Requirement> requirements = new ArrayList<Requirement>();
+    @JsonProperty("graph")
+    private Graph graph;
     @JsonProperty("substrates")
     private List<Substrate> substrates = new ArrayList<Substrate>();
+    /**
+     * The array of functions that the system can use for each graph.
+     * (Required)
+     * 
+     */
+    @JsonProperty("networkFunctions")
+    @JsonPropertyDescription("The array of functions that the system can use for each graph.")
+    private List<FunctionalType> networkFunctions = new ArrayList<FunctionalType>();
     @JsonProperty("networkForwardingPaths")
     private List<NetworkForwardingPath> networkForwardingPaths = new ArrayList<NetworkForwardingPath>();
     @JsonProperty("parsingString")
     private String parsingString;
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("graphs")
-    public List<Graph> getGraphs() {
-        return graphs;
+    @JsonProperty("graph")
+    public Graph getGraph() {
+        return graph;
     }
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("graphs")
-    public void setGraphs(List<Graph> graphs) {
-        this.graphs = graphs;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("requirements")
-    public List<Requirement> getRequirements() {
-        return requirements;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("requirements")
-    public void setRequirements(List<Requirement> requirements) {
-        this.requirements = requirements;
+    @JsonProperty("graph")
+    public void setGraph(Graph graph) {
+        this.graph = graph;
     }
 
     @JsonProperty("substrates")
@@ -93,6 +53,26 @@ public class Nfv {
     @JsonProperty("substrates")
     public void setSubstrates(List<Substrate> substrates) {
         this.substrates = substrates;
+    }
+
+    /**
+     * The array of functions that the system can use for each graph.
+     * (Required)
+     * 
+     */
+    @JsonProperty("networkFunctions")
+    public List<FunctionalType> getNetworkFunctions() {
+        return networkFunctions;
+    }
+
+    /**
+     * The array of functions that the system can use for each graph.
+     * (Required)
+     * 
+     */
+    @JsonProperty("networkFunctions")
+    public void setNetworkFunctions(List<FunctionalType> networkFunctions) {
+        this.networkFunctions = networkFunctions;
     }
 
     @JsonProperty("networkForwardingPaths")
@@ -118,18 +98,18 @@ public class Nfv {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(Nfv.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
-        sb.append("graphs");
+        sb.append(Simulation.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
+        sb.append("graph");
         sb.append('=');
-        sb.append(((this.graphs == null)?"<null>":this.graphs));
-        sb.append(',');
-        sb.append("requirements");
-        sb.append('=');
-        sb.append(((this.requirements == null)?"<null>":this.requirements));
+        sb.append(((this.graph == null)?"<null>":this.graph));
         sb.append(',');
         sb.append("substrates");
         sb.append('=');
         sb.append(((this.substrates == null)?"<null>":this.substrates));
+        sb.append(',');
+        sb.append("networkFunctions");
+        sb.append('=');
+        sb.append(((this.networkFunctions == null)?"<null>":this.networkFunctions));
         sb.append(',');
         sb.append("networkForwardingPaths");
         sb.append('=');
@@ -151,8 +131,8 @@ public class Nfv {
     public int hashCode() {
         int result = 1;
         result = ((result* 31)+((this.substrates == null)? 0 :this.substrates.hashCode()));
-        result = ((result* 31)+((this.graphs == null)? 0 :this.graphs.hashCode()));
-        result = ((result* 31)+((this.requirements == null)? 0 :this.requirements.hashCode()));
+        result = ((result* 31)+((this.networkFunctions == null)? 0 :this.networkFunctions.hashCode()));
+        result = ((result* 31)+((this.graph == null)? 0 :this.graph.hashCode()));
         result = ((result* 31)+((this.networkForwardingPaths == null)? 0 :this.networkForwardingPaths.hashCode()));
         result = ((result* 31)+((this.parsingString == null)? 0 :this.parsingString.hashCode()));
         return result;
@@ -163,11 +143,11 @@ public class Nfv {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Nfv) == false) {
+        if ((other instanceof Simulation) == false) {
             return false;
         }
-        Nfv rhs = ((Nfv) other);
-        return ((((((this.substrates == rhs.substrates)||((this.substrates!= null)&&this.substrates.equals(rhs.substrates)))&&((this.graphs == rhs.graphs)||((this.graphs!= null)&&this.graphs.equals(rhs.graphs))))&&((this.requirements == rhs.requirements)||((this.requirements!= null)&&this.requirements.equals(rhs.requirements))))&&((this.networkForwardingPaths == rhs.networkForwardingPaths)||((this.networkForwardingPaths!= null)&&this.networkForwardingPaths.equals(rhs.networkForwardingPaths))))&&((this.parsingString == rhs.parsingString)||((this.parsingString!= null)&&this.parsingString.equals(rhs.parsingString))));
+        Simulation rhs = ((Simulation) other);
+        return ((((((this.substrates == rhs.substrates)||((this.substrates!= null)&&this.substrates.equals(rhs.substrates)))&&((this.networkFunctions == rhs.networkFunctions)||((this.networkFunctions!= null)&&this.networkFunctions.equals(rhs.networkFunctions))))&&((this.graph == rhs.graph)||((this.graph!= null)&&this.graph.equals(rhs.graph))))&&((this.networkForwardingPaths == rhs.networkForwardingPaths)||((this.networkForwardingPaths!= null)&&this.networkForwardingPaths.equals(rhs.networkForwardingPaths))))&&((this.parsingString == rhs.parsingString)||((this.parsingString!= null)&&this.parsingString.equals(rhs.parsingString))));
     }
 
 }

@@ -1,13 +1,9 @@
 
 package it.polito.verefoo.pojo;
 
-import java.util.HashMap;
-import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -23,7 +19,7 @@ public class AllocationConstraint {
      * 
      */
     @JsonProperty("type")
-    private AllocationConstraint.AllocationConstraintType type;
+    private AllocationConstraintType type;
     /**
      * 
      * (Required)
@@ -45,7 +41,7 @@ public class AllocationConstraint {
      * 
      */
     @JsonProperty("type")
-    public AllocationConstraint.AllocationConstraintType getType() {
+    public AllocationConstraintType getType() {
         return type;
     }
 
@@ -55,7 +51,7 @@ public class AllocationConstraint {
      * 
      */
     @JsonProperty("type")
-    public void setType(AllocationConstraint.AllocationConstraintType type) {
+    public void setType(AllocationConstraintType type) {
         this.type = type;
     }
 
@@ -142,45 +138,6 @@ public class AllocationConstraint {
         }
         AllocationConstraint rhs = ((AllocationConstraint) other);
         return ((((this.nodeB == rhs.nodeB)||((this.nodeB!= null)&&this.nodeB.equals(rhs.nodeB)))&&((this.type == rhs.type)||((this.type!= null)&&this.type.equals(rhs.type))))&&((this.nodeA == rhs.nodeA)||((this.nodeA!= null)&&this.nodeA.equals(rhs.nodeA))));
-    }
-
-    public enum AllocationConstraintType {
-
-        FORBIDDEN("forbidden"),
-        FORCED("forced");
-        private final String value;
-        private final static Map<String, AllocationConstraint.AllocationConstraintType> CONSTANTS = new HashMap<String, AllocationConstraint.AllocationConstraintType>();
-
-        static {
-            for (AllocationConstraint.AllocationConstraintType c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private AllocationConstraintType(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonValue
-        public String value() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static AllocationConstraint.AllocationConstraintType fromValue(String value) {
-            AllocationConstraint.AllocationConstraintType constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
     }
 
 }

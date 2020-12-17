@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "vpnExit",
+    "extends": {
+        "$ref": "./verigraph.json/#/definitions/networkFunction"
+    },
+    "type": "object",
+    "properties": {
+        "vpnAccess": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "vpnAccess"
+    ],
+    "additionalProperties": false
+}

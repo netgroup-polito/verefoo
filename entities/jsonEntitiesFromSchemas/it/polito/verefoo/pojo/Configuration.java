@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "id",
     "name",
     "description",
-    "type"
+    "networkFunction"
 })
 public class Configuration {
 
@@ -25,8 +25,8 @@ public class Configuration {
     private String name;
     @JsonProperty("description")
     private String description;
-    @JsonProperty("type")
-    private it.polito.verefoo.pojo.Node.FunctionalTypes type;
+    @JsonProperty("networkFunction")
+    private NetworkFunction networkFunction;
 
     /**
      * 
@@ -68,14 +68,14 @@ public class Configuration {
         this.description = description;
     }
 
-    @JsonProperty("type")
-    public it.polito.verefoo.pojo.Node.FunctionalTypes getType() {
-        return type;
+    @JsonProperty("networkFunction")
+    public NetworkFunction getNetworkFunction() {
+        return networkFunction;
     }
 
-    @JsonProperty("type")
-    public void setType(it.polito.verefoo.pojo.Node.FunctionalTypes type) {
-        this.type = type;
+    @JsonProperty("networkFunction")
+    public void setNetworkFunction(NetworkFunction networkFunction) {
+        this.networkFunction = networkFunction;
     }
 
     @Override
@@ -94,9 +94,9 @@ public class Configuration {
         sb.append('=');
         sb.append(((this.description == null)?"<null>":this.description));
         sb.append(',');
-        sb.append("type");
+        sb.append("networkFunction");
         sb.append('=');
-        sb.append(((this.type == null)?"<null>":this.type));
+        sb.append(((this.networkFunction == null)?"<null>":this.networkFunction));
         sb.append(',');
         if (sb.charAt((sb.length()- 1)) == ',') {
             sb.setCharAt((sb.length()- 1), ']');
@@ -112,7 +112,7 @@ public class Configuration {
         result = ((result* 31)+((this.name == null)? 0 :this.name.hashCode()));
         result = ((result* 31)+((this.description == null)? 0 :this.description.hashCode()));
         result = ((result* 31)+((this.id == null)? 0 :this.id.hashCode()));
-        result = ((result* 31)+((this.type == null)? 0 :this.type.hashCode()));
+        result = ((result* 31)+((this.networkFunction == null)? 0 :this.networkFunction.hashCode()));
         return result;
     }
 
@@ -125,7 +125,7 @@ public class Configuration {
             return false;
         }
         Configuration rhs = ((Configuration) other);
-        return (((((this.name == rhs.name)||((this.name!= null)&&this.name.equals(rhs.name)))&&((this.description == rhs.description)||((this.description!= null)&&this.description.equals(rhs.description))))&&((this.id == rhs.id)||((this.id!= null)&&this.id.equals(rhs.id))))&&((this.type == rhs.type)||((this.type!= null)&&this.type.equals(rhs.type))));
+        return (((((this.name == rhs.name)||((this.name!= null)&&this.name.equals(rhs.name)))&&((this.description == rhs.description)||((this.description!= null)&&this.description.equals(rhs.description))))&&((this.id == rhs.id)||((this.id!= null)&&this.id.equals(rhs.id))))&&((this.networkFunction == rhs.networkFunction)||((this.networkFunction!= null)&&this.networkFunction.equals(rhs.networkFunction))));
     }
 
 }

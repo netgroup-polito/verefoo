@@ -321,6 +321,9 @@
 				<groupId>Verefoo</groupId>
 				<artifactId>generator-maven-plugin</artifactId>
 				<version>1.0-SNAPSHOT</version>
+				<configuration>
+					<greeting>Hello everybody from Davide</greeting>
+				</configuration>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>

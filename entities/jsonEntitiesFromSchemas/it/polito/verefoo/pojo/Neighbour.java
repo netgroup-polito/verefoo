@@ -1,6 +1,7 @@
 
 package it.polito.verefoo.pojo;
 
+import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -20,7 +21,7 @@ public class Neighbour {
     @JsonProperty("id")
     private Integer id;
     @JsonProperty("address")
-    private String address;
+    private Pattern address;
 
     /**
      * 
@@ -43,12 +44,12 @@ public class Neighbour {
     }
 
     @JsonProperty("address")
-    public String getAddress() {
+    public Pattern getAddress() {
         return address;
     }
 
     @JsonProperty("address")
-    public void setAddress(String address) {
+    public void setAddress(Pattern address) {
         this.address = address;
     }
 

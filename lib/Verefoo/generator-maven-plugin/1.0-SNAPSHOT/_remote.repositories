@@ -1,5 +1,5 @@
 #NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Wed Dec 16 16:48:32 CET 2020
+#Wed Dec 16 18:30:52 CET 2020
 generator-maven-plugin-1.0-SNAPSHOT.jar>localrepository=
 generator-maven-plugin-1.0-SNAPSHOT.jar>=
 generator-maven-plugin-1.0-SNAPSHOT.pom>localrepository=

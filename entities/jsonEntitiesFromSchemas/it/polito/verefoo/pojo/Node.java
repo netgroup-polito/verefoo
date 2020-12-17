@@ -2,14 +2,10 @@
 package it.polito.verefoo.pojo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -36,7 +32,7 @@ public class Node {
     @JsonProperty("address")
     private String address;
     @JsonProperty("functionalType")
-    private Node.FunctionalTypes functionalType;
+    private FunctionalType functionalType;
     @JsonProperty("configuration")
     private Configuration configuration;
     @JsonProperty("neighbours")
@@ -83,12 +79,12 @@ public class Node {
     }
 
     @JsonProperty("functionalType")
-    public Node.FunctionalTypes getFunctionalType() {
+    public FunctionalType getFunctionalType() {
         return functionalType;
     }
 
     @JsonProperty("functionalType")
-    public void setFunctionalType(Node.FunctionalTypes functionalType) {
+    public void setFunctionalType(FunctionalType functionalType) {
         this.functionalType = functionalType;
     }
 
@@ -165,63 +161,6 @@ public class Node {
         }
         Node rhs = ((Node) other);
         return ((((((this.functionalType == rhs.functionalType)||((this.functionalType!= null)&&this.functionalType.equals(rhs.functionalType)))&&((this.neighbours == rhs.neighbours)||((this.neighbours!= null)&&this.neighbours.equals(rhs.neighbours))))&&((this.id == rhs.id)||((this.id!= null)&&this.id.equals(rhs.id))))&&((this.address == rhs.address)||((this.address!= null)&&this.address.equals(rhs.address))))&&((this.configuration == rhs.configuration)||((this.configuration!= null)&&this.configuration.equals(rhs.configuration))));
-    }
-
-    public enum FunctionalTypes {
-
-        FIREWALL("FIREWALL"),
-        ENDHOST("ENDHOST"),
-        ENDPOINT("ENDPOINT"),
-        ANTISPAM("ANTISPAM"),
-        CACHE("CACHE"),
-        DPI("DPI"),
-        MAILCLIENT("MAILCLIENT"),
-        MAILSERVER("MAILSERVER"),
-        NAT("NAT"),
-        VPNACCESS("VPNACCESS"),
-        VPNEXIT("VPNEXIT"),
-        WEBCLIENT("WEBCLIENT"),
-        WEBSERVER("WEBSERVER"),
-        FIELDMODIFIER("FIELDMODIFIER"),
-        FORWARDER("FORWARDER"),
-        LOADBALANCER("LOADBALANCER"),
-        STATEFUL_FIREWALL("STATEFUL_FIREWALL"),
-        PRIORITY_FIREWALL("PRIORITY_FIREWALL"),
-        WEB_APPLICATION_FIREWALL("WEB_APPLICATION_FIREWALL"),
-        TRAFFIC_MONITOR("TRAFFIC_MONITOR");
-        private final String value;
-        private final static Map<String, Node.FunctionalTypes> CONSTANTS = new HashMap<String, Node.FunctionalTypes>();
-
-        static {
-            for (Node.FunctionalTypes c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private FunctionalTypes(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonValue
-        public String value() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static Node.FunctionalTypes fromValue(String value) {
-            Node.FunctionalTypes constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
     }
 
 }

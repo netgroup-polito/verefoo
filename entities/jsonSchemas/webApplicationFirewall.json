@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "webApplicationFirewall",
+    "type": "object",
+    "extends": {
+        "$ref": "./verigraph.json/#/definitions/networkFunction"
+    },
+    "properties": {
+        "webApplicationRules": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "action": {
+                        "existingJavaType": "it.polito.verefoo.pojo.ActionType",
+                        "default": "DENY"
+                    },
+                    "url": {
+                        "type": "string"
+                    },
+                    "domain": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
+        "defaultAction": {
+            "existingJavaType": "it.polito.verefoo.pojo.ActionType"
+        }
+    },
+    "additionalProperties": false
+}

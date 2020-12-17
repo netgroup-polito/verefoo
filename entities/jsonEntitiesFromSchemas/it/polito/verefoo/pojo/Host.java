@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public class Host {
 
     @JsonProperty("supportedVNFTypes")
-    private List<it.polito.verefoo.pojo.Node.FunctionalTypes> supportedVNFTypes = new ArrayList<it.polito.verefoo.pojo.Node.FunctionalTypes>();
+    private List<FunctionalType> supportedVNFTypes = new ArrayList<FunctionalType>();
     @JsonProperty("nodeRefs")
     private List<String> nodeRefs = new ArrayList<String>();
     /**
@@ -76,12 +76,12 @@ public class Host {
     private Boolean active = false;
 
     @JsonProperty("supportedVNFTypes")
-    public List<it.polito.verefoo.pojo.Node.FunctionalTypes> getSupportedVNFTypes() {
+    public List<FunctionalType> getSupportedVNFTypes() {
         return supportedVNFTypes;
     }
 
     @JsonProperty("supportedVNFTypes")
-    public void setSupportedVNFTypes(List<it.polito.verefoo.pojo.Node.FunctionalTypes> supportedVNFTypes) {
+    public void setSupportedVNFTypes(List<FunctionalType> supportedVNFTypes) {
         this.supportedVNFTypes = supportedVNFTypes;
     }
 
