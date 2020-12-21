@@ -3,6 +3,8 @@ package it.polito.verefoo.pojo;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -19,8 +21,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class Simulation {
 
     @JsonProperty("graph")
+    @Valid
     private Graph graph;
     @JsonProperty("substrates")
+    @Valid
     private List<Substrate> substrates = new ArrayList<Substrate>();
     /**
      * The array of functions that the system can use for each graph.
@@ -29,8 +33,11 @@ public class Simulation {
      */
     @JsonProperty("networkFunctions")
     @JsonPropertyDescription("The array of functions that the system can use for each graph.")
+    @Valid
+    @NotNull
     private List<FunctionalType> networkFunctions = new ArrayList<FunctionalType>();
     @JsonProperty("networkForwardingPaths")
+    @Valid
     private List<NetworkForwardingPath> networkForwardingPaths = new ArrayList<NetworkForwardingPath>();
     @JsonProperty("parsingString")
     private String parsingString;

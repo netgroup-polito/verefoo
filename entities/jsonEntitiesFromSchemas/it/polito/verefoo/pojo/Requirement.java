@@ -3,6 +3,7 @@ package it.polito.verefoo.pojo;
 
 import java.util.HashMap;
 import java.util.Map;
+import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
     "levelFourProtocol",
     "sourcePort",
     "destinationPort",
-    "isSat",
+    "isSatisfied",
     "body",
     "definition"
 })
@@ -29,6 +30,7 @@ public class Requirement {
      * 
      */
     @JsonProperty("name")
+    @NotNull
     private Requirement.Name name;
     /**
      * 
@@ -36,6 +38,7 @@ public class Requirement {
      * 
      */
     @JsonProperty("source")
+    @NotNull
     private String source;
     /**
      * 
@@ -43,6 +46,7 @@ public class Requirement {
      * 
      */
     @JsonProperty("destination")
+    @NotNull
     private String destination;
     @JsonProperty("levelFourProtocol")
     private LevelFourProtocolType levelFourProtocol = null;
@@ -50,8 +54,8 @@ public class Requirement {
     private String sourcePort;
     @JsonProperty("destinationPort")
     private String destinationPort;
-    @JsonProperty("isSat")
-    private Boolean isSat;
+    @JsonProperty("isSatisfied")
+    private Boolean isSatisfied;
     @JsonProperty("body")
     private String body;
     @JsonProperty("definition")
@@ -147,14 +151,14 @@ public class Requirement {
         this.destinationPort = destinationPort;
     }
 
-    @JsonProperty("isSat")
-    public Boolean getIsSat() {
-        return isSat;
+    @JsonProperty("isSatisfied")
+    public Boolean getIsSatisfied() {
+        return isSatisfied;
     }
 
-    @JsonProperty("isSat")
-    public void setIsSat(Boolean isSat) {
-        this.isSat = isSat;
+    @JsonProperty("isSatisfied")
+    public void setIsSatisfied(Boolean isSatisfied) {
+        this.isSatisfied = isSatisfied;
     }
 
     @JsonProperty("body")
@@ -205,9 +209,9 @@ public class Requirement {
         sb.append('=');
         sb.append(((this.destinationPort == null)?"<null>":this.destinationPort));
         sb.append(',');
-        sb.append("isSat");
+        sb.append("isSatisfied");
         sb.append('=');
-        sb.append(((this.isSat == null)?"<null>":this.isSat));
+        sb.append(((this.isSatisfied == null)?"<null>":this.isSatisfied));
         sb.append(',');
         sb.append("body");
         sb.append('=');
@@ -229,10 +233,10 @@ public class Requirement {
     public int hashCode() {
         int result = 1;
         result = ((result* 31)+((this.destinationPort == null)? 0 :this.destinationPort.hashCode()));
-        result = ((result* 31)+((this.isSat == null)? 0 :this.isSat.hashCode()));
         result = ((result* 31)+((this.sourcePort == null)? 0 :this.sourcePort.hashCode()));
         result = ((result* 31)+((this.name == null)? 0 :this.name.hashCode()));
         result = ((result* 31)+((this.destination == null)? 0 :this.destination.hashCode()));
+        result = ((result* 31)+((this.isSatisfied == null)? 0 :this.isSatisfied.hashCode()));
         result = ((result* 31)+((this.definition == null)? 0 :this.definition.hashCode()));
         result = ((result* 31)+((this.source == null)? 0 :this.source.hashCode()));
         result = ((result* 31)+((this.body == null)? 0 :this.body.hashCode()));
@@ -249,7 +253,7 @@ public class Requirement {
             return false;
         }
         Requirement rhs = ((Requirement) other);
-        return ((((((((((this.destinationPort == rhs.destinationPort)||((this.destinationPort!= null)&&this.destinationPort.equals(rhs.destinationPort)))&&((this.isSat == rhs.isSat)||((this.isSat!= null)&&this.isSat.equals(rhs.isSat))))&&((this.sourcePort == rhs.sourcePort)||((this.sourcePort!= null)&&this.sourcePort.equals(rhs.sourcePort))))&&((this.name == rhs.name)||((this.name!= null)&&this.name.equals(rhs.name))))&&((this.destination == rhs.destination)||((this.destination!= null)&&this.destination.equals(rhs.destination))))&&((this.definition == rhs.definition)||((this.definition!= null)&&this.definition.equals(rhs.definition))))&&((this.source == rhs.source)||((this.source!= null)&&this.source.equals(rhs.source))))&&((this.body == rhs.body)||((this.body!= null)&&this.body.equals(rhs.body))))&&((this.levelFourProtocol == rhs.levelFourProtocol)||((this.levelFourProtocol!= null)&&this.levelFourProtocol.equals(rhs.levelFourProtocol))));
+        return ((((((((((this.destinationPort == rhs.destinationPort)||((this.destinationPort!= null)&&this.destinationPort.equals(rhs.destinationPort)))&&((this.sourcePort == rhs.sourcePort)||((this.sourcePort!= null)&&this.sourcePort.equals(rhs.sourcePort))))&&((this.name == rhs.name)||((this.name!= null)&&this.name.equals(rhs.name))))&&((this.destination == rhs.destination)||((this.destination!= null)&&this.destination.equals(rhs.destination))))&&((this.isSatisfied == rhs.isSatisfied)||((this.isSatisfied!= null)&&this.isSatisfied.equals(rhs.isSatisfied))))&&((this.definition == rhs.definition)||((this.definition!= null)&&this.definition.equals(rhs.definition))))&&((this.source == rhs.source)||((this.source!= null)&&this.source.equals(rhs.source))))&&((this.body == rhs.body)||((this.body!= null)&&this.body.equals(rhs.body))))&&((this.levelFourProtocol == rhs.levelFourProtocol)||((this.levelFourProtocol!= null)&&this.levelFourProtocol.equals(rhs.levelFourProtocol))));
     }
 
     public enum Name {

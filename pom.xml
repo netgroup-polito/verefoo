@@ -134,11 +134,11 @@
 			<version>1.2.32</version>
 		</dependency>
 		<!-- This dependency has been commented because it furnishes the swagger version 2, while the dependency springdoc-openapi-ui provides the version 3.0.2 -->
-		<!-- <dependency> -->
-		<!-- <groupId>io.springfox</groupId> -->
-		<!-- <artifactId>springfox-swagger2</artifactId> -->
-		<!-- <version>2.9.2</version> -->
-		<!-- </dependency> -->
+		<!-- <dependency>
+		<groupId>io.springfox</groupId>
+		<artifactId>springfox-swagger2</artifactId>
+		<version>2.9.2</version>
+		</dependency> -->
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
@@ -197,7 +197,16 @@
 			<artifactId>activation</artifactId>
 			<version>1.1.1</version>
 		</dependency>
+
+		<!-- Support for HATEOAS hyperlinks -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+			<version>2.1.4.RELEASE</version>
+		</dependency>
+
 	</dependencies>
+
 	<properties>
 		<jersey2.version>2.19</jersey2.version>
 		<jaxrs.version>2.0.1</jaxrs.version>
@@ -303,6 +312,7 @@
 					<sourceDirectory>${project.basedir}/entities/jsonSchemas/</sourceDirectory>
 					<outputDirectory>${project.basedir}/entities/jsonEntitiesFromSchemas/</outputDirectory>
 					<targetPackage>it.polito.verefoo.pojo</targetPackage>
+					<includeJsr303Annotations>true</includeJsr303Annotations>
 				</configuration>
 				<executions>
 					<execution>

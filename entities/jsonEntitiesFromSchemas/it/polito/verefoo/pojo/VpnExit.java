@@ -1,6 +1,7 @@
 
 package it.polito.verefoo.pojo;
 
+import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -26,6 +27,7 @@ public class VpnExit
      * 
      */
     @JsonProperty("vpnAccess")
+    @NotNull
     private String vpnAccess;
 
     /**

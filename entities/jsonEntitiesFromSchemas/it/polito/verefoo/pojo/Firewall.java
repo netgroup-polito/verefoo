@@ -3,6 +3,8 @@ package it.polito.verefoo.pojo;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -24,6 +26,8 @@ public class Firewall
 {
 
     @JsonProperty("rules")
+    @Size(min = 1)
+    @Valid
     private List<Rule> rules = new ArrayList<Rule>();
     @JsonProperty("defaultAction")
     private ActionType defaultAction;

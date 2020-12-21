@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MediaType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
 import it.polito.verefoo.jaxb.*;
 
 
@@ -29,12 +31,15 @@ public class FunctionsController {
 ADPService service = new ADPService();
 	
 	@Autowired
-	private HttpServletRequest request;
+	private void name() {
+		
+	} HttpServletRequest request;
 	
 	/**
 	 * @param function it is the new function to created
 	 * @return the created function
 	 */
+	@Operation(tags = "version 1")
 	@ApiOperation(value = "createFunction", notes = "create a new function"
 				)
 	@RequestMapping(value = "", method = RequestMethod.POST)
@@ -67,6 +72,7 @@ ADPService service = new ADPService();
 	/**
 	 * @param fid it is the name of the function to delete
 	 */
+	@Operation(tags = "version 1")
 	@ApiOperation(value = "deleteFunction", notes = "delete an existing functio"
 				)
 	@RequestMapping(value = "/{fid}", method = RequestMethod.DELETE)
@@ -89,6 +95,7 @@ ADPService service = new ADPService();
 	 * @param fid it is the name of the function to retrieve
 	 * @return the requested function
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "get Function", notes = "retrieve a function"
 	)
 	@RequestMapping(value = "/{fid}", method = RequestMethod.GET)
@@ -96,7 +103,7 @@ ADPService service = new ADPService();
     		@ApiResponse(code = 200, message = "OK"),
     		@ApiResponse(code = 404, message = "Not Found"),
     		})
-    @ResponseBody
+	@ResponseBody
 	String getFunction(@PathVariable("fid") String fid) {
     	boolean found = service.getFunction(fid);
     	

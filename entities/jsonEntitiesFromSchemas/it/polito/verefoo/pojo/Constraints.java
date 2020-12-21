@@ -3,6 +3,8 @@ package it.polito.verefoo.pojo;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -21,6 +23,8 @@ public class Constraints {
      * 
      */
     @JsonProperty("nodeConstraints")
+    @Valid
+    @NotNull
     private List<NodeConstraint> nodeConstraints = new ArrayList<NodeConstraint>();
     /**
      * 
@@ -28,8 +32,11 @@ public class Constraints {
      * 
      */
     @JsonProperty("linkConstraints")
+    @Valid
+    @NotNull
     private List<LinkConstraint> linkConstraints = new ArrayList<LinkConstraint>();
     @JsonProperty("allocationConstraints")
+    @Valid
     private List<AllocationConstraint> allocationConstraints = new ArrayList<AllocationConstraint>();
 
     /**

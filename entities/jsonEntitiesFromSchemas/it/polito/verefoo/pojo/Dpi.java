@@ -3,6 +3,7 @@ package it.polito.verefoo.pojo;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.Valid;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -24,6 +25,7 @@ public class Dpi
 {
 
     @JsonProperty("dpiRules")
+    @Valid
     private List<DpiRule> dpiRules = new ArrayList<DpiRule>();
     @JsonProperty("defaultAction")
     private ActionType defaultAction;

@@ -32,6 +32,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
 import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.extra.TestCaseGeneratorAmsterdam;
 import it.polito.verefoo.jaxb.NFV;
@@ -56,8 +57,8 @@ public class TestCasesController {
 
 	private Logger loggerModel = LogManager.getLogger("model");
 
-	
-	@ApiOperation(value = "runTestCases", notes = "run test cases")
+	@Operation(tags = "version 1")
+	@ApiOperation(value = "runTestCases", notes = "run test cases", tags = "version 1")
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ApiResponses(value = {
 		    		@ApiResponse(code = 200, message = "Ok"),

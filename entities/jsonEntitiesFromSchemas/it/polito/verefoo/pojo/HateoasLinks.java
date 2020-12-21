@@ -3,6 +3,7 @@ package it.polito.verefoo.pojo;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.Valid;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class HateoasLinks {
 
     @JsonProperty("links")
+    @Valid
     private List<Link> links = new ArrayList<Link>();
 
     @JsonProperty("links")

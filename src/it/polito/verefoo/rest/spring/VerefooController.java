@@ -25,6 +25,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ResponseHeader;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 
 //mvn clean package && java -jar target\verifoo-0.0.1-SNAPSHOT.jar
 
@@ -33,7 +36,10 @@ import io.swagger.annotations.ResponseHeader;
 @Controller
 public class VerefooController {
 	
-	
+	@Hidden
+
+	@Operation(tags = "version 1")
+	@ApiOperation(value = "infoVerefoo", notes = "Info on Verefoo", tags = "version 1")
 	@RequestMapping(method = RequestMethod.GET, value = "/")
 	@ResponseBody
 	public String infoVerefoo() {

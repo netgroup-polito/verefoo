@@ -1,6 +1,7 @@
 
 package it.polito.verefoo.pojo;
 
+import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -23,6 +24,7 @@ public class NodeConstraint {
      * 
      */
     @JsonProperty("node")
+    @NotNull
     private String node;
     @JsonProperty("numberOfOperations")
     private Double numberOfOperations;

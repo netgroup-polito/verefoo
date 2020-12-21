@@ -3,6 +3,9 @@ package it.polito.verefoo.pojo;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -20,8 +23,11 @@ public class NetworkForwardingPath {
      * 
      */
     @JsonProperty("id")
+    @NotNull
     private Integer id;
     @JsonProperty("pathNodes")
+    @Size(min = 2)
+    @Valid
     private List<String> pathNodes = new ArrayList<String>();
 
     /**

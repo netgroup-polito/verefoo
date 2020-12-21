@@ -3,6 +3,9 @@ package it.polito.verefoo.pojo;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -23,6 +26,7 @@ public class Graph {
      * 
      */
     @JsonProperty("id")
+    @NotNull
     private Integer id;
     @JsonProperty("serviceGraph")
     private Boolean serviceGraph = false;
@@ -32,10 +36,16 @@ public class Graph {
      * 
      */
     @JsonProperty("nodes")
+    @Size(min = 1)
+    @Valid
+    @NotNull
     private List<Node> nodes = new ArrayList<Node>();
     @JsonProperty("constraints")
+    @Valid
     private Constraints constraints;
     @JsonProperty("requirements")
+    @Size(min = 1)
+    @Valid
     private List<Requirement> requirements = new ArrayList<Requirement>();
 
     /**

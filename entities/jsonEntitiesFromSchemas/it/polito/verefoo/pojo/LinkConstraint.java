@@ -1,6 +1,7 @@
 
 package it.polito.verefoo.pojo;
 
+import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -19,6 +20,7 @@ public class LinkConstraint {
      * 
      */
     @JsonProperty("source")
+    @NotNull
     private String source;
     /**
      * 
@@ -26,6 +28,7 @@ public class LinkConstraint {
      * 
      */
     @JsonProperty("destination")
+    @NotNull
     private String destination;
     /**
      * 
@@ -33,6 +36,7 @@ public class LinkConstraint {
      * 
      */
     @JsonProperty("requestLatency")
+    @NotNull
     private Double requestLatency;
 
     /**

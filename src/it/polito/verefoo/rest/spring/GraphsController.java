@@ -27,6 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
 import it.polito.verefoo.jaxb.*;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -52,6 +53,7 @@ public class GraphsController {
 	 * @param graph it is the graph to store
 	 * @return the created graph
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "createGraph", notes = "create a new graph"
 	)
 	@RequestMapping(value = "", method = RequestMethod.POST)
@@ -90,6 +92,7 @@ public class GraphsController {
 	 * @param afterInclusive it is the ending index
 	 * @return a collection of graph
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "getGraphs", notes = "searches graphs"
 	)
     @RequestMapping(value = "", method = RequestMethod.GET)
@@ -113,6 +116,7 @@ public class GraphsController {
     /**
 	 * 
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "deleteGraphs", notes = "delete all the graphs"
     		)
 	@RequestMapping(value = "", method = RequestMethod.DELETE)
@@ -138,6 +142,7 @@ public class GraphsController {
 	 * @param gid it is the id of the graph to update
 	 * @param graph it is the new graph
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "updateGraph", notes = "update single graph"
 	)
 	@RequestMapping(value = "/{gid}", method = RequestMethod.PUT)
@@ -159,6 +164,7 @@ public class GraphsController {
     /**
 	 * @param gid it is the id of the graph to retrieve
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "getGraph", notes = "retrieve single graph"
 	)
     @RequestMapping(value = "/{gid}", method = RequestMethod.GET)
@@ -182,6 +188,7 @@ public class GraphsController {
 	/**
 	 * @param gid it is the id of the graph to delete
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "deleteGraph", notes = "delete single graph"
 	)
 	@RequestMapping(value = "/{gid}", method = RequestMethod.DELETE)
@@ -210,6 +217,7 @@ public class GraphsController {
 	 * @param node it is the new node to create
 	 * @return the created node
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "createNode", notes = "create a new node"
 	)
 	@RequestMapping(value = "/{gid}/nodes", method = RequestMethod.POST)
@@ -257,6 +265,7 @@ public class GraphsController {
 	 * @param nid it is the name of the node to update
 	 * @param node it is the new value of the node
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "updateNode", notes = "update single node"
 	)
 	@RequestMapping(value = "/{gid}/nodes/{nid}", method = RequestMethod.PUT)
@@ -285,6 +294,7 @@ public class GraphsController {
 	 * @param nid it is the id of the node to retrieve
 	 * @return the node with nid name
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "getNode", notes = "retrieve single node"
 	)
 	@RequestMapping(value = "/{gid}/nodes/{nid}", method = RequestMethod.GET)
@@ -307,6 +317,7 @@ public class GraphsController {
 	 * @param gid it is the id of the graph
 	 * @param nid it is the name of the node to delete
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "deleteNode", notes = "delete single node"
 	)
 	@RequestMapping(value = "/{gid}/nodes/{nid}", method = RequestMethod.DELETE)
@@ -336,6 +347,7 @@ public class GraphsController {
 	 * @param nid it is the name of the node
 	 * @param neighbour it is the new neighbour to add to the node
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "addNeighbour", notes = "add a new neighbour"
 	)
 	@RequestMapping(value = "/{gid}/nodes/{nid}/neighbours", method = RequestMethod.POST)
@@ -365,6 +377,7 @@ public class GraphsController {
 	 * @param nid it is the name of the node 
 	 * @param neighbour it is the neighbour to remove from the node
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "deleteNeighbour", notes = "delete a neighbour"
 	)
 	@RequestMapping(value = "/{gid}/nodes/{nid}/neighbours", method = RequestMethod.DELETE)
@@ -401,6 +414,7 @@ public class GraphsController {
 	 * @param nid it is the name of the node
 	 * @param configuration it is the new configuration
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "updateConfiguration", notes = "update the configuration of a node"
 	)
 	@RequestMapping(value = "/{gid}/nodes/{nid}/configuration", method = RequestMethod.PUT)
@@ -424,7 +438,7 @@ public class GraphsController {
 	 * @param gid it is the id of the graph
 	 * @param nid it is the name of the node whose configuration must be deleted
 	 */
-
+	@Operation(tags = "version 1")
     @ApiOperation(value = "deleteConfiguration", notes = "delete the configuration of a node"
 	)
 	@RequestMapping(value = "/{gid}/nodes/{nid}/configuration", method = RequestMethod.DELETE)
@@ -450,6 +464,7 @@ public class GraphsController {
 	 * @param constraints they are the constraints to add to the graph
 	 * @return the created constraints 
 	 */
+	@Operation(tags = "version 1")
 	@ApiOperation(value = "createConstraints", notes = "create a set of constraints for a graph"
 	)
 	@RequestMapping(value = "/{gid}", method = RequestMethod.POST)
@@ -494,6 +509,7 @@ public class GraphsController {
 	 * @param gid it is the id of the graph
 	 * @param constraints they are the new constraints to update
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "updateConstraints", notes = "update the constraints of a graph"
 	)
 	@RequestMapping(value = "/{gid}/constraints", method = RequestMethod.PUT)
@@ -525,6 +541,7 @@ public class GraphsController {
 	 * @param gid it is the id of the graph
 	 * @return the constraints of the graph
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "getConstraints", notes = "retrieve the constraints of the graph"
 	)
 	@RequestMapping(value = "/{gid}/constraints", method = RequestMethod.GET)
@@ -546,6 +563,7 @@ public class GraphsController {
     /**
 	 * @param gid it is the id of the graph whose constraints must be removed
 	 */
+	@Operation(tags = "version 1")
     @ApiOperation(value = "deleteConstraints", notes = "delete the constraints of a graph"
 	)
 	@RequestMapping(value = "/{gid}/constraints", method = RequestMethod.DELETE)

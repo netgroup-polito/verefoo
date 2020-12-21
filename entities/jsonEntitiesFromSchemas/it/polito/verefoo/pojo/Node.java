@@ -3,6 +3,9 @@ package it.polito.verefoo.pojo;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -23,6 +26,7 @@ public class Node {
      * 
      */
     @JsonProperty("id")
+    @NotNull
     private Integer id;
     /**
      * 
@@ -30,12 +34,16 @@ public class Node {
      * 
      */
     @JsonProperty("address")
+    @Pattern(regexp = "^([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))([.]([0-9]|([1-9][0-9])|(1[0-9][0-9])|(2[0-4][0-9])|(25[0-5]))){3}$")
+    @NotNull
     private String address;
     @JsonProperty("functionalType")
     private FunctionalType functionalType;
     @JsonProperty("configuration")
+    @Valid
     private Configuration configuration;
     @JsonProperty("neighbours")
+    @Valid
     private List<Neighbour> neighbours = new ArrayList<Neighbour>();
 
     /**

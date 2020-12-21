@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.validation.Valid;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,8 +31,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public class Host {
 
     @JsonProperty("supportedVNFTypes")
+    @Valid
     private List<FunctionalType> supportedVNFTypes = new ArrayList<FunctionalType>();
     @JsonProperty("nodeRefs")
+    @Valid
     private List<String> nodeRefs = new ArrayList<String>();
     /**
      * 
@@ -37,6 +42,7 @@ public class Host {
      * 
      */
     @JsonProperty("name")
+    @NotNull
     private String name;
     /**
      * 
@@ -44,6 +50,8 @@ public class Host {
      * 
      */
     @JsonProperty("cpu")
+    @DecimalMin("0")
+    @NotNull
     private Integer cpu;
     /**
      * 
@@ -51,6 +59,8 @@ public class Host {
      * 
      */
     @JsonProperty("cores")
+    @DecimalMin("0")
+    @NotNull
     private Integer cores;
     /**
      * 
@@ -58,6 +68,8 @@ public class Host {
      * 
      */
     @JsonProperty("diskStorage")
+    @DecimalMin("0")
+    @NotNull
     private Integer diskStorage;
     /**
      * 
@@ -65,8 +77,11 @@ public class Host {
      * 
      */
     @JsonProperty("memory")
+    @DecimalMin("0")
+    @NotNull
     private Integer memory;
     @JsonProperty("maxVNF")
+    @DecimalMin("0")
     private Integer maxVNF;
     @JsonProperty("type")
     private Host.Type type;

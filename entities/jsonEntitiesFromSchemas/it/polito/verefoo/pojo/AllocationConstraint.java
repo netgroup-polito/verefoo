@@ -1,6 +1,7 @@
 
 package it.polito.verefoo.pojo;
 
+import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -19,6 +20,7 @@ public class AllocationConstraint {
      * 
      */
     @JsonProperty("type")
+    @NotNull
     private AllocationConstraintType type;
     /**
      * 
@@ -26,6 +28,7 @@ public class AllocationConstraint {
      * 
      */
     @JsonProperty("nodeA")
+    @NotNull
     private String nodeA;
     /**
      * 
@@ -33,6 +36,7 @@ public class AllocationConstraint {
      * 
      */
     @JsonProperty("nodeB")
+    @NotNull
     private String nodeB;
 
     /**
