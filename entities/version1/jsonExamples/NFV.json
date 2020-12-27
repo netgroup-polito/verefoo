@@ -1,0 +1,279 @@
+{
+    "graphs": {
+        "graph": [
+            {
+                "id": 0,
+                "node": [
+                    {
+                        "id": 0,
+                        "name": "10.0.0.3",
+                        "functionalType": "CACHE",
+                        "configuration": {
+                            "forwarder": {
+                                "name": "forwarder"
+                            }
+                        },
+                        "neighbour": [
+                            {
+                                "id": 1,
+                                "name": "10.0.0.2"
+                            },
+                            {
+                                "id": 2,
+                                "name": "10.0.0.4"
+                            }
+                        ]
+                    },
+                    {
+                        "id": 1,
+                        "name": "10.0.0.2",
+                        "configuration": {
+                            "id": 1,
+                            "statefulFirewall": {
+                                "defaultAction": "ALLOW",
+                                "elements": [
+                                    {
+                                        "action": "DENY",
+                                        "source": "10.0.0.3",
+                                        "destination": "*",
+                                        "srcPort": "1004",
+                                        "dstPort": "4001",
+                                        "directional": true,
+                                        "protocol": "UDP"
+                                    },
+                                    {
+                                        "action": "DENY",
+                                        "source": "*",
+                                        "destination": "10.0.0.4",
+                                        "directional": false,
+                                        "protocol": "ANY",
+                                        "srcPort": "*",
+                                        "dstPort": "5004"
+                                    }
+                                ]
+                            }
+                        },
+                        "functionalType": "STATEFUL_FIREWALL",
+                        "neighbour": [
+                            {
+                                "id": 0
+                            }
+                        ]
+                    },
+                    {
+                        "id": 2,
+                        "name": "10.0.0.4",
+                        "functionalType": "NAT",
+                        "configuration": {
+                            "nat": {
+                                "source": [
+                                    "10.0.0.2"
+                                ]
+                            }
+                        },
+                        "neighbour": [
+                            {
+                                "id": 0
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "propertyDefinition": {
+        "property": [
+            {
+                "graph": 0,
+                "httpdefinition": {
+                    "url": "myUrl",
+                    "domain": "myDomain",
+                    "options": "-myOption"
+                },
+                "name": "ISOLATION_PROPERTY",
+                "lv4Proto": "TCP",
+                "src": "10.0.0.2",
+                "dst": "10.0.0.4",
+                "srcPort": "1004",
+                "dstPort": "4001",
+                "isSat": false,
+                "body": "myBody"
+            },
+            {
+                "graph": 0,
+                "pop3Definition": {
+                    "contentType": "application/xml",
+                    "from": "my@email.com",
+                    "to": "your@email.com",
+                    "sender": "s",
+                    "subject": "Hello world!"
+                },
+                "name": "REACHABILITY_PROPERTY",
+                "src": "10.0.0.2",
+                "dst": "10.0.0.4",
+                "srcPort": "657",
+                "dstPort": "756",
+                "isSat": false,
+                "lv4Proto": "OTHER"
+            }
+        ]
+    },
+    "constraints": {
+        "allocationConstraints": {
+            "allocationConstraint": [
+                {
+                    "nodeA": "10.0.0.2",
+                    "nodeB": "10.0.0.3",
+                    "type": "FORBIDDEN"
+                },
+                {
+                    "nodeA": "10.0.0.3",
+                    "nodeB": "10.0.0.4",
+                    "type": "FORCED"
+                }
+            ]
+        },
+        "nodeConstraints": {
+            "nodeMetrics": [
+                {
+                    "node": "10.0.0.2",
+                    "cores": 8,
+                    "memory": 1000,
+                    "maxNodeLatency": 50,
+                    "reqStorage": 10000,
+                    "nrOfOperations": 20,
+                    "optional": true
+                },
+                {
+                    "node": "10.0.0.4",
+                    "cores": 4,
+                    "memory": 500,
+                    "maxNodeLatency": 150,
+                    "nrOfOperations": 8,
+                    "reqStorage": 2000,
+                    "optional": true
+                },
+                {
+                    "node": "10.0.0.3",
+                    "cores": 16,
+                    "memory": 2000,
+                    "maxNodeLatency": 10,
+                    "nrOfOperations": 40,
+                    "reqStorage": 4000,
+                    "optional": false
+                }
+            ]
+        },
+        "linkConstraints": {
+            "linkMetrics": [
+                {
+                    "src": "10.0.0.3",
+                    "dst": "10.0.0.4",
+                    "reqLatency": 40
+                },
+                {
+                    "src": "10.0.0.2",
+                    "dst": "10.0.0.3",
+                    "reqLatency": 50
+                }
+            ]
+        }
+    },
+    "hosts": {
+        "host": [
+            {
+                "name": "host1",
+                "type": "MIDDLEBOX",
+                "cpu": 2,
+                "cores": 8,
+                "nodeRef": [
+                    {
+                        "node": "10.0.0.2"
+                    },
+                    {
+                        "node": "10.0.0.3"
+                    }
+                ],
+                "active": true,
+                "memory": 1000,
+                "diskStorage": 10000,
+                "fixedEndpoint": "endpoint",
+                "maxVNF": 2,
+                "supportedVNF": [
+                    {
+                        "functionalType": "CACHE"
+                    },
+                    {
+                        "functionalType": "VPNEXIT"
+                    },
+                    {
+                        "functionalType": "VPNACCESS"
+                    },
+                    {
+                        "functionalType": "NAT"
+                    }
+                ]
+            },
+            {
+                "name": "hostB",
+                "type": "SERVER",
+                "active": false,
+                "cpu": 2,
+                "cores": 4,
+                "nodeRef": [
+                    {
+                        "node": "10.0.0.4"
+                    }
+                ],
+                "diskStorage": 2000,
+                "fixedEndpoint": "endpoint",
+                "maxVNF": 1,
+                "memory": 2000,
+                "supportedVNF": [
+                    {
+                        "functionalType": "ANTISPAM"
+                    },
+                    {
+                        "functionalType": "NAT"
+                    }
+                ]
+            }
+        ]
+    },
+    "connections": {
+        "connection": [
+            {
+                "sourceHost": "host1",
+                "destHost": "hostB",
+                "avgLatency": 30
+            }
+        ]
+    },
+    "networkForwardingPaths": {
+        "path": [
+            {
+                "id": 0,
+                "pathNode": [
+                    {
+                        "name": "path1"
+                    },
+                    {
+                        "name": "path2"
+                    }
+                ]
+            },
+            {
+                "id": 1,
+                "pathNode": [
+                    {
+                        "name": "path3"
+                    },
+                    {
+                        "name": "path4"
+                    }
+                ]
+            }
+        ]
+    },
+    "parsingString": "parsingString"
+}

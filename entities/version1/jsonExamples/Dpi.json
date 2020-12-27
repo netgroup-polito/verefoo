@@ -1,0 +1,13 @@
+{
+    "defaultAction": "DENY",
+    "dpiElements": [
+        {
+            "action": "ALLOW",
+            "condition": "myCondition"
+        },
+        {
+            "action": "ALLOW",
+            "condition": "yourCondition"
+        }
+    ]
+}
