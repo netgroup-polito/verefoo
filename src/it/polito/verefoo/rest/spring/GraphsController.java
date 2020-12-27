@@ -4,12 +4,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -25,17 +19,20 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.v3.oas.annotations.Operation;
-import it.polito.verefoo.jaxb.*;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import it.polito.verefoo.jaxb.Configuration;
+import it.polito.verefoo.jaxb.Constraints;
+import it.polito.verefoo.jaxb.Graph;
+import it.polito.verefoo.jaxb.Graphs;
+import it.polito.verefoo.jaxb.Neighbour;
+import it.polito.verefoo.jaxb.Node;
 
 
 @Controller
-@RequestMapping(value = "/adp/graphs")
+@RequestMapping(value = "/adp/graphs", consumes = {"application/xml", "application/json"}, produces = {"application/xml", "application/json"})
 public class GraphsController {
 	
 	ADPService service = new ADPService();
@@ -65,7 +62,7 @@ public class GraphsController {
 		long id = service.getNextGraphId();
     	StringBuffer url = request.getRequestURL();
     	Graph created = service.createGraph(id, graph);
-    	if (created!=null) {
+    	if (created != null) {
     		String responseUrl;
     		if(url.toString().endsWith("/")) responseUrl = url.toString() + id;
     		else responseUrl = url.toString() + "/" + id;

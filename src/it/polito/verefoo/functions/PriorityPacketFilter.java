@@ -2,12 +2,8 @@ package it.polito.verefoo.functions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
@@ -18,17 +14,13 @@ import com.microsoft.z3.Optimize;
 
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
-import it.polito.verefoo.extra.WildcardManager;
 import it.polito.verefoo.graph.Flow;
-import it.polito.verefoo.graph.Traffic;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.EType;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Node;
-import it.polito.verefoo.jaxb.PName;
 import it.polito.verefoo.solver.NetContext;
 import it.polito.verefoo.utils.PacketFilterRule;
-import it.polito.verefoo.utils.Tuple;
 
 /** Represents a Packet Filter with the associated Access Control List
  *

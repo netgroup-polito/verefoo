@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "elements": {
+            "type": "array",
+            "items": {
+                "existingJavaType": "it.polito.verefoo.pojo.DpiElements"
+            },
+            "minItems": 1
+        },
+        "defaultAction": {
+            "existingJavaType": "it.polito.verefoo.pojo.ActionTypes"
+        }
+    },
+    "additionalProperties": false
+}

@@ -1,0 +1,9 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Path:PathNode",
+  "properties" : {
+    "name" : {
+      "type" : "string"
+    }
+  }
+}

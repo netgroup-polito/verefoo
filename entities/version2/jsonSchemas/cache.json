@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "cache",
+    "extends": {
+        "$ref": "./verigraph.json/#/definitions/networkFunction"
+    },
+    "properties": {
+        "resource": {
+            "type": "array",
+            "items": {
+                "$comment": "A resource is a node, denoted by its name.",
+                "type": "string"
+            }
+        }
+    },
+    "minItems": 1
+}

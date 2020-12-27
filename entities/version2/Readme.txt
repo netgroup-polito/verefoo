@@ -1,0 +1,1 @@
+This folder contains the schemas, the examples and the POJOs to support the proposed controllers, whose tag in the online Swagger documentation is called 'version 2' indeed.

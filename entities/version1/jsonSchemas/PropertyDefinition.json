@@ -1,0 +1,80 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:PropertyDefinition",
+  "properties" : {
+    "property" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Property",
+        "properties" : {
+          "pop3Definition" : {
+            "type" : "object",
+            "id" : "urn:jsonschema:it:polito:verefoo:jaxb:POP3Definition",
+            "properties" : {
+              "from" : {
+                "type" : "string"
+              },
+              "sender" : {
+                "type" : "string"
+              },
+              "to" : {
+                "type" : "string"
+              },
+              "subject" : {
+                "type" : "string"
+              },
+              "contentType" : {
+                "type" : "string"
+              }
+            }
+          },
+          "name" : {
+            "type" : "string",
+            "enum" : [ "ISOLATION_PROPERTY", "REACHABILITY_PROPERTY" ]
+          },
+          "graph" : {
+            "type" : "integer"
+          },
+          "src" : {
+            "type" : "string"
+          },
+          "dst" : {
+            "type" : "string"
+          },
+          "lv4Proto" : {
+            "type" : "string",
+            "enum" : [ "ANY", "TCP", "UDP", "OTHER" ]
+          },
+          "srcPort" : {
+            "type" : "string"
+          },
+          "dstPort" : {
+            "type" : "string"
+          },
+          "isSat" : {
+            "type" : "boolean"
+          },
+          "body" : {
+            "type" : "string"
+          },
+          "httpdefinition" : {
+            "type" : "object",
+            "id" : "urn:jsonschema:it:polito:verefoo:jaxb:HTTPDefinition",
+            "properties" : {
+              "url" : {
+                "type" : "string"
+              },
+              "domain" : {
+                "type" : "string"
+              },
+              "options" : {
+                "type" : "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

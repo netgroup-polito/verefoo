@@ -1,0 +1,16 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:WafElements",
+  "properties" : {
+    "action" : {
+      "type" : "string",
+      "enum" : [ "ALLOW", "DENY" ]
+    },
+    "url" : {
+      "type" : "string"
+    },
+    "domain" : {
+      "type" : "string"
+    }
+  }
+}

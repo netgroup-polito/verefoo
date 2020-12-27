@@ -1,10 +1,21 @@
 package it.polito.verefoo.rest.spring;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import it.polito.verefoo.jaxb.*;
+import it.polito.verefoo.jaxb.Configuration;
+import it.polito.verefoo.jaxb.Connections;
+import it.polito.verefoo.jaxb.Constraints;
+import it.polito.verefoo.jaxb.FunctionalTypes;
+import it.polito.verefoo.jaxb.Graph;
+import it.polito.verefoo.jaxb.Graphs;
+import it.polito.verefoo.jaxb.Host;
+import it.polito.verefoo.jaxb.Hosts;
+import it.polito.verefoo.jaxb.NFV;
+import it.polito.verefoo.jaxb.Neighbour;
+import it.polito.verefoo.jaxb.Node;
+import it.polito.verefoo.jaxb.Property;
+import it.polito.verefoo.jaxb.PropertyDefinition;
 
 public class ADPService {
 	

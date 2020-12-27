@@ -1,0 +1,15 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:LinkConstraints:LinkMetrics",
+  "properties" : {
+    "src" : {
+      "type" : "string"
+    },
+    "dst" : {
+      "type" : "string"
+    },
+    "reqLatency" : {
+      "type" : "integer"
+    }
+  }
+}

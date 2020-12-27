@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "action": {
+            "existingJavaType": "it.polito.verefoo.pojo.ActionTypes",
+            "default": "DENY"
+        },
+        "source": {
+            "type": "string"
+        },
+        "destination": {
+            "type": "string"
+        },
+        "protocol": {
+            "existingJavaType": "it.polito.verefoo.pojo.L4ProtocolTypes",
+            "default": "ANY"
+        },
+        "src_port": {
+            "type": "string"
+        },
+        "dst_port": {
+            "type": "string"
+        },
+        "directional": {
+            "type": "boolean",
+            "$comment": "Regarding translation from XSDs, should I put true as default value, or 'true'?",
+            "default": true
+        }
+    },
+    "required": [
+        "source",
+        "destination"
+    ],
+    "additionalProperties": false
+}

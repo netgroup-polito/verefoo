@@ -1,0 +1,15 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "action": {
+            "existingJavaType": "it.polito.verefoo.pojo.ActionTypes",
+            "default": "DENY"
+        },
+        "condition": {
+            "type": "string"
+        }
+    },
+    "required": ["condition"],
+    "additionalProperties": false
+}

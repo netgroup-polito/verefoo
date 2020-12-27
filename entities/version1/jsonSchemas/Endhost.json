@@ -1,0 +1,28 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Endhost",
+  "properties" : {
+    "body" : {
+      "type" : "string"
+    },
+    "sequence" : {
+      "type" : "integer"
+    },
+    "protocol" : {
+      "type" : "string",
+      "enum" : [ "HTTP_REQUEST", "HTTP_RESPONSE", "POP_3_REQUEST", "POP_3_RESPONSE" ]
+    },
+    "emailFrom" : {
+      "type" : "string"
+    },
+    "url" : {
+      "type" : "string"
+    },
+    "options" : {
+      "type" : "string"
+    },
+    "destination" : {
+      "type" : "string"
+    }
+  }
+}

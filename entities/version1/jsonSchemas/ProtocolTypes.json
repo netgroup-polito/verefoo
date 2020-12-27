@@ -1,0 +1,4 @@
+{
+  "type" : "string",
+  "enum" : [ "HTTP_REQUEST", "HTTP_RESPONSE", "POP_3_REQUEST", "POP_3_RESPONSE" ]
+}

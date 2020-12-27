@@ -1,0 +1,357 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Graph",
+  "properties" : {
+    "node" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Node",
+        "properties" : {
+          "neighbour" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Neighbour",
+              "properties" : {
+                "id" : {
+                  "type" : "integer"
+                },
+                "name" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "configuration" : {
+            "type" : "object",
+            "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Configuration",
+            "properties" : {
+              "firewall" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Firewall",
+                "properties" : {
+                  "elements" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "object",
+                      "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Elements",
+                      "properties" : {
+                        "action" : {
+                          "type" : "string",
+                          "enum" : [ "ALLOW", "DENY" ]
+                        },
+                        "source" : {
+                          "type" : "string"
+                        },
+                        "destination" : {
+                          "type" : "string"
+                        },
+                        "protocol" : {
+                          "type" : "string",
+                          "enum" : [ "ANY", "TCP", "UDP", "OTHER" ]
+                        },
+                        "srcPort" : {
+                          "type" : "string"
+                        },
+                        "dstPort" : {
+                          "type" : "string"
+                        },
+                        "directional" : {
+                          "type" : "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "defaultAction" : {
+                    "type" : "string",
+                    "enum" : [ "ALLOW", "DENY" ]
+                  }
+                }
+              },
+              "endhost" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Endhost",
+                "properties" : {
+                  "body" : {
+                    "type" : "string"
+                  },
+                  "sequence" : {
+                    "type" : "integer"
+                  },
+                  "protocol" : {
+                    "type" : "string",
+                    "enum" : [ "HTTP_REQUEST", "HTTP_RESPONSE", "POP_3_REQUEST", "POP_3_RESPONSE" ]
+                  },
+                  "emailFrom" : {
+                    "type" : "string"
+                  },
+                  "url" : {
+                    "type" : "string"
+                  },
+                  "options" : {
+                    "type" : "string"
+                  },
+                  "destination" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "endpoint" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Endpoint",
+                "properties" : {
+                  "name" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "antispam" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Antispam",
+                "properties" : {
+                  "source" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              },
+              "cache" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Cache",
+                "properties" : {
+                  "resource" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              },
+              "dpi" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Dpi",
+                "properties" : {
+                  "dpiElements" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "object",
+                      "id" : "urn:jsonschema:it:polito:verefoo:jaxb:DpiElements",
+                      "properties" : {
+                        "action" : {
+                          "type" : "string",
+                          "enum" : [ "ALLOW", "DENY" ]
+                        },
+                        "condition" : {
+                          "type" : "string"
+                        }
+                      }
+                    }
+                  },
+                  "defaultAction" : {
+                    "type" : "string",
+                    "enum" : [ "ALLOW", "DENY" ]
+                  }
+                }
+              },
+              "mailclient" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Mailclient",
+                "properties" : {
+                  "mailserver" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "mailserver" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Mailserver",
+                "properties" : {
+                  "name" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "nat" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Nat",
+                "properties" : {
+                  "source" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              },
+              "vpnaccess" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Vpnaccess",
+                "properties" : {
+                  "vpnexit" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "vpnexit" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Vpnexit",
+                "properties" : {
+                  "vpnaccess" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "webclient" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Webclient",
+                "properties" : {
+                  "nameWebServer" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "webserver" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Webserver",
+                "properties" : {
+                  "name" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "fieldmodifier" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Fieldmodifier",
+                "properties" : {
+                  "name" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "forwarder" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Forwarder",
+                "properties" : {
+                  "name" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "loadbalancer" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Loadbalancer",
+                "properties" : {
+                  "pool" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              },
+              "statefulFirewall" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:StatefulFirewall",
+                "properties" : {
+                  "elements" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "object",
+                      "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Elements",
+                      "properties" : {
+                        "action" : {
+                          "type" : "string",
+                          "enum" : [ "ALLOW", "DENY" ]
+                        },
+                        "source" : {
+                          "type" : "string"
+                        },
+                        "destination" : {
+                          "type" : "string"
+                        },
+                        "protocol" : {
+                          "type" : "string",
+                          "enum" : [ "ANY", "TCP", "UDP", "OTHER" ]
+                        },
+                        "srcPort" : {
+                          "type" : "string"
+                        },
+                        "dstPort" : {
+                          "type" : "string"
+                        },
+                        "directional" : {
+                          "type" : "boolean"
+                        }
+                      }
+                    }
+                  },
+                  "defaultAction" : {
+                    "type" : "string",
+                    "enum" : [ "ALLOW", "DENY" ]
+                  }
+                }
+              },
+              "webApplicationFirewall" : {
+                "type" : "object",
+                "id" : "urn:jsonschema:it:polito:verefoo:jaxb:WebApplicationFirewall",
+                "properties" : {
+                  "wafElements" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "object",
+                      "id" : "urn:jsonschema:it:polito:verefoo:jaxb:WafElements",
+                      "properties" : {
+                        "action" : {
+                          "type" : "string",
+                          "enum" : [ "ALLOW", "DENY" ]
+                        },
+                        "url" : {
+                          "type" : "string"
+                        },
+                        "domain" : {
+                          "type" : "string"
+                        }
+                      }
+                    }
+                  },
+                  "defaultAction" : {
+                    "type" : "string",
+                    "enum" : [ "ALLOW", "DENY" ]
+                  }
+                }
+              },
+              "id" : {
+                "type" : "integer"
+              },
+              "name" : {
+                "type" : "string"
+              },
+              "description" : {
+                "type" : "string"
+              }
+            }
+          },
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "functionalType" : {
+            "type" : "string",
+            "enum" : [ "FIREWALL", "ENDHOST", "ENDPOINT", "ANTISPAM", "CACHE", "DPI", "DPI_S", "MAILCLIENT", "MAILSERVER", "NAT", "VPNACCESS", "VPNEXIT", "WEBCLIENT", "WEBSERVER", "FIELDMODIFIER", "FORWARDER", "LOADBALANCER", "STATEFUL_FIREWALL", "PRIORITY_FIREWALL", "WEB_APPLICATION_FIREWALL", "TRAFFIC_MONITOR" ]
+          }
+        }
+      }
+    },
+    "id" : {
+      "type" : "integer"
+    },
+    "serviceGraph" : {
+      "type" : "boolean"
+    }
+  }
+}

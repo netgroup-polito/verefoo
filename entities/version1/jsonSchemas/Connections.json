@@ -1,0 +1,24 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Connections",
+  "properties" : {
+    "connection" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Connection",
+        "properties" : {
+          "sourceHost" : {
+            "type" : "string"
+          },
+          "destHost" : {
+            "type" : "string"
+          },
+          "avgLatency" : {
+            "type" : "integer"
+          }
+        }
+      }
+    }
+  }
+}

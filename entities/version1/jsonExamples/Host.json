@@ -1,0 +1,24 @@
+{
+    "name": "host1",
+    "type": "CLIENT",
+    "active": true,
+    "maxVNF": 3,
+    "cores": 4,
+    "cpu": 1,
+    "diskStorage": 500,
+    "fixedEndpoint": "endPoint",
+    "memory": 1000,
+    "nodeRef": [
+        {
+            "node": "A"
+        },
+        {
+            "node": "10.0.0.1"
+        }
+    ],
+    "supportedVNF": [
+        {
+            "functionalType": "ENDHOST"
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Webserver",
+  "properties" : {
+    "name" : {
+      "type" : "string"
+    }
+  }
+}

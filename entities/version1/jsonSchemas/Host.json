@@ -1,0 +1,59 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Host",
+  "properties" : {
+    "supportedVNF" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:SupportedVNFType",
+        "properties" : {
+          "functionalType" : {
+            "type" : "string",
+            "enum" : [ "FIREWALL", "ENDHOST", "ENDPOINT", "ANTISPAM", "CACHE", "DPI", "DPI_S", "MAILCLIENT", "MAILSERVER", "NAT", "VPNACCESS", "VPNEXIT", "WEBCLIENT", "WEBSERVER", "FIELDMODIFIER", "FORWARDER", "LOADBALANCER", "STATEFUL_FIREWALL", "PRIORITY_FIREWALL", "WEB_APPLICATION_FIREWALL", "TRAFFIC_MONITOR" ]
+          }
+        }
+      }
+    },
+    "nodeRef" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeRefType",
+        "properties" : {
+          "node" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "name" : {
+      "type" : "string"
+    },
+    "cpu" : {
+      "type" : "integer"
+    },
+    "cores" : {
+      "type" : "integer"
+    },
+    "diskStorage" : {
+      "type" : "integer"
+    },
+    "memory" : {
+      "type" : "integer"
+    },
+    "maxVNF" : {
+      "type" : "integer"
+    },
+    "type" : {
+      "type" : "string",
+      "enum" : [ "CLIENT", "SERVER", "MIDDLEBOX" ]
+    },
+    "fixedEndpoint" : {
+      "type" : "string"
+    },
+    "active" : {
+      "type" : "boolean"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "resource": {
+            "type": "array",
+            "items": {
+                "$comment": "A resource is a node, denoted by its name.",
+                "type": "string"
+            }
+        }
+    },
+    "additionalProperties": false
+}

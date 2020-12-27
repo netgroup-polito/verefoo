@@ -1,0 +1,21 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:POP3Definition",
+  "properties" : {
+    "from" : {
+      "type" : "string"
+    },
+    "sender" : {
+      "type" : "string"
+    },
+    "to" : {
+      "type" : "string"
+    },
+    "subject" : {
+      "type" : "string"
+    },
+    "contentType" : {
+      "type" : "string"
+    }
+  }
+}

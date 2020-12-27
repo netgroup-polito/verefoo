@@ -1,0 +1,18 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Hyperlinks:Link",
+  "properties" : {
+    "rel" : {
+      "type" : "string"
+    },
+    "href" : {
+      "type" : "string"
+    },
+    "type" : {
+      "type" : "string"
+    },
+    "method" : {
+      "type" : "string"
+    }
+  }
+}

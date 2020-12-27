@@ -1,0 +1,9 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "enum": [
+        "HTTP_REQUEST",
+        "HTTP_RESPONSE",
+        "POP3_REQUEST",
+        "POP3_RESPONSE"
+    ]
+}

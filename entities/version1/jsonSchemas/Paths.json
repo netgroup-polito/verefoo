@@ -1,0 +1,24 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Paths",
+  "properties" : {
+    "message" : {
+      "type" : "string"
+    },
+    "path" : {
+      "type" : "array",
+      "items" : {
+        "type" : "string"
+      }
+    },
+    "source" : {
+      "type" : "string"
+    },
+    "destination" : {
+      "type" : "string"
+    },
+    "direction" : {
+      "type" : "string"
+    }
+  }
+}

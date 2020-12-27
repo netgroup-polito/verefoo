@@ -1,0 +1,27 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeConstraints:NodeMetrics",
+  "properties" : {
+    "node" : {
+      "type" : "string"
+    },
+    "nrOfOperations" : {
+      "type" : "integer"
+    },
+    "maxNodeLatency" : {
+      "type" : "integer"
+    },
+    "reqStorage" : {
+      "type" : "integer"
+    },
+    "cores" : {
+      "type" : "integer"
+    },
+    "memory" : {
+      "type" : "integer"
+    },
+    "optional" : {
+      "type" : "boolean"
+    }
+  }
+}

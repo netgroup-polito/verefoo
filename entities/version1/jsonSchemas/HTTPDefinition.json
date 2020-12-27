@@ -1,0 +1,15 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:HTTPDefinition",
+  "properties" : {
+    "url" : {
+      "type" : "string"
+    },
+    "domain" : {
+      "type" : "string"
+    },
+    "options" : {
+      "type" : "string"
+    }
+  }
+}

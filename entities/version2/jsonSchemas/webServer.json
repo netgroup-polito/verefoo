@@ -1,0 +1,15 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "webServer",
+    "extends": {
+        "$ref": "./verigraph.json/#/definitions/networkFunction"
+    },
+    "properties": {
+        "name": {
+            "type": [
+                "null",
+                "string"
+            ]
+        }
+    }
+}

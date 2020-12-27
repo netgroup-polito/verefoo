@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "serviceGraph": {
+            "type": "boolean",
+            "$comment": "Regarding translation of XSDs, should the default value be false or 'false'?",
+            "default": false
+        },
+        "node": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "functional_type": {
+                        "existingJavaType": "it.polito.verefoo.pojo.FunctionalTypes"
+                    }
+                },
+                "required": [
+                    "name"
+                ],
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false
+}

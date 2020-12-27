@@ -1,0 +1,42 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:StatefulFirewall",
+  "properties" : {
+    "elements" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Elements",
+        "properties" : {
+          "action" : {
+            "type" : "string",
+            "enum" : [ "ALLOW", "DENY" ]
+          },
+          "source" : {
+            "type" : "string"
+          },
+          "destination" : {
+            "type" : "string"
+          },
+          "protocol" : {
+            "type" : "string",
+            "enum" : [ "ANY", "TCP", "UDP", "OTHER" ]
+          },
+          "srcPort" : {
+            "type" : "string"
+          },
+          "dstPort" : {
+            "type" : "string"
+          },
+          "directional" : {
+            "type" : "boolean"
+          }
+        }
+      }
+    },
+    "defaultAction" : {
+      "type" : "string",
+      "enum" : [ "ALLOW", "DENY" ]
+    }
+  }
+}

@@ -4,7 +4,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -25,15 +24,13 @@ import it.polito.verefoo.jaxb.*;
 
 
 @Controller
-@RequestMapping(value = "/adp/functions")
+@RequestMapping(value = "/adp/functions", consumes = {"application/xml", "application/json"}, produces = {"application/xml", "application/json"})
 public class FunctionsController {
 
-ADPService service = new ADPService();
+	ADPService service = new ADPService();
 	
 	@Autowired
-	private void name() {
-		
-	} HttpServletRequest request;
+	HttpServletRequest request;
 	
 	/**
 	 * @param function it is the new function to created
@@ -47,13 +44,13 @@ ADPService service = new ADPService();
     		@ApiResponse(code = 201, message = "Created"),
     		@ApiResponse(code = 400, message = "Bad Request"),
     		})
-	public ResponseEntity<String> createFunction(@RequestBody String function) {
+	public ResponseEntity<FunctionalTypes> createFunction(@RequestBody FunctionalTypes functionalType) {
 		StringBuffer url = request.getRequestURL();
-    	String created = service.createFunction(function);
+    	FunctionalTypes created = FunctionalTypes.fromValue(service.createFunction(functionalType.name()));
     	if (created != null) {
     		String responseUrl;
-    		if(url.toString().endsWith("/")) responseUrl = url.toString() + function;
-    		else responseUrl = url.toString() + "/" + function;
+    		if(url.toString().endsWith("/")) responseUrl = url.toString() + functionalType.name();
+    		else responseUrl = url.toString() + "/" + functionalType.name();
     		HttpHeaders responseHeaders = new HttpHeaders();
     		try {
 				responseHeaders.setLocation(new URI(responseUrl));
@@ -62,7 +59,7 @@ ADPService service = new ADPService();
 						  HttpStatus.BAD_REQUEST, "bad request"
 						);
 			}
-        	return new ResponseEntity<String>(created, responseHeaders, HttpStatus.CREATED);
+        	return new ResponseEntity<FunctionalTypes>(created, responseHeaders, HttpStatus.CREATED);
     	} else
     		throw new ResponseStatusException(
 					  HttpStatus.BAD_REQUEST, "bad request"
@@ -82,9 +79,9 @@ ADPService service = new ADPService();
     		})
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
     @ResponseBody
-	public void deleteFunction(@PathVariable("fid") String fid) {
+	public void deleteFunction(@PathVariable("fid") FunctionalTypes functionalType) {
 		
-    	FunctionalTypes deleted = service.deleteFunction(fid);
+    	FunctionalTypes deleted = service.deleteFunction(functionalType.name());
     	if(deleted == null)
     		throw new ResponseStatusException(
 					  HttpStatus.NOT_FOUND, "not found"
@@ -104,13 +101,13 @@ ADPService service = new ADPService();
     		@ApiResponse(code = 404, message = "Not Found"),
     		})
 	@ResponseBody
-	String getFunction(@PathVariable("fid") String fid) {
-    	boolean found = service.getFunction(fid);
+	String getFunction(@PathVariable("fid") FunctionalTypes functionalType) {
+    	boolean found = service.getFunction(functionalType.name());
     	
     	if(!found)
     		throw new ResponseStatusException(
 					  HttpStatus.NOT_FOUND, "not found"
 					);	
-    	return fid;
+    	return functionalType.name();
 	}
 }

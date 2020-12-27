@@ -1,0 +1,66 @@
+{
+    "id": 0,
+    "node": [
+        {
+            "name": "10.0.0.1",
+            "functional_type": "WEBCLIENT",
+            "neighbour": [
+                {
+                    "name": "30.0.0.1"
+                }
+            ],
+            "configuration": {
+                "name": "confA",
+                "description": "A simple description",
+                "webclient": {
+                    "nameWebServer": "20.0.0.1"
+                }
+            }
+        },
+        {
+            "name": "30.0.0.1",
+            "functional_type": "FIREWALL",
+            "neighbour": [
+                {
+                    "name": "10.0.0.1"
+                },
+                {
+                    "name": "20.0.0.1"
+                }
+            ],
+            "configuration": {
+                "description": "A simple description",
+                "name": "conf1",
+                "firewall": {
+                    "defaultAction": "ALLOW",
+                    "elements": [
+                        {
+                            "action": "DENY",
+                            "source": "10.0.0.1",
+                            "destination": "20.0.0.1",
+                            "protocol": "ANY",
+                            "src_port": "*",
+                            "dst_port": "*"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "functional_type": "WEBSERVER",
+            "name": "20.0.0.1",
+            "neighbour": [
+                {
+                    "name": "30.0.0.1"
+                }
+            ],
+            "configuration": {
+                "description": "A simple description",
+                "name": "confB",
+                "webserver": {
+                    "name": "b"
+                }
+            }
+        }
+    ]
+}

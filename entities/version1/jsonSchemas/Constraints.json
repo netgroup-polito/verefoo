@@ -1,0 +1,91 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Constraints",
+  "properties" : {
+    "nodeConstraints" : {
+      "type" : "object",
+      "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeConstraints",
+      "properties" : {
+        "nodeMetrics" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeConstraints:NodeMetrics",
+            "properties" : {
+              "node" : {
+                "type" : "string"
+              },
+              "nrOfOperations" : {
+                "type" : "integer"
+              },
+              "maxNodeLatency" : {
+                "type" : "integer"
+              },
+              "reqStorage" : {
+                "type" : "integer"
+              },
+              "cores" : {
+                "type" : "integer"
+              },
+              "memory" : {
+                "type" : "integer"
+              },
+              "optional" : {
+                "type" : "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    "linkConstraints" : {
+      "type" : "object",
+      "id" : "urn:jsonschema:it:polito:verefoo:jaxb:LinkConstraints",
+      "properties" : {
+        "linkMetrics" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "id" : "urn:jsonschema:it:polito:verefoo:jaxb:LinkConstraints:LinkMetrics",
+            "properties" : {
+              "src" : {
+                "type" : "string"
+              },
+              "dst" : {
+                "type" : "string"
+              },
+              "reqLatency" : {
+                "type" : "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "allocationConstraints" : {
+      "type" : "object",
+      "id" : "urn:jsonschema:it:polito:verefoo:jaxb:AllocationConstraints",
+      "properties" : {
+        "allocationConstraint" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "id" : "urn:jsonschema:it:polito:verefoo:jaxb:AllocationConstraints:AllocationConstraint",
+            "properties" : {
+              "type" : {
+                "type" : "string",
+                "enum" : [ "FORBIDDEN", "FORCED" ]
+              },
+              "nodeA" : {
+                "type" : "string"
+              },
+              "nodeB" : {
+                "type" : "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

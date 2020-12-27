@@ -1,0 +1,16 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "endHost",
+    "type": "object",
+    "extends": {
+        "$ref": "./verigraph.json/#/definitions/networkFunction"
+    },
+    "properties": {
+        "name": {
+            "type": [
+                "null",
+                "string"
+            ]
+        }
+    }
+}

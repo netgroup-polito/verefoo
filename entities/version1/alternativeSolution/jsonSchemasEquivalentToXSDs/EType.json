@@ -1,0 +1,16 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "enum": [
+        "XMLValidationError",
+        "InvalidServerClientConf",
+        "InvalidServiceGraph",
+        "PHYClientServerNotConnected",
+        "InvalidPHYServerClientConf",
+        "NoMiddleHostDefined",
+        "InvalidNodeConfiguration",
+        "InvalidVPNConfiguration",
+        "InvalidPropertyDefinition",
+        "InvalidParsingString",
+        "InternalServerError"
+    ]
+}

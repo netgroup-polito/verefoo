@@ -1,0 +1,16 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:AllocationConstraints:AllocationConstraint",
+  "properties" : {
+    "type" : {
+      "type" : "string",
+      "enum" : [ "FORBIDDEN", "FORCED" ]
+    },
+    "nodeA" : {
+      "type" : "string"
+    },
+    "nodeB" : {
+      "type" : "string"
+    }
+  }
+}

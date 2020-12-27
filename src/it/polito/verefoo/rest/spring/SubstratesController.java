@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import it.polito.verefoo.jaxb.*;
 
 @Controller
-@RequestMapping(value = "/adp/substrates")
+@RequestMapping(value = "/adp/substrates", consumes = {"application/xml", "application/json"}, produces = {"application/xml", "application/json"})
 public class SubstratesController {
 
 	ADPService service = new ADPService();

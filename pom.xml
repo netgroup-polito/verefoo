@@ -59,6 +59,14 @@
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-xml</artifactId>
 		</dependency>
+
+		<!-- Module to generate JSON schemas from JAXB-generated POJOs -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-jsonSchema</artifactId>
+			<version>2.12.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-jaxb-annotations</artifactId>
@@ -297,6 +305,7 @@
 							</schemaIncludes>
 							<generateDirectory>gen-src/</generateDirectory>
 							<generatePackage>it.polito.verefoo.jaxb</generatePackage>
+							<!-- <forceRegenerate>true</forceRegenerate> -->
 							<!-- Other configuration options -->
 						</configuration>
 					</execution>
@@ -309,10 +318,11 @@
 				<artifactId>jsonschema2pojo-maven-plugin</artifactId>
 				<version>1.0.2</version>
 				<configuration>
-					<sourceDirectory>${project.basedir}/entities/jsonSchemas/</sourceDirectory>
-					<outputDirectory>${project.basedir}/entities/jsonEntitiesFromSchemas/</outputDirectory>
+					<sourceDirectory>${project.basedir}/entities/version2/jsonSchemas/</sourceDirectory>
+					<outputDirectory>${project.basedir}/entities/version2/POJOs/</outputDirectory>
 					<targetPackage>it.polito.verefoo.pojo</targetPackage>
 					<includeJsr303Annotations>true</includeJsr303Annotations>
+					<useLongIntegers>false</useLongIntegers>
 				</configuration>
 				<executions>
 					<execution>
@@ -321,6 +331,7 @@
 						</goals>
 						<configuration>
 							<annotationStyle>jackson2</annotationStyle>
+							<!-- This parameter guarantees that all objects in json schemas are treated as if additionalProperties = false -->
 							<includeAdditionalProperties>false</includeAdditionalProperties>
 						</configuration>
 					</execution>

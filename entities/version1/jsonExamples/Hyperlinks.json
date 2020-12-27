@@ -1,0 +1,15 @@
+{
+    "link": [
+        {
+            "rel": "self",
+            "href": "http://localhost:8085/verefoo/graphs/2",
+            "method": "GET",
+            "type": "myType"
+        },
+        {
+            "rel": "collection",
+            "href": "http://localhost:8085/verefoo/graphs",
+            "method": "GET"
+        }
+    ]
+}

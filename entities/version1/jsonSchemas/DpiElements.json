@@ -1,0 +1,13 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:DpiElements",
+  "properties" : {
+    "action" : {
+      "type" : "string",
+      "enum" : [ "ALLOW", "DENY" ]
+    },
+    "condition" : {
+      "type" : "string"
+    }
+  }
+}

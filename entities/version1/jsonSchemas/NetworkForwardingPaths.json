@@ -1,0 +1,30 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NetworkForwardingPaths",
+  "properties" : {
+    "path" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Path",
+        "properties" : {
+          "pathNode" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Path:PathNode",
+              "properties" : {
+                "name" : {
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "id" : {
+            "type" : "integer"
+          }
+        }
+      }
+    }
+  }
+}

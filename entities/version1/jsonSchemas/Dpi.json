@@ -1,0 +1,26 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Dpi",
+  "properties" : {
+    "dpiElements" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:DpiElements",
+        "properties" : {
+          "action" : {
+            "type" : "string",
+            "enum" : [ "ALLOW", "DENY" ]
+          },
+          "condition" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "defaultAction" : {
+      "type" : "string",
+      "enum" : [ "ALLOW", "DENY" ]
+    }
+  }
+}

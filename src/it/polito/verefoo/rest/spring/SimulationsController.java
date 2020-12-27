@@ -1,16 +1,10 @@
 package it.polito.verefoo.rest.spring;
 
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.annotation.XmlElement;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -25,26 +19,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.google.common.base.Optional;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
 import io.swagger.v3.oas.annotations.Operation;
-import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.VerefooSerializer;
-
-import io.swagger.annotations.ApiParam;
+import it.polito.verefoo.jaxb.Constraints;
+import it.polito.verefoo.jaxb.Graph;
+import it.polito.verefoo.jaxb.Graphs;
+import it.polito.verefoo.jaxb.LinkConstraints;
+import it.polito.verefoo.jaxb.NFV;
+import it.polito.verefoo.jaxb.NodeConstraints;
+import it.polito.verefoo.jaxb.PropertyDefinition;
 
 @Controller
-@RequestMapping(value = "/adp/simulations")
+@RequestMapping(value = "/adp/simulations", consumes = {"application/xml", "application/json"}, produces = {"application/xml", "application/json"})
 public class SimulationsController {
 
 	ADPService service = new ADPService();

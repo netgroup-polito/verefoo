@@ -1,0 +1,36 @@
+{
+    "$schema": "../jsonSchemasEquivalentToXSDS/verigraph.json",
+    "NFV": {
+        "graphs": {
+            "graph": [
+                {
+                    "id": 0,
+                    "serviceGraph": false,
+                    "node": [
+                        {
+                            "id": 0,
+                            "name": "myName",
+                            "functional_type": "FIREWALL"
+                        }
+                    ]
+                },
+                {
+                    "id": 1,
+                    "serviceGraph": true,
+                    "node": [
+                        {
+                            "id": 0,
+                            "name": "10.0.0.2",
+                            "functional_type": "STATEFUL_FIREWALL"
+                        },
+                        {
+                            "id": 1,
+                            "name": "10.0.0.3",
+                            "functional_type": "LOADBALANCER"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,4 @@
+{
+  "type" : "string",
+  "enum" : [ "ANY", "TCP", "UDP", "OTHER" ]
+}

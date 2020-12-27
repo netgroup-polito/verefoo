@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.boot.CommandLineRunner;
@@ -24,11 +26,6 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.tags.Tag;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-// import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 // TODO #jalol separate config from rest api
 @SpringBootApplication
@@ -55,8 +52,16 @@ public class SpringBootConfiguration {
 
     @Bean
     public HttpMessageConverters converters() {
+        // This snippet globally instructs Jackson2 to not write null fields in the response, which is the default behaviour
+        MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
+        ObjectMapper objectMapper = mappingJackson2HttpMessageConverter.getObjectMapper();
+        objectMapper.setSerializationInclusion(Include.NON_NULL);
+        mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
+
+
+
         return new HttpMessageConverters(true,
-                Arrays.asList(new MappingJackson2HttpMessageConverter(), new Jaxb2RootElementHttpMessageConverter()));
+                Arrays.asList(mappingJackson2HttpMessageConverter, new Jaxb2RootElementHttpMessageConverter()));
     }
 
     /*
@@ -88,6 +93,9 @@ public class SpringBootConfiguration {
                 ;
     }
 
+    /*
+     * This bean further customizes the creation of the openapi UI in Swagger version 3
+     */
     @Bean
     public OpenApiCustomiser sortSchemasAlphabetically() {
         return openApi -> {
@@ -97,7 +105,8 @@ public class SpringBootConfiguration {
         };
     }
 
-    /*
+    /* This bean works for Swagger 2, which has been disabled in favour of Swagger 3
+     *
      * @Bean public Docket apiDocket() { return new
      * Docket(DocumentationType.SWAGGER_2) .select()
      * .apis(RequestHandlerSelectors.basePackage("it.polito.verefoo.rest.spring"))
