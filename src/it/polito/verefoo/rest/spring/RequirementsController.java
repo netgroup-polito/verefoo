@@ -1,30 +1,25 @@
 package it.polito.verefoo.rest.spring;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.*;
 import io.swagger.v3.oas.annotations.Operation;
-import it.polito.verefoo.jaxb.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import it.polito.verefoo.jaxb.Property;
+import it.polito.verefoo.jaxb.PropertyDefinition;
 
-@Controller
+@RestController
 @RequestMapping(value = "/adp/requirements", consumes = {"application/xml", "application/json"}, produces = {"application/xml", "application/json"})
 public class RequirementsController {
 
@@ -39,30 +34,38 @@ public class RequirementsController {
 	 * @param requirementsSet it is the policy to create
 	 * @return the created requirements set
 	 */
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "createRequirementSet", notes = "create a new requirements set", tags = "version 1")
+	@Operation(tags = "version 1 - requirements", summary = "Create a requirement set", description = "")
 	@RequestMapping(value = "", method = RequestMethod.POST)
-	@ApiResponses(value = { @ApiResponse(code = 201, message = "Created"),
-			@ApiResponse(code = 400, message = "Bad Request"), })
-	public ResponseEntity<PropertyDefinition> createRequirementsSet(@RequestBody PropertyDefinition requirementsSet) {
-		long pid = service.getNextRequirementsSetId();
-		StringBuffer url = request.getRequestURL();
-		PropertyDefinition created = service.createRequirementsSet(pid, requirementsSet);
-		if (created != null) {
-			String responseUrl;
-			if (url.toString().endsWith("/"))
-				responseUrl = url.toString() + pid;
-			else
-				responseUrl = url.toString() + "/" + pid;
-			HttpHeaders responseHeaders = new HttpHeaders();
-			try {
-				responseHeaders.setLocation(new URI(responseUrl));
-			} catch (URISyntaxException e) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-			}
-			return new ResponseEntity<PropertyDefinition>(created, responseHeaders, HttpStatus.CREATED);
-		} else
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "201", description = "Created"),
+			@ApiResponse(responseCode = "400", description = "The passed requirement set is semantically malformed. You can retry the operation or check the data."), })
+	public ResponseEntity<Resources<Void>> createRequirementsSet(@RequestBody PropertyDefinition requirementsSet) {
+		// long pid = service.getNextRequirementsSetId();
+		// StringBuffer url = request.getRequestURL();
+		// PropertyDefinition created = service.createRequirementsSet(pid, requirementsSet);
+		// if (created != null) {
+		// 	String responseUrl;
+		// 	if (url.toString().endsWith("/"))
+		// 		responseUrl = url.toString() + pid;
+		// 	else
+		// 		responseUrl = url.toString() + "/" + pid;
+		// 	HttpHeaders responseHeaders = new HttpHeaders();
+		// 	try {
+		// 		responseHeaders.setLocation(new URI(responseUrl));
+		// 	} catch (URISyntaxException e) {
+		// 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+		// 	}
+		// 	return new ResponseEntity<PropertyDefinition>(created, responseHeaders, HttpStatus.CREATED);
+		// } else
+		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+		String url = request.getRequestURL().toString();
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<Void>()
+						.addLink(url, "new", RequestMethod.POST)
+						.addLink(url, "self", RequestMethod.GET)
+						.addLink(url, "self", RequestMethod.DELETE)
+						.wrap(null));
 	}
 
 	/**
@@ -70,35 +73,51 @@ public class RequirementsController {
 	 * @param afterInclusive  it is the ending index
 	 * @return a collection of requirements sets
 	 */
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "getRequirementsSets", notes = "searches requirements sets", tags = "version 1")
+	@Operation(tags = "version 1 - requirements", summary = "Get all the requirement sets", description = "")
 	@RequestMapping(value = "", method = RequestMethod.GET)
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 404, message = "Not Found"), })
-	@ResponseBody
-	public Collection<PropertyDefinition> getRequirementsSets(
-			@RequestParam(name = "beforeInclusive", defaultValue = "1") int beforeInclusive,
-			@RequestParam(name = "afterInclusive", defaultValue = "10") int afterInclusive) {
-		Collection<PropertyDefinition> set = service.getRequirementsSets(beforeInclusive, afterInclusive);
-		if (set.isEmpty())
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		return set;
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "OK"),
+			@ApiResponse(responseCode = "404", description = "No requirement set has been found. You can retry the operation or create a requirement set.")
+		})
+	
+	public ResponseEntity<Resources<PropertyDefinition>> getRequirementsSets() {
+		// Collection<PropertyDefinition> set = service.getRequirementsSets(beforeInclusive, afterInclusive);
+		// if (set.isEmpty())
+		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+		// return set;
+		PropertyDefinition propertyDefinitions = null;
+		String url = request.getRequestURL().toString();
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<PropertyDefinition>()
+						.addLink(url, "new", RequestMethod.POST)
+						.addLink(url, "self", RequestMethod.GET)
+						.addLink(url, "self", RequestMethod.DELETE)
+						.wrap(propertyDefinitions));
 	}
 
 	/**
 	 * delete all the requirements sets
 	 */
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "deleteRequirementsSets", notes = "delete all the requirements sets", tags = "version 1")
+	@Operation(tags = "version 1 - requirements", summary = "Delete all the requirement sets", description = "Be careful before cleaning the whole workbench of requirements.")
 	@RequestMapping(value = "", method = RequestMethod.DELETE)
-	@ApiResponses(value = { @ApiResponse(code = 204, message = "No Content"),
-			@ApiResponse(code = 404, message = "Not Found"), })
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	@ResponseBody
-	public void deleteRequirementsSets() {
-		boolean removed = service.deleteRequirementsSets();
-		if (!removed)
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "OK"),
+			@ApiResponse(responseCode = "404", description = "No requirement set has been found. You can retry the operation or create a requirement set.")
+		})
+	
+	public ResponseEntity<Resources<Void>> deleteRequirementsSets() {
+		// boolean removed = service.deleteRequirementsSets();
+		// if (!removed)
+		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+		String url = request.getRequestURL().toString();
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<Void>()
+						.addLink(url, "new", RequestMethod.POST)
+						.addLink(url, "self", RequestMethod.GET)
+						.addLink(url, "self", RequestMethod.DELETE)
+						.wrap(null));
 	}
 
 	/* Requirements Set */
@@ -107,50 +126,82 @@ public class RequirementsController {
 	 * @param rid             it is the id of the requirements set to update
 	 * @param requirementsSet it is the new value of the requirements set
 	 */
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "updateRequirementsSet", notes = "update a single requirements set", tags = "version 1")
+	@Operation(tags = "version 1 - requirements", summary = "Update a requirement set", description = "")
 	@RequestMapping(value = "/{rid}", method = RequestMethod.PUT)
-	@ApiResponses(value = { @ApiResponse(code = 204, message = "No Content"),
-			@ApiResponse(code = 404, message = "Not Found"), })
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	@ResponseBody
-	public void updateRequirementsSet(@PathVariable("rid") long rid, @RequestBody PropertyDefinition requirementsSet) {
-		PropertyDefinition updated = service.updateRequirementsSet(rid, requirementsSet);
-		if (updated == null)
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "OK"),
+			@ApiResponse(responseCode = "404", description = "The requirement set has not been found. You can retry the operation or create a requirement set.")
+
+		})
+	
+	public ResponseEntity<Resources<Void>> updateRequirementsSet(@PathVariable("rid") long rid, @RequestBody PropertyDefinition requirementsSet) {
+		// PropertyDefinition updated = service.updateRequirementsSet(rid, requirementsSet);
+		// if (updated == null)
+		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<Void>()
+						.addLink(url + "/" + rid, "self", RequestMethod.GET)
+						.addLink(url + "/" + rid, "self", RequestMethod.PUT)
+						.addLink(url + "/" + rid, "self", RequestMethod.DELETE)
+						.addLink(url, "list", RequestMethod.GET)
+						.wrap(null));
 	}
 
 	/**
 	 * @param rid it is the id of the requirements set to retrieve
 	 * @return the requested requirements set
 	 */
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "getRequirementsSet", notes = "retrieve a single requirements set", tags = "version 1")
+	@Operation(tags = "version 1 - requirements", summary = "Get a requirement set", description = "")
 	@RequestMapping(value = "/{rid}", method = RequestMethod.GET)
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 404, message = "Not Found"), })
-	@ResponseBody
-	public PropertyDefinition getRequirementsSet(@PathVariable("rid") long rid) {
-		PropertyDefinition set = service.getRequirementsSet(rid);
-		if (set == null)
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		return set;
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "OK"),
+			@ApiResponse(responseCode = "404", description = "The requirement set has not been found. You can retry the operation or create a requirement set.")
+		})
+	
+	public ResponseEntity<Resources<PropertyDefinition>> getRequirementsSet(@PathVariable("rid") long rid) {
+		// PropertyDefinition set = service.getRequirementsSet(rid);
+		// if (set == null)
+		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+		// return set;
+		PropertyDefinition propertyDefinition = null;
+		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<PropertyDefinition>()
+						.addLink(url + "/" + rid, "self", RequestMethod.GET)
+						.addLink(url + "/" + rid, "self", RequestMethod.PUT)
+						.addLink(url + "/" + rid, "self", RequestMethod.DELETE)
+						.addLink(url, "list", RequestMethod.GET)
+						.wrap(propertyDefinition));
 	}
 
 	/**
 	 * @param rid it is the id of the requirements set to delete
 	 */
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "deleteRequirementsSet", notes = "delete a single requirements set", tags = "version 1")
+	@Operation(tags = "version 1 - requirements", summary = "Delete a requirement set", description = "")
 	@RequestMapping(value = "/{rid}", method = RequestMethod.DELETE)
-	@ApiResponses(value = { @ApiResponse(code = 204, message = "No Content"),
-			@ApiResponse(code = 404, message = "Not Found"), })
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "204", description = "No Content"),
+			@ApiResponse(responseCode = "404", description = "The requirement set has not been found. You can retry the operation or create a requirement set.")
+		})
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	@ResponseBody
-	public void deleteRequirementsSet(@PathVariable("rid") long rid) {
-		PropertyDefinition deleted = service.deleteRequirementsSet(rid);
-		if (deleted == null)
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+	
+	public ResponseEntity<Resources<Void>> deleteRequirementsSet(@PathVariable("rid") long rid) {
+		// PropertyDefinition deleted = service.deleteRequirementsSet(rid);
+		// if (deleted == null)
+		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+
+		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<Void>()
+						.addLink(url + "/" + rid, "self", RequestMethod.GET)
+						.addLink(url + "/" + rid, "self", RequestMethod.PUT)
+						.addLink(url + "/" + rid, "self", RequestMethod.DELETE)
+						.addLink(url, "list", RequestMethod.GET)
+						.wrap(null));
 	}
 
 	/* Properties */
@@ -160,29 +211,41 @@ public class RequirementsController {
 	 * @param property it is the property to created
 	 * @return the created property
 	 */
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "createProperty", notes = "create a new property", tags = "version 1")
+	@Operation(tags = "version 1 - requirements", summary = "Create a property in a requirement set", description = "")
 	@RequestMapping(value = "/{rid}/properties", method = RequestMethod.POST)
-	@ApiResponses(value = { @ApiResponse(code = 201, message = "Created"),
-			@ApiResponse(code = 400, message = "Bad Request"), })
-	public ResponseEntity<Property> createProperty(@PathVariable("rid") long rid, @RequestBody Property property) {
-		Long idCreated = service.createProperty(rid, property);
-		String url = request.getRequestURL().toString();
-		if (idCreated != 0) {
-			String responseUrl;
-			if (url.toString().endsWith("/"))
-				responseUrl = url.toString() + idCreated;
-			else
-				responseUrl = url.toString() + "/" + idCreated;
-			HttpHeaders responseHeaders = new HttpHeaders();
-			try {
-				responseHeaders.setLocation(new URI(responseUrl));
-			} catch (URISyntaxException e) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-			}
-			return new ResponseEntity<Property>(property, responseHeaders, HttpStatus.CREATED);
-		} else
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "201", description = "Created"),
+			@ApiResponse(responseCode = "400", description = "The passed property is semantically malformed. You can retry the operation or check the data."),
+			@ApiResponse(responseCode = "404", description = "The requirement set has been found. You can retry the operation or create a requirement set.")
+		})
+	public ResponseEntity<Resources<Void>> createProperty(@PathVariable("rid") long rid, @RequestBody Property property) {
+		// Long idCreated = service.createProperty(rid, property);
+		// String url = request.getRequestURL().toString();
+		// if (idCreated != 0) {
+		// 	String responseUrl;
+		// 	if (url.toString().endsWith("/"))
+		// 		responseUrl = url.toString() + idCreated;
+		// 	else
+		// 		responseUrl = url.toString() + "/" + idCreated;
+		// 	HttpHeaders responseHeaders = new HttpHeaders();
+		// 	try {
+		// 		responseHeaders.setLocation(new URI(responseUrl));
+		// 	} catch (URISyntaxException e) {
+		// 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+		// 	}
+		// 	return new ResponseEntity<Property>(property, responseHeaders, HttpStatus.CREATED);
+		// } else
+		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+		String url = request.getRequestURL()
+			.substring(0, request.getRequestURL().lastIndexOf("/"))
+			.substring(0, request.getRequestURL().lastIndexOf("/"));
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<Void>()
+						.addLink(url + "/" + rid + "/properties", "new", RequestMethod.POST)
+						.addLink(url + "/" + rid, "list", RequestMethod.GET)
+						.addLink(url, "list", RequestMethod.GET)
+						.wrap(null));
 	}
 
 	/**
@@ -190,18 +253,33 @@ public class RequirementsController {
 	 * @param pid      it is the id of the property to update
 	 * @param property it is the new value of the property
 	 */
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "updateProperty", notes = "update a single property", tags = "version 1")
+	@Operation(tags = "version 1 - requirements", summary = "Update a property in a requirement set", description = "")
 	@RequestMapping(value = "/{rid}/properties/{pid}", method = RequestMethod.PUT)
-	@ApiResponses(value = { @ApiResponse(code = 204, message = "No Content"),
-			@ApiResponse(code = 404, message = "Not Found"), })
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "204", description = "No Content"),
+			@ApiResponse(responseCode = "404", description = "The requirement set or the property has not been found. You can retry the operation or create a requirement set/property.")
+		})
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	@ResponseBody
-	public void updateProperty(@PathVariable("rid") long rid, @PathVariable("pid") long pid,
+	
+	public ResponseEntity<Resources<Void>> updateProperty(@PathVariable("rid") long rid, @PathVariable("pid") long pid,
 			@RequestBody Property property) {
-		Property updated = service.updateProperty(rid, pid, property);
-		if (updated == null)
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+		// Property updated = service.updateProperty(rid, pid, property);
+		// if (updated == null)
+		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+		String url = request.getRequestURL()
+			.substring(0, request.getRequestURL().lastIndexOf("/"))
+			.substring(0, request.getRequestURL().lastIndexOf("/"))
+			.substring(0, request.getRequestURL().lastIndexOf("/"));
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<Void>()
+						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.GET)
+						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.PUT)
+						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.DELETE)
+						.addLink(url + "/" + rid + "/properties", "new", RequestMethod.POST)
+						.addLink(url + "/" + rid, "list", RequestMethod.GET)
+						.addLink(url, "list", RequestMethod.GET)
+						.wrap(null));
 	}
 
 	/**
@@ -209,34 +287,63 @@ public class RequirementsController {
 	 * @param pid it is the id of the property to retrieve
 	 * @return the requested property
 	 */
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "getProperty", notes = "retrieve a single property", tags = "version 1")
+	@Operation(tags = "version 1 - requirements", summary = "Get a property from a requirement set", description = "")
 	@RequestMapping(value = "/{rid}/properties/{pid}", method = RequestMethod.GET)
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 404, message = "Not Found"), })
-	@ResponseBody
-	public Property getProperty(@PathVariable("rid") long rid, @PathVariable("pid") long pid) {
-		Property property = service.getProperty(rid, pid);
-		if (property == null)
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		return property;
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "OK"),
+			@ApiResponse(responseCode = "404", description = "The requirement set or the property has not been found. You can retry the operation or create a requirement set/property.")
+		})
+	
+	public ResponseEntity<Resources<Property>> getProperty(@PathVariable("rid") long rid, @PathVariable("pid") long pid) {
+		// Property property = service.getProperty(rid, pid);
+		// if (property == null)
+		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+		// return property;
+		Property property = null;
+		String url = request.getRequestURL()
+			.substring(0, request.getRequestURL().lastIndexOf("/"))
+			.substring(0, request.getRequestURL().lastIndexOf("/"))
+			.substring(0, request.getRequestURL().lastIndexOf("/"));
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<Property>()
+						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.GET)
+						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.PUT)
+						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.DELETE)
+						.addLink(url + "/" + rid + "/properties", "new", RequestMethod.POST)
+						.addLink(url + "/" + rid, "list", RequestMethod.GET)
+						.addLink(url, "list", RequestMethod.GET)
+						.wrap(property));
 	}
 
 	/**
 	 * @param rid it is the id of the requirements
 	 * @param pid it is the id of the property to delete
 	 */
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "deleteProperty", notes = "delete a single property", tags = "version 1")
+	@Operation(tags = "version 1 - requirements", summary = "Delete a property from a requirement set", description = "")
 	@RequestMapping(value = "/{rid}/properties/{pid}", method = RequestMethod.DELETE)
-	@ApiResponses(value = { @ApiResponse(code = 204, message = "No Content"),
-			@ApiResponse(code = 404, message = "Not Found"), })
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "OK"),
+			@ApiResponse(responseCode = "404", description = "The requirement set or the property has not been found. You can retry the operation or create a requirement set/property.")
+		})
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	@ResponseBody
-	public void deleteProperty(@PathVariable("rid") long rid, @PathVariable("pid") long pid) {
-		Property property = service.deleteProperty(rid, pid);
-		if (property == null)
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+	
+	public ResponseEntity<Resources<Void>> deleteProperty(@PathVariable("rid") long rid, @PathVariable("pid") long pid) {
+		// Property property = service.deleteProperty(rid, pid);
+		// if (property == null)
+		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+
+		String url = request.getRequestURL()
+			.substring(0, request.getRequestURL().lastIndexOf("/"))
+			.substring(0, request.getRequestURL().lastIndexOf("/"))
+			.substring(0, request.getRequestURL().lastIndexOf("/"));
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<Void>()
+						.addLink(url + "/" + rid + "/properties", "new", RequestMethod.POST)
+						.addLink(url + "/" + rid, "list", RequestMethod.GET)
+						.addLink(url, "list", RequestMethod.GET)
+						.wrap(null));
 	}
 
 }

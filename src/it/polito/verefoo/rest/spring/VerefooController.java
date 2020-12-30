@@ -1,27 +1,21 @@
 package it.polito.verefoo.rest.spring;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 
-//mvn clean package && java -jar target\verifoo-0.0.1-SNAPSHOT.jar
-
 // swagger can be accessed at http://localhost:8085/verefoo/swagger-ui.html 
 
-@Controller
+@RestController
 public class VerefooController {
 	
 	@Hidden
-
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "infoVerefoo", notes = "Info on Verefoo", tags = "version 1")
+	@Operation(summary = "infoVerefoo", description = "Info on Verefoo")
 	@RequestMapping(method = RequestMethod.GET, value = "/")
-	@ResponseBody
+
 	public String infoVerefoo() {
 		return "<h1 style=\"color: #5e9ca0;\">VEREFOO Spring Boot Rest APIs</h1>\r\n" + 
 				"<h2>Some useful features:</h2>\r\n" + 

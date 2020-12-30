@@ -8,7 +8,11 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.boot.CommandLineRunner;
@@ -58,8 +62,6 @@ public class SpringBootConfiguration {
         objectMapper.setSerializationInclusion(Include.NON_NULL);
         mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
 
-
-
         return new HttpMessageConverters(true,
                 Arrays.asList(mappingJackson2HttpMessageConverter, new Jaxb2RootElementHttpMessageConverter()));
     }
@@ -75,7 +77,16 @@ public class SpringBootConfiguration {
         tag.setName("version 2");
         tags.add(tag);
         tag = new Tag();
-        tag.setName("version 1");
+        tag.setName("version 1 - graphs");
+        tags.add(tag);
+        tag = new Tag();
+        tag.setName("version 1 - requirements");
+        tags.add(tag);
+        tag = new Tag();
+        tag.setName("version 1 - simulations");
+        tags.add(tag);
+        tag = new Tag();
+        tag.setName("version 1 - substrates");
         tags.add(tag);
 
         List<Server> servers = new ArrayList<>();

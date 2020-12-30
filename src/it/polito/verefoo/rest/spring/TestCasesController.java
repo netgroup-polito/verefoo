@@ -7,23 +7,23 @@ import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.extra.Package1LoggingClass;
 import it.polito.verefoo.extra.TestCaseGeneratorAmsterdam;
 import it.polito.verefoo.jaxb.NFV;
 
-@Controller
+@Hidden
+@RestController
 @RequestMapping(value = "/adp/test")
 public class TestCasesController {
 	
@@ -43,14 +43,13 @@ public class TestCasesController {
 
 	private Logger loggerModel = LogManager.getLogger("model");
 
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "runTestCases", notes = "run test cases", tags = "version 1")
+	@Operation(summary = "runTestCases", description = "run test cases")
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ApiResponses(value = {
-		    		@ApiResponse(code = 200, message = "Ok"),
-		    		@ApiResponse(code = 400, message = "Bad Request")
+		    		@ApiResponse(responseCode = "200", description = "Ok"),
+		    		@ApiResponse(responseCode = "400", description = "Bad Request")
 		    		})
-	@ResponseBody
+	
 	public void runtestCase(@RequestParam(value="id", required = true) Integer id, //0 only allocation, 1 only policies, 2 both
 							@RequestParam(value="seed", required = true) Integer seed,
 							@RequestParam(value="i", required = true) Integer i,

@@ -21,11 +21,15 @@ public class ResourceWrapperWithLinks<T> {
     }
     
     public Resources<T> wrap(T resource) {
+        if (resource == null) {
+            return new Resources<T>(new ArrayList<>());
+        }
+        
         List<T> resources = new ArrayList<>();
         resources.add(resource);
         Resources<T> result = new Resources<T>(resources);
         for (int i = 0; i < linkStrings.size(); i++) {
-            Link link = new Link("/adp/v2/" + linkStrings.get(i)).withRel(relationships.get(i)).withType(methods.get(i).toString());
+            Link link = new Link(linkStrings.get(i)).withRel(relationships.get(i)).withType(methods.get(i).toString());
             result.add(link);
         }
         return result;

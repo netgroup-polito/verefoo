@@ -10,22 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.jaxb.Constraints;
+import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Graph;
 import it.polito.verefoo.jaxb.Graphs;
 import it.polito.verefoo.jaxb.LinkConstraints;
@@ -33,8 +31,9 @@ import it.polito.verefoo.jaxb.NFV;
 import it.polito.verefoo.jaxb.NodeConstraints;
 import it.polito.verefoo.jaxb.PropertyDefinition;
 
-@Controller
-@RequestMapping(value = "/adp/simulations", consumes = {"application/xml", "application/json"}, produces = {"application/xml", "application/json"})
+@RestController
+@RequestMapping(value = "/adp/simulations", consumes = { "application/xml", "application/json" }, produces = {
+		"application/xml", "application/json" })
 public class SimulationsController {
 
 	ADPService service = new ADPService();
@@ -46,118 +45,122 @@ public class SimulationsController {
 	 * @param nfv it is the NFV object on which the simulation must be performed
 	 * @return the result of the simulation
 	 */
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "runSimulationByNFV", notes = "run a simulation providing a complete NFV", hidden = false, tags = "version 1")
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "application/xml")
-	@ApiResponses(value = { @ApiResponse(code = 201, message = "Created"),
-			@ApiResponse(code = 400, message = "Bad Request"), })
-	public ResponseEntity<NFV> runSimulationByNFV(@ApiParam(name = "nfv", value = "example", required = true)
+	@Operation(tags = "version 1 - simulations", summary = "Run a simulation by passing the actual NFV", description = "")
+	@RequestMapping(value = "", method = RequestMethod.POST)
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "OK"),
+			@ApiResponse(responseCode = "400", description = "The NFV or the requirement set is semantically malformed. You can retry the operation or check the data.")
+		})
+	public ResponseEntity<NFV> runSimulationByNFV(
+			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "nfv example", required = true)
 
-	/***
-	 * , examples=@Example(value= {
-	 * 
-	 * @ExampleProperty(mediaType=MediaType.APPLICATION_XML, value = "<?xml
-	 *                                                       version=\"1.0\"
-	 *                                                       encoding=\"UTF-8\"?>\r\n"
-	 *                                                       + "<NFV
-	 *                                                       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
-	 *                                                       xsi:noNamespaceSchemaLocation=\"../xsd/nfvSchema.xsd\">\r\n"
-	 *                                                       + " <graphs>\r\n" + "
-	 *                                                       <graph id=\"0\">\r\n" +
-	 *                                                       " <node
-	 *                                                       functional_type=\"WEBCLIENT\"
-	 *                                                       name=\"10.0.0.1\">\r\n"
-	 *                                                       + " <neighbour
-	 *                                                       name=\"30.0.0.1\"/>\r\n"
-	 *                                                       + " <configuration
-	 *                                                       description=\"A simple
-	 *                                                       description\"
-	 *                                                       name=\"confA\">\r\n" +
-	 *                                                       " <webclient
-	 *                                                       nameWebServer=\"20.0.0.1\"/>\r\n"
-	 *                                                       + "
-	 *                                                       </configuration>\r\n" +
-	 *                                                       " </node>\r\n" + "
-	 *                                                       <node
-	 *                                                       functional_type=\"WEBCLIENT\"
-	 *                                                       name=\"10.0.0.2\">\r\n"
-	 *                                                       + " <neighbour
-	 *                                                       name=\"30.0.0.1\"/>\r\n"
-	 *                                                       + " <configuration
-	 *                                                       description=\"A simple
-	 *                                                       description\"
-	 *                                                       name=\"confA\">\r\n" +
-	 *                                                       " <webclient
-	 *                                                       nameWebServer=\"20.0.0.1\"/>\r\n"
-	 *                                                       + "
-	 *                                                       </configuration>\r\n" +
-	 *                                                       " </node>\r\n" + "
-	 *                                                       \r\n" + " <node
-	 *                                                       functional_type=\"FIREWALL\"
-	 *                                                       name=\"30.0.0.1\">\r\n"
-	 *                                                       + " <neighbour
-	 *                                                       name=\"10.0.0.1\"/>\r\n"
-	 *                                                       + " <neighbour
-	 *                                                       name=\"10.0.0.2\"/>\r\n"
-	 *                                                       + " <neighbour
-	 *                                                       name=\"20.0.0.1\"/>\r\n"
-	 *                                                       + " <configuration
-	 *                                                       description=\"A simple
-	 *                                                       description\"
-	 *                                                       name=\"conf1\">\r\n" +
-	 *                                                       " <firewall
-	 *                                                       defaultAction=\"ALLOW\"
-	 *                                                       />\r\n" + "
-	 *                                                       </configuration>\r\n" +
-	 *                                                       " </node>\r\n" + "
-	 *                                                       <node
-	 *                                                       functional_type=\"WEBSERVER\"
-	 *                                                       name=\"20.0.0.1\">\r\n"
-	 *                                                       + " <neighbour
-	 *                                                       name=\"30.0.0.1\"/>\r\n"
-	 *                                                       + " <configuration
-	 *                                                       description=\"A simple
-	 *                                                       description\"
-	 *                                                       name=\"confB\">\r\n" +
-	 *                                                       " <webserver>\r\n" + "
-	 *                                                       <name>b</name>\r\n" + "
-	 *                                                       </webserver>\r\n" + "
-	 *                                                       </configuration>\r\n" +
-	 *                                                       " </node>\r\n" + "
-	 *                                                       </graph>\r\n" + "
-	 *                                                       </graphs>\r\n" + "
-	 *                                                       <Constraints>\r\n" + "
-	 *                                                       <NodeConstraints>\r\n"
-	 *                                                       + "
-	 *                                                       </NodeConstraints>\r\n"
-	 *                                                       + "
-	 *                                                       <LinkConstraints/>\r\n"
-	 *                                                       + " </Constraints>\r\n"
-	 *                                                       + "
-	 *                                                       <PropertyDefinition>\r\n"
-	 *                                                       + " <Property
-	 *                                                       graph=\"0\"
-	 *                                                       name=\"IsolationProperty\"
-	 *                                                       src=\"10.0.0.1\"
-	 *                                                       dst=\"20.0.0.1\"/>\r\n"
-	 *                                                       + " <Property
-	 *                                                       graph=\"0\"
-	 *                                                       name=\"IsolationProperty\"
-	 *                                                       src=\"10.0.0.2\"
-	 *                                                       dst=\"20.0.0.1\"/>
-	 *                                                       \r\n" + "
-	 *                                                       </PropertyDefinition>\r\n"
-	 *                                                       + "
-	 *                                                       <ParsingString></ParsingString>\r\n"
-	 *                                                       + "</NFV>")}))
-	 */
-	@RequestBody NFV nfv) {
+			/***
+			 * , examples=@Example(value= {
+			 * 
+			 * @ExampleProperty(mediaType=MediaType.APPLICATION_XML, value = "<?xml
+			 *                                                       version=\"1.0\"
+			 *                                                       encoding=\"UTF-8\"?>\r\n"
+			 *                                                       + "<NFV
+			 *                                                       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
+			 *                                                       xsi:noNamespaceSchemaLocation=\"../xsd/nfvSchema.xsd\">\r\n"
+			 *                                                       + " <graphs>\r\n" + "
+			 *                                                       <graph id=\"0\">\r\n" +
+			 *                                                       " <node
+			 *                                                       functional_type=\"WEBCLIENT\"
+			 *                                                       name=\"10.0.0.1\">\r\n"
+			 *                                                       + " <neighbour
+			 *                                                       name=\"30.0.0.1\"/>\r\n"
+			 *                                                       + " <configuration
+			 *                                                       description=\"A simple
+			 *                                                       description\"
+			 *                                                       name=\"confA\">\r\n" +
+			 *                                                       " <webclient
+			 *                                                       nameWebServer=\"20.0.0.1\"/>\r\n"
+			 *                                                       + "
+			 *                                                       </configuration>\r\n" +
+			 *                                                       " </node>\r\n" + "
+			 *                                                       <node
+			 *                                                       functional_type=\"WEBCLIENT\"
+			 *                                                       name=\"10.0.0.2\">\r\n"
+			 *                                                       + " <neighbour
+			 *                                                       name=\"30.0.0.1\"/>\r\n"
+			 *                                                       + " <configuration
+			 *                                                       description=\"A simple
+			 *                                                       description\"
+			 *                                                       name=\"confA\">\r\n" +
+			 *                                                       " <webclient
+			 *                                                       nameWebServer=\"20.0.0.1\"/>\r\n"
+			 *                                                       + "
+			 *                                                       </configuration>\r\n" +
+			 *                                                       " </node>\r\n" + "
+			 *                                                       \r\n" + " <node
+			 *                                                       functional_type=\"FIREWALL\"
+			 *                                                       name=\"30.0.0.1\">\r\n"
+			 *                                                       + " <neighbour
+			 *                                                       name=\"10.0.0.1\"/>\r\n"
+			 *                                                       + " <neighbour
+			 *                                                       name=\"10.0.0.2\"/>\r\n"
+			 *                                                       + " <neighbour
+			 *                                                       name=\"20.0.0.1\"/>\r\n"
+			 *                                                       + " <configuration
+			 *                                                       description=\"A simple
+			 *                                                       description\"
+			 *                                                       name=\"conf1\">\r\n" +
+			 *                                                       " <firewall
+			 *                                                       defaultAction=\"ALLOW\"
+			 *                                                       />\r\n" + "
+			 *                                                       </configuration>\r\n" +
+			 *                                                       " </node>\r\n" + "
+			 *                                                       <node
+			 *                                                       functional_type=\"WEBSERVER\"
+			 *                                                       name=\"20.0.0.1\">\r\n"
+			 *                                                       + " <neighbour
+			 *                                                       name=\"30.0.0.1\"/>\r\n"
+			 *                                                       + " <configuration
+			 *                                                       description=\"A simple
+			 *                                                       description\"
+			 *                                                       name=\"confB\">\r\n" +
+			 *                                                       " <webserver>\r\n" + "
+			 *                                                       <name>b</name>\r\n" + "
+			 *                                                       </webserver>\r\n" + "
+			 *                                                       </configuration>\r\n" +
+			 *                                                       " </node>\r\n" + "
+			 *                                                       </graph>\r\n" + "
+			 *                                                       </graphs>\r\n" + "
+			 *                                                       <Constraints>\r\n" + "
+			 *                                                       <NodeConstraints>\r\n"
+			 *                                                       + "
+			 *                                                       </NodeConstraints>\r\n"
+			 *                                                       + "
+			 *                                                       <LinkConstraints/>\r\n"
+			 *                                                       + " </Constraints>\r\n"
+			 *                                                       + "
+			 *                                                       <PropertyDefinition>\r\n"
+			 *                                                       + " <Property
+			 *                                                       graph=\"0\"
+			 *                                                       name=\"IsolationProperty\"
+			 *                                                       src=\"10.0.0.1\"
+			 *                                                       dst=\"20.0.0.1\"/>\r\n"
+			 *                                                       + " <Property
+			 *                                                       graph=\"0\"
+			 *                                                       name=\"IsolationProperty\"
+			 *                                                       src=\"10.0.0.2\"
+			 *                                                       dst=\"20.0.0.1\"/>
+			 *                                                       \r\n" + "
+			 *                                                       </PropertyDefinition>\r\n"
+			 *                                                       + "
+			 *                                                       <ParsingString></ParsingString>\r\n"
+			 *                                                       + "</NFV>")}))
+			 */
+			@RequestBody(required = true) NFV nfv, @RequestParam(value = "sid", required = false) Long sid,
+			@RequestParam(value = "usableNetworkFunctions", required = false) List<FunctionalTypes> usableFunctionalTypes) {
 		StringBuffer url = request.getRequestURL();
 		VerefooSerializer test = null;
 		try {
 			test = new VerefooSerializer(nfv);
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"The simulation request is semantically malformed.");
 		}
 
 		long smid = service.getNextSimulationId();
@@ -180,19 +183,21 @@ public class SimulationsController {
 	 * @param gid it is the id of the graph
 	 * @param rid it is the id of the requirements set
 	 * @param sid it is the id of the substrate network
-	 * @param fid it is a list of functions name
+	 * @param usableFunctionalTypes it is a list of functions name
 	 * @return the simulation result
 	 */
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "runSimulationByParams", notes = "run a simulation by a set of parameters", hidden = true, tags = "version 1")
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = "text/plain")
-	@ApiResponses(value = { @ApiResponse(code = 201, message = "Created"),
-			@ApiResponse(code = 400, message = "Bad Request"), @ApiResponse(code = 404, message = "Not Found"), })
+	@Operation(tags = "version 1 - simulations", summary = "Run a simulation by passing references to the data", description = "")
+	@RequestMapping(value = "/byParams", method = RequestMethod.POST, consumes = "text/plain")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "OK"),
+			@ApiResponse(responseCode = "400", description = "One of the parameters is semantically malformed. You can retry the operation or check the data."),
+			@ApiResponse(responseCode = "404", description = "At least one resource referenced by some parameter has not been found. You can retry the operation or check that the resources actually exist.")
+		})
 
-	public ResponseEntity<NFV> runSimulationByParams(@RequestParam(value = "gid", required = false) Long gid,
+	public ResponseEntity<NFV> runSimulationByParams(@RequestParam(value = "gid", required = true) Long gid,
 			@RequestParam(value = "rid", required = false) Long rid,
 			@RequestParam(value = "sid", required = false) Long sid,
-			@RequestParam(value = "fid", required = false) List<String> fid) {
+			@RequestParam(value = "usableNetworkFunctions", required = false) List<FunctionalTypes> usableFunctionalTypes) {
 		StringBuffer url = request.getRequestURL();
 		VerefooSerializer test = null;
 		NFV nfv = new NFV();
@@ -247,12 +252,13 @@ public class SimulationsController {
 	 * @param smid it is the id of the simulation result to retrieve
 	 * @return the simulation result
 	 */
-	@Operation(tags = "version 1")
-	@ApiOperation(value = "getSimulationResult", notes = "get a simulation result by id", tags = "version 1")
+	@Operation(tags = "version 1 - simulations", summary = "Get the result of a past simulation", description = "This API is not intended to run a new simulation.")
 	@RequestMapping(value = "/{smid}", method = RequestMethod.GET)
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 404, message = "Not Found"), })
-	@ResponseBody
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "OK"),
+			@ApiResponse(responseCode = "404", description = "No simulation has been run with the passed parameter.")
+		})
+
 	public NFV getSimulationResult(@PathVariable("smid") long smid) {
 		NFV result = service.getSimulationResult(smid);
 		if (result == null)
