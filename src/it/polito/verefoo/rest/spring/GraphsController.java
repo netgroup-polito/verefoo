@@ -366,7 +366,7 @@ public class GraphsController {
 	@RequestMapping(value = "/{gid}/nodes/{nid}", method = RequestMethod.DELETE)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "204", description = "No Content"),
-			@ApiResponse(responseCode = "404", description = "The graph or the node doesn't exist at all. You can retry the operation or refer to another graph/node.")
+			@ApiResponse(responseCode = "404", description = "The graph or the node doesn't exist at all. You can retry the operation or refer to another graph/node."),
 			@ApiResponse(responseCode = "409", description = "The node could not have been deleted, because it is linked to other nodes; first delete the interested connections.")
 		})
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)

@@ -168,36 +168,47 @@
 
 
 		<!-- Neo4j Jdbc -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-jdbc</artifactId>
 			<version>3.0</version>
-		</dependency>
+		</dependency> -->
 		<!-- For file and in-memory support, add these two as well -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j</artifactId>
-			<version>2.3.2</version>
-		</dependency>
+			<version>3.2.9</version>
+		</dependency> -->
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-kernel</artifactId>
-			<version>2.3.2</version>
+			<version>3.5.25</version>
 			<type>test-jar</type>
 		</dependency>
+		<!-- Add the support for Spring Boot "repository" pattern implementation -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-neo4j</artifactId>
+			<version>5.1.21.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-ogm-http-driver</artifactId>
+			<version>3.2.19</version>
+		</dependency>
+		<!-- Support for vanilla Java -->
+		<!-- <dependency>
+			<groupId>org.neo4j.driver</groupId>
+			<artifactId>neo4j-java-driver</artifactId>
+			<version>1.2.1</version>
+		</dependency> -->
+
 		<dependency>
 			<groupId>com.microsoft</groupId>
 			<artifactId>z3</artifactId>
 			<version>1.0</version>
 			<scope>system</scope>
 			<systemPath>${env.Z3}/com.microsoft.z3.jar</systemPath>
-		</dependency>
-
-
-		<dependency>
-			<groupId>org.neo4j.driver</groupId>
-			<artifactId>neo4j-java-driver</artifactId>
-			<version>1.2.1</version>
 		</dependency>
 
 		<dependency>
@@ -303,6 +314,8 @@
 							<schemaIncludes>
 								<include>nfvSchema.xsd</include>
 							</schemaIncludes>
+							<bindingDirectory>xsd/bindings/</bindingDirectory>
+							<bindingIncludes>prova2.xjb</bindingIncludes>
 							<generateDirectory>gen-src/</generateDirectory>
 							<generatePackage>it.polito.verefoo.jaxb</generatePackage>
 							<!-- <forceRegenerate>true</forceRegenerate> -->
@@ -310,6 +323,25 @@
 						</configuration>
 					</execution>
 				</executions>
+				<configuration>
+					<extension>true</extension>
+					<args>
+						<arg>-Xannotate</arg>
+					</args>
+					<plugins>
+						<plugin>
+							<groupId>org.jvnet.jaxb2_commons</groupId>
+							<artifactId>jaxb2-basics-annotate</artifactId>
+							<version>1.1.0</version>
+						</plugin>
+						 <!-- Artifact with custom annotations -->
+						<plugin>
+							<groupId>org.neo4j</groupId>
+							<artifactId>neo4j-ogm-core</artifactId>
+							<version>3.2.19</version>
+						</plugin>
+					</plugins>
+				</configuration>
 			</plugin>
 
 			<!-- Plugin to convert JSON schemas into Java entities (classes) -->

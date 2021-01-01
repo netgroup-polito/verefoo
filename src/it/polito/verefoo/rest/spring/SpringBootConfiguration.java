@@ -14,6 +14,8 @@ import com.fasterxml.jackson.databind.InjectableValues;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 
+import org.neo4j.ogm.config.Configuration;
+import org.neo4j.ogm.session.SessionFactory;
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -21,6 +23,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 
@@ -40,6 +43,24 @@ public class SpringBootConfiguration {
         SpringApplication.run(SpringBootConfiguration.class, args);
     }
 
+    public static final String URL = System.getenv("NEO4J_URL") != null ? System.getenv("NEO4J_URL")
+            : "http://localhost:7474";
+
+    @Bean
+    public Configuration configuration() {
+        return new Configuration.Builder().uri(URL).credentials("neo4j", "neo4j").build();
+    }
+
+    @Bean
+    public SessionFactory sessionFactory() {
+        return new SessionFactory(configuration(), "it.polito.verefoo.jaxb");
+    }
+
+    @Bean
+    public Neo4jTransactionManager transactionManager() {
+        return new Neo4jTransactionManager(sessionFactory());
+    }
+
     @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
@@ -56,7 +77,8 @@ public class SpringBootConfiguration {
 
     @Bean
     public HttpMessageConverters converters() {
-        // This snippet globally instructs Jackson2 to not write null fields in the response, which is the default behaviour
+        // This snippet globally instructs Jackson2 to not write null fields in the
+        // response, which is the default behaviour
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         ObjectMapper objectMapper = mappingJackson2HttpMessageConverter.getObjectMapper();
         objectMapper.setSerializationInclusion(Include.NON_NULL);
@@ -71,7 +93,7 @@ public class SpringBootConfiguration {
      */
     @Bean
     public OpenAPI customOpenAPI() {
-        
+
         List<Tag> tags = new ArrayList<>();
         Tag tag = new Tag();
         tag.setName("version 2");
@@ -95,28 +117,28 @@ public class SpringBootConfiguration {
         server.setUrl("http://localhost:8085/verefoo");
         servers.add(server);
 
-        return new OpenAPI()
-                .components(new Components())
-                .servers(servers)
-                .info(new Info().title("Verefoo API documentation").description(
-                        "This is the automatically-generated documentation of Verefoo's REST APIs."))
-                .tags(tags)
-                ;
+        return new OpenAPI().components(new Components()).servers(servers)
+                .info(new Info().title("Verefoo API documentation")
+                        .description("This is the automatically-generated documentation of Verefoo's REST APIs."))
+                .tags(tags);
     }
 
     /*
-     * This bean further customizes the creation of the openapi UI in Swagger version 3
+     * This bean further customizes the creation of the openapi UI in Swagger
+     * version 3
      */
     @Bean
     public OpenApiCustomiser sortSchemasAlphabetically() {
         return openApi -> {
             Map<String, Schema> schemas = openApi.getComponents().getSchemas();
-            schemas = schemas.entrySet().stream().sorted((entry1, entry2) -> entry1.getKey().compareTo(entry2.getKey())).collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
+            schemas = schemas.entrySet().stream().sorted((entry1, entry2) -> entry1.getKey().compareTo(entry2.getKey()))
+                    .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
             openApi.getComponents().setSchemas(new TreeMap<>(schemas));
         };
     }
 
-    /* This bean works for Swagger 2, which has been disabled in favour of Swagger 3
+    /*
+     * This bean works for Swagger 2, which has been disabled in favour of Swagger 3
      *
      * @Bean public Docket apiDocket() { return new
      * Docket(DocumentationType.SWAGGER_2) .select()
