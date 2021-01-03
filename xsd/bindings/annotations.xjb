@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<jaxb:bindings version="2.1" 
+    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:annox="http://annox.dev.java.net"
+    xmlns:inheritance="http://jaxb2-commons.dev.java.net/basic/inheritance"
+    jaxb:extensionBindingPrefixes="annox">
+
+    <jaxb:bindings schemaLocation="../errorSchema.xsd" node="/xsd:schema">
+
+        <jaxb:bindings node="xsd:simpleType[@name='E-Type']">
+            <annox:annotateEnum>
+                @org.neo4j.ogm.annotation.NodeEntity("E-Type")
+            </annox:annotateEnum>
+        </jaxb:bindings>
+
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="../nfvSchema.xsd" node="/xsd:schema">
+        <jaxb:bindings node="xsd:element[@name='NFV']/xsd:complexType">
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Nfv")
+            </annox:annotate>
+        </jaxb:bindings>
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="../verigraph.xsd" node="/xsd:schema">
+        <jaxb:bindings node="xsd:element[@name='graph']/xsd:complexType">
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Graph")
+            </annox:annotate>
+        </jaxb:bindings>
+    </jaxb:bindings>
+</jaxb:bindings>

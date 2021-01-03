@@ -179,12 +179,12 @@
 			<artifactId>neo4j</artifactId>
 			<version>3.2.9</version>
 		</dependency> -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-kernel</artifactId>
 			<version>3.5.25</version>
 			<type>test-jar</type>
-		</dependency>
+		</dependency> -->
 		<!-- Add the support for Spring Boot "repository" pattern implementation -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
@@ -315,7 +315,7 @@
 								<include>nfvSchema.xsd</include>
 							</schemaIncludes>
 							<bindingDirectory>xsd/bindings/</bindingDirectory>
-							<bindingIncludes>prova2.xjb</bindingIncludes>
+							<bindingIncludes>annotations.xjb</bindingIncludes>
 							<generateDirectory>gen-src/</generateDirectory>
 							<generatePackage>it.polito.verefoo.jaxb</generatePackage>
 							<!-- <forceRegenerate>true</forceRegenerate> -->
@@ -327,6 +327,8 @@
 					<extension>true</extension>
 					<args>
 						<arg>-Xannotate</arg>
+						<!-- Enable inheritance (see plugin below) -->
+						<!-- <arg>-Xinheritance</arg> -->
 					</args>
 					<plugins>
 						<plugin>
@@ -340,6 +342,12 @@
 							<artifactId>neo4j-ogm-core</artifactId>
 							<version>3.2.19</version>
 						</plugin>
+						<!-- Artifact to enable inheritance (extends and implements) of classes -->
+						<!-- <plugin>
+							<groupId>org.jvnet.jaxb2_commons</groupId>
+							<artifactId>jaxb2-basics</artifactId>
+							<version>1.11.1</version>
+						</plugin> -->
 					</plugins>
 				</configuration>
 			</plugin>

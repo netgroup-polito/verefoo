@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.TypeResolverBuilder;
 
 import org.neo4j.ogm.config.Configuration;
+import org.neo4j.ogm.driver.Driver;
 import org.neo4j.ogm.session.SessionFactory;
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.boot.CommandLineRunner;
@@ -23,6 +24,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
@@ -36,6 +38,7 @@ import io.swagger.v3.oas.models.tags.Tag;
 
 // TODO #jalol separate config from rest api
 @SpringBootApplication
+@EnableNeo4jRepositories
 // @EnableSwagger2
 public class SpringBootConfiguration {
 
@@ -48,12 +51,12 @@ public class SpringBootConfiguration {
 
     @Bean
     public Configuration configuration() {
-        return new Configuration.Builder().uri(URL).credentials("neo4j", "neo4j").build();
+        return new Configuration.Builder().uri(URL).credentials("neo4j", "neo4j").verifyConnection(true).build();
     }
 
     @Bean
     public SessionFactory sessionFactory() {
-        return new SessionFactory(configuration(), "it.polito.verefoo.jaxb");
+        return new SessionFactory(configuration(), "it.polito.verefoo.jaxb", "it.polito.verefoo");
     }
 
     @Bean

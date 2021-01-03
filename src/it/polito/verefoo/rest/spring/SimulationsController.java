@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +52,7 @@ public class SimulationsController {
 			@ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "400", description = "The NFV or the requirement set is semantically malformed. You can retry the operation or check the data.")
 		})
-	public ResponseEntity<NFV> runSimulationByNFV(
+	public ResponseEntity<Resources<NFV>> runSimulationByNFV(
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "nfv example", required = true)
 
 			/***
@@ -154,29 +155,39 @@ public class SimulationsController {
 			 */
 			@RequestBody(required = true) NFV nfv, @RequestParam(value = "sid", required = false) Long sid,
 			@RequestParam(value = "usableNetworkFunctions", required = false) List<FunctionalTypes> usableFunctionalTypes) {
-		StringBuffer url = request.getRequestURL();
-		VerefooSerializer test = null;
-		try {
-			test = new VerefooSerializer(nfv);
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-					"The simulation request is semantically malformed.");
-		}
+		// StringBuffer url = request.getRequestURL();
+		// VerefooSerializer test = null;
+		// try {
+		// 	test = new VerefooSerializer(nfv);
+		// } catch (Exception e) {
+		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+		// 			"The simulation request is semantically malformed.");
+		// }
 
-		long smid = service.getNextSimulationId();
-		service.addSimulationResult(nfv, smid);
-		String responseUrl;
-		if (url.toString().endsWith("/"))
-			responseUrl = url.toString() + smid;
-		else
-			responseUrl = url.toString() + "/" + smid;
-		HttpHeaders responseHeaders = new HttpHeaders();
-		try {
-			responseHeaders.setLocation(new URI(responseUrl));
-		} catch (URISyntaxException e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		}
-		return new ResponseEntity<NFV>(test.getResult(), responseHeaders, HttpStatus.CREATED);
+		// long smid = service.getNextSimulationId();
+		// service.addSimulationResult(nfv, smid);
+		// String responseUrl;
+		// if (url.toString().endsWith("/"))
+		// 	responseUrl = url.toString() + smid;
+		// else
+		// 	responseUrl = url.toString() + "/" + smid;
+		// HttpHeaders responseHeaders = new HttpHeaders();
+		// try {
+		// 	responseHeaders.setLocation(new URI(responseUrl));
+		// } catch (URISyntaxException e) {
+		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+		// }
+		// return new ResponseEntity<NFV>(test.getResult(), responseHeaders, HttpStatus.CREATED);
+
+		NFV result = null;
+		// this value is stored at DB level and passed to the client only through the hyperlink
+		Integer simulationId = 0;
+		String url = request.getRequestURL().toString();
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<NFV>()
+						.addLink(url + "/" + simulationId, "self", RequestMethod.GET)
+						.wrap(result));
 	}
 
 	/**
@@ -194,57 +205,67 @@ public class SimulationsController {
 			@ApiResponse(responseCode = "404", description = "At least one resource referenced by some parameter has not been found. You can retry the operation or check that the resources actually exist.")
 		})
 
-	public ResponseEntity<NFV> runSimulationByParams(@RequestParam(value = "gid", required = true) Long gid,
+	public ResponseEntity<Resources<NFV>> runSimulationByParams(@RequestParam(value = "gid", required = true) Long gid,
 			@RequestParam(value = "rid", required = false) Long rid,
 			@RequestParam(value = "sid", required = false) Long sid,
 			@RequestParam(value = "usableNetworkFunctions", required = false) List<FunctionalTypes> usableFunctionalTypes) {
-		StringBuffer url = request.getRequestURL();
-		VerefooSerializer test = null;
-		NFV nfv = new NFV();
+		// StringBuffer url = request.getRequestURL();
+		// VerefooSerializer test = null;
+		// NFV nfv = new NFV();
 
-		Graph graph = service.getGraph(gid);
-		PropertyDefinition requirementsSet = service.getRequirementsSet(rid);
-		Constraints constraints = service.getConstraints(gid);
+		// Graph graph = service.getGraph(gid);
+		// PropertyDefinition requirementsSet = service.getRequirementsSet(rid);
+		// Constraints constraints = service.getConstraints(gid);
 
-		// For the moment, only allocation + distribution
+		// // For the moment, only allocation + distribution
 
-		if (graph == null || requirementsSet == null) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		}
+		// if (graph == null || requirementsSet == null) {
+		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+		// }
 
-		if (constraints == null) {
-			constraints = new Constraints();
-			constraints.setNodeConstraints(new NodeConstraints());
-			constraints.setLinkConstraints(new LinkConstraints());
-		}
+		// if (constraints == null) {
+		// 	constraints = new Constraints();
+		// 	constraints.setNodeConstraints(new NodeConstraints());
+		// 	constraints.setLinkConstraints(new LinkConstraints());
+		// }
 
-		Graphs graphs = new Graphs();
-		graphs.getGraph().add(graph);
-		nfv.setGraphs(graphs);
-		requirementsSet.getProperty().forEach(p -> p.setGraph(gid));
-		nfv.setPropertyDefinition(requirementsSet);
-		nfv.setConstraints(constraints);
+		// Graphs graphs = new Graphs();
+		// graphs.getGraph().add(graph);
+		// nfv.setGraphs(graphs);
+		// requirementsSet.getProperty().forEach(p -> p.setGraph(gid));
+		// nfv.setPropertyDefinition(requirementsSet);
+		// nfv.setConstraints(constraints);
 
-		try {
-			test = new VerefooSerializer(nfv);
-		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		}
+		// try {
+		// 	test = new VerefooSerializer(nfv);
+		// } catch (Exception e) {
+		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+		// }
 
-		long smid = service.getNextSimulationId();
-		service.addSimulationResult(nfv, smid);
-		String responseUrl;
-		if (url.toString().endsWith("/"))
-			responseUrl = url.toString() + smid;
-		else
-			responseUrl = url.toString() + "/" + smid;
-		HttpHeaders responseHeaders = new HttpHeaders();
-		try {
-			responseHeaders.setLocation(new URI(responseUrl));
-		} catch (URISyntaxException e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		}
-		return new ResponseEntity<NFV>(test.getResult(), responseHeaders, HttpStatus.CREATED);
+		// long smid = service.getNextSimulationId();
+		// service.addSimulationResult(nfv, smid);
+		// String responseUrl;
+		// if (url.toString().endsWith("/"))
+		// 	responseUrl = url.toString() + smid;
+		// else
+		// 	responseUrl = url.toString() + "/" + smid;
+		// HttpHeaders responseHeaders = new HttpHeaders();
+		// try {
+		// 	responseHeaders.setLocation(new URI(responseUrl));
+		// } catch (URISyntaxException e) {
+		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+		// }
+		// return new ResponseEntity<NFV>(test.getResult(), responseHeaders, HttpStatus.CREATED);
+
+		NFV result = null;
+		// this value is stored at DB level and passed to the client only through the hyperlink
+		Integer simulationId = 0;
+		String url = request.getRequestURL().toString();
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<NFV>()
+						.addLink(url + "/" + simulationId, "self", RequestMethod.GET)
+						.wrap(result));
 
 	}
 
@@ -256,14 +277,25 @@ public class SimulationsController {
 	@RequestMapping(value = "/{smid}", method = RequestMethod.GET)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "No simulation has been run with the passed parameter.")
+			@ApiResponse(responseCode = "404", description = "The requested simulation has never been run. You can retry the operation or run a simulation first.")
 		})
 
-	public NFV getSimulationResult(@PathVariable("smid") long smid) {
-		NFV result = service.getSimulationResult(smid);
-		if (result == null)
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		return result;
+	public ResponseEntity<Resources<NFV>> getSimulationResult(@PathVariable("smid") long smid) {
+		// NFV result = service.getSimulationResult(smid);
+		// if (result == null)
+		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+		// return result;
+
+		NFV result = null;
+		// this value is stored at DB level and passed to the client only through the hyperlink
+		Integer simulationId = 0;
+		String url = request.getRequestURL().toString();
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<NFV>()
+						.addLink(url + "/" + simulationId, "self", RequestMethod.GET)
+						.addLink(url, "new", RequestMethod.POST)
+						.wrap(result));
 	}
 
 }

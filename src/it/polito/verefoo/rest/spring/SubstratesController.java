@@ -25,13 +25,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import it.polito.verefoo.jaxb.*;
+import it.polito.verefoo.rest.spring.service.SubstrateService;
 
 @RestController
 @RequestMapping(value = "/adp/substrates", consumes = { "application/xml", "application/json" }, produces = {
 		"application/xml", "application/json" })
 public class SubstratesController {
 
-	ADPService service = new ADPService();
+	@Autowired
+	SubstrateService service;
 
 	@Autowired
 	private HttpServletRequest request;
@@ -91,21 +93,20 @@ public class SubstratesController {
 		})
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
-	public ResponseEntity<Resources<Integer>> createSubstrate() {
+	public ResponseEntity<Resources<Long>> createSubstrate() {
 
-		// Integer substrateId = service.createSubstrate(hosts);
-		Integer substrateId = 0;
+		Long substrateId = service.createSubstrate();
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.CREATED).body(
                                 // wrap the response with the hyperlinks
-                                new ResourceWrapperWithLinks<Integer>()
-												.addLink(url + "/substrates/" + substrateId, "self", RequestMethod.GET)
-												.addLink(url + "/substrates/" + substrateId + "/hosts", "sub", RequestMethod.GET)
-												.addLink(url + "/substrates/" + substrateId + "/connections", "sub", RequestMethod.GET)
-												.addLink(url + "/substrates", "list", RequestMethod.GET)
-                                                .addLink(url + "/substrates/" + substrateId, "self", RequestMethod.DELETE)
-                                                .addLink(url + "/substrates", "new", RequestMethod.POST)
+                                new ResourceWrapperWithLinks<Long>()
+												.addLink(url + "/" + substrateId, "self", RequestMethod.GET)
+												.addLink(url + "/" + substrateId + "/hosts", "sub", RequestMethod.GET)
+												.addLink(url + "/" + substrateId + "/connections", "sub", RequestMethod.GET)
+												.addLink(url, "list", RequestMethod.GET)
+                                                .addLink(url + "/" + substrateId, "self", RequestMethod.DELETE)
+                                                .addLink(url, "new", RequestMethod.POST)
                                                 .wrap(substrateId));
 
 		/* Boolean created = true;

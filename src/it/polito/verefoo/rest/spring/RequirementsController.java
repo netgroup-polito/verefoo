@@ -38,7 +38,8 @@ public class RequirementsController {
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "201", description = "Created"),
-			@ApiResponse(responseCode = "400", description = "The passed requirement set is semantically malformed. You can retry the operation or check the data."), })
+			@ApiResponse(responseCode = "400", description = "The passed requirement set is semantically malformed. You can retry the operation or check the data."),
+			@ApiResponse(responseCode = "404", description = "The referenced graph doesn't exist. You can first create a graph or refer to another one.") })
 	public ResponseEntity<Resources<Void>> createRequirementsSet(@RequestBody PropertyDefinition requirementsSet) {
 		// long pid = service.getNextRequirementsSetId();
 		// StringBuffer url = request.getRequestURL();
@@ -130,7 +131,7 @@ public class RequirementsController {
 	@RequestMapping(value = "/{rid}", method = RequestMethod.PUT)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The requirement set has not been found. You can retry the operation or create a requirement set.")
+			@ApiResponse(responseCode = "404", description = "The requirement set has not been found or the referenced graph doesn't exist. You can retry the operation or first create a requirement set or refer to another graph.")
 
 		})
 	
@@ -211,12 +212,12 @@ public class RequirementsController {
 	 * @param property it is the property to created
 	 * @return the created property
 	 */
-	@Operation(tags = "version 1 - requirements", summary = "Create a property in a requirement set", description = "")
+	@Operation(tags = "version 1 - requirements", summary = "Create another property in a requirement set", description = "")
 	@RequestMapping(value = "/{rid}/properties", method = RequestMethod.POST)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "201", description = "Created"),
 			@ApiResponse(responseCode = "400", description = "The passed property is semantically malformed. You can retry the operation or check the data."),
-			@ApiResponse(responseCode = "404", description = "The requirement set has been found. You can retry the operation or create a requirement set.")
+			@ApiResponse(responseCode = "404", description = "The requirement set has not been found or the referred graph doesn't exist. You can retry the operation or create/refer to another requirement set/graph.")
 		})
 	public ResponseEntity<Resources<Void>> createProperty(@PathVariable("rid") long rid, @RequestBody Property property) {
 		// Long idCreated = service.createProperty(rid, property);
@@ -257,7 +258,7 @@ public class RequirementsController {
 	@RequestMapping(value = "/{rid}/properties/{pid}", method = RequestMethod.PUT)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "204", description = "No Content"),
-			@ApiResponse(responseCode = "404", description = "The requirement set or the property has not been found. You can retry the operation or create a requirement set/property.")
+			@ApiResponse(responseCode = "404", description = "The requirement set, the property or the referred graph has not been found. You can retry the operation or create/refer to a/another requirement set/property/graph.")
 		})
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	
