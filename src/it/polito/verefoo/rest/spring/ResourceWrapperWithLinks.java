@@ -21,12 +21,12 @@ public class ResourceWrapperWithLinks<T> {
     }
     
     public Resources<T> wrap(T resource) {
-        if (resource == null) {
-            return new Resources<T>(new ArrayList<>());
+        List<T> resources = new ArrayList<>();
+        // resource should be null if nothing, besides the links, has to be returned
+        if (resource != null) {
+            resources.add(resource);
         }
         
-        List<T> resources = new ArrayList<>();
-        resources.add(resource);
         Resources<T> result = new Resources<T>(resources);
         for (int i = 0; i < linkStrings.size(); i++) {
             Link link = new Link(linkStrings.get(i)).withRel(relationships.get(i)).withType(methods.get(i).toString());

@@ -19,7 +19,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
@@ -33,7 +32,6 @@ import io.swagger.v3.oas.models.tags.Tag;
 
 // TODO #jalol separate config from rest api
 @SpringBootApplication
-@EnableNeo4jRepositories
 // @EnableSwagger2
 public class SpringBootConfiguration {
 
@@ -46,7 +44,7 @@ public class SpringBootConfiguration {
 
     @Bean
     public Configuration configuration() {
-        return new Configuration.Builder().uri(URL).credentials("neo4j", "neo4j").verifyConnection(true).build();
+        return new Configuration.Builder().uri(URL).credentials("neo4j", "costLess").verifyConnection(true).build();
     }
 
     @Bean

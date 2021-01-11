@@ -22,6 +22,58 @@
                 @org.neo4j.ogm.annotation.NodeEntity(label = "Nfv")
             </annox:annotate>
         </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='Host']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Host")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='name']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:complexType[@name='SupportedVNFType']">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "SupportedVNFType")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='functional_type']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:complexType[@name='NodeRefType']">
+            
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "NodeRefType")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='node']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
     </jaxb:bindings>
 
     <jaxb:bindings schemaLocation="../verigraph.xsd" node="/xsd:schema">

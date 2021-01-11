@@ -1,30 +1,26 @@
 package it.polito.verefoo.rest.spring;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resources;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
-import ch.qos.logback.classic.html.UrlCssBuilder;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import it.polito.verefoo.jaxb.*;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import it.polito.verefoo.jaxb.Connections;
+import it.polito.verefoo.jaxb.Host;
+import it.polito.verefoo.jaxb.Hosts;
 import it.polito.verefoo.rest.spring.service.SubstrateService;
 
 @RestController
@@ -37,6 +33,7 @@ public class SubstratesController {
 
 	@Autowired
 	private HttpServletRequest request;
+	
 
 	/* Substrates */
 
@@ -139,17 +136,17 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "404", description = "No substrates have been found. You can retry the operation or first create a substrate.")
 		})
 
-	public ResponseEntity<Resources<List<Integer>>> getSubstrates() {
+	public ResponseEntity<Resources<List<Long>>> getSubstrates() {
 		// List<Host> substrates = service.getSubstrates();
 		// if (substrates.isEmpty())
 		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
 		// return substrates;
-		List<Integer> ids = null;
+		List<Long> ids = service.getAllSubstrates();
 
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
-                                new ResourceWrapperWithLinks<List<Integer>>()
+                                new ResourceWrapperWithLinks<List<Long>>()
                                                 .addLink(url, "self", RequestMethod.GET)
                                                 .addLink(url, "self", RequestMethod.DELETE)
 												.addLink(url, "new", RequestMethod.POST)
@@ -172,6 +169,8 @@ public class SubstratesController {
 		// boolean removed = service.deleteSubstrates();
 		// if (!removed)
 		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+
+		service.deleteAllSubstrates();
 
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.OK).body(
@@ -224,19 +223,20 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "404", description = "The selected substrate doesn't exist at all. You can eventually retry the operation or refer to another substrate.")
 		})
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
-	public ResponseEntity<Resources<Void>> deleteSubstrate(@PathVariable("sid") long sid) {
+	public ResponseEntity<Resources<Long>> deleteSubstrate(@PathVariable("sid") long sid) {
 		// service.deleteSubstrate(sid);
 		// if (substrate == null)
 		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
 
+		service.deleteSubstrate(sid);
+
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
-                                new ResourceWrapperWithLinks<Void>()
+                                new ResourceWrapperWithLinks<Long>()
                                                 .addLink(url, "list", RequestMethod.GET)
-                                                .wrap(null));
+                                                .wrap(sid));
 	}
 
 	/* Hosts */
@@ -255,7 +255,7 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can first create a substrate or use an existing one.")
 		})
 	public ResponseEntity<Resources<Void>> createHosts(@PathVariable("sid") long sid,
-			Hosts hosts) {
+			@RequestBody Hosts hosts) {
 		// String hid = host.getName();
 		// if (hid == null)
 		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
@@ -277,9 +277,11 @@ public class SubstratesController {
 		// } else
 		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
 
-		String url = request.getRequestURL()
-			.substring(0, request.getRequestURL().lastIndexOf("/"))
-			.substring(0, request.getRequestURL().lastIndexOf("/"));
+		service.createHosts(sid, hosts);
+
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.CREATED).body(
                                 // wrap the response with the hyperlinks
 								new ResourceWrapperWithLinks<Void>()
@@ -324,11 +326,11 @@ public class SubstratesController {
 		// 	return new ResponseEntity<Host>(created, responseHeaders, HttpStatus.CREATED);
 		// } else
 		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		Hosts hosts = null;
+		Hosts hosts = service.getHosts(sid);
 		
-		String url = request.getRequestURL()
-			.substring(0, request.getRequestURL().lastIndexOf("/"))
-			.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
 								new ResourceWrapperWithLinks<Hosts>()
@@ -373,10 +375,12 @@ public class SubstratesController {
 		// 	return new ResponseEntity<Host>(created, responseHeaders, HttpStatus.CREATED);
 		// } else
 		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+
+		service.deleteHosts(sid);
 		
-		String url = request.getRequestURL()
-			.substring(0, request.getRequestURL().lastIndexOf("/"))
-			.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
 								new ResourceWrapperWithLinks<Void>()
@@ -400,7 +404,12 @@ public class SubstratesController {
 		// if (updated == null)
 		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/")).substring(0, request.getRequestURL().lastIndexOf("/")).substring(0, request.getRequestURL().lastIndexOf("/"));
+		service.updateHost(sid, hid, host);
+
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
 								new ResourceWrapperWithLinks<Void>()
@@ -431,9 +440,12 @@ public class SubstratesController {
 		// if (host == null)
 		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
 		// return host;
-		Host host = null;
+		Host host = service.getHost(sid, hid);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/")).substring(0, request.getRequestURL().lastIndexOf("/")).substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
                                 new ResourceWrapperWithLinks<Host>()
@@ -461,14 +473,16 @@ public class SubstratesController {
 		})
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
-	public ResponseEntity<Resources<Void>> deleteHost(@PathVariable("sid") long sid, @PathVariable("hid") long hid) {
+	public ResponseEntity<Resources<Void>> deleteHost(@PathVariable("sid") long sid, @PathVariable("hid") String hid) {
 		// Host host = service.deleteHost(sid, hid);
 		// if (host == null)
 		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		String url = request.getRequestURL()
-			.substring(0, request.getRequestURL().lastIndexOf("/"))
-			.substring(0, request.getRequestURL().lastIndexOf("/"))
-			.substring(0, request.getRequestURL().lastIndexOf("/"));
+		service.deleteHost(sid, hid);
+
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
                                 new ResourceWrapperWithLinks<Void>()
@@ -519,9 +533,9 @@ public class SubstratesController {
 		// } else
 		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
 
-		String url = request.getRequestURL()
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.CREATED).body(
                                 // wrap the response with the hyperlinks
                                 new ResourceWrapperWithLinks<Void>()
@@ -556,9 +570,9 @@ public class SubstratesController {
 		// else if (updated.getConnection().isEmpty())
 		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
 
-		String url = request.getRequestURL()
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
                                 new ResourceWrapperWithLinks<Void>()
@@ -590,9 +604,9 @@ public class SubstratesController {
 
 		Connections connections = null;
 
-		String url = request.getRequestURL()
-			.substring(0, request.getRequestURL().lastIndexOf("/"))
-			.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
                                 new ResourceWrapperWithLinks<Connections>()
@@ -620,9 +634,9 @@ public class SubstratesController {
 		// if (deleted == null)
 		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
 
-		String url = request.getRequestURL()
-			.substring(0, request.getRequestURL().lastIndexOf("/"))
-			.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
                                 new ResourceWrapperWithLinks<Void>()

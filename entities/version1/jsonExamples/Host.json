@@ -1,24 +1,33 @@
 {
-    "name": "host1",
-    "type": "CLIENT",
-    "active": true,
-    "maxVNF": 3,
-    "cores": 4,
-    "cpu": 1,
-    "diskStorage": 500,
-    "fixedEndpoint": "endPoint",
-    "memory": 1000,
+    "name": "singleHost",
+    "type": "MIDDLEBOX",
+    "cpu": 2,
+    "cores": 8,
     "nodeRef": [
         {
-            "node": "A"
+            "node": "10.0.0.2"
         },
         {
-            "node": "10.0.0.1"
+            "node": "10.0.0.3"
         }
     ],
+    "active": true,
+    "memory": 1000,
+    "diskStorage": 10000,
+    "fixedEndpoint": "endpoint",
+    "maxVNF": 2,
     "supportedVNF": [
         {
-            "functionalType": "ENDHOST"
+            "functionalType": "CACHE"
+        },
+        {
+            "functionalType": "VPNEXIT"
+        },
+        {
+            "functionalType": "VPNACCESS"
+        },
+        {
+            "functionalType": "NAT"
         }
     ]
 }
