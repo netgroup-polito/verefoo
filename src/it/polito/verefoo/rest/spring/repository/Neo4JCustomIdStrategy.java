@@ -5,25 +5,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.id.IdStrategy;
 
 import it.polito.verefoo.jaxb.Host;
 import it.polito.verefoo.jaxb.NodeRefType;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-
 public class Neo4JCustomIdStrategy implements IdStrategy {
-
-    static Logger logger = LogManager.getLogger("neo4jIdLog");
 
     @Override
     public Object generateId(Object entity) {
 
-        logger.info(entity.getClass().getSimpleName());
-
         List<Field> fields = Arrays.asList(entity.getClass().getFields());
+        // Field idField = fields.stream().filter(field -> field.isAnnotationPresent(Id.class)).findFirst().get();
+        // try {
+        //     return idField.get(idField);
+        // } catch (IllegalArgumentException | IllegalAccessException e1) {
+        //     // TODO Auto-generated catch block
+        //     e1.printStackTrace();
+        // }
 
         Optional<Field> field = fields.stream().filter(f -> f.getName().equals("id")).findAny();
         if (field.isPresent()) {

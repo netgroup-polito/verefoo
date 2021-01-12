@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import it.polito.verefoo.Neo4jConnection;
 import it.polito.verefoo.SubstrateId;
-import it.polito.verefoo.jaxb.Connection;
 import it.polito.verefoo.jaxb.Connections;
 import it.polito.verefoo.jaxb.Host;
 import it.polito.verefoo.jaxb.Hosts;

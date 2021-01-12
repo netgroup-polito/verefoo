@@ -104,13 +104,434 @@
 
         </jaxb:bindings> -->
 
+        <jaxb:bindings node="xsd:complexType[@name='Property']">
+            
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Property")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='graph']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
     </jaxb:bindings>
 
     <jaxb:bindings schemaLocation="../verigraph.xsd" node="/xsd:schema">
+
         <jaxb:bindings node="xsd:element[@name='graph']/xsd:complexType">
+
             <annox:annotate target="class">
                 @org.neo4j.ogm.annotation.NodeEntity(label = "Graph")
             </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='id']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
         </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='node']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Node")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='id']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='neighbour']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Neighbour")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='id']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='configuration']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Configuration")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='id']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='firewall']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Firewall")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence/xsd:element">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='elements']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Firewall")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence/xsd:element[@name='source']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='endhost']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Endhost")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='url']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='endpoint']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Endpoint")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence/xsd:element[@name='name']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='antispam']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Antispam")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='cache']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Cache")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='dpi']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Dpi")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='dpi_elements']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "DpiElements")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence/xsd:element[@name='condition']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='mailclient']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Mailclient")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='mailserver']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='mailserver']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Mailserver")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence/xsd:element[@name='name']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='nat']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Nat")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='vpnaccess']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Vpnaccess")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='vpnexit']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='vpnexit']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Vpnexit")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='vpnaccess']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='webclient']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Webclient")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='nameWebServer']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='webserver']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Webserver")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence/xsd:element[@name='name']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='fieldmodifier']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Fieldmodifier")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence/xsd:element[@name='name']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='loadbalancer']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Loadbalancer")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='stateful_firewall']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "StatefulFirewall")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence/xsd:element[@ref='elements']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='web_application_firewall']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "WebApplicationFirewall")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence/xsd:element[@ref='waf_elements']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='waf_elements']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "WafElements")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence/xsd:sequence/xsd:element[@name='url']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
     </jaxb:bindings>
 </jaxb:bindings>
