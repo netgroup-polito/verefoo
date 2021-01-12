@@ -74,6 +74,36 @@
 
         </jaxb:bindings>
 
+        <!-- <jaxb:bindings node="xsd:element[@name='Connection']/xsd:complexType">
+            
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.RelationshipEntity(type = "CONNECTION")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:attribute[@name='sourceHost']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.StartNode
+                </annox:annotate>
+            </jaxb:bindings>
+
+            <jaxb:bindings node="xsd:attribute[@name='destHost']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.EndNode
+                </annox:annotate>
+            </jaxb:bindings>
+
+            <jaxb:bindings node="xsd:attribute[@name='avgLatency']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+
+            </jaxb:bindings>
+
+        </jaxb:bindings> -->
+
     </jaxb:bindings>
 
     <jaxb:bindings schemaLocation="../verigraph.xsd" node="/xsd:schema">

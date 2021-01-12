@@ -33,51 +33,6 @@ public class SubstratesController {
 
 	@Autowired
 	private HttpServletRequest request;
-	
-
-	/* Substrates */
-
-	// /**
-	//  * @param substrate is the substrate network to create
-	//  * @return the created substrate network
-	//  */
-	// @Operation(tags = "version 1 - substrates", summary = "createSubstrate", description = "create a new substrate network")
-	// @RequestMapping(value = "", method = RequestMethod.POST)
-	// @ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Created"),
-	// 		@ApiResponse(responseCode = "400", description = "Bad Request"), })
-	// public List<Integer> createSubstrate(@RequestBody List<Host> hosts) {
-
-	// 	StringBuffer url = request.getRequestURL();
-
-	// 	List<Integer> ids = service.createSubstrate(hosts);
-
-	// 	return ResponseEntity.status(HttpStatus.OK).body(
-    //                             // wrap the response with the hyperlinks
-    //                             new ResourceWrapperWithLinks<List<Integer>>()
-    //                                             .addLink("substrates/" + substrateId, "first", RequestMethod.GET)
-    //                                             .addLink("substrates/" + substrateId, "first", RequestMethod.DELETE)
-    //                                             .addLink("substrates/" + substrateId, "first", RequestMethod.PUT)
-    //                                             .addLink("substrates", "new", RequestMethod.POST)
-    //                                             .addLink("substrates", "self", RequestMethod.GET)
-    //                                             .wrap(substrates));
-
-	// 	/* Boolean created = true;
-	// 	if (created != null) {
-	// 		String responseUrl;
-	// 		if (url.toString().endsWith("/"))
-	// 			responseUrl = url.toString() + sid;
-	// 		else
-	// 			responseUrl = url.toString() + "/" + sid;
-	// 		HttpHeaders responseHeaders = new HttpHeaders();
-	// 		try {
-	// 			responseHeaders.setLocation(new URI(responseUrl));
-	// 		} catch (URISyntaxException e) {
-	// 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-	// 		}
-	// 		return new ResponseEntity<List<Host>>(created, responseHeaders, HttpStatus.CREATED);
-	// 	} else
-	// 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request"); */
-	// }
 
 	/**
 	 * @param substrate is the substrate network to create
@@ -104,24 +59,10 @@ public class SubstratesController {
 												.addLink(url, "list", RequestMethod.GET)
                                                 .addLink(url + "/" + substrateId, "self", RequestMethod.DELETE)
                                                 .addLink(url, "new", RequestMethod.POST)
-                                                .wrap(substrateId));
-
-		/* Boolean created = true;
-		if (created != null) {
-			String responseUrl;
-			if (url.toString().endsWith("/"))
-				responseUrl = url.toString() + sid;
-			else
-				responseUrl = url.toString() + "/" + sid;
-			HttpHeaders responseHeaders = new HttpHeaders();
-			try {
-				responseHeaders.setLocation(new URI(responseUrl));
-			} catch (URISyntaxException e) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-			}
-			return new ResponseEntity<List<Host>>(created, responseHeaders, HttpStatus.CREATED);
-		} else
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request"); */
+												.wrap(substrateId));
+												
+			// TODO: add exception handling for all controllers; follow/modify the design accordingly
+			// throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request"); */
 	}
 
 	/**
@@ -137,10 +78,7 @@ public class SubstratesController {
 		})
 
 	public ResponseEntity<Resources<List<Long>>> getSubstrates() {
-		// List<Host> substrates = service.getSubstrates();
-		// if (substrates.isEmpty())
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		// return substrates;
+
 		List<Long> ids = service.getAllSubstrates();
 
 		String url = request.getRequestURL().toString();
@@ -155,9 +93,6 @@ public class SubstratesController {
                                                 .wrap(ids));
 	}
 
-	/**
-	 * delete all the substrate network
-	 */
 	@Operation(tags = "version 1 - substrates", summary = "Delete all the substrates", description = "Be careful before cleaning the whole substrate workbench.")
 	@RequestMapping(value = "", method = RequestMethod.DELETE)
 	@ApiResponses(value = {
@@ -166,9 +101,6 @@ public class SubstratesController {
 		})
 
 	public ResponseEntity<Resources<Void>> deleteSubstrates() {
-		// boolean removed = service.deleteSubstrates();
-		// if (!removed)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
 
 		service.deleteAllSubstrates();
 
@@ -179,40 +111,6 @@ public class SubstratesController {
                                                 .addLink(url, "new", RequestMethod.POST)
                                                 .wrap(null));
 	}
-
-	/* Substrate */
-
-	// /**
-	//  * @param sid       it is the id of the substrate network
-	//  * @param substrate it is the new value of the substrate network
-	//  */
-	// @Operation(tags = "version 1 - substrates", summary = "updateSubstrate", description = "update a single substrate network")
-	// @RequestMapping(value = "/{sid}", method = RequestMethod.PUT)
-	// @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "No Content"),
-	// 		@ApiResponse(responseCode = "404", description = "Not Found"), })
-	// @ResponseStatus(value = HttpStatus.NO_CONTENT)
-
-	// public void updateSubstrate(@PathVariable("sid") long sid, @RequestBody Hosts substrate) {
-	// 	Hosts updated = service.updateSubstrate(sid, substrate);
-	// 	if (updated == null)
-	// 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-	// }
-
-	// /**
-	//  * @param sid it is the id of the substrate network to retrieve
-	//  * @return the requested substrate network
-	//  */
-	// @Operation(tags = "version 1 - substrates", summary = "getSubstrate", description = "retrieve a single substrate network")
-	// @RequestMapping(value = "/{sid}", method = RequestMethod.GET)
-	// @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
-	// 		@ApiResponse(responseCode = "404", description = "Not Found"), })
-
-	// public Hosts getSubstrate(@PathVariable("sid") long sid) {
-	// 	Hosts substrate = service.getSubstrate(sid);
-	// 	if (substrate == null)
-	// 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-	// 	return substrate;
-	// }
 
 	/**
 	 * @param sid it is the id of the substrate network to delete
@@ -225,9 +123,6 @@ public class SubstratesController {
 		})
 
 	public ResponseEntity<Resources<Long>> deleteSubstrate(@PathVariable("sid") long sid) {
-		// service.deleteSubstrate(sid);
-		// if (substrate == null)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
 
 		service.deleteSubstrate(sid);
 
@@ -254,28 +149,7 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "400", description = "The passed hosts resource is semantically malformed. You can retry the operation or check the data."),
 			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can first create a substrate or use an existing one.")
 		})
-	public ResponseEntity<Resources<Void>> createHosts(@PathVariable("sid") long sid,
-			@RequestBody Hosts hosts) {
-		// String hid = host.getName();
-		// if (hid == null)
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		// String url = request.getRequestURL().toString();
-		// Host created = service.createHost(sid, hid, host);
-		// if (created != null) {
-		// 	String responseUrl;
-		// 	if (url.toString().endsWith("/"))
-		// 		responseUrl = url.toString() + hid;
-		// 	else
-		// 		responseUrl = url.toString() + "/" + hid;
-		// 	HttpHeaders responseHeaders = new HttpHeaders();
-		// 	try {
-		// 		responseHeaders.setLocation(new URI(responseUrl));
-		// 	} catch (URISyntaxException e) {
-		// 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		// 	}
-		// 	return new ResponseEntity<Host>(created, responseHeaders, HttpStatus.CREATED);
-		// } else
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+	public ResponseEntity<Resources<Void>> createHosts(@PathVariable("sid") long sid, @RequestBody Hosts hosts) {
 
 		service.createHosts(sid, hosts);
 
@@ -306,26 +180,7 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can first create a substrate or use an existing one.")
 		})
 	public ResponseEntity<Resources<Hosts>> getHosts(@PathVariable("sid") long sid) {
-		// String hid = host.getName();
-		// if (hid == null)
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		// String url = request.getRequestURL().toString();
-		// Host created = service.createHost(sid, hid, host);
-		// if (created != null) {
-		// 	String responseUrl;
-		// 	if (url.toString().endsWith("/"))
-		// 		responseUrl = url.toString() + hid;
-		// 	else
-		// 		responseUrl = url.toString() + "/" + hid;
-		// 	HttpHeaders responseHeaders = new HttpHeaders();
-		// 	try {
-		// 		responseHeaders.setLocation(new URI(responseUrl));
-		// 	} catch (URISyntaxException e) {
-		// 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		// 	}
-		// 	return new ResponseEntity<Host>(created, responseHeaders, HttpStatus.CREATED);
-		// } else
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+
 		Hosts hosts = service.getHosts(sid);
 		
 		String url = request.getRequestURL().toString();
@@ -355,26 +210,6 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can first create a substrate or use an existing one.")
 		})
 	public ResponseEntity<Resources<Void>> deleteHosts(@PathVariable("sid") long sid) {
-		// String hid = host.getName();
-		// if (hid == null)
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		// String url = request.getRequestURL().toString();
-		// Host created = service.createHost(sid, hid, host);
-		// if (created != null) {
-		// 	String responseUrl;
-		// 	if (url.toString().endsWith("/"))
-		// 		responseUrl = url.toString() + hid;
-		// 	else
-		// 		responseUrl = url.toString() + "/" + hid;
-		// 	HttpHeaders responseHeaders = new HttpHeaders();
-		// 	try {
-		// 		responseHeaders.setLocation(new URI(responseUrl));
-		// 	} catch (URISyntaxException e) {
-		// 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		// 	}
-		// 	return new ResponseEntity<Host>(created, responseHeaders, HttpStatus.CREATED);
-		// } else
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
 
 		service.deleteHosts(sid);
 		
@@ -400,9 +235,6 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "404", description = "The host or the substrate doesn't exist. You can retry the operation or create/use other substrates or hosts."), })
 
 	public ResponseEntity<Resources<Void>> updateHost(@PathVariable("sid") long sid, @PathVariable("hid") String hid, @RequestBody Host host) {
-		// Host updated = service.updateHost(sid, hid, host);
-		// if (updated == null)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
 
 		service.updateHost(sid, hid, host);
 
@@ -436,10 +268,7 @@ public class SubstratesController {
 		})
 
 	public ResponseEntity<Resources<Host>> getHost(@PathVariable("sid") long sid, @PathVariable("hid") String hid) {
-		// Host host = service.getHost(sid, hid);
-		// if (host == null)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		// return host;
+
 		Host host = service.getHost(sid, hid);
 
 		String url = request.getRequestURL().toString();
@@ -474,9 +303,7 @@ public class SubstratesController {
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
 	public ResponseEntity<Resources<Void>> deleteHost(@PathVariable("sid") long sid, @PathVariable("hid") String hid) {
-		// Host host = service.deleteHost(sid, hid);
-		// if (host == null)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+
 		service.deleteHost(sid, hid);
 
 		String url = request.getRequestURL().toString();
@@ -509,29 +336,9 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "400", description = "The passed connections resource is semantically malformed. You can retry the operation or check the data."),
 			@ApiResponse(responseCode = "409", description = "The connections cannot be established between the existing hosts. You can check the hosts configuration or the connections.")
 		})
-	public ResponseEntity<Resources<Void>> createConnections(@PathVariable("sid") long sid,
-			@RequestBody Connections connections) {
-		// if (connections.getConnection().isEmpty())
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		// String url = request.getRequestURL().toString();
-		// Connections created = service.createConnections(sid, connections);
-		// if (created != null) {
-		// 	if (created.getConnection().isEmpty())
-		// 		throw new ResponseStatusException(HttpStatus.CONFLICT, "conflict");
-		// 	String responseUrl;
-		// 	if (url.toString().endsWith("/"))
-		// 		responseUrl = url.toString() + "connections";
-		// 	else
-		// 		responseUrl = url.toString() + "/" + "connections";
-		// 	HttpHeaders responseHeaders = new HttpHeaders();
-		// 	try {
-		// 		responseHeaders.setLocation(new URI(responseUrl));
-		// 	} catch (URISyntaxException e) {
-		// 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		// 	}
-		// 	return new ResponseEntity<Connections>(created, responseHeaders, HttpStatus.CREATED);
-		// } else
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+	public ResponseEntity<Resources<Void>> createConnections(@PathVariable("sid") long sid, @RequestBody Connections connections) {
+
+		service.createConnections(sid, connections);
 
 		String url = request.getRequestURL().toString();
 		url = url.substring(0, url.lastIndexOf("/"));
@@ -552,7 +359,7 @@ public class SubstratesController {
 	 * @param sid         it is the id of the substrate network
 	 * @param connections it is the new value of the connections
 	 */
-	@Operation(tags = "version 1 - substrates", summary = "Update the connections of a substrate", description = "The new connections replace the existing ones in a shallow way.")
+	@Operation(tags = "version 1 - substrates", summary = "Change all the connections between hosts in a substrate.", description = "The old connections will be lost.")
 	@RequestMapping(value = "/{sid}/connections", method = RequestMethod.PUT)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "OK"),
@@ -562,13 +369,8 @@ public class SubstratesController {
 		})
 
 	public ResponseEntity<Resources<Void>> updateConnections(@PathVariable("sid") long sid, @RequestBody Connections connections) {
-		// if (connections.getConnection().isEmpty())
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		// Connections updated = service.updateConnections(sid, connections);
-		// if (updated == null)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		// else if (updated.getConnection().isEmpty())
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+
+		service.updateConnections(sid, connections);
 
 		String url = request.getRequestURL().toString();
 		url = url.substring(0, url.lastIndexOf("/"));
@@ -597,12 +399,8 @@ public class SubstratesController {
 		})
 
 	public ResponseEntity<Resources<Connections>> getConnections(@PathVariable("sid") long sid) {
-		// Connections connections = service.getConnections(sid);
-		// if (connections == null)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		// return connections;
 
-		Connections connections = null;
+		Connections connections = service.getConnections(sid);
 
 		String url = request.getRequestURL().toString();
 		url = url.substring(0, url.lastIndexOf("/"));
@@ -630,9 +428,8 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can retry the operation or refer to another substrate."), })
 
 	public ResponseEntity<Resources<Void>> deleteConnections(@PathVariable("sid") long sid) {
-		// Connections deleted = service.deleteConnections(sid);
-		// if (deleted == null)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+		
+		service.deleteConnections(sid);
 
 		String url = request.getRequestURL().toString();
 		url = url.substring(0, url.lastIndexOf("/"));

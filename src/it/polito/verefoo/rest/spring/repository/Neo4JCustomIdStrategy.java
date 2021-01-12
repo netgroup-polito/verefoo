@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.neo4j.ogm.id.IdStrategy;
 
 import it.polito.verefoo.jaxb.Host;
+import it.polito.verefoo.jaxb.NodeRefType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,6 +36,8 @@ public class Neo4JCustomIdStrategy implements IdStrategy {
 
         if (entity instanceof Host) {
             return ((Host) entity).getName();
+        } else if (entity instanceof NodeRefType) {
+            return ((NodeRefType) entity).getNode();
         }
 
         // field = fields.stream().filter(f -> f.getName().equals("name")).findAny();
@@ -46,7 +49,7 @@ public class Neo4JCustomIdStrategy implements IdStrategy {
         //     }
         // }
 
-        // should never arrive here
+        // the default case
         return entity.hashCode();
     }
   }

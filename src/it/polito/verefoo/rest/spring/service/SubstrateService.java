@@ -6,9 +6,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import it.polito.verefoo.Neo4jConnection;
 import it.polito.verefoo.SubstrateId;
+import it.polito.verefoo.jaxb.Connection;
+import it.polito.verefoo.jaxb.Connections;
 import it.polito.verefoo.jaxb.Host;
 import it.polito.verefoo.jaxb.Hosts;
+import it.polito.verefoo.rest.spring.repository.ConnectionRepository;
 import it.polito.verefoo.rest.spring.repository.HostRepository;
 import it.polito.verefoo.rest.spring.repository.SubstrateRepository;
 
@@ -20,6 +24,9 @@ public class SubstrateService {
 
     @Autowired
     HostRepository hostRepository;
+
+    @Autowired
+    ConnectionRepository connectionRepository;
 
     public Long createSubstrate() {
         return substrateRepository.save(new SubstrateId()).getId();
@@ -75,5 +82,39 @@ public class SubstrateService {
         hostRepository.unbindHostFromSubstrate(substrateId, hostId);
         hostRepository.delete(hostRepository.findById(hostId).get());
     }
+
+	public void createConnections(Long substrateId, Connections connections) {
+        connections.getConnection().forEach(
+            connection -> {
+                Host source = getHost(substrateId, connection.getSourceHost());
+                Host destination = getHost(substrateId, connection.getDestHost());
+                Neo4jConnection neo4jConnection = new Neo4jConnection(connection, source, destination);
+                connectionRepository.save(neo4jConnection);
+            }
+        );
+	}
+
+    /**
+     * In the current version, this method is just a shortcut for 
+     * deleting and creating new connections in once;
+     * @param substrateId
+     * @param connections
+     */
+	public void updateConnections(Long substrateId, Connections connections) {
+        deleteConnections(substrateId);
+        createConnections(substrateId, connections);
+	}
+
+	public void deleteConnections(Long substrateId) {
+        connectionRepository.deleteBySubstrateId(substrateId);
+	}
+
+	public Connections getConnections(Long substrateId) {
+        Connections connections = new Connections();
+		connectionRepository.findAllBySubstrateId(substrateId).forEach(neo4jConnection -> {
+            connections.getConnection().add(neo4jConnection.getConnection());
+        });
+        return connections;
+	}
 
 }
