@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import it.polito.verefoo.extra.BadGraphError;
+import it.polito.verefoo.firewall.FirewallDeploy;
 import it.polito.verefoo.firewall.FirewallSerializer;
 import it.polito.verefoo.jaxb.*;
 
@@ -56,11 +57,10 @@ public class Main {
 					
 					loggerResult.info("----------------------OUTPUTFIREWALL---------------");
 					//local debug
-					FirewallSerializer fs = new FirewallSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/FWAutoconfiguration/prova.xml")));
+					FirewallSerializer fs = new FirewallSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/Others/useCaseFirewallDeployment.xml")),FirewallDeploy.ALL);
 					//uncomment for link to ADP module output
 					//FirewallSerializer fs = new FirewallSerializer((NFV) u.unmarshal(new StringReader(stringWriter.toString())));
-					
-					//StringWriter stringWriterfw = new StringWriter();
+	
 
 					loggerResult.info("--------------------------------------------------");
 					//System.out.println(stringWriter);

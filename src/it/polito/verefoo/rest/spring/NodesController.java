@@ -1,10 +1,12 @@
 package it.polito.verefoo.rest.spring;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +29,8 @@ import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.Configuration;
 import it.polito.verefoo.jaxb.Elements;
 import it.polito.verefoo.jaxb.Firewall;
+import it.polito.verefoo.jaxb.Graph;
+import it.polito.verefoo.jaxb.NFV;
 import it.polito.verefoo.jaxb.Node;
 
 @Controller
@@ -36,53 +40,66 @@ public class NodesController {
 	FDWService service = new FDWService();
 	@Autowired
 	private HttpServletRequest request;
+	
+	//nfv
+	
+	@ApiOperation(value = "createNodesFromNFV", notes = "create a set of nodes from a NFV")
+	@RequestMapping(value = "/addnfv", method = RequestMethod.POST)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 400, message = "Bad Request"), })
+	@ResponseStatus(value = HttpStatus.OK)
+	public void createNodesNFV(@RequestBody NFV nfv, HttpServletResponse response) {
+		String created = service.loadNFV(nfv);
+		StringBuffer url = request.getRequestURL();
+		if (created != null) {
+			String responseUrl;
+			if (url.toString().endsWith("/"))
+				responseUrl = url.toString().substring(0, url.toString().length()-new String("/addnfv/").length());
+				//responseUrl = url.toString().substring(0, url.toString().length()-8);
+			else
+				responseUrl = url.toString().substring(0, url.toString().length()-new String("/addnfv").length());
+				//responseUrl = url.toString().substring(0, url.toString().length()-7);
+			try {
+				response.sendRedirect(responseUrl+"?afterInclusive="+created.split("-")[1]+"&beforeInclusive="+created.split("-")[0]);
+			} catch (IOException  e) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+			}
+		} else
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+	}
 
-	// @ApiOperation(value = "createNodes", notes = "create a nodes from a graph"
-	// )
-	// @RequestMapping(value = "", method = RequestMethod.POST)
-	// @ApiResponses(value = {
-	// @ApiResponse(code = 201, message = "Created"),
-	// @ApiResponse(code = 400, message = "Bad Request"),
-	// })
-	// public ResponseEntity<List<Node>> createGraph(@RequestBody Graph graph) {
-	// long id;// = service.getNextGraphId();
-	// List<Node> nodes;
-	// nodes = graph.getNode().stream().filter(x ->
-	// x.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
-	// for(int index=0;index<nodes.size();index++) {
-	// id=service.getNextNodeId();
-	// }
-	//
-	//
-	// //graph.getNode().get(0).getFunctionalType().equals(FunctionalTypes.FIREWALL);
-	// StringBuffer url = request.getRequestURL();
-	// Node created = service.createNode(id, graph);
-	// if (created!=null) {
-	// String responseUrl;
-	// if(url.toString().endsWith("/")) responseUrl = url.toString() + id;
-	// else responseUrl = url.toString() + "/" + id;
-	//
-	// //created.setId(id);
-	// HttpHeaders responseHeaders = new HttpHeaders();
-	// try {
-	// responseHeaders.setLocation(new URI(responseUrl));
-	// } catch (URISyntaxException e) {
-	// throw new ResponseStatusException(
-	// HttpStatus.BAD_REQUEST, "bad request"
-	// );
-	// }
-	// return new ResponseEntity<List<Node>>(created, responseHeaders,
-	// HttpStatus.CREATED);
-	// } else
-	// throw new ResponseStatusException(
-	// HttpStatus.BAD_REQUEST, "bad request"
-	// );
-	// }
+	//graph
+	
+	
+	@ApiOperation(value = "createNodesFromGraph", notes = "create a set of nodes from a graph")
+	@RequestMapping(value = "/addgraph", method = RequestMethod.POST)
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 400, message = "Bad Request"), })
+	@ResponseStatus(value = HttpStatus.OK)
+	public void createNodesGraph(@RequestBody Graph g, HttpServletResponse response) {
+		String created = service.loadGraph(g);
+		StringBuffer url = request.getRequestURL();
+		if (created != null) {
+			String responseUrl;
+			if (url.toString().endsWith("/"))
+				responseUrl = url.toString().substring(0, url.toString().length()-new String("/addgraph/").length());
+			else
+				responseUrl = url.toString().substring(0, url.toString().length()-new String("/addgraph").length());
+			try {
+				response.sendRedirect(responseUrl+"?afterInclusive="+created.split("-")[1]+"&beforeInclusive="+created.split("-")[0]);
+			} catch (IOException  e) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+			}
+		} else
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+	}
+	
+	//node
 
 	@ApiOperation(value = "createNode", notes = "create a new node")
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	@ApiResponses(value = { @ApiResponse(code = 201, message = "Created"),
-			@ApiResponse(code = 400, message = "Bad Request"), })
+			@ApiResponse(code = 400, message = "Bad Request"),@ApiResponse(code = 409, message = "Conflict"), })
 	public ResponseEntity<Node> createNode(@RequestBody Node node) {
 		long nid = service.getNextNodeId();
 		StringBuffer url = request.getRequestURL();
@@ -109,14 +126,14 @@ public class NodesController {
 	@ApiOperation(value = "getNodes", notes = "searches nodes")
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 404, message = "Not Found"), })
+			@ApiResponse(code = 404, message = "Not Found"), @ApiResponse(code = 400, message = "Bad Request"),})
 	@ResponseBody
 	public List<Node> getNodes(@RequestParam(name = "beforeInclusive", defaultValue = "1") int beforeInclusive,
 			@RequestParam(name = "afterInclusive", defaultValue = "10") int afterInclusive) {
 		List<Node> nodes = service.getNodes(beforeInclusive, afterInclusive);
 		if (nodes == null)
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		if (nodes.get(0) == null)
+		if (nodes.isEmpty())
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
 		return nodes;
 	}
@@ -124,7 +141,7 @@ public class NodesController {
 	@ApiOperation(value = "deleteNodes", notes = "delete all the nodes")
 	@RequestMapping(value = "", method = RequestMethod.DELETE)
 	@ApiResponses(value = { @ApiResponse(code = 204, message = "No Content"),
-			@ApiResponse(code = 400, message = "Bad Request"), @ApiResponse(code = 404, message = "Not Found"), })
+			 @ApiResponse(code = 404, message = "Not Found"), })
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	@ResponseBody
 	public void deleteNodes() {
@@ -132,11 +149,11 @@ public class NodesController {
 		if (nodes == null)
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
 	}
-	// NODE
+	// node
 
 	@ApiOperation(value = "updateNode", notes = "update single node")
 	@RequestMapping(value = "/{nid}", method = RequestMethod.PUT)
-	@ApiResponses(value = { @ApiResponse(code = 204, message = "No Content"),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
 			@ApiResponse(code = 404, message = "Not Found"), })
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	@ResponseBody
@@ -155,7 +172,6 @@ public class NodesController {
 		Node node = service.getNode(nid);
 		if (node == null)
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		// forse non serve
 		node.setId(nid);
 		return node;
 	}
@@ -176,7 +192,7 @@ public class NodesController {
 
 	@ApiOperation(value = "updateConfiguration", notes = "update the configuration of a node")
 	@RequestMapping(value = "/{nid}/configuration", method = RequestMethod.PUT)
-	@ApiResponses(value = { @ApiResponse(code = 204, message = "No Content"),
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
 			@ApiResponse(code = 404, message = "Not Found") })
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	@ResponseBody
@@ -252,17 +268,20 @@ public class NodesController {
 	@ApiOperation(value = "updatePolicy", notes = "update single policy of a node")
 	@RequestMapping(value = "/{nid}/configuration/firewall/{eid}", method = RequestMethod.PUT)
 	@ApiResponses(value = { @ApiResponse(code = 204, message = "No Content"),
-			@ApiResponse(code = 400, message = "Bad Request"), @ApiResponse(code = 404, message = "Not Found"), })
+			@ApiResponse(code = 400, message = "Bad Request"), @ApiResponse(code = 404, message = "Not Found"),@ApiResponse(code = 409, message = "Conflict"), })
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	@ResponseBody
 	public void updatePolicy(@PathVariable("eid") long eid, @PathVariable("nid") long nid,
 			@RequestBody Elements policy) {
+		if (policy.getAction() == null || policy.getProtocol() == null || policy.getDestination() == null
+				|| policy.getSource() == null)
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
 		Elements updated = service.updatePolicy(eid, nid, policy);
 		if (updated == null)
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		else if (updated.getAction() == null || updated.getProtocol() == null || updated.getDestination() == null
-				|| updated.getSource() == null)
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+		else if(updated.getAction()==null) 
+			throw new ResponseStatusException(HttpStatus.CONFLICT, "conflict");
+		
 	}
 
 	@ApiOperation(value = "getPolicy", notes = "retrieve single policy")

@@ -1,15 +1,16 @@
 package it.polito.verefoo.rest.spring;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,63 +37,72 @@ public class DeployerController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
 			@ApiResponse(code = 404, message = "Not Found"), })
 	@ResponseBody
-	public ResponseEntity<Resource> getFortinet(@PathVariable("nid") long nid) {
-       
-		Resource resource = service.loadFileAsResource(nid,"fortinet");
-		//determine the type of the file
-		if (resource==null) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		}
-        String contentType = null;
-        try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        } catch (IOException ex) {
-           // if type error
-        	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-        }
+	public void getFortinet(@PathVariable("nid") long nid, HttpServletResponse response) {
+	       
+			File file = service.getFile(nid,"fortinet");
+			if (file==null) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+			}
+			
+			 String contentType = null;
+		        contentType = request.getServletContext().getMimeType(file.getAbsolutePath());
 
-        //if type could not be determined
-        if(contentType == null) {
-            contentType = "application/octet-stream";
-        }
+		        if(contentType == null) {
+		            contentType = "application/octet-stream";
+		        }
+			    response.setContentType(contentType);
+			    response.setHeader("Content-disposition", "attachment; filename=" + file.getName());
+			    OutputStream out;
+				try {
+					out = response.getOutputStream();
+				    FileInputStream in = new FileInputStream(file);
+				    IOUtils.copy(in,out);
+				    out.close();
+				    in.close();
+				} catch (IOException e) {
+					throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+				}
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
-	}
+			    file.delete();
+			}
+        
 
 
+	
+	
+	
 	@ApiOperation(value = "get ipfirewall configuration for a node", notes = "get configuration file for fortinet device")
 	@RequestMapping(value = "getIpfw/{nid}", method = RequestMethod.GET)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
 			@ApiResponse(code = 404, message = "Not Found"), })
 	@ResponseBody
-	public ResponseEntity<Resource> getIpfw(@PathVariable("nid") long nid) {
-       
-		Resource resource = service.loadFileAsResource(nid,"ipfw");
-		//determine the type of the file
-		if (resource==null) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		}
-        String contentType = null;
-        try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        } catch (IOException ex) {
-           // if type error
-        	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-        }
+	public void getIpfw(@PathVariable("nid") long nid, HttpServletResponse response) {
+	       
+			File file = service.getFile(nid,"ipfw");
+			if (file==null) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+			}
+			 String contentType = null;
+		        contentType = request.getServletContext().getMimeType(file.getAbsolutePath());
 
-        //if type could not be determined
-        if(contentType == null) {
-            contentType = "application/octet-stream";
-        }
+		        if(contentType == null) {
+		            contentType = "application/octet-stream";
+		        }
+			    response.setContentType(contentType);
+			    response.setHeader("Content-disposition", "attachment; filename=" + file.getName());
+			    OutputStream out;
+				try {
+					out = response.getOutputStream();
+				    FileInputStream in = new FileInputStream(file);
+				    IOUtils.copy(in,out);
+				    out.close();
+				    in.close();
+				} catch (IOException e) {;
+					throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+				}
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
-	}
+			    file.delete();
+			}
 	
 
 	@ApiOperation(value = "get iptables configuration for a node", notes = "get configuration file for fortinet device")
@@ -100,31 +110,37 @@ public class DeployerController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
 			@ApiResponse(code = 404, message = "Not Found"), })
 	@ResponseBody
-	public ResponseEntity<Resource> getIptables(@PathVariable("nid") long nid) {
-       
-		Resource resource = service.loadFileAsResource(nid,"iptables");
-		//determine the type of the file
-		if (resource==null) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		}
-        String contentType = null;
-        try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        } catch (IOException ex) {
-           // if type error
-        	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-        }
+	public void getIptables(@PathVariable("nid") long nid, HttpServletResponse response) {
+	       
+			File file = service.getFile(nid,"iptables");
+			if (file==null) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+			}
+			
 
-        //if type could not be determined
-        if(contentType == null) {
-            contentType = "application/octet-stream";
-        }
+			 String contentType = null;
+		        contentType = request.getServletContext().getMimeType(file.getAbsolutePath());
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
-	}
+		        if(contentType == null) {
+		            contentType = "application/octet-stream";
+		        }
+			    response.setContentType(contentType);
+			    response.setHeader("Content-disposition", "attachment; filename=" + file.getName());
+			    OutputStream out;
+				try {
+					out = response.getOutputStream();
+				    FileInputStream in = new FileInputStream(file);
+
+				    IOUtils.copy(in,out);
+
+				    out.close();
+				    in.close();
+				} catch (IOException e) {
+					throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+				}
+
+			    file.delete();
+			}
 	
 
 	@ApiOperation(value = "get openvswitch configuration for a node", notes = "get configuration file for fortinet device")
@@ -132,65 +148,100 @@ public class DeployerController {
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
 			@ApiResponse(code = 404, message = "Not Found"), })
 	@ResponseBody
-	public ResponseEntity<Resource> getOpenvswitch(@PathVariable("nid") long nid) {
+	public void getOpenvswitch(@PathVariable("nid") long nid,HttpServletResponse response) {
        
-		Resource resource = service.loadFileAsResource(nid,"opnvswitch");
-		//determine the type of the file
-		if (resource==null) {
+		File file = service.getFile(nid,"opnvswitch");
+		if (file==null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
 		}
-        String contentType = null;
-        try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        } catch (IOException ex) {
-           // if type error
-        	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-        }
+		 String contentType = null;
+	        contentType = request.getServletContext().getMimeType(file.getAbsolutePath());
+	        if(contentType == null) {
+	            contentType = "application/octet-stream";
+	        }
+		    response.setContentType(contentType);
+		    response.setHeader("Content-disposition", "attachment; filename=" + file.getName());
+		    OutputStream out;
+			try {
+				out = response.getOutputStream();
+			    FileInputStream in = new FileInputStream(file);
+			    IOUtils.copy(in,out);
+			    out.close();
+			    in.close();
+			} catch (IOException e) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+			}
 
-        //if type could not be determined
-        if(contentType == null) {
-            contentType = "application/octet-stream";
-        }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
-	}
+		    file.delete();
+		}
 	
 	
 
+
+	
 	@ApiOperation(value = "get BpfFirewall configuration for a node", notes = "get configuration file for fortinet device")
 	@RequestMapping(value = "getBpfFirewall/{nid}", method = RequestMethod.GET)
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
 			@ApiResponse(code = 404, message = "Not Found"), })
-	@ResponseBody
-	public ResponseEntity<Resource> getBpfFirewall(@PathVariable("nid") long nid) {
-       
-		Resource resource = service.loadFileAsResource(nid,"bpf_iptables");
+	public void getBpfFirewall(@PathVariable("nid") long nid,HttpServletResponse response) {
+		File file = service.getFile(nid,"bpf_iptables");
 		//determine the type of the file
-		if (resource==null) {
+		if (file==null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
 		}
-        String contentType = null;
-        try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        } catch (IOException ex) {
-           // if type error
-        	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-        }
+		
+		 String contentType = null;
+	        contentType = request.getServletContext().getMimeType(file.getAbsolutePath());
 
-        //if type could not be determined
-        if(contentType == null) {
-            contentType = "application/octet-stream";
-        }
+	        //if type could not be determined
+	        if(contentType == null) {
+	            contentType = "application/octet-stream";
+	        }
+		    response.setContentType(contentType);
+		    response.setHeader("Content-disposition", "attachment; filename=" + file.getName());
+		    OutputStream out;
+			try {
+				out = response.getOutputStream();
+			    FileInputStream in = new FileInputStream(file);
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
-	}
+			    // copy from in to out
+			    IOUtils.copy(in,out);
+
+			    out.close();
+			    in.close();
+			} catch (IOException e) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+			}
+
+		    file.delete();
+		}
+
+// old version	
+//	@ApiOperation(value = "get BpfFirewall configuration for a node", notes = "get configuration file for fortinet device")
+//	@RequestMapping(value = "getBpfFirewall/{nid}", method = RequestMethod.GET)
+//	@ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+//			@ApiResponse(code = 404, message = "Not Found"), })
+//	@ResponseBody
+//	public ResponseEntity<Resource> getBpfFirewall(@PathVariable("nid") long nid) {
+//       
+//		Resource resource = service.loadFileAsResource(nid,"bpf_iptables");
+//		if (resource==null) {
+//			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+//		}
+//        String contentType = null;
+//        try {
+//            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+//        } catch (IOException ex) {
+//        	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+//        }
+//        if(contentType == null) {
+//            contentType = "application/octet-stream";
+//        }
+//
+//        return ResponseEntity.ok()
+//                .contentType(MediaType.parseMediaType(contentType))
+//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+//                .body(resource);
+//	}
 	
-	
-
 }
