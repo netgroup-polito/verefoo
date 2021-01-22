@@ -1,0 +1,156 @@
+{
+  "type" : "object",
+  "id" : "urn:jsonschema:it:polito:verefoo:Neo4jConnection",
+  "additionalProperties" : false,
+  "properties" : {
+    "sourceHost" : {
+      "type" : "string"
+    },
+    "destHost" : {
+      "type" : "string"
+    },
+    "avgLatency" : {
+      "type" : "integer"
+    },
+    "startHost" : {
+      "type" : "object",
+      "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Host",
+      "additionalProperties" : false,
+      "properties" : {
+        "supportedVNF" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "id" : "urn:jsonschema:it:polito:verefoo:jaxb:SupportedVNFType",
+            "additionalProperties" : false,
+            "properties" : {
+              "functionalType" : {
+                "type" : "string",
+                "enum" : [ "FIREWALL", "ENDHOST", "ENDPOINT", "ANTISPAM", "CACHE", "DPI", "DPI_S", "MAILCLIENT", "MAILSERVER", "NAT", "VPNACCESS", "VPNEXIT", "WEBCLIENT", "WEBSERVER", "FIELDMODIFIER", "FORWARDER", "LOADBALANCER", "STATEFUL_FIREWALL", "PRIORITY_FIREWALL", "WEB_APPLICATION_FIREWALL", "TRAFFIC_MONITOR" ]
+              }
+            }
+          }
+        },
+        "nodeRef" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeRefType",
+            "additionalProperties" : false,
+            "properties" : {
+              "node" : {
+                "type" : "string"
+              }
+            }
+          }
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "cpu" : {
+          "type" : "integer"
+        },
+        "cores" : {
+          "type" : "integer"
+        },
+        "diskStorage" : {
+          "type" : "integer"
+        },
+        "memory" : {
+          "type" : "integer"
+        },
+        "maxVNF" : {
+          "type" : "integer"
+        },
+        "type" : {
+          "type" : "string",
+          "enum" : [ "CLIENT", "SERVER", "MIDDLEBOX" ]
+        },
+        "fixedEndpoint" : {
+          "type" : "string"
+        },
+        "active" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "endHost" : {
+      "type" : "object",
+      "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Host",
+      "additionalProperties" : false,
+      "properties" : {
+        "supportedVNF" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "id" : "urn:jsonschema:it:polito:verefoo:jaxb:SupportedVNFType",
+            "additionalProperties" : false,
+            "properties" : {
+              "functionalType" : {
+                "type" : "string",
+                "enum" : [ "FIREWALL", "ENDHOST", "ENDPOINT", "ANTISPAM", "CACHE", "DPI", "DPI_S", "MAILCLIENT", "MAILSERVER", "NAT", "VPNACCESS", "VPNEXIT", "WEBCLIENT", "WEBSERVER", "FIELDMODIFIER", "FORWARDER", "LOADBALANCER", "STATEFUL_FIREWALL", "PRIORITY_FIREWALL", "WEB_APPLICATION_FIREWALL", "TRAFFIC_MONITOR" ]
+              }
+            }
+          }
+        },
+        "nodeRef" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeRefType",
+            "additionalProperties" : false,
+            "properties" : {
+              "node" : {
+                "type" : "string"
+              }
+            }
+          }
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "cpu" : {
+          "type" : "integer"
+        },
+        "cores" : {
+          "type" : "integer"
+        },
+        "diskStorage" : {
+          "type" : "integer"
+        },
+        "memory" : {
+          "type" : "integer"
+        },
+        "maxVNF" : {
+          "type" : "integer"
+        },
+        "type" : {
+          "type" : "string",
+          "enum" : [ "CLIENT", "SERVER", "MIDDLEBOX" ]
+        },
+        "fixedEndpoint" : {
+          "type" : "string"
+        },
+        "active" : {
+          "type" : "boolean"
+        }
+      }
+    },
+    "connection" : {
+      "type" : "object",
+      "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Connection",
+      "additionalProperties" : false,
+      "properties" : {
+        "sourceHost" : {
+          "type" : "string"
+        },
+        "destHost" : {
+          "type" : "string"
+        },
+        "avgLatency" : {
+          "type" : "integer"
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Paths",
+  "additionalProperties" : false,
   "properties" : {
     "message" : {
       "type" : "string"

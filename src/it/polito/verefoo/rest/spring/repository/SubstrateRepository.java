@@ -7,14 +7,5 @@ import it.polito.verefoo.SubstrateId;
 
 @Repository
 public interface SubstrateRepository extends Neo4jRepository<SubstrateId, Long> {
-    
-    // @Override
-    // @Query("MATCH (s:SubstrateId) WHERE s.id = $id RETURN count(s) = 1")
-    // boolean existsById(@Param("id") Long id);
-
-    // @Override
-    // @Query("MERGE (s:SubstrateId {id: $substrateId.id}) " +
-    // "RETURN s")
-    // SubstrateId save(@Param("substrateId") SubstrateId substrateId);
 
 }

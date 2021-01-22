@@ -1,12 +1,14 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:AllocationConstraints",
+  "additionalProperties" : false,
   "properties" : {
     "allocationConstraint" : {
       "type" : "array",
       "items" : {
         "type" : "object",
         "id" : "urn:jsonschema:it:polito:verefoo:jaxb:AllocationConstraints:AllocationConstraint",
+        "additionalProperties" : false,
         "properties" : {
           "type" : {
             "type" : "string",

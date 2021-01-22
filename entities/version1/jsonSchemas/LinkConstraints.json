@@ -1,12 +1,14 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:LinkConstraints",
+  "additionalProperties" : false,
   "properties" : {
     "linkMetrics" : {
       "type" : "array",
       "items" : {
         "type" : "object",
         "id" : "urn:jsonschema:it:polito:verefoo:jaxb:LinkConstraints:LinkMetrics",
+        "additionalProperties" : false,
         "properties" : {
           "src" : {
             "type" : "string"

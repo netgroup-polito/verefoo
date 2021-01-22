@@ -3,7 +3,7 @@
     "node": [
         {
             "name": "10.0.0.1",
-            "functional_type": "WEBCLIENT",
+            "functionalType": "WEBCLIENT",
             "neighbour": [
                 {
                     "name": "30.0.0.1"
@@ -19,7 +19,7 @@
         },
         {
             "name": "30.0.0.1",
-            "functional_type": "FIREWALL",
+            "functionalType": "FIREWALL",
             "neighbour": [
                 {
                     "name": "10.0.0.1"
@@ -39,15 +39,15 @@
                             "source": "10.0.0.1",
                             "destination": "20.0.0.1",
                             "protocol": "ANY",
-                            "src_port": "*",
-                            "dst_port": "*"
+                            "srcPort": "*",
+                            "dstPort": "*"
                         }
                     ]
                 }
             }
         },
         {
-            "functional_type": "WEBSERVER",
+            "functionalType": "WEBSERVER",
             "name": "20.0.0.1",
             "neighbour": [
                 {

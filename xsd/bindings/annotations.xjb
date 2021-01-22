@@ -36,6 +36,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -53,6 +56,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -70,6 +76,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -104,7 +113,7 @@
 
         </jaxb:bindings> -->
 
-        <jaxb:bindings node="xsd:complexType[@name='Property']">
+        <!-- <jaxb:bindings node="xsd:complexType[@name='Property']">
             
             <annox:annotate target="class">
                 @org.neo4j.ogm.annotation.NodeEntity(label = "Property")
@@ -117,30 +126,16 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate>
             </jaxb:bindings>
 
-        </jaxb:bindings>
+        </jaxb:bindings> -->
 
     </jaxb:bindings>
 
     <jaxb:bindings schemaLocation="../verigraph.xsd" node="/xsd:schema">
-
-        <jaxb:bindings node="xsd:element[@name='graph']/xsd:complexType">
-
-            <annox:annotate target="class">
-                @org.neo4j.ogm.annotation.NodeEntity(label = "Graph")
-            </annox:annotate>
-
-            <jaxb:bindings node="xsd:attribute[@name='id']">
-                <annox:annotate target="field">
-                    @org.neo4j.ogm.annotation.Id
-                </annox:annotate>
-                <annox:annotate target="field">
-                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
-                </annox:annotate>
-            </jaxb:bindings>
-
-        </jaxb:bindings>
 
         <jaxb:bindings node="xsd:element[@name='node']/xsd:complexType">
 
@@ -148,13 +143,22 @@
                 @org.neo4j.ogm.annotation.NodeEntity(label = "Node")
             </annox:annotate>
 
+            <jaxb:bindings node="xsd:sequence/xsd:element[@ref='neighbour']">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Relationship(type = "NodeToNode")
+                </annox:annotate>
+            </jaxb:bindings>
+
             <jaxb:bindings node="xsd:attribute[@name='id']">
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.Id
                 </annox:annotate>
                 <annox:annotate target="field">
-                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                    @org.neo4j.ogm.annotation.GeneratedValue
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -170,8 +174,11 @@
                     @org.neo4j.ogm.annotation.Id
                 </annox:annotate>
                 <annox:annotate target="field">
-                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                    @org.neo4j.ogm.annotation.GeneratedValue
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -179,7 +186,7 @@
         <jaxb:bindings node="xsd:element[@name='configuration']/xsd:complexType">
 
             <annox:annotate target="class">
-                @org.neo4j.ogm.annotation.NodeEntity(label = "Configuration")
+                @org.neo4j.ogm.annotation.NodeEntity
             </annox:annotate>
 
             <jaxb:bindings node="xsd:attribute[@name='id']">
@@ -187,8 +194,11 @@
                     @org.neo4j.ogm.annotation.Id
                 </annox:annotate>
                 <annox:annotate target="field">
-                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                    @org.neo4j.ogm.annotation.GeneratedValue
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -223,6 +233,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -257,6 +270,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -291,6 +307,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -325,6 +344,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -359,6 +381,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -376,6 +401,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -393,6 +421,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -410,6 +441,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -427,6 +461,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -444,6 +481,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -461,6 +501,29 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
+            </jaxb:bindings>
+
+        </jaxb:bindings>
+
+        <jaxb:bindings node="xsd:element[@name='forwarder']/xsd:complexType">
+
+            <annox:annotate target="class">
+                @org.neo4j.ogm.annotation.NodeEntity(label = "Forwarder")
+            </annox:annotate>
+
+            <jaxb:bindings node="xsd:sequence/xsd:element">
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.Id
+                </annox:annotate>
+                <annox:annotate target="field">
+                    @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
+                </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>
@@ -478,6 +541,9 @@
                 <annox:annotate target="field">
                     @org.neo4j.ogm.annotation.GeneratedValue(strategy = it.polito.verefoo.rest.spring.repository.Neo4JCustomIdStrategy.class)
                 </annox:annotate>
+                <!-- <annox:annotate target="field">
+                    @com.fasterxml.jackson.annotation.JsonProperty(required = true)
+                </annox:annotate> -->
             </jaxb:bindings>
 
         </jaxb:bindings>

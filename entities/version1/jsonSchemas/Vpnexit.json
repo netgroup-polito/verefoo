@@ -1,6 +1,7 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Vpnexit",
+  "additionalProperties" : false,
   "properties" : {
     "vpnaccess" : {
       "type" : "string"

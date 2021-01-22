@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.neo4j.ogm.config.Configuration;
@@ -19,6 +20,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.core.convert.support.GenericConversionService;
+import org.springframework.data.neo4j.conversion.MetaDataDrivenConversionService;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
@@ -33,6 +38,7 @@ import io.swagger.v3.oas.models.tags.Tag;
 // TODO #jalol separate config from rest api
 @SpringBootApplication
 // @EnableSwagger2
+// @EnableTransactionManagement
 public class SpringBootConfiguration {
 
     public static void main(String[] args) {
@@ -58,6 +64,13 @@ public class SpringBootConfiguration {
     }
 
     @Bean
+    public ConversionService conversionService() {
+        ConversionService conversionService = new MetaDataDrivenConversionService(sessionFactory().metaData());
+        DefaultConversionService.addDefaultConverters((GenericConversionService) conversionService);
+        return conversionService;
+    }
+
+    @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
 
@@ -77,7 +90,11 @@ public class SpringBootConfiguration {
         // response, which is the default behaviour
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         ObjectMapper objectMapper = mappingJackson2HttpMessageConverter.getObjectMapper();
+        // doesn't write null-valued properties in the response
         objectMapper.setSerializationInclusion(Include.NON_NULL);
+        // equivalent of setting additionalProperties = false in json schemas; in other words
+        // reject every unknown property
+        objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
 
         return new HttpMessageConverters(true,

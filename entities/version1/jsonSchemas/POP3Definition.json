@@ -1,6 +1,7 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:POP3Definition",
+  "additionalProperties" : false,
   "properties" : {
     "from" : {
       "type" : "string"

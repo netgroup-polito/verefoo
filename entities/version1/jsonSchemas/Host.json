@@ -1,12 +1,14 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Host",
+  "additionalProperties" : false,
   "properties" : {
     "supportedVNF" : {
       "type" : "array",
       "items" : {
         "type" : "object",
         "id" : "urn:jsonschema:it:polito:verefoo:jaxb:SupportedVNFType",
+        "additionalProperties" : false,
         "properties" : {
           "functionalType" : {
             "type" : "string",
@@ -20,6 +22,7 @@
       "items" : {
         "type" : "object",
         "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeRefType",
+        "additionalProperties" : false,
         "properties" : {
           "node" : {
             "type" : "string"

@@ -1,28 +1,33 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NFV",
+  "additionalProperties" : false,
   "properties" : {
     "graphs" : {
       "type" : "object",
       "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Graphs",
+      "additionalProperties" : false,
       "properties" : {
         "graph" : {
           "type" : "array",
           "items" : {
             "type" : "object",
             "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Graph",
+            "additionalProperties" : false,
             "properties" : {
               "node" : {
                 "type" : "array",
                 "items" : {
                   "type" : "object",
                   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Node",
+                  "additionalProperties" : false,
                   "properties" : {
                     "neighbour" : {
                       "type" : "array",
                       "items" : {
                         "type" : "object",
                         "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Neighbour",
+                        "additionalProperties" : false,
                         "properties" : {
                           "id" : {
                             "type" : "integer"
@@ -36,16 +41,19 @@
                     "configuration" : {
                       "type" : "object",
                       "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Configuration",
+                      "additionalProperties" : false,
                       "properties" : {
                         "firewall" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Firewall",
+                          "additionalProperties" : false,
                           "properties" : {
                             "elements" : {
                               "type" : "array",
                               "items" : {
                                 "type" : "object",
                                 "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Elements",
+                                "additionalProperties" : false,
                                 "properties" : {
                                   "action" : {
                                     "type" : "string",
@@ -82,6 +90,7 @@
                         "endhost" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Endhost",
+                          "additionalProperties" : false,
                           "properties" : {
                             "body" : {
                               "type" : "string"
@@ -110,6 +119,7 @@
                         "endpoint" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Endpoint",
+                          "additionalProperties" : false,
                           "properties" : {
                             "name" : {
                               "type" : "string"
@@ -119,6 +129,7 @@
                         "antispam" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Antispam",
+                          "additionalProperties" : false,
                           "properties" : {
                             "source" : {
                               "type" : "array",
@@ -131,6 +142,7 @@
                         "cache" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Cache",
+                          "additionalProperties" : false,
                           "properties" : {
                             "resource" : {
                               "type" : "array",
@@ -143,12 +155,14 @@
                         "dpi" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Dpi",
+                          "additionalProperties" : false,
                           "properties" : {
                             "dpiElements" : {
                               "type" : "array",
                               "items" : {
                                 "type" : "object",
                                 "id" : "urn:jsonschema:it:polito:verefoo:jaxb:DpiElements",
+                                "additionalProperties" : false,
                                 "properties" : {
                                   "action" : {
                                     "type" : "string",
@@ -169,6 +183,7 @@
                         "mailclient" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Mailclient",
+                          "additionalProperties" : false,
                           "properties" : {
                             "mailserver" : {
                               "type" : "string"
@@ -178,6 +193,7 @@
                         "mailserver" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Mailserver",
+                          "additionalProperties" : false,
                           "properties" : {
                             "name" : {
                               "type" : "string"
@@ -187,6 +203,7 @@
                         "nat" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Nat",
+                          "additionalProperties" : false,
                           "properties" : {
                             "source" : {
                               "type" : "array",
@@ -199,6 +216,7 @@
                         "vpnaccess" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Vpnaccess",
+                          "additionalProperties" : false,
                           "properties" : {
                             "vpnexit" : {
                               "type" : "string"
@@ -208,6 +226,7 @@
                         "vpnexit" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Vpnexit",
+                          "additionalProperties" : false,
                           "properties" : {
                             "vpnaccess" : {
                               "type" : "string"
@@ -217,6 +236,7 @@
                         "webclient" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Webclient",
+                          "additionalProperties" : false,
                           "properties" : {
                             "nameWebServer" : {
                               "type" : "string"
@@ -226,6 +246,7 @@
                         "webserver" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Webserver",
+                          "additionalProperties" : false,
                           "properties" : {
                             "name" : {
                               "type" : "string"
@@ -235,6 +256,7 @@
                         "fieldmodifier" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Fieldmodifier",
+                          "additionalProperties" : false,
                           "properties" : {
                             "name" : {
                               "type" : "string"
@@ -244,6 +266,7 @@
                         "forwarder" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Forwarder",
+                          "additionalProperties" : false,
                           "properties" : {
                             "name" : {
                               "type" : "string"
@@ -253,6 +276,7 @@
                         "loadbalancer" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Loadbalancer",
+                          "additionalProperties" : false,
                           "properties" : {
                             "pool" : {
                               "type" : "array",
@@ -265,12 +289,14 @@
                         "statefulFirewall" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:StatefulFirewall",
+                          "additionalProperties" : false,
                           "properties" : {
                             "elements" : {
                               "type" : "array",
                               "items" : {
                                 "type" : "object",
                                 "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Elements",
+                                "additionalProperties" : false,
                                 "properties" : {
                                   "action" : {
                                     "type" : "string",
@@ -307,12 +333,14 @@
                         "webApplicationFirewall" : {
                           "type" : "object",
                           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:WebApplicationFirewall",
+                          "additionalProperties" : false,
                           "properties" : {
                             "wafElements" : {
                               "type" : "array",
                               "items" : {
                                 "type" : "object",
                                 "id" : "urn:jsonschema:it:polito:verefoo:jaxb:WafElements",
+                                "additionalProperties" : false,
                                 "properties" : {
                                   "action" : {
                                     "type" : "string",
@@ -371,16 +399,19 @@
     "constraints" : {
       "type" : "object",
       "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Constraints",
+      "additionalProperties" : false,
       "properties" : {
         "nodeConstraints" : {
           "type" : "object",
           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeConstraints",
+          "additionalProperties" : false,
           "properties" : {
             "nodeMetrics" : {
               "type" : "array",
               "items" : {
                 "type" : "object",
                 "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeConstraints:NodeMetrics",
+                "additionalProperties" : false,
                 "properties" : {
                   "node" : {
                     "type" : "string"
@@ -411,12 +442,14 @@
         "linkConstraints" : {
           "type" : "object",
           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:LinkConstraints",
+          "additionalProperties" : false,
           "properties" : {
             "linkMetrics" : {
               "type" : "array",
               "items" : {
                 "type" : "object",
                 "id" : "urn:jsonschema:it:polito:verefoo:jaxb:LinkConstraints:LinkMetrics",
+                "additionalProperties" : false,
                 "properties" : {
                   "src" : {
                     "type" : "string"
@@ -435,12 +468,14 @@
         "allocationConstraints" : {
           "type" : "object",
           "id" : "urn:jsonschema:it:polito:verefoo:jaxb:AllocationConstraints",
+          "additionalProperties" : false,
           "properties" : {
             "allocationConstraint" : {
               "type" : "array",
               "items" : {
                 "type" : "object",
                 "id" : "urn:jsonschema:it:polito:verefoo:jaxb:AllocationConstraints:AllocationConstraint",
+                "additionalProperties" : false,
                 "properties" : {
                   "type" : {
                     "type" : "string",
@@ -462,16 +497,19 @@
     "propertyDefinition" : {
       "type" : "object",
       "id" : "urn:jsonschema:it:polito:verefoo:jaxb:PropertyDefinition",
+      "additionalProperties" : false,
       "properties" : {
         "property" : {
           "type" : "array",
           "items" : {
             "type" : "object",
             "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Property",
+            "additionalProperties" : false,
             "properties" : {
               "pop3Definition" : {
                 "type" : "object",
                 "id" : "urn:jsonschema:it:polito:verefoo:jaxb:POP3Definition",
+                "additionalProperties" : false,
                 "properties" : {
                   "from" : {
                     "type" : "string"
@@ -522,6 +560,7 @@
               "httpdefinition" : {
                 "type" : "object",
                 "id" : "urn:jsonschema:it:polito:verefoo:jaxb:HTTPDefinition",
+                "additionalProperties" : false,
                 "properties" : {
                   "url" : {
                     "type" : "string"
@@ -542,18 +581,21 @@
     "hosts" : {
       "type" : "object",
       "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Hosts",
+      "additionalProperties" : false,
       "properties" : {
         "host" : {
           "type" : "array",
           "items" : {
             "type" : "object",
             "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Host",
+            "additionalProperties" : false,
             "properties" : {
               "supportedVNF" : {
                 "type" : "array",
                 "items" : {
                   "type" : "object",
                   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:SupportedVNFType",
+                  "additionalProperties" : false,
                   "properties" : {
                     "functionalType" : {
                       "type" : "string",
@@ -567,6 +609,7 @@
                 "items" : {
                   "type" : "object",
                   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeRefType",
+                  "additionalProperties" : false,
                   "properties" : {
                     "node" : {
                       "type" : "string"
@@ -610,12 +653,14 @@
     "connections" : {
       "type" : "object",
       "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Connections",
+      "additionalProperties" : false,
       "properties" : {
         "connection" : {
           "type" : "array",
           "items" : {
             "type" : "object",
             "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Connection",
+            "additionalProperties" : false,
             "properties" : {
               "sourceHost" : {
                 "type" : "string"
@@ -634,18 +679,21 @@
     "networkForwardingPaths" : {
       "type" : "object",
       "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NetworkForwardingPaths",
+      "additionalProperties" : false,
       "properties" : {
         "path" : {
           "type" : "array",
           "items" : {
             "type" : "object",
             "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Path",
+            "additionalProperties" : false,
             "properties" : {
               "pathNode" : {
                 "type" : "array",
                 "items" : {
                   "type" : "object",
                   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Path:PathNode",
+                  "additionalProperties" : false,
                   "properties" : {
                     "name" : {
                       "type" : "string"

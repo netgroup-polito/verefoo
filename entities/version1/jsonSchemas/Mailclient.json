@@ -1,6 +1,7 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Mailclient",
+  "additionalProperties" : false,
   "properties" : {
     "mailserver" : {
       "type" : "string"

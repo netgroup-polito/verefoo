@@ -1,12 +1,14 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:PriorityFirewall",
+  "additionalProperties" : false,
   "properties" : {
     "elements" : {
       "type" : "array",
       "items" : {
         "type" : "object",
         "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Elements",
+        "additionalProperties" : false,
         "properties" : {
           "action" : {
             "type" : "string",

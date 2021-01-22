@@ -1,16 +1,19 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Constraints",
+  "additionalProperties" : false,
   "properties" : {
     "nodeConstraints" : {
       "type" : "object",
       "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeConstraints",
+      "additionalProperties" : false,
       "properties" : {
         "nodeMetrics" : {
           "type" : "array",
           "items" : {
             "type" : "object",
             "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeConstraints:NodeMetrics",
+            "additionalProperties" : false,
             "properties" : {
               "node" : {
                 "type" : "string"
@@ -41,12 +44,14 @@
     "linkConstraints" : {
       "type" : "object",
       "id" : "urn:jsonschema:it:polito:verefoo:jaxb:LinkConstraints",
+      "additionalProperties" : false,
       "properties" : {
         "linkMetrics" : {
           "type" : "array",
           "items" : {
             "type" : "object",
             "id" : "urn:jsonschema:it:polito:verefoo:jaxb:LinkConstraints:LinkMetrics",
+            "additionalProperties" : false,
             "properties" : {
               "src" : {
                 "type" : "string"
@@ -65,12 +70,14 @@
     "allocationConstraints" : {
       "type" : "object",
       "id" : "urn:jsonschema:it:polito:verefoo:jaxb:AllocationConstraints",
+      "additionalProperties" : false,
       "properties" : {
         "allocationConstraint" : {
           "type" : "array",
           "items" : {
             "type" : "object",
             "id" : "urn:jsonschema:it:polito:verefoo:jaxb:AllocationConstraints:AllocationConstraint",
+            "additionalProperties" : false,
             "properties" : {
               "type" : {
                 "type" : "string",

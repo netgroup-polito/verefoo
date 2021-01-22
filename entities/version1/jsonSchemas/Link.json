@@ -1,6 +1,7 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Hyperlinks:Link",
+  "additionalProperties" : false,
   "properties" : {
     "rel" : {
       "type" : "string"

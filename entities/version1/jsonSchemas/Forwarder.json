@@ -1,6 +1,7 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Forwarder",
+  "additionalProperties" : false,
   "properties" : {
     "name" : {
       "type" : "string"

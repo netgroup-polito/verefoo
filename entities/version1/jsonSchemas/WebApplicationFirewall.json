@@ -1,12 +1,14 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:WebApplicationFirewall",
+  "additionalProperties" : false,
   "properties" : {
     "wafElements" : {
       "type" : "array",
       "items" : {
         "type" : "object",
         "id" : "urn:jsonschema:it:polito:verefoo:jaxb:WafElements",
+        "additionalProperties" : false,
         "properties" : {
           "action" : {
             "type" : "string",

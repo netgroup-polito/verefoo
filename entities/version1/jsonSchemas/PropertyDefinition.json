@@ -1,16 +1,19 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:PropertyDefinition",
+  "additionalProperties" : false,
   "properties" : {
     "property" : {
       "type" : "array",
       "items" : {
         "type" : "object",
         "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Property",
+        "additionalProperties" : false,
         "properties" : {
           "pop3Definition" : {
             "type" : "object",
             "id" : "urn:jsonschema:it:polito:verefoo:jaxb:POP3Definition",
+            "additionalProperties" : false,
             "properties" : {
               "from" : {
                 "type" : "string"
@@ -61,6 +64,7 @@
           "httpdefinition" : {
             "type" : "object",
             "id" : "urn:jsonschema:it:polito:verefoo:jaxb:HTTPDefinition",
+            "additionalProperties" : false,
             "properties" : {
               "url" : {
                 "type" : "string"

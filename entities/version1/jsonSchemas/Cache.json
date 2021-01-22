@@ -1,6 +1,7 @@
 {
   "type" : "object",
   "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Cache",
+  "additionalProperties" : false,
   "properties" : {
     "resource" : {
       "type" : "array",

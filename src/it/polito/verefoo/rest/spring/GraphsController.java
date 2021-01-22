@@ -1,13 +1,13 @@
 package it.polito.verefoo.rest.spring;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resources;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,27 +17,31 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import it.polito.verefoo.jaxb.Configuration;
 import it.polito.verefoo.jaxb.Constraints;
 import it.polito.verefoo.jaxb.Graph;
 import it.polito.verefoo.jaxb.Graphs;
 import it.polito.verefoo.jaxb.Neighbour;
 import it.polito.verefoo.jaxb.Node;
+import it.polito.verefoo.rest.spring.service.GraphService;
+
 
 @RestController
 @RequestMapping(value = "/adp/graphs", consumes = { "application/xml", "application/json" }, produces = {
 		"application/xml", "application/json" })
 public class GraphsController {
 
-	ADPService service = new ADPService();
+	@Autowired
+	GraphService service;
 
 	@Autowired
 	private HttpServletRequest request;
+
+	static Logger logger = LogManager.getLogger("result");
 
 	/*
 	 * Graphs
@@ -47,14 +51,14 @@ public class GraphsController {
 	 * @param graph it is the graph to store
 	 * @return the created graph
 	 */
-	@Operation(tags = "version 1 - graphs", summary = "Create a graph", description = "")
+	@Operation(tags = "version 1 - graphs", summary = "Create a graph", description = "The graph's id in the request, if provided, is neglected; instead, the system automatically generates, stores the id for all the graphs and puts them in the response.")
 	@ApiResponses(value = { 
 		@ApiResponse(responseCode = "201", description = "Created"),
 		@ApiResponse(responseCode = "400", description = "The provided graph is semantically malformed. You can check it and retry the operation accordingly."),
 	})
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
-	public ResponseEntity<Resources<Integer>> createGraph(@RequestBody Graph graph) {
+	public ResponseEntity<Resources<List<Long>>> createGraphs(@RequestBody Graphs graphs) {
 		// long id = service.getNextGraphId();
 		// StringBuffer url = request.getRequestURL();
 		// Graph created = service.createGraph(id, graph);
@@ -77,18 +81,20 @@ public class GraphsController {
 		// throw new ResponseStatusException(
 		// HttpStatus.BAD_REQUEST, "bad request"
 		// );
-		Integer graphId = 0;
+
+		List<Long> graphIds = service.createGraphs(graphs);
+
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.CREATED).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Integer>()
-						.addLink(url + "/" + graphId, "self", RequestMethod.GET)
-						.addLink(url + "/" + graphId, "self", RequestMethod.PUT)
+				new ResourceWrapperWithLinks<List<Long>>()
+						.addLink(url + "/" + graphIds.get(0), "first", RequestMethod.GET)
+						.addLink(url + "/" + graphIds.get(0), "first", RequestMethod.PUT)
 						.addLink(url, "list", RequestMethod.GET)
 						.addLink(url, "list", RequestMethod.DELETE)
 						.addLink(url, "new", RequestMethod.POST)
-						.addLink(url + "/" + graphId, "self", RequestMethod.DELETE)
-						.wrap(graphId));
+						.addLink(url + "/" + graphIds.get(0), "first", RequestMethod.DELETE)
+						.wrap(graphIds));
 	}
 
 	/**
@@ -105,14 +111,14 @@ public class GraphsController {
 
 	public ResponseEntity<Resources<Graphs>> getGraphs() {
 		// Graphs graphs = service.getGraphs();
-		Graphs graphs = null;
+		Graphs graphs = service.getGraphs();
 		// if(graphs.getGraph().isEmpty())
 		// throw new ResponseStatusException(
 		// HttpStatus.NOT_FOUND, "not found"
 		// );
 		// return graphs;
 		String url = request.getRequestURL().toString();
-		return ResponseEntity.status(HttpStatus.CREATED).body(
+		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Graphs>()
 						.addLink(url, "new", RequestMethod.POST)
@@ -132,11 +138,9 @@ public class GraphsController {
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
 	public ResponseEntity<Resources<Void>> deleteGraphs() {
-		// Graphs graphs = service.deleteGraphs();
-		// if (graphs == null)
-		// throw new ResponseStatusException(
-		// HttpStatus.NOT_FOUND, "not found"
-		// );
+
+		service.deleteGraphs();
+
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.CREATED).body(
 				// wrap the response with the hyperlinks
@@ -157,18 +161,18 @@ public class GraphsController {
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist. You can retry the operation or create the graph instead."), })
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
-	public ResponseEntity<Resources<Void>> updateGraph(@PathVariable("gid") long gid, @RequestBody Graph graph) {
-		// Graph updated = service.updateGraph(gid, graph);
-		// if (updated == null)
-		// throw new ResponseStatusException(
-		// HttpStatus.NOT_FOUND, "not found"
-		// );
+	public ResponseEntity<Resources<Long>> updateGraph(@PathVariable("gid") long gid, @RequestBody Graph graph) {
+
+		Long newId = service.updateGraph(gid, graph);
+
 		String url = request.getRequestURL().toString().substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + gid, "self", RequestMethod.GET)
-						.addLink(url, "new", RequestMethod.POST).addLink(url + "/" + gid, "self", RequestMethod.DELETE)
-						.addLink(url + "/" + gid, "self", RequestMethod.PUT).wrap(null));
+				new ResourceWrapperWithLinks<Long>().addLink(url + "/" + newId, "self", RequestMethod.GET)
+						.addLink(url, "new", RequestMethod.POST)
+						.addLink(url + "/" + newId, "self", RequestMethod.DELETE)
+						.addLink(url + "/" + newId, "self", RequestMethod.PUT)
+						.wrap(newId));
 	}
 
 	/**
@@ -180,14 +184,9 @@ public class GraphsController {
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist. You can retry the operation or refer to another graph."), })
 
 	public ResponseEntity<Resources<Graph>> getGraph(@PathVariable("gid") long gid) {
-		// Graph graph = service.getGraph(gid);
-		// if (graph==null)
-		// throw new ResponseStatusException(
-		// HttpStatus.NOT_FOUND, "not found"
-		// );
-		// graph.setId(gid);
-		// return graph;
-		Graph graph = null;
+
+		Graph graph = service.getGraph(gid);
+
 		String url = request.getRequestURL().toString().substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
@@ -208,12 +207,10 @@ public class GraphsController {
 			@ApiResponse(responseCode = "409", description = "The graph could not be deleted because it is referenced by a requirement resource; you can first delete the interested requirement.")})
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
-	public ResponseEntity<Resources<Void>> deleteGraph(@PathVariable("gid") long gid) {
-		// Graph graph = service.deleteGraph(gid);
-		// if (graph == null)
-		// throw new ResponseStatusException(
-		// HttpStatus.NOT_FOUND, "not found"
-		// );
+	public ResponseEntity<Resources<Void>> deleteGraph(@PathVariable("gid") Long gid) {
+
+		service.deleteGraph(gid);
+
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
@@ -238,8 +235,7 @@ public class GraphsController {
 			@ApiResponse(responseCode = "400", description = "The node is semantically malformed. You can retry the operation or check the node."),
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist at all. You can retry the operation or refer to another graph.")
 		})
-	public ResponseEntity<Resources<Integer>> createNode(@PathVariable("gid") long gid,
-			@RequestParam(name = "nid") String nid, @RequestBody Node node) {
+	public ResponseEntity<Resources<Integer>> createNode(@PathVariable("gid") long gid, @RequestBody Node node) {
 		// if(nid == null)
 		// throw new ResponseStatusException(
 		// HttpStatus.BAD_REQUEST, "bad request"
@@ -268,7 +264,7 @@ public class GraphsController {
 		// throw new ResponseStatusException(
 		// HttpStatus.BAD_REQUEST, "bad request"
 		// );
-		Integer nodeId = 0;
+		Integer nodeId = service.createNode(gid, node);
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/")).substring(0,
 				request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.CREATED).body(
