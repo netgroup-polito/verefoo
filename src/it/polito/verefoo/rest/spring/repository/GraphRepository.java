@@ -38,4 +38,16 @@ public interface GraphRepository extends Neo4jRepository<DbGraph, Long> {
     @Query("CYPHER 3.5 MATCH (s:DbGraph)-[*]-(n) WHERE id(s)=$id " +
     "RETURN (s:DbGraph)-[*]-(n)")
     Optional<DbGraph> findById(@Param("id") Long id);
+
+    @Query("CYPHER 3.5 MATCH (d:DbGraph) WHERE id(d)=$id " +
+    "WITH d " +
+    "MATCH (n:DbNode) WHERE id(n)=$nodeId " +
+    "MERGE (d)-[:NODE]->(n)")
+    void bindNode(@Param("id") Long id, @Param("nodeId") Long nodeId);
+    
+    @Query("CYPHER 3.5 " +
+    "MATCH (d:DbGraph)-[r:NODE]->(n:DbNode) WHERE id(d)=$id AND id(n)=$nodeId " +
+    "DELETE r")
+    void unbindNode(@Param("id") Long id, @Param("nodeId") Long nodeId);
+    
 }

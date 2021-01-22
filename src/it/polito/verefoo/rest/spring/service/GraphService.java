@@ -6,19 +6,31 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import it.polito.verefoo.DbGraph;
+import it.polito.verefoo.DbNeighbour;
+import it.polito.verefoo.DbNode;
 import it.polito.verefoo.jaxb.Graph;
 import it.polito.verefoo.jaxb.Graphs;
+import it.polito.verefoo.jaxb.Neighbour;
 import it.polito.verefoo.jaxb.Node;
 import it.polito.verefoo.rest.spring.converter.GraphConverter;
 import it.polito.verefoo.rest.spring.repository.GraphRepository;
+import it.polito.verefoo.rest.spring.repository.NeighbourRepository;
+import it.polito.verefoo.rest.spring.repository.NodeRepository;
 
 @Service
 public class GraphService {
 
         @Autowired
         GraphRepository graphRepository;
+
+        @Autowired
+        NodeRepository nodeRepository;
+
+        @Autowired
+        NeighbourRepository neighbourRepository;
 
         @Autowired
         GraphConverter converter;
@@ -76,8 +88,56 @@ public class GraphService {
                         return null;
         }
 
-        public Integer createNode(long gid, Node node) {
-                return null;
+        @Transactional
+        public Long createNode(Long id, Node node) {
+                Long nodeId = nodeRepository.save(converter.deserializeNode(node)).getId();
+                graphRepository.bindNode(id, nodeId);
+                return nodeId;
+        }
+
+        /**
+         * TODO: decide what happens if this node is defined as neighbour of another
+         * node
+         * 
+         * @param id
+         * @param nodeId
+         */
+        @Transactional
+        public void deleteNode(Long id, Long nodeId) {
+                graphRepository.unbindNode(id, nodeId);
+                nodeRepository.deleteById(nodeId);
+        }
+
+        /**
+         * As usual, {@code node} and its neighbours must not declare any id.
+         * 
+         * @param id
+         * @param nodeId
+         * @param node
+         * @return
+         */
+        public Long updateNode(Long id, Long nodeId, Node node) {
+                deleteNode(id, nodeId);
+                return createNode(id, node);
+        }
+
+        public Node getNode(Long gid, Long nodeId) {
+                Optional<DbNode> dbNode = nodeRepository.findById(nodeId);
+                if (dbNode.isPresent()) {
+                        return converter.serializeNode(dbNode.get());
+                } else
+                        return null;
+        }
+
+        public Long createNeighbour(Long id, Long nodeId, Neighbour neighbour) {
+                DbNeighbour dbNeighbour = neighbourRepository.save(converter.deserializeNeighbour(neighbour));
+                nodeRepository.bindNeighbour(nodeId, dbNeighbour.getId());
+                return dbNeighbour.getId();
+        }
+
+        public void deleteNeighbour(Long gid, Long nodeId, Long neighbourId) {
+                nodeRepository.unbindNeighbour(nodeId, neighbourId);
+                neighbourRepository.deleteById(neighbourId);
         }
 
 }

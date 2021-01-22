@@ -59,28 +59,6 @@ public class GraphsController {
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	public ResponseEntity<Resources<List<Long>>> createGraphs(@RequestBody Graphs graphs) {
-		// long id = service.getNextGraphId();
-		// StringBuffer url = request.getRequestURL();
-		// Graph created = service.createGraph(id, graph);
-		// if (created != null) {
-		// String responseUrl;
-		// if(url.toString().endsWith("/")) responseUrl = url.toString() + id;
-		// else responseUrl = url.toString() + "/" + id;
-		// created.setId(id);
-		// HttpHeaders responseHeaders = new HttpHeaders();
-		// try {
-		// responseHeaders.setLocation(new URI(responseUrl));
-		// } catch (URISyntaxException e) {
-		// throw new ResponseStatusException(
-		// HttpStatus.BAD_REQUEST, "bad request"
-		// );
-		// }
-		// return new ResponseEntity<Graph>(created, responseHeaders,
-		// HttpStatus.CREATED);
-		// } else
-		// throw new ResponseStatusException(
-		// HttpStatus.BAD_REQUEST, "bad request"
-		// );
 
 		List<Long> graphIds = service.createGraphs(graphs);
 
@@ -110,13 +88,9 @@ public class GraphsController {
 	 })
 
 	public ResponseEntity<Resources<Graphs>> getGraphs() {
-		// Graphs graphs = service.getGraphs();
+		
 		Graphs graphs = service.getGraphs();
-		// if(graphs.getGraph().isEmpty())
-		// throw new ResponseStatusException(
-		// HttpStatus.NOT_FOUND, "not found"
-		// );
-		// return graphs;
+
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
@@ -235,41 +209,15 @@ public class GraphsController {
 			@ApiResponse(responseCode = "400", description = "The node is semantically malformed. You can retry the operation or check the node."),
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist at all. You can retry the operation or refer to another graph.")
 		})
-	public ResponseEntity<Resources<Integer>> createNode(@PathVariable("gid") long gid, @RequestBody Node node) {
-		// if(nid == null)
-		// throw new ResponseStatusException(
-		// HttpStatus.BAD_REQUEST, "bad request"
-		// );
-		// StringBuffer url = request.getRequestURL();
-		// Node created = service.createNode(gid, node, nid);
-		// if (created != null) {
-		// if(created.getName() == null)
-		// throw new ResponseStatusException(
-		// HttpStatus.CONFLICT, "conflict"
-		// );
-		// String responseUrl;
-		// if(url.toString().endsWith("/")) responseUrl = url.toString() + nid;
-		// else responseUrl = url.toString() + "/" + nid;
-		// HttpHeaders responseHeaders = new HttpHeaders();
-		// try {
-		// responseHeaders.setLocation(new URI(responseUrl));
-		// } catch (URISyntaxException e) {
-		// throw new ResponseStatusException(
-		// HttpStatus.BAD_REQUEST, "bad request"
-		// );
-		// }
-		// return new ResponseEntity<Node>(created, responseHeaders,
-		// HttpStatus.CREATED);
-		// } else
-		// throw new ResponseStatusException(
-		// HttpStatus.BAD_REQUEST, "bad request"
-		// );
-		Integer nodeId = service.createNode(gid, node);
+	public ResponseEntity<Resources<Long>> createNode(@PathVariable("gid") long gid, @RequestBody Node node) {
+
+		Long nodeId = service.createNode(gid, node);
+
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/")).substring(0,
 				request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.CREATED).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Integer>().addLink(url + "/" + gid + "/nodes", "new", RequestMethod.POST)
+				new ResourceWrapperWithLinks<Long>().addLink(url + "/" + gid + "/nodes", "new", RequestMethod.POST)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nodeId, "self", RequestMethod.DELETE)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nodeId, "self", RequestMethod.PUT)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nodeId, "self", RequestMethod.GET)
@@ -292,30 +240,22 @@ public class GraphsController {
 		})
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
-	public ResponseEntity<Resources<Void>> updateNode(@PathVariable("gid") long gid, @PathVariable("nid") String nid,
-			@RequestBody Node node) {
-		// Node updated = service.updateNode(gid, nid, node);
-		// if (updated == null)
-		// throw new ResponseStatusException(
-		// HttpStatus.NOT_FOUND, "not found"
-		// );
-		// else if (updated.getName() == null)
-		// throw new ResponseStatusException(
-		// HttpStatus.BAD_REQUEST, "bad request"
-		// );
+	public ResponseEntity<Resources<Long>> updateNode(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid, @RequestBody Node node) {
+
+		Long newId = service.updateNode(gid, nid, node);
 
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
-		return ResponseEntity.status(HttpStatus.CREATED).body(
+		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + gid + "/nodes", "new", RequestMethod.POST)
-						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.DELETE)
-						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.PUT)
-						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.GET)
+				new ResourceWrapperWithLinks<Long>().addLink(url + "/" + gid + "/nodes", "new", RequestMethod.POST)
+						.addLink(url + "/" + gid + "/nodes" + "/" + newId, "self", RequestMethod.DELETE)
+						.addLink(url + "/" + gid + "/nodes" + "/" + newId, "self", RequestMethod.PUT)
+						.addLink(url + "/" + gid + "/nodes" + "/" + newId, "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
 						.addLink(url + "/" + gid, "list", RequestMethod.GET).addLink(url, "list", RequestMethod.GET)
-						.wrap(null));
+						.wrap(newId));
 	}
 
 	/**
@@ -330,19 +270,14 @@ public class GraphsController {
 			@ApiResponse(responseCode = "404", description = "The graph or the node doesn't exist at all. You can retry the operation or refer to another graph/node.")
 		})
 
-	public ResponseEntity<Resources<Node>> getNode(@PathVariable("gid") long gid, @PathVariable("nid") String nid) {
-		// Node node = service.getNode(gid, nid);
-		// if (node == null)
-		// throw new ResponseStatusException(
-		// HttpStatus.NOT_FOUND, "not found"
-		// );
-		// return node;
+	public ResponseEntity<Resources<Node>> getNode(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid) {
 
-		Node node = null;
+		Node node = service.getNode(gid, nid);
+
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
-		return ResponseEntity.status(HttpStatus.CREATED).body(
+		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Node>()
 						.addLink(url + "/" + gid + "/nodes", "new", RequestMethod.POST)
@@ -367,17 +302,14 @@ public class GraphsController {
 		})
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
-	public ResponseEntity<Resources<Void>> deleteNode(@PathVariable("gid") long gid, @PathVariable("nid") String nid) {
-		// Node node = service.deleteNode(gid, nid);
-		// if ( node == null)
-		// throw new ResponseStatusException(
-		// HttpStatus.NOT_FOUND, "not found"
-		// );
+	public ResponseEntity<Resources<Void>> deleteNode(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid) {
+
+		service.deleteNode(gid, nid);
 
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
-		return ResponseEntity.status(HttpStatus.CREATED).body(
+		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + gid + "/nodes", "new", RequestMethod.POST)
 						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
@@ -401,32 +333,25 @@ public class GraphsController {
 			@ApiResponse(responseCode = "404", description = "The graph or the node doesn't exist at all. You can retry the operation or refer to another graph/node."),
 			@ApiResponse(responseCode = "409", description = "")
 		})
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	public ResponseEntity<Resources<Void>> addNeighbour(@PathVariable("gid") long gid, @PathVariable("nid") String nid,
-			@RequestBody Neighbour neighbour) {
-		// Neighbour added = service.addNeighbour(gid, nid, neighbour);
-		// if(added == null)
-		// throw new ResponseStatusException(
-		// HttpStatus.NOT_FOUND, "not found"
-		// );
-		// else if(added.getName() == null)
-		// throw new ResponseStatusException(
-		// HttpStatus.CONFLICT, "conflict"
-		// );
+
+	public ResponseEntity<Resources<Long>> createNeighbour(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid, @RequestBody Neighbour neighbour) {
+
+		Long neighbourId = service.createNeighbour(gid, nid, neighbour);
+
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.CREATED).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Void>()
+				new ResourceWrapperWithLinks<Long>()
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/neighbours", "new", RequestMethod.POST)
-						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/neighbours" + "?neighbour=" + neighbour.getName(), "self", RequestMethod.DELETE)
+						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/neighbours/" + neighbourId, "self", RequestMethod.DELETE)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
 						.addLink(url + "/" + gid, "list", RequestMethod.GET)
 						.addLink(url, "list", RequestMethod.GET)
-						.wrap(null));
+						.wrap(neighbourId));
 	}
 
 	/**
@@ -435,24 +360,16 @@ public class GraphsController {
 	 * @param neighbour it is the neighbour to remove from the node
 	 */
 	@Operation(tags = "version 1 - graphs", summary = "Delete a neighbour of a node", description = "delete a neighbour")
-	@RequestMapping(value = "/{gid}/nodes/{nid}/neighbours", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{gid}/nodes/{noid}/neighbours/{neid}", method = RequestMethod.DELETE)
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "204", description = "No Content"),
 		@ApiResponse(responseCode = "404", description = "The graph, the initial node or the incident node doesn't exist at all. You can retry the operation or refer to another graph/node.")
 	})
 
 
-	public ResponseEntity<Resources<Void>> deleteNeighbour(@PathVariable("gid") long gid, @PathVariable("nid") String nid,
-			@RequestParam(name = "neighbour") String neighbour) {
+	public ResponseEntity<Resources<Void>> deleteNeighbour(@PathVariable("gid") Long gid, @PathVariable("noid") Long noid, @PathVariable("neid") Long neid) {
 
-		// if (neighbour == null)
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-
-		// Neighbour removed = service.deleteNeighbour(gid, nid, neighbour);
-		// if (removed == null)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		// else if (removed.getName() == null)
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+		service.deleteNeighbour(gid, noid, neid);
 
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
@@ -461,8 +378,8 @@ public class GraphsController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>()
-						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/neighbours", "new", RequestMethod.POST)
-						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.GET)
+						.addLink(url + "/" + gid + "/nodes" + "/" + noid + "/neighbours", "new", RequestMethod.POST)
+						.addLink(url + "/" + gid + "/nodes" + "/" + noid, "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
 						.addLink(url + "/" + gid, "list", RequestMethod.GET)
 						.addLink(url, "list", RequestMethod.GET)
