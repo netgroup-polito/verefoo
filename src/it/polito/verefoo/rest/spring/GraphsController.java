@@ -399,13 +399,10 @@ public class GraphsController {
 		@ApiResponse(responseCode = "404", description = "The graph, the node or the configuration doesn't exist at all. You can retry the operation or refer to another graph/node.")
 	})
 
-	public ResponseEntity<Resources<Configuration>> getConfiguration(@PathVariable("gid") long gid, @PathVariable("nid") String nid) {
+	public ResponseEntity<Resources<Configuration>> getConfiguration(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid) {
 
-		// Configuration configuration = service.getConfiguration(gid, nid);
-		// if (configuration == null)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		// return configuration;
-		Configuration configuration = null;
+		Configuration configuration = service.getConfiguration(gid, nid);
+
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
@@ -428,51 +425,31 @@ public class GraphsController {
 	 * @param configuration it is the new configuration
 	 */
 	@Operation(tags = "version 1 - graphs", summary = "Update the configuration of a node", description = "")
-	@RequestMapping(value = "/{gid}/nodes/{nid}/configuration", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{gid}/nodes/{nid}/configuration/{cid}", method = RequestMethod.PUT)
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "204", description = "No Content"),
+		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "404", description = "The graph, the node or the configuration doesn't exist at all. You can retry the operation or refer to another graph/node.")
 	})
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
-	public ResponseEntity<Resources<Void>> updateConfiguration(@PathVariable("gid") long gid, @PathVariable("nid") String nid,
-			@RequestBody Configuration configuration) {
+	public ResponseEntity<Resources<Long>> updateConfiguration(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid, @PathVariable("cid") Long cid, @RequestBody Configuration configuration) {
 
-		// Configuration updated = service.updateConfiguration(gid, nid, configuration);
-		// if (updated == null)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+		Long newConfigurationId = service.updateConfiguration(gid, nid, cid, configuration);
+
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Void>()
-						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/configuration", "self", RequestMethod.PUT)
+				new ResourceWrapperWithLinks<Long>()
+						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/configuration/" + newConfigurationId, "self", RequestMethod.PUT)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/configuration", "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
 						.addLink(url + "/" + gid, "list", RequestMethod.GET)
 						.addLink(url, "list", RequestMethod.GET)
-						.wrap(null));
+						.wrap(newConfigurationId));
 	}
-
-	// /**
-	//  * @param gid it is the id of the graph
-	//  * @param nid it is the name of the node whose configuration must be deleted
-	//  */
-	// @Operation(tags = "version 1 - graphs", summary = "deleteConfiguration", description = "delete the configuration of a node")
-	// @RequestMapping(value = "/{gid}/nodes/{nid}/configuration", method = RequestMethod.DELETE)
-	// @ApiResponses(value = { @ApiResponse(responseCode = "204", description = "No Content"),
-	// 		@ApiResponse(responseCode = "404", description = "Not Found") })
-	// @ResponseStatus(value = HttpStatus.NO_CONTENT)
-
-	// public void deleteConfiguration(@PathVariable("gid") long gid, @PathVariable("nid") String nid) {
-
-	// 	Configuration deleted = service.deleteConfiguration(gid, nid);
-	// 	if (deleted == null)
-	// 		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-	// }
 
 	/* Constraints */
 
@@ -488,38 +465,10 @@ public class GraphsController {
 			@ApiResponse(responseCode = "400", description = "The passed constraints are semantically malformed. You can retry the operation or check them."),
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist at all. You can retry the operation or refer to another graph.")
 		})
-	public ResponseEntity<Resources<Void>> createConstraints(@PathVariable("gid") long gid, @RequestBody Constraints constraints) {
-		// if(constraints.getLinkConstraints().getLinkMetrics().isEmpty() &&
-		// constraints.getNodeConstraints().getNodeMetrics().isEmpty())
-		// throw new ResponseStatusException(
-		// HttpStatus.BAD_REQUEST, "bad request"
-		// );
-		// StringBuffer url = request.getRequestURL();
-		// String responseUrl;
-		// if(url.toString().endsWith("/")) responseUrl = url.toString() +
-		// "constraints";
-		// else responseUrl = url.toString() + "/constraints";
-		// Constraints created = service.createConstraints(gid, constraints);
-		// if (created != null) {
-		// if(created.getLinkConstraints() == null && created.getNodeConstraints() ==
-		// null)
-		// throw new ResponseStatusException(
-		// HttpStatus.CONFLICT, "conflict"
-		// );
-		// HttpHeaders responseHeaders = new HttpHeaders();
-		// try {
-		// responseHeaders.setLocation(new URI(responseUrl));
-		// } catch (URISyntaxException e) {
-		// throw new ResponseStatusException(
-		// HttpStatus.BAD_REQUEST, "bad request"
-		// );
-		// }
-		// return new ResponseEntity<Constraints>(created, responseHeaders,
-		// HttpStatus.CREATED);
-		// } else
-		// throw new ResponseStatusException(
-		// HttpStatus.BAD_REQUEST, "bad request"
-		// );
+	public ResponseEntity<Resources<Void>> createConstraints(@PathVariable("gid") Long gid, @RequestBody Constraints constraints) {
+		
+		service.createConstraints(gid, constraints);
+
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
@@ -547,17 +496,10 @@ public class GraphsController {
 		})
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
-	public ResponseEntity<Resources<Void>> updateConstraints(@PathVariable("gid") long gid, @RequestBody Constraints constraints) {
-		// if (constraints.getLinkConstraints().getLinkMetrics().isEmpty()
-		// 		&& constraints.getNodeConstraints().getNodeMetrics().isEmpty())
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		// ;
-		// Constraints updated = service.updateConstraints(gid, constraints);
-		// if (updated == null)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		// else if (updated.getLinkConstraints().getLinkMetrics().isEmpty()
-		// 		&& updated.getNodeConstraints().getNodeMetrics().isEmpty())
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+	public ResponseEntity<Resources<Void>> updateConstraints(@PathVariable("gid") Long gid, @RequestBody Constraints constraints) {
+		
+		service.updateConstraints(gid, constraints);
+
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
@@ -583,12 +525,10 @@ public class GraphsController {
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist at all. You can retry the operation or refer to another graph.")
 		})
 
-	public ResponseEntity<Resources<Constraints>> getConstraints(@PathVariable("gid") long gid) {
-		// Constraints constraints = service.getConstraints(gid);
-		// if (constraints == null)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		// return constraints;
-		Constraints constraints = null;
+	public ResponseEntity<Resources<Constraints>> getConstraints(@PathVariable("gid") Long gid) {
+
+		Constraints constraints = service.getConstraints(gid);
+
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
@@ -614,10 +554,10 @@ public class GraphsController {
 
 		})
 
-	public ResponseEntity<Resources<Void>> deleteConstraints(@PathVariable("gid") long gid) {
-		// Constraints deleted = service.deleteConstraints(gid);
-		// if (deleted == null)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+	public ResponseEntity<Resources<Void>> deleteConstraints(@PathVariable("gid") Long gid) {
+		
+		service.deleteConstraints(gid);
+
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(

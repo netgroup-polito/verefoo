@@ -8,14 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import it.polito.verefoo.DbConfiguration;
+import it.polito.verefoo.DbConstraints;
 import it.polito.verefoo.DbGraph;
 import it.polito.verefoo.DbNeighbour;
 import it.polito.verefoo.DbNode;
+import it.polito.verefoo.jaxb.Configuration;
+import it.polito.verefoo.jaxb.Constraints;
 import it.polito.verefoo.jaxb.Graph;
 import it.polito.verefoo.jaxb.Graphs;
 import it.polito.verefoo.jaxb.Neighbour;
 import it.polito.verefoo.jaxb.Node;
 import it.polito.verefoo.rest.spring.converter.GraphConverter;
+import it.polito.verefoo.rest.spring.repository.ConfigurationRepository;
+import it.polito.verefoo.rest.spring.repository.ConstraintsRepository;
 import it.polito.verefoo.rest.spring.repository.GraphRepository;
 import it.polito.verefoo.rest.spring.repository.NeighbourRepository;
 import it.polito.verefoo.rest.spring.repository.NodeRepository;
@@ -31,6 +37,12 @@ public class GraphService {
 
         @Autowired
         NeighbourRepository neighbourRepository;
+
+        @Autowired
+        ConfigurationRepository configurationRepository;
+
+        @Autowired
+        ConstraintsRepository constraintsRepository;
 
         @Autowired
         GraphConverter converter;
@@ -138,6 +150,44 @@ public class GraphService {
         public void deleteNeighbour(Long gid, Long nodeId, Long neighbourId) {
                 nodeRepository.unbindNeighbour(nodeId, neighbourId);
                 neighbourRepository.deleteById(neighbourId);
+        }
+
+        public Configuration getConfiguration(Long gid, Long nodeId) {
+                return converter.serializeConfiguration(nodeRepository.findConfiguration(nodeId));
+        }
+
+        @Transactional
+        public Long updateConfiguration(Long id, Long nodeId, Long configurationId, Configuration configuration) {
+                nodeRepository.unbindConfiguration(nodeId);
+                configurationRepository.deleteById(configurationId);
+                DbConfiguration dbConfiguration = configurationRepository
+                                .save(converter.deserializeConfiguration(configuration));
+                nodeRepository.bindConfiguration(nodeId, dbConfiguration.getId());
+                return dbConfiguration.getId();
+        }
+
+        public void createConstraints(Long id, Constraints constraints) {
+                DbConstraints dbConstraints = converter.deserializeConstraints(constraints);
+                dbConstraints.setGraph(id);
+                constraintsRepository.save(dbConstraints);
+        }
+
+        public void deleteConstraints(Long id) {
+                constraintsRepository.deleteByGraphId(id);
+        }
+
+        public Constraints getConstraints(Long id) {
+                Optional<DbConstraints> dbConstraints = constraintsRepository.findByGraphId(id);
+                if (dbConstraints.isPresent()) {
+                        return converter.serializeConstraints(dbConstraints.get());
+                } else
+                        return null;
+        }
+
+        @Transactional
+        public void updateConstraints(Long id, Constraints constraints) {
+                deleteConstraints(id);
+                createConstraints(id, constraints);
         }
 
 }

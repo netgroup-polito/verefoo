@@ -7,6 +7,7 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import it.polito.verefoo.DbConfiguration;
 import it.polito.verefoo.DbNode;
 
 @Repository
@@ -35,5 +36,22 @@ public interface NodeRepository extends Neo4jRepository<DbNode, Long> {
     "MATCH (no:DbNode)-[r:NEIGHBOUR]->(ne:DbNeighbour) WHERE id(no)=$id AND id(ne)=$neighbourId " +
     "DELETE r")
     void unbindNeighbour(@Param("id") Long id, @Param("neighbourId") Long neighbourId);
+
+    @Query("CYPHER 3.5 MATCH (n:DbNode)-[:CONFIGURATION]->(c) WHERE id(n)=$id " +
+    "WITH c " +
+    "MATCH (c)-[*]->(any) " +
+    "RETURN (c)-[*]->(any)")
+    DbConfiguration findConfiguration(@Param("id") Long id);
+
+    @Query("CYPHER 3.5 " +
+    "MATCH (n:DbNode)-[r:CONFIGURATION]->(c) WHERE id(n)=$id " +
+    "DELETE r")
+    void unbindConfiguration(@Param("id") Long id);
+
+    @Query("CYPHER 3.5 MATCH (n:DbNode) WHERE id(n)=$id " +
+    "WITH n " +
+    "MATCH (c:DbConfiguration) WHERE id(c)=$configurationId " +
+    "MERGE (n)-[:CONFIGURATION]->(c)")
+    void bindConfiguration(@Param("id") Long id, @Param("configurationId") Long configurationId);
 
 }

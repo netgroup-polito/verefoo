@@ -6,9 +6,13 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import it.polito.verefoo.DbActionTypes;
+import it.polito.verefoo.DbAllocationConstraint;
+import it.polito.verefoo.DbAllocationConstraintType;
+import it.polito.verefoo.DbAllocationConstraints;
 import it.polito.verefoo.DbAntispam;
 import it.polito.verefoo.DbCache;
 import it.polito.verefoo.DbConfiguration;
+import it.polito.verefoo.DbConstraints;
 import it.polito.verefoo.DbDpi;
 import it.polito.verefoo.DbDpiElements;
 import it.polito.verefoo.DbElements;
@@ -20,12 +24,16 @@ import it.polito.verefoo.DbForwarder;
 import it.polito.verefoo.DbFunctionalTypes;
 import it.polito.verefoo.DbGraph;
 import it.polito.verefoo.DbL4ProtocolTypes;
+import it.polito.verefoo.DbLinkConstraints;
+import it.polito.verefoo.DbLinkMetrics;
 import it.polito.verefoo.DbLoadbalancer;
 import it.polito.verefoo.DbMailclient;
 import it.polito.verefoo.DbMailserver;
 import it.polito.verefoo.DbNat;
 import it.polito.verefoo.DbNeighbour;
 import it.polito.verefoo.DbNode;
+import it.polito.verefoo.DbNodeConstraints;
+import it.polito.verefoo.DbNodeMetrics;
 import it.polito.verefoo.DbProtocolTypes;
 import it.polito.verefoo.DbStatefulFirewall;
 import it.polito.verefoo.DbVpnaccess;
@@ -35,9 +43,12 @@ import it.polito.verefoo.DbWebApplicationFirewall;
 import it.polito.verefoo.DbWebclient;
 import it.polito.verefoo.DbWebserver;
 import it.polito.verefoo.jaxb.ActionTypes;
+import it.polito.verefoo.jaxb.AllocationConstraintType;
+import it.polito.verefoo.jaxb.AllocationConstraints;
 import it.polito.verefoo.jaxb.Antispam;
 import it.polito.verefoo.jaxb.Cache;
 import it.polito.verefoo.jaxb.Configuration;
+import it.polito.verefoo.jaxb.Constraints;
 import it.polito.verefoo.jaxb.Dpi;
 import it.polito.verefoo.jaxb.DpiElements;
 import it.polito.verefoo.jaxb.Elements;
@@ -49,12 +60,14 @@ import it.polito.verefoo.jaxb.Forwarder;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Graph;
 import it.polito.verefoo.jaxb.L4ProtocolTypes;
+import it.polito.verefoo.jaxb.LinkConstraints;
 import it.polito.verefoo.jaxb.Loadbalancer;
 import it.polito.verefoo.jaxb.Mailclient;
 import it.polito.verefoo.jaxb.Mailserver;
 import it.polito.verefoo.jaxb.Nat;
 import it.polito.verefoo.jaxb.Neighbour;
 import it.polito.verefoo.jaxb.Node;
+import it.polito.verefoo.jaxb.NodeConstraints;
 import it.polito.verefoo.jaxb.ProtocolTypes;
 import it.polito.verefoo.jaxb.StatefulFirewall;
 import it.polito.verefoo.jaxb.Vpnaccess;
@@ -63,6 +76,9 @@ import it.polito.verefoo.jaxb.WafElements;
 import it.polito.verefoo.jaxb.WebApplicationFirewall;
 import it.polito.verefoo.jaxb.Webclient;
 import it.polito.verefoo.jaxb.Webserver;
+import it.polito.verefoo.jaxb.AllocationConstraints.AllocationConstraint;
+import it.polito.verefoo.jaxb.LinkConstraints.LinkMetrics;
+import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
 
 @Component
 public class GraphConverter {
@@ -104,7 +120,6 @@ public class GraphConverter {
         dbConfiguration.setFieldmodifier(deserializeFieldmodifier(configuration.getFieldmodifier()));
         dbConfiguration.setFirewall(deserializeFirewall(configuration.getFirewall()));
         dbConfiguration.setForwarder(deserializeForwarder(configuration.getForwarder()));
-        dbConfiguration.setId(configuration.getId());
         dbConfiguration.setLoadbalancer(deserializeLoadbalancer(configuration.getLoadbalancer()));
         dbConfiguration.setMailclient(deserializeMailclient(configuration.getMailclient()));
         dbConfiguration.setMailserver(deserializeMailserver(configuration.getMailserver()));
@@ -318,6 +333,68 @@ public class GraphConverter {
         return dbWebserver;
     }
 
+    public DbConstraints deserializeConstraints(Constraints constraints) {
+        DbConstraints dbConstraints = new DbConstraints();
+        dbConstraints
+                .setAllocationConstraints(deserializeAllocationConstraints(constraints.getAllocationConstraints()));
+        dbConstraints.setLinkConstraints(deserializeLinkConstraints(constraints.getLinkConstraints()));
+        dbConstraints.setNodeConstraints(deserializeNodeConstraints(constraints.getNodeConstraints()));
+        return dbConstraints;
+    }
+
+    private DbAllocationConstraints deserializeAllocationConstraints(AllocationConstraints allocationConstraints) {
+        DbAllocationConstraints dbAllocationConstraints = new DbAllocationConstraints();
+        allocationConstraints.getAllocationConstraint().forEach(allocationConstraint -> {
+            dbAllocationConstraints.getAllocationConstraint()
+                    .add(deserializeAllocationConstraint(allocationConstraint));
+        });
+        return dbAllocationConstraints;
+    }
+
+    private DbAllocationConstraint deserializeAllocationConstraint(AllocationConstraint allocationConstraint) {
+        DbAllocationConstraint dbAllocationConstraint = new DbAllocationConstraint();
+        dbAllocationConstraint.setNodeA(allocationConstraint.getNodeA());
+        dbAllocationConstraint.setNodeB(allocationConstraint.getNodeB());
+        dbAllocationConstraint.setType(DbAllocationConstraintType.fromValue(allocationConstraint.getType().name()));
+        return dbAllocationConstraint;
+    }
+
+    private DbLinkConstraints deserializeLinkConstraints(LinkConstraints linkConstraints) {
+        DbLinkConstraints dbLinkConstraints = new DbLinkConstraints();
+        linkConstraints.getLinkMetrics().forEach(linkConstraint -> {
+            dbLinkConstraints.getLinkMetrics().add(deserializeLinkConstraint(linkConstraint));
+        });
+        return dbLinkConstraints;
+    }
+
+    private DbLinkMetrics deserializeLinkConstraint(LinkMetrics linkMetrics) {
+        DbLinkMetrics dbLinkMetrics = new DbLinkMetrics();
+        dbLinkMetrics.setDst(linkMetrics.getDst());
+        dbLinkMetrics.setReqLatency(linkMetrics.getReqLatency());
+        dbLinkMetrics.setSrc(linkMetrics.getSrc());
+        return dbLinkMetrics;
+    }
+
+    private DbNodeConstraints deserializeNodeConstraints(NodeConstraints nodeConstraints) {
+        DbNodeConstraints dbNodeConstraints = new DbNodeConstraints();
+        nodeConstraints.getNodeMetrics().forEach(nodeConstraint -> {
+            dbNodeConstraints.getNodeMetrics().add(deserializeNodeConstraint(nodeConstraint));
+        });
+        return dbNodeConstraints;
+    }
+
+    private DbNodeMetrics deserializeNodeConstraint(NodeMetrics nodeConstraint) {
+        DbNodeMetrics dbNodeMetrics = new DbNodeMetrics();
+        dbNodeMetrics.setCores(nodeConstraint.getCores());
+        dbNodeMetrics.setMaxNodeLatency(nodeConstraint.getMaxNodeLatency());
+        dbNodeMetrics.setMemory(nodeConstraint.getMemory());
+        dbNodeMetrics.setNode(nodeConstraint.getNode());
+        dbNodeMetrics.setNrOfOperations(nodeConstraint.getNrOfOperations());
+        dbNodeMetrics.setOptional(nodeConstraint.isOptional());
+        dbNodeMetrics.setReqStorage(nodeConstraint.getReqStorage());
+        return dbNodeMetrics;
+    }
+
     public Graph serializeGraph(DbGraph dbGraph) {
         if (dbGraph == null)
             return null;
@@ -375,7 +452,8 @@ public class GraphConverter {
         configuration.setStatefulFirewall(serializeStatefulFirewall(dbConfiguration.getStatefulFirewall()));
         configuration.setVpnaccess(serializeVpnaccess(dbConfiguration.getVpnaccess()));
         configuration.setVpnexit(serializeVpnexit(dbConfiguration.getVpnexit()));
-        configuration.setWebApplicationFirewall(serializeWebApplicationFirewall(dbConfiguration.getWebApplicationFirewall()));
+        configuration.setWebApplicationFirewall(
+                serializeWebApplicationFirewall(dbConfiguration.getWebApplicationFirewall()));
         configuration.setWebclient(serializeWebclient(dbConfiguration.getWebclient()));
         configuration.setWebserver(serializeWebserver(dbConfiguration.getWebserver()));
         return configuration;
@@ -577,6 +655,68 @@ public class GraphConverter {
         Webserver webserver = new Webserver();
         webserver.setName(dbWebserver.getName());
         return webserver;
+    }
+
+    
+    public Constraints serializeConstraints(DbConstraints dbConstraints) {
+        Constraints constraints = new Constraints();
+        constraints.setAllocationConstraints(serializeAllocationConstraints(dbConstraints.getAllocationConstraints()));
+        constraints.setLinkConstraints(serializeLinkConstraints(dbConstraints.getLinkConstraints()));
+        constraints.setNodeConstraints(serializeNodeConstraints(dbConstraints.getNodeConstraints()));
+        return constraints;
+    }
+
+    private AllocationConstraints serializeAllocationConstraints(DbAllocationConstraints dbAllocationConstraints) {
+        AllocationConstraints allocationConstraints = new AllocationConstraints();
+        dbAllocationConstraints.getAllocationConstraint().forEach(dbAllocationConstraint -> {
+            allocationConstraints.getAllocationConstraint()
+                    .add(serializeAllocationConstraint(dbAllocationConstraint));
+        });
+        return allocationConstraints;
+    }
+
+    private AllocationConstraint serializeAllocationConstraint(DbAllocationConstraint dbAllocationConstraint) {
+        AllocationConstraint allocationConstraint = new AllocationConstraint();
+        allocationConstraint.setNodeA(dbAllocationConstraint.getNodeA());
+        allocationConstraint.setNodeB(dbAllocationConstraint.getNodeB());
+        allocationConstraint.setType(AllocationConstraintType.fromValue(dbAllocationConstraint.getType().name().toLowerCase()));
+        return allocationConstraint;
+    }
+
+    private LinkConstraints serializeLinkConstraints(DbLinkConstraints dbLinkConstraints) {
+        LinkConstraints linkConstraints = new LinkConstraints();
+        dbLinkConstraints.getLinkMetrics().forEach(dbLinkConstraint -> {
+            linkConstraints.getLinkMetrics().add(serializeLinkConstraint(dbLinkConstraint));
+        });
+        return linkConstraints;
+    }
+
+    private LinkMetrics serializeLinkConstraint(DbLinkMetrics dbLinkMetrics) {
+        LinkMetrics linkMetrics = new LinkMetrics();
+        linkMetrics.setDst(dbLinkMetrics.getDst());
+        linkMetrics.setReqLatency(dbLinkMetrics.getReqLatency());
+        linkMetrics.setSrc(dbLinkMetrics.getSrc());
+        return linkMetrics;
+    }
+
+    private NodeConstraints serializeNodeConstraints(DbNodeConstraints dbNodeConstraints) {
+        NodeConstraints nodeConstraints = new NodeConstraints();
+        dbNodeConstraints.getNodeMetrics().forEach(dbNodeConstraint -> {
+            nodeConstraints.getNodeMetrics().add(serializeNodeConstraint(dbNodeConstraint));
+        });
+        return nodeConstraints;
+    }
+
+    private NodeMetrics serializeNodeConstraint(DbNodeMetrics dbNodeMetrics) {
+        NodeMetrics nodeMetrics = new NodeMetrics();
+        nodeMetrics.setCores(dbNodeMetrics.getCores());
+        nodeMetrics.setMaxNodeLatency(dbNodeMetrics.getMaxNodeLatency());
+        nodeMetrics.setMemory(dbNodeMetrics.getMemory());
+        nodeMetrics.setNode(dbNodeMetrics.getNode());
+        nodeMetrics.setNrOfOperations(dbNodeMetrics.getNrOfOperations());
+        nodeMetrics.setOptional(dbNodeMetrics.isOptional());
+        nodeMetrics.setReqStorage(dbNodeMetrics.getReqStorage());
+        return nodeMetrics;
     }
 
 }
