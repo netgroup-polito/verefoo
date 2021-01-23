@@ -1,5 +1,7 @@
 package it.polito.verefoo.rest.spring;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,15 +20,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.jaxb.PropertyDefinition;
+import it.polito.verefoo.rest.spring.service.RequirementService;
 
 @RestController
 @RequestMapping(value = "/adp/requirements", consumes = {"application/xml", "application/json"}, produces = {"application/xml", "application/json"})
 public class RequirementsController {
 
-	ADPService service = new ADPService();
-
 	@Autowired
 	private HttpServletRequest request;
+
+	@Autowired
+	RequirementService service;
 
 	/* Requirements Sets */
 
@@ -40,33 +44,18 @@ public class RequirementsController {
 			@ApiResponse(responseCode = "201", description = "Created"),
 			@ApiResponse(responseCode = "400", description = "The passed requirement set is semantically malformed. You can retry the operation or check the data."),
 			@ApiResponse(responseCode = "404", description = "The referenced graph doesn't exist. You can first create a graph or refer to another one.") })
-	public ResponseEntity<Resources<Void>> createRequirementsSet(@RequestBody PropertyDefinition requirementsSet) {
-		// long pid = service.getNextRequirementsSetId();
-		// StringBuffer url = request.getRequestURL();
-		// PropertyDefinition created = service.createRequirementsSet(pid, requirementsSet);
-		// if (created != null) {
-		// 	String responseUrl;
-		// 	if (url.toString().endsWith("/"))
-		// 		responseUrl = url.toString() + pid;
-		// 	else
-		// 		responseUrl = url.toString() + "/" + pid;
-		// 	HttpHeaders responseHeaders = new HttpHeaders();
-		// 	try {
-		// 		responseHeaders.setLocation(new URI(responseUrl));
-		// 	} catch (URISyntaxException e) {
-		// 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		// 	}
-		// 	return new ResponseEntity<PropertyDefinition>(created, responseHeaders, HttpStatus.CREATED);
-		// } else
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
+	public ResponseEntity<Resources<Long>> createRequirementsSet(@RequestBody PropertyDefinition requirementsSet) {
+		
+		Long requirementsSetId = service.createRequirementsSet(requirementsSet);
+
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Void>()
+				new ResourceWrapperWithLinks<Long>()
 						.addLink(url, "new", RequestMethod.POST)
 						.addLink(url, "self", RequestMethod.GET)
 						.addLink(url, "self", RequestMethod.DELETE)
-						.wrap(null));
+						.wrap(requirementsSetId));
 	}
 
 	/**
@@ -81,20 +70,18 @@ public class RequirementsController {
 			@ApiResponse(responseCode = "404", description = "No requirement set has been found. You can retry the operation or create a requirement set.")
 		})
 	
-	public ResponseEntity<Resources<PropertyDefinition>> getRequirementsSets() {
-		// Collection<PropertyDefinition> set = service.getRequirementsSets(beforeInclusive, afterInclusive);
-		// if (set.isEmpty())
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
-		// return set;
-		PropertyDefinition propertyDefinitions = null;
+	public ResponseEntity<Resources<List<PropertyDefinition>>> getRequirementsSets() {
+		
+		List<PropertyDefinition> requirementsSets = service.getRequirementsSets();
+
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<PropertyDefinition>()
+				new ResourceWrapperWithLinks<List<PropertyDefinition>>()
 						.addLink(url, "new", RequestMethod.POST)
 						.addLink(url, "self", RequestMethod.GET)
 						.addLink(url, "self", RequestMethod.DELETE)
-						.wrap(propertyDefinitions));
+						.wrap(requirementsSets));
 	}
 
 	/**
@@ -108,9 +95,9 @@ public class RequirementsController {
 		})
 	
 	public ResponseEntity<Resources<Void>> deleteRequirementsSets() {
-		// boolean removed = service.deleteRequirementsSets();
-		// if (!removed)
-		// 	throw new ResponseStatusException(HttpStatus.NOT_FOUND, "not found");
+		
+		service.deleteRequirementsSets();
+
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
