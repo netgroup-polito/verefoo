@@ -1,0 +1,22 @@
+{
+    "body": "This is an example of body",
+    "dst": "10.0.0.16",
+    "dstPort": "1546",
+    "graph": 102,
+    "httpdefinition": {
+        "domain": "verifoo",
+        "options": "-t -o -l",
+        "url": "https://localhost:8080/verifoo"
+    },
+    "lv4Proto": "UDP",
+    "name": "ISOLATION_PROPERTY",
+    "pop3Definition": {
+        "contentType": "An example of content",
+        "from": "verifoo.sender@mail.com",
+        "sender": "verifoo user agent",
+        "subject": "read it",
+        "to": "verifoo.addressee@mail.com"
+    },
+    "src": "10.0.4.1",
+    "srcPort": "1342"
+}
