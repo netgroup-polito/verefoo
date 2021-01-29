@@ -115,23 +115,23 @@ public class SubstratesController {
 	/**
 	 * @param sid it is the id of the substrate network to delete
 	 */
-	@Operation(tags = "version 1 - substrates", summary = "Delete a substrate", description = "The operation deletes all the hosts and connections of the substrates accordingly.")
+	@Operation(tags = "version 1 - substrates", summary = "Delete a substrate", description = "The operation deletes all the hosts and connections of the substrate accordingly.")
 	@RequestMapping(value = "/{sid}", method = RequestMethod.DELETE)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "404", description = "The selected substrate doesn't exist at all. You can eventually retry the operation or refer to another substrate.")
 		})
 
-	public ResponseEntity<Resources<Long>> deleteSubstrate(@PathVariable("sid") long sid) {
+	public ResponseEntity<Resources<Void>> deleteSubstrate(@PathVariable("sid") Long sid) {
 
 		service.deleteSubstrate(sid);
 
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
-                                new ResourceWrapperWithLinks<Long>()
+                                new ResourceWrapperWithLinks<Void>()
                                                 .addLink(url, "list", RequestMethod.GET)
-                                                .wrap(sid));
+                                                .wrap(null));
 	}
 
 	/* Hosts */
@@ -142,29 +142,29 @@ public class SubstratesController {
 	 * @param host it is the host to create
 	 * @return the created host
 	 */
-	@Operation(tags = "version 1 - substrates", summary = "Create a list of hosts in the substrate", description = "")
+	@Operation(tags = "version 1 - substrates", summary = "Add a list of hosts in the substrate", description = "")
 	@RequestMapping(value = "/{sid}/hosts", method = RequestMethod.POST)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "201", description = "Created"),
 			@ApiResponse(responseCode = "400", description = "The passed hosts resource is semantically malformed. You can retry the operation or check the data."),
 			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can first create a substrate or use an existing one.")
 		})
-	public ResponseEntity<Resources<Void>> createHosts(@PathVariable("sid") long sid, @RequestBody Hosts hosts) {
+	public ResponseEntity<Resources<List<Long>>> createHosts(@PathVariable("sid") Long sid, @RequestBody Hosts hosts) {
 
-		service.createHosts(sid, hosts);
+		List<Long> ids = service.createHosts(sid, hosts);
 
 		String url = request.getRequestURL().toString();
 		url = url.substring(0, url.lastIndexOf("/"));
 		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.CREATED).body(
                                 // wrap the response with the hyperlinks
-								new ResourceWrapperWithLinks<Void>()
+								new ResourceWrapperWithLinks<List<Long>>()
 												.addLink(url + "/" + sid + "/connections", "new", RequestMethod.POST)
                                                 .addLink(url + "/" + sid + "/hosts", "self", RequestMethod.GET)
 												.addLink(url + "/" + sid + "/hosts", "self", RequestMethod.DELETE)
 												.addLink(url + "/" + sid + "/hosts", "new", RequestMethod.POST)
 												.addLink(url, "list", RequestMethod.GET)
-                                                .wrap(null));
+                                                .wrap(ids));
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can first create a substrate or use an existing one.")
 		})
-	public ResponseEntity<Resources<Hosts>> getHosts(@PathVariable("sid") long sid) {
+	public ResponseEntity<Resources<Hosts>> getHosts(@PathVariable("sid") Long sid) {
 
 		Hosts hosts = service.getHosts(sid);
 		
@@ -234,9 +234,9 @@ public class SubstratesController {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "404", description = "The host or the substrate doesn't exist. You can retry the operation or create/use other substrates or hosts."), })
 
-	public ResponseEntity<Resources<Void>> updateHost(@PathVariable("sid") long sid, @PathVariable("hid") String hid, @RequestBody Host host) {
+	public ResponseEntity<Resources<Long>> updateHost(@PathVariable("sid") Long sid, @PathVariable("hid") Long hid, @RequestBody Host host) {
 
-		service.updateHost(sid, hid, host);
+		Long newHostId = service.updateHost(sid, hid, host);
 
 		String url = request.getRequestURL().toString();
 		url = url.substring(0, url.lastIndexOf("/"));
@@ -244,7 +244,7 @@ public class SubstratesController {
 		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
-								new ResourceWrapperWithLinks<Void>()
+								new ResourceWrapperWithLinks<Long>()
 												.addLink(url + "/" + sid + "/connections", "list", RequestMethod.GET)
 												.addLink(url + "/" + sid + "/connections", "new", RequestMethod.POST)
 												.addLink(url + "/" + sid + "/hosts", "list", RequestMethod.GET)
@@ -252,7 +252,7 @@ public class SubstratesController {
 												.addLink(url + "/" + sid + "/hosts/" + hid, "self", RequestMethod.PUT)
 												.addLink(url + "/" + sid + "/hosts/" + hid, "self", RequestMethod.DELETE)
 												.addLink(url, "list", RequestMethod.GET)
-                                                .wrap(null));
+                                                .wrap(newHostId));
 	}
 
 	/**
@@ -267,7 +267,7 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "404", description = "The host or the substrate doesn't exist. You can retry the operation or refer to other hosts/substrates.")
 		})
 
-	public ResponseEntity<Resources<Host>> getHost(@PathVariable("sid") long sid, @PathVariable("hid") String hid) {
+	public ResponseEntity<Resources<Host>> getHost(@PathVariable("sid") Long sid, @PathVariable("hid") Long hid) {
 
 		Host host = service.getHost(sid, hid);
 
@@ -302,7 +302,7 @@ public class SubstratesController {
 		})
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
-	public ResponseEntity<Resources<Void>> deleteHost(@PathVariable("sid") long sid, @PathVariable("hid") String hid) {
+	public ResponseEntity<Resources<Void>> deleteHost(@PathVariable("sid") Long sid, @PathVariable("hid") Long hid) {
 
 		service.deleteHost(sid, hid);
 
