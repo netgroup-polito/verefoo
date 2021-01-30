@@ -19,6 +19,7 @@ import it.polito.verefoo.jaxb.PropertyDefinition;
 public class RequirementConverter {
 
     public DbPropertyDefinition deserializePropertyDefinition(PropertyDefinition propertyDefinition) {
+        if (propertyDefinition == null) return null;
         DbPropertyDefinition dbPropertyDefinition = new DbPropertyDefinition();
         propertyDefinition.getProperty().forEach(property -> {
             dbPropertyDefinition.getProperty().add(deserializeProperty(property));
@@ -27,6 +28,7 @@ public class RequirementConverter {
     }
 
     public DbProperty deserializeProperty(Property property) {
+        if (property == null) return null;
         DbProperty dbProperty = new DbProperty();
         dbProperty.setBody(property.getBody());
         dbProperty.setDst(property.getDst());
@@ -43,6 +45,7 @@ public class RequirementConverter {
     }
 
     public DbHTTPDefinition deserializeHTTPDefinition(HTTPDefinition httpDefinition) {
+        if (httpDefinition == null) return null;
         DbHTTPDefinition dbHTTPDefinition = new DbHTTPDefinition();
         dbHTTPDefinition.setDomain(httpDefinition.getDomain());
         dbHTTPDefinition.setOptions(httpDefinition.getOptions());
@@ -51,6 +54,7 @@ public class RequirementConverter {
     }
 
     public DbPOP3Definition deserializePOP3Definition(POP3Definition pop3Definition) {
+        if (pop3Definition == null) return null;
         DbPOP3Definition dbPOP3Definition = new DbPOP3Definition();
         dbPOP3Definition.setContentType(pop3Definition.getContentType());
         dbPOP3Definition.setFrom(pop3Definition.getFrom());
@@ -61,6 +65,7 @@ public class RequirementConverter {
     }
 
     public PropertyDefinition serializePropertyDefinition(DbPropertyDefinition dbPropertyDefinition) {
+        if (dbPropertyDefinition == null) return null;
         PropertyDefinition propertyDefinition = new PropertyDefinition();
         dbPropertyDefinition.getProperty().forEach(dbProperty -> {
             propertyDefinition.getProperty().add(serializeProperty(dbProperty));
@@ -69,6 +74,7 @@ public class RequirementConverter {
     }
 
     public Property serializeProperty(DbProperty dbProperty) {
+        if (dbProperty == null) return null;
         Property property = new Property();
         property.setBody(dbProperty.getBody());
         property.setDst(dbProperty.getDst());
@@ -89,6 +95,7 @@ public class RequirementConverter {
     }
 
     public HTTPDefinition serializeHTTPDefinition(DbHTTPDefinition dbHTTPDefinition) {
+        if (dbHTTPDefinition == null) return null;
         HTTPDefinition httpDefinition = new HTTPDefinition();
         httpDefinition.setDomain(dbHTTPDefinition.getDomain());
         httpDefinition.setOptions(dbHTTPDefinition.getOptions());
@@ -97,6 +104,7 @@ public class RequirementConverter {
     }
 
     public POP3Definition serializePOP3Definition(DbPOP3Definition dbPOP3Definition) {
+        if (dbPOP3Definition == null) return null;
         POP3Definition pop3Definition = new POP3Definition();
         pop3Definition.setContentType(dbPOP3Definition.getContentType());
         pop3Definition.setFrom(dbPOP3Definition.getFrom());

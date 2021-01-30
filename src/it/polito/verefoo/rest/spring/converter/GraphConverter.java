@@ -23,6 +23,7 @@ import it.polito.verefoo.DbFirewall;
 import it.polito.verefoo.DbForwarder;
 import it.polito.verefoo.DbFunctionalTypes;
 import it.polito.verefoo.DbGraph;
+import it.polito.verefoo.DbGraphs;
 import it.polito.verefoo.DbL4ProtocolTypes;
 import it.polito.verefoo.DbLinkConstraints;
 import it.polito.verefoo.DbLinkMetrics;
@@ -59,6 +60,7 @@ import it.polito.verefoo.jaxb.Firewall;
 import it.polito.verefoo.jaxb.Forwarder;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Graph;
+import it.polito.verefoo.jaxb.Graphs;
 import it.polito.verefoo.jaxb.L4ProtocolTypes;
 import it.polito.verefoo.jaxb.LinkConstraints;
 import it.polito.verefoo.jaxb.Loadbalancer;
@@ -83,7 +85,17 @@ import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
 @Component
 public class GraphConverter {
 
+    public DbGraphs deserializeGraphs(Graphs graphs) {
+        if (graphs == null) return null;
+        DbGraphs dbGraphs = new DbGraphs();
+        graphs.getGraph().forEach(graph -> {
+            dbGraphs.getGraph().add(deserializeGraph(graph));
+        });
+        return dbGraphs;
+    }
+
     public DbGraph deserializeGraph(Graph graph) {
+        if (graph == null) return null;
         DbGraph dbGraph = new DbGraph();
         dbGraph.setServiceGraph(graph.isServiceGraph());
         graph.getNode().forEach(node -> {
@@ -93,6 +105,7 @@ public class GraphConverter {
     }
 
     public DbNode deserializeNode(Node node) {
+        if (node == null) return null;
         DbNode dbNode = new DbNode();
         dbNode.setName(node.getName());
         dbNode.setFunctionalType(DbFunctionalTypes.fromValue(node.getFunctionalType().name()));
@@ -104,12 +117,14 @@ public class GraphConverter {
     }
 
     public DbNeighbour deserializeNeighbour(Neighbour neighbour) {
+        if (neighbour == null) return null;
         DbNeighbour dbNeighbour = new DbNeighbour();
         dbNeighbour.setName(neighbour.getName());
         return dbNeighbour;
     }
 
     public DbConfiguration deserializeConfiguration(Configuration configuration) {
+        if (configuration == null) return null;
         DbConfiguration dbConfiguration = new DbConfiguration();
         dbConfiguration.setAntispam(deserializeAntispam(configuration.getAntispam()));
         dbConfiguration.setCache(deserializeCache(configuration.getCache()));
@@ -334,6 +349,7 @@ public class GraphConverter {
     }
 
     public DbConstraints deserializeConstraints(Constraints constraints) {
+        if (constraints == null) return null;
         DbConstraints dbConstraints = new DbConstraints();
         dbConstraints
                 .setAllocationConstraints(deserializeAllocationConstraints(constraints.getAllocationConstraints()));
@@ -343,6 +359,7 @@ public class GraphConverter {
     }
 
     private DbAllocationConstraints deserializeAllocationConstraints(AllocationConstraints allocationConstraints) {
+        if (allocationConstraints == null) return null;
         DbAllocationConstraints dbAllocationConstraints = new DbAllocationConstraints();
         allocationConstraints.getAllocationConstraint().forEach(allocationConstraint -> {
             dbAllocationConstraints.getAllocationConstraint()
@@ -352,6 +369,7 @@ public class GraphConverter {
     }
 
     private DbAllocationConstraint deserializeAllocationConstraint(AllocationConstraint allocationConstraint) {
+        if (allocationConstraint == null) return null;
         DbAllocationConstraint dbAllocationConstraint = new DbAllocationConstraint();
         dbAllocationConstraint.setNodeA(allocationConstraint.getNodeA());
         dbAllocationConstraint.setNodeB(allocationConstraint.getNodeB());
@@ -360,6 +378,7 @@ public class GraphConverter {
     }
 
     private DbLinkConstraints deserializeLinkConstraints(LinkConstraints linkConstraints) {
+        if (linkConstraints == null) return null;
         DbLinkConstraints dbLinkConstraints = new DbLinkConstraints();
         linkConstraints.getLinkMetrics().forEach(linkConstraint -> {
             dbLinkConstraints.getLinkMetrics().add(deserializeLinkConstraint(linkConstraint));
@@ -368,6 +387,7 @@ public class GraphConverter {
     }
 
     private DbLinkMetrics deserializeLinkConstraint(LinkMetrics linkMetrics) {
+        if (linkMetrics == null) return null;
         DbLinkMetrics dbLinkMetrics = new DbLinkMetrics();
         dbLinkMetrics.setDst(linkMetrics.getDst());
         dbLinkMetrics.setReqLatency(linkMetrics.getReqLatency());
@@ -376,6 +396,7 @@ public class GraphConverter {
     }
 
     private DbNodeConstraints deserializeNodeConstraints(NodeConstraints nodeConstraints) {
+        if (nodeConstraints == null) return null;
         DbNodeConstraints dbNodeConstraints = new DbNodeConstraints();
         nodeConstraints.getNodeMetrics().forEach(nodeConstraint -> {
             dbNodeConstraints.getNodeMetrics().add(deserializeNodeConstraint(nodeConstraint));
@@ -384,6 +405,7 @@ public class GraphConverter {
     }
 
     private DbNodeMetrics deserializeNodeConstraint(NodeMetrics nodeConstraint) {
+        if (nodeConstraint == null) return null;
         DbNodeMetrics dbNodeMetrics = new DbNodeMetrics();
         dbNodeMetrics.setCores(nodeConstraint.getCores());
         dbNodeMetrics.setMaxNodeLatency(nodeConstraint.getMaxNodeLatency());
@@ -659,6 +681,7 @@ public class GraphConverter {
 
     
     public Constraints serializeConstraints(DbConstraints dbConstraints) {
+        if (dbConstraints == null) return null;
         Constraints constraints = new Constraints();
         constraints.setAllocationConstraints(serializeAllocationConstraints(dbConstraints.getAllocationConstraints()));
         constraints.setLinkConstraints(serializeLinkConstraints(dbConstraints.getLinkConstraints()));
@@ -667,6 +690,7 @@ public class GraphConverter {
     }
 
     private AllocationConstraints serializeAllocationConstraints(DbAllocationConstraints dbAllocationConstraints) {
+        if (dbAllocationConstraints == null) return null;
         AllocationConstraints allocationConstraints = new AllocationConstraints();
         dbAllocationConstraints.getAllocationConstraint().forEach(dbAllocationConstraint -> {
             allocationConstraints.getAllocationConstraint()
@@ -676,6 +700,7 @@ public class GraphConverter {
     }
 
     private AllocationConstraint serializeAllocationConstraint(DbAllocationConstraint dbAllocationConstraint) {
+        if (dbAllocationConstraint == null) return null;
         AllocationConstraint allocationConstraint = new AllocationConstraint();
         allocationConstraint.setNodeA(dbAllocationConstraint.getNodeA());
         allocationConstraint.setNodeB(dbAllocationConstraint.getNodeB());
@@ -684,6 +709,7 @@ public class GraphConverter {
     }
 
     private LinkConstraints serializeLinkConstraints(DbLinkConstraints dbLinkConstraints) {
+        if (dbLinkConstraints == null) return null;
         LinkConstraints linkConstraints = new LinkConstraints();
         dbLinkConstraints.getLinkMetrics().forEach(dbLinkConstraint -> {
             linkConstraints.getLinkMetrics().add(serializeLinkConstraint(dbLinkConstraint));
@@ -692,6 +718,7 @@ public class GraphConverter {
     }
 
     private LinkMetrics serializeLinkConstraint(DbLinkMetrics dbLinkMetrics) {
+        if (dbLinkMetrics == null) return null;
         LinkMetrics linkMetrics = new LinkMetrics();
         linkMetrics.setDst(dbLinkMetrics.getDst());
         linkMetrics.setReqLatency(dbLinkMetrics.getReqLatency());
@@ -700,6 +727,7 @@ public class GraphConverter {
     }
 
     private NodeConstraints serializeNodeConstraints(DbNodeConstraints dbNodeConstraints) {
+        if (dbNodeConstraints == null) return null;
         NodeConstraints nodeConstraints = new NodeConstraints();
         dbNodeConstraints.getNodeMetrics().forEach(dbNodeConstraint -> {
             nodeConstraints.getNodeMetrics().add(serializeNodeConstraint(dbNodeConstraint));
@@ -708,6 +736,7 @@ public class GraphConverter {
     }
 
     private NodeMetrics serializeNodeConstraint(DbNodeMetrics dbNodeMetrics) {
+        if (dbNodeMetrics == null) return null;
         NodeMetrics nodeMetrics = new NodeMetrics();
         nodeMetrics.setCores(dbNodeMetrics.getCores());
         nodeMetrics.setMaxNodeLatency(dbNodeMetrics.getMaxNodeLatency());

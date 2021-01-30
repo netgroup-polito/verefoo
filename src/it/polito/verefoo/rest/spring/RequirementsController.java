@@ -157,7 +157,7 @@ public class RequirementsController {
 
 	public ResponseEntity<Resources<Void>> deleteRequirementsSet(@PathVariable("rid") Long rid) {
 
-		service.deleteRequirementSet(rid);
+		service.deleteRequirementsSet(rid);
 
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(

@@ -23,6 +23,7 @@ import it.polito.verefoo.jaxb.TypeOfHost;
 public class SubstrateConverter {
 
     public DbHosts deserializeHosts(Hosts hosts) {
+        if (hosts == null) return null;
         DbHosts dbHosts = new DbHosts();
         hosts.getHost().forEach(host -> {
             dbHosts.getHost().add(deserializeHost(host));
@@ -31,6 +32,7 @@ public class SubstrateConverter {
     }
 
     public DbHost deserializeHost(Host host) {
+        if (host == null) return null;
         DbHost dbHost = new DbHost();
         dbHost.setActive(host.isActive());
         dbHost.setCores(host.getCores());
@@ -50,19 +52,22 @@ public class SubstrateConverter {
         return dbHost;
     }
 
-    public DbNodeRefType deserializeNodeRefType(NodeRefType nodeRef) {
+    public DbNodeRefType deserializeNodeRefType(NodeRefType nodeRefType) {
+        if (nodeRefType == null) return null;
         DbNodeRefType dbNodeRefType = new DbNodeRefType();
-        dbNodeRefType.setNode(nodeRef.getNode());
+        dbNodeRefType.setNode(nodeRefType.getNode());
         return dbNodeRefType;
     }
 
-    public DbSupportedVNFType deserializeSupportedVNF(SupportedVNFType supportedVNF) {
+    public DbSupportedVNFType deserializeSupportedVNF(SupportedVNFType supportedVNFType) {
+        if (supportedVNFType == null) return null;
         DbSupportedVNFType dbSupportedVNFType = new DbSupportedVNFType();
-        dbSupportedVNFType.setFunctionalType(DbFunctionalTypes.fromValue(supportedVNF.getFunctionalType().name()));
+        dbSupportedVNFType.setFunctionalType(DbFunctionalTypes.fromValue(supportedVNFType.getFunctionalType().name()));
         return dbSupportedVNFType;
     }
 
     public DbConnections deserializeConnections(Connections connections) {
+        if (connections == null) return null;
         DbConnections dbConnections = new DbConnections();
         connections.getConnection().forEach(connection -> {
             dbConnections.getConnection().add(deserializeConnection(connection));
@@ -77,6 +82,7 @@ public class SubstrateConverter {
      *         require a call to the db
      */
     private DbConnection deserializeConnection(Connection connection) {
+        if (connection == null) return null;
         DbConnection dbConnection = new DbConnection();
         dbConnection.setAvgLatency(connection.getAvgLatency());
         dbConnection.setDestHost(connection.getDestHost());
@@ -85,6 +91,7 @@ public class SubstrateConverter {
     }
 
     public Hosts serializeHosts(DbHosts dbHosts) {
+        if (dbHosts == null) return null;
         Hosts hosts = new Hosts();
         dbHosts.getHost().forEach(dbHost -> {
             hosts.getHost().add(serializeHost(dbHost));
@@ -94,6 +101,7 @@ public class SubstrateConverter {
 
 
     public Host serializeHost(DbHost dbHost) {
+        if (dbHost == null) return null;
         Host host = new Host();
         host.setActive(dbHost.isActive());
         host.setCores(dbHost.getCores());
@@ -114,18 +122,21 @@ public class SubstrateConverter {
     }
 
     public NodeRefType serializeNodeRefType(DbNodeRefType dbNodeRefType) {
+        if (dbNodeRefType == null) return null;
         NodeRefType nodeRefType = new NodeRefType();
         nodeRefType.setNode(dbNodeRefType.getNode());
         return nodeRefType;
     }
 
     public SupportedVNFType serializeSupportedVNFType(DbSupportedVNFType dbSupportedVNFType) {
+        if (dbSupportedVNFType == null) return null;
         SupportedVNFType supportedVNFType = new SupportedVNFType();
         supportedVNFType.setFunctionalType(FunctionalTypes.fromValue(dbSupportedVNFType.getFunctionalType().name()));
         return supportedVNFType;
     }
 
 	public Connection serializeConnection(DbConnection dbConnection) {
+        if (dbConnection == null) return null;
         Connection connection = new Connection();
         connection.setAvgLatency(dbConnection.getAvgLatency());
         connection.setDestHost(dbConnection.getDestHost());

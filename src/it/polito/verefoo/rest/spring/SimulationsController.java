@@ -14,22 +14,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.NFV;
+import it.polito.verefoo.rest.spring.service.SimulationService;
 
 @RestController
 @RequestMapping(value = "/adp/simulations", consumes = { "application/xml", "application/json" }, produces = {
 		"application/xml", "application/json" })
 public class SimulationsController {
 
-	ADPService service = new ADPService();
-
 	@Autowired
 	private HttpServletRequest request;
+
+	@Autowired
+	SimulationService service;
 
 	/**
 	 * @param nfv it is the NFV object on which the simulation must be performed
@@ -41,7 +45,7 @@ public class SimulationsController {
 			@ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "400", description = "The NFV or the requirement set is semantically malformed. You can retry the operation or check the data.")
 		})
-	public ResponseEntity<Resources<NFV>> runSimulationByNFV(
+	public ResponseEntity<Resources<Long>> runSimulationByNFV(
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "nfv example", required = true)
 
 			/***
@@ -142,16 +146,15 @@ public class SimulationsController {
 			 *                                                       <ParsingString></ParsingString>\r\n"
 			 *                                                       + "</NFV>")}))
 			 */
-			@RequestBody(required = true) NFV nfv, @RequestParam(value = "sid", required = false) Long sid,
-			@RequestParam(value = "usableNetworkFunctions", required = false) List<FunctionalTypes> usableFunctionalTypes) {
-		// StringBuffer url = request.getRequestURL();
-		// VerefooSerializer test = null;
-		// try {
-		// 	test = new VerefooSerializer(nfv);
-		// } catch (Exception e) {
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-		// 			"The simulation request is semantically malformed.");
-		// }
+			@RequestBody NFV nfv, @RequestParam(value = "usableNetworkFunctions", required = false) List<FunctionalTypes> usableFunctionalTypes) {
+
+		try {
+			// the nfv is modified in place by VerefooSerializer
+			new VerefooSerializer(nfv);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+					"The simulation request is semantically malformed.");
+		}
 
 		// long smid = service.getNextSimulationId();
 		// service.addSimulationResult(nfv, smid);
@@ -168,15 +171,14 @@ public class SimulationsController {
 		// }
 		// return new ResponseEntity<NFV>(test.getResult(), responseHeaders, HttpStatus.CREATED);
 
-		NFV result = null;
-		// this value is stored at DB level and passed to the client only through the hyperlink
-		Integer simulationId = 0;
+		Long simulationId = service.createSimulationResult(nfv);
+
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<NFV>()
+				new ResourceWrapperWithLinks<Long>()
 						.addLink(url + "/" + simulationId, "self", RequestMethod.GET)
-						.wrap(result));
+						.wrap(simulationId));
 	}
 
 	/**

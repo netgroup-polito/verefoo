@@ -28,11 +28,6 @@ public class RequirementService {
     @Autowired
     RequirementConverter converter;
 
-	public Long createRequirementsSet(PropertyDefinition requirementsSet) {
-        DbPropertyDefinition dbPropertyDefinition = requirementRepository.save(converter.deserializePropertyDefinition(requirementsSet));
-        return dbPropertyDefinition.getId();
-	}
-
 	public List<PropertyDefinition> getRequirementsSets() {
         List<PropertyDefinition> requirementsSets = new ArrayList<>();
         requirementRepository.findAll().forEach(requirementsSet -> {
@@ -43,9 +38,14 @@ public class RequirementService {
 
 	public void deleteRequirementsSets() {
         requirementRepository.deleteAll();
+    }
+    
+    public Long createRequirementsSet(PropertyDefinition requirementsSet) {
+        DbPropertyDefinition dbPropertyDefinition = requirementRepository.save(converter.deserializePropertyDefinition(requirementsSet));
+        return dbPropertyDefinition.getId();
 	}
 
-	public void deleteRequirementSet(Long id) {
+	public void deleteRequirementsSet(Long id) {
         requirementRepository.deleteById(id);
 	}
 
@@ -58,7 +58,7 @@ public class RequirementService {
 
     @Transactional
 	public Long updateRequirementsSet(Long id, PropertyDefinition requirementsSet) {
-        deleteRequirementSet(id);
+        deleteRequirementsSet(id);
         return createRequirementsSet(requirementsSet);
 	}
 
