@@ -748,4 +748,24 @@ public class GraphConverter {
         return nodeMetrics;
     }
 
+    // public DbGraph mergeGraphs(DbGraph oldDbGraph, DbGraph newDbGraph) {
+    //     // unnecessary for graphs, for the sake of completeness
+    //     newDbGraph.setId(oldDbGraph.getId());
+
+    //     if (newDbGraph.getNode().size() >= oldDbGraph.getNode().size()) {
+    //         for (int i = 0; i < oldDbGraph.getNode().size(); i++) {
+    //                 newDbGraph.getNode().get(i).setId(oldDbGraph.getNode().get(i).getId());
+    //         }
+    //     } else {
+    //         int i = 0;
+    //         for ( ; i < newDbGraph.getNode().size(); i++) {
+    //                 newDbGraph.getNode().get(i).setId(oldDbGraph.getNode().get(i).getId());
+    //         }
+    //         for ( ; i < oldDbGraph.getNode().size(); i++) {
+    //                 //deleteNode(oldDbGraph.getId(), oldDbGraph.getNode().get(i).getId()); 
+    //         }
+    //     }
+    //     return null;
+    // }
+
 }

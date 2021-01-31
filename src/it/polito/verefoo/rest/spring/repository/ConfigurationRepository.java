@@ -15,4 +15,13 @@ public interface ConfigurationRepository extends Neo4jRepository<DbConfiguration
     "DETACH DELETE c, any")
     void deleteById(@Param("id") Long id);
 
+    
+    /**
+     * Works as deleteById, but erases only the functions
+     * @param id
+     */
+    @Query("CYPHER 3.5 MATCH (c:DbConfiguration)-[*]->(any) WHERE id(c)=$id " +
+    "DETACH DELETE any")
+    void deleteFunctionsById(@Param("id") Long id);
+
 }

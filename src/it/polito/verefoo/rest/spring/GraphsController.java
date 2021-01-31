@@ -116,7 +116,7 @@ public class GraphsController {
 		service.deleteGraphs();
 
 		String url = request.getRequestURL().toString();
-		return ResponseEntity.status(HttpStatus.CREATED).body(
+		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>().addLink(url, "new", RequestMethod.POST).wrap(null));
 	}
@@ -135,18 +135,18 @@ public class GraphsController {
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist. You can retry the operation or create the graph instead."), })
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
-	public ResponseEntity<Resources<Long>> updateGraph(@PathVariable("gid") long gid, @RequestBody Graph graph) {
+	public ResponseEntity<Resources<Void>> updateGraph(@PathVariable("gid") long gid, @RequestBody Graph graph) {
 
-		Long newId = service.updateGraph(gid, graph);
+		service.updateGraph(gid, graph);
 
 		String url = request.getRequestURL().toString().substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Long>().addLink(url + "/" + newId, "self", RequestMethod.GET)
+				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + gid, "self", RequestMethod.GET)
 						.addLink(url, "new", RequestMethod.POST)
-						.addLink(url + "/" + newId, "self", RequestMethod.DELETE)
-						.addLink(url + "/" + newId, "self", RequestMethod.PUT)
-						.wrap(newId));
+						.addLink(url + "/" + gid, "self", RequestMethod.DELETE)
+						.addLink(url + "/" + gid, "self", RequestMethod.PUT)
+						.wrap(null));
 	}
 
 	/**
@@ -240,22 +240,22 @@ public class GraphsController {
 		})
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
-	public ResponseEntity<Resources<Long>> updateNode(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid, @RequestBody Node node) {
+	public ResponseEntity<Resources<Void>> updateNode(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid, @RequestBody Node node) {
 
-		Long newId = service.updateNode(gid, nid, node);
+		service.updateNode(gid, nid, node);
 
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Long>().addLink(url + "/" + gid + "/nodes", "new", RequestMethod.POST)
-						.addLink(url + "/" + gid + "/nodes" + "/" + newId, "self", RequestMethod.DELETE)
-						.addLink(url + "/" + gid + "/nodes" + "/" + newId, "self", RequestMethod.PUT)
-						.addLink(url + "/" + gid + "/nodes" + "/" + newId, "self", RequestMethod.GET)
+				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + gid + "/nodes", "new", RequestMethod.POST)
+						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.DELETE)
+						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.PUT)
+						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
 						.addLink(url + "/" + gid, "list", RequestMethod.GET).addLink(url, "list", RequestMethod.GET)
-						.wrap(newId));
+						.wrap(null));
 	}
 
 	/**
@@ -431,9 +431,9 @@ public class GraphsController {
 		@ApiResponse(responseCode = "404", description = "The graph, the node or the configuration doesn't exist at all. You can retry the operation or refer to another graph/node.")
 	})
 
-	public ResponseEntity<Resources<Long>> updateConfiguration(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid, @PathVariable("cid") Long cid, @RequestBody Configuration configuration) {
+	public ResponseEntity<Resources<Void>> updateConfiguration(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid, @PathVariable("cid") Long cid, @RequestBody Configuration configuration) {
 
-		Long newConfigurationId = service.updateConfiguration(gid, nid, cid, configuration);
+		service.updateConfiguration(gid, nid, cid, configuration);
 
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
@@ -441,14 +441,14 @@ public class GraphsController {
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Long>()
-						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/configuration/" + newConfigurationId, "self", RequestMethod.PUT)
+				new ResourceWrapperWithLinks<Void>()
+						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/configuration/" + cid, "self", RequestMethod.PUT)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/configuration", "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
 						.addLink(url + "/" + gid, "list", RequestMethod.GET)
 						.addLink(url, "list", RequestMethod.GET)
-						.wrap(newConfigurationId));
+						.wrap(null));
 	}
 
 	/* Constraints */

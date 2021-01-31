@@ -10,30 +10,66 @@ import org.springframework.data.repository.query.Param;
 import it.polito.verefoo.DbPropertyDefinition;
 
 public interface RequirementRepository extends Neo4jRepository<DbPropertyDefinition, Long> {
-    
+
+
+
     @Override
-    @Query("CYPHER 3.5 MATCH (p:DbPropertyDefinition)-[*]-(any) " +
+    @Query("CYPHER 3.5 MATCH tmp = (p:DbPropertyDefinition)-[*]-(any) " +
+
+    // Neglect the foreign-key relationship
+    "WITH *, relationships(tmp) as rels " +
+    "WHERE NONE( rel in rels WHERE type(rel)='PROPERTY_TO_GRAPH') " +
+
     "RETURN (p)-[*]-(any)")
     List<DbPropertyDefinition> findAll();
 
-    @Override
-    @Query("CYPHER 3.5 MATCH (p:DbPropertyDefinition)-[*]-(any) " +
-    "DETACH DELETE p, any")
-    void deleteAll();
+
 
     /**
-     * The super method just deletes the node labeled with DbPropertyDefinition and with the
-     * given id, while its neighbours remain stored (no cascade).
+     * Delete all the requirements sets
      */
     @Override
-    @Query("CYPHER 3.5 MATCH (p:DbPropertyDefinition)-[*]-(any) WHERE id(p)=$id " +
-    "DETACH DELETE p, any")
+    @Query("CYPHER 3.5 MATCH tmp = (p:DbPropertyDefinition)-[*]->(any) " +
+
+    // Neglect the foreign-key relationship
+    "WITH *, relationships(tmp) as rels " +
+    "WHERE NONE( rel in rels WHERE type(rel)='PROPERTY_TO_GRAPH') " +
+
+    "DETACH DELETE tmp")
+    void deleteAll();
+
+
+
+
+    /**
+     * The super method just deletes the node labeled with DbPropertyDefinition and
+     * with the given id, while its neighbours remain stored (no cascade).
+     */
+    @Override
+    @Query("CYPHER 3.5 MATCH tmp = (p:DbPropertyDefinition)-[*]-(any) WHERE id(p)=$id " + 
+    
+    // Neglect the foreign-key relationship
+    "WITH *, relationships(tmp) as rels " +
+    "WHERE NONE( rel in rels WHERE type(rel)='PROPERTY_TO_GRAPH') " +
+    
+    "DETACH DELETE tmp")
     void deleteById(@Param("id") Long id);
 
+
+
+
     @Override
-    @Query("CYPHER 3.5 MATCH (p:DbPropertyDefinition)-[*]-(any) WHERE id(p)=$id " +
+    @Query("CYPHER 3.5 MATCH tmp = (p:DbPropertyDefinition)-[*]-(any) WHERE id(p)=$id " +
+
+    // Neglect the foreign-key relationship
+    "WITH *, relationships(tmp) as rels " +
+    "WHERE NONE( rel in rels WHERE type(rel)='PROPERTY_TO_GRAPH') " +
+
     "RETURN (p)-[*]-(any)")
     Optional<DbPropertyDefinition> findById(@Param("id") Long id);
+
+
+
 
     @Query("CYPHER 3.5 MATCH (propertyDefinition:DbPropertyDefinition) WHERE id(propertyDefinition)=$id " +
     "WITH propertyDefinition " +
@@ -41,8 +77,10 @@ public interface RequirementRepository extends Neo4jRepository<DbPropertyDefinit
     "MERGE (propertyDefinition)-[:PROPERTY]->(property)")
     void bindProperty(@Param("id") Long id, @Param("propertyId") Long propertyId);
 
-    @Query("CYPHER 3.5 MATCH (propertyDefinition:DbPropertyDefinition)-[r:PROPERTY]->(property:DbProperty) WHERE id(propertyDefinition)=$id AND id(property)=$propertyId " +
-    "DELETE r")
-    void unbindProperty(@Param("id") Long id, @Param("propertyId") Long propertyId);
     
+
+    @Query("CYPHER 3.5 MATCH (propertyDefinition:DbPropertyDefinition)-[r:PROPERTY]->(property:DbProperty) WHERE id(propertyDefinition)=$id AND id(property)=$propertyId "
+            + "DELETE r")
+    void unbindProperty(@Param("id") Long id, @Param("propertyId") Long propertyId);
+
 }

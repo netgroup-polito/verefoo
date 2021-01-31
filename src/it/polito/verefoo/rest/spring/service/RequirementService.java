@@ -40,8 +40,20 @@ public class RequirementService {
         requirementRepository.deleteAll();
     }
     
+    @Transactional
     public Long createRequirementsSet(PropertyDefinition requirementsSet) {
         DbPropertyDefinition dbPropertyDefinition = requirementRepository.save(converter.deserializePropertyDefinition(requirementsSet));
+        
+        // create the edge as a foreign key
+        // try {
+            dbPropertyDefinition.getProperty().forEach(property -> {
+                propertyRepository.bindToGraph(property.getId());
+            });
+        // } catch (Exception e) {
+        //     // Referential integrity non satisfiable: the referred graph doesn't exist
+        //     throw new Exception("The referred graph doesn't exist");
+        // }
+
         return dbPropertyDefinition.getId();
 	}
 
