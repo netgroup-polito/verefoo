@@ -36,12 +36,13 @@ public interface GraphRepository extends Neo4jRepository<DbGraph, Long> {
     void deleteAll();
 
 
+    
     /**
      * Check if it exists at least one graph which is referred
      * @param id
      * @return
      */
-    @Query("optional match (g:DbGraph)-[r:PROPERTY_TO_GRAPH]-() " +
+    @Query("optional match (g:DbGraph)-[r:PROPERTY_TO_GRAPH|CONSTRAINTS_TO_GRAPH]-() " +
     "return case when r is null then false else true end")
     Boolean isAnyReferred();
 
@@ -55,15 +56,15 @@ public interface GraphRepository extends Neo4jRepository<DbGraph, Long> {
     @Query("CYPHER 3.5 MATCH tmp = (s:DbGraph)-[*]-(n) WHERE id(s)=$id " +
 
     // Neglect the foreign-key relationship
-    "WITH *, relationships(tmp) as rels " +
-    "WHERE NONE( rel in rels WHERE type(rel)='PROPERTY_TO_GRAPH') " +
+    // "WITH *, relationships(tmp) as rels " +
+    // "WHERE NONE( rel in rels WHERE type(rel)='PROPERTY_TO_GRAPH') " +
 
     "DETACH DELETE s, n")
     void deleteById(@Param("id") Long id);
 
 
 
-    @Query("optional match (g:DbGraph)-[r:PROPERTY_TO_GRAPH]-() WHERE id(g)=$id " +
+    @Query("optional match (g:DbGraph)-[r:PROPERTY_TO_GRAPH|CONSTRAINTS_TO_GRAPH]-() WHERE id(g)=$id " +
     "return case when r is null then false else true end")
     Boolean isReferred(@Param("id") Long id);
 

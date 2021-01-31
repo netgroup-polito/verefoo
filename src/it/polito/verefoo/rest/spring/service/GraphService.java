@@ -265,7 +265,8 @@ public class GraphService {
         public void createConstraints(Long id, Constraints constraints) {
                 DbConstraints dbConstraints = converter.deserializeConstraints(constraints);
                 dbConstraints.setGraph(id);
-                constraintsRepository.save(dbConstraints);
+                dbConstraints = constraintsRepository.save(dbConstraints);
+                constraintsRepository.bindToGraph(dbConstraints.getId());
         }
 
         public void deleteConstraints(Long id) {
