@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import it.polito.verefoo.DbConnections;
 import it.polito.verefoo.DbHost;
 import it.polito.verefoo.DbHosts;
+import it.polito.verefoo.DbNodeRefType;
+import it.polito.verefoo.DbSupportedVNFType;
 import it.polito.verefoo.jaxb.Connections;
 import it.polito.verefoo.jaxb.Host;
 import it.polito.verefoo.jaxb.Hosts;
@@ -18,7 +20,9 @@ import it.polito.verefoo.rest.spring.converter.SubstrateConverter;
 import it.polito.verefoo.rest.spring.repository.ConnectionRepository;
 import it.polito.verefoo.rest.spring.repository.HostRepository;
 import it.polito.verefoo.rest.spring.repository.HostsRepository;
+import it.polito.verefoo.rest.spring.repository.NodeRefTypeRepository;
 import it.polito.verefoo.rest.spring.repository.SubstrateRepository;
+import it.polito.verefoo.rest.spring.repository.SupportedVNFTypeRepository;
 
 @Service
 public class SubstrateService {
@@ -34,6 +38,12 @@ public class SubstrateService {
 
     @Autowired
     ConnectionRepository connectionRepository;
+
+    @Autowired
+    NodeRefTypeRepository nodeRefTypeRepository;
+
+    @Autowired
+    SupportedVNFTypeRepository supportedVNFTypeRepository;
 
     @Autowired
     SubstrateConverter converter;
@@ -63,6 +73,9 @@ public class SubstrateService {
         hosts.getHost().forEach(host -> {
             DbHost dbHost = hostRepository.save(converter.deserializeHost(host));
             hostsRepository.bindHost(substrateId, dbHost.getId());
+            dbHost.getNodeRef().forEach(nodeRef -> {
+                nodeRefTypeRepository.bindToGraph(nodeRef.getId());
+            });
             hostsIds.add(dbHost.getId());
         });
         return hostsIds;
@@ -79,15 +92,89 @@ public class SubstrateService {
         hostsRepository.deleteHosts(substrateId);
     }
 
-    // TODO: write this on docs
-    // Do not annotate this method with Transactional, since all the called methods
-    // are already annotated with it
+    @Transactional
     public Long updateHost(Long substrateId, Long hostId, Host host) {
-        deleteHost(substrateId, hostId);
+        DbHost newDbHost = converter.deserializeHost(host);
+        DbHost oldDbHost;
+        Optional<DbHost> dbHost = hostRepository.findById(hostId, -1);
+        if (dbHost.isPresent()) {
+            oldDbHost = dbHost.get();
+        } else return null;
 
-        Hosts hosts = new Hosts();
-        hosts.getHost().add(host);
-        return createHosts(substrateId, hosts).get(0);
+        // merge
+        newDbHost.setId(hostId);
+        hostRepository.save(newDbHost, 0);
+        // merge nodeRef nodes, updating the foreign keys
+        if (newDbHost.getNodeRef().size() >= oldDbHost.getNodeRef().size()) {
+            int i = 0;
+            for ( ; i < oldDbHost.getNodeRef().size(); i++) {
+                // update in place
+                newDbHost.getNodeRef().get(i).setId(oldDbHost.getNodeRef().get(i).getId());
+                nodeRefTypeRepository.unbindFromGraph(oldDbHost.getNodeRef().get(i).getId());
+                nodeRefTypeRepository.save(newDbHost.getNodeRef().get(i), 0);
+                nodeRefTypeRepository.bindToGraph(oldDbHost.getNodeRef().get(i).getId());
+            }
+            for ( ; i < newDbHost.getNodeRef().size(); i++) {
+                DbNodeRefType newDbNodeRefType = nodeRefTypeRepository.save(newDbHost.getNodeRef().get(i), 0);
+                hostRepository.bindNodeRefType(hostId, newDbNodeRefType.getId());
+                nodeRefTypeRepository.bindToGraph(newDbNodeRefType.getId());
+            }
+        } else {
+            int i = 0;
+            for ( ; i < newDbHost.getNodeRef().size(); i++) {
+                // update in place
+                newDbHost.getNodeRef().get(i).setId(oldDbHost.getNodeRef().get(i).getId());
+                nodeRefTypeRepository.unbindFromGraph(oldDbHost.getNodeRef().get(i).getId());
+                nodeRefTypeRepository.save(newDbHost.getNodeRef().get(i), 0);
+                nodeRefTypeRepository.bindToGraph(oldDbHost.getNodeRef().get(i).getId());
+            }
+            for ( ; i < oldDbHost.getNodeRef().size(); i++) {
+                // This solution doesn't work because the save method is inspired to MERGE,
+                // so the nodes not referenced are not deleted
+                // oldDbGraph.getNode().remove(i);
+                nodeRefTypeRepository.unbindFromGraph(oldDbHost.getNodeRef().get(i).getId());
+                nodeRefTypeRepository.delete(oldDbHost.getNodeRef().get(i)); 
+            }
+        }
+        // merge SupportedVNFType nodes
+        if (newDbHost.getSupportedVNF().size() >= oldDbHost.getSupportedVNF().size()) {
+            int i = 0;
+            for ( ; i < oldDbHost.getSupportedVNF().size(); i++) {
+                // update in place
+                newDbHost.getSupportedVNF().get(i).setId(oldDbHost.getSupportedVNF().get(i).getId());
+                supportedVNFTypeRepository.save(newDbHost.getSupportedVNF().get(i));
+            }
+            for ( ; i < newDbHost.getSupportedVNF().size(); i++) {
+                // create the remaining ones
+                DbSupportedVNFType dbSupportedVNFType = supportedVNFTypeRepository.save(newDbHost.getSupportedVNF().get(i), 0);
+                hostRepository.bindSupportedVNFType(hostId, dbSupportedVNFType.getId());
+            }
+        } else {
+            int i = 0;
+            for ( ; i < newDbHost.getSupportedVNF().size(); i++) {
+                // update in place
+                newDbHost.getSupportedVNF().get(i).setId(oldDbHost.getSupportedVNF().get(i).getId());
+                supportedVNFTypeRepository.save(newDbHost.getSupportedVNF().get(i));
+            }
+            for ( ; i < oldDbHost.getSupportedVNF().size(); i++) {
+                // delete the remaining ones
+                // This solution doesn't work because the save method is inspired to MERGE,
+                // so the nodes not referenced are not deleted
+                // oldDbGraph.getNode().remove(i);
+                supportedVNFTypeRepository.delete(oldDbHost.getSupportedVNF().get(i)); 
+            }
+        }
+        // newDbHost.getNodeRef().forEach(nodeRef -> {
+        //     nodeRefTypeRepository.unbindFromGraph(nodeRef.getId());
+        //     nodeRefTypeRepository.save(nodeRef);
+        // });
+        // deleteHost(substrateId, hostId);
+
+        // Hosts hosts = new Hosts();
+        // hosts.getHost().add(host);
+        // return createHosts(substrateId, hosts).get(0);
+
+        return 1L;
     }
 
     public Host getHost(Long substrateId, Long hostId) {
@@ -128,6 +215,8 @@ public class SubstrateService {
      * @param connections
      */
 	public void updateConnections(Long substrateId, Connections connections) {
+        // this methodology is applicable because the id of connections is not visible to the
+        // user
         deleteConnections(substrateId);
         createConnections(substrateId, connections);
 	}
