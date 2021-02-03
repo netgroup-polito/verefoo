@@ -164,12 +164,8 @@ public class SubstrateService {
                 supportedVNFTypeRepository.delete(oldDbHost.getSupportedVNF().get(i)); 
             }
         }
-        // newDbHost.getNodeRef().forEach(nodeRef -> {
-        //     nodeRefTypeRepository.unbindFromGraph(nodeRef.getId());
-        //     nodeRefTypeRepository.save(nodeRef);
-        // });
-        // deleteHost(substrateId, hostId);
 
+        // old implementation
         // Hosts hosts = new Hosts();
         // hosts.getHost().add(host);
         // return createHosts(substrateId, hosts).get(0);

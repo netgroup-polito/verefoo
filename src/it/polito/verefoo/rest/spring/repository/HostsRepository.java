@@ -21,7 +21,7 @@ public interface HostsRepository extends Neo4jRepository<DbHosts, Long> {
     @Override
     @Query("CYPHER 3.5 MATCH tmp = (h:DbHosts)-[*]-(any) " +
 
-    // Neglect the foreign-key relationship
+    // Neglect the outgoing foreign-key relationship
     "WITH *, relationships(tmp) as rels " +
     "WHERE NONE( rel in rels WHERE type(rel)='HOST_TO_NODE') " +
 
@@ -37,7 +37,7 @@ public interface HostsRepository extends Neo4jRepository<DbHosts, Long> {
     @Override
     @Query("CYPHER 3.5 MATCH tmp = (h:DbHosts)-[*]-(any) WHERE id(h)=$id " +
 
-    // Neglect the foreign-key relationship
+    // Neglect the outgoing foreign-key relationship
     "WITH *, relationships(tmp) as rels " +
     "WHERE NONE( rel in rels WHERE type(rel)='HOST_TO_NODE') " +
 
@@ -52,7 +52,7 @@ public interface HostsRepository extends Neo4jRepository<DbHosts, Long> {
      */
     @Query("CYPHER 3.5 MATCH tmp = (h:DbHosts)-[*]-(any) WHERE id(h)=$id " +
 
-    // Neglect the foreign-key relationship
+    // Neglect the outgoing foreign-key relationship
     "WITH *, relationships(tmp) as rels " +
     "WHERE NONE( rel in rels WHERE type(rel)='HOST_TO_NODE') " +
 

@@ -1,4 +1,4 @@
-package it.polito.verefoo.rest.spring;
+package it.polito.verefoo.rest.spring.controller;
 
 import java.util.List;
 
@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.jaxb.PropertyDefinition;
+import it.polito.verefoo.rest.spring.ResourceWrapperWithLinks;
 import it.polito.verefoo.rest.spring.service.RequirementService;
 
 @RestController

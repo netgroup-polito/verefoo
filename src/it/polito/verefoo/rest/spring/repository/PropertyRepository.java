@@ -1,7 +1,5 @@
 package it.polito.verefoo.rest.spring.repository;
 
-import java.util.Optional;
-
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
@@ -27,18 +25,6 @@ public interface PropertyRepository extends Neo4jRepository<DbProperty, Long> {
 
     "DETACH DELETE p, any")
     void deleteById(@Param("id") Long id);
-
-
-
-    @Override
-    @Query("CYPHER 3.5 MATCH tmp = (p:DbProperty)-[*]->(any) WHERE id(p)=$id " +
-
-    // Neglect the foreign-key relationship
-    "WITH *, relationships(tmp) as rels " +
-    "WHERE NONE( rel in rels WHERE type(rel)='PROPERTY_TO_GRAPH') " +
-
-    "RETURN (p)-[*]->(any)")
-    Optional<DbProperty> findById(@Param("id") Long id);
 
 
 

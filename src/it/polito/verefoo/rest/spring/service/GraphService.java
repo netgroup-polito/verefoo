@@ -65,7 +65,7 @@ public class GraphService {
 
         public Graphs getGraphs() {
                 Graphs graphs = new Graphs();
-                graphRepository.findAll().forEach(dbGraph -> {
+                graphRepository.findAll(-1).forEach(dbGraph -> {
                         graphs.getGraph().add(converter.serializeGraph(dbGraph));
                 });
                 return graphs;
@@ -95,7 +95,7 @@ public class GraphService {
                 DbGraph newDbGraph = converter.deserializeGraph(graph);
 
                 DbGraph oldDbGraph;
-                Optional<DbGraph> dbGraph = graphRepository.findById(id);
+                Optional<DbGraph> dbGraph = graphRepository.findById(id, -1);
                 if (dbGraph.isPresent())
                         oldDbGraph = dbGraph.get();
                 else
@@ -141,7 +141,7 @@ public class GraphService {
         }
 
         public Graph getGraph(Long id) {
-                Optional<DbGraph> dbGraph = graphRepository.findById(id);
+                Optional<DbGraph> dbGraph = graphRepository.findById(id, -1);
                 if (dbGraph.isPresent())
                         return converter.serializeGraph(dbGraph.get());
                 else
@@ -164,8 +164,12 @@ public class GraphService {
          */
         @Transactional
         public void deleteNode(Long id, Long nodeId) {
-                graphRepository.unbindNode(id, nodeId);
-                nodeRepository.deleteById(nodeId);
+                if (nodeRepository.isReferred(nodeId)) {
+                        // throw exception
+                } else {
+                        graphRepository.unbindNode(id, nodeId);
+                        nodeRepository.deleteById(nodeId);   
+                }
         }
 
         /**
@@ -176,7 +180,7 @@ public class GraphService {
         public void updateNode(Long id, Long nodeId, Node node) {
                 DbNode newDbNode = converter.deserializeNode(node);
                 DbNode oldDbNode;
-                Optional<DbNode> dbNode = nodeRepository.findById(nodeId);
+                Optional<DbNode> dbNode = nodeRepository.findById(nodeId, -1);
                 if (dbNode.isPresent()) {
                         oldDbNode = dbNode.get();
                 } else
@@ -216,7 +220,7 @@ public class GraphService {
         }
 
         public Node getNode(Long id, Long nodeId) {
-                Optional<DbNode> dbNode = nodeRepository.findById(nodeId);
+                Optional<DbNode> dbNode = nodeRepository.findById(nodeId, -1);
                 if (dbNode.isPresent()) {
                         return converter.serializeNode(dbNode.get());
                 } else

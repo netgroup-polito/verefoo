@@ -13,18 +13,6 @@ public interface RequirementRepository extends Neo4jRepository<DbPropertyDefinit
 
 
 
-    @Override
-    @Query("CYPHER 3.5 MATCH tmp = (p:DbPropertyDefinition)-[*]-(any) " +
-
-    // Neglect the foreign-key relationship
-    "WITH *, relationships(tmp) as rels " +
-    "WHERE NONE( rel in rels WHERE type(rel)='PROPERTY_TO_GRAPH') " +
-
-    "RETURN (p)-[*]-(any)")
-    List<DbPropertyDefinition> findAll();
-
-
-
     /**
      * Delete all the requirements sets
      */
@@ -57,20 +45,6 @@ public interface RequirementRepository extends Neo4jRepository<DbPropertyDefinit
 
 
 
-
-    @Override
-    @Query("CYPHER 3.5 MATCH tmp = (p:DbPropertyDefinition)-[*]-(any) WHERE id(p)=$id " +
-
-    // Neglect the foreign-key relationship
-    "WITH *, relationships(tmp) as rels " +
-    "WHERE NONE( rel in rels WHERE type(rel)='PROPERTY_TO_GRAPH') " +
-
-    "RETURN (p)-[*]-(any)")
-    Optional<DbPropertyDefinition> findById(@Param("id") Long id);
-
-
-
-
     @Query("CYPHER 3.5 MATCH (propertyDefinition:DbPropertyDefinition) WHERE id(propertyDefinition)=$id " +
     "WITH propertyDefinition " +
     "MATCH (property:DbProperty) WHERE id(property)=$propertyId " +
@@ -83,4 +57,6 @@ public interface RequirementRepository extends Neo4jRepository<DbPropertyDefinit
             + "DELETE r")
     void unbindProperty(@Param("id") Long id, @Param("propertyId") Long propertyId);
 
+
+    
 }

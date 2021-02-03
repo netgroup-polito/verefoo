@@ -1,4 +1,4 @@
-package it.polito.verefoo.rest.spring;
+package it.polito.verefoo.rest.spring.controller;
 
 import java.io.File;
 import java.io.FileWriter;

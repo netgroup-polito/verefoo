@@ -1,8 +1,5 @@
 package it.polito.verefoo.rest.spring.repository;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.repository.query.Param;
@@ -15,23 +12,11 @@ public interface GraphRepository extends Neo4jRepository<DbGraph, Long> {
 
 
 
-    @Override
-    @Query("CYPHER 3.5 MATCH (s:DbGraph)-[*]-(n) " + "RETURN (s)-[*]-(n)")
-    List<DbGraph> findAll();
-
-
-
     /**
-     * The super method just deletes all nodes labeled with {@code DbGraph}, while
-     * their neighbours remain stored (no cascade).
+     * Use this method in conjunction with {@code isAnyReferred} to enforce foreign key integrity
      */
     @Override
-    @Query("CYPHER 3.5 MATCH tmp = (s:DbGraph)-[*]-(n) " +
-
-    // Neglect the foreign-key relationship
-    "WITH *, relationships(tmp) as rels " +
-    "WHERE NONE( rel in rels WHERE type(rel)='PROPERTY_TO_GRAPH') " +
-    
+    @Query("CYPHER 3.5 MATCH tmp = (s:DbGraph)-[*]-(n) " + 
     "DETACH DELETE s, n")
     void deleteAll();
 
@@ -42,38 +27,33 @@ public interface GraphRepository extends Neo4jRepository<DbGraph, Long> {
      * @param id
      * @return
      */
-    @Query("optional match (g:DbGraph)-[r:PROPERTY_TO_GRAPH|CONSTRAINTS_TO_GRAPH]-() " +
-    "return case when r is null then false else true end")
+    @Query("optional match (g:DbGraph)-[r1:PROPERTY_TO_GRAPH|CONSTRAINTS_TO_GRAPH]-() " +
+    "WITH r1 " +
+    "optional match (g:DbGraph)-[:NODE]-(n:DbNode)-[r2:HOST_TO_NODE]-() " +
+    "with r1 is not null or r2 is not null as res " +
+    "return res " +
+    "limit 1 ")
     Boolean isAnyReferred();
 
 
 
     /**
-     * The super method just deletes the node labeled with DbGraph and with the
-     * given id, while its neighbours remain stored (no cascade).
+     * Use this method in conjunction with {@code isReferred} to enforce foreign key integrity
      */
     @Override
     @Query("CYPHER 3.5 MATCH tmp = (s:DbGraph)-[*]-(n) WHERE id(s)=$id " +
-
-    // Neglect the foreign-key relationship
-    // "WITH *, relationships(tmp) as rels " +
-    // "WHERE NONE( rel in rels WHERE type(rel)='PROPERTY_TO_GRAPH') " +
-
     "DETACH DELETE s, n")
     void deleteById(@Param("id") Long id);
 
 
 
-    @Query("optional match (g:DbGraph)-[r:PROPERTY_TO_GRAPH|CONSTRAINTS_TO_GRAPH]-() WHERE id(g)=$id " +
-    "return case when r is null then false else true end")
+    @Query("optional match (g:DbGraph)-[r1:PROPERTY_TO_GRAPH|CONSTRAINTS_TO_GRAPH]-() WHERE id(g)=$id " +
+    "WITH r1 " +
+    "optional match (g:DbGraph)-[:NODE]-(n:DbNode)-[r2:HOST_TO_NODE]-() WHERE id(g)=$id " +
+    "with r1 is not null or r2 is not null as res " +
+    "return res " +
+    "limit 1")
     Boolean isReferred(@Param("id") Long id);
-
-
-
-    @Override
-    @Query("CYPHER 3.5 MATCH (s:DbGraph)-[*]-(n) WHERE id(s)=$id " +
-    "RETURN (s:DbGraph)-[*]-(n)")
-    Optional<DbGraph> findById(@Param("id") Long id);
 
 
 

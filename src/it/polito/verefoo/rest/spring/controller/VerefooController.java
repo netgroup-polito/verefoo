@@ -1,4 +1,4 @@
-package it.polito.verefoo.rest.spring;
+package it.polito.verefoo.rest.spring.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

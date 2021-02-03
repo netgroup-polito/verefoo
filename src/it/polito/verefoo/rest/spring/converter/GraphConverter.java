@@ -198,7 +198,7 @@ public class GraphConverter {
         dbElements.setDstPort(elements.getDstPort());
         dbElements.setProtocol(DbL4ProtocolTypes.fromValue(elements.getProtocol().name()));
         dbElements.setSource(elements.getSource());
-        dbElements.setSrcPort(elements.getSource());
+        dbElements.setSrcPort(elements.getSrcPort());
         return dbElements;
     }
 
@@ -529,7 +529,7 @@ public class GraphConverter {
         elements.setDstPort(dbElements.getDstPort());
         elements.setProtocol(L4ProtocolTypes.fromValue(dbElements.getProtocol().name()));
         elements.setSource(dbElements.getSource());
-        elements.setSrcPort(dbElements.getSource());
+        elements.setSrcPort(dbElements.getSrcPort());
         return elements;
     }
 

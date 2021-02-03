@@ -1,4 +1,4 @@
-package it.polito.verefoo.rest.spring;
+package it.polito.verefoo.rest.spring.controller;
 
 import java.util.List;
 
@@ -27,6 +27,7 @@ import it.polito.verefoo.jaxb.Graph;
 import it.polito.verefoo.jaxb.Graphs;
 import it.polito.verefoo.jaxb.Neighbour;
 import it.polito.verefoo.jaxb.Node;
+import it.polito.verefoo.rest.spring.ResourceWrapperWithLinks;
 import it.polito.verefoo.rest.spring.service.GraphService;
 
 

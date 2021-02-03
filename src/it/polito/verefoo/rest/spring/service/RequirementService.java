@@ -30,7 +30,7 @@ public class RequirementService {
 
 	public List<PropertyDefinition> getRequirementsSets() {
         List<PropertyDefinition> requirementsSets = new ArrayList<>();
-        requirementRepository.findAll().forEach(requirementsSet -> {
+        requirementRepository.findAll(-1).forEach(requirementsSet -> {
             requirementsSets.add(converter.serializePropertyDefinition(requirementsSet));
         });
 		return requirementsSets;
@@ -62,7 +62,7 @@ public class RequirementService {
 	}
 
 	public PropertyDefinition getRequirementsSet(Long id) {
-        Optional<DbPropertyDefinition> dbPropertyDefinition = requirementRepository.findById(id);
+        Optional<DbPropertyDefinition> dbPropertyDefinition = requirementRepository.findById(id, -1);
         if (dbPropertyDefinition.isPresent()) {
             return converter.serializePropertyDefinition(dbPropertyDefinition.get());
         } else return null;
@@ -88,7 +88,7 @@ public class RequirementService {
 	}
 
 	public Property getProperty(Long id, Long propertyId) {
-        Optional<DbProperty> dbProperty = propertyRepository.findById(propertyId);
+        Optional<DbProperty> dbProperty = propertyRepository.findById(propertyId, -1);
         if (dbProperty.isPresent()) {
             return converter.serializeProperty(dbProperty.get());
         } else return null;
