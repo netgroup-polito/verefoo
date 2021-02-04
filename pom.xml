@@ -4,6 +4,20 @@
 	<artifactId>verifoo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
+	<developers>
+		<developer>
+			<name>Calarco Davide</name>
+			<id>Thefolle</id>
+			<roles>
+				<role>
+					REST API developer and designer: controllers, services and repositories
+				</role>
+			</roles>
+			<organization>Politecnico di Torino</organization>
+			<email>cdavide8@gmail.com</email>
+		</developer>
+	</developers>
+
 
 	<pluginRepositories>
 		<pluginRepository>
@@ -21,6 +35,13 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- Spring boot artifact to configure and run tests; it includes Junit and Mockito -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<version>2.1.4.RELEASE</version>
 		</dependency>
 
 		<!-- Dependencies to generate Java classes from JSON schemas -->
@@ -92,7 +113,6 @@
 			<systemPath>${project.basedir}/lib/junit/concurrent-junit-1.0.0.jar</systemPath>
 		</dependency>
 
-
 		<dependency>
 			<groupId>com.verifoo</groupId>
 			<artifactId>thriftjunit</artifactId>
@@ -152,6 +172,7 @@
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>2.9.2</version>
 		</dependency>
+
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
@@ -191,6 +212,7 @@
 			<artifactId>spring-data-neo4j</artifactId>
 			<version>5.1.21.RELEASE</version>
 		</dependency>
+		<!-- Driver for establishing a connection between Tomcat and Neo4j server through HTTP -->
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-ogm-http-driver</artifactId>
@@ -255,6 +277,23 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<!-- To run integration tests: mvn verify -->
+					<!-- run spring boot automatically for testing -->
+					<execution>
+						<id>pre-integration-test</id>
+						<goals>
+							<goal>start</goal>
+						</goals>
+					</execution>
+					<!-- stop spring boot after that all tests have been processed -->
+					<execution>
+						<id>post-integration-test</id>
+						<goals>
+							<goal>stop</goal>
+						</goals>
+					</execution>
+				</executions>
 				<!-- Linked to springdoc-openapi-maven-plugin
 					<executions>
 					<execution>
@@ -430,6 +469,27 @@
 					</execution>
 				</executions>
 			</plugin>-->
+
+			<!-- Plugin to run integration tests -->
+			<!-- To run integration tests: mvn verify -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.22.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- This parameter redirects the report to the console (if false) or to ${project.basedir}/target/failsafe-reports/failsafe-summary.xml -->
+					<useFile>false</useFile>
+					<testClassesDirectory>${project.basedir}/target/classes</testClassesDirectory>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

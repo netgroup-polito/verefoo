@@ -1,0 +1,150 @@
+{
+    "graph": [
+        {
+            "id": 0,
+            "node": [
+                {
+                    "name": "10.0.0.1",
+                    "functionalType": "WEBCLIENT",
+                    "neighbour": [
+                        {
+                            "name": "30.0.0.1"
+                        }
+                    ],
+                    "configuration": {
+                        "name": "confA",
+                        "description": "A simple description",
+                        "webclient": {
+                            "nameWebServer": "20.0.0.1"
+                        }
+                    }
+                },
+                {
+                    "name": "30.0.0.1",
+                    "functionalType": "FIREWALL",
+                    "neighbour": [
+                        {
+                            "name": "10.0.0.1"
+                        },
+                        {
+                            "name": "20.0.0.1"
+                        }
+                    ],
+                    "configuration": {
+                        "description": "A simple description",
+                        "name": "conf1",
+                        "firewall": {
+                            "defaultAction": "ALLOW",
+                            "elements": [
+                                {
+                                    "action": "DENY",
+                                    "source": "10.0.0.1",
+                                    "destination": "20.0.0.1",
+                                    "protocol": "ANY",
+                                    "srcPort": "*",
+                                    "dstPort": "*"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "functionalType": "WEBSERVER",
+                    "name": "20.0.0.1",
+                    "neighbour": [
+                        {
+                            "name": "30.0.0.1"
+                        }
+                    ],
+                    "configuration": {
+                        "description": "A simple description",
+                        "name": "confB",
+                        "webserver": {
+                            "name": "b"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": 1,
+            "node": [
+                {
+                    "id": 0,
+                    "name": "10.0.0.6",
+                    "functionalType": "CACHE",
+                    "configuration": {
+                        "name": "myConfD",
+                        "forwarder": {
+                            "name": "forwarder"
+                        }
+                    },
+                    "neighbour": [
+                        {
+                            "id": 1,
+                            "name": "10.0.0.2"
+                        },
+                        {
+                            "id": 2,
+                            "name": "10.0.0.4"
+                        }
+                    ]
+                },
+                {
+                    "id": 1,
+                    "name": "10.0.0.5",
+                    "configuration": {
+                        "id": 1,
+                        "statefulFirewall": {
+                            "defaultAction": "ALLOW",
+                            "elements": [
+                                {
+                                    "action": "DENY",
+                                    "source": "10.0.0.3",
+                                    "destination": "*",
+                                    "srcPort": "1004",
+                                    "dstPort": "4001",
+                                    "directional": true,
+                                    "protocol": "UDP"
+                                },
+                                {
+                                    "action": "DENY",
+                                    "source": "*",
+                                    "destination": "10.0.0.4",
+                                    "directional": false,
+                                    "protocol": "ANY",
+                                    "srcPort": "*",
+                                    "dstPort": "5004"
+                                }
+                            ]
+                        }
+                    },
+                    "functionalType": "STATEFUL_FIREWALL",
+                    "neighbour": [
+                        {
+                            "id": 0
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "name": "10.0.0.4",
+                    "functionalType": "NAT",
+                    "configuration": {
+                        "nat": {
+                            "source": [
+                                "10.0.0.5"
+                            ]
+                        }
+                    },
+                    "neighbour": [
+                        {
+                            "id": 0,
+                            "name": "10.0.0.6"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
