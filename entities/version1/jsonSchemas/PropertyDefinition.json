@@ -1,84 +1,81 @@
 {
+  "$schema" : "http://json-schema.org/draft-07/schema#",
   "type" : "object",
-  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:PropertyDefinition",
-  "additionalProperties" : false,
   "properties" : {
     "property" : {
       "type" : "array",
       "items" : {
         "type" : "object",
-        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Property",
-        "additionalProperties" : false,
         "properties" : {
+          "body" : {
+            "type" : "string"
+          },
+          "dst" : {
+            "type" : "string"
+          },
+          "dstPort" : {
+            "type" : "string"
+          },
+          "graph" : {
+            "type" : "integer"
+          },
+          "httpDefinition" : {
+            "type" : "object",
+            "properties" : {
+              "domain" : {
+                "type" : "string"
+              },
+              "options" : {
+                "type" : "string"
+              },
+              "url" : {
+                "type" : "string"
+              }
+            },
+            "additionalProperties" : false
+          },
+          "isSat" : {
+            "type" : "boolean"
+          },
+          "lv4Proto" : {
+            "type" : "string",
+            "enum" : [ "ANY", "TCP", "UDP", "OTHER" ]
+          },
+          "name" : {
+            "type" : "string",
+            "enum" : [ "ISOLATION_PROPERTY", "REACHABILITY_PROPERTY" ]
+          },
           "pop3Definition" : {
             "type" : "object",
-            "id" : "urn:jsonschema:it:polito:verefoo:jaxb:POP3Definition",
-            "additionalProperties" : false,
             "properties" : {
+              "contentType" : {
+                "type" : "string"
+              },
               "from" : {
                 "type" : "string"
               },
               "sender" : {
                 "type" : "string"
               },
-              "to" : {
-                "type" : "string"
-              },
               "subject" : {
                 "type" : "string"
               },
-              "contentType" : {
+              "to" : {
                 "type" : "string"
               }
-            }
-          },
-          "name" : {
-            "type" : "string",
-            "enum" : [ "ISOLATION_PROPERTY", "REACHABILITY_PROPERTY" ]
-          },
-          "graph" : {
-            "type" : "integer"
+            },
+            "additionalProperties" : false
           },
           "src" : {
             "type" : "string"
           },
-          "dst" : {
-            "type" : "string"
-          },
-          "lv4Proto" : {
-            "type" : "string",
-            "enum" : [ "ANY", "TCP", "UDP", "OTHER" ]
-          },
           "srcPort" : {
             "type" : "string"
-          },
-          "dstPort" : {
-            "type" : "string"
-          },
-          "isSat" : {
-            "type" : "boolean"
-          },
-          "body" : {
-            "type" : "string"
-          },
-          "httpdefinition" : {
-            "type" : "object",
-            "id" : "urn:jsonschema:it:polito:verefoo:jaxb:HTTPDefinition",
-            "additionalProperties" : false,
-            "properties" : {
-              "url" : {
-                "type" : "string"
-              },
-              "domain" : {
-                "type" : "string"
-              },
-              "options" : {
-                "type" : "string"
-              }
-            }
           }
-        }
+        },
+        "additionalProperties" : false
       }
     }
-  }
+  },
+  "additionalProperties" : false
 }

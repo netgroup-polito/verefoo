@@ -81,11 +81,18 @@
 			<artifactId>jackson-dataformat-xml</artifactId>
 		</dependency>
 
-		<!-- Module to generate JSON schemas from JAXB-generated POJOs -->
+		<!-- Module to generate draft-3 JSON schemas from JAXB-generated POJOs -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-jsonSchema</artifactId>
 			<version>2.12.0</version>
+		</dependency>
+
+		<!-- Module to generate draft-7 JSON schemas from JAXB-generated POJOs -->
+		<dependency>
+			<groupId>com.github.victools</groupId>
+			<artifactId>jsonschema-generator</artifactId>
+			<version>4.17.0</version>
 		</dependency>
 
 		<dependency>

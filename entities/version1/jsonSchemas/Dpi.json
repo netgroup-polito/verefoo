@@ -1,28 +1,31 @@
 {
+  "$schema" : "http://json-schema.org/draft-07/schema#",
+  "definitions" : {
+    "ActionTypes" : {
+      "type" : "string",
+      "enum" : [ "ALLOW", "DENY" ]
+    }
+  },
   "type" : "object",
-  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Dpi",
-  "additionalProperties" : false,
   "properties" : {
+    "defaultAction" : {
+      "$ref" : "#/definitions/ActionTypes"
+    },
     "dpiElements" : {
       "type" : "array",
       "items" : {
         "type" : "object",
-        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:DpiElements",
-        "additionalProperties" : false,
         "properties" : {
           "action" : {
-            "type" : "string",
-            "enum" : [ "ALLOW", "DENY" ]
+            "$ref" : "#/definitions/ActionTypes"
           },
           "condition" : {
             "type" : "string"
           }
-        }
+        },
+        "additionalProperties" : false
       }
-    },
-    "defaultAction" : {
-      "type" : "string",
-      "enum" : [ "ALLOW", "DENY" ]
     }
-  }
+  },
+  "additionalProperties" : false
 }

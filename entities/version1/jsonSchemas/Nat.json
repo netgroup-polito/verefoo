@@ -1,7 +1,6 @@
 {
+  "$schema" : "http://json-schema.org/draft-07/schema#",
   "type" : "object",
-  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Nat",
-  "additionalProperties" : false,
   "properties" : {
     "source" : {
       "type" : "array",
@@ -9,5 +8,6 @@
         "type" : "string"
       }
     }
-  }
+  },
+  "additionalProperties" : false
 }

@@ -1,7 +1,6 @@
 {
+  "$schema" : "http://json-schema.org/draft-07/schema#",
   "type" : "object",
-  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:DpiElements",
-  "additionalProperties" : false,
   "properties" : {
     "action" : {
       "type" : "string",
@@ -10,5 +9,6 @@
     "condition" : {
       "type" : "string"
     }
-  }
+  },
+  "additionalProperties" : false
 }

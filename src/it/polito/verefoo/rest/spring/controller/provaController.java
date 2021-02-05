@@ -7,25 +7,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.fasterxml.jackson.databind.type.TypeModifier;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.VisitorContext;
 import com.fasterxml.jackson.module.jsonSchema.types.ArraySchema;
 import com.fasterxml.jackson.module.jsonSchema.types.ObjectSchema;
+import com.github.victools.jsonschema.generator.Option;
+import com.github.victools.jsonschema.generator.OptionPreset;
+import com.github.victools.jsonschema.generator.SchemaGenerator;
+import com.github.victools.jsonschema.generator.SchemaGeneratorConfig;
+import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder;
+import com.github.victools.jsonschema.generator.SchemaVersion;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,16 +35,14 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import it.polito.verefoo.rest.spring.repository.DEBUG_Repository;
-
-import com.fasterxml.jackson.databind.jsontype.*;
-import com.fasterxml.jackson.databind.cfg.*;
-import com.fasterxml.jackson.databind.introspect.*;
 
 @Hidden
 @RestController
@@ -59,149 +57,78 @@ public class provaController {
     @RequestMapping(value = "/convertPojoToJsonSchemas", method = RequestMethod.POST)
     public void converter() throws IOException, ClassNotFoundException {
 
-        // Incidentally, the false parameter to the SubTypesScanner constructor is essential
-        // to include the Object class and therefore correctly performing the getSubTypesOf method
-        Reflections reflections = new Reflections(new ConfigurationBuilder()
-            .setUrls(ClasspathHelper.forPackage("it.polito.verefoo.jaxb"))
-            .setScanners(new SubTypesScanner(false), new TypeAnnotationsScanner()));
-        
-        /* The classes in the package are scanned through the annotation XmlType; the alternative approach
-        * would be to scan all sub-types of Object, but unfortunately that method may throw StackOverflowException,
-        * probably due to the considerable number of classes in the package;
-        */
+        // Incidentally, the false parameter to the SubTypesScanner constructor is
+        // essential
+        // to include the Object class and therefore correctly performing the
+        // getSubTypesOf method
+        Reflections reflections = new Reflections(
+                new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage("it.polito.verefoo.jaxb"))
+                        .setScanners(new SubTypesScanner(false), new TypeAnnotationsScanner()));
+        /*
+         * The classes in the package are scanned through the annotation XmlType; the
+         * alternative approach would be to scan all sub-types of Object, but
+         * unfortunately that method may throw StackOverflowException, probably due to
+         * the considerable number of classes in the package;
+         */
         Set<Class<? extends Object>> classes = reflections.getTypesAnnotatedWith(XmlType.class);
 
-        /* List<Class> classes = new ArrayList<>();
-        classes.add(ActionTypes.class);
-        classes.add(AllocationConstraintType.class);
-        classes.add(Antispam.class);
-        classes.add(ApplicationError.class);
-        classes.add(Cache.class);
-        classes.add(Configuration.class);
-        classes.add(Connection.class);
-        classes.add(Connections.class);
-        classes.add(Constraints.class);
-        classes.add(Dpi.class);
-        classes.add(DpiElements.class);
-        classes.add(Elements.class);
-        classes.add(Endhost.class);
-        classes.add(Endpoint.class);
-        classes.add(EType.class);
-        classes.add(Fieldmodifier.class);
-        classes.add(Firewall.class);
-        classes.add(Forwarder.class);
-        classes.add(FunctionalTypes.class);
-        classes.add(Graph.class);
-        classes.add(Graphs.class);
-        classes.add(Host.class);
-        classes.add(Hosts.class);
-        classes.add(HTTPDefinition.class);
-        classes.add(Hyperlinks.class);
-        classes.add(L4ProtocolTypes.class);
-        classes.add(LinkConstraints.class);
-        classes.add(Loadbalancer.class);
-        classes.add(Mailclient.class);
-        classes.add(Mailserver.class);
-        classes.add(Nat.class);
-        classes.add(Neighbour.class);
-        classes.add(NetworkForwardingPaths.class);
-        classes.add(NFV.class);
-        classes.add(Node.class);
-        classes.add(NodeConstraints.class);
-        classes.add(NodeRefType.class);
-        classes.add(ObjectFactory.class);
-        classes.add(Path.class);
-        classes.add(Paths.class);
-        classes.add(PName.class);
-        classes.add(POP3Definition.class);
-        classes.add(PriorityFirewall.class);
-        classes.add(Property.class);
-        classes.add(PropertyDefinition.class);
-        classes.add(ProtocolTypes.class);
-        classes.add(StatefulFirewall.class);
-        classes.add(SupportedVNFType.class);
-        classes.add(TrafficMonitor.class);
-        classes.add(TypeOfHost.class);
-        classes.add(Vpnaccess.class);
-        classes.add(Vpnexit.class);
-        classes.add(WafElements.class);
-        classes.add(WebApplicationFirewall.class);
-        classes.add(Webclient.class);
-        classes.add(Webserver.class); */
+        // now convert classes into json Schemas
+        SchemaGeneratorConfigBuilder configBuilder = new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_7,
+                OptionPreset.PLAIN_JSON);
+        configBuilder.getObjectMapper().enable(MapperFeature.USE_ANNOTATIONS);
+        configBuilder.getObjectMapper().enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY);
+        configBuilder.getObjectMapper().setSerializationInclusion(Include.NON_EMPTY);
+        configBuilder.with(Option.FORBIDDEN_ADDITIONAL_PROPERTIES_BY_DEFAULT);
+        SchemaGeneratorConfig config = configBuilder.build();
+        SchemaGenerator generator = new SchemaGenerator(config);
 
         classes.forEach(pojo -> {
-            ObjectMapper mapper = new ObjectMapper();
 
-            // consider also annotations in POJOs generated by JAXB
-            // AnnotationIntrospector annotationIntrospector = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance());
-            // AnnotationIntrospector annotationIntrospector = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance()){
-            //     @Override
-            //     public TypeResolverBuilder<?> findTypeResolver(MapperConfig<?> config,
-            //         AnnotatedMember ac, JavaType baseType)
-            //     {
-            //         if (ac.hasAnnotation(XmlAttribute.class) && ac.getAnnotation(XmlAttribute.class).required()) {
-            //             return ;
-            //         }
-            //         return null;
-            //     }
-            // }
-            // };
-            // mapper.setAnnotationIntrospector(annotationIntrospector);
-            mapper.enable(MapperFeature.USE_ANNOTATIONS);
+            JsonNode jsonSchema = generator.generateSchema(pojo);
 
-            // doesn't write null properties at all
-            mapper.setSerializationInclusion(Include.NON_EMPTY);
-            // mapper.configure(MapperFeature.USE_ANNOTATIONS, true);
-            
-            JsonSchemaGenerator schemaGen = buildSchemaGenerator(mapper);
-            JsonSchema schema = null;
-            try {
-                schema = schemaGen.generateSchema(pojo);
-                rejectAdditionalProperties(schema);
-            } catch (JsonMappingException e) {
-                e.printStackTrace();
-            }
-            
             FileWriter fileWriter;
             try {
                 fileWriter = new FileWriter(
                         new File("./entities/version1/jsonSchemas/", pojo.getSimpleName() + ".json"));
-                mapper.writerWithDefaultPrettyPrinter().writeValue(fileWriter, schema);
+                configBuilder.getObjectMapper().writerWithDefaultPrettyPrinter().writeValue(fileWriter, jsonSchema);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
         });
+
     }
 
     /**
      * Recursive function to set additionalProperties = false for every object
      * inside the json schema
+     * 
      * @param jsonSchema
      */
     public static void rejectAdditionalProperties(JsonSchema jsonSchema) {
         if (jsonSchema.isObjectSchema()) {
-          ObjectSchema objectSchema = jsonSchema.asObjectSchema();
-          ObjectSchema.AdditionalProperties additionalProperties = objectSchema.getAdditionalProperties();
-          if (additionalProperties instanceof ObjectSchema.SchemaAdditionalProperties) {
-              rejectAdditionalProperties(((ObjectSchema.SchemaAdditionalProperties) additionalProperties).getJsonSchema());
-          } else {
-            for (JsonSchema property : objectSchema.getProperties().values()) {
-              rejectAdditionalProperties(property);
+            ObjectSchema objectSchema = jsonSchema.asObjectSchema();
+            ObjectSchema.AdditionalProperties additionalProperties = objectSchema.getAdditionalProperties();
+            if (additionalProperties instanceof ObjectSchema.SchemaAdditionalProperties) {
+                rejectAdditionalProperties(
+                        ((ObjectSchema.SchemaAdditionalProperties) additionalProperties).getJsonSchema());
+            } else {
+                for (JsonSchema property : objectSchema.getProperties().values()) {
+                    rejectAdditionalProperties(property);
+                }
+                objectSchema.rejectAdditionalProperties();
             }
-            objectSchema.rejectAdditionalProperties();
-          }
         } else if (jsonSchema.isArraySchema()) {
-          ArraySchema.Items items = jsonSchema.asArraySchema().getItems();
-          if (items.isSingleItems()) {
-            rejectAdditionalProperties(items.asSingleItems().getSchema());
-          } else if (items.isArrayItems()) {
-            for (JsonSchema schema : items.asArrayItems().getJsonSchemas()) {
-              rejectAdditionalProperties(schema);
+            ArraySchema.Items items = jsonSchema.asArraySchema().getItems();
+            if (items.isSingleItems()) {
+                rejectAdditionalProperties(items.asSingleItems().getSchema());
+            } else if (items.isArrayItems()) {
+                for (JsonSchema schema : items.asArrayItems().getJsonSchemas()) {
+                    rejectAdditionalProperties(schema);
+                }
             }
-          }
         }
-      }
+    }
 
     /*
      * this method overrides the default behaviour (superclass VisitorContext) of
@@ -244,7 +171,8 @@ public class provaController {
     }
 
     @RequestMapping(value = "/DEBUG_removeAllNodes", method = RequestMethod.DELETE)
-    public void DEBUG_removeAllNodes() {
+    public ResponseEntity<Void> DEBUG_removeAllNodes() {
         debug_Repository.DEBUG_cleanDb();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

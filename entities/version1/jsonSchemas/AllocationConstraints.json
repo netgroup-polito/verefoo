@@ -1,27 +1,26 @@
 {
+  "$schema" : "http://json-schema.org/draft-07/schema#",
   "type" : "object",
-  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:AllocationConstraints",
-  "additionalProperties" : false,
   "properties" : {
     "allocationConstraint" : {
       "type" : "array",
       "items" : {
         "type" : "object",
-        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:AllocationConstraints:AllocationConstraint",
-        "additionalProperties" : false,
         "properties" : {
-          "type" : {
-            "type" : "string",
-            "enum" : [ "FORBIDDEN", "FORCED" ]
-          },
           "nodeA" : {
             "type" : "string"
           },
           "nodeB" : {
             "type" : "string"
+          },
+          "type" : {
+            "type" : "string",
+            "enum" : [ "FORBIDDEN", "FORCED" ]
           }
-        }
+        },
+        "additionalProperties" : false
       }
     }
-  }
+  },
+  "additionalProperties" : false
 }

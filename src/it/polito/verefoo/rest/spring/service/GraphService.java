@@ -48,10 +48,9 @@ public class GraphService {
         GraphConverter converter;
 
         /**
-         * Each graph given in input and its neighbours must not have set any id
-         * 
+         * The order of returned ids is the same as that of the input graphs
          * @param graphs
-         * @return the generated ids for the created graphs
+         * @return the generated ids for the graphs
          */
         public List<Long> createGraphs(Graphs graphs) {
                 List<Long> ids = new ArrayList<>();

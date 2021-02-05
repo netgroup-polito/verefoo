@@ -1,17 +1,17 @@
 {
+  "$schema" : "http://json-schema.org/draft-07/schema#",
   "type" : "object",
-  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:WafElements",
-  "additionalProperties" : false,
   "properties" : {
     "action" : {
       "type" : "string",
       "enum" : [ "ALLOW", "DENY" ]
     },
-    "url" : {
-      "type" : "string"
-    },
     "domain" : {
       "type" : "string"
+    },
+    "url" : {
+      "type" : "string"
     }
-  }
+  },
+  "additionalProperties" : false
 }

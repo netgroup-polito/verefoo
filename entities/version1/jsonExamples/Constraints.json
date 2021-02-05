@@ -4,7 +4,7 @@
             {
                 "nodeA": "10.0.0.1",
                 "nodeB": "10.0.0.2",
-                "type": "forbidden"
+                "type": "FORBIDDEN"
             },
             {
                 "nodeA": "30.0.0.3",

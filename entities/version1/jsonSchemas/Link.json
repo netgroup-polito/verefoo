@@ -1,19 +1,19 @@
 {
+  "$schema" : "http://json-schema.org/draft-07/schema#",
   "type" : "object",
-  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Hyperlinks:Link",
-  "additionalProperties" : false,
   "properties" : {
-    "rel" : {
-      "type" : "string"
-    },
     "href" : {
-      "type" : "string"
-    },
-    "type" : {
       "type" : "string"
     },
     "method" : {
       "type" : "string"
+    },
+    "rel" : {
+      "type" : "string"
+    },
+    "type" : {
+      "type" : "string"
     }
-  }
+  },
+  "additionalProperties" : false
 }

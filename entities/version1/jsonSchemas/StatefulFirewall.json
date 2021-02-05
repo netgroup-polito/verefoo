@@ -1,44 +1,47 @@
 {
+  "$schema" : "http://json-schema.org/draft-07/schema#",
+  "definitions" : {
+    "ActionTypes" : {
+      "type" : "string",
+      "enum" : [ "ALLOW", "DENY" ]
+    }
+  },
   "type" : "object",
-  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:StatefulFirewall",
-  "additionalProperties" : false,
   "properties" : {
+    "defaultAction" : {
+      "$ref" : "#/definitions/ActionTypes"
+    },
     "elements" : {
       "type" : "array",
       "items" : {
         "type" : "object",
-        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Elements",
-        "additionalProperties" : false,
         "properties" : {
           "action" : {
-            "type" : "string",
-            "enum" : [ "ALLOW", "DENY" ]
-          },
-          "source" : {
-            "type" : "string"
+            "$ref" : "#/definitions/ActionTypes"
           },
           "destination" : {
+            "type" : "string"
+          },
+          "directional" : {
+            "type" : "boolean"
+          },
+          "dstPort" : {
             "type" : "string"
           },
           "protocol" : {
             "type" : "string",
             "enum" : [ "ANY", "TCP", "UDP", "OTHER" ]
           },
+          "source" : {
+            "type" : "string"
+          },
           "srcPort" : {
             "type" : "string"
-          },
-          "dstPort" : {
-            "type" : "string"
-          },
-          "directional" : {
-            "type" : "boolean"
           }
-        }
+        },
+        "additionalProperties" : false
       }
-    },
-    "defaultAction" : {
-      "type" : "string",
-      "enum" : [ "ALLOW", "DENY" ]
     }
-  }
+  },
+  "additionalProperties" : false
 }

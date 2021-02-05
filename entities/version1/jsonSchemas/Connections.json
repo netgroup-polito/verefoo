@@ -1,26 +1,25 @@
 {
+  "$schema" : "http://json-schema.org/draft-07/schema#",
   "type" : "object",
-  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Connections",
-  "additionalProperties" : false,
   "properties" : {
     "connection" : {
       "type" : "array",
       "items" : {
         "type" : "object",
-        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Connection",
-        "additionalProperties" : false,
         "properties" : {
-          "sourceHost" : {
-            "type" : "string"
+          "avgLatency" : {
+            "type" : "integer"
           },
           "destHost" : {
             "type" : "string"
           },
-          "avgLatency" : {
-            "type" : "integer"
+          "sourceHost" : {
+            "type" : "string"
           }
-        }
+        },
+        "additionalProperties" : false
       }
     }
-  }
+  },
+  "additionalProperties" : false
 }

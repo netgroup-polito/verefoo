@@ -1,16 +1,16 @@
 {
+  "$schema" : "http://json-schema.org/draft-07/schema#",
   "type" : "object",
-  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:LinkConstraints:LinkMetrics",
-  "additionalProperties" : false,
   "properties" : {
-    "src" : {
-      "type" : "string"
-    },
     "dst" : {
       "type" : "string"
     },
     "reqLatency" : {
       "type" : "integer"
+    },
+    "src" : {
+      "type" : "string"
     }
-  }
+  },
+  "additionalProperties" : false
 }

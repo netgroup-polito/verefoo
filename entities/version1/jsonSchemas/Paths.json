@@ -1,8 +1,13 @@
 {
+  "$schema" : "http://json-schema.org/draft-07/schema#",
   "type" : "object",
-  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:Paths",
-  "additionalProperties" : false,
   "properties" : {
+    "destination" : {
+      "type" : "string"
+    },
+    "direction" : {
+      "type" : "string"
+    },
     "message" : {
       "type" : "string"
     },
@@ -14,12 +19,7 @@
     },
     "source" : {
       "type" : "string"
-    },
-    "destination" : {
-      "type" : "string"
-    },
-    "direction" : {
-      "type" : "string"
     }
-  }
+  },
+  "additionalProperties" : false
 }

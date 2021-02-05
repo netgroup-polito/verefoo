@@ -1,31 +1,34 @@
 {
+  "$schema" : "http://json-schema.org/draft-07/schema#",
+  "definitions" : {
+    "ActionTypes" : {
+      "type" : "string",
+      "enum" : [ "ALLOW", "DENY" ]
+    }
+  },
   "type" : "object",
-  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:WebApplicationFirewall",
-  "additionalProperties" : false,
   "properties" : {
+    "defaultAction" : {
+      "$ref" : "#/definitions/ActionTypes"
+    },
     "wafElements" : {
       "type" : "array",
       "items" : {
         "type" : "object",
-        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:WafElements",
-        "additionalProperties" : false,
         "properties" : {
           "action" : {
-            "type" : "string",
-            "enum" : [ "ALLOW", "DENY" ]
-          },
-          "url" : {
-            "type" : "string"
+            "$ref" : "#/definitions/ActionTypes"
           },
           "domain" : {
             "type" : "string"
+          },
+          "url" : {
+            "type" : "string"
           }
-        }
+        },
+        "additionalProperties" : false
       }
-    },
-    "defaultAction" : {
-      "type" : "string",
-      "enum" : [ "ALLOW", "DENY" ]
     }
-  }
+  },
+  "additionalProperties" : false
 }

@@ -29,6 +29,8 @@ import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.data.neo4j.conversion.MetaDataDrivenConversionService;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
+import org.springframework.hateoas.config.EnableHypermediaSupport;
+import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 
@@ -42,7 +44,8 @@ import io.swagger.v3.oas.models.tags.Tag;
 // TODO #jalol separate config from rest api
 @SpringBootApplication
 // @EnableSwagger2
-// @EnableTransactionManagement
+// A client implementation should activate this annotation and use the injected bean RestTemplate, which works as a rest client along with hyperlinks
+// @EnableHypermediaSupport(type = HypermediaType.HAL)
 public class SpringBootConfiguration {
 
     public static void main(String[] args) {
@@ -131,7 +134,7 @@ public class SpringBootConfiguration {
         List<Server> servers = new ArrayList<>();
         Server server = new Server();
         server.setDescription("ADP module server");
-        server.setUrl("http://localhost:8085/verefoo");
+        server.setUrl("http://localhost:8085/verefoo/adp");
         servers.add(server);
 
         return new OpenAPI().components(new Components()).servers(servers)

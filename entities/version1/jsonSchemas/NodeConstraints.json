@@ -1,38 +1,37 @@
 {
+  "$schema" : "http://json-schema.org/draft-07/schema#",
   "type" : "object",
-  "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeConstraints",
-  "additionalProperties" : false,
   "properties" : {
     "nodeMetrics" : {
       "type" : "array",
       "items" : {
         "type" : "object",
-        "id" : "urn:jsonschema:it:polito:verefoo:jaxb:NodeConstraints:NodeMetrics",
-        "additionalProperties" : false,
         "properties" : {
+          "cores" : {
+            "type" : "integer"
+          },
+          "maxNodeLatency" : {
+            "type" : "integer"
+          },
+          "memory" : {
+            "type" : "integer"
+          },
           "node" : {
             "type" : "string"
           },
           "nrOfOperations" : {
             "type" : "integer"
           },
-          "maxNodeLatency" : {
-            "type" : "integer"
+          "optional" : {
+            "type" : "boolean"
           },
           "reqStorage" : {
             "type" : "integer"
-          },
-          "cores" : {
-            "type" : "integer"
-          },
-          "memory" : {
-            "type" : "integer"
-          },
-          "optional" : {
-            "type" : "boolean"
           }
-        }
+        },
+        "additionalProperties" : false
       }
     }
-  }
+  },
+  "additionalProperties" : false
 }
