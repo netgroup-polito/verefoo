@@ -77,7 +77,7 @@ public class SimulationService {
 		return simulationRepository.save(dbNFV).getId();
 	}
 
-	public NFV getSimulationResult(Long id) {
+	public NFV getSimulationResult(Long id) throws Exception {
 		NFV nfv = new NFV();
 		DbNFV dbNFV;
 		Optional<DbNFV> tmp = simulationRepository.findById(id, -1);
@@ -88,7 +88,9 @@ public class SimulationService {
 		// }
 
 		nfv.setGraphs(new Graphs());
-		dbNFV.getGraph().forEach(graphId -> nfv.getGraphs().getGraph().add(graphService.getGraph(graphId)));
+		for (Long graphId : dbNFV.getGraph()) {
+			nfv.getGraphs().getGraph().add(graphService.getGraph(graphId));
+		}
 
 		dbNFV.getGraph().forEach(graphId -> nfv.setConstraints(graphService.getConstraints(graphId)));
 
@@ -103,7 +105,7 @@ public class SimulationService {
 		return nfv;
 	}
 
-	public NFV buildNFVFromParams(Long graphId, Long substrateId, Long requirementsSetId) {
+	public NFV buildNFVFromParams(Long graphId, Long substrateId, Long requirementsSetId) throws Exception {
 		NFV nfv = new NFV();
 		nfv.setGraphs(new Graphs());
 		nfv.getGraphs().getGraph().add(graphService.getGraph(graphId));

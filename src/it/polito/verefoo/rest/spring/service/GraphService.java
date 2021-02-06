@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import it.polito.verefoo.DbConfiguration;
 import it.polito.verefoo.DbConstraints;
@@ -139,12 +141,12 @@ public class GraphService {
                 }
         }
 
-        public Graph getGraph(Long id) {
+        public Graph getGraph(Long id) throws Exception {
                 Optional<DbGraph> dbGraph = graphRepository.findById(id, -1);
                 if (dbGraph.isPresent())
                         return converter.serializeGraph(dbGraph.get());
                 else
-                        return null;
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The graph with id " + id + " doesn't exist.");
         }
 
         @Transactional

@@ -183,24 +183,26 @@ public class SimulationsController {
 	}
 
 	/**
-	 * @param gid it is the id of the graph
-	 * @param rid it is the id of the requirements set
-	 * @param sid it is the id of the substrate network
+	 * @param gid                   it is the id of the graph
+	 * @param rid                   it is the id of the requirements set
+	 * @param sid                   it is the id of the substrate network
 	 * @param usableFunctionalTypes it is a list of functions name
 	 * @return the simulation result
+	 * @throws Exception
 	 */
 	@Operation(tags = "version 1 - simulations", summary = "Run a simulation by passing references to data structures", description = "At the moment, neither network forwarding paths nor the parsing string can be passed; use the other simulation API instead.")
 	@RequestMapping(value = "/byParams", method = RequestMethod.POST)
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK"),
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "400", description = "One of the parameters is semantically malformed. You can retry the operation or check the data."),
-			@ApiResponse(responseCode = "404", description = "At least one resource referenced by some parameter has not been found. You can retry the operation or check that the resources actually exist.")
-		})
+			@ApiResponse(responseCode = "404", description = "At least one resource referenced by some parameter has not been found. You can retry the operation or check that the resources actually exist.") })
 
 	public ResponseEntity<Resources<Long>> runSimulationByParams(@RequestParam(value = "gid", required = true) Long gid,
 			@RequestParam(value = "rid", required = false) Long rid,
 			@RequestParam(value = "sid", required = false) Long sid
-			/* This parameter is not used yet: @RequestParam(value = "fid", required = false) List<FunctionalTypes> fid */) {
+	/*
+	 * This parameter is not used yet: @RequestParam(value = "fid", required =
+	 * false) List<FunctionalTypes> fid
+	 */) throws Exception {
 
 		NFV nfv = service.buildNFVFromParams(gid, sid, rid);
 		// from now on, the controller behaves like the other simulation API
@@ -227,15 +229,14 @@ public class SimulationsController {
 	/**
 	 * @param smid it is the id of the simulation result to retrieve
 	 * @return the simulation result
+	 * @throws Exception
 	 */
 	@Operation(tags = "version 1 - simulations", summary = "Get the result of a past simulation", description = "This API is not intended to run a new simulation.")
 	@RequestMapping(value = "/{smid}", method = RequestMethod.GET)
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The requested simulation has never been run. You can retry the operation or run a simulation first.")
-		})
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
+			@ApiResponse(responseCode = "404", description = "The requested simulation has never been run. You can retry the operation or run a simulation first.") })
 
-	public ResponseEntity<Resources<NFV>> getSimulationResult(@PathVariable("smid") long smid) {
+	public ResponseEntity<Resources<NFV>> getSimulationResult(@PathVariable("smid") long smid) throws Exception {
 
 		NFV result = service.getSimulationResult(smid);
 
