@@ -44,23 +44,6 @@
 			<version>2.1.4.RELEASE</version>
 		</dependency>
 
-		<!-- Dependencies to generate Java classes from JSON schemas -->
-		<!-- <dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.9</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.9.9.2</version>
-		</dependency> -->
-		<!-- <dependency>
-			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>org.eclipse.persistence.moxy</artifactId>
-			<version>3.0.0</version>
-		</dependency> -->
-
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-core</artifactId>
@@ -168,6 +151,7 @@
 			<artifactId>springdoc-openapi-ui</artifactId>
 			<version>1.2.32</version>
 		</dependency>
+
 		<!-- This dependency has been commented because it furnishes the swagger version 2, while the dependency springdoc-openapi-ui provides the version 3.0.2 -->
 		<!-- <dependency>
 		<groupId>io.springfox</groupId>
@@ -194,25 +178,6 @@
 			<scope>test</scope>
 		</dependency>
 
-
-		<!-- Neo4j Jdbc -->
-		<!-- <dependency>
-			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j-jdbc</artifactId>
-			<version>3.0</version>
-		</dependency> -->
-		<!-- For file and in-memory support, add these two as well -->
-		<!-- <dependency>
-			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j</artifactId>
-			<version>3.2.9</version>
-		</dependency> -->
-		<!-- <dependency>
-			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j-kernel</artifactId>
-			<version>3.5.25</version>
-			<type>test-jar</type>
-		</dependency> -->
 		<!-- Add the support for Spring Boot "repository" pattern implementation -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
@@ -225,12 +190,6 @@
 			<artifactId>neo4j-ogm-http-driver</artifactId>
 			<version>3.2.19</version>
 		</dependency>
-		<!-- Support for vanilla Java -->
-		<!-- <dependency>
-			<groupId>org.neo4j.driver</groupId>
-			<artifactId>neo4j-java-driver</artifactId>
-			<version>1.2.1</version>
-		</dependency> -->
 
 		<dependency>
 			<groupId>com.microsoft</groupId>
@@ -284,23 +243,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<executions>
-					<!-- To run integration tests: mvn verify -->
-					<!-- run spring boot automatically for testing -->
-					<execution>
-						<id>pre-integration-test</id>
-						<goals>
-							<goal>start</goal>
-						</goals>
-					</execution>
-					<!-- stop spring boot after that all tests have been processed -->
-					<execution>
-						<id>post-integration-test</id>
-						<goals>
-							<goal>stop</goal>
-						</goals>
-					</execution>
-				</executions>
+				<version>2.1.4.RELEASE</version>
 				<!-- Linked to springdoc-openapi-maven-plugin
 					<executions>
 					<execution>
@@ -365,7 +308,6 @@
 							<generateDirectory>gen-src/</generateDirectory>
 							<generatePackage>it.polito.verefoo.jaxb</generatePackage>
 							<!-- <forceRegenerate>true</forceRegenerate> -->
-							<!-- Other configuration options -->
 						</configuration>
 					</execution>
 				</executions>
@@ -447,9 +389,7 @@
 					<execution>
 						<phase>generate-sources</phase>
 						<goals>
-							<goal>
-								generate-pojos
-							</goal>
+							<goal>generate-pojos</goal>
 						</goals>
 					</execution>
 				</executions>
