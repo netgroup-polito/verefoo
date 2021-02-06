@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,6 +46,8 @@ import it.polito.verefoo.jaxb.Configuration;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Graph;
 import it.polito.verefoo.jaxb.Graphs;
+import it.polito.verefoo.jaxb.Mailserver;
+import it.polito.verefoo.jaxb.Nat;
 import it.polito.verefoo.jaxb.Neighbour;
 import it.polito.verefoo.jaxb.Node;
 
@@ -160,9 +163,77 @@ public class GraphIT {
             .getNeighbour().stream().filter(n -> n.getId().equals(neighbourId)).findFirst().get();
         assertEquals(neighbour.getName(), createdNeighbour.getName());
 
+        // delete the neighbour
+        deleteNeighbour(graphId, nodeId, neighbourId);
+        Graph deletedNeighbourGraph = getGraph(graphId);
+        assertTrue(deletedNeighbourGraph
+            .getNode().stream().filter(n -> n.getId().equals(nodeId)).findFirst().get()
+            .getNeighbour().stream().noneMatch(n -> n.getId().equals(neighbourId)));
+
+
         deleteGraphs();
 
     }
+
+
+
+    @Test
+    public void test3OneNode() throws Exception {
+        // create a graph
+        graphs.getGraph().remove(1);
+        List<Long> graphIds = createGraphs(graphs);
+        Long graphId = graphIds.get(0);
+        // get the graph
+        Graph graph = getGraph(graphId);
+
+        // create a node
+        Node node = new Node();
+        node.setName("20.0.0.1");
+        node.setFunctionalType(FunctionalTypes.MAILSERVER);
+        Configuration configuration = new Configuration();
+        Mailserver mailserver = new Mailserver();
+        mailserver.setName("test mail server");
+        configuration.setMailserver(mailserver);
+        node.setConfiguration(configuration);
+
+        Long nodeId = createNode(graphId, node);
+
+        graph = getGraph(graphId);
+
+        assertTrue(graph.getNode().stream().anyMatch(n -> n.getId().equals(nodeId)));
+        Node createdNode = graph.getNode().stream().filter(n -> n.getId().equals(nodeId)).findFirst().get();
+        assertEquals(createdNode.getName(), node.getName());
+
+        // update the node
+        node.setName("10.0.0.5");
+
+        updateNode(graphId, nodeId, node);
+
+        // get the node
+        Node updatedNode = getNode(graphId, nodeId);
+
+        assertEquals(node.getName(), updatedNode.getName());
+
+        // update configuration
+        updatedNode.setFunctionalType(FunctionalTypes.NAT);
+        configuration = new Configuration();
+        Nat nat = new Nat();
+        nat.getSource().add("test source 1");
+        nat.getSource().add("test source 2");
+        configuration.setNat(nat);
+        configuration.setId(updatedNode.getConfiguration().getId());
+        updatedNode.setConfiguration(configuration);
+        updateConfiguration(graphId, nodeId, updatedNode.getConfiguration().getId(), configuration);
+
+        // get configuration
+        Configuration updatedConfiguration = getConfiguration(graphId, nodeId);
+        assertEquals(configuration.getName(), updatedConfiguration.getName());
+        assertEquals(configuration.getNat().getSource().size(), updatedConfiguration.getNat().getSource().size());
+
+        deleteGraphs();
+
+    }
+
 
 
 
@@ -233,6 +304,57 @@ public class GraphIT {
         String rawContent = jsonResponse.get("_embedded").get("longList").elements().next().toString();
 
         return objectMapper.readValue(rawContent, Long.class);
+    }
+
+    private void deleteNeighbour(Long graphId, Long nodeId, Long neighbourId) throws Exception {
+        mvc.perform(delete("/adp/graphs/" + graphId + "/nodes/" + nodeId + "/neighbours/" + neighbourId).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+    }
+
+    private Long createNode(Long graphId, Node node) throws Exception {
+        String body = objectMapper.writeValueAsString(node);
+
+        String rawResponse = mvc.perform(post("/adp/graphs/" + graphId + "/nodes").contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isCreated()).andReturn()
+                .getResponse().getContentAsString();
+
+        JsonNode jsonResponse = objectMapper.readTree(rawResponse);
+        String rawContent = jsonResponse.get("_embedded").get("longList").elements().next().toString();
+
+        return objectMapper.readValue(rawContent, Long.class);
+    }
+
+
+    private void updateNode(Long graphId, Long nodeId, Node node) throws Exception {
+        String body = objectMapper.writeValueAsString(node);
+        mvc.perform(put("/adp/graphs/" + graphId + "/nodes/" + nodeId).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isOk());
+    }
+
+    private Node getNode(Long graphId, Long nodeId) throws Exception {
+        String rawResponse = mvc
+                .perform(get("/adp/graphs/" + graphId + "/nodes/" + nodeId).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        JsonNode jsonResponse = objectMapper.readTree(rawResponse);
+        String rawContent = jsonResponse.get("_embedded").get("nodeList").elements().next().toString();
+        return objectMapper.readValue(rawContent, Node.class);
+    }
+
+    private void updateConfiguration(Long graphId, Long nodeId, Long configurationId, Configuration configuration) throws Exception {
+        String body = objectMapper.writeValueAsString(configuration);
+        mvc.perform(put("/adp/graphs/" + graphId + "/nodes/" + nodeId + "/configuration/" + configurationId).contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isOk());
+    }
+
+    private Configuration getConfiguration(Long graphId, Long nodeId) throws Exception {
+        String rawResponse = mvc
+                .perform(get("/adp/graphs/" + graphId + "/nodes/" + nodeId + "/configuration").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        JsonNode jsonResponse = objectMapper.readTree(rawResponse);
+        String rawContent = jsonResponse.get("_embedded").get("configurationList").elements().next().toString();
+        return objectMapper.readValue(rawContent, Configuration.class);
     }
 
 

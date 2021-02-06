@@ -364,7 +364,7 @@ public class GraphsController {
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
-		return ResponseEntity.status(HttpStatus.CREATED).body(
+		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>()
 						.addLink(url + "/" + gid + "/nodes" + "/" + noid + "/neighbours", "new", RequestMethod.POST)
@@ -396,7 +396,7 @@ public class GraphsController {
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
-		return ResponseEntity.status(HttpStatus.CREATED).body(
+		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Configuration>()
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/configuration", "self", RequestMethod.PUT)

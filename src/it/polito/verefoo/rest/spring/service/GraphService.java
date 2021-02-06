@@ -1,6 +1,9 @@
 package it.polito.verefoo.rest.spring.service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import it.polito.verefoo.DbConfiguration;
 import it.polito.verefoo.DbConstraints;
+import it.polito.verefoo.DbFunctionalTypes;
 import it.polito.verefoo.DbGraph;
 import it.polito.verefoo.DbNeighbour;
 import it.polito.verefoo.DbNode;
@@ -51,6 +55,7 @@ public class GraphService {
 
         /**
          * The order of returned ids is the same as that of the input graphs
+         * 
          * @param graphs
          * @return the generated ids for the graphs
          */
@@ -101,29 +106,29 @@ public class GraphService {
                         oldDbGraph = dbGraph.get();
                 else
                         return;
-                
+
                 // merge
                 newDbGraph.setId(id);
                 graphRepository.save(newDbGraph, 0);
                 if (newDbGraph.getNode().size() >= oldDbGraph.getNode().size()) {
                         int i = 0;
-                        for ( ; i < oldDbGraph.getNode().size(); i++) {
+                        for (; i < oldDbGraph.getNode().size(); i++) {
                                 // newDbGraph.getNode().get(i).setId(oldDbGraph.getNode().get(i).getId());
                                 updateNode(id, oldDbGraph.getNode().get(i).getId(), graph.getNode().get(i));
                         }
-                        for ( ; i < newDbGraph.getNode().size(); i++) {
+                        for (; i < newDbGraph.getNode().size(); i++) {
                                 createNode(id, graph.getNode().get(i));
                         }
                 } else {
                         int i = 0;
-                        for ( ; i < newDbGraph.getNode().size(); i++) {
+                        for (; i < newDbGraph.getNode().size(); i++) {
                                 updateNode(id, oldDbGraph.getNode().get(i).getId(), graph.getNode().get(i));
                         }
-                        for ( ; i < oldDbGraph.getNode().size(); i++) {
+                        for (; i < oldDbGraph.getNode().size(); i++) {
                                 // This solution doesn't work because the save method is inspired to MERGE,
                                 // so the nodes not referenced are not deleted
                                 // oldDbGraph.getNode().remove(i);
-                                deleteNode(oldDbGraph.getId(), oldDbGraph.getNode().get(i).getId()); 
+                                deleteNode(oldDbGraph.getId(), oldDbGraph.getNode().get(i).getId());
                         }
                 }
 
@@ -146,7 +151,8 @@ public class GraphService {
                 if (dbGraph.isPresent())
                         return converter.serializeGraph(dbGraph.get());
                 else
-                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The graph with id " + id + " doesn't exist.");
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                        "The graph with id " + id + " doesn't exist.");
         }
 
         @Transactional
@@ -169,7 +175,7 @@ public class GraphService {
                         // throw exception
                 } else {
                         graphRepository.unbindNode(id, nodeId);
-                        nodeRepository.deleteById(nodeId);   
+                        nodeRepository.deleteById(nodeId);
                 }
         }
 
@@ -186,32 +192,35 @@ public class GraphService {
                         oldDbNode = dbNode.get();
                 } else
                         return;
-                
+
                 // merge
                 newDbNode.setId(nodeId);
                 nodeRepository.save(newDbNode, 0);
                 updateConfiguration(id, nodeId, oldDbNode.getConfiguration().getId(), node.getConfiguration());
-                // neighbours can be updated by just deleting all of them and creating new ones, since
+                // neighbours can be updated by just deleting all of them and creating new ones,
+                // since
                 // the ids are not visible to the user
                 if (newDbNode.getNeighbour().size() >= oldDbNode.getNeighbour().size()) {
                         int i = 0;
-                        for ( ; i < oldDbNode.getNeighbour().size(); i++) {
+                        for (; i < oldDbNode.getNeighbour().size(); i++) {
                                 // newDbGraph.getNode().get(i).setId(oldDbGraph.getNode().get(i).getId());
-                                updateNeighbour(id, nodeId, oldDbNode.getNeighbour().get(i).getId(), node.getNeighbour().get(i));
+                                updateNeighbour(id, nodeId, oldDbNode.getNeighbour().get(i).getId(),
+                                                node.getNeighbour().get(i));
                         }
-                        for ( ; i < newDbNode.getNeighbour().size(); i++) {
+                        for (; i < newDbNode.getNeighbour().size(); i++) {
                                 createNeighbour(id, nodeId, node.getNeighbour().get(i));
                         }
                 } else {
                         int i = 0;
-                        for ( ; i < newDbNode.getNeighbour().size(); i++) {
-                                updateNeighbour(id, nodeId, oldDbNode.getNeighbour().get(i).getId(), node.getNeighbour().get(i));
+                        for (; i < newDbNode.getNeighbour().size(); i++) {
+                                updateNeighbour(id, nodeId, oldDbNode.getNeighbour().get(i).getId(),
+                                                node.getNeighbour().get(i));
                         }
-                        for ( ; i < oldDbNode.getNeighbour().size(); i++) {
+                        for (; i < oldDbNode.getNeighbour().size(); i++) {
                                 // This solution doesn't work because the save method is inspired to MERGE,
                                 // so the nodes not referenced are not deleted
                                 // oldDbGraph.getNode().remove(i);
-                                deleteNeighbour(id, nodeId, oldDbNode.getNeighbour().get(i).getId()); 
+                                deleteNeighbour(id, nodeId, oldDbNode.getNeighbour().get(i).getId());
                         }
                 }
 
@@ -257,6 +266,7 @@ public class GraphService {
                 configurationRepository.deleteFunctionsById(configurationId);
                 newDbConfiguration.setId(configurationId);
                 configurationRepository.save(newDbConfiguration);
+                configurationRepository.updateNodeFunctionalType(nodeId, inferFunctionalType(configuration));
 
                 // old version: update by deleting and creating again, but a new id is generated
                 // nodeRepository.unbindConfiguration(nodeId);
@@ -265,6 +275,29 @@ public class GraphService {
                 //                 .save(converter.deserializeConfiguration(configuration));
                 // nodeRepository.bindConfiguration(nodeId, dbConfiguration.getId());
                 // return dbConfiguration.getId();
+        }
+
+        private DbFunctionalTypes inferFunctionalType(Configuration configuration) {
+                if (configuration.getAntispam() != null) return DbFunctionalTypes.ANTISPAM;
+                else if (configuration.getCache() != null) return DbFunctionalTypes.CACHE;
+                else if (configuration.getDpi() != null) return DbFunctionalTypes.DPI;
+                else if (configuration.getEndhost() != null) return DbFunctionalTypes.ENDHOST;
+                else if (configuration.getEndpoint() != null) return DbFunctionalTypes.ENDPOINT;
+                else if (configuration.getFieldmodifier() != null) return DbFunctionalTypes.FIELDMODIFIER;
+                else if (configuration.getFirewall() != null) return DbFunctionalTypes.FIREWALL;
+                else if (configuration.getForwarder() != null) return DbFunctionalTypes.FORWARDER;
+                else if (configuration.getLoadbalancer() != null) return DbFunctionalTypes.LOADBALANCER;
+                else if (configuration.getMailclient()!= null) return DbFunctionalTypes.MAILCLIENT;
+                else if (configuration.getMailserver() != null) return DbFunctionalTypes.MAILSERVER;
+                else if (configuration.getNat() != null) return DbFunctionalTypes.NAT;
+                else if (configuration.getStatefulFirewall() != null) return DbFunctionalTypes.STATEFUL_FIREWALL;
+                else if (configuration.getVpnaccess() != null) return DbFunctionalTypes.VPNACCESS;
+                else if (configuration.getVpnexit() != null) return DbFunctionalTypes.VPNEXIT;
+                else if (configuration.getWebApplicationFirewall() != null) return DbFunctionalTypes.WEB_APPLICATION_FIREWALL;
+                else if (configuration.getWebclient() != null) return DbFunctionalTypes.WEBCLIENT;
+                else if (configuration.getWebserver() != null) return DbFunctionalTypes.WEBSERVER;
+                // fallback value to avoid exception throwing
+                else return DbFunctionalTypes.ANTISPAM;
         }
 
         public void createConstraints(Long id, Constraints constraints) {
