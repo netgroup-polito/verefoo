@@ -24,79 +24,125 @@ public class RequirementService {
 
     @Autowired
     PropertyRepository propertyRepository;
-    
+
     @Autowired
     RequirementConverter converter;
 
-	public List<PropertyDefinition> getRequirementsSets() {
+    public List<PropertyDefinition> getRequirementsSets() {
         List<PropertyDefinition> requirementsSets = new ArrayList<>();
         requirementRepository.findAll(-1).forEach(requirementsSet -> {
             requirementsSets.add(converter.serializePropertyDefinition(requirementsSet));
         });
-		return requirementsSets;
-	}
+        return requirementsSets;
+    }
 
-	public void deleteRequirementsSets() {
+    public void deleteRequirementsSets() {
         requirementRepository.deleteAll();
     }
-    
+
     @Transactional
     public Long createRequirementsSet(PropertyDefinition requirementsSet) {
-        DbPropertyDefinition dbPropertyDefinition = requirementRepository.save(converter.deserializePropertyDefinition(requirementsSet));
-        
+        DbPropertyDefinition dbPropertyDefinition = requirementRepository
+                .save(converter.deserializePropertyDefinition(requirementsSet));
+
         // create the edge as a foreign key
         // try {
-            dbPropertyDefinition.getProperty().forEach(property -> {
-                propertyRepository.bindToGraph(property.getId());
-            });
+        dbPropertyDefinition.getProperty().forEach(property -> {
+            propertyRepository.bindToGraph(property.getId());
+        });
         // } catch (Exception e) {
-        //     // Referential integrity non satisfiable: the referred graph doesn't exist
-        //     throw new Exception("The referred graph doesn't exist");
+        // // Referential integrity non satisfiable: the referred graph doesn't exist
+        // throw new Exception("The referred graph doesn't exist");
         // }
 
         return dbPropertyDefinition.getId();
-	}
+    }
 
-	public void deleteRequirementsSet(Long id) {
+    public void deleteRequirementsSet(Long id) {
         requirementRepository.deleteById(id);
-	}
+    }
 
-	public PropertyDefinition getRequirementsSet(Long id) {
+    public PropertyDefinition getRequirementsSet(Long id) {
         Optional<DbPropertyDefinition> dbPropertyDefinition = requirementRepository.findById(id, -1);
         if (dbPropertyDefinition.isPresent()) {
             return converter.serializePropertyDefinition(dbPropertyDefinition.get());
-        } else return null;
-	}
+        } else
+            return null;
+    }
 
     @Transactional
-	public Long updateRequirementsSet(Long id, PropertyDefinition requirementsSet) {
-        deleteRequirementsSet(id);
-        return createRequirementsSet(requirementsSet);
-	}
+    public void updateRequirementsSet(Long id, PropertyDefinition requirementsSet) {
+        DbPropertyDefinition newDbPropertyDefinition = converter.deserializePropertyDefinition(requirementsSet);
+
+        DbPropertyDefinition oldDbPropertyDefinition;
+        Optional<DbPropertyDefinition> dbPropertyDefinition = requirementRepository.findById(id, -1);
+        if (dbPropertyDefinition.isPresent()) {
+            oldDbPropertyDefinition = dbPropertyDefinition.get();
+        } else
+            return;
+
+        // merge
+        newDbPropertyDefinition.setId(id);
+        requirementRepository.save(newDbPropertyDefinition, 0);
+
+        if (newDbPropertyDefinition.getProperty().size() >= oldDbPropertyDefinition.getProperty().size()) {
+            int i = 0;
+            for (; i < oldDbPropertyDefinition.getProperty().size(); i++) {
+                updateProperty(id, oldDbPropertyDefinition.getProperty().get(i).getId(), requirementsSet.getProperty().get(i));
+            }
+            for (; i < newDbPropertyDefinition.getProperty().size(); i++) {
+                createProperty(id, requirementsSet.getProperty().get(i));
+            }
+        } else {
+            int i = 0;
+            for (; i < newDbPropertyDefinition.getProperty().size(); i++) {
+                updateProperty(id, oldDbPropertyDefinition.getProperty().get(i).getId(), requirementsSet.getProperty().get(i));
+            }
+            for (; i < oldDbPropertyDefinition.getProperty().size(); i++) {
+                deleteProperty(id, oldDbPropertyDefinition.getProperty().get(i).getId());
+            }
+        }
+
+    }
 
     @Transactional
-	public Long createProperty(Long id, Property property) {
+    public Long createProperty(Long id, Property property) {
         DbProperty dbProperty = propertyRepository.save(converter.deserializeProperty(property));
         requirementRepository.bindProperty(id, dbProperty.getId());
-		return dbProperty.getId();
-	}
+        return dbProperty.getId();
+    }
 
     @Transactional
-	public void deleteProperty(Long id, Long propertyId) {
+    public void deleteProperty(Long id, Long propertyId) {
         requirementRepository.unbindProperty(id, propertyId);
         propertyRepository.deleteById(propertyId);
-	}
+    }
 
-	public Property getProperty(Long id, Long propertyId) {
+    public Property getProperty(Long id, Long propertyId) {
         Optional<DbProperty> dbProperty = propertyRepository.findById(propertyId, -1);
         if (dbProperty.isPresent()) {
             return converter.serializeProperty(dbProperty.get());
-        } else return null;
-	}
+        } else
+            return null;
+    }
 
-	public Long updateProperty(Long id, Long propertyId, Property property) {
-        deleteProperty(id, propertyId);
-		return createProperty(id, property);
-	}
+    public void updateProperty(Long id, Long propertyId, Property property) {
+
+        DbProperty newDbProperty = converter.deserializeProperty(property);
+
+        DbProperty oldDbProperty;
+        Optional<DbProperty> dbProperty = propertyRepository.findById(propertyId, -1);
+        if (dbProperty.isPresent()) {
+            oldDbProperty = dbProperty.get();
+        } else
+            return;
+
+        // merge
+        newDbProperty.setId(propertyId);
+        newDbProperty.getHTTPDefinition().setId(oldDbProperty.getHTTPDefinition().getId());
+        newDbProperty.getPOP3Definition().setId(oldDbProperty.getPOP3Definition().getId());
+        propertyRepository.save(newDbProperty);
+
+    }
 
 }

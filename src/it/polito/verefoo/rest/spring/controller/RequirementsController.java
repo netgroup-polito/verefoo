@@ -93,7 +93,7 @@ public class RequirementsController {
 		Long requirementsSetId = service.createRequirementsSet(requirementsSet);
 
 		String url = request.getRequestURL().toString();
-		return ResponseEntity.status(HttpStatus.OK).body(
+		return ResponseEntity.status(HttpStatus.CREATED).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Long>().addLink(url, "new", RequestMethod.POST)
 						.addLink(url, "self", RequestMethod.GET).addLink(url, "self", RequestMethod.DELETE)
@@ -111,18 +111,18 @@ public class RequirementsController {
 
 	})
 
-	public ResponseEntity<Resources<Long>> updateRequirementsSet(@PathVariable("rid") Long rid,
+	public ResponseEntity<Resources<Void>> updateRequirementsSet(@PathVariable("rid") Long rid,
 			@RequestBody PropertyDefinition requirementsSet) {
 
-		Long newRequirementsSetId = service.updateRequirementsSet(rid, requirementsSet);
+		service.updateRequirementsSet(rid, requirementsSet);
 
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Long>().addLink(url + "/" + rid, "self", RequestMethod.GET)
+				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + rid, "self", RequestMethod.GET)
 						.addLink(url + "/" + rid, "self", RequestMethod.PUT)
 						.addLink(url + "/" + rid, "self", RequestMethod.DELETE).addLink(url, "list", RequestMethod.GET)
-						.wrap(newRequirementsSetId));
+						.wrap(null));
 	}
 
 	/**
@@ -188,7 +188,7 @@ public class RequirementsController {
 
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/")).substring(0,
 				request.getRequestURL().lastIndexOf("/"));
-		return ResponseEntity.status(HttpStatus.OK).body(
+		return ResponseEntity.status(HttpStatus.CREATED).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Long>().addLink(url + "/" + rid + "/properties", "new", RequestMethod.POST)
 						.addLink(url + "/" + rid, "list", RequestMethod.GET).addLink(url, "list", RequestMethod.GET)
@@ -205,22 +205,22 @@ public class RequirementsController {
 	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "No Content"),
 			@ApiResponse(responseCode = "404", description = "The requirement set, the property or the referred graph has not been found. You can retry the operation or create/refer to a/another requirement set/property/graph.") })
 
-	public ResponseEntity<Resources<Long>> updateProperty(@PathVariable("rid") Long rid, @PathVariable("pid") Long pid, @RequestBody Property property) {
+	public ResponseEntity<Resources<Void>> updateProperty(@PathVariable("rid") Long rid, @PathVariable("pid") Long pid, @RequestBody Property property) {
 
-		Long newPropertyId = service.updateProperty(rid, pid, property);
+		service.updateProperty(rid, pid, property);
 
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Long>()
+				new ResourceWrapperWithLinks<Void>()
 						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.GET)
 						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.PUT)
 						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.DELETE)
 						.addLink(url + "/" + rid + "/properties", "new", RequestMethod.POST)
 						.addLink(url + "/" + rid, "list", RequestMethod.GET).addLink(url, "list", RequestMethod.GET)
-						.wrap(newPropertyId));
+						.wrap(null));
 	}
 
 	/**

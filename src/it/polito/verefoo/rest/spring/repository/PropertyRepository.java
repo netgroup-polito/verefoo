@@ -37,4 +37,6 @@ public interface PropertyRepository extends Neo4jRepository<DbProperty, Long> {
     "MERGE (p)-[:PROPERTY_TO_GRAPH]->(g)")
     void bindToGraph(@Param("id") Long id);
 
+
+    
 }

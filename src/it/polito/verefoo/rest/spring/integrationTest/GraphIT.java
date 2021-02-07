@@ -8,14 +8,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -61,7 +58,9 @@ public class GraphIT {
     
 
     @Before
-    public void start() throws JsonParseException, JsonMappingException, IOException {
+    public void start() throws Exception {
+        mvc.perform(delete("/adp/DEBUG_removeAllNodes")).andExpect(status().isOk());
+
         objectMapper = new ObjectMapper();
 
         // convert Graphs.json into a Graphs object
@@ -262,6 +261,12 @@ public class GraphIT {
     }
 
 
+    @After
+    public void end() throws Exception {
+        mvc.perform(delete("/adp/DEBUG_removeAllNodes")).andExpect(status().isOk());
+    }
+
+
 
 
     private List<Long> createGraphs(Graphs graphs) throws Exception {
@@ -414,13 +419,6 @@ public class GraphIT {
     private void deleteConstraints(Long graphId) throws Exception {
         mvc.perform(delete("/adp/graphs/" + graphId + "/constraints").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
-    }
-
-
-
-    @After
-    public void end() throws Exception {
-        mvc.perform(delete("/adp/DEBUG_removeAllNodes")).andExpect(status().isOk());
     }
 
 }
