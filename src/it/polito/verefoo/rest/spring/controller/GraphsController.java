@@ -460,7 +460,7 @@ public class GraphsController {
 
 		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
 				.substring(0, request.getRequestURL().lastIndexOf("/"));
-		return ResponseEntity.status(HttpStatus.OK).body(
+		return ResponseEntity.status(HttpStatus.CREATED).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>()
 						.addLink(url + "/" + gid + "/constraints", "new", RequestMethod.POST)
