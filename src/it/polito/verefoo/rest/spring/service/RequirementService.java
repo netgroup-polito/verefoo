@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import it.polito.verefoo.DbProperty;
 import it.polito.verefoo.DbPropertyDefinition;
@@ -30,14 +32,23 @@ public class RequirementService {
 
     public List<PropertyDefinition> getRequirementsSets() {
         List<PropertyDefinition> requirementsSets = new ArrayList<>();
-        requirementRepository.findAll(-1).forEach(requirementsSet -> {
-            requirementsSets.add(converter.serializePropertyDefinition(requirementsSet));
+        requirementRepository.findAll(-1).forEach(dbRequirementsSet -> {
+            requirementsSets.add(converter.serializePropertyDefinition(dbRequirementsSet));
         });
-        return requirementsSets;
+        if (requirementsSets.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "No requirement set is in the workspace.");
+        } else {
+            return requirementsSets;
+        }
     }
 
     public void deleteRequirementsSets() {
-        requirementRepository.deleteAll();
+        if (requirementRepository.count() > 0) {
+            requirementRepository.deleteAll();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_MODIFIED, "The workspace is already clean of requirement sets.");
+        }
+        
     }
 
     @Transactional
@@ -46,20 +57,24 @@ public class RequirementService {
                 .save(converter.deserializePropertyDefinition(requirementsSet));
 
         // create the edge as a foreign key
-        // try {
-        dbPropertyDefinition.getProperty().forEach(property -> {
-            propertyRepository.bindToGraph(property.getId());
-        });
-        // } catch (Exception e) {
-        // // Referential integrity non satisfiable: the referred graph doesn't exist
-        // throw new Exception("The referred graph doesn't exist");
-        // }
+        try {
+            dbPropertyDefinition.getProperty().forEach(property -> {
+                propertyRepository.bindToGraph(property.getId());
+            });
+        } catch (Exception e) {
+            // Referential integrity non satisfiable
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The referred graph doesn't exist");
+        }
 
         return dbPropertyDefinition.getId();
     }
 
     public void deleteRequirementsSet(Long id) {
-        requirementRepository.deleteById(id);
+        if (requirementRepository.existsById(id)) {
+            requirementRepository.deleteById(id);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requirement set " + id + " doesn't exist.");
+        }
     }
 
     public PropertyDefinition getRequirementsSet(Long id) {
@@ -67,7 +82,7 @@ public class RequirementService {
         if (dbPropertyDefinition.isPresent()) {
             return converter.serializePropertyDefinition(dbPropertyDefinition.get());
         } else
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requirement set " + id + " doesn't exist.");
     }
 
     @Transactional
@@ -78,8 +93,9 @@ public class RequirementService {
         Optional<DbPropertyDefinition> dbPropertyDefinition = requirementRepository.findById(id, -1);
         if (dbPropertyDefinition.isPresent()) {
             oldDbPropertyDefinition = dbPropertyDefinition.get();
-        } else
-            return;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requirement set " + id + " doesn't exist.");
+        }
 
         // merge
         newDbPropertyDefinition.setId(id);
@@ -109,13 +125,25 @@ public class RequirementService {
     public Long createProperty(Long id, Property property) {
         DbProperty dbProperty = propertyRepository.save(converter.deserializeProperty(property));
         requirementRepository.bindProperty(id, dbProperty.getId());
+        // create the edge as a foreign key
+        try {
+            propertyRepository.bindToGraph(dbProperty.getId());
+        } catch (Exception e) {
+            // Referential integrity non satisfiable
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The referred graph doesn't exist");
+        }
         return dbProperty.getId();
     }
 
     @Transactional
     public void deleteProperty(Long id, Long propertyId) {
-        requirementRepository.unbindProperty(id, propertyId);
-        propertyRepository.deleteById(propertyId);
+        if (propertyRepository.existsById(propertyId)) {
+            requirementRepository.unbindProperty(id, propertyId);
+            propertyRepository.deleteById(propertyId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The property " + propertyId + " doesn't exist.");
+        }
+        
     }
 
     public Property getProperty(Long id, Long propertyId) {
@@ -123,9 +151,10 @@ public class RequirementService {
         if (dbProperty.isPresent()) {
             return converter.serializeProperty(dbProperty.get());
         } else
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The property " + propertyId + " doesn't exist.");
     }
 
+    @Transactional
     public void updateProperty(Long id, Long propertyId, Property property) {
 
         DbProperty newDbProperty = converter.deserializeProperty(property);
@@ -134,8 +163,9 @@ public class RequirementService {
         Optional<DbProperty> dbProperty = propertyRepository.findById(propertyId, -1);
         if (dbProperty.isPresent()) {
             oldDbProperty = dbProperty.get();
-        } else
-            return;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The property " + propertyId + " doesn't exist.");
+        }
 
         // merge
         newDbProperty.setId(propertyId);

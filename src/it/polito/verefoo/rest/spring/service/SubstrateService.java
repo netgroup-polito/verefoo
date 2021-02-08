@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import it.polito.verefoo.DbConnections;
 import it.polito.verefoo.DbHost;
@@ -55,29 +57,46 @@ public class SubstrateService {
 
     public List<Long> getAllSubstrates() {
         List<Long> substrateIds = new ArrayList<>();
-        hostsRepository.findAll().forEach(substrate -> substrateIds.add(substrate.getId()));
-        return substrateIds;
+        hostsRepository.findAll(-1).forEach(substrate -> substrateIds.add(substrate.getId()));
+
+        if (substrateIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "No substrate is in the workspace.");
+        } else {
+            return substrateIds;
+        }
     }
 
     public void deleteAllSubstrates() {
-        hostsRepository.deleteAll();
+        if (hostsRepository.count() == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_MODIFIED, "The workspace is already clean of substrates.");
+        } else {
+            hostsRepository.deleteAll();
+        }
     }
 
     public void deleteSubstrate(Long id) {
-        hostsRepository.deleteById(id);
+        if (hostsRepository.existsById(id) == false) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The substrate " + id + " doesn't exist.");
+        } else {
+                hostsRepository.deleteById(id);
+        }
     }
 
     @Transactional
     public List<Long> createHosts(Long substrateId, Hosts hosts) {
         List<Long> hostsIds = new ArrayList<>();
-        hosts.getHost().forEach(host -> {
-            DbHost dbHost = hostRepository.save(converter.deserializeHost(host));
-            hostsRepository.bindHost(substrateId, dbHost.getId());
-            dbHost.getNodeRef().forEach(nodeRef -> {
-                nodeRefTypeRepository.bindToGraph(nodeRef.getId());
+        try {
+            hosts.getHost().forEach(host -> {
+                DbHost dbHost = hostRepository.save(converter.deserializeHost(host));
+                hostsRepository.bindHost(substrateId, dbHost.getId());
+                dbHost.getNodeRef().forEach(nodeRef -> {
+                    nodeRefTypeRepository.bindToGraph(nodeRef.getId());
+                });
+                hostsIds.add(dbHost.getId());
             });
-            hostsIds.add(dbHost.getId());
-        });
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The referred graph doesn't exist");
+        }
         return hostsIds;
     }
 
@@ -85,21 +104,29 @@ public class SubstrateService {
         Optional<DbHosts> dbHosts = hostsRepository.findById(substrateId, -1);
         if (dbHosts.isPresent()) {
             return converter.serializeHosts(dbHosts.get());
-        } else return null;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The substrate " + substrateId + " doesn't exist.");
+        }
     }
 
     public void deleteHosts(Long substrateId) {
-        hostsRepository.deleteHosts(substrateId);
+        if (hostsRepository.existsById(substrateId)) {
+            hostsRepository.deleteHosts(substrateId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The substrate " + substrateId + " doesn't exist.");
+        }
     }
 
     @Transactional
-    public Long updateHost(Long substrateId, Long hostId, Host host) {
+    public void updateHost(Long substrateId, Long hostId, Host host) {
         DbHost newDbHost = converter.deserializeHost(host);
         DbHost oldDbHost;
         Optional<DbHost> dbHost = hostRepository.findById(hostId, -1);
         if (dbHost.isPresent()) {
             oldDbHost = dbHost.get();
-        } else return null;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The host " + hostId + " doesn't exist.");
+        }
 
         // merge
         newDbHost.setId(hostId);
@@ -112,7 +139,12 @@ public class SubstrateService {
                 newDbHost.getNodeRef().get(i).setId(oldDbHost.getNodeRef().get(i).getId());
                 nodeRefTypeRepository.unbindFromGraph(oldDbHost.getNodeRef().get(i).getId());
                 nodeRefTypeRepository.save(newDbHost.getNodeRef().get(i), 0);
-                nodeRefTypeRepository.bindToGraph(oldDbHost.getNodeRef().get(i).getId());
+                try {
+                    nodeRefTypeRepository.bindToGraph(oldDbHost.getNodeRef().get(i).getId());
+                } catch (Exception e) {
+                    throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The referred node " + oldDbHost.getNodeRef().get(i).getNode() + " for the host " + hostId + "doesn't exist");
+                }
+                
             }
             for ( ; i < newDbHost.getNodeRef().size(); i++) {
                 DbNodeRefType newDbNodeRefType = nodeRefTypeRepository.save(newDbHost.getNodeRef().get(i), 0);
@@ -126,12 +158,13 @@ public class SubstrateService {
                 newDbHost.getNodeRef().get(i).setId(oldDbHost.getNodeRef().get(i).getId());
                 nodeRefTypeRepository.unbindFromGraph(oldDbHost.getNodeRef().get(i).getId());
                 nodeRefTypeRepository.save(newDbHost.getNodeRef().get(i), 0);
-                nodeRefTypeRepository.bindToGraph(oldDbHost.getNodeRef().get(i).getId());
+                try {
+                    nodeRefTypeRepository.bindToGraph(oldDbHost.getNodeRef().get(i).getId());
+                } catch (Exception e) {
+                    throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The referred node " + oldDbHost.getNodeRef().get(i).getNode() + " for the host " + hostId + "doesn't exist");
+                }
             }
             for ( ; i < oldDbHost.getNodeRef().size(); i++) {
-                // This solution doesn't work because the save method is inspired to MERGE,
-                // so the nodes not referenced are not deleted
-                // oldDbGraph.getNode().remove(i);
                 nodeRefTypeRepository.unbindFromGraph(oldDbHost.getNodeRef().get(i).getId());
                 nodeRefTypeRepository.delete(oldDbHost.getNodeRef().get(i)); 
             }
@@ -158,48 +191,48 @@ public class SubstrateService {
             }
             for ( ; i < oldDbHost.getSupportedVNF().size(); i++) {
                 // delete the remaining ones
-                // This solution doesn't work because the save method is inspired to MERGE,
-                // so the nodes not referenced are not deleted
-                // oldDbGraph.getNode().remove(i);
                 supportedVNFTypeRepository.delete(oldDbHost.getSupportedVNF().get(i)); 
             }
         }
-
-        // old implementation
-        // Hosts hosts = new Hosts();
-        // hosts.getHost().add(host);
-        // return createHosts(substrateId, hosts).get(0);
-
-        return 1L;
     }
 
     public Host getHost(Long substrateId, Long hostId) {
         Optional<DbHost> dbHost = hostRepository.findById(hostId, -1);
         if (dbHost.isPresent()) {
             return converter.serializeHost(dbHost.get());
-        } else return null;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The host " + hostId + " doesn't exist.");
+        }
     }
 
     @Transactional
     public void deleteHost(Long substrateId, Long hostId) {
-        hostsRepository.unbindHost(substrateId, hostId);
-        hostRepository.deleteById(hostId);
+        if (hostRepository.existsById(hostId)) {
+            hostsRepository.unbindHost(substrateId, hostId);
+            hostRepository.deleteById(hostId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The host " + hostId + " doesn't exist.");
+        }
     }
 
 	public void createConnections(Long substrateId, Connections connections) {
         DbConnections dbConnections = converter.deserializeConnections(connections);
         // Some properties can be retrieved only from the db, so this snippet finalizes
         // the deserialization process of connections
-        dbConnections.getConnection().forEach(
-            dbConnection -> {
-                Optional<DbHost> source = hostRepository.findByName(dbConnection.getSourceHost());
-                Optional<DbHost> dest = hostRepository.findByName(dbConnection.getDestHost());
-                if (source.isPresent() && dest.isPresent()) {
-                    dbConnection.setSource(source.get());
-                    dbConnection.setDest(dest.get());
+        try {
+            dbConnections.getConnection().forEach(
+                dbConnection -> {
+                    Optional<DbHost> source = hostRepository.findByName(dbConnection.getSourceHost());
+                    Optional<DbHost> dest = hostRepository.findByName(dbConnection.getDestHost());
+                    if (source.isPresent() && dest.isPresent()) {
+                        dbConnection.setSource(source.get());
+                        dbConnection.setDest(dest.get());
+                    }
                 }
-            }
-        );
+            );
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The host " + substrateId + " doesn't exist.");
+        }
 
         connectionRepository.saveAll(dbConnections.getConnection());
 	}
@@ -215,17 +248,28 @@ public class SubstrateService {
         // user
         deleteConnections(substrateId);
         createConnections(substrateId, connections);
+        
 	}
 
 	public void deleteConnections(Long substrateId) {
-        connectionRepository.deleteAllConnectionsBySubstrateId(substrateId);
+        if (hostsRepository.existsById(substrateId)) {
+            connectionRepository.deleteAllConnectionsBySubstrateId(substrateId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The substrate " + substrateId + " doesn't exist.");
+        }
+        
 	}
 
 	public Connections getConnections(Long substrateId) {
         Connections connections = new Connections();
-		connectionRepository.findAllConnectionsBySubstrateId(substrateId).forEach(dbConnection -> {
-            connections.getConnection().add(converter.serializeConnection(dbConnection));
-        });
+        if (hostsRepository.existsById(substrateId)) {
+            connectionRepository.findAllConnectionsBySubstrateId(substrateId).forEach(dbConnection -> {
+                connections.getConnection().add(converter.serializeConnection(dbConnection));
+            });
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The substrate " + substrateId + " doesn't exist.");
+        }
+		
         return connections;
 	}
 

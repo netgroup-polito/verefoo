@@ -5,8 +5,10 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import it.polito.verefoo.DbNFV;
 import it.polito.verefoo.jaxb.Constraints;
@@ -81,11 +83,11 @@ public class SimulationService {
 		NFV nfv = new NFV();
 		DbNFV dbNFV;
 		Optional<DbNFV> tmp = simulationRepository.findById(id, -1);
-		// if (tmp.isPresent()) {
+		if (tmp.isPresent()) {
 			dbNFV = tmp.get();
-		// } else {
-			// throw exception (404)
-		// }
+		} else {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The simulation result " + id + " doesn't exist.");
+		}
 
 		nfv.setGraphs(new Graphs());
 		for (Long graphId : dbNFV.getGraph()) {

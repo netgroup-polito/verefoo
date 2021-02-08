@@ -74,5 +74,4 @@ public interface HostsRepository extends Neo4jRepository<DbHosts, Long> {
     void unbindHost(@Param("substrateId") Long substrateId, @Param("hostId") Long hostId);
 
     
-    
 }

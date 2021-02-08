@@ -1,9 +1,6 @@
 package it.polito.verefoo.rest.spring.service;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,12 +71,19 @@ public class GraphService {
                 graphRepository.findAll(-1).forEach(dbGraph -> {
                         graphs.getGraph().add(converter.serializeGraph(dbGraph));
                 });
-                return graphs;
+
+                if (graphs.getGraph().isEmpty()) {
+                        throw new ResponseStatusException(HttpStatus.NO_CONTENT, "No graph is in the workspace.");
+                } else {
+                        return graphs;
+                }
         }
 
         public void deleteGraphs() {
-                if (graphRepository.isAnyReferred()) {
-                        // throw an exception
+                if (graphRepository.count() == 0) {
+                        throw new ResponseStatusException(HttpStatus.NOT_MODIFIED, "The workspace is already clean of graphs.");
+                } else if (graphRepository.isAnyReferred()) {
+                        throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "A graph cannot be deleted because it is referred by other resources: delete them first.");
                 } else {
                         graphRepository.deleteAll();
                 }
@@ -92,12 +96,8 @@ public class GraphService {
          * @param graph
          * @return a new id for the modified graph
          */
+        @Transactional
         public void updateGraph(Long id, Graph graph) {
-                // possible alternative implementation through merge
-                // deserialize the graph into dbGraph
-                // set the ids of dbGraph as the ids of the existing graph
-                // store dbGraph
-
                 DbGraph newDbGraph = converter.deserializeGraph(graph);
 
                 DbGraph oldDbGraph;
@@ -105,7 +105,7 @@ public class GraphService {
                 if (dbGraph.isPresent())
                         oldDbGraph = dbGraph.get();
                 else
-                        return;
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The graph " + id + " doesn't exist.");
 
                 // merge
                 newDbGraph.setId(id);
@@ -125,23 +125,18 @@ public class GraphService {
                                 updateNode(id, oldDbGraph.getNode().get(i).getId(), graph.getNode().get(i));
                         }
                         for (; i < oldDbGraph.getNode().size(); i++) {
-                                // This solution doesn't work because the save method is inspired to MERGE,
-                                // so the nodes not referenced are not deleted
-                                // oldDbGraph.getNode().remove(i);
                                 deleteNode(oldDbGraph.getId(), oldDbGraph.getNode().get(i).getId());
                         }
                 }
 
-                // old version: update by deleting and creating again, but a new id is generated
-                // graphRepository.deleteById(id);
-                // DbGraph dbGraph = graphRepository.save(converter.deserializeGraph(graph));
-                // return dbGraph.getId();
         }
 
         public void deleteGraph(Long id) {
-                if (graphRepository.isReferred(id)) {
-                        // throw exception (status code should be 409)
-                } else {
+                if (graphRepository.existsById(id) == false) {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The graph " + id + " doesn't exist.");
+                } else if (graphRepository.isReferred(id)) {
+                        throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The graph is currently referred by other resources. First delete them.");
+                } else  {
                         graphRepository.deleteById(id);
                 }
         }
@@ -152,14 +147,19 @@ public class GraphService {
                         return converter.serializeGraph(dbGraph.get());
                 else
                         throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                        "The graph with id " + id + " doesn't exist.");
+                                        "The graph " + id + " doesn't exist.");
         }
 
         @Transactional
         public Long createNode(Long id, Node node) {
-                Long nodeId = nodeRepository.save(converter.deserializeNode(node)).getId();
-                graphRepository.bindNode(id, nodeId);
-                return nodeId;
+                if (graphRepository.existsById(id)) {
+                        Long nodeId = nodeRepository.save(converter.deserializeNode(node)).getId();
+                        graphRepository.bindNode(id, nodeId);
+                        return nodeId;   
+                } else {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                        "The graph " + id + " doesn't exist.");
+                }
         }
 
         /**
@@ -172,17 +172,13 @@ public class GraphService {
         @Transactional
         public void deleteNode(Long id, Long nodeId) {
                 if (nodeRepository.isReferred(nodeId)) {
-                        // throw exception
+                        throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The node is currently referred by other resources. First delete them.");
                 } else {
                         graphRepository.unbindNode(id, nodeId);
                         nodeRepository.deleteById(nodeId);
                 }
         }
 
-        /**
-         * As usual, {@code node} and its neighbours must not declare any id.
-         * 
-         */
         @Transactional
         public void updateNode(Long id, Long nodeId, Node node) {
                 DbNode newDbNode = converter.deserializeNode(node);
@@ -191,19 +187,17 @@ public class GraphService {
                 if (dbNode.isPresent()) {
                         oldDbNode = dbNode.get();
                 } else
-                        return;
-
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The node " + nodeId + " doesn't exist.");
+                
                 // merge
                 newDbNode.setId(nodeId);
                 nodeRepository.save(newDbNode, 0);
+
                 updateConfiguration(id, nodeId, oldDbNode.getConfiguration().getId(), node.getConfiguration());
-                // neighbours can be updated by just deleting all of them and creating new ones,
-                // since
-                // the ids are not visible to the user
+
                 if (newDbNode.getNeighbour().size() >= oldDbNode.getNeighbour().size()) {
                         int i = 0;
                         for (; i < oldDbNode.getNeighbour().size(); i++) {
-                                // newDbGraph.getNode().get(i).setId(oldDbGraph.getNode().get(i).getId());
                                 updateNeighbour(id, nodeId, oldDbNode.getNeighbour().get(i).getId(),
                                                 node.getNeighbour().get(i));
                         }
@@ -217,16 +211,9 @@ public class GraphService {
                                                 node.getNeighbour().get(i));
                         }
                         for (; i < oldDbNode.getNeighbour().size(); i++) {
-                                // This solution doesn't work because the save method is inspired to MERGE,
-                                // so the nodes not referenced are not deleted
-                                // oldDbGraph.getNode().remove(i);
                                 deleteNeighbour(id, nodeId, oldDbNode.getNeighbour().get(i).getId());
                         }
                 }
-
-                // old version: update by deleting and creating again, but a new id is generated
-                // deleteNode(id, nodeId);
-                // return createNode(id, node);
         }
 
         public Node getNode(Long id, Long nodeId) {
@@ -234,47 +221,53 @@ public class GraphService {
                 if (dbNode.isPresent()) {
                         return converter.serializeNode(dbNode.get());
                 } else
-                        return null;
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The node " + nodeId + " doesn't exist.");
         }
 
         public Long createNeighbour(Long id, Long nodeId, Neighbour neighbour) {
-                DbNeighbour dbNeighbour = neighbourRepository.save(converter.deserializeNeighbour(neighbour));
-                nodeRepository.bindNeighbour(nodeId, dbNeighbour.getId());
-                return dbNeighbour.getId();
+                if (nodeRepository.existsById(nodeId)) {
+                        DbNeighbour dbNeighbour = neighbourRepository.save(converter.deserializeNeighbour(neighbour));
+                        nodeRepository.bindNeighbour(nodeId, dbNeighbour.getId());
+                        return dbNeighbour.getId();
+                } else {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The node " + nodeId + " doesn't exist.");
+                }
+                
         }
 
-        // TODO: decide whether to add a controller for this function or not
+        // This method may become public and bound to a controller
         private void updateNeighbour(Long id, Long nodeId, Long neighbourId, Neighbour neighbour) {
                 DbNeighbour newDbNeighbour = converter.deserializeNeighbour(neighbour);
                 newDbNeighbour.setId(neighbourId);
                 neighbourRepository.save(newDbNeighbour);
         }
 
+        @Transactional
         public void deleteNeighbour(Long id, Long nodeId, Long neighbourId) {
-                nodeRepository.unbindNeighbour(nodeId, neighbourId);
-                neighbourRepository.deleteById(neighbourId);
+                if (neighbourRepository.existsById(neighbourId)) {
+                        nodeRepository.unbindNeighbour(nodeId, neighbourId);
+                        neighbourRepository.deleteById(neighbourId);
+                } else {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The neighbour " + neighbourId + " doesn't exist.");
+                }
         }
 
-        public Configuration getConfiguration(Long gid, Long nodeId) {
+        public Configuration getConfiguration(Long id, Long nodeId) {
                 return converter.serializeConfiguration(nodeRepository.findConfiguration(nodeId));
         }
 
         @Transactional
         public void updateConfiguration(Long id, Long nodeId, Long configurationId, Configuration configuration) {
-                DbConfiguration newDbConfiguration = converter.deserializeConfiguration(configuration);
+                if (nodeRepository.existsById(nodeId)) {
+                        DbConfiguration newDbConfiguration = converter.deserializeConfiguration(configuration);
 
-                configurationRepository.deleteFunctionsById(configurationId);
-                newDbConfiguration.setId(configurationId);
-                configurationRepository.save(newDbConfiguration);
-                configurationRepository.updateNodeFunctionalType(nodeId, inferFunctionalType(configuration));
-
-                // old version: update by deleting and creating again, but a new id is generated
-                // nodeRepository.unbindConfiguration(nodeId);
-                // configurationRepository.deleteById(configurationId);
-                // DbConfiguration dbConfiguration = configurationRepository
-                //                 .save(converter.deserializeConfiguration(configuration));
-                // nodeRepository.bindConfiguration(nodeId, dbConfiguration.getId());
-                // return dbConfiguration.getId();
+                        configurationRepository.deleteFunctionsById(configurationId);
+                        newDbConfiguration.setId(configurationId);
+                        configurationRepository.save(newDbConfiguration);
+                        configurationRepository.updateNodeFunctionalType(nodeId, inferFunctionalType(configuration));
+                } else {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The node " + nodeId + " doesn't exist.");
+                }
         }
 
         private DbFunctionalTypes inferFunctionalType(Configuration configuration) {
@@ -301,28 +294,42 @@ public class GraphService {
         }
 
         public void createConstraints(Long id, Constraints constraints) {
-                DbConstraints dbConstraints = converter.deserializeConstraints(constraints);
-                dbConstraints.setGraph(id);
-                dbConstraints = constraintsRepository.save(dbConstraints);
-                constraintsRepository.bindToGraph(dbConstraints.getId());
+                if (graphRepository.existsById(id)) {
+                        DbConstraints dbConstraints = converter.deserializeConstraints(constraints);
+                        dbConstraints.setGraph(id);
+                        dbConstraints = constraintsRepository.save(dbConstraints);
+                        constraintsRepository.bindToGraph(dbConstraints.getId());   
+                } else {
+                        throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The graph " + id + " doesn't exist.");
+                }
+                
         }
 
         public void deleteConstraints(Long id) {
-                constraintsRepository.deleteByGraphId(id);
+                if (graphRepository.existsById(id)) {
+                        constraintsRepository.deleteByGraphId(id);
+                } else {
+                        throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The graph " + id + " doesn't exist.");
+                }
         }
 
         public Constraints getConstraints(Long id) {
                 Optional<DbConstraints> dbConstraints = constraintsRepository.findByGraphId(id);
                 if (dbConstraints.isPresent()) {
                         return converter.serializeConstraints(dbConstraints.get());
-                } else
-                        return null;
+                } else {
+                        throw new ResponseStatusException(HttpStatus.NO_CONTENT, "No constraints for the graph " + id + " exist.");
+                }     
         }
 
         @Transactional
         public void updateConstraints(Long id, Constraints constraints) {
-                deleteConstraints(id);
-                createConstraints(id, constraints);
+                if (graphRepository.existsById(id)) {
+                        deleteConstraints(id);
+                        createConstraints(id, constraints);
+                } else {
+                        throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The graph " + id + " doesn't exist.");
+                }
         }
 
 }

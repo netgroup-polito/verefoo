@@ -35,10 +35,9 @@ public class SubstratesController {
 	@Autowired
 	private HttpServletRequest request;
 
-	/**
-	 * @param substrate is the substrate network to create
-	 * @return the created substrate network
-	 */
+
+	
+
 	@Operation(tags = "version 1 - substrates", summary = "Create an empty substrate", description = "Create a new physical network")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "201", description = "Created"),
@@ -63,14 +62,10 @@ public class SubstratesController {
 												.wrap(substrateId));
 												
 			// TODO: add exception handling for all controllers; follow/modify the design accordingly
-			// throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request"); */
 	}
 
-	/**
-	 * @param beforeInclusive it is the starting index
-	 * @param afterInclusive  it is the ending index
-	 * @return a collection of substrate network
-	 */
+
+	
 	@Operation(tags = "version 1 - substrates", summary = "Get all substrates ids", description = "")
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ApiResponses(value = {
@@ -113,9 +108,8 @@ public class SubstratesController {
                                                 .wrap(null));
 	}
 
-	/**
-	 * @param sid it is the id of the substrate network to delete
-	 */
+
+	
 	@Operation(tags = "version 1 - substrates", summary = "Delete a substrate", description = "The operation deletes all the hosts and connections of the substrate accordingly.")
 	@RequestMapping(value = "/{sid}", method = RequestMethod.DELETE)
 	@ApiResponses(value = {
@@ -136,14 +130,8 @@ public class SubstratesController {
                                                 .wrap(null));
 	}
 
-	/* Hosts */
 
-	/**
-	 * @param sid  it is the id of the substrate network
-	 * @param hid  it is the name of the host to create
-	 * @param host it is the host to create
-	 * @return the created host
-	 */
+
 	@Operation(tags = "version 1 - substrates", summary = "Add a collection of hosts in the substrate", description = "")
 	@RequestMapping(value = "/{sid}/hosts", method = RequestMethod.POST)
 	@ApiResponses(value = {
@@ -169,12 +157,9 @@ public class SubstratesController {
                                                 .wrap(ids));
 	}
 
-	/**
-	 * @param sid  it is the id of the substrate network
-	 * @param hid  it is the name of the host to create
-	 * @param host it is the host to create
-	 * @return the created host
-	 */
+
+	
+
 	@Operation(tags = "version 1 - substrates", summary = "Get the collection of hosts in the substrate", description = "")
 	@RequestMapping(value = "/{sid}/hosts", method = RequestMethod.GET)
 	@ApiResponses(value = {
@@ -199,12 +184,9 @@ public class SubstratesController {
                                                 .wrap(hosts));
 	}
 
-	/**
-	 * @param sid  it is the id of the substrate network
-	 * @param hid  it is the name of the host to create
-	 * @param host it is the host to create
-	 * @return the created host
-	 */
+
+	
+
 	@Operation(tags = "version 1 - substrates", summary = "Delete the list of hosts in the substrate", description = "The list is deleted only if no connections exists.")
 	@RequestMapping(value = "/{sid}/hosts", method = RequestMethod.DELETE)
 	@ApiResponses(value = {
@@ -226,19 +208,17 @@ public class SubstratesController {
                                                 .wrap(null));
 	}
 
-	/**
-	 * @param sid  it is the id of the substrate network
-	 * @param hid  it is the name of the host to update
-	 * @param host it is the new value of the host
-	 */
+
+	
+
 	@Operation(tags = "version 1 - substrates", summary = "Update a host in a substrate", description = "")
 	@RequestMapping(value = "/{sid}/hosts/{hid}", method = RequestMethod.PUT)
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "404", description = "The host or the substrate doesn't exist. You can retry the operation or create/use other substrates or hosts."), })
 
-	public ResponseEntity<Resources<Long>> updateHost(@PathVariable("sid") Long sid, @PathVariable("hid") Long hid, @RequestBody Host host) {
+	public ResponseEntity<Resources<Void>> updateHost(@PathVariable("sid") Long sid, @PathVariable("hid") Long hid, @RequestBody Host host) {
 
-		Long newHostId = service.updateHost(sid, hid, host);
+		service.updateHost(sid, hid, host);
 
 		String url = request.getRequestURL().toString();
 		url = url.substring(0, url.lastIndexOf("/"));
@@ -246,7 +226,7 @@ public class SubstratesController {
 		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
-								new ResourceWrapperWithLinks<Long>()
+								new ResourceWrapperWithLinks<Void>()
 												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.GET)
 												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.POST)
 												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.GET)
@@ -254,14 +234,12 @@ public class SubstratesController {
 												.addLink(url + "/" + sid + "/hosts/" + hid, "self", RequestMethod.PUT)
 												.addLink(url + "/" + sid + "/hosts/" + hid, "self", RequestMethod.DELETE)
 												.addLink(url, "collection", RequestMethod.GET)
-                                                .wrap(newHostId));
+                                                .wrap(null));
 	}
 
-	/**
-	 * @param sid it is the id of the substrate network
-	 * @param hid it is the name of the host to retrieve
-	 * @return the request host
-	 */
+
+	
+
 	@Operation(tags = "version 1 - substrates", summary = "Get a host in a substrate", description = "")
 	@RequestMapping(value = "/{sid}/hosts/{hid}", method = RequestMethod.GET)
 	@ApiResponses(value = {
@@ -291,10 +269,9 @@ public class SubstratesController {
                                                 .wrap(host));
 	}
 
-	/**
-	 * @param sid it is the id of the substrate network
-	 * @param hid it is the name of the host to delete
-	 */
+
+	
+
 	@Operation(tags = "version 1 - substrates", summary = "Delete a host", description = "The host is deleted only if it is not implied in any connection.")
 	@RequestMapping(value = "/{sid}/hosts/{hid}", method = RequestMethod.DELETE)
 	@ApiResponses(value = {
@@ -324,13 +301,9 @@ public class SubstratesController {
                                                 .wrap(null));
 	}
 
-	/* Connections */
 
-	/**
-	 * @param sid         it is the id of the substrate network
-	 * @param connections they are the connections to add to the substrate network
-	 * @return the created connections
-	 */
+	
+
 	@Operation(tags = "version 1 - substrates", summary = "Create a list of connections between hosts in the substrate", description = "The hosts must already exist. If some connections already exist, the new connections are just added; the duplicates are discarded.")
 	@RequestMapping(value = "/{sid}/connections", method = RequestMethod.POST)
 	@ApiResponses(value = {
@@ -357,10 +330,9 @@ public class SubstratesController {
                                                 .wrap(null));
 	}
 
-	/**
-	 * @param sid         it is the id of the substrate network
-	 * @param connections it is the new value of the connections
-	 */
+
+	
+
 	@Operation(tags = "version 1 - substrates", summary = "Change all the connections between hosts in a substrate.", description = "The old connections will be lost.")
 	@RequestMapping(value = "/{sid}/connections", method = RequestMethod.PUT)
 	@ApiResponses(value = {
@@ -389,10 +361,8 @@ public class SubstratesController {
                                                 .wrap(null));
 	}
 
-	/**
-	 * @param sid it is the id of the substrate network
-	 * @return the connections of the substrate network
-	 */
+
+	
 	@Operation(tags = "version 1 - substrates", summary = "Get all the connections of a substrate", description = "")
 	@RequestMapping(value = "/{sid}/connections", method = RequestMethod.GET)
 	@ApiResponses(value = {
@@ -419,10 +389,8 @@ public class SubstratesController {
                                                 .wrap(connections));
 	}
 
-	/**
-	 * @param sid it is the id of the substrate network whose connections must be
-	 *            deleted
-	 */
+
+	
 	@Operation(tags = "version 1 - substrates", summary = "Delete all the connections of a substrate", description = "")
 	@RequestMapping(value = "/{sid}/connections", method = RequestMethod.DELETE)
 	@ApiResponses(value = {
