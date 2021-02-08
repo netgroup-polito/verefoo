@@ -53,7 +53,7 @@ public class RequirementsController {
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<List<PropertyDefinition>>().addLink(url, "new", RequestMethod.POST)
+				new ResourceWrapperWithLinks<List<PropertyDefinition>>().addLink(url, "collection", RequestMethod.POST)
 						.addLink(url, "self", RequestMethod.GET).addLink(url, "self", RequestMethod.DELETE)
 						.wrap(requirementsSets));
 	}
@@ -73,7 +73,7 @@ public class RequirementsController {
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Void>().addLink(url, "new", RequestMethod.POST)
+				new ResourceWrapperWithLinks<Void>().addLink(url, "collection", RequestMethod.POST)
 						.addLink(url, "self", RequestMethod.GET).addLink(url, "self", RequestMethod.DELETE).wrap(null));
 	}
 
@@ -95,7 +95,7 @@ public class RequirementsController {
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.CREATED).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Long>().addLink(url, "new", RequestMethod.POST)
+				new ResourceWrapperWithLinks<Long>().addLink(url, "collection", RequestMethod.POST)
 						.addLink(url, "self", RequestMethod.GET).addLink(url, "self", RequestMethod.DELETE)
 						.wrap(requirementsSetId));
 	}
@@ -116,12 +116,13 @@ public class RequirementsController {
 
 		service.updateRequirementsSet(rid, requirementsSet);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + rid, "self", RequestMethod.GET)
 						.addLink(url + "/" + rid, "self", RequestMethod.PUT)
-						.addLink(url + "/" + rid, "self", RequestMethod.DELETE).addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + rid, "self", RequestMethod.DELETE).addLink(url, "collection", RequestMethod.GET)
 						.wrap(null));
 	}
 
@@ -138,12 +139,13 @@ public class RequirementsController {
 
 		PropertyDefinition propertyDefinition = service.getRequirementsSet(rid);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<PropertyDefinition>().addLink(url + "/" + rid, "self", RequestMethod.GET)
 						.addLink(url + "/" + rid, "self", RequestMethod.PUT)
-						.addLink(url + "/" + rid, "self", RequestMethod.DELETE).addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + rid, "self", RequestMethod.DELETE).addLink(url, "collection", RequestMethod.GET)
 						.wrap(propertyDefinition));
 	}
 
@@ -160,12 +162,13 @@ public class RequirementsController {
 
 		service.deleteRequirementsSet(rid);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + rid, "self", RequestMethod.GET)
 						.addLink(url + "/" + rid, "self", RequestMethod.PUT)
-						.addLink(url + "/" + rid, "self", RequestMethod.DELETE).addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + rid, "self", RequestMethod.DELETE).addLink(url, "collection", RequestMethod.GET)
 						.wrap(null));
 	}
 
@@ -186,12 +189,13 @@ public class RequirementsController {
 
 		Long propertyId = service.createProperty(rid, property);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/")).substring(0,
-				request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.CREATED).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Long>().addLink(url + "/" + rid + "/properties", "new", RequestMethod.POST)
-						.addLink(url + "/" + rid, "list", RequestMethod.GET).addLink(url, "list", RequestMethod.GET)
+				new ResourceWrapperWithLinks<Long>().addLink(url + "/" + rid + "/properties", "collection", RequestMethod.POST)
+						.addLink(url + "/" + rid, "collection", RequestMethod.GET).addLink(url, "collection", RequestMethod.GET)
 						.wrap(propertyId));
 	}
 
@@ -209,17 +213,17 @@ public class RequirementsController {
 
 		service.updateProperty(rid, pid, property);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>()
 						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.GET)
 						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.PUT)
 						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.DELETE)
-						.addLink(url + "/" + rid + "/properties", "new", RequestMethod.POST)
-						.addLink(url + "/" + rid, "list", RequestMethod.GET).addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + rid + "/properties", "collection", RequestMethod.POST)
+						.addLink(url + "/" + rid, "collection", RequestMethod.GET).addLink(url, "collection", RequestMethod.GET)
 						.wrap(null));
 	}
 
@@ -238,17 +242,17 @@ public class RequirementsController {
 
 		Property property = service.getProperty(rid, pid);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Property>()
 						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.GET)
 						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.PUT)
 						.addLink(url + "/" + rid + "/properties/" + rid, "self", RequestMethod.DELETE)
-						.addLink(url + "/" + rid + "/properties", "new", RequestMethod.POST)
-						.addLink(url + "/" + rid, "list", RequestMethod.GET).addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + rid + "/properties", "collection", RequestMethod.POST)
+						.addLink(url + "/" + rid, "collection", RequestMethod.GET).addLink(url, "collection", RequestMethod.GET)
 						.wrap(property));
 	}
 
@@ -267,13 +271,13 @@ public class RequirementsController {
 
 		service.deleteProperty(rid, pid);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + rid + "/properties", "new", RequestMethod.POST)
-						.addLink(url + "/" + rid, "list", RequestMethod.GET).addLink(url, "list", RequestMethod.GET)
+				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + rid + "/properties", "collection", RequestMethod.POST)
+						.addLink(url + "/" + rid, "collection", RequestMethod.GET).addLink(url, "collection", RequestMethod.GET)
 						.wrap(null));
 	}
 

@@ -11,12 +11,12 @@ public class ResourceWrapperWithLinks<T> {
 
     List<String> linkStrings = new ArrayList<>();
     List<String> relationships = new ArrayList<>();
-    List<String> methods = new ArrayList<>();
+    List<RequestMethod> methods = new ArrayList<>();
 
     public ResourceWrapperWithLinks<T> addLink(String linkString, String relationship, RequestMethod method) {
         linkStrings.add(linkString);
         relationships.add(relationship);
-        methods.add(method.toString());
+        methods.add(method);
         return this;
     }
     
@@ -29,9 +29,44 @@ public class ResourceWrapperWithLinks<T> {
         
         Resources<T> result = new Resources<T>(resources);
         for (int i = 0; i < linkStrings.size(); i++) {
-            Link link = new Link(linkStrings.get(i)).withRel(relationships.get(i)).withType(methods.get(i).toString());
+            Link link = new Link(linkStrings.get(i)).withRel(relationships.get(i)).withTitle(buildTitle(methods.get(i)));
             result.add(link);
         }
         return result;
+    }
+
+    private String buildTitle(RequestMethod method) {
+        String action;
+        switch (method) {
+            case DELETE:
+                action = "delete the";
+                break;
+            case GET:
+                action = "get the";
+                break;
+            case HEAD:
+                action = "get only the response header";
+                break;
+            case OPTIONS:
+                action = "get only the options of the";
+                break;
+            case PATCH:
+                action = "patch the";
+                break;
+            case POST:
+                action = "create a new";
+                break;
+            case PUT:
+                action = "modify the";
+                break;
+            case TRACE:
+                action = "trace the";
+                break;
+            default:
+                action = "custom action on the";
+                break;
+        }
+
+        return action + " resource";
     }
 }

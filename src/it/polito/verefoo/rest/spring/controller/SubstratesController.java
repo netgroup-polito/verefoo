@@ -55,11 +55,11 @@ public class SubstratesController {
                                 // wrap the response with the hyperlinks
                                 new ResourceWrapperWithLinks<Long>()
 												.addLink(url + "/" + substrateId, "self", RequestMethod.GET)
-												.addLink(url + "/" + substrateId + "/hosts", "sub", RequestMethod.GET)
-												.addLink(url + "/" + substrateId + "/connections", "sub", RequestMethod.GET)
-												.addLink(url, "list", RequestMethod.GET)
+												.addLink(url + "/" + substrateId + "/hosts", "subsection", RequestMethod.GET)
+												.addLink(url + "/" + substrateId + "/connections", "subsection", RequestMethod.GET)
+												.addLink(url, "collection", RequestMethod.GET)
                                                 .addLink(url + "/" + substrateId, "self", RequestMethod.DELETE)
-                                                .addLink(url, "new", RequestMethod.POST)
+                                                .addLink(url, "collection", RequestMethod.POST)
 												.wrap(substrateId));
 												
 			// TODO: add exception handling for all controllers; follow/modify the design accordingly
@@ -88,9 +88,9 @@ public class SubstratesController {
                                 new ResourceWrapperWithLinks<List<Long>>()
                                                 .addLink(url, "self", RequestMethod.GET)
                                                 .addLink(url, "self", RequestMethod.DELETE)
-												.addLink(url, "new", RequestMethod.POST)
-												.addLink(url + "/" + ids.get(0) + "/hosts", "first", RequestMethod.GET)
-												.addLink(url + "/" + ids.get(0) + "/connections", "first", RequestMethod.GET)
+												.addLink(url, "collection", RequestMethod.POST)
+												.addLink(url + "/" + ids.get(0) + "/hosts", "subsection", RequestMethod.GET)
+												.addLink(url + "/" + ids.get(0) + "/connections", "subsection", RequestMethod.GET)
                                                 .wrap(ids));
 	}
 
@@ -109,7 +109,7 @@ public class SubstratesController {
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
                                 new ResourceWrapperWithLinks<Void>()
-                                                .addLink(url, "new", RequestMethod.POST)
+                                                .addLink(url, "collection", RequestMethod.POST)
                                                 .wrap(null));
 	}
 
@@ -127,11 +127,12 @@ public class SubstratesController {
 
 		service.deleteSubstrate(sid);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
                                 new ResourceWrapperWithLinks<Void>()
-                                                .addLink(url, "list", RequestMethod.GET)
+                                                .addLink(url, "collection", RequestMethod.GET)
                                                 .wrap(null));
 	}
 
@@ -143,7 +144,7 @@ public class SubstratesController {
 	 * @param host it is the host to create
 	 * @return the created host
 	 */
-	@Operation(tags = "version 1 - substrates", summary = "Add a list of hosts in the substrate", description = "")
+	@Operation(tags = "version 1 - substrates", summary = "Add a collection of hosts in the substrate", description = "")
 	@RequestMapping(value = "/{sid}/hosts", method = RequestMethod.POST)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "201", description = "Created"),
@@ -160,11 +161,11 @@ public class SubstratesController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(
                                 // wrap the response with the hyperlinks
 								new ResourceWrapperWithLinks<List<Long>>()
-												.addLink(url + "/" + sid + "/connections", "new", RequestMethod.POST)
+												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.POST)
                                                 .addLink(url + "/" + sid + "/hosts", "self", RequestMethod.GET)
 												.addLink(url + "/" + sid + "/hosts", "self", RequestMethod.DELETE)
-												.addLink(url + "/" + sid + "/hosts", "new", RequestMethod.POST)
-												.addLink(url, "list", RequestMethod.GET)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.POST)
+												.addLink(url, "collection", RequestMethod.GET)
                                                 .wrap(ids));
 	}
 
@@ -174,7 +175,7 @@ public class SubstratesController {
 	 * @param host it is the host to create
 	 * @return the created host
 	 */
-	@Operation(tags = "version 1 - substrates", summary = "Get the list of hosts in the substrate", description = "")
+	@Operation(tags = "version 1 - substrates", summary = "Get the collection of hosts in the substrate", description = "")
 	@RequestMapping(value = "/{sid}/hosts", method = RequestMethod.GET)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "OK"),
@@ -190,11 +191,11 @@ public class SubstratesController {
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
 								new ResourceWrapperWithLinks<Hosts>()
-												.addLink(url + "/" + sid + "/connections", "new", RequestMethod.POST)
-												.addLink(url + "/" + sid + "/hosts", "new", RequestMethod.POST)
+												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.POST)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.POST)
 												.addLink(url + "/" + sid + "/hosts", "self", RequestMethod.DELETE)
 												.addLink(url + "/" + sid + "/hosts", "self", RequestMethod.GET)
-												.addLink(url, "list", RequestMethod.GET)
+												.addLink(url, "collection", RequestMethod.GET)
                                                 .wrap(hosts));
 	}
 
@@ -220,8 +221,8 @@ public class SubstratesController {
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
 								new ResourceWrapperWithLinks<Void>()
-												.addLink(url + "/" + sid + "/hosts", "new", RequestMethod.POST)
-												.addLink(url, "list", RequestMethod.GET)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.POST)
+												.addLink(url, "collection", RequestMethod.GET)
                                                 .wrap(null));
 	}
 
@@ -246,13 +247,13 @@ public class SubstratesController {
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
 								new ResourceWrapperWithLinks<Long>()
-												.addLink(url + "/" + sid + "/connections", "list", RequestMethod.GET)
-												.addLink(url + "/" + sid + "/connections", "new", RequestMethod.POST)
-												.addLink(url + "/" + sid + "/hosts", "list", RequestMethod.GET)
+												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.GET)
+												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.POST)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.GET)
 												.addLink(url + "/" + sid + "/hosts/" + hid, "self", RequestMethod.GET)
 												.addLink(url + "/" + sid + "/hosts/" + hid, "self", RequestMethod.PUT)
 												.addLink(url + "/" + sid + "/hosts/" + hid, "self", RequestMethod.DELETE)
-												.addLink(url, "list", RequestMethod.GET)
+												.addLink(url, "collection", RequestMethod.GET)
                                                 .wrap(newHostId));
 	}
 
@@ -279,14 +280,14 @@ public class SubstratesController {
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
                                 new ResourceWrapperWithLinks<Host>()
-												.addLink(url + "/" + sid + "/connections", "new", RequestMethod.POST)
-												.addLink(url + "/" + sid + "/hosts", "list", RequestMethod.GET)
-												.addLink(url + "/" + sid + "/hosts", "new", RequestMethod.POST)
+												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.POST)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.GET)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.POST)
 												.addLink(url + "/" + sid + "/hosts/" + hid, "self", RequestMethod.GET)
 												.addLink(url + "/" + sid + "/hosts/" + hid, "self", RequestMethod.PUT)
 												.addLink(url + "/" + sid + "/hosts/" + hid, "self", RequestMethod.DELETE)
-												.addLink(url + "/" + sid + "/hosts", "list", RequestMethod.DELETE)
-												.addLink(url, "list", RequestMethod.GET)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.DELETE)
+												.addLink(url, "collection", RequestMethod.GET)
                                                 .wrap(host));
 	}
 
@@ -314,12 +315,12 @@ public class SubstratesController {
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
                                 new ResourceWrapperWithLinks<Void>()
-												.addLink(url + "/" + sid + "/connections", "new", RequestMethod.POST)
-												.addLink(url + "/" + sid + "/connections", "list", RequestMethod.GET)
-												.addLink(url + "/" + sid + "/hosts", "list", RequestMethod.GET)
-												.addLink(url + "/" + sid + "/hosts", "new", RequestMethod.POST)
-												.addLink(url + "/" + sid + "/hosts", "list", RequestMethod.DELETE)
-												.addLink(url, "list", RequestMethod.GET)
+												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.POST)
+												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.GET)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.GET)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.POST)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.DELETE)
+												.addLink(url, "collection", RequestMethod.GET)
                                                 .wrap(null));
 	}
 
@@ -350,9 +351,9 @@ public class SubstratesController {
 												.addLink(url + "/" + sid + "/connections", "self", RequestMethod.GET)
 												.addLink(url + "/" + sid + "/connections", "self", RequestMethod.PUT)
 												.addLink(url + "/" + sid + "/connections", "self", RequestMethod.DELETE)
-												.addLink(url + "/" + sid + "/connections", "new", RequestMethod.POST)
-												.addLink(url + "/" + sid + "/hosts", "list", RequestMethod.GET)
-												.addLink(url, "list", RequestMethod.GET)
+												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.POST)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.GET)
+												.addLink(url, "collection", RequestMethod.GET)
                                                 .wrap(null));
 	}
 
@@ -382,9 +383,9 @@ public class SubstratesController {
 												.addLink(url + "/" + sid + "/connections", "self", RequestMethod.GET)
 												.addLink(url + "/" + sid + "/connections", "self", RequestMethod.PUT)
 												.addLink(url + "/" + sid + "/connections", "self", RequestMethod.DELETE)
-												.addLink(url + "/" + sid + "/connections", "new", RequestMethod.POST)
-												.addLink(url + "/" + sid + "/hosts", "list", RequestMethod.GET)
-												.addLink(url, "list", RequestMethod.GET)
+												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.POST)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.GET)
+												.addLink(url, "collection", RequestMethod.GET)
                                                 .wrap(null));
 	}
 
@@ -412,9 +413,9 @@ public class SubstratesController {
 												.addLink(url + "/" + sid + "/connections", "self", RequestMethod.GET)
 												.addLink(url + "/" + sid + "/connections", "self", RequestMethod.PUT)
 												.addLink(url + "/" + sid + "/connections", "self", RequestMethod.DELETE)
-												.addLink(url + "/" + sid + "/connections", "new", RequestMethod.POST)
-												.addLink(url + "/" + sid + "/hosts", "list", RequestMethod.GET)
-												.addLink(url, "list", RequestMethod.GET)
+												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.POST)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.GET)
+												.addLink(url, "collection", RequestMethod.GET)
                                                 .wrap(connections));
 	}
 
@@ -438,9 +439,9 @@ public class SubstratesController {
 		return ResponseEntity.status(HttpStatus.OK).body(
                                 // wrap the response with the hyperlinks
                                 new ResourceWrapperWithLinks<Void>()
-												.addLink(url + "/" + sid + "/connections", "new", RequestMethod.POST)
-												.addLink(url + "/" + sid + "/hosts", "list", RequestMethod.GET)
-												.addLink(url, "list", RequestMethod.GET)
+												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.POST)
+												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.GET)
+												.addLink(url, "collection", RequestMethod.GET)
                                                 .wrap(null));
 	}
 

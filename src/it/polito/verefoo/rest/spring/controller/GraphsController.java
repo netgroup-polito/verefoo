@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -64,8 +61,9 @@ public class GraphsController {
 				new ResourceWrapperWithLinks<List<Long>>()
 						.addLink(url + "/" + graphIds.get(0), "first", RequestMethod.GET)
 						.addLink(url + "/" + graphIds.get(0), "first", RequestMethod.PUT)
-						.addLink(url, "list", RequestMethod.GET).addLink(url, "list", RequestMethod.DELETE)
-						.addLink(url, "new", RequestMethod.POST)
+						.addLink(url, "collection", RequestMethod.GET)
+						.addLink(url, "collection", RequestMethod.DELETE)
+						.addLink(url, "collection", RequestMethod.POST)
 						.addLink(url + "/" + graphIds.get(0), "first", RequestMethod.DELETE).wrap(graphIds));
 	}
 
@@ -86,7 +84,7 @@ public class GraphsController {
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Graphs>().addLink(url, "new", RequestMethod.POST)
+				new ResourceWrapperWithLinks<Graphs>().addLink(url, "collection", RequestMethod.POST)
 						.addLink(url, "self", RequestMethod.DELETE).addLink(url, "self", RequestMethod.GET)
 						.wrap(graphs));
 	}
@@ -108,7 +106,7 @@ public class GraphsController {
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Void>().addLink(url, "new", RequestMethod.POST).wrap(null));
+				new ResourceWrapperWithLinks<Void>().addLink(url, "collection", RequestMethod.POST).wrap(null));
 	}
 
 	/*
@@ -129,11 +127,12 @@ public class GraphsController {
 
 		service.updateGraph(gid, graph);
 
-		String url = request.getRequestURL().toString().substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + gid, "self", RequestMethod.GET)
-						.addLink(url, "new", RequestMethod.POST).addLink(url + "/" + gid, "self", RequestMethod.DELETE)
+						.addLink(url, "collection", RequestMethod.POST).addLink(url + "/" + gid, "self", RequestMethod.DELETE)
 						.addLink(url + "/" + gid, "self", RequestMethod.PUT).wrap(null));
 	}
 
@@ -150,12 +149,13 @@ public class GraphsController {
 
 		Graph graph = service.getGraph(gid);
 
-		String url = request.getRequestURL().toString().substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Graph>()
 						.addLink(url + "/" + gid, "self", RequestMethod.GET)
-						.addLink(url, "new", RequestMethod.POST)
+						.addLink(url, "collection", RequestMethod.POST)
 						.addLink(url + "/" + gid, "self", RequestMethod.DELETE)
 						.addLink(url + "/" + gid, "self", RequestMethod.PUT).wrap(graph));
 	}
@@ -174,11 +174,12 @@ public class GraphsController {
 
 		service.deleteGraph(gid);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Void>().addLink(url, "new", RequestMethod.POST)
-						.addLink(url, "list", RequestMethod.GET).wrap(null));
+				new ResourceWrapperWithLinks<Void>().addLink(url, "collection", RequestMethod.POST)
+						.addLink(url, "collection", RequestMethod.GET).wrap(null));
 	}
 
 	/*
@@ -202,15 +203,16 @@ public class GraphsController {
 
 		Long nodeId = service.createNode(gid, node);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/")).substring(0,
-				request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.CREATED).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Long>().addLink(url + "/" + gid + "/nodes", "new", RequestMethod.POST)
+				new ResourceWrapperWithLinks<Long>().addLink(url + "/" + gid + "/nodes", "collection", RequestMethod.POST)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nodeId, "self", RequestMethod.DELETE)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nodeId, "self", RequestMethod.PUT)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nodeId, "self", RequestMethod.GET)
-						.addLink(url, "list", RequestMethod.GET).wrap(nodeId));
+						.addLink(url, "collection", RequestMethod.GET).wrap(nodeId));
 	}
 
 	/* Node */
@@ -233,17 +235,17 @@ public class GraphsController {
 
 		service.updateNode(gid, nid, node);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + gid + "/nodes", "new", RequestMethod.POST)
+				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + gid + "/nodes", "collection", RequestMethod.POST)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.DELETE)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.PUT)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.GET)
-						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
-						.addLink(url + "/" + gid, "list", RequestMethod.GET).addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + gid + "/nodes", "collection", RequestMethod.GET)
+						.addLink(url + "/" + gid, "collection", RequestMethod.GET).addLink(url, "collection", RequestMethod.GET)
 						.wrap(null));
 	}
 
@@ -263,18 +265,18 @@ public class GraphsController {
 
 		Node node = service.getNode(gid, nid);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Node>()
-						.addLink(url + "/" + gid + "/nodes", "new", RequestMethod.POST)
+						.addLink(url + "/" + gid + "/nodes", "collection", RequestMethod.POST)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.DELETE)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.PUT)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.GET)
-						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
-						.addLink(url + "/" + gid, "list", RequestMethod.GET).addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + gid + "/nodes", "collection", RequestMethod.GET)
+						.addLink(url + "/" + gid, "collection", RequestMethod.GET).addLink(url, "collection", RequestMethod.GET)
 						.wrap(node));
 	}
 
@@ -295,14 +297,14 @@ public class GraphsController {
 
 		service.deleteNode(gid, nid);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + gid + "/nodes", "new", RequestMethod.POST)
-						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
-						.addLink(url + "/" + gid, "list", RequestMethod.GET).addLink(url, "list", RequestMethod.GET)
+				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + gid + "/nodes", "collection", RequestMethod.POST)
+						.addLink(url + "/" + gid + "/nodes", "collection", RequestMethod.GET)
+						.addLink(url + "/" + gid, "collection", RequestMethod.GET).addLink(url, "collection", RequestMethod.GET)
 						.wrap(null));
 	}
 
@@ -327,19 +329,19 @@ public class GraphsController {
 
 		Long neighbourId = service.createNeighbour(gid, nid, neighbour);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.CREATED).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Long>()
-						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/neighbours", "new", RequestMethod.POST)
+						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/neighbours", "collection", RequestMethod.POST)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/neighbours/" + neighbourId, "self", RequestMethod.DELETE)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.GET)
-						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
-						.addLink(url + "/" + gid, "list", RequestMethod.GET)
-						.addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + gid + "/nodes", "collection", RequestMethod.GET)
+						.addLink(url + "/" + gid, "collection", RequestMethod.GET)
+						.addLink(url, "collection", RequestMethod.GET)
 						.wrap(neighbourId));
 	}
 
@@ -360,18 +362,18 @@ public class GraphsController {
 
 		service.deleteNeighbour(gid, noid, neid);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>()
-						.addLink(url + "/" + gid + "/nodes" + "/" + noid + "/neighbours", "new", RequestMethod.POST)
+						.addLink(url + "/" + gid + "/nodes" + "/" + noid + "/neighbours", "collection", RequestMethod.POST)
 						.addLink(url + "/" + gid + "/nodes" + "/" + noid, "self", RequestMethod.GET)
-						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
-						.addLink(url + "/" + gid, "list", RequestMethod.GET)
-						.addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + gid + "/nodes", "collection", RequestMethod.GET)
+						.addLink(url + "/" + gid, "collection", RequestMethod.GET)
+						.addLink(url, "collection", RequestMethod.GET)
 						.wrap(null));
 	}
 
@@ -392,19 +394,19 @@ public class GraphsController {
 
 		Configuration configuration = service.getConfiguration(gid, nid);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Configuration>()
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/configuration", "self", RequestMethod.PUT)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/configuration", "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.GET)
-						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
-						.addLink(url + "/" + gid, "list", RequestMethod.GET)
-						.addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + gid + "/nodes", "collection", RequestMethod.GET)
+						.addLink(url + "/" + gid, "collection", RequestMethod.GET)
+						.addLink(url, "collection", RequestMethod.GET)
 						.wrap(configuration));
 	}
 
@@ -424,19 +426,19 @@ public class GraphsController {
 
 		service.updateConfiguration(gid, nid, cid, configuration);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>()
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/configuration/" + cid, "self", RequestMethod.PUT)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid + "/configuration", "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/nodes" + "/" + nid, "self", RequestMethod.GET)
-						.addLink(url + "/" + gid + "/nodes", "list", RequestMethod.GET)
-						.addLink(url + "/" + gid, "list", RequestMethod.GET)
-						.addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + gid + "/nodes", "collection", RequestMethod.GET)
+						.addLink(url + "/" + gid, "collection", RequestMethod.GET)
+						.addLink(url, "collection", RequestMethod.GET)
 						.wrap(null));
 	}
 
@@ -458,17 +460,17 @@ public class GraphsController {
 		
 		service.createConstraints(gid, constraints);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.CREATED).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>()
-						.addLink(url + "/" + gid + "/constraints", "new", RequestMethod.POST)
+						.addLink(url + "/" + gid + "/constraints", "collection", RequestMethod.POST)
 						.addLink(url + "/" + gid + "/constraints", "self", RequestMethod.PUT)
 						.addLink(url + "/" + gid + "/constraints", "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/constraints", "self", RequestMethod.DELETE)
-						.addLink(url + "/" + gid, "list", RequestMethod.GET)
-						.addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + gid, "collection", RequestMethod.GET)
+						.addLink(url, "collection", RequestMethod.GET)
 						.wrap(null));
 	}
 
@@ -489,17 +491,17 @@ public class GraphsController {
 		
 		service.updateConstraints(gid, constraints);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>()
-						.addLink(url + "/" + gid + "/constraints", "new", RequestMethod.POST)
+						.addLink(url + "/" + gid + "/constraints", "collection", RequestMethod.POST)
 						.addLink(url + "/" + gid + "/constraints", "self", RequestMethod.PUT)
 						.addLink(url + "/" + gid + "/constraints", "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/constraints", "self", RequestMethod.DELETE)
-						.addLink(url + "/" + gid, "list", RequestMethod.GET)
-						.addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + gid, "collection", RequestMethod.GET)
+						.addLink(url, "collection", RequestMethod.GET)
 						.wrap(null));
 	}
 
@@ -518,17 +520,17 @@ public class GraphsController {
 
 		Constraints constraints = service.getConstraints(gid);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Constraints>()
-						.addLink(url + "/" + gid + "/constraints", "new", RequestMethod.POST)
+						.addLink(url + "/" + gid + "/constraints", "collection", RequestMethod.POST)
 						.addLink(url + "/" + gid + "/constraints", "self", RequestMethod.PUT)
 						.addLink(url + "/" + gid + "/constraints", "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/constraints", "self", RequestMethod.DELETE)
-						.addLink(url + "/" + gid, "list", RequestMethod.GET)
-						.addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + gid, "collection", RequestMethod.GET)
+						.addLink(url, "collection", RequestMethod.GET)
 						.wrap(constraints));
 	}
 
@@ -547,17 +549,17 @@ public class GraphsController {
 		
 		service.deleteConstraints(gid);
 
-		String url = request.getRequestURL().substring(0, request.getRequestURL().lastIndexOf("/"))
-				.substring(0, request.getRequestURL().lastIndexOf("/"));
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<Void>()
-						.addLink(url + "/" + gid + "/constraints", "new", RequestMethod.POST)
+						.addLink(url + "/" + gid + "/constraints", "collection", RequestMethod.POST)
 						.addLink(url + "/" + gid + "/constraints", "self", RequestMethod.PUT)
 						.addLink(url + "/" + gid + "/constraints", "self", RequestMethod.GET)
 						.addLink(url + "/" + gid + "/constraints", "self", RequestMethod.DELETE)
-						.addLink(url + "/" + gid, "list", RequestMethod.GET)
-						.addLink(url, "list", RequestMethod.GET)
+						.addLink(url + "/" + gid, "collection", RequestMethod.GET)
+						.addLink(url, "collection", RequestMethod.GET)
 						.wrap(null));
 	}
 

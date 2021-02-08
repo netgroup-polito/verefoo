@@ -245,7 +245,7 @@ public class SimulationsController {
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<NFV>()
 						.addLink(url + "/" + smid, "self", RequestMethod.GET)
-						.addLink(url, "new", RequestMethod.POST)
+						.addLink(url, "collection", RequestMethod.POST)
 						.wrap(result));
 	}
 
