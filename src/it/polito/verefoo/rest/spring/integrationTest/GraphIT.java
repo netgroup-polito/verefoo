@@ -64,7 +64,7 @@ public class GraphIT {
         objectMapper = new ObjectMapper();
 
         // convert Graphs.json into a Graphs object
-        String folder = "src/" + this.getClass().getPackageName().replace(".", "/") + "/";
+        String folder = "src/" + this.getClass().getPackage().getName().replace(".", "/") + "/";
         Path path1 = Paths.get(folder + "Graphs.json");
         graphs = objectMapper.readValue(path1.toFile(), Graphs.class);
         Path path2 = Paths.get(folder + "Constraints.json");

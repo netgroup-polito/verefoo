@@ -157,21 +157,6 @@ public class SimulationsController {
 					"The simulation request is semantically malformed. Cause: " + e.getMessage());
 		}
 
-		// long smid = service.getNextSimulationId();
-		// service.addSimulationResult(nfv, smid);
-		// String responseUrl;
-		// if (url.toString().endsWith("/"))
-		// 	responseUrl = url.toString() + smid;
-		// else
-		// 	responseUrl = url.toString() + "/" + smid;
-		// HttpHeaders responseHeaders = new HttpHeaders();
-		// try {
-		// 	responseHeaders.setLocation(new URI(responseUrl));
-		// } catch (URISyntaxException e) {
-		// 	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bad request");
-		// }
-		// return new ResponseEntity<NFV>(test.getResult(), responseHeaders, HttpStatus.CREATED);
-
 		Long simulationId = service.createSimulationResult(nfv);
 
 		String url = request.getRequestURL().toString();

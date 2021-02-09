@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -279,7 +278,6 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "404", description = "The host doesn't exist at all. You can retry the operation or consider other hosts."),
 			@ApiResponse(responseCode = "409", description = "The host cannot be deleted because it is implied in at least one connection. You can first delete the pertinent connections.")
 		})
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
 	public ResponseEntity<Resources<Void>> deleteHost(@PathVariable("sid") Long sid, @PathVariable("hid") Long hid) {
 

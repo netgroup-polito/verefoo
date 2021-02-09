@@ -15,6 +15,8 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -24,15 +26,12 @@ import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import it.polito.verefoo.jaxb.Graphs;
-import it.polito.verefoo.jaxb.HTTPDefinition;
-import it.polito.verefoo.jaxb.L4ProtocolTypes;
-import it.polito.verefoo.jaxb.PName;
-import it.polito.verefoo.jaxb.POP3Definition;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.jaxb.PropertyDefinition;
 
@@ -62,7 +61,7 @@ public class RequirementIT {
         objectMapper = new ObjectMapper();
 
         // convert Graphs.json into a Graphs object
-        String folder = "src/" + this.getClass().getPackageName().replace(".", "/") + "/";
+        String folder = "src/" + this.getClass().getPackage().getName().replace(".", "/") + "/";
         Path path1 = Paths.get(folder + "Graphs.json");
         graphs = objectMapper.readValue(path1.toFile(), Graphs.class);
         Path path2 = Paths.get(folder + "PropertyDefinition.json");
@@ -76,6 +75,7 @@ public class RequirementIT {
         graphId = graphIds.get(0);
 
         requirementsSet.getProperty().forEach(property -> property.setGraph(graphId));
+        property.setGraph(graphId);
     }
 
     @Test
@@ -193,7 +193,7 @@ public class RequirementIT {
     private void deleteRequirementsSets() throws Exception {
         mvc.perform(
                 delete("/adp/requirements").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().is(Matchers.isOneOf(HttpStatus.OK.value(), HttpStatus.NOT_MODIFIED.value())));
     }
 
     private PropertyDefinition getRequirementsSet(Long requirementsSetId) throws Exception {

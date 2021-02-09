@@ -97,37 +97,51 @@ public class GraphService {
          * @return a new id for the modified graph
          */
         @Transactional
-        public void updateGraph(Long id, Graph graph) {
+        public List<Long> updateGraph(Long id, Graph graph) {
                 DbGraph newDbGraph = converter.deserializeGraph(graph);
 
                 DbGraph oldDbGraph;
                 Optional<DbGraph> dbGraph = graphRepository.findById(id, -1);
+
                 if (dbGraph.isPresent())
                         oldDbGraph = dbGraph.get();
                 else
                         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The graph " + id + " doesn't exist.");
 
+                
+
+                List<Long> list = new ArrayList<>();
+                list.add(-1L);
+                // oldDbGraph.getNode().forEach(node -> list.add(node.getId()));
                 // merge
                 newDbGraph.setId(id);
                 graphRepository.save(newDbGraph, 0);
-                if (newDbGraph.getNode().size() >= oldDbGraph.getNode().size()) {
+
+                // transfer the information on a variable due to @Transactional side effects
+                Long oldDbGraphNodeSize = Long.valueOf(oldDbGraph.getNode().size());
+                Long newDbGraphNodeSize = Long.valueOf(newDbGraph.getNode().size());
+
+                if (newDbGraphNodeSize >= oldDbGraphNodeSize) {
                         int i = 0;
-                        for (; i < oldDbGraph.getNode().size(); i++) {
-                                // newDbGraph.getNode().get(i).setId(oldDbGraph.getNode().get(i).getId());
+                        for (; i < oldDbGraphNodeSize; i++) {
                                 updateNode(id, oldDbGraph.getNode().get(i).getId(), graph.getNode().get(i));
                         }
-                        for (; i < newDbGraph.getNode().size(); i++) {
+                        for (; i < newDbGraphNodeSize; i++) {
                                 createNode(id, graph.getNode().get(i));
                         }
                 } else {
                         int i = 0;
-                        for (; i < newDbGraph.getNode().size(); i++) {
+                        list.add(Long.valueOf(oldDbGraph.getNode().size()));
+                        for (; i < newDbGraphNodeSize; i++) {
                                 updateNode(id, oldDbGraph.getNode().get(i).getId(), graph.getNode().get(i));
                         }
-                        for (; i < oldDbGraph.getNode().size(); i++) {
-                                deleteNode(oldDbGraph.getId(), oldDbGraph.getNode().get(i).getId());
+                        list.add(Long.valueOf(oldDbGraph.getNode().size()));
+                        for (; i < oldDbGraphNodeSize; i++) {
+                                deleteNode(id, oldDbGraph.getNode().get(i).getId());
                         }
                 }
+
+                return list;
 
         }
 
@@ -193,24 +207,27 @@ public class GraphService {
                 newDbNode.setId(nodeId);
                 nodeRepository.save(newDbNode, 0);
 
+                Long oldDbNodeNeighbourSize = Long.valueOf(oldDbNode.getNeighbour().size());
+                Long newDbNodeNeighbourSize = Long.valueOf(newDbNode.getNeighbour().size());
+
                 updateConfiguration(id, nodeId, oldDbNode.getConfiguration().getId(), node.getConfiguration());
 
-                if (newDbNode.getNeighbour().size() >= oldDbNode.getNeighbour().size()) {
+                if (newDbNodeNeighbourSize >= oldDbNodeNeighbourSize) {
                         int i = 0;
-                        for (; i < oldDbNode.getNeighbour().size(); i++) {
+                        for (; i < oldDbNodeNeighbourSize; i++) {
                                 updateNeighbour(id, nodeId, oldDbNode.getNeighbour().get(i).getId(),
                                                 node.getNeighbour().get(i));
                         }
-                        for (; i < newDbNode.getNeighbour().size(); i++) {
+                        for (; i < newDbNodeNeighbourSize; i++) {
                                 createNeighbour(id, nodeId, node.getNeighbour().get(i));
                         }
                 } else {
                         int i = 0;
-                        for (; i < newDbNode.getNeighbour().size(); i++) {
+                        for (; i < newDbNodeNeighbourSize; i++) {
                                 updateNeighbour(id, nodeId, oldDbNode.getNeighbour().get(i).getId(),
                                                 node.getNeighbour().get(i));
                         }
-                        for (; i < oldDbNode.getNeighbour().size(); i++) {
+                        for (; i < oldDbNodeNeighbourSize; i++) {
                                 deleteNeighbour(id, nodeId, oldDbNode.getNeighbour().get(i).getId());
                         }
                 }
@@ -256,7 +273,6 @@ public class GraphService {
                 return converter.serializeConfiguration(nodeRepository.findConfiguration(nodeId));
         }
 
-        @Transactional
         public void updateConfiguration(Long id, Long nodeId, Long configurationId, Configuration configuration) {
                 if (nodeRepository.existsById(nodeId)) {
                         DbConfiguration newDbConfiguration = converter.deserializeConfiguration(configuration);

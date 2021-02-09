@@ -18,14 +18,6 @@
 		</developer>
 	</developers>
 
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>localrepository</id>
-			<url>file:///${project.basedir}\lib</url>
-		</pluginRepository>
-	</pluginRepositories>
-
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -244,21 +236,6 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>2.1.4.RELEASE</version>
-				<!-- Linked to springdoc-openapi-maven-plugin
-					<executions>
-					<execution>
-						<id>pre-integration-test</id>
-						<goals>
-							<goal>start</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>post-integration-test</id>
-						<goals>
-							<goal>stop</goal>
-						</goals>
-					</execution>
-				</executions> -->
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -267,26 +244,6 @@
 					<includeSystemScope>true</includeSystemScope>
 				</configuration>
 			</plugin>
-
-			<!-- NOT WORKING FOR NOW: Plugin to generate docs into an openapi.json file -->
-			<!-- <plugin>
-				<groupId>org.springdoc</groupId>
-				<artifactId>springdoc-openapi-maven-plugin</artifactId>
-				<version>0.2</version>
-				<executions>
-					<execution>
-						<phase>integration-test</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration> 
-					<apiDocsUrl>http://localhost:8080/v3/api-docs</apiDocsUrl> 
-					<outputFileName>openapi.json</outputFileName> 
-					<outputDir>${project.basedir}/docs</outputDir> 
-				</configuration>
-			</plugin> -->
 
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
@@ -303,53 +260,12 @@
 							<schemaIncludes>
 								<include>nfvSchema.xsd</include>
 							</schemaIncludes>
-							<bindingDirectory>xsd/bindings/</bindingDirectory>
-							<bindingIncludes>annotations.xjb</bindingIncludes>
 							<generateDirectory>gen-src/</generateDirectory>
 							<generatePackage>it.polito.verefoo.jaxb</generatePackage>
 							<!-- <forceRegenerate>true</forceRegenerate> -->
 						</configuration>
 					</execution>
 				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>net.codesup.util</groupId>
-						<artifactId>jaxb2-rich-contract-plugin</artifactId>
-						<version>2.1.0</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<extension>true</extension>
-					<args>
-						<arg>-Xannotate</arg>
-						<!-- Enable inheritance (see plugin below) -->
-						<!-- <arg>-Xinheritance</arg> -->
-					</args>
-					<plugins>
-						<plugin>
-							<groupId>org.jvnet.jaxb2_commons</groupId>
-							<artifactId>jaxb2-basics</artifactId>
-							<version>0.11.1</version>
-						</plugin>
-						<plugin>
-							<groupId>org.jvnet.jaxb2_commons</groupId>
-							<artifactId>jaxb2-basics-annotate</artifactId>
-							<version>1.1.0</version>
-						</plugin>
-						<!-- Artifact with custom annotations -->
-						<plugin>
-							<groupId>org.neo4j</groupId>
-							<artifactId>neo4j-ogm-core</artifactId>
-							<version>3.2.19</version>
-						</plugin>
-						<!-- Artifact to enable inheritance (extends and implements) of classes -->
-						<!-- <plugin>
-							<groupId>org.jvnet.jaxb2_commons</groupId>
-							<artifactId>jaxb2-basics</artifactId>
-							<version>1.11.1</version>
-						</plugin> -->
-					</plugins>
-				</configuration>
 			</plugin>
 
 			<!-- Plugin to convert JSON schemas into Java entities (classes) -->
@@ -378,23 +294,6 @@
 				</executions>
 			</plugin>
 
-			<plugin>
-				<groupId>Verefoo</groupId>
-				<artifactId>generator-maven-plugin</artifactId>
-				<version>1.0-SNAPSHOT</version>
-				<configuration>
-					<greeting>Hello everybody from Davide</greeting>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>generate-pojos</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 			<!--<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
@@ -418,7 +317,7 @@
 			</plugin>-->
 
 			<!-- Plugin to run integration tests -->
-			<!-- To run integration tests: mvn verify -->
+			<!-- Command to run integration tests: mvn verify -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>

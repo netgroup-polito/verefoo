@@ -23,7 +23,6 @@ import it.polito.verefoo.rest.spring.repository.ConnectionRepository;
 import it.polito.verefoo.rest.spring.repository.HostRepository;
 import it.polito.verefoo.rest.spring.repository.HostsRepository;
 import it.polito.verefoo.rest.spring.repository.NodeRefTypeRepository;
-import it.polito.verefoo.rest.spring.repository.SubstrateRepository;
 import it.polito.verefoo.rest.spring.repository.SupportedVNFTypeRepository;
 
 @Service
@@ -31,9 +30,6 @@ public class SubstrateService {
 
     @Autowired
     HostsRepository hostsRepository;
-
-    @Autowired
-    SubstrateRepository substrateRepository;
 
     @Autowired
     HostRepository hostRepository;

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -156,7 +155,6 @@ public class RequirementsController {
 	@RequestMapping(value = "/{rid}", method = RequestMethod.DELETE)
 	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "No Content"),
 			@ApiResponse(responseCode = "404", description = "The requirement set has not been found. You can retry the operation or create a requirement set.") })
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
 	public ResponseEntity<Resources<Void>> deleteRequirementsSet(@PathVariable("rid") Long rid) {
 
@@ -264,7 +262,6 @@ public class RequirementsController {
 	@RequestMapping(value = "/{rid}/properties/{pid}", method = RequestMethod.DELETE)
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "404", description = "The requirement set or the property has not been found. You can retry the operation or create a requirement set/property.") })
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
 	public ResponseEntity<Resources<Void>> deleteProperty(@PathVariable("rid") Long rid,
 			@PathVariable("pid") Long pid) {

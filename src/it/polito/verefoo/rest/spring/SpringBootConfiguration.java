@@ -7,14 +7,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 import org.neo4j.ogm.config.Configuration;
 import org.neo4j.ogm.session.SessionFactory;
@@ -30,8 +25,6 @@ import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.data.neo4j.conversion.MetaDataDrivenConversionService;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
-import org.springframework.hateoas.config.EnableHypermediaSupport;
-import org.springframework.hateoas.config.EnableHypermediaSupport.HypermediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 

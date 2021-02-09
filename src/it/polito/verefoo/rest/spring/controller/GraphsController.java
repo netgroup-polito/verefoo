@@ -8,11 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -97,7 +97,6 @@ public class GraphsController {
 	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "No Content"),
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist at all. You can retry the operation or refer to another graph."),
 			@ApiResponse(responseCode = "409", description = "No graph has been deleted because at least one of them is referred by a requirement; you can first delete the interested requirements.") })
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
 	public ResponseEntity<Resources<Void>> deleteGraphs() {
 
@@ -117,23 +116,23 @@ public class GraphsController {
 	 * @param gid   it is the id of the graph to update
 	 * @param graph it is the new graph
 	 */
-	@Operation(tags = "version 1 - graphs", summary = "Update a graph", description = "All the nested resources are replaced with the new ones in a shallow way.")
+	@Operation(tags = "version 1 - graphs", summary = "Update a graph", description = "It's advisable to explicitly perform a get of the modified resource through the pertinent API, since some ids may have been changed.")
 	@RequestMapping(value = "/{gid}", method = RequestMethod.PUT)
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist. You can retry the operation or create the graph instead."), })
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
-	public ResponseEntity<Resources<Void>> updateGraph(@PathVariable("gid") long gid, @RequestBody Graph graph) {
 
-		service.updateGraph(gid, graph);
+	public ResponseEntity<Resources<List<Long>>> updateGraph(@PathVariable("gid") Long gid, @RequestBody Graph graph) {
+
+		List<Long> f = service.updateGraph(gid, graph);
 
 		String url = request.getRequestURL().toString();
 		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + gid, "self", RequestMethod.GET)
+				new ResourceWrapperWithLinks<List<Long>>().addLink(url + "/" + gid, "self", RequestMethod.GET)
 						.addLink(url, "collection", RequestMethod.POST).addLink(url + "/" + gid, "self", RequestMethod.DELETE)
-						.addLink(url + "/" + gid, "self", RequestMethod.PUT).wrap(null));
+						.addLink(url + "/" + gid, "self", RequestMethod.PUT).wrap(f));
 	}
 
 	/**
@@ -168,7 +167,6 @@ public class GraphsController {
 	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "No Content"),
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist at all. You can retry the operation or refer to another graph."),
 			@ApiResponse(responseCode = "409", description = "The graph could not be deleted because it is referenced by a requirement resource; you can first delete the interested requirement.")})
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
 	public ResponseEntity<Resources<Void>> deleteGraph(@PathVariable("gid") Long gid) {
 
@@ -229,7 +227,6 @@ public class GraphsController {
 			@ApiResponse(responseCode = "400", description = "The node is semantically malformed. You can retry the operation or check the node."),
 			@ApiResponse(responseCode = "404", description = "The graph or the node doesn't exist at all. You can retry the operation or refer to another graph/node.")
 		})
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
 	public ResponseEntity<Resources<Void>> updateNode(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid, @RequestBody Node node) {
 
@@ -291,7 +288,6 @@ public class GraphsController {
 			@ApiResponse(responseCode = "404", description = "The graph or the node doesn't exist at all. You can retry the operation or refer to another graph/node."),
 			@ApiResponse(responseCode = "409", description = "The node could not have been deleted, because it is linked to other nodes; first delete the interested connections.")
 		})
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
 	public ResponseEntity<Resources<Void>> deleteNode(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid) {
 
@@ -485,7 +481,6 @@ public class GraphsController {
 			@ApiResponse(responseCode = "400", description = "The passed constraints are semantically malformed. You can retry the operation or check them."),
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist at all. You can retry the operation or refer to another graph.")
 		})
-	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 
 	public ResponseEntity<Resources<Void>> updateConstraints(@PathVariable("gid") Long gid, @RequestBody Constraints constraints) {
 		
