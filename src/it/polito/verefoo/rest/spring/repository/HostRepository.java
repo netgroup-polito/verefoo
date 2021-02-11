@@ -30,8 +30,8 @@ public interface HostRepository extends Neo4jRepository<DbHost, Long> {
 
 
 
-    @Query("CYPHER 3.5 MATCH (h:DbHost {name: $name}) " +
-    "RETURN h")
+    @Query("CYPHER 3.5 MATCH (h:DbHost {name: $name})-[*]->(any) " +
+    "RETURN (h)-[*]->(any)")
     Optional<DbHost> findByName(@Param("name") String name);
 
 

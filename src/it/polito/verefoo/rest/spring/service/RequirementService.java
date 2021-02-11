@@ -101,20 +101,24 @@ public class RequirementService {
         newDbPropertyDefinition.setId(id);
         requirementRepository.save(newDbPropertyDefinition, 0);
 
-        if (newDbPropertyDefinition.getProperty().size() >= oldDbPropertyDefinition.getProperty().size()) {
+        // transfer the information on a variable due to @Transactional behaviour
+        Long newDbPropertyDefinitionPropertySize = Long.valueOf(newDbPropertyDefinition.getProperty().size());
+        Long oldDbPropertyDefinitionPropertySize = Long.valueOf(oldDbPropertyDefinition.getProperty().size());
+
+        if (newDbPropertyDefinitionPropertySize >= oldDbPropertyDefinitionPropertySize) {
             int i = 0;
-            for (; i < oldDbPropertyDefinition.getProperty().size(); i++) {
+            for (; i < oldDbPropertyDefinitionPropertySize; i++) {
                 updateProperty(id, oldDbPropertyDefinition.getProperty().get(i).getId(), requirementsSet.getProperty().get(i));
             }
-            for (; i < newDbPropertyDefinition.getProperty().size(); i++) {
+            for (; i < newDbPropertyDefinitionPropertySize; i++) {
                 createProperty(id, requirementsSet.getProperty().get(i));
             }
         } else {
             int i = 0;
-            for (; i < newDbPropertyDefinition.getProperty().size(); i++) {
+            for (; i < newDbPropertyDefinitionPropertySize; i++) {
                 updateProperty(id, oldDbPropertyDefinition.getProperty().get(i).getId(), requirementsSet.getProperty().get(i));
             }
-            for (; i < oldDbPropertyDefinition.getProperty().size(); i++) {
+            for (; i < oldDbPropertyDefinitionPropertySize; i++) {
                 deleteProperty(id, oldDbPropertyDefinition.getProperty().get(i).getId());
             }
         }

@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.neo4j.ogm.config.Configuration;
@@ -96,6 +97,7 @@ public class SpringBootConfiguration {
         // equivalent of setting additionalProperties = false in json schemas; in other words
         // reject every unknown property
         objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        objectMapper.enable(MapperFeature.USE_ANNOTATIONS);
         mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
 
         return new HttpMessageConverters(false,

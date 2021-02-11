@@ -19,13 +19,13 @@ public interface NodeRefTypeRepository extends Neo4jRepository<DbNodeRefType, Lo
     "OPTIONAL MATCH (node:DbNode {name: nodeRef.node}) " +
     "WITH nodeRef, node " +
     "MERGE (nodeRef)-[:HOST_TO_NODE]->(node)")
-    void bindToGraph(@Param("id") Long id);
+    void bindToNode(@Param("id") Long id);
 
 
 
     @Query("CYPHER 3.5 MATCH (nodeRef:DbNodeRefType)-[r:HOST_TO_NODE]->(node:DbNode {name: nodeRef.node}) WHERE id(nodeRef)=$id " +
     "DELETE r")
-    void unbindFromGraph(@Param("id") Long id);
+    void unbindFromNode(@Param("id") Long id);
 
 
 

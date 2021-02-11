@@ -122,17 +122,17 @@ public class GraphsController {
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist. You can retry the operation or create the graph instead."), })
 
 
-	public ResponseEntity<Resources<List<Long>>> updateGraph(@PathVariable("gid") Long gid, @RequestBody Graph graph) {
+	public ResponseEntity<Resources<Void>> updateGraph(@PathVariable("gid") Long gid, @RequestBody Graph graph) {
 
-		List<Long> f = service.updateGraph(gid, graph);
+		service.updateGraph(gid, graph);
 
 		String url = request.getRequestURL().toString();
 		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<List<Long>>().addLink(url + "/" + gid, "self", RequestMethod.GET)
+				new ResourceWrapperWithLinks<Void>().addLink(url + "/" + gid, "self", RequestMethod.GET)
 						.addLink(url, "collection", RequestMethod.POST).addLink(url + "/" + gid, "self", RequestMethod.DELETE)
-						.addLink(url + "/" + gid, "self", RequestMethod.PUT).wrap(f));
+						.addLink(url + "/" + gid, "self", RequestMethod.PUT).wrap(null));
 	}
 
 	/**

@@ -97,7 +97,7 @@ public class GraphService {
          * @return a new id for the modified graph
          */
         @Transactional
-        public List<Long> updateGraph(Long id, Graph graph) {
+        public void updateGraph(Long id, Graph graph) {
                 DbGraph newDbGraph = converter.deserializeGraph(graph);
 
                 DbGraph oldDbGraph;
@@ -109,15 +109,11 @@ public class GraphService {
                         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The graph " + id + " doesn't exist.");
 
                 
-
-                List<Long> list = new ArrayList<>();
-                list.add(-1L);
-                // oldDbGraph.getNode().forEach(node -> list.add(node.getId()));
                 // merge
                 newDbGraph.setId(id);
                 graphRepository.save(newDbGraph, 0);
 
-                // transfer the information on a variable due to @Transactional side effects
+                // transfer the information on a variable due to @Transactional behaviour
                 Long oldDbGraphNodeSize = Long.valueOf(oldDbGraph.getNode().size());
                 Long newDbGraphNodeSize = Long.valueOf(newDbGraph.getNode().size());
 
@@ -131,17 +127,13 @@ public class GraphService {
                         }
                 } else {
                         int i = 0;
-                        list.add(Long.valueOf(oldDbGraph.getNode().size()));
                         for (; i < newDbGraphNodeSize; i++) {
                                 updateNode(id, oldDbGraph.getNode().get(i).getId(), graph.getNode().get(i));
                         }
-                        list.add(Long.valueOf(oldDbGraph.getNode().size()));
                         for (; i < oldDbGraphNodeSize; i++) {
                                 deleteNode(id, oldDbGraph.getNode().get(i).getId());
                         }
                 }
-
-                return list;
 
         }
 

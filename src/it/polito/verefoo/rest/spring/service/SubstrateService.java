@@ -79,21 +79,18 @@ public class SubstrateService {
     }
 
     @Transactional
-    public List<Long> createHosts(Long substrateId, Hosts hosts) {
-        List<Long> hostsIds = new ArrayList<>();
+    public void createHosts(Long substrateId, Hosts hosts) {
         try {
             hosts.getHost().forEach(host -> {
                 DbHost dbHost = hostRepository.save(converter.deserializeHost(host));
                 hostsRepository.bindHost(substrateId, dbHost.getId());
                 dbHost.getNodeRef().forEach(nodeRef -> {
-                    nodeRefTypeRepository.bindToGraph(nodeRef.getId());
+                    nodeRefTypeRepository.bindToNode(nodeRef.getId());
                 });
-                hostsIds.add(dbHost.getId());
             });
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The referred graph doesn't exist");
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "One referred node from the substrate " + substrateId + " doesn't exist.");
         }
-        return hostsIds;
     }
 
     public Hosts getHosts(Long substrateId) {
@@ -114,101 +111,111 @@ public class SubstrateService {
     }
 
     @Transactional
-    public void updateHost(Long substrateId, Long hostId, Host host) {
+    public void updateHost(Long substrateId, String hostName, Host host) {
         DbHost newDbHost = converter.deserializeHost(host);
         DbHost oldDbHost;
-        Optional<DbHost> dbHost = hostRepository.findById(hostId, -1);
+        Optional<DbHost> dbHost = hostRepository.findByName(hostName);
         if (dbHost.isPresent()) {
             oldDbHost = dbHost.get();
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The host " + hostId + " doesn't exist.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The host " + hostName + " doesn't exist.");
         }
 
+        Long oldDbHostId = oldDbHost.getId();
+        Long newDbHostNodeRefSize = Long.valueOf(newDbHost.getNodeRef().size());
+        Long oldDbHostNodeRefSize = Long.valueOf(oldDbHost.getNodeRef().size());
+        Long newDbHostSupportedVNFSize = Long.valueOf(newDbHost.getSupportedVNF().size());
+        Long oldDbHostSupportedVNFSize = Long.valueOf(oldDbHost.getSupportedVNF().size());
+
         // merge
-        newDbHost.setId(hostId);
+        newDbHost.setId(oldDbHostId);
         hostRepository.save(newDbHost, 0);
         // merge nodeRef nodes, updating the foreign keys
-        if (newDbHost.getNodeRef().size() >= oldDbHost.getNodeRef().size()) {
+        if (newDbHostNodeRefSize >= oldDbHostNodeRefSize) {
             int i = 0;
-            for ( ; i < oldDbHost.getNodeRef().size(); i++) {
+            for ( ; i < oldDbHostNodeRefSize; i++) {
                 // update in place
                 newDbHost.getNodeRef().get(i).setId(oldDbHost.getNodeRef().get(i).getId());
-                nodeRefTypeRepository.unbindFromGraph(oldDbHost.getNodeRef().get(i).getId());
+                nodeRefTypeRepository.unbindFromNode(oldDbHost.getNodeRef().get(i).getId());
                 nodeRefTypeRepository.save(newDbHost.getNodeRef().get(i), 0);
                 try {
-                    nodeRefTypeRepository.bindToGraph(oldDbHost.getNodeRef().get(i).getId());
+                    nodeRefTypeRepository.bindToNode(oldDbHost.getNodeRef().get(i).getId());
                 } catch (Exception e) {
-                    throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The referred node " + oldDbHost.getNodeRef().get(i).getNode() + " for the host " + hostId + "doesn't exist");
+                    throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The referred node " + oldDbHost.getNodeRef().get(i).getNode() + " for the host " + hostName + "doesn't exist");
                 }
                 
             }
-            for ( ; i < newDbHost.getNodeRef().size(); i++) {
+            for ( ; i < newDbHostNodeRefSize; i++) {
                 DbNodeRefType newDbNodeRefType = nodeRefTypeRepository.save(newDbHost.getNodeRef().get(i), 0);
-                hostRepository.bindNodeRefType(hostId, newDbNodeRefType.getId());
-                nodeRefTypeRepository.bindToGraph(newDbNodeRefType.getId());
+                hostRepository.bindNodeRefType(oldDbHostId, newDbNodeRefType.getId());
+                nodeRefTypeRepository.bindToNode(newDbNodeRefType.getId());
             }
         } else {
             int i = 0;
-            for ( ; i < newDbHost.getNodeRef().size(); i++) {
+            for ( ; i < newDbHostNodeRefSize; i++) {
                 // update in place
                 newDbHost.getNodeRef().get(i).setId(oldDbHost.getNodeRef().get(i).getId());
-                nodeRefTypeRepository.unbindFromGraph(oldDbHost.getNodeRef().get(i).getId());
+                nodeRefTypeRepository.unbindFromNode(oldDbHost.getNodeRef().get(i).getId());
                 nodeRefTypeRepository.save(newDbHost.getNodeRef().get(i), 0);
                 try {
-                    nodeRefTypeRepository.bindToGraph(oldDbHost.getNodeRef().get(i).getId());
+                    nodeRefTypeRepository.bindToNode(oldDbHost.getNodeRef().get(i).getId());
                 } catch (Exception e) {
-                    throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The referred node " + oldDbHost.getNodeRef().get(i).getNode() + " for the host " + hostId + "doesn't exist");
+                    throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The referred node " + oldDbHost.getNodeRef().get(i).getNode() + " for the host " + hostName + "doesn't exist");
                 }
             }
-            for ( ; i < oldDbHost.getNodeRef().size(); i++) {
-                nodeRefTypeRepository.unbindFromGraph(oldDbHost.getNodeRef().get(i).getId());
+            for ( ; i < oldDbHostNodeRefSize; i++) {
+                nodeRefTypeRepository.unbindFromNode(oldDbHost.getNodeRef().get(i).getId());
                 nodeRefTypeRepository.delete(oldDbHost.getNodeRef().get(i)); 
             }
         }
         // merge SupportedVNFType nodes
-        if (newDbHost.getSupportedVNF().size() >= oldDbHost.getSupportedVNF().size()) {
+        if (newDbHostSupportedVNFSize >= oldDbHostSupportedVNFSize) {
             int i = 0;
-            for ( ; i < oldDbHost.getSupportedVNF().size(); i++) {
+            for ( ; i < oldDbHostSupportedVNFSize; i++) {
                 // update in place
                 newDbHost.getSupportedVNF().get(i).setId(oldDbHost.getSupportedVNF().get(i).getId());
                 supportedVNFTypeRepository.save(newDbHost.getSupportedVNF().get(i));
             }
-            for ( ; i < newDbHost.getSupportedVNF().size(); i++) {
+            for ( ; i < newDbHostSupportedVNFSize; i++) {
                 // create the remaining ones
                 DbSupportedVNFType dbSupportedVNFType = supportedVNFTypeRepository.save(newDbHost.getSupportedVNF().get(i), 0);
-                hostRepository.bindSupportedVNFType(hostId, dbSupportedVNFType.getId());
+                hostRepository.bindSupportedVNFType(oldDbHostId, dbSupportedVNFType.getId());
             }
         } else {
             int i = 0;
-            for ( ; i < newDbHost.getSupportedVNF().size(); i++) {
+            for ( ; i < newDbHostSupportedVNFSize; i++) {
                 // update in place
                 newDbHost.getSupportedVNF().get(i).setId(oldDbHost.getSupportedVNF().get(i).getId());
                 supportedVNFTypeRepository.save(newDbHost.getSupportedVNF().get(i));
             }
-            for ( ; i < oldDbHost.getSupportedVNF().size(); i++) {
+            for ( ; i < oldDbHostSupportedVNFSize; i++) {
                 // delete the remaining ones
                 supportedVNFTypeRepository.delete(oldDbHost.getSupportedVNF().get(i)); 
             }
         }
     }
 
-    public Host getHost(Long substrateId, Long hostId) {
-        Optional<DbHost> dbHost = hostRepository.findById(hostId, -1);
+    public Host getHost(Long substrateId, String hostName) {
+        Optional<DbHost> dbHost = hostRepository.findByName(hostName);
         if (dbHost.isPresent()) {
             return converter.serializeHost(dbHost.get());
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The host " + hostId + " doesn't exist.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The host " + hostName + " doesn't exist.");
         }
     }
 
     @Transactional
-    public void deleteHost(Long substrateId, Long hostId) {
-        if (hostRepository.existsById(hostId)) {
-            hostsRepository.unbindHost(substrateId, hostId);
-            hostRepository.deleteById(hostId);
+    public void deleteHost(Long substrateId, String hostName) {
+        DbHost dbHost;
+        Optional<DbHost> tmp = hostRepository.findByName(hostName);
+        if (tmp.isPresent()) {
+            dbHost = tmp.get();
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The host " + hostId + " doesn't exist.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The host " + hostName + " doesn't exist.");
         }
+
+        hostsRepository.unbindHost(substrateId, dbHost.getId());
+        hostRepository.deleteById(dbHost.getId());
     }
 
 	public void createConnections(Long substrateId, Connections connections) {

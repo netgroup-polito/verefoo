@@ -1,0 +1,9 @@
+{
+    "connection": [
+        {
+            "sourceHost": "host1",
+            "destHost": "host2",
+            "avgLatency": 1000
+        }
+    ]
+}

@@ -138,22 +138,22 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "400", description = "The passed hosts resource is semantically malformed. You can retry the operation or check the data."),
 			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can first create a substrate or use an existing one.")
 		})
-	public ResponseEntity<Resources<List<Long>>> createHosts(@PathVariable("sid") Long sid, @RequestBody Hosts hosts) {
+	public ResponseEntity<Resources<Void>> createHosts(@PathVariable("sid") Long sid, @RequestBody Hosts hosts) {
 
-		List<Long> ids = service.createHosts(sid, hosts);
+		service.createHosts(sid, hosts);
 
 		String url = request.getRequestURL().toString();
 		url = url.substring(0, url.lastIndexOf("/"));
 		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.CREATED).body(
                                 // wrap the response with the hyperlinks
-								new ResourceWrapperWithLinks<List<Long>>()
+								new ResourceWrapperWithLinks<Void>()
 												.addLink(url + "/" + sid + "/connections", "collection", RequestMethod.POST)
                                                 .addLink(url + "/" + sid + "/hosts", "self", RequestMethod.GET)
 												.addLink(url + "/" + sid + "/hosts", "self", RequestMethod.DELETE)
 												.addLink(url + "/" + sid + "/hosts", "collection", RequestMethod.POST)
 												.addLink(url, "collection", RequestMethod.GET)
-                                                .wrap(ids));
+                                                .wrap(null));
 	}
 
 
@@ -215,7 +215,7 @@ public class SubstratesController {
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
 			@ApiResponse(responseCode = "404", description = "The host or the substrate doesn't exist. You can retry the operation or create/use other substrates or hosts."), })
 
-	public ResponseEntity<Resources<Void>> updateHost(@PathVariable("sid") Long sid, @PathVariable("hid") Long hid, @RequestBody Host host) {
+	public ResponseEntity<Resources<Void>> updateHost(@PathVariable("sid") Long sid, @PathVariable("hid") String hid, @RequestBody Host host) {
 
 		service.updateHost(sid, hid, host);
 
@@ -246,7 +246,7 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "404", description = "The host or the substrate doesn't exist. You can retry the operation or refer to other hosts/substrates.")
 		})
 
-	public ResponseEntity<Resources<Host>> getHost(@PathVariable("sid") Long sid, @PathVariable("hid") Long hid) {
+	public ResponseEntity<Resources<Host>> getHost(@PathVariable("sid") Long sid, @PathVariable("hid") String hid) {
 
 		Host host = service.getHost(sid, hid);
 
@@ -279,7 +279,7 @@ public class SubstratesController {
 			@ApiResponse(responseCode = "409", description = "The host cannot be deleted because it is implied in at least one connection. You can first delete the pertinent connections.")
 		})
 
-	public ResponseEntity<Resources<Void>> deleteHost(@PathVariable("sid") Long sid, @PathVariable("hid") Long hid) {
+	public ResponseEntity<Resources<Void>> deleteHost(@PathVariable("sid") Long sid, @PathVariable("hid") String hid) {
 
 		service.deleteHost(sid, hid);
 
