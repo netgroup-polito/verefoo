@@ -52,7 +52,7 @@ public class SpringBootConfiguration {
 
     @Bean
     public Configuration configuration() {
-        return new Configuration.Builder().uri(URL).credentials("neo4j", "costLess").verifyConnection(true).build();
+        return new Configuration.Builder().uri(URL).credentials("neo4j", "costLess").verifyConnection(false).build();
     }
 
     @Bean
