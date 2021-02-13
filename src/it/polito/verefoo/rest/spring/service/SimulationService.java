@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import it.polito.verefoo.DbNFV;
 import it.polito.verefoo.jaxb.Constraints;
 import it.polito.verefoo.jaxb.Graphs;
+import it.polito.verefoo.jaxb.Hosts;
 import it.polito.verefoo.jaxb.LinkConstraints;
 import it.polito.verefoo.jaxb.NFV;
 import it.polito.verefoo.jaxb.NodeConstraints;
@@ -79,6 +80,15 @@ public class SimulationService {
 		return simulationRepository.save(dbNFV).getId();
 	}
 
+	@Transactional
+	public Long createSimulationResult(Long gid, Long rid, Long sid) {
+		DbNFV dbNFV = new DbNFV();
+		dbNFV.getGraph().add(gid);
+		dbNFV.setPropertyDefinition(rid);
+		dbNFV.setSubstrate(sid);
+		return simulationRepository.save(dbNFV).getId();
+	}
+
 	public NFV getSimulationResult(Long id) throws Exception {
 		NFV nfv = new NFV();
 		DbNFV dbNFV;
@@ -94,12 +104,25 @@ public class SimulationService {
 			nfv.getGraphs().getGraph().add(graphService.getGraph(graphId));
 		}
 
-		dbNFV.getGraph().forEach(graphId -> nfv.setConstraints(graphService.getConstraints(graphId)));
+		// a set of constraints refers to one graph; since the NFV POJO accepts only one set of constraints,
+		// I assume that the constraints are the same for all graphs of the nfv
+		try {
+			dbNFV.getGraph().forEach(graphId -> nfv.setConstraints(graphService.getConstraints(graphId)));
+		} catch (ResponseStatusException e) {
+			// no constraints exist for the graph
+			Constraints constraints;
+			constraints = new Constraints();
+			constraints.setNodeConstraints(new NodeConstraints());
+			constraints.setLinkConstraints(new LinkConstraints());
+			nfv.setConstraints(constraints);
+		}
 
 		nfv.setPropertyDefinition(requirementService.getRequirementsSet(dbNFV.getPropertyDefinition()));
 
-		nfv.setHosts(substrateService.getHosts(dbNFV.getSubstrate()));
-		nfv.setConnections(substrateService.getConnections(dbNFV.getSubstrate()));
+		if (dbNFV.getSubstrate() != null) {
+			nfv.setHosts(substrateService.getHosts(dbNFV.getSubstrate()));
+			nfv.setConnections(substrateService.getConnections(dbNFV.getSubstrate()));
+		}
 
 		nfv.setNetworkForwardingPaths(converter.serializeNetworkForwardingPaths(dbNFV.getNetworkForwardingPaths()));
 		nfv.setParsingString(dbNFV.getParsingString());
@@ -107,14 +130,18 @@ public class SimulationService {
 		return nfv;
 	}
 
-	public NFV buildNFVFromParams(Long graphId, Long substrateId, Long requirementsSetId) throws Exception {
+	@Transactional
+	public NFV buildNFVFromParams(Long graphId, Long requirementsSetId, Long substrateId) {
 		NFV nfv = new NFV();
 		nfv.setGraphs(new Graphs());
 		nfv.getGraphs().getGraph().add(graphService.getGraph(graphId));
 		
-		Constraints constraints = graphService.getConstraints(graphId);
 		// if no constraints are defined, empty inner data structures are needed by the verefoo core in any case
-		if (constraints == null) {
+		Constraints constraints;
+		try {
+			constraints = graphService.getConstraints(graphId);
+		} catch (ResponseStatusException e) {
+			// no constraints exist for the graph
 			constraints = new Constraints();
 			constraints.setNodeConstraints(new NodeConstraints());
 			constraints.setLinkConstraints(new LinkConstraints());

@@ -20,6 +20,9 @@ public class ResourceWrapperWithLinks<T> {
         return this;
     }
     
+    /**
+     * @param resource must be null if the response body, besides the links, is empty
+     */
     public Resources<T> wrap(T resource) {
         List<T> resources = new ArrayList<>();
         // resource should be null if nothing, besides the links, has to be returned

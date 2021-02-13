@@ -108,8 +108,8 @@ public class GraphConverter {
         if (node == null) return null;
         DbNode dbNode = new DbNode();
         dbNode.setName(node.getName());
-        dbNode.setFunctionalType(DbFunctionalTypes.fromValue(node.getFunctionalType().name()));
-        dbNode.setConfiguration(deserializeConfiguration(node.getConfiguration()));
+        dbNode.setFunctionalType(node.getFunctionalType() != null ? DbFunctionalTypes.fromValue(node.getFunctionalType().name()) : null);
+        dbNode.setConfiguration(node.getConfiguration() != null ? deserializeConfiguration(node.getConfiguration()) : null);
         node.getNeighbour().forEach(neighbour -> {
             dbNode.getNeighbour().add(deserializeNeighbour(neighbour));
         });
@@ -435,8 +435,8 @@ public class GraphConverter {
         Node node = new Node();
         node.setId(dbNode.getId());
         node.setName(dbNode.getName());
-        node.setFunctionalType(FunctionalTypes.fromValue(dbNode.getFunctionalType().name()));
-        node.setConfiguration(serializeConfiguration(dbNode.getConfiguration()));
+        node.setFunctionalType(dbNode.getFunctionalType() != null ? FunctionalTypes.fromValue(dbNode.getFunctionalType().name()) : null);
+        node.setConfiguration(dbNode.getConfiguration() != null ? serializeConfiguration(dbNode.getConfiguration()) : null);
         dbNode.getNeighbour().forEach(neighbour -> {
             node.getNeighbour().add(serializeNeighbour(neighbour));
         });

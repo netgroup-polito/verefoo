@@ -147,7 +147,7 @@ public class GraphService {
                 }
         }
 
-        public Graph getGraph(Long id) throws Exception {
+        public Graph getGraph(Long id) {
                 Optional<DbGraph> dbGraph = graphRepository.findById(id, -1);
                 if (dbGraph.isPresent())
                         return converter.serializeGraph(dbGraph.get());
@@ -326,7 +326,7 @@ public class GraphService {
                 if (dbConstraints.isPresent()) {
                         return converter.serializeConstraints(dbConstraints.get());
                 } else {
-                        throw new ResponseStatusException(HttpStatus.NO_CONTENT, "No constraints for the graph " + id + " exist.");
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No constraints for the graph " + id + " exist.");
                 }     
         }
 
