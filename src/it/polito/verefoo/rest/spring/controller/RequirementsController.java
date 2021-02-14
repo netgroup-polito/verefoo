@@ -25,6 +25,9 @@ import it.polito.verefoo.rest.spring.service.RequirementService;
 @RestController
 @RequestMapping(value = "/adp/requirements", consumes = { "application/xml", "application/json" }, produces = {
 		"application/xml", "application/json" })
+@ApiResponses(value = {
+	@ApiResponse(responseCode = "400", description = "The provided resource is not compliant with the data model.")
+})
 public class RequirementsController {
 
 	@Autowired
@@ -33,18 +36,14 @@ public class RequirementsController {
 	@Autowired
 	RequirementService service;
 
-	/* Requirements Sets */
 
-	/**
-	 * @param beforeInclusive it is the starting index
-	 * @param afterInclusive  it is the ending index
-	 * @return a collection of requirements sets
-	 */
 	@Operation(tags = "version 1 - requirements", summary = "Get all the requirement sets", description = "")
-	@RequestMapping(value = "", method = RequestMethod.GET)
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "No requirement set has been found. You can retry the operation or create a requirement set.") })
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "No requirement set has been found in the workspace.")
+	})
 
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	public ResponseEntity<Resources<List<PropertyDefinition>>> getRequirementsSets() {
 
 		List<PropertyDefinition> requirementsSets = service.getRequirementsSets();
@@ -57,14 +56,15 @@ public class RequirementsController {
 						.wrap(requirementsSets));
 	}
 
-	/**
-	 * delete all the requirements sets
-	 */
-	@Operation(tags = "version 1 - requirements", summary = "Delete all the requirement sets", description = "Be careful before cleaning the whole workbench of requirements.")
-	@RequestMapping(value = "", method = RequestMethod.DELETE)
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "No requirement set has been found. You can retry the operation or create a requirement set.") })
 
+
+	@Operation(tags = "version 1 - requirements", summary = "Delete all the requirement sets", description = "Be careful before cleaning the whole workbench of requirements.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "304", description = "No requirement set has been found.")
+	})
+
+	@RequestMapping(value = "", method = RequestMethod.DELETE)
 	public ResponseEntity<Resources<Void>> deleteRequirementsSets() {
 
 		service.deleteRequirementsSets();
@@ -76,17 +76,14 @@ public class RequirementsController {
 						.addLink(url, "self", RequestMethod.GET).addLink(url, "self", RequestMethod.DELETE).wrap(null));
 	}
 
-	/* Requirements Set */
 
-	/**
-	 * @param requirementsSet it is the policy to create
-	 * @return the created requirements set
-	 */
+
 	@Operation(tags = "version 1 - requirements", summary = "Create a requirement set", description = "")
+	@ApiResponses(value = { 
+		@ApiResponse(responseCode = "201", description = "Created"),
+		@ApiResponse(responseCode = "424", description = "The referenced graph doesn't exist.") })
+	
 	@RequestMapping(value = "", method = RequestMethod.POST)
-	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Created"),
-			@ApiResponse(responseCode = "400", description = "The passed requirement set is semantically malformed. You can retry the operation or check the data."),
-			@ApiResponse(responseCode = "404", description = "The referenced graph doesn't exist. You can first create a graph or refer to another one.") })
 	public ResponseEntity<Resources<Long>> createRequirementsSet(@RequestBody PropertyDefinition requirementsSet) {
 
 		Long requirementsSetId = service.createRequirementsSet(requirementsSet);
@@ -99,17 +96,16 @@ public class RequirementsController {
 						.wrap(requirementsSetId));
 	}
 
-	/**
-	 * @param rid             it is the id of the requirements set to update
-	 * @param requirementsSet it is the new value of the requirements set
-	 */
-	@Operation(tags = "version 1 - requirements", summary = "Update a requirement set", description = "")
-	@RequestMapping(value = "/{rid}", method = RequestMethod.PUT)
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The requirement set has not been found or the referenced graph doesn't exist. You can retry the operation or first create a requirement set or refer to another graph.")
 
+
+	@Operation(tags = "version 1 - requirements", summary = "Update a requirement set", description = "")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "OK"),
+		@ApiResponse(responseCode = "404", description = "The requirement set has not been found."),
+		@ApiResponse(responseCode = "424", description = "The referenced graph doesn't exist."),
 	})
 
+	@RequestMapping(value = "/{rid}", method = RequestMethod.PUT)
 	public ResponseEntity<Resources<Void>> updateRequirementsSet(@PathVariable("rid") Long rid,
 			@RequestBody PropertyDefinition requirementsSet) {
 
@@ -125,15 +121,15 @@ public class RequirementsController {
 						.wrap(null));
 	}
 
-	/**
-	 * @param rid it is the id of the requirements set to retrieve
-	 * @return the requested requirements set
-	 */
-	@Operation(tags = "version 1 - requirements", summary = "Get a requirement set", description = "")
-	@RequestMapping(value = "/{rid}", method = RequestMethod.GET)
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The requirement set has not been found. You can retry the operation or create a requirement set.") })
 
+
+	@Operation(tags = "version 1 - requirements", summary = "Get a requirement set", description = "")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The requirement doesn't exist at all in the workspace.")
+	})
+
+	@RequestMapping(value = "/{rid}", method = RequestMethod.GET)
 	public ResponseEntity<Resources<PropertyDefinition>> getRequirementsSet(@PathVariable("rid") Long rid) {
 
 		PropertyDefinition propertyDefinition = service.getRequirementsSet(rid);
@@ -148,14 +144,15 @@ public class RequirementsController {
 						.wrap(propertyDefinition));
 	}
 
-	/**
-	 * @param rid it is the id of the requirements set to delete
-	 */
-	@Operation(tags = "version 1 - requirements", summary = "Delete a requirement set", description = "")
-	@RequestMapping(value = "/{rid}", method = RequestMethod.DELETE)
-	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "No Content"),
-			@ApiResponse(responseCode = "404", description = "The requirement set has not been found. You can retry the operation or create a requirement set.") })
 
+	
+	@Operation(tags = "version 1 - requirements", summary = "Delete a requirement set", description = "")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The requirement doesn't exist at all in the workspace.")
+	})
+
+	@RequestMapping(value = "/{rid}", method = RequestMethod.DELETE)
 	public ResponseEntity<Resources<Void>> deleteRequirementsSet(@PathVariable("rid") Long rid) {
 
 		service.deleteRequirementsSet(rid);
@@ -170,18 +167,16 @@ public class RequirementsController {
 						.wrap(null));
 	}
 
-	/* Properties */
 
-	/**
-	 * @param rid      it is the id of the requirements set
-	 * @param property it is the property to created
-	 * @return the created property
-	 */
+	
 	@Operation(tags = "version 1 - requirements", summary = "Create another property in a requirement set", description = "")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "Created"),
+		@ApiResponse(responseCode = "404", description = "The requirements set has not been found."),
+		@ApiResponse(responseCode = "424", description = "The referred graph doesn't exist.")
+	})
+
 	@RequestMapping(value = "/{rid}/properties", method = RequestMethod.POST)
-	@ApiResponses(value = { @ApiResponse(responseCode = "201", description = "Created"),
-			@ApiResponse(responseCode = "400", description = "The passed property is semantically malformed. You can retry the operation or check the data."),
-			@ApiResponse(responseCode = "404", description = "The requirement set has not been found or the referred graph doesn't exist. You can retry the operation or create/refer to another requirement set/graph.") })
 	public ResponseEntity<Resources<Long>> createProperty(@PathVariable("rid") Long rid,
 			@RequestBody Property property) {
 
@@ -197,16 +192,16 @@ public class RequirementsController {
 						.wrap(propertyId));
 	}
 
-	/**
-	 * @param rid      it is the id of the requirements set
-	 * @param pid      it is the id of the property to update
-	 * @param property it is the new value of the property
-	 */
-	@Operation(tags = "version 1 - requirements", summary = "Update a property in a requirement set", description = "")
-	@RequestMapping(value = "/{rid}/properties/{pid}", method = RequestMethod.PUT)
-	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "No Content"),
-			@ApiResponse(responseCode = "404", description = "The requirement set, the property or the referred graph has not been found. You can retry the operation or create/refer to a/another requirement set/property/graph.") })
 
+
+	@Operation(tags = "version 1 - requirements", summary = "Update a property in a requirement set", description = "")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The property has not been found."),
+		@ApiResponse(responseCode = "424", description = "The referred graph has not been found.")
+	})
+
+	@RequestMapping(value = "/{rid}/properties/{pid}", method = RequestMethod.PUT)
 	public ResponseEntity<Resources<Void>> updateProperty(@PathVariable("rid") Long rid, @PathVariable("pid") Long pid, @RequestBody Property property) {
 
 		service.updateProperty(rid, pid, property);
@@ -225,16 +220,15 @@ public class RequirementsController {
 						.wrap(null));
 	}
 
-	/**
-	 * @param rid it is the id of the requirements
-	 * @param pid it is the id of the property to retrieve
-	 * @return the requested property
-	 */
-	@Operation(tags = "version 1 - requirements", summary = "Get a property from a requirement set", description = "")
-	@RequestMapping(value = "/{rid}/properties/{pid}", method = RequestMethod.GET)
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The requirement set or the property has not been found. You can retry the operation or create a requirement set/property.") })
 
+
+	@Operation(tags = "version 1 - requirements", summary = "Get a property from a requirement set", description = "")
+	@ApiResponses(value = { 
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The property doesn't exist at all in the workspace.")
+	})
+
+	@RequestMapping(value = "/{rid}/properties/{pid}", method = RequestMethod.GET)
 	public ResponseEntity<Resources<Property>> getProperty(@PathVariable("rid") Long rid,
 			@PathVariable("pid") Long pid) {
 
@@ -254,15 +248,15 @@ public class RequirementsController {
 						.wrap(property));
 	}
 
-	/**
-	 * @param rid it is the id of the requirements
-	 * @param pid it is the id of the property to delete
-	 */
-	@Operation(tags = "version 1 - requirements", summary = "Delete a property from a requirement set", description = "")
-	@RequestMapping(value = "/{rid}/properties/{pid}", method = RequestMethod.DELETE)
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The requirement set or the property has not been found. You can retry the operation or create a requirement set/property.") })
 
+	
+	@Operation(tags = "version 1 - requirements", summary = "Delete a property from a requirement set", description = "")
+	@ApiResponses(value = { 
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The property doesn't exist at all in the workspace.")
+	})
+
+	@RequestMapping(value = "/{rid}/properties/{pid}", method = RequestMethod.DELETE)
 	public ResponseEntity<Resources<Void>> deleteProperty(@PathVariable("rid") Long rid,
 			@PathVariable("pid") Long pid) {
 

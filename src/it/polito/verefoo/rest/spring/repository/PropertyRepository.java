@@ -38,5 +38,15 @@ public interface PropertyRepository extends Neo4jRepository<DbProperty, Long> {
     void bindToGraph(@Param("id") Long id);
 
 
+
+    @Query("CYPHER 3.5 MATCH (p:DbProperty) WHERE id(p)=$id " +
+    "WITH p " +
+    "MATCH (g:DbGraph) WHERE id(g)=p.graph " +
+    "WITH p, g " +
+    "MATCH (p)-[r:PROPERTY_TO_GRAPH]->(g) " +
+    "DELETE r")
+    void unbindFromGraph(@Param("id") Long id);
+
+
     
 }

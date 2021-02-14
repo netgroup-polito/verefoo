@@ -234,7 +234,7 @@ public class SubstrateService {
                 }
             );
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The host " + substrateId + " doesn't exist.");
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The host " + substrateId + " doesn't exist.");
         }
 
         connectionRepository.saveAll(dbConnections.getConnection());

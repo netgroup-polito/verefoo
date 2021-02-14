@@ -26,6 +26,9 @@ import it.polito.verefoo.rest.spring.service.SubstrateService;
 @RestController
 @RequestMapping(value = "/adp/substrates", consumes = { "application/xml", "application/json" }, produces = {
 		"application/xml", "application/json" })
+@ApiResponses(value = {
+	@ApiResponse(responseCode = "400", description = "The provided resource is not compliant with the data model.")
+})
 public class SubstratesController {
 
 	@Autowired
@@ -39,9 +42,8 @@ public class SubstratesController {
 
 	@Operation(tags = "version 1 - substrates", summary = "Create an empty substrate", description = "Create a new physical network")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "201", description = "Created"),
-			@ApiResponse(responseCode = "500", description = "The server could not create a new substrate. You can do it over or retry later.")
-		})
+		@ApiResponse(responseCode = "201", description = "Created")
+	})
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	public ResponseEntity<Resources<Long>> createSubstrate() {
@@ -59,19 +61,17 @@ public class SubstratesController {
                                                 .addLink(url + "/" + substrateId, "self", RequestMethod.DELETE)
                                                 .addLink(url, "collection", RequestMethod.POST)
 												.wrap(substrateId));
-												
-			// TODO: add exception handling for all controllers; follow/modify the design accordingly
 	}
 
 
 	
 	@Operation(tags = "version 1 - substrates", summary = "Get all substrates ids", description = "")
-	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "No substrates have been found. You can retry the operation or first create a substrate.")
-		})
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "No substrates have been found.")
+	})
 
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	public ResponseEntity<Resources<List<Long>>> getSubstrates() {
 
 		List<Long> ids = service.getAllSubstrates();
@@ -88,13 +88,15 @@ public class SubstratesController {
                                                 .wrap(ids));
 	}
 
-	@Operation(tags = "version 1 - substrates", summary = "Delete all the substrates", description = "Be careful before cleaning the whole substrate workbench.")
-	@RequestMapping(value = "", method = RequestMethod.DELETE)
-	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The substrates don't exist at all. You can retry the operation first create a substrate.")
-		})
 
+
+	@Operation(tags = "version 1 - substrates", summary = "Delete all the substrates", description = "Be careful before cleaning the whole substrate workbench.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "304", description = "No substrate exists at all in the workspace.")
+	})
+
+	@RequestMapping(value = "", method = RequestMethod.DELETE)
 	public ResponseEntity<Resources<Void>> deleteSubstrates() {
 
 		service.deleteAllSubstrates();
@@ -110,12 +112,12 @@ public class SubstratesController {
 
 	
 	@Operation(tags = "version 1 - substrates", summary = "Delete a substrate", description = "The operation deletes all the hosts and connections of the substrate accordingly.")
-	@RequestMapping(value = "/{sid}", method = RequestMethod.DELETE)
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The selected substrate doesn't exist at all. You can eventually retry the operation or refer to another substrate.")
-		})
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The selected substrate doesn't exist at all.")
+	})
 
+	@RequestMapping(value = "/{sid}", method = RequestMethod.DELETE)
 	public ResponseEntity<Resources<Void>> deleteSubstrate(@PathVariable("sid") Long sid) {
 
 		service.deleteSubstrate(sid);
@@ -132,12 +134,12 @@ public class SubstratesController {
 
 
 	@Operation(tags = "version 1 - substrates", summary = "Add a collection of hosts in the substrate", description = "")
-	@RequestMapping(value = "/{sid}/hosts", method = RequestMethod.POST)
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "201", description = "Created"),
-			@ApiResponse(responseCode = "400", description = "The passed hosts resource is semantically malformed. You can retry the operation or check the data."),
-			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can first create a substrate or use an existing one.")
-		})
+		@ApiResponse(responseCode = "201", description = "Created"),
+		@ApiResponse(responseCode = "404", description = "The substrate doesn't exist at all in the workspace.")
+	})
+
+	@RequestMapping(value = "/{sid}/hosts", method = RequestMethod.POST)
 	public ResponseEntity<Resources<Void>> createHosts(@PathVariable("sid") Long sid, @RequestBody Hosts hosts) {
 
 		service.createHosts(sid, hosts);
@@ -160,11 +162,12 @@ public class SubstratesController {
 	
 
 	@Operation(tags = "version 1 - substrates", summary = "Get the collection of hosts in the substrate", description = "")
-	@RequestMapping(value = "/{sid}/hosts", method = RequestMethod.GET)
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can first create a substrate or use an existing one.")
-		})
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The substrate doesn't exist at all in the workspace.")
+	})
+
+	@RequestMapping(value = "/{sid}/hosts", method = RequestMethod.GET)
 	public ResponseEntity<Resources<Hosts>> getHosts(@PathVariable("sid") Long sid) {
 
 		Hosts hosts = service.getHosts(sid);
@@ -187,12 +190,13 @@ public class SubstratesController {
 	
 
 	@Operation(tags = "version 1 - substrates", summary = "Delete the list of hosts in the substrate", description = "The list is deleted only if no connections exists.")
-	@RequestMapping(value = "/{sid}/hosts", method = RequestMethod.DELETE)
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can first create a substrate or use an existing one.")
-		})
-	public ResponseEntity<Resources<Void>> deleteHosts(@PathVariable("sid") long sid) {
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The substrate doesn't exist at all in the workspace.")
+	})
+
+	@RequestMapping(value = "/{sid}/hosts", method = RequestMethod.DELETE)
+	public ResponseEntity<Resources<Void>> deleteHosts(@PathVariable("sid") Long sid) {
 
 		service.deleteHosts(sid);
 		
@@ -211,10 +215,13 @@ public class SubstratesController {
 	
 
 	@Operation(tags = "version 1 - substrates", summary = "Update a host in a substrate", description = "")
-	@RequestMapping(value = "/{sid}/hosts/{hid}", method = RequestMethod.PUT)
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The host or the substrate doesn't exist. You can retry the operation or create/use other substrates or hosts."), })
+	@ApiResponses(value = { 
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The host doesn't exist at all in the workspace."),
+		@ApiResponse(responseCode = "424", description = "One referred node doesn't exist.")
+	})
 
+	@RequestMapping(value = "/{sid}/hosts/{hid}", method = RequestMethod.PUT)
 	public ResponseEntity<Resources<Void>> updateHost(@PathVariable("sid") Long sid, @PathVariable("hid") String hid, @RequestBody Host host) {
 
 		service.updateHost(sid, hid, host);
@@ -240,12 +247,12 @@ public class SubstratesController {
 	
 
 	@Operation(tags = "version 1 - substrates", summary = "Get a host in a substrate", description = "")
-	@RequestMapping(value = "/{sid}/hosts/{hid}", method = RequestMethod.GET)
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The host or the substrate doesn't exist. You can retry the operation or refer to other hosts/substrates.")
+			@ApiResponse(responseCode = "200", description = ""),
+			@ApiResponse(responseCode = "404", description = "The host doesn't exist at all in the workspace.")
 		})
 
+	@RequestMapping(value = "/{sid}/hosts/{hid}", method = RequestMethod.GET)
 	public ResponseEntity<Resources<Host>> getHost(@PathVariable("sid") Long sid, @PathVariable("hid") String hid) {
 
 		Host host = service.getHost(sid, hid);
@@ -272,13 +279,12 @@ public class SubstratesController {
 	
 
 	@Operation(tags = "version 1 - substrates", summary = "Delete a host", description = "The host is deleted only if it is not implied in any connection.")
-	@RequestMapping(value = "/{sid}/hosts/{hid}", method = RequestMethod.DELETE)
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The host doesn't exist at all. You can retry the operation or consider other hosts."),
-			@ApiResponse(responseCode = "409", description = "The host cannot be deleted because it is implied in at least one connection. You can first delete the pertinent connections.")
-		})
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The host doesn't exist at all in the workspace.")
+	})
 
+	@RequestMapping(value = "/{sid}/hosts/{hid}", method = RequestMethod.DELETE)
 	public ResponseEntity<Resources<Void>> deleteHost(@PathVariable("sid") Long sid, @PathVariable("hid") String hid) {
 
 		service.deleteHost(sid, hid);
@@ -303,12 +309,12 @@ public class SubstratesController {
 	
 
 	@Operation(tags = "version 1 - substrates", summary = "Create a list of connections between hosts in the substrate", description = "The hosts must already exist. If some connections already exist, the new connections are just added; the duplicates are discarded.")
-	@RequestMapping(value = "/{sid}/connections", method = RequestMethod.POST)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "201", description = "Created"),
-			@ApiResponse(responseCode = "400", description = "The passed connections resource is semantically malformed. You can retry the operation or check the data."),
-			@ApiResponse(responseCode = "409", description = "The connections cannot be established between the existing hosts. You can check the hosts configuration or the connections.")
+			@ApiResponse(responseCode = "424", description = "The connections cannot be established between the hosts because at least one of them doesn't exist in the workspace.")
 		})
+	
+	@RequestMapping(value = "/{sid}/connections", method = RequestMethod.POST)
 	public ResponseEntity<Resources<Void>> createConnections(@PathVariable("sid") long sid, @RequestBody Connections connections) {
 
 		service.createConnections(sid, connections);
@@ -332,15 +338,14 @@ public class SubstratesController {
 	
 
 	@Operation(tags = "version 1 - substrates", summary = "Change all the connections between hosts in a substrate.", description = "The old connections will be lost.")
-	@RequestMapping(value = "/{sid}/connections", method = RequestMethod.PUT)
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "400", description = "The passed connections resource is semantically malformed. You can retry the operation or check the data."),
-			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can create a new substrate or refer to another one."),
-			@ApiResponse(responseCode = "409", description = "The connections cannot be established between the existing hosts. You can check the hosts configuration or the connections.")
-		})
+		@ApiResponse(responseCode = "200", description = "OK"),
+		@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can create a new substrate or refer to another one."),
+		@ApiResponse(responseCode = "424", description = "The connections cannot be established between the hosts because at least one of them doesn't exist in the workspace.")
+	})
 
-	public ResponseEntity<Resources<Void>> updateConnections(@PathVariable("sid") long sid, @RequestBody Connections connections) {
+	@RequestMapping(value = "/{sid}/connections", method = RequestMethod.PUT)
+	public ResponseEntity<Resources<Void>> updateConnections(@PathVariable("sid") Long sid, @RequestBody Connections connections) {
 
 		service.updateConnections(sid, connections);
 
@@ -362,13 +367,13 @@ public class SubstratesController {
 
 	
 	@Operation(tags = "version 1 - substrates", summary = "Get all the connections of a substrate", description = "")
-	@RequestMapping(value = "/{sid}/connections", method = RequestMethod.GET)
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can create a new one or refer to another one.")
-		})
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The substrate doesn't exist at all in the workspace.")
+	})
 
-	public ResponseEntity<Resources<Connections>> getConnections(@PathVariable("sid") long sid) {
+	@RequestMapping(value = "/{sid}/connections", method = RequestMethod.GET)
+	public ResponseEntity<Resources<Connections>> getConnections(@PathVariable("sid") Long sid) {
 
 		Connections connections = service.getConnections(sid);
 
@@ -390,12 +395,13 @@ public class SubstratesController {
 
 	
 	@Operation(tags = "version 1 - substrates", summary = "Delete all the connections of a substrate", description = "")
-	@RequestMapping(value = "/{sid}/connections", method = RequestMethod.DELETE)
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The substrate doesn't exist. You can retry the operation or refer to another substrate."), })
-
-	public ResponseEntity<Resources<Void>> deleteConnections(@PathVariable("sid") long sid) {
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The substrate doesn't exist at all in the workspace.")
+	})
+	
+	@RequestMapping(value = "/{sid}/connections", method = RequestMethod.DELETE)
+	public ResponseEntity<Resources<Void>> deleteConnections(@PathVariable("sid") Long sid) {
 		
 		service.deleteConnections(sid);
 

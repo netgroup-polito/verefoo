@@ -28,6 +28,9 @@ import it.polito.verefoo.rest.spring.service.SimulationService;
 @RestController
 @RequestMapping(value = "/adp/simulations", consumes = { "application/xml", "application/json" }, produces = {
 		"application/xml", "application/json" })
+@ApiResponses(value = {
+	@ApiResponse(responseCode = "400", description = "The provided resource is not compliant with the data model.")
+})
 public class SimulationsController {
 
 	@Autowired
@@ -36,16 +39,14 @@ public class SimulationsController {
 	@Autowired
 	SimulationService service;
 
-	/**
-	 * @param nfv it is the NFV object on which the simulation must be performed
-	 * @return the result of the simulation
-	 */
+
+
 	@Operation(tags = "version 1 - simulations", summary = "Run a simulation by passing the actual NFV", description = "This is an all-in-one service, since the relative data structures (like graphs) are created automatically and they will be retrievable with the pertinent APIs separately.")
-	@RequestMapping(value = "", method = RequestMethod.POST)
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "400", description = "The NFV or the requirement set is semantically malformed. You can retry the operation or check the data.")
-		})
+		@ApiResponse(responseCode = "200", description = "")
+	})
+
+	@RequestMapping(value = "", method = RequestMethod.POST)
 	public ResponseEntity<Resources<Long>> runSimulationByNFV(@RequestBody NFV nfv, @RequestParam(value = "fid", required = false) List<FunctionalTypes> usableFunctionalTypes) {
 
 		try {
@@ -66,20 +67,15 @@ public class SimulationsController {
 						.wrap(simulationId));
 	}
 
-	/**
-	 * @param gid                   it is the id of the graph
-	 * @param rid                   it is the id of the requirements set
-	 * @param sid                   it is the id of the substrate network
-	 * @param usableFunctionalTypes it is a list of functions name
-	 * @return the simulation result
-	 * @throws Exception
-	 */
-	@Operation(tags = "version 1 - simulations", summary = "Run a simulation by passing references to data structures", description = "At the moment, neither network forwarding paths nor the parsing string can be passed; use the other simulation API instead.")
-	@RequestMapping(value = "/byParams", method = RequestMethod.POST)
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "400", description = "One of the parameters is semantically malformed. You can retry the operation or check the data."),
-			@ApiResponse(responseCode = "404", description = "At least one resource referenced by some parameter has not been found. You can retry the operation or check that the resources actually exist.") })
 
+
+	@Operation(tags = "version 1 - simulations", summary = "Run a simulation by passing references to data structures", description = "At the moment, neither network forwarding paths nor the parsing string can be passed; use the other simulation API instead.")
+	@ApiResponses(value = { 
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "At least one resource referenced by some parameter doesn't exist in the workspace.")
+	})
+
+	@RequestMapping(value = "/byParams", method = RequestMethod.POST)
 	public ResponseEntity<Resources<Long>> runSimulationByParams(@RequestParam(value = "gid", required = true) Long gid,
 			@RequestParam(value = "rid", required = false) Long rid,
 			@RequestParam(value = "sid", required = false) Long sid,
@@ -109,10 +105,12 @@ public class SimulationsController {
 
 
 	@Operation(tags = "version 1 - simulations", summary = "Get the result of a past simulation", description = "This API is not intended to run a new simulation.")
-	@RequestMapping(value = "/{smid}", method = RequestMethod.GET)
-	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
-			@ApiResponse(responseCode = "404", description = "The requested simulation has never been run. You can retry the operation or run a simulation first.") })
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The requested simulation doesn't exist in the workspace.")
+	})
 
+	@RequestMapping(value = "/{smid}", method = RequestMethod.GET)
 	public ResponseEntity<Resources<NFV>> getSimulationResult(@PathVariable("smid") Long smid) throws Exception {
 
 		NFV result = service.getSimulationResult(smid);

@@ -44,12 +44,12 @@ public class TestCasesController {
 	private Logger loggerModel = LogManager.getLogger("model");
 
 	@Operation(summary = "runTestCases", description = "run test cases")
-	@RequestMapping(value = "", method = RequestMethod.GET)
 	@ApiResponses(value = {
 		    		@ApiResponse(responseCode = "200", description = "Ok"),
 		    		@ApiResponse(responseCode = "400", description = "Bad Request")
 		    		})
 	
+	@RequestMapping(value = "", method = RequestMethod.GET)
 	public void runtestCase(@RequestParam(value="id", required = true) Integer id, //0 only allocation, 1 only policies, 2 both
 							@RequestParam(value="seed", required = true) Integer seed,
 							@RequestParam(value="i", required = true) Integer i,

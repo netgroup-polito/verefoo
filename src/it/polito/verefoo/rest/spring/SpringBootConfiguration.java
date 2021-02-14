@@ -100,7 +100,7 @@ public class SpringBootConfiguration {
         objectMapper.enable(MapperFeature.USE_ANNOTATIONS);
         mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
 
-        return new HttpMessageConverters(false,
+        return new HttpMessageConverters(true,
                 Arrays.asList(mappingJackson2HttpMessageConverter, new Jaxb2RootElementHttpMessageConverter()));
     }
 

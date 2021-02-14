@@ -73,7 +73,7 @@ public class GraphService {
                 });
 
                 if (graphs.getGraph().isEmpty()) {
-                        throw new ResponseStatusException(HttpStatus.NO_CONTENT, "No graph is in the workspace.");
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No graph is in the workspace.");
                 } else {
                         return graphs;
                 }

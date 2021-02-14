@@ -128,7 +128,11 @@ public class RequirementService {
     @Transactional
     public Long createProperty(Long id, Property property) {
         DbProperty dbProperty = propertyRepository.save(converter.deserializeProperty(property));
-        requirementRepository.bindProperty(id, dbProperty.getId());
+        try {
+            requirementRepository.bindProperty(id, dbProperty.getId());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The requirements set " + id + " doesn't exist.");
+        }
         // create the edge as a foreign key
         try {
             propertyRepository.bindToGraph(dbProperty.getId());
@@ -171,12 +175,18 @@ public class RequirementService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The property " + propertyId + " doesn't exist.");
         }
 
+        // detach
+        propertyRepository.unbindFromGraph(propertyId);
         // merge
         newDbProperty.setId(propertyId);
         newDbProperty.getHTTPDefinition().setId(oldDbProperty.getHTTPDefinition().getId());
         newDbProperty.getPOP3Definition().setId(oldDbProperty.getPOP3Definition().getId());
         propertyRepository.save(newDbProperty);
-
+        try {
+            propertyRepository.bindToGraph(propertyId);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "The referred graph doesn't exist");
+        }
     }
 
 }
