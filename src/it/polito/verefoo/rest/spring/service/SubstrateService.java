@@ -46,11 +46,13 @@ public class SubstrateService {
     @Autowired
     SubstrateConverter converter;
 
+    @Transactional
     public Long createSubstrate() {
         DbHosts dbHosts = new DbHosts();
         return hostsRepository.save(dbHosts).getId();
     }
 
+    @Transactional
     public List<Long> getAllSubstrates() {
         List<Long> substrateIds = new ArrayList<>();
         hostsRepository.findAll(-1).forEach(substrate -> substrateIds.add(substrate.getId()));
@@ -62,6 +64,7 @@ public class SubstrateService {
         }
     }
 
+    @Transactional
     public void deleteAllSubstrates() {
         if (hostsRepository.count() == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_MODIFIED, "The workspace is already clean of substrates.");
@@ -70,6 +73,7 @@ public class SubstrateService {
         }
     }
 
+    @Transactional
     public void deleteSubstrate(Long id) {
         if (hostsRepository.existsById(id) == false) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The substrate " + id + " doesn't exist.");
@@ -93,6 +97,7 @@ public class SubstrateService {
         }
     }
 
+    @Transactional
     public Hosts getHosts(Long substrateId) {
         Optional<DbHosts> dbHosts = hostsRepository.findById(substrateId, -1);
         if (dbHosts.isPresent()) {
@@ -102,6 +107,7 @@ public class SubstrateService {
         }
     }
 
+    @Transactional
     public void deleteHosts(Long substrateId) {
         if (hostsRepository.existsById(substrateId)) {
             hostsRepository.deleteHosts(substrateId);
@@ -195,6 +201,7 @@ public class SubstrateService {
         }
     }
 
+    @Transactional
     public Host getHost(Long substrateId, String hostName) {
         Optional<DbHost> dbHost = hostRepository.findByName(hostName);
         if (dbHost.isPresent()) {
@@ -218,6 +225,7 @@ public class SubstrateService {
         hostRepository.deleteById(dbHost.getId());
     }
 
+    @Transactional
 	public void createConnections(Long substrateId, Connections connections) {
         DbConnections dbConnections = converter.deserializeConnections(connections);
         // Some properties can be retrieved only from the db, so this snippet finalizes
@@ -246,6 +254,7 @@ public class SubstrateService {
      * @param substrateId
      * @param connections
      */
+    @Transactional
 	public void updateConnections(Long substrateId, Connections connections) {
         // this methodology is applicable because the id of connections is not visible to the
         // user
@@ -254,6 +263,7 @@ public class SubstrateService {
         
 	}
 
+    @Transactional
 	public void deleteConnections(Long substrateId) {
         if (hostsRepository.existsById(substrateId)) {
             connectionRepository.deleteAllConnectionsBySubstrateId(substrateId);
@@ -263,6 +273,7 @@ public class SubstrateService {
         
 	}
 
+    @Transactional
 	public Connections getConnections(Long substrateId) {
         Connections connections = new Connections();
         if (hostsRepository.existsById(substrateId)) {

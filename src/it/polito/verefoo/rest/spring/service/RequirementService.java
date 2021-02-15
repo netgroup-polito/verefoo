@@ -30,6 +30,7 @@ public class RequirementService {
     @Autowired
     RequirementConverter converter;
 
+    @Transactional
     public List<PropertyDefinition> getRequirementsSets() {
         List<PropertyDefinition> requirementsSets = new ArrayList<>();
         requirementRepository.findAll(-1).forEach(dbRequirementsSet -> {
@@ -42,6 +43,7 @@ public class RequirementService {
         }
     }
 
+    @Transactional
     public void deleteRequirementsSets() {
         if (requirementRepository.count() > 0) {
             requirementRepository.deleteAll();
@@ -69,6 +71,7 @@ public class RequirementService {
         return dbPropertyDefinition.getId();
     }
 
+    @Transactional
     public void deleteRequirementsSet(Long id) {
         if (requirementRepository.existsById(id)) {
             requirementRepository.deleteById(id);
@@ -77,6 +80,7 @@ public class RequirementService {
         }
     }
 
+    @Transactional
     public PropertyDefinition getRequirementsSet(Long id) {
         Optional<DbPropertyDefinition> dbPropertyDefinition = requirementRepository.findById(id, -1);
         if (dbPropertyDefinition.isPresent()) {
@@ -154,6 +158,7 @@ public class RequirementService {
         
     }
 
+    @Transactional
     public Property getProperty(Long id, Long propertyId) {
         Optional<DbProperty> dbProperty = propertyRepository.findById(propertyId, -1);
         if (dbProperty.isPresent()) {

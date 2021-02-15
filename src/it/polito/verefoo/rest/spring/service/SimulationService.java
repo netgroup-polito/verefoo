@@ -13,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 import it.polito.verefoo.DbNFV;
 import it.polito.verefoo.jaxb.Constraints;
 import it.polito.verefoo.jaxb.Graphs;
-import it.polito.verefoo.jaxb.Hosts;
 import it.polito.verefoo.jaxb.LinkConstraints;
 import it.polito.verefoo.jaxb.NFV;
 import it.polito.verefoo.jaxb.NodeConstraints;
@@ -89,6 +88,7 @@ public class SimulationService {
 		return simulationRepository.save(dbNFV).getId();
 	}
 
+	@Transactional
 	public NFV getSimulationResult(Long id) throws Exception {
 		NFV nfv = new NFV();
 		DbNFV dbNFV;
@@ -130,7 +130,6 @@ public class SimulationService {
 		return nfv;
 	}
 
-	@Transactional
 	public NFV buildNFVFromParams(Long graphId, Long requirementsSetId, Long substrateId) {
 		NFV nfv = new NFV();
 		nfv.setGraphs(new Graphs());
@@ -157,7 +156,7 @@ public class SimulationService {
 			nfv.getPropertyDefinition().getProperty().forEach(property -> property.setGraph(graphId));
 		}
 		
-		// no network forwarding paths nor parsing string here
+		// no network forwarding paths nor parsing string here: their values remain null
 
 		return nfv;
 

@@ -45,10 +45,8 @@ public class DevelopmentController {
     @RequestMapping(value = "/convertPojoToJsonSchemas", method = RequestMethod.POST)
     public void converter() throws IOException, ClassNotFoundException {
 
-        // Incidentally, the false parameter to the SubTypesScanner constructor is
-        // essential
-        // to include the Object class and therefore correctly performing the
-        // getSubTypesOf method
+        // Incidentally, the false parameter to the SubTypesScanner constructor is essential
+        // to include the Object class and therefore correctly performing the getSubTypesOf method
         Reflections reflections = new Reflections(
                 new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage("it.polito.verefoo.jaxb"))
                         .setScanners(new SubTypesScanner(false), new TypeAnnotationsScanner()));
@@ -63,6 +61,7 @@ public class DevelopmentController {
         // now convert classes into json Schemas
         SchemaGeneratorConfigBuilder configBuilder = new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_7,
                 OptionPreset.PLAIN_JSON);
+        // USE_ANNOTATIONS only considers Json mapping annotations, like @JsonProperty
         configBuilder.getObjectMapper().enable(MapperFeature.USE_ANNOTATIONS);
         configBuilder.getObjectMapper().enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY);
         configBuilder.getObjectMapper().setSerializationInclusion(Include.NON_EMPTY);

@@ -56,6 +56,7 @@ public class GraphService {
          * @param graphs
          * @return the generated ids for the graphs
          */
+        @Transactional
         public List<Long> createGraphs(Graphs graphs) {
                 List<Long> ids = new ArrayList<>();
                 graphs.getGraph().forEach(graph -> {
@@ -66,6 +67,7 @@ public class GraphService {
                 return ids;
         }
 
+        @Transactional
         public Graphs getGraphs() {
                 Graphs graphs = new Graphs();
                 graphRepository.findAll(-1).forEach(dbGraph -> {
@@ -79,6 +81,7 @@ public class GraphService {
                 }
         }
 
+        @Transactional
         public void deleteGraphs() {
                 if (graphRepository.count() == 0) {
                         throw new ResponseStatusException(HttpStatus.NOT_MODIFIED, "The workspace is already clean of graphs.");
@@ -137,6 +140,7 @@ public class GraphService {
 
         }
 
+        @Transactional
         public void deleteGraph(Long id) {
                 if (graphRepository.existsById(id) == false) {
                         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The graph " + id + " doesn't exist.");
@@ -147,6 +151,7 @@ public class GraphService {
                 }
         }
 
+        @Transactional
         public Graph getGraph(Long id) {
                 Optional<DbGraph> dbGraph = graphRepository.findById(id, -1);
                 if (dbGraph.isPresent())
@@ -168,13 +173,6 @@ public class GraphService {
                 }
         }
 
-        /**
-         * TODO: decide what happens if this node is defined as neighbour of another
-         * node
-         * 
-         * @param id
-         * @param nodeId
-         */
         @Transactional
         public void deleteNode(Long id, Long nodeId) {
                 if (nodeRepository.isReferred(nodeId)) {
@@ -225,6 +223,7 @@ public class GraphService {
                 }
         }
 
+        @Transactional
         public Node getNode(Long id, Long nodeId) {
                 Optional<DbNode> dbNode = nodeRepository.findById(nodeId, -1);
                 if (dbNode.isPresent()) {
@@ -233,6 +232,7 @@ public class GraphService {
                         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The node " + nodeId + " doesn't exist.");
         }
 
+        @Transactional
         public Long createNeighbour(Long id, Long nodeId, Neighbour neighbour) {
                 if (nodeRepository.existsById(nodeId)) {
                         DbNeighbour dbNeighbour = neighbourRepository.save(converter.deserializeNeighbour(neighbour));
@@ -244,7 +244,7 @@ public class GraphService {
                 
         }
 
-        // This method may become public and bound to a controller
+        @Transactional
         private void updateNeighbour(Long id, Long nodeId, Long neighbourId, Neighbour neighbour) {
                 DbNeighbour newDbNeighbour = converter.deserializeNeighbour(neighbour);
                 newDbNeighbour.setId(neighbourId);
@@ -261,10 +261,12 @@ public class GraphService {
                 }
         }
 
+        @Transactional
         public Configuration getConfiguration(Long id, Long nodeId) {
                 return converter.serializeConfiguration(nodeRepository.findConfiguration(nodeId));
         }
 
+        @Transactional
         public void updateConfiguration(Long id, Long nodeId, Long configurationId, Configuration configuration) {
                 if (nodeRepository.existsById(nodeId)) {
                         DbConfiguration newDbConfiguration = converter.deserializeConfiguration(configuration);
@@ -301,6 +303,7 @@ public class GraphService {
                 else return DbFunctionalTypes.ANTISPAM;
         }
 
+        @Transactional
         public void createConstraints(Long id, Constraints constraints) {
                 if (graphRepository.existsById(id)) {
                         DbConstraints dbConstraints = converter.deserializeConstraints(constraints);
@@ -313,6 +316,7 @@ public class GraphService {
                 
         }
 
+        @Transactional
         public void deleteConstraints(Long id) {
                 if (graphRepository.existsById(id)) {
                         constraintsRepository.deleteByGraphId(id);
@@ -321,6 +325,7 @@ public class GraphService {
                 }
         }
 
+        @Transactional
         public Constraints getConstraints(Long id) {
                 Optional<DbConstraints> dbConstraints = constraintsRepository.findByGraphId(id);
                 if (dbConstraints.isPresent()) {
