@@ -56,13 +56,6 @@
 			<artifactId>jackson-dataformat-xml</artifactId>
 		</dependency>
 
-		<!-- Module to generate draft-3 JSON schemas from JAXB-generated POJOs -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.module</groupId>
-			<artifactId>jackson-module-jsonSchema</artifactId>
-			<version>2.12.0</version>
-		</dependency>
-
 		<!-- Module to generate draft-7 JSON schemas from JAXB-generated POJOs -->
 		<dependency>
 			<groupId>com.github.victools</groupId>
@@ -109,12 +102,6 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/lib/lib4j/log4j-core-2.9.1.jar</systemPath>
 		</dependency>
-
-		<!-- <dependency>
-			<groupId>com.googlecode.json-simple</groupId>
-			<artifactId>json-simple</artifactId>
-			<version>1.1.1</version>
-		</dependency> -->
 
 		<!-- Jersey 2.19 -->
 		<dependency>

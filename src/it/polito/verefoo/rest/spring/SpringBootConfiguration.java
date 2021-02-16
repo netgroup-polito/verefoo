@@ -38,7 +38,6 @@ import io.swagger.v3.oas.models.tags.Tag;
 
 // TODO #jalol separate config from rest api
 @SpringBootApplication
-// @EnableSwagger2
 // A client implementation should activate this annotation and use the injected bean RestTemplate, which works as a rest client along with hyperlinks
 // @EnableHypermediaSupport(type = HypermediaType.HAL)
 public class SpringBootConfiguration {
@@ -134,8 +133,9 @@ public class SpringBootConfiguration {
         servers.add(server);
 
         return new OpenAPI().components(new Components()).servers(servers)
-                .info(new Info().title("Verefoo API documentation")
-                        .description("This is the automatically-generated documentation of Verefoo's REST APIs."))
+                .info(new Info().title("Verefoo REST API Online Swagger documentation")
+                        .description("This is the automatically-generated documentation of the Verefoo's REST APIs, in the format of an openapi file, compliant with Swagger version 3, here shown in a user-friendly interface.\n\nCurrently, the version 2 of the REST APIs is not implemented.")
+                        .version("versions 1, 2"))
                 .tags(tags);
     }
 
@@ -153,12 +153,4 @@ public class SpringBootConfiguration {
         };
     }
 
-    /*
-     * This bean works for Swagger 2, which has been disabled in favour of Swagger 3
-     *
-     * @Bean public Docket apiDocket() { return new
-     * Docket(DocumentationType.SWAGGER_2) .select()
-     * .apis(RequestHandlerSelectors.basePackage("it.polito.verefoo.rest.spring"))
-     * .paths(PathSelectors.any()) .build(); }
-     */
 }
