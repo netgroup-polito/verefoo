@@ -329,6 +329,8 @@ public class VerefooProxy {
 		if(level != 0) {
 			if(current.getNode().getFunctionalType() == FunctionalTypes.WEBCLIENT || current.getNode().getFunctionalType() == FunctionalTypes.WEBSERVER) {
 				//traffic is not forwarded anymore
+				visited.remove(current.getNode().getName());
+				currentPath.remove(level);
 				return;
 			}
 		}
@@ -349,6 +351,7 @@ public class VerefooProxy {
 		currentPath.remove(level);
 		return;
 	}
+
 
 
 	
