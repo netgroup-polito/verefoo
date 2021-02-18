@@ -1,5 +1,7 @@
 package it.polito.verefoo.rest.spring.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -178,6 +180,19 @@ public class SimulationService {
 		} else {
 			throw new ResponseStatusException(HttpStatus.NOT_MODIFIED, "The workspace is already clean of simulation results.");
 		}
+	}
+
+	public List<NFV> getSimulationResults() {
+		List<NFV> nfvs = new ArrayList<>();
+		if (simulationRepository.count() > 0) {
+			simulationRepository.findAll(-1).forEach(dbNfv -> {
+				nfvs.add(getSimulationResult(dbNfv.getId()));
+			});
+		} else {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No simulation result exist in the workspace.");
+		}
+		
+		return nfvs;
 	}
 
     

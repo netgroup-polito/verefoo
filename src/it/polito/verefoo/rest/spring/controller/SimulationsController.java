@@ -127,6 +127,27 @@ public class SimulationsController {
 
 
 
+	@Operation(tags = "version 1 - simulations", summary = "Get the result of a past simulation", description = "This API is not intended to run a new simulation.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "No simulation results currently exist in the workspace. You can start by performing a new simulation.")
+	})
+
+	@RequestMapping(value = "", method = RequestMethod.GET)
+	public ResponseEntity<Resources<List<NFV>>> getSimulationResults() {
+
+		List<NFV> results = service.getSimulationResults();
+
+		String url = request.getRequestURL().toString();
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<List<NFV>>()
+						.addLink(url, "collection", RequestMethod.POST)
+						.wrap(results));
+	}
+
+
+
 	@Operation(tags = "version 1 - simulations", summary = "Delete the result of a past simulation", description = "")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = ""),
