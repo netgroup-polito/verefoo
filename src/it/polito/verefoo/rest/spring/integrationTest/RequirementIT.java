@@ -77,7 +77,10 @@ public class RequirementIT {
         property.setGraph(graphId);
     }
 
-    
+    /**
+     * Test controllers which manage the {@code PropertyDefinition} collection
+     * @throws Exception
+     */
     @Test
     public void test0AllRequirementsSets() throws Exception {
 
@@ -93,6 +96,9 @@ public class RequirementIT {
         deleteRequirementsSets();
     }
 
+    /**
+     * Test controllers which manage a single {@code PropertyDefinition} (a.k.a. requirementsSet) resource
+     */
     @Test
     public void test1OneRequirementsSet() throws Exception {
         // create requirements set
@@ -117,6 +123,9 @@ public class RequirementIT {
         deleteRequirementsSets();
     }
 
+    /**
+     * Test controllers which manage a single {@code Property} resource at a time
+     */
     @Test
     public void test2OneProperty() throws Exception {
         // create requirements set

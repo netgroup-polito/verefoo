@@ -1,9 +1,21 @@
 package it.polito.verefoo.rest.spring.integrationTest;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.apache.commons.lang3.EnumUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -23,22 +35,6 @@ import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Graphs;
 import it.polito.verefoo.jaxb.Host;
 import it.polito.verefoo.jaxb.Hosts;
-import it.polito.verefoo.jaxb.SupportedVNFType;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -81,7 +77,10 @@ public class SubstrateIT {
     }
 
 
-
+    /**
+     * Test controllers which manage all the {@code Substrate} resources at a time
+     * @throws Exception
+     */
     @Test
     public void test0AllSubstrates() throws Exception {
         // create substrates (> 1)
@@ -100,7 +99,9 @@ public class SubstrateIT {
 
 
 
-
+    /**
+     * Test controllers which manage a single {@code Substrate} resource at a time
+     */
     @Test
     public void test1OneSubstrate() throws Exception {
         // create substrates (1)
@@ -123,7 +124,9 @@ public class SubstrateIT {
 
 
 
-
+    /**
+     * Test controllers which manage a single {@code Host} resource at a time
+     */
     @Test
     public void test2OneHost() throws Exception {
         // create substrates (1)
@@ -159,7 +162,10 @@ public class SubstrateIT {
 
 
 
-
+    /**
+     * Test controllers which manage all the {@code Connection} resources of a substrate
+     * @throws Exception
+     */
     @Test
     public void test3Connections() throws Exception {
         // create substrates (1)

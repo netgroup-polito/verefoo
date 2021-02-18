@@ -72,7 +72,10 @@ public class GraphIT {
     }
 
 
-
+    /**
+     * Test controllers which manage the {@code Graphs} collection, that is all the graphs in the workspace
+     * @throws Exception
+     */
     @Test
     public void test0AllGraphs() throws Exception {
 
@@ -90,7 +93,9 @@ public class GraphIT {
     }
 
 
-
+    /**
+     * Test controllers which manage a single {@code Graph} resource at a time
+     */
     @Test
     public void test1OneGraph() throws Exception {
 
@@ -129,7 +134,10 @@ public class GraphIT {
     }
 
 
-
+    /**
+     * Test controllers which manage the {@code Neighbour} resources
+     * @throws Exception
+     */
     @Test
     public void test2Neighbours() throws Exception {
         // create a graph
@@ -165,7 +173,10 @@ public class GraphIT {
     }
 
 
-
+    /**
+     * Test controllers which manage the {@code Node} resource
+     * @throws Exception
+     */
     @Test
     public void test3OneNode() throws Exception {
         // create a graph
@@ -226,6 +237,10 @@ public class GraphIT {
 
     }
 
+    /**
+     * Test controllers which manage the {@code Constraints} resource
+     * @throws Exception
+     */
     @Test
     public void test4Constraints() throws Exception {
         // create a graph

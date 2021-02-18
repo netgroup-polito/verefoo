@@ -80,7 +80,10 @@ public class SimulationIT {
     }
 
 
-
+    /**
+     * Test the controller to run a simulation by passing the whole {@code NFV} resource
+     * @throws Exception
+     */
     @Test
     public void test0ByNFV() throws Exception {
 
@@ -96,6 +99,10 @@ public class SimulationIT {
         end();
     }
 
+    /**
+     * Test the controller to run a simulation by passing previously-defined resources as parameters
+     * @throws Exception
+     */
     @Test
     public void test1ByParams() throws Exception {
 
@@ -114,6 +121,10 @@ public class SimulationIT {
         assertEquals(nfv.getPropertyDefinition().getProperty().size(), resultNFV.getPropertyDefinition().getProperty().size());
     }
 
+    /**
+     * Test the controller to run a simulation by passing the whole {@code NFV} resource
+     * @throws Exception
+     */
     @Test
     public void test2ByNFV() throws Exception {
 
@@ -129,6 +140,10 @@ public class SimulationIT {
         end();
     }
 
+    /**
+     * Test the controller to run a simulation by passing previously-defined resources as parameters
+     * @throws Exception
+     */
     @Test
     public void test3ByParams() throws Exception {
 
