@@ -91,7 +91,7 @@ public class SimulationsController {
 					"The simulation request is semantically malformed. Cause: " + e.getMessage());
 		}
 
-		Long simulationId = service.createSimulationResult(gid, rid, sid);
+		Long simulationId = service.createSimulationResult(nfv, gid, rid, sid);
 
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.OK).body(

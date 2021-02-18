@@ -184,8 +184,12 @@ public class RequirementService {
         propertyRepository.unbindFromGraph(propertyId);
         // merge
         newDbProperty.setId(propertyId);
-        newDbProperty.getHTTPDefinition().setId(oldDbProperty.getHTTPDefinition().getId());
-        newDbProperty.getPOP3Definition().setId(oldDbProperty.getPOP3Definition().getId());
+        if (newDbProperty.getHTTPDefinition() != null) {
+            newDbProperty.getHTTPDefinition().setId(oldDbProperty.getHTTPDefinition().getId());
+        }
+        if (newDbProperty.getPOP3Definition() != null) {
+            newDbProperty.getPOP3Definition().setId(oldDbProperty.getPOP3Definition().getId());
+        }
         propertyRepository.save(newDbProperty);
         try {
             propertyRepository.bindToGraph(propertyId);

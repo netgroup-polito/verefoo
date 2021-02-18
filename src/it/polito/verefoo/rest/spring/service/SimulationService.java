@@ -80,11 +80,12 @@ public class SimulationService {
 	}
 
 	@Transactional
-	public Long createSimulationResult(Long gid, Long rid, Long sid) {
+	public Long createSimulationResult(NFV nfv, Long gid, Long rid, Long sid) {
 		DbNFV dbNFV = new DbNFV();
 		dbNFV.getGraph().add(gid);
 		dbNFV.setPropertyDefinition(rid);
 		dbNFV.setSubstrate(sid);
+		requirementService.updateRequirementsSet(rid, nfv.getPropertyDefinition());
 		return simulationRepository.save(dbNFV).getId();
 	}
 
