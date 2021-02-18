@@ -90,7 +90,7 @@ public class SimulationService {
 	}
 
 	@Transactional
-	public NFV getSimulationResult(Long id) throws Exception {
+	public NFV getSimulationResult(Long id) {
 		NFV nfv = new NFV();
 		DbNFV dbNFV;
 		Optional<DbNFV> tmp = simulationRepository.findById(id, -1);
@@ -161,6 +161,23 @@ public class SimulationService {
 
 		return nfv;
 
+	}
+
+	public void deleteSimulationResult(Long id) {
+		if (simulationRepository.existsById(id)) {
+			simulationRepository.deleteById(id);
+		} else {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The simulation " + id + " doesn't exist.");
+		}
+		
+	}
+
+	public void deleteSimulationResults() {
+		if (simulationRepository.count() > 0) {
+			simulationRepository.deleteAll();
+		} else {
+			throw new ResponseStatusException(HttpStatus.NOT_MODIFIED, "The workspace is already clean of simulation results.");
+		}
 	}
 
     

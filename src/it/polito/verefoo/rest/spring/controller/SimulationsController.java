@@ -111,17 +111,61 @@ public class SimulationsController {
 	})
 
 	@RequestMapping(value = "/{smid}", method = RequestMethod.GET)
-	public ResponseEntity<Resources<NFV>> getSimulationResult(@PathVariable("smid") Long smid) throws Exception {
+	public ResponseEntity<Resources<NFV>> getSimulationResult(@PathVariable("smid") Long smid) {
 
 		NFV result = service.getSimulationResult(smid);
 
 		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<NFV>()
 						.addLink(url + "/" + smid, "self", RequestMethod.GET)
 						.addLink(url, "collection", RequestMethod.POST)
 						.wrap(result));
+	}
+
+
+
+	@Operation(tags = "version 1 - simulations", summary = "Delete the result of a past simulation", description = "")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "404", description = "The requested simulation doesn't exist in the workspace.")
+	})
+
+	@RequestMapping(value = "/{smid}", method = RequestMethod.DELETE)
+	public ResponseEntity<Resources<Void>> deleteSimulationResult(@PathVariable("smid") Long smid) {
+
+		service.deleteSimulationResult(smid);
+
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<Void>()
+						.addLink(url, "collection", RequestMethod.POST)
+						.wrap(null));
+	}
+
+
+	@Operation(tags = "version 1 - simulations", summary = "Delete all the results of past simulations", description = "")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = ""),
+		@ApiResponse(responseCode = "304", description = "No simulation results are in the workspace at all.")
+	})
+
+	@RequestMapping(value = "", method = RequestMethod.DELETE)
+	public ResponseEntity<Resources<Void>> deleteSimulationResults() {
+
+		service.deleteSimulationResults();
+
+		String url = request.getRequestURL().toString();
+		url = url.substring(0, url.lastIndexOf("/"));
+		return ResponseEntity.status(HttpStatus.OK).body(
+				// wrap the response with the hyperlinks
+				new ResourceWrapperWithLinks<Void>()
+						.addLink(url, "collection", RequestMethod.POST)
+						.wrap(null));
 	}
 
 }
