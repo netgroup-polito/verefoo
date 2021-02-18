@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import it.polito.verefoo.VerefooSerializer;
+import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.NFV;
 import it.polito.verefoo.rest.spring.ResourceWrapperWithLinks;
@@ -52,9 +53,10 @@ public class SimulationsController {
 		try {
 			// the nfv is modified in place by VerefooSerializer
 			new VerefooSerializer(nfv);
+		} catch (BadGraphError e) {
+			throw verefooCoreExceptionBuilder(e);
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-					"The simulation request is semantically malformed. Cause: " + e.getMessage());
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 
 		Long simulationId = service.createSimulationResult(nfv);
@@ -86,9 +88,10 @@ public class SimulationsController {
 		try {
 			// the nfv is modified in place by VerefooSerializer
 			new VerefooSerializer(nfv);
+		} catch (BadGraphError e) {
+			throw verefooCoreExceptionBuilder(e);
 		} catch (Exception e) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-					"The simulation request is semantically malformed. Cause: " + e.getMessage());
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 
 		Long simulationId = service.createSimulationResult(nfv, gid, rid, sid);
@@ -187,6 +190,48 @@ public class SimulationsController {
 				new ResourceWrapperWithLinks<Void>()
 						.addLink(url, "collection", RequestMethod.POST)
 						.wrap(null));
+	}
+
+
+	/**
+	 * Beware that with some HTTP status codes (like {@literal INTERNAL_SERVER_ERROR} ) the descriptive message is
+	 * automatically neglected by HTTP parsers
+	 * @param badGraphError
+	 * @return an exception that should be thrown (the exception is returned, but not thrown by this method)
+	 */
+	private ResponseStatusException verefooCoreExceptionBuilder(BadGraphError badGraphError) {
+		HttpStatus returnStatus;
+		switch (badGraphError.getE()) {
+			case INVALID_NODE_CONFIGURATION:
+			case INVALID_PARSING_STRING:
+			case INVALID_PROPERTY_DEFINITION:
+			case INVALID_SERVICE_GRAPH:
+			case INVALID_VPN_CONFIGURATION:
+			case NO_MIDDLE_HOST_DEFINED:
+				returnStatus = HttpStatus.BAD_REQUEST;
+				break;
+			case INVALID_PHY_SERVER_CLIENT_CONF:
+			case INVALID_SERVER_CLIENT_CONF:
+				returnStatus = HttpStatus.FORBIDDEN;
+				break;
+			case XML_VALIDATION_ERROR:
+				returnStatus = HttpStatus.UNPROCESSABLE_ENTITY;
+				break;
+			case PHY_CLIENT_SERVER_NOT_CONNECTED:
+				returnStatus = HttpStatus.SERVICE_UNAVAILABLE;
+				break;
+			case INTERNAL_SERVER_ERROR:
+			default:
+				returnStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+				break;
+		}
+		String returnMessage = "";
+		if (badGraphError.getE() != null) {
+			returnMessage += "Type of error: " + badGraphError.getE() + ". ";
+		}
+		returnMessage += "Cause: " + badGraphError.getMessage();
+	
+		return new ResponseStatusException(returnStatus, returnMessage);
 	}
 
 }

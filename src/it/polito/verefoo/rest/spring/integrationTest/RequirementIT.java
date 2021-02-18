@@ -77,6 +77,7 @@ public class RequirementIT {
         property.setGraph(graphId);
     }
 
+    
     @Test
     public void test0AllRequirementsSets() throws Exception {
 
