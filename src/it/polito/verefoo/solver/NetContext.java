@@ -133,11 +133,12 @@ public class NetContext {
      * This method is in charge of creating the z3 types for ports, nodes, addresses and packets 
      * @param nodes it is the array of node names
      * @param addresses it is the array of IP addresses
-     * @param srcp_ranges it is the array of source ports
+     * @param srcp_ranges it is the array of source ports -> it can be a single port or a range of ports divided by a "-"
      * @param dstp_ranges it is the array of destination ports
      */
     private void mkTypes (String[] nodes, String[] addresses, String[] srcp_ranges, String[] dstp_ranges){
-    	 //----------- Port ranges for this network         
+    	
+    	//----------- Port ranges for this network         
         String[] new_port_ranges = new String[srcp_ranges.length+dstp_ranges.length+1];
         for(int k=0;k<srcp_ranges.length;k++)
         	new_port_ranges[k] = srcp_ranges[k];
@@ -191,7 +192,8 @@ public class NetContext {
 
         new_addr[new_addr.length-2] = "null";
         new_addr[new_addr.length-1] = "wildcard";
-
+        
+        //qui crea la variabile z3 addressType che è composta da 4 oggetti (ipAddr_1, ipAddr_2 ecc)
         String[] ipfieldNames = new String[]{"ipAddr_1","ipAddr_2","ipAddr_3","ipAddr_4"};
         Sort[] sort = new Sort[]{ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort()};
         Constructor ipCon = ctx.mkConstructor("ip_constructor", "is_ip", ipfieldNames, sort, null);

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.StringWriter;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -19,13 +20,12 @@ import org.xml.sax.SAXException;
 
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.jaxb.*;
-
+import net.sf.javabdd.*;
 /**
  * This is the main class only for testing the Verefoo execution
  *
  */
 
-/* Push nuovo branch per gli atomic predicates */
 public class Main {
 	static Logger loggerInfo = LogManager.getLogger(Main.class);
 	static Logger loggerResult = LogManager.getLogger("result");
@@ -39,13 +39,14 @@ public class Main {
 			SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schema = sf.newSchema(new File("./xsd/nfvSchema.xsd"));
 			u.setSchema(schema);
+			
 
 			long beginAll = System.currentTimeMillis();
 			try {
 				Marshaller m = jc.createMarshaller();
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "./xsd/nfvSchema.xsd");
-				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/FWCorrectness/FWCorrect10.xml")));
+				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/AP/APtest05.xml")));
 				if (test.isSat()) {
 					loggerResult.info("SAT");
 					loggerResult.info("----------------------OUTPUT----------------------");
