@@ -3,6 +3,8 @@ package it.polito.verefoo.graph;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.polito.verefoo.utils.APUtils;
+
 
 public class SimplePredicate {
 	List<String> IPSrcList = new ArrayList<>();		//in AND
@@ -13,9 +15,9 @@ public class SimplePredicate {
 	boolean negPSrc;
 	List<String> pDstList = new ArrayList<>();
 	boolean negPDst;
+	APUtils aputils;
 	
-	
-	public SimplePredicate(String IPSrc, boolean negIPSrc, String IPDst, boolean negIPDst,
+	public SimplePredicate(APUtils aputils, String IPSrc, boolean negIPSrc, String IPDst, boolean negIPDst,
 			String pSrc, boolean negPSrc, String pDst, boolean negPDst) {
 		super();
 		IPSrcList.add(IPSrc);
@@ -26,44 +28,12 @@ public class SimplePredicate {
 		this.negPSrc = negPSrc;
 		pDstList.add(pDst);
 		this.negPDst = negPDst;
+		this.aputils = aputils;
 	}
 	
 	public SimplePredicate() {
 		
-	}
-	
-	public List<SimplePredicate> neg(){
-		List<SimplePredicate> retList = new ArrayList<>();
-		//check IPSrc
-		for(String src: IPSrcList) {
-			if(!src.equals("*")) {
-				SimplePredicate sp = new  SimplePredicate(src, !negIPSrc, "*", false, "*", false, "*", false);
-				retList.add(sp);
-			}
-		}
-		//check IPDst
-		for(String dst: IPDstList) {
-			if(!dst.equals("*")) {
-				SimplePredicate sp = new  SimplePredicate("*", false, dst, !negIPDst, "*", false, "*", false);
-				retList.add(sp);
-			}
-		}
-		//check pSrc
-		for(String psrc: pSrcList) {
-			if(!psrc.equals("*")) {
-				SimplePredicate sp = new  SimplePredicate("*", false, "*", false, psrc, !negPSrc, "*", false);
-				retList.add(sp);
-			}
-		}
-		//check pDst
-		for(String pdst: pDstList) {
-			if(!pdst.equals("*")) {
-				SimplePredicate sp = new  SimplePredicate("*", false, "*", false, "*", false, pdst, !negPDst);
-				retList.add(sp);
-			}
-		}
-		return retList;
-	}
+	}	
 
 	public List<String> getIPSrcList() {
 		return IPSrcList;

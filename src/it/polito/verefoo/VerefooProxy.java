@@ -28,6 +28,7 @@ import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verefoo.jaxb.Path.PathNode;
 import it.polito.verefoo.solver.*;
 import it.polito.verefoo.solver.Checker.Prop;
+import it.polito.verefoo.utils.APUtils;
 import it.polito.verefoo.utils.VerificationResult;
 import scala.collection.concurrent.FailedNode;
 
@@ -49,6 +50,7 @@ public class VerefooProxy {
 	private List<Node> nodes;
 	private List<NodeMetrics> nodeMetrics;
 	private AllocationManager allocationManager;
+	private APUtils aputils;
 	
 	/* Atomic predicates */
 	private HashMap<Integer, SimplePredicate> networkAtomicPredicates;
@@ -91,6 +93,7 @@ public class VerefooProxy {
 		HashMap<String, String> cfg = new HashMap<String, String>();
 		cfg.put("model", "true");
 		ctx = new Context(cfg);
+		aputils = new APUtils();
 				
 		//Creation of the NetContext (z3 variables)
 		nctx = nctxGenerate(ctx, nodes, prop, allocationNodes);
@@ -113,7 +116,6 @@ public class VerefooProxy {
 		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
 		allocationManager.instantiateFunctions();
 		allocateFunctions();
-		
 		distributeTrafficFlows();
 		allocationManager.configureFunctions();
 		
@@ -133,14 +135,11 @@ public class VerefooProxy {
 		
 		/* END DEBUG */
 		
-		
 		check = new Checker(ctx, nctx, allocationNodes);
 		formalizeRequirements();
 		
 	}
-	
-	
-	
+
 	HashMap<Integer, SimplePredicate> generateAtomicPredicates(){
 		List<SimplePredicate> predicates = new ArrayList<>();
 		List<SimplePredicate> atomicPredicates = new ArrayList<>();
@@ -149,6 +148,7 @@ public class VerefooProxy {
 		List<String> srcPList = new ArrayList<>();
 		List<String> dstPList = new ArrayList<>();
 		
+		//Generate predicates representing source and predicates representing destination of each requirement
 		for(SecurityRequirement sr : securityRequirements.values()) {
 			Property property = sr.getOriginalProperty();
 			String IPSrc = property.getSrc();
@@ -156,279 +156,46 @@ public class VerefooProxy {
 			String pSrc = property.getSrcPort() != null ? property.getSrcPort() : "*";
 			String pDst = property.getDstPort() != null ? property.getDstPort() : "*";
 			
-			//Generate predicates representing source and predicates representing destination of the requirement
-			if(!srcList.contains(IPSrc)) {
-				SimplePredicate srcPredicate = new SimplePredicate(IPSrc, false, "*", false, pSrc, false, "*", false);
+			if(!srcList.contains(IPSrc) || !srcPList.contains(pSrc)) {
+				if(!srcList.contains(IPSrc))
+					srcList.add(IPSrc);
+				else IPSrc = "*";
+				if(!srcPList.contains(pSrc)) 
+					srcPList.add(pSrc);
+				else pSrc = "*";
+				
+				SimplePredicate srcPredicate = new SimplePredicate(aputils, IPSrc, false, "*", false, pSrc, false, "*", false);
 				predicates.add(srcPredicate);
-				srcList.add(IPSrc);
 			}
 			
-			if(!dstList.contains(IPDst)) {
-				SimplePredicate dstPredicate = new SimplePredicate("*", false, IPDst, false, "*", false, pDst, false);
+			if(!dstList.contains(IPDst) || !dstPList.contains(pDst)) {
+				if(!dstList.contains(IPDst)) dstList.add(IPDst);
+				else IPDst = "*";
+				if(!dstPList.contains(pDst)) dstPList.add(pDst);
+				else pDst = "*";
+				SimplePredicate dstPredicate = new SimplePredicate(aputils, "*", false, IPDst, false, "*", false, pDst, false);
 				predicates.add(dstPredicate);
-				dstList.add(IPDst);
 			}
 		}
 		
-		atomicPredicates = computeAtomicPredicates(atomicPredicates, predicates);
+		atomicPredicates = aputils.computeAtomicPredicates(atomicPredicates, predicates);
+		
+		
+		
 		
 		//DEBUG: print atomic predicates
+		System.out.println("INTERESTING PREDICATES");
+		for(SimplePredicate ap: predicates) {
+			System.out.println(ap.toString());
+		}
 		System.out.println("ATOMIC PREDICATES REQUIREMENTS");
 		for(SimplePredicate ap: atomicPredicates) {
 			System.out.println(ap.toString());
 		}
 		//END DEBUG
 		
-		return null;
+		return null; 
 	}
-	
-	List<SimplePredicate> computeAtomicPredicates(List<SimplePredicate> atomicPredicates, List<SimplePredicate> predicates){
-		List<SimplePredicate> newAtomicPredicates = new ArrayList<>();
-		SimplePredicate first = null;
-		List<SimplePredicate> firstNeg = null;
-		int count = -1;
-		
-		for(SimplePredicate sp: predicates) {
-			if(atomicPredicates.isEmpty() && count == -1) {
-				first = sp;
-				firstNeg = sp.neg();
-				count = 1;
-			}
-			else if(count == 1) {
-				SimplePredicate sp1 = computeIntersection(first, sp);
-				if(sp1 != null) atomicPredicates.add(sp1);
-				
-				for(SimplePredicate s: firstNeg) {
-					SimplePredicate sp2 = computeIntersection(s, sp);
-					if(sp2 != null) atomicPredicates.add(sp2);
-				}
-				
-				for(SimplePredicate s: sp.neg()) {
-					SimplePredicate sp3 = computeIntersection(first,s);
-					if(sp3 != null) atomicPredicates.add(sp3);
-				}
-				
-				for(SimplePredicate s1: sp.neg()) {
-					for(SimplePredicate s2: firstNeg) {
-						SimplePredicate sp4 = computeIntersection(s1,s2);
-						if(sp4 != null) atomicPredicates.add(sp4);
-					}
-				}
-				
-				count = -1;
-			} else {
-				for(SimplePredicate prevSp: atomicPredicates) {
-					SimplePredicate res1 = computeIntersection(prevSp, sp);
-					if(res1 != null) newAtomicPredicates.add(res1);
-					
-					for(SimplePredicate s: sp.neg()) {
-						SimplePredicate res2 = computeIntersection(prevSp,s);
-						if(res2 != null) newAtomicPredicates.add(res2);
-					}
-				}
-				atomicPredicates = new ArrayList<>(newAtomicPredicates);
-				newAtomicPredicates = new ArrayList<>();
-			}
-		}
-		return atomicPredicates;
-	}
-	
-	SimplePredicate computeIntersection(SimplePredicate p1, SimplePredicate p2){
-		SimplePredicate retPredicate = new SimplePredicate();
-		List<String> IPSrcList;
-		boolean negIPSrc;
-		List<String> IPDstList;
-		boolean negIPDst;
-		List<String> pSrcList;
-		boolean negpSrc;
-		List<String> pDstList;
-		boolean negpDst;
-		
-		//Check IPSrc
-		if(!p1.isNegIPSrc()) {
-			if(!p2.isNegIPSrc()) {   //both not neg
-				IPSrcList = intersection(p1.getIPSrcList(), p2.getIPSrcList());
-				negIPSrc = false;
-			}
-			else { //p1 not neg, p2 neg
-				if(p1.getIPSrcList().contains("*")) {
-					IPSrcList = new ArrayList<>(p2.getIPSrcList());
-					negIPSrc = true;
-				} else {
-					IPSrcList = notContained(p1.getIPSrcList(), p2.getIPSrcList());
-					negIPSrc = false;
-				}
-			}
-		} else {
-			if(!p2.isNegIPSrc()) { //p1 neg, p2 not neg
-				if(p2.getIPSrcList().contains("*")) {
-					IPSrcList = new ArrayList<>(p1.getIPSrcList());
-					negIPSrc = true;
-				} else {
-					IPSrcList = notContained(p2.getIPSrcList(), p1.getIPSrcList());
-					negIPSrc = false;
-				}
-			}
-			else { //both neg
-				IPSrcList = union(p1.getIPSrcList(), p2.getIPSrcList());
-				negIPSrc = true;
-			}
-		}
-		if(IPSrcList.isEmpty())
-			return null;		//no intersection exists
-
-		//Check IPDst
-		if(!p1.isNegIPDst()) {
-			if(!p2.isNegIPDst()) {   //both not neg
-				IPDstList = intersection(p1.getIPDstList(), p2.getIPDstList());
-				negIPDst = false;
-			}
-			else { //p1 not neg, p2 neg
-				if(p1.getIPDstList().contains("*")) {
-					IPDstList = new ArrayList<>(p2.getIPDstList());
-					negIPDst = true;
-				} else {
-					IPDstList = notContained(p1.getIPDstList(), p2.getIPDstList());
-					negIPDst = false;
-				}
-			}
-		} else {
-			if(!p2.isNegIPDst()) { //p1 neg, p2 not neg
-				if(p2.getIPDstList().contains("*")) {
-					IPDstList = new ArrayList<>(p1.getIPDstList());
-					negIPDst = true;
-				} else {
-					IPDstList = notContained(p2.getIPDstList(), p1.getIPDstList());
-					negIPDst = false;
-				}
-			}
-			else { //both neg
-				IPDstList = union(p1.getIPDstList(), p2.getIPDstList());
-				negIPDst = true;
-			}
-		}
-		if(IPDstList.isEmpty())
-			return null;		//no intersection exists
-
-		//Check pSrc
-		if(!p1.isNegPSrc()) {
-			if(!p2.isNegPSrc()) {   //both not neg
-				pSrcList = intersection(p1.getpSrcList(), p2.getpSrcList());
-				negpSrc = false;
-			}
-			else { //p1 not neg, p2 neg
-				if(p1.getpSrcList().contains("*")) {
-					pSrcList = new ArrayList<>(p2.getpSrcList());
-					negpSrc = true;
-				} else {
-					pSrcList = notContained(p1.getpSrcList(), p2.getpSrcList());
-					negpSrc = false;
-				}
-			}
-		} else {
-			if(!p2.isNegPSrc()) { //p1 neg, p2 not neg
-				if(p2.getpSrcList().contains("*")) {
-					pSrcList = new ArrayList<>(p1.getpSrcList());
-					negpSrc = true;
-				} else {
-					pSrcList = notContained(p2.getpSrcList(), p1.getpSrcList());
-					negpSrc = false;
-				}
-			}
-			else { //both neg
-				pSrcList = union(p1.getpSrcList(), p2.getpSrcList());
-				negpSrc = true;
-			}
-		}
-		if(pSrcList.isEmpty())
-			return null;		//no intersection exists
-
-		//Check pDst
-		if(!p1.isNegPDst()) {
-			if(!p2.isNegPDst()) {   //both not neg
-				pDstList = intersection(p1.getpDstList(), p2.getpDstList());
-				negpDst = false;
-			}
-			else { //p1 not neg, p2 neg
-				if(p1.getpDstList().contains("*")) {
-					pDstList = new ArrayList<>(p2.getpDstList());
-					negpDst = true;
-				} else {
-					pDstList = notContained(p1.getpDstList(), p2.getpDstList());
-					negpDst = false;
-				}
-			}
-		} else {
-			if(!p2.isNegPDst()) { //p1 neg, p2 not neg
-				if(p2.getpDstList().contains("*")) {
-					pDstList = new ArrayList<>(p1.getpDstList());
-					negpDst = true;
-				} else {
-					pDstList = notContained(p2.getpDstList(), p1.getpDstList());
-					negpDst = false;
-				}
-			}
-			else { //both neg
-				pDstList = union(p1.getpDstList(), p2.getpDstList());
-				negpDst = true;
-			}
-		}
-		if(pDstList.isEmpty())
-			return null;		//no intersection exists
-
-		retPredicate.setIPSrcList(IPSrcList);
-		retPredicate.setIPDstList(IPDstList);
-		retPredicate.setpSrcList(pSrcList);
-		retPredicate.setpDstList(pDstList);
-		retPredicate.setNegIPSrc(negIPSrc);
-		retPredicate.setNegIPDst(negIPDst);
-		retPredicate.setNegPSrc(negpSrc);
-		retPredicate.setNegPDst(negpDst);
-		return retPredicate;
-	}
-	
-	
-	
-	
-	List<String> union(List<String> list1, List<String> list2){
-		List<String> retList = new ArrayList<>();
-		for(String str: list1) {
-			if(!retList.contains(str))
-				retList.add(str);
-		}
-		for(String str: list2) {
-			if(!retList.contains(str))
-				retList.add(str);
-		}
-		return retList;
-	}
-	
-	List<String> intersection(List<String> list1, List<String> list2){
-		List<String> retList;
-		if(list1.contains("*"))
-			retList = new ArrayList<>(list2);
-		else if(list2.contains("*"))
-			retList = new ArrayList<>(list1);
-		else {
-			retList = new ArrayList<>();
-			for(String str: list1) {
-				if(list2.contains(str))
-					retList.add(str);
-			}
-		}
-		return retList;
-	}
-	
-	List<String> notContained(List<String> list1, List<String> list2){
-		List<String> retList = new ArrayList<>();
-		for(String str: list1) {
-			if(!list2.contains(str))
-				retList.add(str);
-		}
-		return retList;
-	}
-	
-	
 	
 	
 	/**
