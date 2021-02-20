@@ -49,7 +49,6 @@ public class SimulationsController {
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	public ResponseEntity<Resources<Long>> runSimulationByNFV(@RequestBody NFV nfv, @RequestParam(value = "fid", required = false) List<FunctionalTypes> usableFunctionalTypes) {
-
 		try {
 			// the nfv is modified in place by VerefooSerializer
 			new VerefooSerializer(nfv);
@@ -201,7 +200,8 @@ public class SimulationsController {
 	 */
 	private ResponseStatusException verefooCoreExceptionBuilder(BadGraphError badGraphError) {
 		HttpStatus returnStatus;
-		switch (badGraphError.getE()) {
+		if (badGraphError.getE() != null) {
+			switch (badGraphError.getE()) {
 			case INVALID_NODE_CONFIGURATION:
 			case INVALID_PARSING_STRING:
 			case INVALID_PROPERTY_DEFINITION:
@@ -224,7 +224,11 @@ public class SimulationsController {
 			default:
 				returnStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 				break;
+			}
+		} else {
+			returnStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
+		
 		String returnMessage = "";
 		if (badGraphError.getE() != null) {
 			returnMessage += "Type of error: " + badGraphError.getE() + ". ";

@@ -2,15 +2,21 @@ package it.polito.verefoo.rest.spring;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import org.neo4j.ogm.config.Configuration;
 import org.neo4j.ogm.session.SessionFactory;
@@ -26,8 +32,15 @@ import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.data.neo4j.conversion.MetaDataDrivenConversionService;
 import org.springframework.data.neo4j.transaction.Neo4jTransactionManager;
+import org.springframework.http.codec.xml.Jaxb2XmlDecoder;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.xml.Jaxb2CollectionHttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
+import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
+import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
+import org.springframework.oxm.Unmarshaller;
+import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -38,7 +51,8 @@ import io.swagger.v3.oas.models.tags.Tag;
 
 // TODO #jalol separate config from rest api
 @SpringBootApplication
-// A client implementation should activate this annotation and use the injected bean RestTemplate, which works as a rest client along with hyperlinks
+// A client implementation should activate this annotation and use the injected
+// bean RestTemplate, which works as a rest client along with hyperlinks
 // @EnableHypermediaSupport(type = HypermediaType.HAL)
 public class SpringBootConfiguration {
 
@@ -86,22 +100,19 @@ public class SpringBootConfiguration {
     }
 
     @Bean
-    public HttpMessageConverters converters() {
-        // This snippet globally instructs Jackson2 to not write null fields in the
-        // response, which is the default behaviour
-        MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
-        ObjectMapper objectMapper = mappingJackson2HttpMessageConverter.getObjectMapper();
-        // doesn't write null-valued properties in the response
-        objectMapper.setSerializationInclusion(Include.NON_NULL);
-        // equivalent of setting additionalProperties = false in json schemas; in other words
-        // reject every unknown property
-        objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        objectMapper.enable(MapperFeature.USE_ANNOTATIONS);
-        mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
-
-        return new HttpMessageConverters(true,
-                Arrays.asList(mappingJackson2HttpMessageConverter, new Jaxb2RootElementHttpMessageConverter()));
+    public HttpMessageConverters converters() throws JAXBException {
+        
+        // create xml unmarshaller
+        MarshallingHttpMessageConverter marshallingHttpMessageConverter = new MarshallingHttpMessageConverter();
+        Jaxb2Marshaller jaxb2Marshaller = new Jaxb2Marshaller();
+        jaxb2Marshaller.setContextPath("it.polito.verefoo.jaxb");
+        marshallingHttpMessageConverter.setUnmarshaller(jaxb2Marshaller);
+        
+        // the xml unmarshaller is jaxb2, while the xml marshaller is part of Spring default HTTP message converters
+        // json marshaller are also part of the Spring default HTTP message converters
+        return new HttpMessageConverters(true, Arrays.asList(marshallingHttpMessageConverter));
     }
+
 
     /*
      * This bean customizes the creation of the openapi UI in Swagger version 3

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -22,6 +23,8 @@ public class ResourceWrapperWithLinks<T> {
     
     /**
      * @param resource must be null if the response body, besides the links, is empty
+     * @return an array containing the passed resource; notice that the response body is always wrapped into
+     * an array
      */
     public Resources<T> wrap(T resource) {
         List<T> resources = new ArrayList<>();
