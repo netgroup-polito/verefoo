@@ -1,0 +1,30 @@
+{
+  "$schema" : "http://json-schema.org/draft-07/schema#",
+  "type" : "object",
+  "properties" : {
+    "action" : {
+      "type" : "string",
+      "enum" : [ "ALLOW", "DENY" ]
+    },
+    "destination" : {
+      "type" : "string"
+    },
+    "directional" : {
+      "type" : "boolean"
+    },
+    "dstPort" : {
+      "type" : "string"
+    },
+    "protocol" : {
+      "type" : "string",
+      "enum" : [ "ANY", "TCP", "UDP", "OTHER" ]
+    },
+    "source" : {
+      "type" : "string"
+    },
+    "srcPort" : {
+      "type" : "string"
+    }
+  },
+  "additionalProperties" : false
+}

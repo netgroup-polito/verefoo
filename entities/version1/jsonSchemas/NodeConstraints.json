@@ -1,0 +1,37 @@
+{
+  "$schema" : "http://json-schema.org/draft-07/schema#",
+  "type" : "object",
+  "properties" : {
+    "nodeMetrics" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "cores" : {
+            "type" : "integer"
+          },
+          "maxNodeLatency" : {
+            "type" : "integer"
+          },
+          "memory" : {
+            "type" : "integer"
+          },
+          "node" : {
+            "type" : "string"
+          },
+          "nrOfOperations" : {
+            "type" : "integer"
+          },
+          "optional" : {
+            "type" : "boolean"
+          },
+          "reqStorage" : {
+            "type" : "integer"
+          }
+        },
+        "additionalProperties" : false
+      }
+    }
+  },
+  "additionalProperties" : false
+}

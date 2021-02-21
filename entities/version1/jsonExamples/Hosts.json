@@ -1,0 +1,52 @@
+{
+    "host": [
+        {
+            "name": "host1",
+            "type": "CLIENT",
+            "active": true,
+            "maxVNF": 3,
+            "cores": 4,
+            "cpu": 1,
+            "diskStorage": 500,
+            "fixedEndpoint": "endPoint",
+            "memory": 1000,
+            "nodeRef": [
+                {
+                    "node": "A"
+                },
+                {
+                    "node": "10.0.0.1"
+                }
+            ],
+            "supportedVNF": [
+                {
+                    "functionalType": "ENDHOST"
+                }
+            ]
+        },
+        {
+            "name": "host2",
+            "type": "MIDDLEBOX",
+            "active": true,
+            "maxVNF": 5,
+            "cores": 2,
+            "cpu": 2,
+            "diskStorage": 1500,
+            "fixedEndpoint": "endPoint",
+            "memory": 1500,
+            "nodeRef": [
+                {
+                    "node": "B"
+                },
+                {
+                    "node": "10.0.0.2"
+                }
+            ],
+            "supportedVNF": [
+                {
+                    "functionalType": "DPI"
+                }
+            ]
+        }
+    ]
+}

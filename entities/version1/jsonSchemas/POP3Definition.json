@@ -1,0 +1,22 @@
+{
+  "$schema" : "http://json-schema.org/draft-07/schema#",
+  "type" : "object",
+  "properties" : {
+    "contentType" : {
+      "type" : "string"
+    },
+    "from" : {
+      "type" : "string"
+    },
+    "sender" : {
+      "type" : "string"
+    },
+    "subject" : {
+      "type" : "string"
+    },
+    "to" : {
+      "type" : "string"
+    }
+  },
+  "additionalProperties" : false
+}
