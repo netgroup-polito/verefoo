@@ -39,14 +39,14 @@ Swagger documentation can be accessed at [localhost:8085/verefoo](localhost:8085
 * (optional) if you previously configured Tomcat Manager you can open a  browser and navigate to `this link <http://localhost:8080/manager>`  and login using the proper username and password (e.g.,  ``admin/admin`` in the previous example);
 * (optional) you can `deploy/undeploy/redeploy` the downloaded WARs through the web interface.
 
-## ADP module - REST APIs
+## REST APIs
 
 ### Connecting to the REST APIs
 
-In order to access the ADP module, namely the core of Verefoo, some REST APIs are available; follow these steps to boot the environment:
+In order to access the core of Verefoo, some REST APIs are available. Follow these steps to boot the environment:
 
 * Run the Neo4j server: open a shell in the folder */neo4j-server/neo4j-community-3.5.25/bin* and type ```./neo4j console```;
-* Run Tomcat: open another shell in the project root folder and type ```java -jar target/verifoo-0.0.1-SNAPSHOT.jar```;
+* Run Tomcat: open another shell in the project root folder and type the following two commands: ```mvn clean package``` and ```java -jar target/verifoo-0.0.1-SNAPSHOT.jar```;
 * Interact with the REST APIs: start doing requests to Verefoo by means of a RESTful client; for any doubt about the REST APIs, their documentation can be found at [localhost:8085/verefoo](localhost:8085/verefoo).
 
 ### Launching the integration tests
@@ -71,11 +71,3 @@ The current version of the Neo4j server is 3.5.25 (Community Edition): it is com
 ## Resources
 
 * [VerifooDocs.pdf](https://github.com/netgroup-polito/verifoo/blob/master/docs/VerifooDocs.pdf) for documentation.
-
-## TODO
-
-mvn clean compile assembly:single
-
-java -jar target\verifoo-0.0.1-SNAPSHOT-jar-with-dependencies.jar 25154 60 10 100
-
-mvn clean package && java -jar target\verifoo-0.0.1-SNAPSHOT.jar

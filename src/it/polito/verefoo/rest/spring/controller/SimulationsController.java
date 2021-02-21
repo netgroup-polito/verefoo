@@ -27,8 +27,7 @@ import it.polito.verefoo.rest.spring.ResourceWrapperWithLinks;
 import it.polito.verefoo.rest.spring.service.SimulationService;
 
 @RestController
-@RequestMapping(value = "/adp/simulations", consumes = { "application/xml", "application/json" }, produces = {
-		"application/xml", "application/json" })
+@RequestMapping(value = "/adp/simulations", produces = {"application/xml", "application/json" })
 @ApiResponses(value = {
 	@ApiResponse(responseCode = "400", description = "The provided resource is not compliant with the data model.")
 })
@@ -42,12 +41,12 @@ public class SimulationsController {
 
 
 
-	@Operation(tags = "version 1 - simulations", summary = "Run a simulation by passing the actual NFV", description = "This is an all-in-one service, since the relative data structures (like graphs) are created automatically and they will be retrievable with the pertinent APIs separately.")
+	@Operation(tags = "simulations", summary = "Run a simulation by passing the actual NFV", description = "This is an all-in-one service, since the relative data structures (like graphs) are created automatically and they will be retrievable with the pertinent APIs separately.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "")
 	})
 
-	@RequestMapping(value = "", method = RequestMethod.POST)
+	@RequestMapping(value = "", consumes = { "application/xml", "application/json" }, method = RequestMethod.POST)
 	public ResponseEntity<Resources<Long>> runSimulationByNFV(@RequestBody NFV nfv, @RequestParam(value = "fid", required = false) List<FunctionalTypes> usableFunctionalTypes) {
 		try {
 			// the nfv is modified in place by VerefooSerializer
@@ -70,7 +69,7 @@ public class SimulationsController {
 
 
 
-	@Operation(tags = "version 1 - simulations", summary = "Run a simulation by passing references to data structures", description = "At the moment, neither network forwarding paths nor the parsing string can be passed; use the other simulation API instead.")
+	@Operation(tags = "simulations", summary = "Run a simulation by passing references to data structures", description = "At the moment, neither network forwarding paths nor the parsing string can be passed; use the other simulation API instead.")
 	@ApiResponses(value = { 
 		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "404", description = "At least one resource referenced by some parameter doesn't exist in the workspace.")
@@ -106,7 +105,7 @@ public class SimulationsController {
 
 
 
-	@Operation(tags = "version 1 - simulations", summary = "Get the result of a past simulation", description = "This API is not intended to run a new simulation.")
+	@Operation(tags = "simulations", summary = "Get the result of a past simulation", description = "This API is not intended to run a new simulation.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "404", description = "The requested simulation doesn't exist in the workspace.")
@@ -129,7 +128,7 @@ public class SimulationsController {
 
 
 
-	@Operation(tags = "version 1 - simulations", summary = "Get the result of a past simulation", description = "This API is not intended to run a new simulation.")
+	@Operation(tags = "simulations", summary = "Get the result of a past simulation", description = "This API is not intended to run a new simulation.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "404", description = "No simulation results currently exist in the workspace. You can start by performing a new simulation.")
@@ -150,7 +149,7 @@ public class SimulationsController {
 
 
 
-	@Operation(tags = "version 1 - simulations", summary = "Delete the result of a past simulation", description = "")
+	@Operation(tags = "simulations", summary = "Delete the result of a past simulation", description = "")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "404", description = "The requested simulation doesn't exist in the workspace.")
@@ -171,7 +170,7 @@ public class SimulationsController {
 	}
 
 
-	@Operation(tags = "version 1 - simulations", summary = "Delete all the results of past simulations", description = "")
+	@Operation(tags = "simulations", summary = "Delete all the results of past simulations", description = "")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "304", description = "No simulation results are in the workspace at all.")

@@ -122,31 +122,28 @@ public class SpringBootConfiguration {
 
         List<Tag> tags = new ArrayList<>();
         Tag tag = new Tag();
-        tag.setName("version 2");
+        tag.setName("graphs");
         tags.add(tag);
         tag = new Tag();
-        tag.setName("version 1 - graphs");
+        tag.setName("requirements");
         tags.add(tag);
         tag = new Tag();
-        tag.setName("version 1 - requirements");
+        tag.setName("simulations");
         tags.add(tag);
         tag = new Tag();
-        tag.setName("version 1 - simulations");
-        tags.add(tag);
-        tag = new Tag();
-        tag.setName("version 1 - substrates");
+        tag.setName("substrates");
         tags.add(tag);
 
         List<Server> servers = new ArrayList<>();
         Server server = new Server();
         server.setDescription("ADP module server");
-        server.setUrl("http://localhost:8085/verefoo/adp");
+        server.setUrl("http://localhost:8085/verefoo");
         servers.add(server);
 
         return new OpenAPI().components(new Components()).servers(servers)
                 .info(new Info().title("Verefoo REST API Online Swagger documentation")
-                        .description("This is the automatically-generated documentation of the Verefoo's REST APIs, in the format of an openapi file, compliant with Swagger version 3, here shown in a user-friendly interface.\n\nCurrently, the version 2 of the REST APIs is not implemented.")
-                        .version("versions 1, 2"))
+                        .description("This is the automatically-generated documentation of the Verefoo's REST APIs, in the format of an openapi file, compliant with Swagger version 3, here shown in a user-friendly interface.")
+                		)
                 .tags(tags);
     }
 

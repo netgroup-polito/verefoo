@@ -261,54 +261,6 @@
 				</executions>
 			</plugin>
 
-			<!-- Plugin to convert JSON schemas into Java entities (classes) -->
-			<plugin>
-				<groupId>org.jsonschema2pojo</groupId>
-				<artifactId>jsonschema2pojo-maven-plugin</artifactId>
-				<version>1.0.2</version>
-				<configuration>
-					<sourceDirectory>${project.basedir}/entities/version2/jsonSchemas/</sourceDirectory>
-					<outputDirectory>${project.basedir}/entities/version2/POJOs/</outputDirectory>
-					<targetPackage>it.polito.verefoo.pojo</targetPackage>
-					<includeJsr303Annotations>true</includeJsr303Annotations>
-					<useLongIntegers>false</useLongIntegers>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<annotationStyle>jackson2</annotationStyle>
-							<!-- This parameter guarantees that all objects in json schemas are treated as if additionalProperties = false -->
-							<includeAdditionalProperties>false</includeAdditionalProperties>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!--<plugin>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.13.2</version>
-				<executions>
-					<execution>
-						<id>add-source-for-murcia</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<schemaDirectory>xsd/</schemaDirectory>
-							<schemaIncludes>
-								<include>murcia.xsd</include>
-							</schemaIncludes>
-							<generateDirectory>gen-src/</generateDirectory>
-							<generatePackage>it.polito.verefoo.murcia.jaxb</generatePackage>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>-->
-
 			<!-- Plugin to run integration tests -->
 			<!-- Command to run integration tests: mvn verify -->
 			<plugin>

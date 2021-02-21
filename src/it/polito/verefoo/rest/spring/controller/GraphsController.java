@@ -28,8 +28,7 @@ import it.polito.verefoo.rest.spring.ResourceWrapperWithLinks;
 import it.polito.verefoo.rest.spring.service.GraphService;
 
 @RestController
-@RequestMapping(value = "/adp/graphs", consumes = { "application/xml", "application/json" }, produces = {
-		"application/xml", "application/json" })
+@RequestMapping(value = "/adp/graphs", produces = {"application/xml", "application/json" })
 @ApiResponses(value = {
 	@ApiResponse(responseCode = "400", description = "The provided resource is not compliant with the data model.")
 })
@@ -43,12 +42,12 @@ public class GraphsController {
 
 
 
-	@Operation(tags = "version 1 - graphs", summary = "Create a graph", description = "The graph's id in the request, if provided, is neglected; instead, the system automatically generates, stores the id for all the graphs and puts them in the response.")
+	@Operation(tags = "graphs", summary = "Create a graph", description = "The graph's id in the request, if provided, is neglected; instead, the system automatically generates, stores the id for all the graphs and puts them in the response.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "201", description = "Created"),
 	})
 
-	@RequestMapping(value = "", method = RequestMethod.POST)
+	@RequestMapping(value = "", consumes = { "application/xml", "application/json" }, method = RequestMethod.POST)
 	public ResponseEntity<Resources<List<Long>>> createGraphs(@RequestBody Graphs graphs) {
 
 		List<Long> graphIds = service.createGraphs(graphs);
@@ -67,7 +66,7 @@ public class GraphsController {
 
 
 
-	@Operation(tags = "version 1 - graphs", summary = "Get all the graphs", description = "")
+	@Operation(tags = "graphs", summary = "Get all the graphs", description = "")
 	@ApiResponses(value = { 
 		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "404", description = "No graphs currently exist in the workspace. You can start by creating a new graph") })
@@ -87,7 +86,7 @@ public class GraphsController {
 
 
 
-	@Operation(tags = "version 1 - graphs", summary = "Delete all the graphs", description = "Be careful before cleaning the whole workbench of graphs.")
+	@Operation(tags = "graphs", summary = "Delete all the graphs", description = "Be careful before cleaning the whole workbench of graphs.")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = ""),
 			@ApiResponse(responseCode = "304", description = "No graph exists at all in the workspace."),
 			@ApiResponse(responseCode = "424", description = "No graph has been deleted because at least one of them is referred by other resources; you must first delete the interested resources.") })
@@ -105,11 +104,11 @@ public class GraphsController {
 
 
 
-	@Operation(tags = "version 1 - graphs", summary = "Update a graph", description = "It's advisable to explicitly perform a get of the modified resource through the pertinent API, since some ids may have been changed.")
+	@Operation(tags = "graphs", summary = "Update a graph", description = "It's advisable to explicitly perform a get of the modified resource through the pertinent API, since some ids may have been changed.")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = ""),
 			@ApiResponse(responseCode = "404", description = "The graph or one of its sub-resources doesn't exist. Check the ids of the submitted resources."), })
 
-	@RequestMapping(value = "/{gid}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{gid}", consumes = { "application/xml", "application/json" }, method = RequestMethod.PUT)
 	public ResponseEntity<Resources<Void>> updateGraph(@PathVariable("gid") Long gid, @RequestBody Graph graph) {
 
 		service.updateGraph(gid, graph);
@@ -125,7 +124,7 @@ public class GraphsController {
 
 
 
-	@Operation(tags = "version 1 - graphs", summary = "Get a graph", description = "")
+	@Operation(tags = "graphs", summary = "Get a graph", description = "")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = ""),
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist in the workspace."), })
 
@@ -147,7 +146,7 @@ public class GraphsController {
 
 
 	
-	@Operation(tags = "version 1 - graphs", summary = "Delete a graph", description = "All the nested resources are deleted accordingly. In case the graph is referred by other resources, the operation is not performed and the workspace is not modified.")
+	@Operation(tags = "graphs", summary = "Delete a graph", description = "All the nested resources are deleted accordingly. In case the graph is referred by other resources, the operation is not performed and the workspace is not modified.")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = ""),
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist at all in the workspace."),
 			@ApiResponse(responseCode = "409", description = "The graph could not be deleted because it is referenced by other resources; you must first delete the interested resources.")})
@@ -167,13 +166,13 @@ public class GraphsController {
 
 
 
-	@Operation(tags = "version 1 - graphs", summary = "Create a node in a graph", description = "The neighbours and the configuration are considered too eventually.")
+	@Operation(tags = "graphs", summary = "Create a node in a graph", description = "The neighbours and the configuration are considered too eventually.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "201", description = "Created"),
 		@ApiResponse(responseCode = "404", description = "The graph doesn't exist at all.")
 	})
 
-	@RequestMapping(value = "/{gid}/nodes", method = RequestMethod.POST)
+	@RequestMapping(value = "/{gid}/nodes", consumes = { "application/xml", "application/json" }, method = RequestMethod.POST)
 	public ResponseEntity<Resources<Long>> createNode(@PathVariable("gid") Long gid, @RequestBody Node node) {
 
 		Long nodeId = service.createNode(gid, node);
@@ -192,13 +191,13 @@ public class GraphsController {
 
 
 	
-	@Operation(tags = "version 1 - graphs", summary = "Update a node in a graph", description = "All the nested resources are replaced in a shallow way, besides the neighbours; that field is totally neglected.")
+	@Operation(tags = "graphs", summary = "Update a node in a graph", description = "All the nested resources are replaced in a shallow way, besides the neighbours; that field is totally neglected.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "404", description = "The graph or the node doesn't exist at all.")
 	})
 
-	@RequestMapping(value = "/{gid}/nodes/{nid}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{gid}/nodes/{nid}", consumes = { "application/xml", "application/json" }, method = RequestMethod.PUT)
 	public ResponseEntity<Resources<Void>> updateNode(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid, @RequestBody Node node) {
 
 		service.updateNode(gid, nid, node);
@@ -219,7 +218,7 @@ public class GraphsController {
 
 
 	
-	@Operation(tags = "version 1 - graphs", summary = "Get a node", description = "")
+	@Operation(tags = "graphs", summary = "Get a node", description = "")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "404", description = "The graph or the node doesn't exist at all.")
@@ -247,7 +246,7 @@ public class GraphsController {
 
 	
 
-	@Operation(tags = "version 1 - graphs", summary = "Delete a node", description = "")
+	@Operation(tags = "graphs", summary = "Delete a node", description = "")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "404", description = "The graph or the node doesn't exist at all."),
@@ -272,13 +271,13 @@ public class GraphsController {
 
 
 
-	@Operation(tags = "version 1 - graphs", summary = "Add a neighbour to a node", description = "add a new neighbour")
+	@Operation(tags = "graphs", summary = "Add a neighbour to a node", description = "add a new neighbour")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "201", description = "Created"),
 		@ApiResponse(responseCode = "404", description = "The graph or the node doesn't exist at all.")
 	})
 
-	@RequestMapping(value = "/{gid}/nodes/{nid}/neighbours", method = RequestMethod.POST)
+	@RequestMapping(value = "/{gid}/nodes/{nid}/neighbours", consumes = { "application/xml", "application/json" }, method = RequestMethod.POST)
 	public ResponseEntity<Resources<Long>> createNeighbour(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid, @RequestBody Neighbour neighbour) {
 
 		Long neighbourId = service.createNeighbour(gid, nid, neighbour);
@@ -301,7 +300,7 @@ public class GraphsController {
 
 
 
-	@Operation(tags = "version 1 - graphs", summary = "Delete a neighbour of a node", description = "delete a neighbour")
+	@Operation(tags = "graphs", summary = "Delete a neighbour of a node", description = "delete a neighbour")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "404", description = "The graph, the node or its neighbour doesn't exist at all.")
@@ -329,7 +328,7 @@ public class GraphsController {
 
 
 
-	@Operation(tags = "version 1 - graphs", summary = "Get the configuration of a node", description = "")
+	@Operation(tags = "graphs", summary = "Get the configuration of a node", description = "")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "404", description = "The graph or the node doesn't exist at all.")
@@ -358,13 +357,13 @@ public class GraphsController {
 
 
 
-	@Operation(tags = "version 1 - graphs", summary = "Update the configuration of a node", description = "")
+	@Operation(tags = "graphs", summary = "Update the configuration of a node", description = "")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "404", description = "The graph or the node doesn't exist at all.")
 	})
 
-	@RequestMapping(value = "/{gid}/nodes/{nid}/configuration/{cid}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{gid}/nodes/{nid}/configuration/{cid}", consumes = { "application/xml", "application/json" }, method = RequestMethod.PUT)
 	public ResponseEntity<Resources<Void>> updateConfiguration(@PathVariable("gid") Long gid, @PathVariable("nid") Long nid, @PathVariable("cid") Long cid, @RequestBody Configuration configuration) {
 
 		service.updateConfiguration(gid, nid, cid, configuration);
@@ -387,13 +386,13 @@ public class GraphsController {
 
 
 	
-	@Operation(tags = "version 1 - graphs", summary = "Create a set of constraints in a graph", description = "If the constraints already exists, the new ones replace them in a shallow way.")
+	@Operation(tags = "graphs", summary = "Create a set of constraints in a graph", description = "If the constraints already exists, the new ones replace them in a shallow way.")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "201", description = "Created"),
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist at all.")
 		})
 
-	@RequestMapping(value = "/{gid}/constraints", method = RequestMethod.POST)
+	@RequestMapping(value = "/{gid}/constraints", consumes = { "application/xml", "application/json" }, method = RequestMethod.POST)
 	public ResponseEntity<Resources<Void>> createConstraints(@PathVariable("gid") Long gid, @RequestBody Constraints constraints) {
 		
 		service.createConstraints(gid, constraints);
@@ -415,13 +414,13 @@ public class GraphsController {
 
 	
 
-	@Operation(tags = "version 1 - graphs", summary = "Update constraints of a graph", description = "update the constraints of a graph")
+	@Operation(tags = "graphs", summary = "Update constraints of a graph", description = "update the constraints of a graph")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = ""),
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist at all.")
 		})
 
-	@RequestMapping(value = "/{gid}/constraints", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{gid}/constraints", consumes = { "application/xml", "application/json" }, method = RequestMethod.PUT)
 	public ResponseEntity<Resources<Void>> updateConstraints(@PathVariable("gid") Long gid, @RequestBody Constraints constraints) {
 		
 		service.updateConstraints(gid, constraints);
@@ -442,7 +441,7 @@ public class GraphsController {
 
 
 
-	@Operation(tags = "version 1 - graphs", summary = "Get the constraints of a graph", description = "")
+	@Operation(tags = "graphs", summary = "Get the constraints of a graph", description = "")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = ""),
 			@ApiResponse(responseCode = "404", description = "The graph doesn't exist at all.")
@@ -469,7 +468,7 @@ public class GraphsController {
 
 
 
-	@Operation(tags = "version 1 - graphs", summary = "Delete all the constraints of a graph", description = "")
+	@Operation(tags = "graphs", summary = "Delete all the constraints of a graph", description = "")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = ""),
 		@ApiResponse(responseCode = "404", description = "The graph doesn't exist at all.")
