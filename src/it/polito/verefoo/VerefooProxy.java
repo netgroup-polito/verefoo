@@ -54,7 +54,12 @@ public class VerefooProxy {
 	
 	/* Atomic predicates */
 	private HashMap<Integer, SimplePredicate> networkAtomicPredicates;
-	
+	HashMap<String, Node> transformersNode = new HashMap<>();
+	HashMap<String, List<SimplePredicate>> transformersShadowing = new HashMap<>();
+	HashMap<String, List<SimplePredicate>> transformersShadowed = new HashMap<>();
+	HashMap<String, List<SimplePredicate>> transformersReconversion = new HashMap<>();
+	HashMap<String, List<SimplePredicate>> transformersReconverted = new HashMap<>();
+	HashMap<String, HashMap<Integer, List<Integer>>> transformationsMap = new HashMap<>();
 	
 	/**
 	 * Public constructor for the Verefoo proxy service
@@ -110,30 +115,36 @@ public class VerefooProxy {
 		 */
 		
 		/* Atomic predicates */
+		trafficFlowsMap = generateFlowPaths();
 		networkAtomicPredicates = generateAtomicPredicates();
 		
-		trafficFlowsMap = generateFlowPaths();
+		//DEBUG: print resulting ap
+		System.out.println("ATOMIC PREDICATES REQUIREMENTS");
+		for(HashMap.Entry<Integer, SimplePredicate> ap: networkAtomicPredicates.entrySet()) {
+			System.out.print("Simple Predicate " + ap.getKey());
+			System.out.println(ap.getValue().toString());
+		}
+		//END DEBUG
+		
+		fillTransformationsMap();
+		
+		//DEBUG: print transformation map
+		System.out.println("TRANSFORMATION MAP");
+		for(String node: transformersNode.keySet()) {
+			for(HashMap.Entry<Integer, List<Integer>> entry: transformationsMap.get(node).entrySet()) {
+				System.out.print(entry.getKey() + " -> ");
+				for(Integer integ: entry.getValue())
+					System.out.print(integ + " ");
+				System.out.println();
+			}
+		}
+		//END DEBUG
+		
 		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
 		allocationManager.instantiateFunctions();
 		allocateFunctions();
 		distributeTrafficFlows();
 		allocationManager.configureFunctions();
-		
-		/* DEBUG: for each requirement, show all possible traffic flows */
-//		for(Map.Entry<Integer, Flow> flows: trafficFlowsMap.entrySet()) {
-//			System.out.println("Flow id: " + flows.getKey());
-//			SecurityRequirement sr = flows.getValue().getRequirement();
-//			System.out.println("Requirement " +sr.getIdRequirement() + " : " + sr.getOriginalProperty().getName()+ 
-//					" " + sr.getOriginalProperty().getSrc() + " " + sr.getOriginalProperty().getSrcPort()
-//					+ " -> "+ sr.getOriginalProperty().getDst() + " "+ sr.getOriginalProperty().getDstPort() +" " + sr.getOriginalProperty().getLv4Proto());
-//			System.out.println("Print list of nodes");
-//			for(AllocationNode node: flows.getValue().getPath().getNodes()) {
-//				Traffic crossedTraffic = flows.getValue().getCrossedTraffic(node.getNode().getName());
-//				System.out.println("Node " +node.getNode().getName() + " " + crossedTraffic.getIPSrc() + "->" + crossedTraffic.getIPDst() );
-//			}
-//		}
-		
-		/* END DEBUG */
 		
 		check = new Checker(ctx, nctx, allocationNodes);
 		formalizeRequirements();
@@ -141,6 +152,7 @@ public class VerefooProxy {
 	}
 
 	HashMap<Integer, SimplePredicate> generateAtomicPredicates(){
+		HashMap<Integer, SimplePredicate> retList = new HashMap<>();
 		List<SimplePredicate> predicates = new ArrayList<>();
 		List<SimplePredicate> atomicPredicates = new ArrayList<>();
 		List<String> srcList = new ArrayList<>();
@@ -153,8 +165,8 @@ public class VerefooProxy {
 			Property property = sr.getOriginalProperty();
 			String IPSrc = property.getSrc();
 			String IPDst = property.getDst();
-			String pSrc = property.getSrcPort() != null ? property.getSrcPort() : "*";
-			String pDst = property.getDstPort() != null ? property.getDstPort() : "*";
+			String pSrc = property.getSrcPort() != null &&  !property.getSrcPort().equals("null") ? property.getSrcPort() : "*";
+			String pDst = property.getDstPort() != null &&  !property.getDstPort().equals("null") ? property.getDstPort() : "*";
 			
 			if(!srcList.contains(IPSrc) || !srcPList.contains(pSrc)) {
 				if(!srcList.contains(IPSrc))
@@ -173,28 +185,180 @@ public class VerefooProxy {
 				else IPDst = "*";
 				if(!dstPList.contains(pDst)) dstPList.add(pDst);
 				else pDst = "*";
+				
 				SimplePredicate dstPredicate = new SimplePredicate(aputils, "*", false, IPDst, false, "*", false, pDst, false);
 				predicates.add(dstPredicate);
 			}
 		}
 		
+		//Generate predicates representing input packet class for each transformers
+		for(Node node: transformersNode.values()) {
+			List<SimplePredicate> shadowingPredicates =  new ArrayList<>();
+			List<SimplePredicate> reconversionPredicates =  new ArrayList<>();
+			List<SimplePredicate> shadowedPredicates =  new ArrayList<>();
+			List<SimplePredicate> reconvertedPredicates =  new ArrayList<>();
+			if(node.getFunctionalType() == FunctionalTypes.NAT) {
+				//Compute list of shadowed and not shadowed addresses
+				List<String> shadowedAddressesList = new ArrayList<>();
+				for(String shadowedAddress: node.getConfiguration().getNat().getSource()) {
+					if(srcList.contains(shadowedAddress) || dstList.contains(shadowedAddress))
+						shadowedAddressesList.add(shadowedAddress);
+				}
+				List<String> notShadowedAddressesList = new ArrayList<>();
+				for(String address: srcList) {
+					if(!node.getConfiguration().getNat().getSource().contains(address) && !address.equals("*") 
+							&& !notShadowedAddressesList.contains(address))
+						notShadowedAddressesList.add(address);
+				}
+				for(String address: dstList) {
+					if(!node.getConfiguration().getNat().getSource().contains(address) && !address.equals("*")
+							&& !notShadowedAddressesList.contains(address))
+						notShadowedAddressesList.add(address);
+				}
+				//Generate predicates
+				//Shadowing
+				for(String notShadowed: notShadowedAddressesList) {
+					for(String shadowed: shadowedAddressesList) { 
+						SimplePredicate p = new SimplePredicate(aputils, shadowed, false, notShadowed, false, "*", false, "*", false);
+						shadowingPredicates.add(p);
+						//check if it needs also to be inserted into predicates
+						if(!srcList.contains(shadowed) && !dstList.contains(notShadowed)) {
+							predicates.add(p);
+							srcList.add(shadowed); dstList.add(notShadowed);
+						} else if(!srcList.contains(shadowed)) {
+							SimplePredicate p1 = new SimplePredicate(aputils, shadowed, false, "*", false, "*", false, "*", false);
+							predicates.add(p1);
+							srcList.add(shadowed); 
+						} else if(!dstList.contains(notShadowed)) {
+							SimplePredicate p1 = new SimplePredicate(aputils, "*", false, notShadowed, false, "*", false, "*", false);
+							predicates.add(p1);
+							dstList.add(notShadowed); 
+						}
+					}
+					shadowedPredicates.add(new SimplePredicate(aputils, node.getName(), false, notShadowed, false, "*", false, "*", false));
+				}
+				//Reconversion
+				for(String notShadowedAddress: notShadowedAddressesList) {
+					SimplePredicate p = new SimplePredicate(aputils, notShadowedAddress, false, node.getName(), false, "*", false, "*", false);
+					reconversionPredicates.add(p);
+					for(String shadowedAddress: shadowedAddressesList)
+						reconvertedPredicates.add(new SimplePredicate(aputils, notShadowedAddress, false, shadowedAddress, false, "*", false, "*", false));
+					//check if it needs also to be inserted into predicates
+					if(!dstList.contains(node.getName())) {
+						SimplePredicate p2 = new SimplePredicate(aputils, "*", false, node.getName(), false, "*", false, "*", false);
+						predicates.add(p2);
+						dstList.add(node.getName());
+					}
+					if(!srcList.contains(notShadowedAddress)) {
+						SimplePredicate p3 = new SimplePredicate(aputils, notShadowedAddress, false, "*", false, "*", false, "*", false);
+						predicates.add(p3);
+						srcList.add(notShadowedAddress);
+					}
+				}
+				//Add predicate after applying trasformation: this is enough, all the others have already been added
+				predicates.add(new SimplePredicate(aputils, node.getName(), false, "*", false, "*", false, "*", false));
+			}
+			transformersShadowing.put(node.getName(), shadowingPredicates);
+			transformersReconversion.put(node.getName(), reconversionPredicates);
+			transformersShadowed.put(node.getName(), shadowedPredicates);
+			transformersReconverted.put(node.getName(), reconvertedPredicates);
+		}
+		
 		atomicPredicates = aputils.computeAtomicPredicates(atomicPredicates, predicates);
+		int id = 0;
+		for(SimplePredicate ap: atomicPredicates) {
+			retList.put(id, ap);
+			id++;
+		}
 		
-		
-		
+		//DEBUG: print transformers node list
+		System.out.println("TRANSFORMERS NODE");
+		for(Node node: transformersNode.values()) {
+			System.out.println("Node " + node.getName() + " is a " + node.getFunctionalType());
+			System.out.println("Shadowing:");
+			for(SimplePredicate sp: transformersShadowing.get(node.getName())) {
+				System.out.println("     " + sp.toString());
+			}
+			System.out.println("Reconversion:");
+			for(SimplePredicate sp: transformersReconversion.get(node.getName())) {
+				System.out.println("     " + sp.toString());
+			}
+			System.out.println("After Shadowing:");
+			for(SimplePredicate sp: transformersShadowed.get(node.getName())) {
+				System.out.println("     " + sp.toString());
+			}
+			System.out.println("After Reconversion:");
+			for(SimplePredicate sp: transformersReconverted.get(node.getName())) {
+				System.out.println("     " + sp.toString());
+			}
+		}
+		//END DEBUG
 		
 		//DEBUG: print atomic predicates
-		System.out.println("INTERESTING PREDICATES");
+		System.out.println("INTERESTING PREDICATES (with optimization)");
 		for(SimplePredicate ap: predicates) {
-			System.out.println(ap.toString());
-		}
-		System.out.println("ATOMIC PREDICATES REQUIREMENTS");
-		for(SimplePredicate ap: atomicPredicates) {
 			System.out.println(ap.toString());
 		}
 		//END DEBUG
 		
-		return null; 
+		return retList; 
+	}
+	
+	void fillTransformationsMap() {
+		for(Node node: transformersNode.values()) {
+			List<Integer> shadowingInt = new ArrayList<>();
+			List<Integer> reconversionInt = new ArrayList<>();
+			List<Integer> reconvertedInt = new ArrayList<>();
+			List<Integer> shadowedInt = new ArrayList<>();
+			HashMap<Integer, List<Integer>> mapValues = new HashMap<>();
+			boolean found;
+			
+			//ottimizzazioni: remove from list (da testare però), continue dopo il break;
+			for(HashMap.Entry<Integer, SimplePredicate> atomicPredicate: networkAtomicPredicates.entrySet()) {
+				found = false;
+				//scan pre shadowing
+				for(SimplePredicate shadowingPredicate: transformersShadowing.get(node.getName())) {
+					if(aputils.APCompare(atomicPredicate.getValue(), shadowingPredicate)) {
+						shadowingInt.add(atomicPredicate.getKey());
+						found = true;
+						break; //plus continue to next atomic predicate
+					}
+				}
+				if(found) continue;
+				//scan pre reconversion
+				for(SimplePredicate reconversionPredicate: transformersReconversion.get(node.getName())) {
+					if(aputils.APCompare(atomicPredicate.getValue(), reconversionPredicate)) {
+						reconversionInt.add(atomicPredicate.getKey());
+						found = true;
+						break; //plus continue to next atomic predicate
+					}
+				}
+				if(found) continue;
+				//scan post shadowing
+				for(SimplePredicate shadowedPredicate: transformersShadowed.get(node.getName())) {
+					if(aputils.APCompare(atomicPredicate.getValue(), shadowedPredicate)) {
+						shadowedInt.add(atomicPredicate.getKey());
+						found = true;
+						break; //plus continue to next atomic predicate
+					}
+				}
+				if(found) continue;
+				//scan post reconversion
+				for(SimplePredicate reconvertedPredicate: transformersReconverted.get(node.getName())) {
+					if(aputils.APCompare(atomicPredicate.getValue(), reconvertedPredicate)) {
+						reconvertedInt.add(atomicPredicate.getKey());
+						break; //plus continue to next atomic predicate
+					}
+				}
+			}
+			
+			//Now fill the map
+			for(Integer shadowing: shadowingInt) 
+				mapValues.put(shadowing, shadowedInt);
+			for(Integer reconversion: reconversionInt)
+				mapValues.put(reconversion, reconvertedInt);
+			transformationsMap.put(node.getName(), mapValues);
+		}
 	}
 	
 	
@@ -394,6 +558,10 @@ public class VerefooProxy {
 			//I save the completed path and search for others
 			List<AllocationNode> pathToStore = new ArrayList<>();
 			for(int i = 0; i < currentPath.size(); i++) {
+				if((currentPath.get(i).getNode().getFunctionalType() == FunctionalTypes.NAT 
+						|| currentPath.get(i).getNode().getFunctionalType() == FunctionalTypes.FIREWALL)
+						&& !transformersNode.containsKey(currentPath.get(i).getNode().getName()))
+					transformersNode.put(currentPath.get(i).getNode().getName(), currentPath.get(i).getNode());
 				pathToStore.add(i, currentPath.get(i));
 			}
 			allPaths.add(pathToStore);

@@ -102,7 +102,7 @@ public class SimplePredicate {
 	@Override
 	public String toString() {
 		
-		System.out.print("SimplePredicate: {");
+		System.out.print(": {");
 		int i=0;
 		for(String IPSrc: IPSrcList) {
 			if(i!=0) System.out.print("AND");
