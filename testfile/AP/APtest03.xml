@@ -25,7 +25,31 @@
                         <elements>
                             <action>DENY</action>
                             <source>10.0.0.1</source>
-                            <destination>20.0.0.1</destination>
+                            <destination>*</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>20.0.0.1</source>
+                            <destination>10.0.0.1</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                         <elements>
+                            <action>DENY</action>
+                            <source>30.0.0.1</source>
+                            <destination>*</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>ALLOW</action>
+                            <source>20.0.0.1</source>
+                            <destination>*</destination>
                             <protocol>ANY</protocol>
                             <src_port>*</src_port>
                             <dst_port>*</dst_port>
@@ -50,7 +74,8 @@
 	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
-		<Property graph="0" name="ReachabilityProperty" src="10.0.0.2" dst="20.0.0.1"/> 				
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.2" dst="20.0.0.1"/> 
+		<Property graph="0" name="IsolationProperty" src="20.0.0.1" dst="10.0.0.1"/> 				
   </PropertyDefinition>
   <ParsingString></ParsingString>
 </NFV>

@@ -8,17 +8,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
-import com.microsoft.z3.Expr;
 
 import it.polito.verefoo.allocation.AllocationManager;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
-import it.polito.verefoo.functions.Forwarder;
 import it.polito.verefoo.graph.FlowPath;
-import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verefoo.graph.SimplePredicate;
 import it.polito.verefoo.graph.Traffic;
@@ -30,7 +26,6 @@ import it.polito.verefoo.solver.*;
 import it.polito.verefoo.solver.Checker.Prop;
 import it.polito.verefoo.utils.APUtils;
 import it.polito.verefoo.utils.VerificationResult;
-import scala.collection.concurrent.FailedNode;
 
 /**
  * 
@@ -130,12 +125,14 @@ public class VerefooProxy {
 		
 		//DEBUG: print transformation map
 		System.out.println("TRANSFORMATION MAP");
-		for(String node: transformersNode.keySet()) {
-			for(HashMap.Entry<Integer, List<Integer>> entry: transformationsMap.get(node).entrySet()) {
-				System.out.print(entry.getKey() + " -> ");
-				for(Integer integ: entry.getValue())
-					System.out.print(integ + " ");
-				System.out.println();
+		for(Node node: transformersNode.values()) {
+			if(node.getFunctionalType() == FunctionalTypes.NAT) {
+				for(HashMap.Entry<Integer, List<Integer>> entry: transformationsMap.get(node.getName()).entrySet()) {
+					System.out.print(entry.getKey() + " -> ");
+					for(Integer integ: entry.getValue())
+						System.out.print(integ + " ");
+					System.out.println();
+				}
 			}
 		}
 		//END DEBUG
@@ -193,11 +190,11 @@ public class VerefooProxy {
 		
 		//Generate predicates representing input packet class for each transformers
 		for(Node node: transformersNode.values()) {
-			List<SimplePredicate> shadowingPredicates =  new ArrayList<>();
-			List<SimplePredicate> reconversionPredicates =  new ArrayList<>();
-			List<SimplePredicate> shadowedPredicates =  new ArrayList<>();
-			List<SimplePredicate> reconvertedPredicates =  new ArrayList<>();
 			if(node.getFunctionalType() == FunctionalTypes.NAT) {
+				List<SimplePredicate> shadowingPredicates =  new ArrayList<>();
+				List<SimplePredicate> reconversionPredicates =  new ArrayList<>();
+				List<SimplePredicate> shadowedPredicates =  new ArrayList<>();
+				List<SimplePredicate> reconvertedPredicates =  new ArrayList<>();
 				//Compute list of shadowed and not shadowed addresses
 				List<String> shadowedAddressesList = new ArrayList<>();
 				for(String shadowedAddress: node.getConfiguration().getNat().getSource()) {
@@ -257,107 +254,156 @@ public class VerefooProxy {
 				}
 				//Add predicate after applying trasformation: this is enough, all the others have already been added
 				predicates.add(new SimplePredicate(aputils, node.getName(), false, "*", false, "*", false, "*", false));
+				transformersShadowing.put(node.getName(), shadowingPredicates);
+				transformersReconversion.put(node.getName(), reconversionPredicates);
+				transformersShadowed.put(node.getName(), shadowedPredicates);
+				transformersReconverted.put(node.getName(), reconvertedPredicates);
+				
+			} else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
+				List<SimplePredicate> allowedList = new ArrayList<>();
+				List<SimplePredicate> deniedList = new ArrayList<>();
+				for(int index = 0; index < node.getConfiguration().getFirewall().getElements().size() + 1; index++) {
+					Elements rule;
+					if(index < node.getConfiguration().getFirewall().getElements().size())
+						rule = node.getConfiguration().getFirewall().getElements().get(index);
+					else {
+						rule = new Elements();
+						rule.setAction(node.getConfiguration().getFirewall().getDefaultAction());
+						rule.setSource("*"); rule.setDestination("*"); rule.setSrcPort("*"); rule.setDstPort("*");
+					}
+					
+					if(rule.getAction().equals(ActionTypes.DENY)) {
+						//denied <-- denied V rule-i
+						deniedList.add(new SimplePredicate(aputils, rule.getSource(), false, rule.getDestination(), false, rule.getSrcPort(), false, rule.getDstPort(), false));
+					} else if(rule.getAction().equals(ActionTypes.ALLOW)){
+						//allowed <-- allowed V (rule-i AND !denied)
+						List<SimplePredicate> resToAdd = new ArrayList<>();
+						resToAdd.add(new SimplePredicate(aputils, rule.getSource(), false, rule.getDestination(), false, rule.getSrcPort(), false, rule.getDstPort(), false));
+						List<SimplePredicate> tmpList = new ArrayList<>();
+						for(SimplePredicate denied: deniedList) {
+							List<SimplePredicate> negDeniedList = aputils.neg(denied);
+							for(SimplePredicate allow: resToAdd) {
+								for(SimplePredicate negDenied: negDeniedList) {
+									SimplePredicate res = aputils.computeIntersection(allow, negDenied);
+									if(res != null)
+										tmpList.add(res);
+								}
+							}
+							if(tmpList.isEmpty()) { //No intersections foud, so rule is useless
+								resToAdd.clear();
+								break;
+							} else {
+								resToAdd = new ArrayList<>(tmpList);
+								tmpList = new ArrayList<>();
+							}
+						}
+						if(!resToAdd.isEmpty()) allowedList.addAll(resToAdd);
+					}
+				}
+				
+				//DEBUG: print allowed rules
+				System.out.println("ALLOWED RULES");
+				for(SimplePredicate allowed: allowedList) {
+					System.out.println(allowed.toString());
+				}
 			}
-			transformersShadowing.put(node.getName(), shadowingPredicates);
-			transformersReconversion.put(node.getName(), reconversionPredicates);
-			transformersShadowed.put(node.getName(), shadowedPredicates);
-			transformersReconverted.put(node.getName(), reconvertedPredicates);
 		}
-		
+
 		atomicPredicates = aputils.computeAtomicPredicates(atomicPredicates, predicates);
 		int id = 0;
 		for(SimplePredicate ap: atomicPredicates) {
 			retList.put(id, ap);
 			id++;
 		}
-		
-		//DEBUG: print transformers node list
-		System.out.println("TRANSFORMERS NODE");
-		for(Node node: transformersNode.values()) {
-			System.out.println("Node " + node.getName() + " is a " + node.getFunctionalType());
-			System.out.println("Shadowing:");
-			for(SimplePredicate sp: transformersShadowing.get(node.getName())) {
-				System.out.println("     " + sp.toString());
-			}
-			System.out.println("Reconversion:");
-			for(SimplePredicate sp: transformersReconversion.get(node.getName())) {
-				System.out.println("     " + sp.toString());
-			}
-			System.out.println("After Shadowing:");
-			for(SimplePredicate sp: transformersShadowed.get(node.getName())) {
-				System.out.println("     " + sp.toString());
-			}
-			System.out.println("After Reconversion:");
-			for(SimplePredicate sp: transformersReconverted.get(node.getName())) {
-				System.out.println("     " + sp.toString());
-			}
-		}
-		//END DEBUG
-		
+
 		//DEBUG: print atomic predicates
 		System.out.println("INTERESTING PREDICATES (with optimization)");
 		for(SimplePredicate ap: predicates) {
 			System.out.println(ap.toString());
 		}
 		//END DEBUG
-		
+
 		return retList; 
 	}
-	
+
 	void fillTransformationsMap() {
 		for(Node node: transformersNode.values()) {
-			List<Integer> shadowingInt = new ArrayList<>();
-			List<Integer> reconversionInt = new ArrayList<>();
-			List<Integer> reconvertedInt = new ArrayList<>();
-			List<Integer> shadowedInt = new ArrayList<>();
-			HashMap<Integer, List<Integer>> mapValues = new HashMap<>();
-			boolean found;
-			
-			//ottimizzazioni: remove from list (da testare però), continue dopo il break;
-			for(HashMap.Entry<Integer, SimplePredicate> atomicPredicate: networkAtomicPredicates.entrySet()) {
-				found = false;
-				//scan pre shadowing
-				for(SimplePredicate shadowingPredicate: transformersShadowing.get(node.getName())) {
-					if(aputils.APCompare(atomicPredicate.getValue(), shadowingPredicate)) {
-						shadowingInt.add(atomicPredicate.getKey());
-						found = true;
-						break; //plus continue to next atomic predicate
+			if(node.getFunctionalType() == FunctionalTypes.NAT) {
+				List<Integer> shadowingInt = new ArrayList<>();
+				List<Integer> reconversionInt = new ArrayList<>();
+				List<Integer> reconvertedInt = new ArrayList<>();
+				List<Integer> shadowedInt = new ArrayList<>();
+				HashMap<Integer, List<Integer>> mapValues = new HashMap<>();
+				int toFind = transformersShadowing.get(node.getName()).size() + transformersReconversion.get(node.getName()).size() 
+						+ transformersShadowed.get(node.getName()).size() + transformersReconverted.get(node.getName()).size();
+				int index;
+				boolean found;
+				//ottimizzazioni: remove from list (da testare però), continue dopo il break;
+				for(HashMap.Entry<Integer, SimplePredicate> atomicPredicate: networkAtomicPredicates.entrySet()) {
+					found = false;
+					//scan pre shadowing
+					index = 0;
+					for(SimplePredicate shadowingPredicate: transformersShadowing.get(node.getName())) {
+						if(aputils.APCompare(atomicPredicate.getValue(), shadowingPredicate)) {
+							shadowingInt.add(atomicPredicate.getKey());
+							transformersShadowing.get(node.getName()).remove(index);
+							found = true;
+							toFind--;
+							break; //plus continue to next atomic predicate
+						} 
+						index++;
 					}
-				}
-				if(found) continue;
-				//scan pre reconversion
-				for(SimplePredicate reconversionPredicate: transformersReconversion.get(node.getName())) {
-					if(aputils.APCompare(atomicPredicate.getValue(), reconversionPredicate)) {
-						reconversionInt.add(atomicPredicate.getKey());
-						found = true;
-						break; //plus continue to next atomic predicate
+					if(found) continue;
+					if(toFind == 0) break;
+					//scan pre reconversion
+					index = 0;
+					for(SimplePredicate reconversionPredicate: transformersReconversion.get(node.getName())) {
+						if(aputils.APCompare(atomicPredicate.getValue(), reconversionPredicate)) {
+							reconversionInt.add(atomicPredicate.getKey());
+							transformersReconversion.get(node.getName()).remove(index);
+							found = true;
+							toFind--;
+							break; //plus continue to next atomic predicate
+						}
+						index++;
 					}
-				}
-				if(found) continue;
-				//scan post shadowing
-				for(SimplePredicate shadowedPredicate: transformersShadowed.get(node.getName())) {
-					if(aputils.APCompare(atomicPredicate.getValue(), shadowedPredicate)) {
-						shadowedInt.add(atomicPredicate.getKey());
-						found = true;
-						break; //plus continue to next atomic predicate
+					if(found) continue;
+					if(toFind == 0) break;
+					//scan post shadowing
+					index = 0;
+					for(SimplePredicate shadowedPredicate: transformersShadowed.get(node.getName())) {
+						if(aputils.APCompare(atomicPredicate.getValue(), shadowedPredicate)) {
+							shadowedInt.add(atomicPredicate.getKey());
+							transformersShadowed.get(node.getName()).remove(index);
+							found = true;
+							toFind--;
+							break; //plus continue to next atomic predicate
+						}
+						index++;
 					}
-				}
-				if(found) continue;
-				//scan post reconversion
-				for(SimplePredicate reconvertedPredicate: transformersReconverted.get(node.getName())) {
-					if(aputils.APCompare(atomicPredicate.getValue(), reconvertedPredicate)) {
-						reconvertedInt.add(atomicPredicate.getKey());
-						break; //plus continue to next atomic predicate
+					if(found) continue;
+					if(toFind == 0) break;
+					//scan post reconversion
+					index = 0;
+					for(SimplePredicate reconvertedPredicate: transformersReconverted.get(node.getName())) {
+						if(aputils.APCompare(atomicPredicate.getValue(), reconvertedPredicate)) {
+							reconvertedInt.add(atomicPredicate.getKey());
+							transformersReconverted.get(node.getName()).remove(index);
+							toFind--;
+							break; //plus continue to next atomic predicate
+						}
+						index++;
 					}
+					if(toFind == 0) break;
 				}
+
+				//Now fill the map
+				for(Integer shadowing: shadowingInt) 
+					mapValues.put(shadowing, shadowedInt);
+				for(Integer reconversion: reconversionInt)
+					mapValues.put(reconversion, reconvertedInt);
+				transformationsMap.put(node.getName(), mapValues);
 			}
-			
-			//Now fill the map
-			for(Integer shadowing: shadowingInt) 
-				mapValues.put(shadowing, shadowedInt);
-			for(Integer reconversion: reconversionInt)
-				mapValues.put(reconversion, reconvertedInt);
-			transformationsMap.put(node.getName(), mapValues);
 		}
 	}
 	

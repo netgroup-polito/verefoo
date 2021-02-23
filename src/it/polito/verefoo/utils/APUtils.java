@@ -175,7 +175,7 @@ public class APUtils {
 		return true;
 	}
 	
-	private SimplePredicate computeIntersection(SimplePredicate p1, SimplePredicate p2){
+	public SimplePredicate computeIntersection(SimplePredicate p1, SimplePredicate p2){
 		SimplePredicate retPredicate = new SimplePredicate();
 		List<String> IPSrcList;
 		boolean negIPSrc;
