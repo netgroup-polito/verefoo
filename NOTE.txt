@@ -1,0 +1,9 @@
+DA TESTARE:
+- verificare transformation NAT con più NAT in sequenza
+- aggiungere integrazione per ProtoType
+- Quando metto un requisito con una wildcards es APtest032 con 10.0.0.-1, mi divide il requirement in più requisiti -> ho commentato normalize() 
+  dentro il VerefooNormalizer
+
+
+
+

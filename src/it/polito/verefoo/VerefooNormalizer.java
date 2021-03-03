@@ -32,7 +32,7 @@ public class VerefooNormalizer {
 			flowGroups = new HashMap<>();
 			this.originalNfv = root;
 			this.root = root;
-			normalize();
+			//normalize();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new BadGraphError("Error during deserializing");

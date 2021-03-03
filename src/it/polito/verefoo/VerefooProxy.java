@@ -15,8 +15,9 @@ import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
 import it.polito.verefoo.graph.FlowPath;
+import it.polito.verefoo.graph.IPAddress;
+import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.graph.SecurityRequirement;
-import it.polito.verefoo.graph.SimplePredicate;
 import it.polito.verefoo.graph.Traffic;
 import it.polito.verefoo.graph.Flow;
 import it.polito.verefoo.jaxb.*;
@@ -48,13 +49,8 @@ public class VerefooProxy {
 	private APUtils aputils;
 	
 	/* Atomic predicates */
-	private HashMap<Integer, SimplePredicate> networkAtomicPredicates;
+	private HashMap<Integer, Predicate> networkAtomicPredicatesNew = new HashMap<>();
 	HashMap<String, Node> transformersNode = new HashMap<>();
-	HashMap<String, List<SimplePredicate>> transformersShadowing = new HashMap<>();
-	HashMap<String, List<SimplePredicate>> transformersShadowed = new HashMap<>();
-	HashMap<String, List<SimplePredicate>> transformersReconversion = new HashMap<>();
-	HashMap<String, List<SimplePredicate>> transformersReconverted = new HashMap<>();
-	HashMap<String, HashMap<Integer, List<Integer>>> transformationsMap = new HashMap<>();
 	
 	/**
 	 * Public constructor for the Verefoo proxy service
@@ -111,31 +107,9 @@ public class VerefooProxy {
 		
 		/* Atomic predicates */
 		trafficFlowsMap = generateFlowPaths();
-		networkAtomicPredicates = generateAtomicPredicates();
-		
-		//DEBUG: print resulting ap
-		System.out.println("ATOMIC PREDICATES REQUIREMENTS");
-		for(HashMap.Entry<Integer, SimplePredicate> ap: networkAtomicPredicates.entrySet()) {
-			System.out.print("Simple Predicate " + ap.getKey());
-			System.out.println(ap.getValue().toString());
-		}
-		//END DEBUG
-		
-		fillTransformationsMap();
-		
-		//DEBUG: print transformation map
-		System.out.println("TRANSFORMATION MAP");
-		for(Node node: transformersNode.values()) {
-			if(node.getFunctionalType() == FunctionalTypes.NAT) {
-				for(HashMap.Entry<Integer, List<Integer>> entry: transformationsMap.get(node.getName()).entrySet()) {
-					System.out.print(entry.getKey() + " -> ");
-					for(Integer integ: entry.getValue())
-						System.out.print(integ + " ");
-					System.out.println();
-				}
-			}
-		}
-		//END DEBUG
+		networkAtomicPredicatesNew = generateAtomicPredicateNew();
+		fillTransformationMap();
+		printTransformations(); //DEBUG
 		
 		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
 		allocationManager.instantiateFunctions();
@@ -147,16 +121,120 @@ public class VerefooProxy {
 		formalizeRequirements();
 		
 	}
-
-	HashMap<Integer, SimplePredicate> generateAtomicPredicates(){
-		HashMap<Integer, SimplePredicate> retList = new HashMap<>();
-		List<SimplePredicate> predicates = new ArrayList<>();
-		List<SimplePredicate> atomicPredicates = new ArrayList<>();
+	
+	
+	//DEBUG
+	void printTransformations() {
+		for(String node: transformersNode.keySet()) {
+			AllocationNode allocNode = allocationNodes.get(node);
+			System.out.println("TRANSFORMATION MAP for node " + node);
+			for(HashMap.Entry<Integer, List<Integer>> entry: allocNode.getTransformationMap().entrySet()) {
+				System.out.print(entry.getKey() + ":" );
+				for(Integer res: entry.getValue())
+					System.out.print(res + " ");
+				System.out.println();
+			}
+			System.out.println("ALLOWED PREDICATES for node " + node);
+			for(Integer i: allocNode.getForwardBehaviourList())
+				System.out.print(i + " ");
+			System.out.println();
+			//END DEBUG
+		}
+	}
+	//END DEBUG
+	
+	void fillTransformationMap() {
+		for(Node node: transformersNode.values()) {
+			HashMap<Integer, List<Integer>> resultMap = allocationNodes.get(node.getName()).getTransformationMap();
+			if(node.getFunctionalType() == FunctionalTypes.NAT) {
+				HashMap<String, List<Integer>> shadowingMap = new HashMap<>(); //grouped by dest
+				HashMap<String, List<Integer>> reconversionMap = new HashMap<>();
+				HashMap<String, List<Integer>> shadowedMap = new HashMap<>();
+				HashMap<String, List<Integer>> reconvertedMap = new HashMap<>();
+				List<IPAddress> natIPSrcAddressList = new ArrayList<>();
+				for(String src: node.getConfiguration().getNat().getSource()) 
+					natIPSrcAddressList.add(new IPAddress(src, false));
+				IPAddress natIPAddress = new IPAddress(node.getName(), false);
+				
+				for(HashMap.Entry<Integer, Predicate> apEntry: networkAtomicPredicatesNew.entrySet()) {
+					Predicate ap = apEntry.getValue();
+					if(ap.getIPSrcListSize() != 1 || ap.getIPDstListSize() != 1) continue;
+					if(ap.hasIPDstNotIncludedIn(natIPSrcAddressList) && !ap.hasIPDstEqual(natIPAddress)) {
+						if(ap.hasIPSrcEqual(natIPAddress)) {
+							if(!shadowedMap.containsKey(ap.firstIPDstToString())) {
+								List<Integer> list = new ArrayList<>();
+								list.add(apEntry.getKey());
+								shadowedMap.put(ap.firstIPDstToString(), list);
+							} else {
+								shadowedMap.get(ap.firstIPDstToString()).add(apEntry.getKey());
+							}
+						} 
+						else {
+							if(ap.hasIPSrcEqualOrIncludedIn(natIPSrcAddressList))
+								if(!shadowingMap.containsKey(ap.firstIPDstToString())) {
+									List<Integer> list = new ArrayList<>();
+									list.add(apEntry.getKey());
+									shadowingMap.put(ap.firstIPDstToString(), list);
+								} else {
+									shadowingMap.get(ap.firstIPDstToString()).add(apEntry.getKey());
+								}
+						}
+					} else if(ap.hasIPSrcNotIncludedIn(natIPSrcAddressList) && !ap.hasIPSrcEqual(natIPAddress)) {
+						if(ap.hasIPDstEqual(natIPAddress)) {
+							if(!reconversionMap.containsKey(ap.firstIPSrcToString())) {
+								List<Integer> list = new ArrayList<>();
+								list.add(apEntry.getKey());
+								reconversionMap.put(ap.firstIPSrcToString(), list);
+							} else {
+								reconversionMap.get(ap.firstIPSrcToString()).add(apEntry.getKey());
+							}
+						} else if(ap.hasIPDstEqualOrIncludedIn(natIPSrcAddressList)) {
+							if(!reconvertedMap.containsKey(ap.firstIPSrcToString())) {
+								List<Integer> list = new ArrayList<>();
+								list.add(apEntry.getKey());
+								reconvertedMap.put(ap.firstIPSrcToString(), list);
+							} else {
+								reconvertedMap.get(ap.firstIPSrcToString()).add(apEntry.getKey());
+							}
+						}
+					}
+				}
+				for(HashMap.Entry<String, List<Integer>> entry: shadowingMap.entrySet()) {
+					for(Integer sh: entry.getValue()) {
+						resultMap.put(sh, shadowedMap.get(entry.getKey()));
+					}
+				}
+				for(HashMap.Entry<String, List<Integer>> entry: reconversionMap.entrySet()) {
+					for(Integer rc: entry.getValue()) {
+						resultMap.put(rc, reconvertedMap.get(entry.getKey()));
+					}
+				}
+			} else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
+				List<Predicate> allowedPredicates = allocationNodes.get(node.getName()).getForwardBehaviourPredicateList();
+				List<Integer> resultList = new ArrayList<>();
+				for(HashMap.Entry<Integer, Predicate> apEntry: networkAtomicPredicatesNew.entrySet()) {
+					//check if the atomic predicate match at least one allowed rule
+					for(Predicate allowed: allowedPredicates) {
+						Predicate intersectionPredicate = aputils.computeIntersectionNew(apEntry.getValue(), allowed);
+						if(intersectionPredicate != null && aputils.APCompareNew(intersectionPredicate, apEntry.getValue())) {
+							resultList.add(apEntry.getKey());
+							break;
+						}
+					}
+				}
+				allocationNodes.get(node.getName()).setForwardBehaviourList(resultList);
+			}
+		}
+	}
+	
+	HashMap<Integer, Predicate> generateAtomicPredicateNew(){
+		List<Predicate> predicates = new ArrayList<>();
+		List<Predicate> atomicPredicates = new ArrayList<>();
 		List<String> srcList = new ArrayList<>();
 		List<String> dstList = new ArrayList<>();
 		List<String> srcPList = new ArrayList<>();
 		List<String> dstPList = new ArrayList<>();
-		
+
 		//Generate predicates representing source and predicates representing destination of each requirement
 		for(SecurityRequirement sr : securityRequirements.values()) {
 			Property property = sr.getOriginalProperty();
@@ -164,6 +242,8 @@ public class VerefooProxy {
 			String IPDst = property.getDst();
 			String pSrc = property.getSrcPort() != null &&  !property.getSrcPort().equals("null") ? property.getSrcPort() : "*";
 			String pDst = property.getDstPort() != null &&  !property.getDstPort().equals("null") ? property.getDstPort() : "*";
+			L4ProtocolTypes proto = property.getLv4Proto() != null ? property.getLv4Proto() : L4ProtocolTypes.ANY;
+			srcList.add("*"); dstList.add("*"); srcPList.add("*"); dstPList.add("*");
 			
 			if(!srcList.contains(IPSrc) || !srcPList.contains(pSrc)) {
 				if(!srcList.contains(IPSrc))
@@ -173,7 +253,7 @@ public class VerefooProxy {
 					srcPList.add(pSrc);
 				else pSrc = "*";
 				
-				SimplePredicate srcPredicate = new SimplePredicate(aputils, IPSrc, false, "*", false, pSrc, false, "*", false);
+				Predicate srcPredicate = new Predicate(IPSrc, false, "*", false, pSrc, false, "*", false, proto);
 				predicates.add(srcPredicate);
 			}
 			
@@ -183,230 +263,108 @@ public class VerefooProxy {
 				if(!dstPList.contains(pDst)) dstPList.add(pDst);
 				else pDst = "*";
 				
-				SimplePredicate dstPredicate = new SimplePredicate(aputils, "*", false, IPDst, false, "*", false, pDst, false);
+				Predicate dstPredicate = new Predicate("*", false, IPDst, false, "*", false, pDst, false, proto);
 				predicates.add(dstPredicate);
 			}
 		}
-		
+
 		//Generate predicates representing input packet class for each transformers
 		for(Node node: transformersNode.values()) {
 			if(node.getFunctionalType() == FunctionalTypes.NAT) {
-				List<SimplePredicate> shadowingPredicates =  new ArrayList<>();
-				List<SimplePredicate> reconversionPredicates =  new ArrayList<>();
-				List<SimplePredicate> shadowedPredicates =  new ArrayList<>();
-				List<SimplePredicate> reconvertedPredicates =  new ArrayList<>();
-				//Compute list of shadowed and not shadowed addresses
+				//Compute list of shadowed (only those related to requirements source and dest addresses)
 				List<String> shadowedAddressesList = new ArrayList<>();
+				boolean found;
 				for(String shadowedAddress: node.getConfiguration().getNat().getSource()) {
-					if(srcList.contains(shadowedAddress) || dstList.contains(shadowedAddress))
-						shadowedAddressesList.add(shadowedAddress);
-				}
-				List<String> notShadowedAddressesList = new ArrayList<>();
-				for(String address: srcList) {
-					if(!node.getConfiguration().getNat().getSource().contains(address) && !address.equals("*") 
-							&& !notShadowedAddressesList.contains(address))
-						notShadowedAddressesList.add(address);
-				}
-				for(String address: dstList) {
-					if(!node.getConfiguration().getNat().getSource().contains(address) && !address.equals("*")
-							&& !notShadowedAddressesList.contains(address))
-						notShadowedAddressesList.add(address);
-				}
-				//Generate predicates
-				//Shadowing
-				for(String notShadowed: notShadowedAddressesList) {
-					for(String shadowed: shadowedAddressesList) { 
-						SimplePredicate p = new SimplePredicate(aputils, shadowed, false, notShadowed, false, "*", false, "*", false);
-						shadowingPredicates.add(p);
-						//check if it needs also to be inserted into predicates
-						if(!srcList.contains(shadowed) && !dstList.contains(notShadowed)) {
-							predicates.add(p);
-							srcList.add(shadowed); dstList.add(notShadowed);
-						} else if(!srcList.contains(shadowed)) {
-							SimplePredicate p1 = new SimplePredicate(aputils, shadowed, false, "*", false, "*", false, "*", false);
-							predicates.add(p1);
-							srcList.add(shadowed); 
-						} else if(!dstList.contains(notShadowed)) {
-							SimplePredicate p1 = new SimplePredicate(aputils, "*", false, notShadowed, false, "*", false, "*", false);
-							predicates.add(p1);
-							dstList.add(notShadowed); 
+					found = false;
+					for(String ip: srcList) {
+						if(shadowedAddress.equals(ip) || aputils.isIncludedIPString(shadowedAddress, ip)) {
+							shadowedAddressesList.add(shadowedAddress);
+							found = true;
+							break;
 						}
 					}
-					shadowedPredicates.add(new SimplePredicate(aputils, node.getName(), false, notShadowed, false, "*", false, "*", false));
+					if(found) continue;
+					//TODO: non sono sicuro che serva
+//					for(String ip: dstList) {
+//						if(shadowedAddress.equals(ip) || aputils.isIncludedIPString(shadowedAddress, ip)) {
+//							shadowedAddressesList.add(shadowedAddress);
+//							found = true;
+//							break;
+//						}
+//					}
 				}
-				//Reconversion
-				for(String notShadowedAddress: notShadowedAddressesList) {
-					SimplePredicate p = new SimplePredicate(aputils, notShadowedAddress, false, node.getName(), false, "*", false, "*", false);
-					reconversionPredicates.add(p);
-					for(String shadowedAddress: shadowedAddressesList)
-						reconvertedPredicates.add(new SimplePredicate(aputils, notShadowedAddress, false, shadowedAddress, false, "*", false, "*", false));
-					//check if it needs also to be inserted into predicates
-					if(!dstList.contains(node.getName())) {
-						SimplePredicate p2 = new SimplePredicate(aputils, "*", false, node.getName(), false, "*", false, "*", false);
-						predicates.add(p2);
-						dstList.add(node.getName());
+				//Generate and add shadowing predicates
+				for(String shadowed: shadowedAddressesList) {
+					if(!srcList.contains(shadowed)) {
+						Predicate shpred = new Predicate(shadowed, false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY);
+						predicates.add(shpred);
 					}
-					if(!srcList.contains(notShadowedAddress)) {
-						SimplePredicate p3 = new SimplePredicate(aputils, notShadowedAddress, false, "*", false, "*", false, "*", false);
-						predicates.add(p3);
-						srcList.add(notShadowedAddress);
-					}
+				}
+				//Reconversion predicate
+				if(!dstList.contains(node.getName())) {
+					Predicate rcpred = new Predicate("*", false, node.getName(), false, "*", false, "*", false, L4ProtocolTypes.ANY);
+					predicates.add(rcpred);
 				}
 				//Add predicate after applying trasformation: this is enough, all the others have already been added
-				predicates.add(new SimplePredicate(aputils, node.getName(), false, "*", false, "*", false, "*", false));
-				transformersShadowing.put(node.getName(), shadowingPredicates);
-				transformersReconversion.put(node.getName(), reconversionPredicates);
-				transformersShadowed.put(node.getName(), shadowedPredicates);
-				transformersReconverted.put(node.getName(), reconvertedPredicates);
-				
+				predicates.add(new Predicate(node.getName(), false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY));
 			} else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
-				List<SimplePredicate> allowedList = new ArrayList<>();
-				List<SimplePredicate> deniedList = new ArrayList<>();
-				for(int index = 0; index < node.getConfiguration().getFirewall().getElements().size() + 1; index++) {
-					Elements rule;
-					if(index < node.getConfiguration().getFirewall().getElements().size())
-						rule = node.getConfiguration().getFirewall().getElements().get(index);
-					else {
-						rule = new Elements();
-						rule.setAction(node.getConfiguration().getFirewall().getDefaultAction());
-						rule.setSource("*"); rule.setDestination("*"); rule.setSrcPort("*"); rule.setDstPort("*");
-					}
-					
+				List<Predicate> allowedList = new ArrayList<>();
+				List<Predicate> deniedList = new ArrayList<>();
+				
+				for(Elements rule: node.getConfiguration().getFirewall().getElements()) {
 					if(rule.getAction().equals(ActionTypes.DENY)) {
-						//denied <-- denied V rule-i
-						deniedList.add(new SimplePredicate(aputils, rule.getSource(), false, rule.getDestination(), false, rule.getSrcPort(), false, rule.getDstPort(), false));
-					} else if(rule.getAction().equals(ActionTypes.ALLOW)){
-						//allowed <-- allowed V (rule-i AND !denied)
-						List<SimplePredicate> resToAdd = new ArrayList<>();
-						resToAdd.add(new SimplePredicate(aputils, rule.getSource(), false, rule.getDestination(), false, rule.getSrcPort(), false, rule.getDstPort(), false));
-						List<SimplePredicate> tmpList = new ArrayList<>();
-						for(SimplePredicate denied: deniedList) {
-							List<SimplePredicate> negDeniedList = aputils.neg(denied);
-							for(SimplePredicate allow: resToAdd) {
-								for(SimplePredicate negDenied: negDeniedList) {
-									SimplePredicate res = aputils.computeIntersection(allow, negDenied);
-									if(res != null)
-										tmpList.add(res);
-								}
-							}
-							if(tmpList.isEmpty()) { //No intersections foud, so rule is useless
-								resToAdd.clear();
-								break;
-							} else {
-								resToAdd = new ArrayList<>(tmpList);
-								tmpList = new ArrayList<>();
-							}
-						}
-						if(!resToAdd.isEmpty()) allowedList.addAll(resToAdd);
+						//deny <--- deny V rule-i
+						deniedList.add(new Predicate(rule.getSource(), false, rule.getDestination(), false, 
+								rule.getSrcPort(), false, rule.getDstPort(), false, L4ProtocolTypes.ANY));
+					} else {
+						//allowed <--- allowed V (rule-i AND !denied)
+						Predicate toAdd = new Predicate(rule.getSource(), false, rule.getDestination(), false, 
+								rule.getSrcPort(), false, rule.getDstPort(), false, L4ProtocolTypes.ANY);
+						List<Predicate> allowedToAdd = aputils.computeAllowedForRule(toAdd, deniedList);
+						allowedList.addAll(allowedToAdd);
 					}
+				}
+				//Check default action: if DENY do nothing
+				if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
+					Predicate toAdd = new Predicate("*", false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY);
+					List<Predicate> allowedToAdd = aputils.computeAllowedForRule(toAdd, deniedList);
+					allowedList.addAll(allowedToAdd);
 				}
 				
+				allocationNodes.get(node.getName()).setForwardBehaviourPredicateList(allowedList);
 				//DEBUG: print allowed rules
-				System.out.println("ALLOWED RULES");
-				for(SimplePredicate allowed: allowedList) {
-					System.out.println(allowed.toString());
+				System.out.println("Allowed rules for " + node.getName());
+				for(Predicate pred: allowedList) {
+					pred.print();
 				}
+				//END DEBUG
 			}
 		}
 
-		atomicPredicates = aputils.computeAtomicPredicates(atomicPredicates, predicates);
-		int id = 0;
-		for(SimplePredicate ap: atomicPredicates) {
-			retList.put(id, ap);
-			id++;
-		}
-
-		//DEBUG: print atomic predicates
-		System.out.println("INTERESTING PREDICATES (with optimization)");
-		for(SimplePredicate ap: predicates) {
-			System.out.println(ap.toString());
-		}
+		//DEBUG: interesting predicates for requirements source and destination
+		System.out.println("NEW INTERESTING PREDICATES");
+		for(Predicate p: predicates)
+			p.print();
 		//END DEBUG
 
-		return retList; 
-	}
-
-	void fillTransformationsMap() {
-		for(Node node: transformersNode.values()) {
-			if(node.getFunctionalType() == FunctionalTypes.NAT) {
-				List<Integer> shadowingInt = new ArrayList<>();
-				List<Integer> reconversionInt = new ArrayList<>();
-				List<Integer> reconvertedInt = new ArrayList<>();
-				List<Integer> shadowedInt = new ArrayList<>();
-				HashMap<Integer, List<Integer>> mapValues = new HashMap<>();
-				int toFind = transformersShadowing.get(node.getName()).size() + transformersReconversion.get(node.getName()).size() 
-						+ transformersShadowed.get(node.getName()).size() + transformersReconverted.get(node.getName()).size();
-				int index;
-				boolean found;
-				//ottimizzazioni: remove from list (da testare però), continue dopo il break;
-				for(HashMap.Entry<Integer, SimplePredicate> atomicPredicate: networkAtomicPredicates.entrySet()) {
-					found = false;
-					//scan pre shadowing
-					index = 0;
-					for(SimplePredicate shadowingPredicate: transformersShadowing.get(node.getName())) {
-						if(aputils.APCompare(atomicPredicate.getValue(), shadowingPredicate)) {
-							shadowingInt.add(atomicPredicate.getKey());
-							transformersShadowing.get(node.getName()).remove(index);
-							found = true;
-							toFind--;
-							break; //plus continue to next atomic predicate
-						} 
-						index++;
-					}
-					if(found) continue;
-					if(toFind == 0) break;
-					//scan pre reconversion
-					index = 0;
-					for(SimplePredicate reconversionPredicate: transformersReconversion.get(node.getName())) {
-						if(aputils.APCompare(atomicPredicate.getValue(), reconversionPredicate)) {
-							reconversionInt.add(atomicPredicate.getKey());
-							transformersReconversion.get(node.getName()).remove(index);
-							found = true;
-							toFind--;
-							break; //plus continue to next atomic predicate
-						}
-						index++;
-					}
-					if(found) continue;
-					if(toFind == 0) break;
-					//scan post shadowing
-					index = 0;
-					for(SimplePredicate shadowedPredicate: transformersShadowed.get(node.getName())) {
-						if(aputils.APCompare(atomicPredicate.getValue(), shadowedPredicate)) {
-							shadowedInt.add(atomicPredicate.getKey());
-							transformersShadowed.get(node.getName()).remove(index);
-							found = true;
-							toFind--;
-							break; //plus continue to next atomic predicate
-						}
-						index++;
-					}
-					if(found) continue;
-					if(toFind == 0) break;
-					//scan post reconversion
-					index = 0;
-					for(SimplePredicate reconvertedPredicate: transformersReconverted.get(node.getName())) {
-						if(aputils.APCompare(atomicPredicate.getValue(), reconvertedPredicate)) {
-							reconvertedInt.add(atomicPredicate.getKey());
-							transformersReconverted.get(node.getName()).remove(index);
-							toFind--;
-							break; //plus continue to next atomic predicate
-						}
-						index++;
-					}
-					if(toFind == 0) break;
-				}
-
-				//Now fill the map
-				for(Integer shadowing: shadowingInt) 
-					mapValues.put(shadowing, shadowedInt);
-				for(Integer reconversion: reconversionInt)
-					mapValues.put(reconversion, reconvertedInt);
-				transformationsMap.put(node.getName(), mapValues);
-			}
+		atomicPredicates = aputils.computeAtomicPredicatesNew(atomicPredicates, predicates);
+		
+		int index = 0;
+		for(Predicate p: atomicPredicates) {
+			networkAtomicPredicatesNew.put(index, p);
+			index++;
 		}
-	}
+		
+		//DEBUG: print atomic predicates
+		System.out.println("ATOMIC PREDICATES");
+		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicatesNew.entrySet()) {
+			System.out.print(entry.getKey() + " ");
+			entry.getValue().print();
+		}
+		//END DEBUG
 	
+		return networkAtomicPredicatesNew;
+	}
 	
 	/**
 	 * This method allocates the functions on allocation nodes that are empty.
@@ -618,6 +576,8 @@ public class VerefooProxy {
 		if(level != 0) {
 			if(current.getNode().getFunctionalType() == FunctionalTypes.WEBCLIENT || current.getNode().getFunctionalType() == FunctionalTypes.WEBSERVER) {
 				//traffic is not forwarded anymore
+				visited.remove(current.getNode().getName());
+				currentPath.remove(level);
 				return;
 			}
 		}

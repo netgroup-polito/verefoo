@@ -7,6 +7,7 @@ import com.microsoft.z3.Optimize;
 
 import it.polito.verefoo.functions.GenericFunction;
 import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.jaxb.*;
 
 
@@ -25,6 +26,10 @@ public class AllocationNode {
 	private DatatypeExpr z3Node;
 	private Map<Integer, Flow> crossingFlows = new HashMap<>();
 	
+	/* Atomic predicates */
+	HashMap<Integer, List<Integer>> transformationsMap = new HashMap<>();
+	List<Predicate> forwardBehaviourPredicateList = new ArrayList<>();
+	List<Integer> forwardBehaviourList = new ArrayList<>();
 	
 	/**
 	 * Public constructor for the AllocationNode class
@@ -193,5 +198,24 @@ public class AllocationNode {
 	public void setFlows(Map<Integer, Flow> requirements) {
 		this.crossingFlows = requirements;
 	}
-
+	
+	public HashMap<Integer, List<Integer>> getTransformationMap(){
+		return transformationsMap;
+	}
+	
+	public void setForwardBehaviourPredicateList(List<Predicate> list) {
+		this.forwardBehaviourPredicateList = list;
+	}
+	
+	public List<Predicate> getForwardBehaviourPredicateList(){
+		return forwardBehaviourPredicateList;
+	}
+	
+	public void setForwardBehaviourList(List<Integer> list) {
+		forwardBehaviourList = list;
+	}
+	
+	public List<Integer> getForwardBehaviourList(){
+		return forwardBehaviourList;
+	}
 }

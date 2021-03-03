@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.StringWriter;
-import java.math.BigInteger;
 import java.net.MalformedURLException;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -20,7 +19,6 @@ import org.xml.sax.SAXException;
 
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.jaxb.*;
-import net.sf.javabdd.*;
 /**
  * This is the main class only for testing the Verefoo execution
  *
@@ -39,7 +37,6 @@ public class Main {
 			SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schema = sf.newSchema(new File("./xsd/nfvSchema.xsd"));
 			u.setSchema(schema);
-			
 
 			long beginAll = System.currentTimeMillis();
 			try {
