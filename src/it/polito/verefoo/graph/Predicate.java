@@ -6,11 +6,11 @@ import java.util.List;
 import it.polito.verefoo.jaxb.L4ProtocolTypes;
 
 public class Predicate {
-	List<IPAddress> IPSrcList = new ArrayList<>();
+	List<IPAddress> IPSrcList = new ArrayList<>();  //in AND
 	List<IPAddress> IPDstList = new ArrayList<>();
 	List<PortInterval> pSrcList = new ArrayList<>();
 	List<PortInterval> pDstList = new ArrayList<>();
-	List<L4ProtocolTypes> protoTypeList = new ArrayList<>();
+	List<L4ProtocolTypes> protoTypeList = new ArrayList<>(); //in OR
 	
 	public Predicate() {
 		
@@ -169,9 +169,12 @@ public class Predicate {
 			System.out.print(pDst.toString());
 			i++;
 		}
+		i=0;
 		System.out.print(", ");
 		for(L4ProtocolTypes proto: protoTypeList) {
+			if(i!=0) System.out.print("-");
 			System.out.print(proto);
+			i++;
 		}
 		System.out.print("}\n");
 	}

@@ -121,6 +121,20 @@ public class APUtils {
 					neg.add(sp2);
 				}
 			}
+			//check protoType
+			List<L4ProtocolTypes> list = ap.getProtoTypeList();
+			//If different from ANY and different from the full set (all others L4ProtocolTypes without ANY) 
+			if(!list.contains(L4ProtocolTypes.ANY) && list.size() != L4ProtocolTypes.values().length-1) {
+				Predicate sp1 = new Predicate("*", false, "*", false,  "*", false, "*", false, L4ProtocolTypes.ANY);
+				sp1.setProtoTypeList(list);
+				neg.add(sp1);
+				List<L4ProtocolTypes> negList = computeDifferenceL4ProtocolTypes(list);
+				if(!negList.isEmpty()) {
+					Predicate sp2 = new Predicate("*", false, "*", false,  "*", false, "*", false, L4ProtocolTypes.ANY);
+					sp2.setProtoTypeList(negList);
+					neg.add(sp2);
+				}
+			}
 
 			//Now we have to compute the atomic Predicates
 			neg = computeAtomicPredicatesForNegNew(neg);
@@ -157,7 +171,15 @@ public class APUtils {
 		Collections.sort(p2.getpDstList(), new PortIntervalComparator());
 		if(!p1.getpDstList().equals(p2.getpDstList()))
 			return false;
-		return true;
+		return APComparePrototypeList(p1.getProtoTypeList(), p2.getProtoTypeList());
+	}
+	
+	public boolean APComparePrototypeList(List<L4ProtocolTypes> list1, List<L4ProtocolTypes> list2) {
+		Collections.sort(list1);
+		Collections.sort(list2);
+		if(list1.equals(list2))
+			return true;
+		return false;
 	}
 	
 	public List<Predicate> computeAtomicPredicatesForNegNew(List<Predicate> predicates){
@@ -388,16 +410,29 @@ public class APUtils {
 			tmpPList2 = new ArrayList<>();
 			if(toInsert1) toInsert1PList.add(pdst1);
 		}
-		resultPDstList.addAll(toInsert1PList); 
+		resultPDstList.addAll(toInsert1PList);
+		
+		//Check proto
+		List<L4ProtocolTypes> resultProtoList = new ArrayList<>();
+		if(p1.getProtoTypeList().contains(L4ProtocolTypes.ANY))
+			resultProtoList =  p2.getProtoTypeList();
+		else if(p2.getProtoTypeList().contains(L4ProtocolTypes.ANY))
+			resultProtoList =  p1.getProtoTypeList();
+		else { //None contains ANY, so compute intersection
+			for(L4ProtocolTypes proto1: p1.getProtoTypeList()) {
+				if(p2.getProtoTypeList().contains(proto1))
+					resultProtoList.add(proto1);
+			}
+		}
+		if(resultProtoList.isEmpty())
+			return null; //no intersection exists
 	
 		Predicate resultPredicate = new Predicate();
 		resultPredicate.setIPSrcList(resultIPSrcList);
 		resultPredicate.setIPDstList(resultIPDstList);
 		resultPredicate.setpSrcList(resultPSrcList);
 		resultPredicate.setpDstList(resultPDstList);
-		List<L4ProtocolTypes> rr = new ArrayList<>();
-		rr.add(L4ProtocolTypes.ANY);
-		resultPredicate.setProtoTypeList(rr);
+		resultPredicate.setProtoTypeList(resultProtoList);
 		return resultPredicate;
 	}
 	
@@ -460,7 +495,30 @@ public class APUtils {
 					neg.add(sp2);
 				}
 			}
-
+			//check protoType
+			List<L4ProtocolTypes> list = ap.getProtoTypeList();
+			//If different from ANY and different from the full set (all others L4ProtocolTypes without ANY) 
+			if(!list.contains(L4ProtocolTypes.ANY) && list.size() != L4ProtocolTypes.values().length-1) {
+				List<L4ProtocolTypes> negList = computeDifferenceL4ProtocolTypes(list);
+				if(!negList.isEmpty()) {
+					Predicate sp2 = new Predicate("*", false, "*", false,  "*", false, "*", false, L4ProtocolTypes.ANY);
+					sp2.setProtoTypeList(negList);
+					neg.add(sp2);
+				}
+			}
 			return neg;
+	}
+	
+	
+	public List<L4ProtocolTypes> computeDifferenceL4ProtocolTypes(List<L4ProtocolTypes> list){
+		List<L4ProtocolTypes> retList = new ArrayList<>();
+		if(list.contains(L4ProtocolTypes.ANY))
+			return new ArrayList<>();
+
+		for(L4ProtocolTypes ptype: L4ProtocolTypes.values()) {
+			if(!ptype.equals(L4ProtocolTypes.ANY) && !list.contains(ptype))
+				retList.add(ptype);
+		}
+		return retList;
 	}
 }

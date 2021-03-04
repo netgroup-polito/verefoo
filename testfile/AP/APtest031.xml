@@ -26,7 +26,7 @@
                             <action>DENY</action>
                             <source>10.0.0.1</source>
                             <destination>20.0.0.1</destination>
-                            <protocol>ANY</protocol>
+                            <protocol>TCP</protocol>
                             <src_port>*</src_port>
                             <dst_port>*</dst_port>
                         </elements>
@@ -50,7 +50,7 @@
 	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
-		<Property graph="0" name="ReachabilityProperty" src="10.0.0.1" dst="20.0.0.1"/> 
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.1" dst="20.0.0.1" lv4proto="TCP"/> 
 		<Property graph="0" name="IsolationProperty" src="20.0.0.1" dst="10.0.0.1"/> 				
   </PropertyDefinition>
   <ParsingString></ParsingString>
