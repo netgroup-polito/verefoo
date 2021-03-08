@@ -50,7 +50,8 @@
 	  <LinkConstraints/>
   </Constraints>
   <PropertyDefinition>
-		<Property graph="0" name="ReachabilityProperty" src="10.0.0.-1" dst="30.0.5.1"/> 			
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.-1" dst="30.0.5.1"/> 		
+		<Property graph="0" name="ReachabilityProperty" src="30.0.5.1" dst="10.0.0.-1"/> 		
   </PropertyDefinition>
   <ParsingString></ParsingString>
 </NFV>

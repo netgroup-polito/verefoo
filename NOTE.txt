@@ -1,14 +1,25 @@
-DA TESTARE:
-- verificare transformation NAT con più NAT in sequenza
-- aggiungere integrazione per ProtoType
-- Quando metto un requisito con una wildcards es APtest032 con 10.0.0.-1, mi divide il requirement in più requisiti -> ho commentato normalize() 
-  dentro il VerefooNormalizer
- - rendere parallelizzabile il calcolo dei singoli atomic flows
-  
- CASI DA CHIEDERE
+CASI DA CHIEDERE
  - singoli web client con ip 10.0.0.1, 10.0.0.2 ecc e requisito con 10.0.0.-1. E' possibile?
  - chiedere cosa succede per i predicati che, passato un NAT, non vengono trasformati
-
-
-
+ 
+ 
+ Da fare:
+ - testing
+ - concorrenza su generate atomic flows
+ - togliere codice vecchio Budapest
+ - NAT03 con sottorete in wildcards
+ 
+ TEST CASES
+ -APtest03 : firewall con regole complesse
+ -APtest031: firewall con singola regola in deny
+ -APtest032: firewall con wildcards
+ -APtest05 : esempio cartaceo con NAT
+ -APtest051: cartaceo con anche prototype nel requisito
+ -APtest052: cartaceo con porte singole nel requisito
+ -APtest07 : NAT e wildcards
+ -APtest09 : 2 clients e 2 server e tanti  requisiti
+ -NAT01 : firewall e NAT
+ -NAT02 : 2 NAT in cascata
+ -NAT03 : 2 NAT, ognuno in uscita da una rete privata differente
+ -NAT04 : esempio sopra più un terzo NAT
 

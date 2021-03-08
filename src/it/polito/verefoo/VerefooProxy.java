@@ -278,6 +278,7 @@ public class VerefooProxy {
 				HashMap<String, List<Integer>> shadowedMap = new HashMap<>(); //grouped by dest address
 				HashMap<String, List<Integer>> reconversionMap = new HashMap<>(); //grouped by source address
 				HashMap<String, List<Integer>> reconvertedMap = new HashMap<>();  //grouped by source address
+				List<Integer> notChaingingPredicateList = new ArrayList<>();
 				List<IPAddress> natIPSrcAddressList = new ArrayList<>();
 				for(String src: node.getConfiguration().getNat().getSource()) 
 					natIPSrcAddressList.add(new IPAddress(src, false));
@@ -331,6 +332,9 @@ public class VerefooProxy {
 								reconvertedMap.get(ap.firstIPSrcToString()).add(apEntry.getKey());
 							}
 						}
+					} else if(ap.hasIPSrcEqualOrIncludedIn(natIPSrcAddressList) && ap.hasIPDstEqualOrIncludedIn(natIPSrcAddressList)) {
+						//5*: src included in NAT src (private) and dst included in NAT src (private) -> predicate is just forwarded without transformation
+						notChaingingPredicateList.add(apEntry.getKey());
 					}
 				}
 				//Fill the map: to each shadowing predicate assign the corresponding shadowed predicate, to each reconversion predicate assign the corresponding
@@ -338,6 +342,7 @@ public class VerefooProxy {
 				for(HashMap.Entry<String, List<Integer>> entry: shadowingMap.entrySet()) {
 					for(Integer shing: entry.getValue()) {
 						List<Integer> result = new ArrayList<>();
+						if(!shadowedMap.containsKey(entry.getKey())) break;
 						for(Integer shed: shadowedMap.get(entry.getKey())) {
 							if(aputils.APComparePrototypeList(
 									networkAtomicPredicatesNew.get(shing).getProtoTypeList(), networkAtomicPredicatesNew.get(shed).getProtoTypeList())
@@ -351,6 +356,7 @@ public class VerefooProxy {
 				for(HashMap.Entry<String, List<Integer>> entry: reconversionMap.entrySet()) {
 					for(Integer rcvion: entry.getValue()) {
 						List<Integer> result = new ArrayList<>();
+						if(!reconvertedMap.containsKey(entry.getKey())) break;
 						for(Integer rcved: reconvertedMap.get(entry.getKey())) {
 							if(aputils.APComparePrototypeList(
 									networkAtomicPredicatesNew.get(rcvion).getProtoTypeList(), networkAtomicPredicatesNew.get(rcved).getProtoTypeList())
@@ -360,6 +366,12 @@ public class VerefooProxy {
 						}
 						resultMap.put(rcvion, result);
 					}
+				}
+				//Add predicates that are simply forwarded without being transformed
+				for(Integer pred: notChaingingPredicateList) {
+					List<Integer> toAdd = new ArrayList<>();
+					toAdd.add(pred);
+					resultMap.put(pred, toAdd);
 				}
 			} else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
 				List<Predicate> allowedPredicates = allocationNodes.get(node.getName()).getForwardBehaviourPredicateList();
@@ -430,21 +442,35 @@ public class VerefooProxy {
 		//Generate predicates representing input packet class for each transformers
 		for(Node node: transformersNode.values()) {
 			if(node.getFunctionalType() == FunctionalTypes.NAT) {
-				//Compute list of shadowed (only those related to requirements sources), considering NAT source addresses list
-				List<String> shadowedAddressesList = new ArrayList<>();
+				//Compute list of shadowed and reconverted (only those related to requirements sources), considering NAT source addresses list
+				List<String> shadowedAddressesListSrc = new ArrayList<>();
+				List<String> shadowedAddressesListDst = new ArrayList<>();
 				for(String shadowedAddress: node.getConfiguration().getNat().getSource()) {
-					for(String ip: srcList) {
-						if(shadowedAddress.equals(ip) || aputils.isIncludedIPString(shadowedAddress, ip)) {
-							shadowedAddressesList.add(shadowedAddress);
+					for(String ips: srcList) {
+						if(shadowedAddress.equals(ips) || aputils.isIncludedIPString(shadowedAddress, ips)) {
+							shadowedAddressesListSrc.add(shadowedAddress);
+							break;
+						}
+					}
+					for(String ipd: dstList) {
+						if(shadowedAddress.equals(ipd) || aputils.isIncludedIPString(shadowedAddress, ipd)) {
+							shadowedAddressesListDst.add(shadowedAddress);
 							break;
 						}
 					}
 				}
 				//Generate and add shadowing predicates
-				for(String shadowed: shadowedAddressesList) {
+				for(String shadowed: shadowedAddressesListSrc) {
 					if(!srcList.contains(shadowed)) {
 						Predicate shpred = new Predicate(shadowed, false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY);
 						predicates.add(shpred);
+					}
+				}
+				//Generate and add reconverted predicates
+				for(String shadowed: shadowedAddressesListDst) {
+					if(!dstList.contains(shadowed)) {
+						Predicate rcvedpred = new Predicate("*", false, shadowed, false, "*", false, "*", false, L4ProtocolTypes.ANY);
+						predicates.add(rcvedpred);
 					}
 				}
 				//Reconversion predicate
@@ -452,7 +478,7 @@ public class VerefooProxy {
 					Predicate rcpred = new Predicate("*", false, node.getName(), false, "*", false, "*", false, L4ProtocolTypes.ANY);
 					predicates.add(rcpred);
 				}
-				//Add predicate after applying trasformation: this is enough, all the others have already been added
+				//Add shadowed predicate: this is enough, all the others have already been added
 				predicates.add(new Predicate(node.getName(), false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY));	
 			} 
 				//If the node is a firewall, compute its allowed rules list
