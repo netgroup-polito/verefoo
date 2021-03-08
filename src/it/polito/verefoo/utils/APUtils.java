@@ -12,50 +12,54 @@ import it.polito.verefoo.jaxb.L4ProtocolTypes;
 public class APUtils {
 	
 	public APUtils() {}
-
-	/* Refactor: new part */
 	
-	public List<Predicate> computeAtomicPredicatesNew(List<Predicate> atomicPredicates, List<Predicate> predicates){
+	//Given a list of already computed atomicPredicates and a list of new predicates to insert into the list, transfrom predicates into atomic
+	//predicates, add them to the list and return the new list
+	//Algorithm 3 Yang_Lam_2015
+	public List<Predicate> computeAtomicPredicates(List<Predicate> atomicPredicates, List<Predicate> predicates){
 		List<Predicate> newAtomicPredicates = new ArrayList<>();
 		Predicate first = null;
 		List<Predicate> firstNeg = null;
 		int count = -1;
 		
 		for(Predicate sp: predicates) {
+			//If sp is the first predicate to transform and atomicPredicates is empty
 			if(atomicPredicates.isEmpty() && count == -1) {
 				first = sp;
 				firstNeg = neg(sp);
 				count = 1;
 			}
 			else if(count == 1) {
-				Predicate sp1 = computeIntersectionNew(first, sp);
+				//There is already a predicate in the list, and this is the second
+				Predicate sp1 = computeIntersection(first, sp);
 				if(sp1 != null) atomicPredicates.add(sp1);
 				
 				for(Predicate s: firstNeg) {
-					Predicate sp2 = computeIntersectionNew(s, sp);
+					Predicate sp2 = computeIntersection(s, sp);
 					if(sp2 != null) atomicPredicates.add(sp2);
 				}
 				
 				for(Predicate s: neg(sp)) {
-					Predicate sp3 = computeIntersectionNew(first,s);
+					Predicate sp3 = computeIntersection(first,s);
 					if(sp3 != null) atomicPredicates.add(sp3);
 				}
 				
 				for(Predicate s1: neg(sp)) {
 					for(Predicate s2: firstNeg) {
-						Predicate sp4 = computeIntersectionNew(s1,s2);
+						Predicate sp4 = computeIntersection(s1,s2);
 						if(sp4 != null) atomicPredicates.add(sp4);
 					}
 				}
 				
 				count = -1;
 			} else {
+				//there are already more then 2 predicates
 				for(Predicate prevSp: atomicPredicates) {
-					Predicate res1 = computeIntersectionNew(prevSp, sp);
+					Predicate res1 = computeIntersection(prevSp, sp);
 					if(res1 != null) newAtomicPredicates.add(res1);
 					
 					for(Predicate s: neg(sp)) {
-						Predicate res2 = computeIntersectionNew(prevSp,s);
+						Predicate res2 = computeIntersection(prevSp,s);
 						if(res2 != null) newAtomicPredicates.add(res2);
 					}
 				}
@@ -83,6 +87,10 @@ public class APUtils {
 		return false;
 	}
 	
+	//Given a predicate ap, this function computes its negation (it will be the disjunction of more predicates according to DeMorgan Law)
+	//i.e. !{10.0.0.1, *, 20.0.0.2, *} =  {!10.0.0.1, *, *, *} V {*, *, !20.0.0.2, *} , whose atomic predicates (excluding ap) are
+	//{10.0.0.1, *, !20.0.0.2, *}, {!10.0.0.1, *, 20.0.0.2, *}, {!10.0.0.1, *, !20.0.0.2, *}
+	//This is the list returned
 	public List<Predicate> neg(Predicate ap){
 		List<Predicate> neg = new ArrayList<>();
 			//check IPSrc
@@ -137,11 +145,11 @@ public class APUtils {
 			}
 
 			//Now we have to compute the atomic Predicates
-			neg = computeAtomicPredicatesForNegNew(neg);
-			//Remove form atomicPredicates the predicate equal to "this" AP
+			neg = computeAtomicPredicatesForNeg(neg);
+			//Remove form atomicPredicates the predicate equal to ap
 			int index = 0;
 			for(Predicate sp: neg) {
-				if(APCompareNew(ap, sp)) {
+				if(APCompare(ap, sp)) {
 					neg.remove(index);
 					break;
 				}
@@ -150,7 +158,7 @@ public class APUtils {
 			return neg;
 	}
 	
-	public boolean APCompareNew(Predicate p1, Predicate p2) {
+	public boolean APCompare(Predicate p1, Predicate p2) {
 		//comparing lists size
 		if(p1.getIPSrcList().size() != p2.getIPSrcList().size() || p1.getIPDstList().size() != p2.getIPDstList().size() 
 				|| p1.getpSrcList().size() != p2.getpSrcList().size() || p1.getpDstList().size() != p2.getpDstList().size())
@@ -163,13 +171,9 @@ public class APUtils {
 		Collections.sort(p2.getIPDstList(), new IPAddressComparator());
 		if(!p1.getIPDstList().equals(p2.getIPDstList()))
 			return false;
-		Collections.sort(p1.getpSrcList(), new PortIntervalComparator());
-		Collections.sort(p2.getpSrcList(), new PortIntervalComparator());
-		if(!p1.getpSrcList().equals(p2.getpSrcList()))
+		if(!APComparePortList(p1.getpSrcList(), p2.getpSrcList()))
 			return false;
-		Collections.sort(p1.getpDstList(), new PortIntervalComparator());
-		Collections.sort(p2.getpDstList(), new PortIntervalComparator());
-		if(!p1.getpDstList().equals(p2.getpDstList()))
+		if(!APComparePortList(p1.getpDstList(), p2.getpDstList()))
 			return false;
 		return APComparePrototypeList(p1.getProtoTypeList(), p2.getProtoTypeList());
 	}
@@ -182,7 +186,16 @@ public class APUtils {
 		return false;
 	}
 	
-	public List<Predicate> computeAtomicPredicatesForNegNew(List<Predicate> predicates){
+	public boolean APComparePortList(List<PortInterval> list1, List<PortInterval> list2) {
+		Collections.sort(list1, new PortIntervalComparator());
+		Collections.sort(list2, new PortIntervalComparator());
+		if(list1.equals(list2))
+			return true;
+		return false;
+	}
+	
+	//Compute atomic predicates considering the neg list of a predicate
+	public List<Predicate> computeAtomicPredicatesForNeg(List<Predicate> predicates){
 		List<Predicate> retList = new ArrayList<>();
 		List<Predicate> tmpList = new ArrayList<>();
 		int i = 0;
@@ -196,8 +209,8 @@ public class APUtils {
 			}
 			else {
 				for(Predicate sp: retList) {
-					Predicate res = computeIntersectionNew(sp, predicates.get(i));
-					Predicate res2 =  computeIntersectionNew(sp, predicates.get(i+1));
+					Predicate res = computeIntersection(sp, predicates.get(i));
+					Predicate res2 =  computeIntersection(sp, predicates.get(i+1));
 					if(res != null) tmpList.add(res);
 					if(res2 != null) tmpList.add(res2);
 				}
@@ -210,6 +223,7 @@ public class APUtils {
 		return retList;
 	}
 	
+	//Compute the intersection of two IPAddress (if the intersection exists, otherwise it returns an empty list)
 	public List<IPAddress> intersectionIPAddressNew(IPAddress ip1, IPAddress ip2){
 		List<IPAddress> retList = new ArrayList<>();
 		if(!ip1.isNeg() && !ip2.isNeg()) { //both not neg
@@ -263,6 +277,7 @@ public class APUtils {
 		return retList;
 	}
 	
+	//Compute the intersection of two PortInterval (if the intersection exists, otherwise it returns an empty list)
 	public List<PortInterval> intersectionPortIntervalNew(PortInterval pi1, PortInterval pi2){
 		List<PortInterval> retList = new ArrayList<>();
 		if(!pi1.isNeg() && !pi2.isNeg()) { //both not neg
@@ -318,7 +333,8 @@ public class APUtils {
 		return retList;
 	}
 	
-	public Predicate computeIntersectionNew(Predicate p1, Predicate p2){
+	//Computes the intersection between two predicates and returns the resulting predicate or null 
+	public Predicate computeIntersection(Predicate p1, Predicate p2){
 		//Check IPSrc
 		List<IPAddress> resultIPSrcList = p2.getIPSrcList();
 		List<IPAddress> tmpList;
@@ -330,13 +346,14 @@ public class APUtils {
 			for(IPAddress src2: resultIPSrcList) {
 				tmpList = intersectionIPAddressNew(src1, src2);
 				if(tmpList.isEmpty())
-					return null; //no  intersection exists
+					return null; //no intersection exists
 				for(IPAddress res: tmpList) {
 					if(res.equals(src1))
 						toInsert1 = true;
 					else tmpList2.add(res);
 				}
 			}
+			
 			if(resultIPSrcList.isEmpty()) toInsert1 = true;
 			resultIPSrcList = new ArrayList<>(tmpList2);
 			tmpList2 = new ArrayList<>();
@@ -436,6 +453,9 @@ public class APUtils {
 		return resultPredicate;
 	}
 	
+	/* Compute rules for firewall */
+	//toAdd is the ALLOW rule to insert, denied is the list of denied predicates
+	//return allowed = rule-i AND !denied
 	public List<Predicate> computeAllowedForRule(Predicate toAdd, List<Predicate> deniedList){
 		List<Predicate> retList = new ArrayList<>();
 		List<Predicate> tmpList = new ArrayList<>();
@@ -448,7 +468,7 @@ public class APUtils {
 			List<Predicate> negDeniedRuleList = negForFirewallRules(deniedRule);
 			for(Predicate p1: retList) {
 				for(Predicate p2: negDeniedRuleList) {
-					Predicate res = computeIntersectionNew(p1, p2);
+					Predicate res = computeIntersection(p1, p2);
 					if(res != null) {
 						tmpList.add(res);
 					}
@@ -509,7 +529,7 @@ public class APUtils {
 			return neg;
 	}
 	
-	
+	//compute the difference between two sets: the set of all possible values for L4ProtocolTypes - list (from params)
 	public List<L4ProtocolTypes> computeDifferenceL4ProtocolTypes(List<L4ProtocolTypes> list){
 		List<L4ProtocolTypes> retList = new ArrayList<>();
 		if(list.contains(L4ProtocolTypes.ANY))

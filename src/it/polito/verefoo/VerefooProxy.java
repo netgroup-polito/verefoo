@@ -132,26 +132,29 @@ public class VerefooProxy {
 			Predicate srcPredicate = new Predicate(prop.getSrc(), false, "*", false, pSrc, false, "*", false, L4ProtocolTypes.ANY);
 			List<Integer> srcPredicateList = new ArrayList<>();
 			for(HashMap.Entry<Integer, Predicate> apEntry: networkAtomicPredicatesNew.entrySet()) {
-				Predicate intersectionPredicate = aputils.computeIntersectionNew(apEntry.getValue(), srcPredicate);
-				if(intersectionPredicate != null && aputils.APCompareNew(intersectionPredicate, apEntry.getValue())) {
+				Predicate intersectionPredicate = aputils.computeIntersection(apEntry.getValue(), srcPredicate);
+				if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, apEntry.getValue())) {
 					System.out.print(apEntry.getKey() + " ");
 					apEntry.getValue().print();
 					srcPredicateList.add(apEntry.getKey());
 				}
 			}
+			
 			System.out.println("Destination predicates");
 			List<Integer> dstPredicateList = new ArrayList<>();
 			String pDst = prop.getDstPort() != null &&  !prop.getDstPort().equals("null") ? prop.getDstPort() : "*";
 			Predicate dstPredicate = new Predicate("*", false, prop.getDst(), false, "*", false, pDst, false, prop.getLv4Proto());
+			//get all atomic predicates that match IPDst and PDst and prototype
 			for(HashMap.Entry<Integer, Predicate> apEntry: networkAtomicPredicatesNew.entrySet()) {
-				Predicate intersectionPredicate = aputils.computeIntersectionNew(apEntry.getValue(), dstPredicate);
-				if(intersectionPredicate != null && aputils.APCompareNew(intersectionPredicate, apEntry.getValue())) {
+				Predicate intersectionPredicate = aputils.computeIntersection(apEntry.getValue(), dstPredicate);
+				if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, apEntry.getValue())) {
 					System.out.print(apEntry.getKey() + " ");
 					apEntry.getValue().print();
 					dstPredicateList.add(apEntry.getKey());
 				}
 			}
 			
+			//Generate atomic flows
 			for(Flow flow: sr.getFlowsMap().values()) {
 				List<AllocationNode> path = flow.getPath().getNodes();
 				List<List<Integer>> resultList = new ArrayList<>();
@@ -194,7 +197,7 @@ public class VerefooProxy {
 		Predicate currentNodeDestPredicate = new Predicate("*", false, currentNode.getIpAddress(), false, "*", false, "*", false, L4ProtocolTypes.ANY);
 		
 		if(nodeIndex == path.size() -1) {
-			//last node of the path, ALL OK, new atomic flow found
+			//last node of the path
 			if(dstPredicateList.contains(ap)) {
 				//ALL OK, new atomic flow found
 				atomicFlowsList.add(currentList);
@@ -207,8 +210,8 @@ public class VerefooProxy {
 			}
 		}
 		
-		Predicate intersectionPredicate = aputils.computeIntersectionNew(currentPredicate, currentNodeDestPredicate);
-		if(intersectionPredicate != null && aputils.APCompareNew(intersectionPredicate, currentPredicate)
+		Predicate intersectionPredicate = aputils.computeIntersection(currentPredicate, currentNodeDestPredicate);
+		if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, currentPredicate)
 				&& currentNode.getTransformationMap().isEmpty()) { //not NAT
 			//Discard path: destination reached without reaching destination of the path
 			currentList.add(ap);
@@ -217,7 +220,7 @@ public class VerefooProxy {
 		}
 		
 		//Apply transformation and filtering rules
-		if(currentNode.getForwardBehaviourList().isEmpty() && !currentNode.getTransformationMap().isEmpty()) { //NAT
+		if(transformersNode.containsKey(currentNode.getIpAddress()) && transformersNode.get(currentNode.getIpAddress()).getFunctionalType().equals(FunctionalTypes.NAT)) { //NAT
 			if(currentNode.getTransformationMap().containsKey(ap)) {
 				for(Integer newAp: currentNode.getTransformationMap().get(ap)) {
 					List<Integer> newCurrentList = new ArrayList<>(currentList);
@@ -230,24 +233,12 @@ public class VerefooProxy {
 				atomicFlowsListToDiscard.add(currentList);
 				return;
 			}
-		} else if(!currentNode.getForwardBehaviourList().isEmpty() && currentNode.getTransformationMap().isEmpty()) { //firewall
-			if(currentNode.getForwardBehaviourList().contains(ap)) {
-				List<Integer> newCurrentList = new ArrayList<>(currentList);
-				newCurrentList.add(ap);
-				recursiveGenerateAtomicPath(nodeIndex+1, sr, path, ap, dstPredicateList, atomicFlowsList, atomicFlowsListToDiscard, newCurrentList);
-			}
-			else {
-				//discard path: packet dropped by firewall
-				currentList.add(ap);
-				atomicFlowsListToDiscard.add(currentList);
-				return;
-			}
-		} else { //normal node
+		} 
+		else { //normal node
 			List<Integer> newCurrentList = new ArrayList<>(currentList);
 			newCurrentList.add(ap);
 			recursiveGenerateAtomicPath(nodeIndex+1, sr, path, ap, dstPredicateList, atomicFlowsList, atomicFlowsListToDiscard, newCurrentList);
-		}
-		
+		}	
 	}
 		
 	//DEBUG
@@ -274,14 +265,19 @@ public class VerefooProxy {
 	}
 	//END DEBUG
 	
+	/* Compute the structures of support for transformers: for each NAT compute the transforming map, for each FIREWALL its deny/allow lists 
+	 * i.e. a NAT will have a map of entry for example {10: 5} which means that the atomic predicates 10 arrives at the nat and it is transformed in
+	 * atomic predicate 5.
+	 * a firewall instead will have a list of id foe example [1,2,5,6,10 ...], that are the identifiers of atomic predicates allowed to cross the firewall,
+	 * all the other predicates will be dropped */
 	private void fillTransformationMap() {
 		for(Node node: transformersNode.values()) {
 			HashMap<Integer, List<Integer>> resultMap = allocationNodes.get(node.getName()).getTransformationMap();
 			if(node.getFunctionalType() == FunctionalTypes.NAT) {
-				HashMap<String, List<Integer>> shadowingMap = new HashMap<>(); //grouped by dest
-				HashMap<String, List<Integer>> reconversionMap = new HashMap<>();
-				HashMap<String, List<Integer>> shadowedMap = new HashMap<>();
-				HashMap<String, List<Integer>> reconvertedMap = new HashMap<>();
+				HashMap<String, List<Integer>> shadowingMap = new HashMap<>(); //grouped by dest address
+				HashMap<String, List<Integer>> shadowedMap = new HashMap<>(); //grouped by dest address
+				HashMap<String, List<Integer>> reconversionMap = new HashMap<>(); //grouped by source address
+				HashMap<String, List<Integer>> reconvertedMap = new HashMap<>();  //grouped by source address
 				List<IPAddress> natIPSrcAddressList = new ArrayList<>();
 				for(String src: node.getConfiguration().getNat().getSource()) 
 					natIPSrcAddressList.add(new IPAddress(src, false));
@@ -289,10 +285,12 @@ public class VerefooProxy {
 				
 				for(HashMap.Entry<Integer, Predicate> apEntry: networkAtomicPredicatesNew.entrySet()) {
 					Predicate ap = apEntry.getValue();
+					//if source ip address list or dest ip address list have size != 1, it means it is a complex predicates so it can not be a shodowing/reconversion predicates
 					if(ap.getIPSrcListSize() != 1 || ap.getIPDstListSize() != 1) continue;
 					if(ap.hasIPDstNotIncludedIn(natIPSrcAddressList) && !ap.hasIPDstEqual(natIPAddress)) {
 						if(ap.hasIPSrcEqual(natIPAddress)) {
-							//2*
+							//2*: if dest is not a src address of the NAT (so it is a public address) and ip source = ip NAT, this is a shadowed predicate
+							//{IP NAT, public address}
 							if(!shadowedMap.containsKey(ap.firstIPDstToString())) {
 								List<Integer> list = new ArrayList<>();
 								list.add(apEntry.getKey());
@@ -302,6 +300,8 @@ public class VerefooProxy {
 							}
 						} 
 						else {
+							//1*: if dest is not a src address of the NAT (so it is a public address), while src is a src address of NAT (private address),
+							//this is a shadowing predicates {private address, public address}
 							if(ap.hasIPSrcEqualOrIncludedIn(natIPSrcAddressList))
 								if(!shadowingMap.containsKey(ap.firstIPDstToString())) {
 									List<Integer> list = new ArrayList<>();
@@ -313,6 +313,7 @@ public class VerefooProxy {
 						}
 					} else if(ap.hasIPSrcNotIncludedIn(natIPSrcAddressList) && !ap.hasIPSrcEqual(natIPAddress)) {
 						if(ap.hasIPDstEqual(natIPAddress)) {
+							//3*: src not included in NAT src, dest = IP NAT -> reconversion predicate {public address, IP NAT}
 							if(!reconversionMap.containsKey(ap.firstIPSrcToString())) {
 								List<Integer> list = new ArrayList<>();
 								list.add(apEntry.getKey());
@@ -321,6 +322,7 @@ public class VerefooProxy {
 								reconversionMap.get(ap.firstIPSrcToString()).add(apEntry.getKey());
 							}
 						} else if(ap.hasIPDstEqualOrIncludedIn(natIPSrcAddressList)) {
+							//4*: src not included in NAT src, dest included in NAT src -> reconverted predicate {public address, private address}
 							if(!reconvertedMap.containsKey(ap.firstIPSrcToString())) {
 								List<Integer> list = new ArrayList<>();
 								list.add(apEntry.getKey());
@@ -331,12 +333,16 @@ public class VerefooProxy {
 						}
 					}
 				}
+				//Fill the map: to each shadowing predicate assign the corresponding shadowed predicate, to each reconversion predicate assign the corresponding
+				//list of reconverted predicates. NOTE: take also in consideration the ports and prototype of the predicate
 				for(HashMap.Entry<String, List<Integer>> entry: shadowingMap.entrySet()) {
 					for(Integer shing: entry.getValue()) {
 						List<Integer> result = new ArrayList<>();
 						for(Integer shed: shadowedMap.get(entry.getKey())) {
 							if(aputils.APComparePrototypeList(
-									networkAtomicPredicatesNew.get(shing).getProtoTypeList(), networkAtomicPredicatesNew.get(shed).getProtoTypeList()))
+									networkAtomicPredicatesNew.get(shing).getProtoTypeList(), networkAtomicPredicatesNew.get(shed).getProtoTypeList())
+									&& aputils.APComparePortList(networkAtomicPredicatesNew.get(shing).getpSrcList(), networkAtomicPredicatesNew.get(shed).getpSrcList())
+									&& aputils.APComparePortList(networkAtomicPredicatesNew.get(shing).getpDstList(), networkAtomicPredicatesNew.get(shed).getpDstList())) 
 								result.add(shed);
 						}
 						resultMap.put(shing, result);
@@ -347,7 +353,9 @@ public class VerefooProxy {
 						List<Integer> result = new ArrayList<>();
 						for(Integer rcved: reconvertedMap.get(entry.getKey())) {
 							if(aputils.APComparePrototypeList(
-									networkAtomicPredicatesNew.get(rcvion).getProtoTypeList(), networkAtomicPredicatesNew.get(rcved).getProtoTypeList()))
+									networkAtomicPredicatesNew.get(rcvion).getProtoTypeList(), networkAtomicPredicatesNew.get(rcved).getProtoTypeList())
+									&& aputils.APComparePortList(networkAtomicPredicatesNew.get(rcvion).getpSrcList(), networkAtomicPredicatesNew.get(rcved).getpSrcList())
+									&& aputils.APComparePortList(networkAtomicPredicatesNew.get(rcvion).getpDstList(), networkAtomicPredicatesNew.get(rcved).getpDstList()))
 								result.add(rcved);
 						}
 						resultMap.put(rcvion, result);
@@ -359,8 +367,8 @@ public class VerefooProxy {
 				for(HashMap.Entry<Integer, Predicate> apEntry: networkAtomicPredicatesNew.entrySet()) {
 					//check if the atomic predicate match at least one allowed rule
 					for(Predicate allowed: allowedPredicates) {
-						Predicate intersectionPredicate = aputils.computeIntersectionNew(apEntry.getValue(), allowed);
-						if(intersectionPredicate != null && aputils.APCompareNew(intersectionPredicate, apEntry.getValue())) {
+						Predicate intersectionPredicate = aputils.computeIntersection(apEntry.getValue(), allowed);
+						if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, apEntry.getValue())) {
 							resultList.add(apEntry.getKey());
 							break;
 						}
@@ -371,6 +379,8 @@ public class VerefooProxy {
 		}
 	}
 	
+	/* Starting from source and destination of each requirement, compute related atomic predicates. Then add to the computed set
+	 * also atomic predicates representing input packet classes for each transformer (here we are considering only NAT and firewall)*/
 	private HashMap<Integer, Predicate> generateAtomicPredicateNew(){
 		List<Predicate> predicates = new ArrayList<>();
 		List<Predicate> atomicPredicates = new ArrayList<>();
@@ -390,6 +400,7 @@ public class VerefooProxy {
 			L4ProtocolTypes proto = property.getLv4Proto() != null ? property.getLv4Proto() : L4ProtocolTypes.ANY;
 			srcList.add("*"); dstList.add("*"); srcPList.add("*"); dstPList.add("*"); dstProtoList.add(L4ProtocolTypes.ANY);
 			
+			//if we have already inserted this source into the list, we can skip it
 			if(!srcList.contains(IPSrc) || !srcPList.contains(pSrc)) {
 				if(!srcList.contains(IPSrc))
 					srcList.add(IPSrc);
@@ -402,6 +413,7 @@ public class VerefooProxy {
 				predicates.add(srcPredicate);
 			}
 			
+			//if we have already inserted this destination into the list, we can skip it
 			if(!dstList.contains(IPDst) || !dstPList.contains(pDst) || !dstProtoList.contains(proto)) {
 				if(!dstList.contains(IPDst)) dstList.add(IPDst);
 				else IPDst = "*";
@@ -418,27 +430,15 @@ public class VerefooProxy {
 		//Generate predicates representing input packet class for each transformers
 		for(Node node: transformersNode.values()) {
 			if(node.getFunctionalType() == FunctionalTypes.NAT) {
-				//Compute list of shadowed (only those related to requirements source and dest addresses)
+				//Compute list of shadowed (only those related to requirements sources), considering NAT source addresses list
 				List<String> shadowedAddressesList = new ArrayList<>();
-				boolean found;
 				for(String shadowedAddress: node.getConfiguration().getNat().getSource()) {
-					found = false;
 					for(String ip: srcList) {
 						if(shadowedAddress.equals(ip) || aputils.isIncludedIPString(shadowedAddress, ip)) {
 							shadowedAddressesList.add(shadowedAddress);
-							found = true;
 							break;
 						}
 					}
-					if(found) continue;
-					//TODO: non sono sicuro che serva
-//					for(String ip: dstList) {
-//						if(shadowedAddress.equals(ip) || aputils.isIncludedIPString(shadowedAddress, ip)) {
-//							shadowedAddressesList.add(shadowedAddress);
-//							found = true;
-//							break;
-//						}
-//					}
 				}
 				//Generate and add shadowing predicates
 				for(String shadowed: shadowedAddressesList) {
@@ -453,8 +453,12 @@ public class VerefooProxy {
 					predicates.add(rcpred);
 				}
 				//Add predicate after applying trasformation: this is enough, all the others have already been added
-				predicates.add(new Predicate(node.getName(), false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY));
-			} else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
+				predicates.add(new Predicate(node.getName(), false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY));	
+			} 
+				//If the node is a firewall, compute its allowed rules list
+				//Algorithm 1 Yang_Lam 2015
+				else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
+				
 				List<Predicate> allowedList = new ArrayList<>();
 				List<Predicate> deniedList = new ArrayList<>();
 				
@@ -477,7 +481,7 @@ public class VerefooProxy {
 					List<Predicate> allowedToAdd = aputils.computeAllowedForRule(toAdd, deniedList);
 					allowedList.addAll(allowedToAdd);
 				}
-				
+				//the algorithm returns the allowed predicates list (if we want also the denied predicates list, we can compute allowed list negation)
 				allocationNodes.get(node.getName()).setForwardBehaviourPredicateList(allowedList);
 			}
 		}
@@ -488,8 +492,10 @@ public class VerefooProxy {
 			p.print();
 		//END DEBUG
 
-		atomicPredicates = aputils.computeAtomicPredicatesNew(atomicPredicates, predicates);
+		//Now we have the list of predicates on which we have to compute the set of atomic predicates, so compute atomic predicates
+		atomicPredicates = aputils.computeAtomicPredicates(atomicPredicates, predicates);
 		
+		//Give to each atomic predicate an identifier
 		int index = 0;
 		for(Predicate p: atomicPredicates) {
 			networkAtomicPredicatesNew.put(index, p);

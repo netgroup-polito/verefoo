@@ -7,13 +7,12 @@ import it.polito.verefoo.jaxb.L4ProtocolTypes;
 
 public class Predicate {
 	List<IPAddress> IPSrcList = new ArrayList<>();  //in AND
-	List<IPAddress> IPDstList = new ArrayList<>();
-	List<PortInterval> pSrcList = new ArrayList<>();
-	List<PortInterval> pDstList = new ArrayList<>();
+	List<IPAddress> IPDstList = new ArrayList<>(); //in AND
+	List<PortInterval> pSrcList = new ArrayList<>(); //in AND
+	List<PortInterval> pDstList = new ArrayList<>(); //in AND
 	List<L4ProtocolTypes> protoTypeList = new ArrayList<>(); //in OR
 	
 	public Predicate() {
-		
 	}
 	
 	public Predicate(String IPSrc, boolean negIPSrc, String IPDst, boolean negIPDst,
@@ -67,7 +66,7 @@ public class Predicate {
 		return IPDstList.size();
 	}
 	
-	//IPSrc should be single not neg
+	//IPSrc should be single not neg (the check sould be done before calling the method)
 	public boolean hasIPSrcEqualOrIncludedIn(List<IPAddress> ipList) {
 		IPAddress IPSrc = IPSrcList.get(0);
 		if(IPSrc == null || IPSrc.isNeg()) return false;
@@ -79,7 +78,7 @@ public class Predicate {
 		return false;
 	}
 
-	//IPDst should be single not neg
+	//IPDst should be single not neg (the check sould be done before calling the method)
 	public boolean hasIPDstEqualOrIncludedIn(List<IPAddress> ipList) {
 		IPAddress IPDst = IPDstList.get(0);
 		if(IPDst == null || IPDst.isNeg()) return false;
@@ -90,6 +89,7 @@ public class Predicate {
 		return false;
 	}
 	
+	//IPSrc should be single not neg
 	public boolean hasIPSrcNotIncludedIn(List<IPAddress> ipList) {
 		IPAddress IPSrc = IPSrcList.get(0);
 		if(IPSrc == null || IPSrc.isNeg()) return false;
@@ -100,6 +100,7 @@ public class Predicate {
 		return true;
 	}
 	
+	//IPDst should be single not neg
 	public boolean hasIPDstNotIncludedIn(List<IPAddress> ipList) {
 		IPAddress IPDst = IPDstList.get(0);
 		if(IPDst == null || IPDst.isNeg()) return false;
@@ -110,28 +111,33 @@ public class Predicate {
 		return true;
 	}
 	
+	//IPSrc should be single not neg
 	public boolean hasIPSrcEqual(IPAddress ip) {
 		IPAddress IPSrc = IPSrcList.get(0);
 		if(IPSrc == null || IPSrc.isNeg()) return false;
 		return IPSrc.equals(ip);
 	}
 	
+	//IPDst should be single not neg
 	public boolean hasIPDstEqual(IPAddress ip) {
 		IPAddress IPDst = IPDstList.get(0);
 		if(IPDst == null || IPDst.isNeg()) return false;
 		return IPDst.equals(ip);
 	}
 
+	//Get the fist IPAddress from the IPSrc list and convert it to string
 	public String firstIPSrcToString() {
 		IPAddress IPSrc = IPSrcList.get(0);
 		return IPSrc.toString();
 	}
 	
+	//Get the fist IPAddress from the IPDst list and convert it to string
 	public String firstIPDstToString() {
 		IPAddress IPDst = IPDstList.get(0);
 		return IPDst.toString();
 	}
 	
+	//Just for DEBUG
 	public void print() {
 		System.out.print(": {");
 		int i=0;

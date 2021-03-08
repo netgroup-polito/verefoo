@@ -46,7 +46,7 @@ public class PortInterval {
 		this.neg = neg;
 	}
 	
-	//function that checks if p1 is included in p2
+	//function that checks if "this" is included in p
 	public boolean isIncludedInPortInterval(PortInterval p) {
 		if((min >= p.getMin() || p.getMin() == -1) && (max <= p.getMax() || p.getMax() == -1))
 			return true;
@@ -76,6 +76,7 @@ public class PortInterval {
 		return false;
 	}
 	
+	//function that checks if "this" is equal to pi, but without considering neg attribute
 	public boolean equalFileds(PortInterval pi) {
 		if(min == pi.getMin() && max == pi.getMax())
 			return true;

@@ -63,8 +63,8 @@ public class IPAddress {
 		this.neg = neg;
 	}
 
-	//function that checks if this is included in ip (NOTE: ip should use wildcards)
-	//NOTE: here not considering if neg or not
+	/* function that checks if "this" is included in ip (NOTE: ip should use wildcards)
+	   NOTE: here not considering if neg or not */
 	public boolean isIncludedIn(IPAddress ip) {
 		if((firstByte.equals(ip.getFirstByte()) || ip.getFirstByte().equals("-1")) 
 				&& (secondByte.equals(ip.getSecondByte()) || ip.getSecondByte().equals("-1"))
@@ -73,6 +73,7 @@ public class IPAddress {
 			return true;
 		return false;
 	}
+	
 	
 	public boolean equalsStar() {
 		if(firstByte.equals("-1") && secondByte.equals("-1") && thirdByte.equals("-1") && fourthByte.equals("-1"))
@@ -97,14 +98,11 @@ public class IPAddress {
 		return false;
 	}
 	
-	//does not take in consideration neg attribute
+	//fuction that checks if "this" is equal to ip, but without considering the neg attribute
 	public boolean equalFileds(IPAddress ip) {
 		if(firstByte.equals(ip.getFirstByte()) && secondByte.equals(ip.getSecondByte()) &&
 				thirdByte.equals(ip.getThirdByte()) && fourthByte.equals(ip.getFourthByte()))
 			return true;
 		return false;
 	}
-	
-	
-	
 }
