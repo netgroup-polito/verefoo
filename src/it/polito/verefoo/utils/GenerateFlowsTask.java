@@ -1,0 +1,128 @@
+package it.polito.verefoo.utils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.Predicate;
+import it.polito.verefoo.graph.SecurityRequirement;
+import it.polito.verefoo.jaxb.FunctionalTypes;
+import it.polito.verefoo.jaxb.L4ProtocolTypes;
+import it.polito.verefoo.jaxb.Node;
+import it.polito.verefoo.jaxb.Property;
+
+public class GenerateFlowsTask implements Runnable {
+
+	SecurityRequirement requirement;
+	HashMap<Integer, Predicate> networkAtomicPredicates;
+	APUtils aputils;
+	HashMap<String, Node> transformersNode;
+	
+	public GenerateFlowsTask(SecurityRequirement requirement, HashMap<Integer, Predicate> networkAtomicPredicates, APUtils aputils, HashMap<String, Node> transformersNode) {
+		this.requirement = requirement;
+		this.networkAtomicPredicates = networkAtomicPredicates;
+		this.aputils = aputils;
+		this.transformersNode = transformersNode;
+	}
+	
+	
+	@Override
+	public void run() {
+		Property prop = requirement.getOriginalProperty();
+		//System.out.println("\nSource predicates for requirement {"+prop.getSrc()+","+prop.getSrcPort()+","+prop.getDst()+","+prop.getDstPort()+","+prop.getLv4Proto()+"}");
+		String pSrc = prop.getSrcPort() != null &&  !prop.getSrcPort().equals("null") ? prop.getSrcPort() : "*";
+		//get all atomic predicates that match IPSrc and PSrc
+		Predicate srcPredicate = new Predicate(prop.getSrc(), false, "*", false, pSrc, false, "*", false, L4ProtocolTypes.ANY);
+		List<Integer> srcPredicateList = new ArrayList<>();
+		for(HashMap.Entry<Integer, Predicate> apEntry: networkAtomicPredicates.entrySet()) {
+			Predicate intersectionPredicate = aputils.computeIntersection(apEntry.getValue(), srcPredicate);
+			if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, apEntry.getValue())) {
+				//System.out.print(apEntry.getKey() + " "); apEntry.getValue().print();
+				srcPredicateList.add(apEntry.getKey());
+			}
+		}
+		
+		//System.out.println("Destination predicates");
+		List<Integer> dstPredicateList = new ArrayList<>();
+		String pDst = prop.getDstPort() != null &&  !prop.getDstPort().equals("null") ? prop.getDstPort() : "*";
+		Predicate dstPredicate = new Predicate("*", false, prop.getDst(), false, "*", false, pDst, false, prop.getLv4Proto());
+		//get all atomic predicates that match IPDst and PDst and prototype
+		for(HashMap.Entry<Integer, Predicate> apEntry: networkAtomicPredicates.entrySet()) {
+			Predicate intersectionPredicate = aputils.computeIntersection(apEntry.getValue(), dstPredicate);
+			if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, apEntry.getValue())) {
+				//System.out.print(apEntry.getKey() + " "); apEntry.getValue().print();
+				dstPredicateList.add(apEntry.getKey());
+			}
+		}
+		
+		//Generate atomic flows
+		for(Flow flow: requirement.getFlowsMap().values()) {
+			List<AllocationNode> path = flow.getPath().getNodes();
+			List<List<Integer>> resultList = new ArrayList<>();
+			List<List<Integer>> resultListToDiscard = new ArrayList<>();
+			//now we have the requirement, the path and the list of source predicates -> call recursive function
+			int nodeIndex = 0;
+			for(Integer ap: srcPredicateList) {
+				List<Integer> currentList = new ArrayList<>();
+				recursiveGenerateAtomicPath(nodeIndex, requirement, path, ap, dstPredicateList, resultList, resultListToDiscard, currentList);
+			}
+			
+			//TODO: here we can insert the results into a map (or other structure)
+			requirement.addAtomicFlowsList(flow.getIdFlow(), resultList, resultListToDiscard);
+		}
+		
+	}
+	
+	private void recursiveGenerateAtomicPath(int nodeIndex, SecurityRequirement sr, List<AllocationNode> path, int ap, List<Integer> dstPredicateList, List<List<Integer>> atomicFlowsList, List<List<Integer>> atomicFlowsListToDiscard, List<Integer> currentList) {
+		AllocationNode currentNode = path.get(nodeIndex);
+		Predicate currentPredicate = networkAtomicPredicates.get(ap);
+		Predicate currentNodeDestPredicate = new Predicate("*", false, currentNode.getIpAddress(), false, "*", false, "*", false, L4ProtocolTypes.ANY);
+		
+		if(nodeIndex == path.size() -1) {
+			//last node of the path
+			if(dstPredicateList.contains(ap)) {
+				//ALL OK, new atomic flow found
+				atomicFlowsList.add(currentList);
+				return;
+			} else {
+				//Discard path
+				currentList.add(ap);
+				atomicFlowsListToDiscard.add(currentList);
+				return;
+			}
+		}
+		
+		Predicate intersectionPredicate = aputils.computeIntersection(currentPredicate, currentNodeDestPredicate);
+		if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, currentPredicate)
+				&& currentNode.getTransformationMap().isEmpty()) { //not NAT
+			//Discard path: destination reached without reaching destination of the path
+			currentList.add(ap);
+			atomicFlowsListToDiscard.add(currentList);
+			return;
+		}
+		
+		//Apply transformation and filtering rules
+		if(transformersNode.containsKey(currentNode.getIpAddress()) && transformersNode.get(currentNode.getIpAddress()).getFunctionalType().equals(FunctionalTypes.NAT)) { //NAT
+			if(currentNode.getTransformationMap().containsKey(ap)) {
+				for(Integer newAp: currentNode.getTransformationMap().get(ap)) {
+					List<Integer> newCurrentList = new ArrayList<>(currentList);
+					newCurrentList.add(newAp);
+					recursiveGenerateAtomicPath(nodeIndex+1, sr, path, newAp, dstPredicateList, atomicFlowsList, atomicFlowsListToDiscard, newCurrentList);
+				}
+			} else {
+				//Discard path: packet dropped
+				currentList.add(ap);
+				atomicFlowsListToDiscard.add(currentList);
+				return;
+			}
+		} 
+		else { //normal node
+			List<Integer> newCurrentList = new ArrayList<>(currentList);
+			newCurrentList.add(ap);
+			recursiveGenerateAtomicPath(nodeIndex+1, sr, path, ap, dstPredicateList, atomicFlowsList, atomicFlowsListToDiscard, newCurrentList);
+		}	
+	}
+
+}

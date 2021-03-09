@@ -1,6 +1,8 @@
 package it.polito.verefoo.graph;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import it.polito.verefoo.jaxb.Property;
@@ -11,6 +13,24 @@ public class SecurityRequirement {
 	int idRequirement;
 	Map<String, Traffic> nodeTrafficMap;
 	Map<Integer, Flow> flowsMap;
+	
+	/* Atomic predicates */
+	//Map <flow id, list of related atomic flows> 
+	HashMap<Integer, List<List<Integer>>> atomicFlowsMap = new HashMap<>();
+	HashMap<Integer, List<List<Integer>>> atomicFlowsToDiscardMap = new HashMap<>();
+	
+	public void addAtomicFlowsList(int flowId, List<List<Integer>> atomicFlowList, List<List<Integer>> atomicFlowToDiscardList) {
+		atomicFlowsMap.put(flowId, atomicFlowList);
+		atomicFlowsToDiscardMap.put(flowId, atomicFlowToDiscardList);
+	}
+	
+	public List<List<Integer>> getAtomicFlowsForFlow(int flowId){
+		return atomicFlowsMap.get(flowId);
+	}
+	
+	public List<List<Integer>> getAtomicFlowsToDiscardForFlow(int flowId){
+		return atomicFlowsToDiscardMap.get(flowId);
+	}
 
 	public SecurityRequirement(Property originalProperty, int idRequirement) {
 		this.originalProperty = originalProperty;
