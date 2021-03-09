@@ -19,7 +19,10 @@ CASI DA CHIEDERE
  -APtest07 : NAT e wildcards
  -APtest09 : 2 clients e 2 server e tanti  requisiti
  -NAT01 : firewall e NAT
- -NAT02 : 2 NAT in cascata
- -NAT03 : 2 NAT, ognuno in uscita da una rete privata differente
+ -NAT02 : 2 NAT in cascata 
+ -NAT03 : 2 NAT, ognuno in uscita da una rete privata differente 
  -NAT04 : esempio sopra più un terzo NAT
+ -NAT05: natting from both directions
+ -NAT06: percorso circolare I
+ -NAT07: percorso circolare II
 
