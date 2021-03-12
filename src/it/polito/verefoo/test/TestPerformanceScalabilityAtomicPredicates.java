@@ -50,7 +50,7 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		numberRPR = j/2;
 		numberPR = numberIPR + numberRPR;
 		numberNAT = 4;
-		numberFW = 0;
+		numberFW = 10;
 		runs = 1;
 		testScalabilityPerformance();
 	}
@@ -207,7 +207,6 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	        					//no random
 	        					//root = f.changeIP(IPClient[k], IPAllocationPlace[k], IPServer[k]);
 	        					//random
-
 	        					root = f.changeIP(numberAP, numberWC, numberWS, numberRPR, numberIPR, numberNAT, numberFW,seeds[k]);
 
 	        					//random
@@ -217,7 +216,7 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	        					//for debug purpose 
 	        					m.marshal( root, System.out );  
 	        					i++;
-	        					//NFV resultNFV = testCoarse(root);
+	        					NFV resultNFV = testCoarse(root);
 	        					// StringWriter stringWriter = new StringWriter();
 	        					//m.marshal( resultNFV, System.out );
 	        					//loggerModel.debug(stringWriter.toString());

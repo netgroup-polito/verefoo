@@ -52,6 +52,7 @@ public class TestCaseGeneratorAtomicPredicates {
 	
 	/* Atomic predicates new */
 	int maxNATSrcs = 2;
+	int maxFWRules = 3;
 	
 	
 	public TestCaseGeneratorAtomicPredicates(String name, int numberAllocationPlaces, int numberWebClients, int numberWebServers, 
@@ -130,7 +131,6 @@ public class TestCaseGeneratorAtomicPredicates {
 	public NFV generateNFV(int numberAllocationPlaces, int numberWebClients, int numberWebServers, int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberFirewall, Random rand) {
 		
 		int numberPolicies = numberReachPolicies + numberIsPolicies;
-		
 		/* Creation of the test */
 		
 		NFV nfv = new NFV();
@@ -212,6 +212,7 @@ public class TestCaseGeneratorAtomicPredicates {
 		for(int i = 0; i < numberFirewall; i++) {
 			String ip = createRandomIP();
 			Node firewall = new Node();
+			firewall.setFunctionalType(FunctionalTypes.FIREWALL);
 			firewall.setName(ip);
 			Configuration confF = new Configuration();
 			confF.setName("confF");
@@ -220,9 +221,7 @@ public class TestCaseGeneratorAtomicPredicates {
 			firewall.setConfiguration(confF);
 			allFirewalls.add(firewall);
 		}
-		
-		//attach one firewall to each client
-		
+				
 		//attach the APs
 		int factorPAP = numberAllocationPlaces/numberWebClients;
 		int resto = numberAllocationPlaces%numberWebClients;
@@ -234,7 +233,6 @@ public class TestCaseGeneratorAtomicPredicates {
 		int numC = 0;
 
 		while(!createdAllAPs) {
-			//System.out.println(numC);
 			Node client = allClients.get(numC);
 			Node prev = client;
 			for(int j = 0; j < factorPAP; j++) {
@@ -262,10 +260,43 @@ public class TestCaseGeneratorAtomicPredicates {
 			lastAPs.add(new Tuple<String, Node>(client.getName(), client));
 		}
 		
+		//DEBUG
+		System.out.println("TUPLE before attaching firewalls");
+		for(Tuple<String, Node> tuple: lastAPs) {
+			System.out.println("TUPLE before fw: " + tuple._1 + " -> " + tuple._2.getName());
+		}
+		System.out.println();
+		//END DEBUG
+		
+		//attach firewall to client chain (NOTE: some can ramain)
+		int remainingFirewall = numberFirewall;
+		List<Tuple<String, Node>> tmpTupleList = new ArrayList<Tuple<String, Node>>();
+		for(Tuple<String, Node> tuple: lastAPs) {
+			if(remainingFirewall > 0) {
+				Node currentFirewall = allFirewalls.get(numberFirewall-remainingFirewall);
+				Neighbour neighForTuple = new Neighbour();
+				Neighbour neighForFirewall = new Neighbour();
+				neighForTuple.setName(currentFirewall.getName());
+				neighForFirewall.setName(tuple._2.getName());
+				tuple._2.getNeighbour().add(neighForTuple);
+				currentFirewall.getNeighbour().add(neighForFirewall);
+				tmpTupleList.add(new Tuple<String, Node>(tuple._1, currentFirewall));
+				remainingFirewall--;
+			} else
+				tmpTupleList.add(new Tuple<String, Node>(tuple._1, tuple._2));
+		}
+		lastAPs = new ArrayList<Tuple<String, Node>>(tmpTupleList);
+		
 		//DEBUG:print tuple
 		int index = 0;
 		System.out.println("ALL CLIENTS");
 		for(Node node: allClients) {
+			System.out.println(index + " " + node.getName());
+			index++;
+		}
+		System.out.println();
+		System.out.println("ALL FIREWALLS");
+		for(Node node: allFirewalls) {
 			System.out.println(index + " " + node.getName());
 			index++;
 		}
@@ -282,8 +313,9 @@ public class TestCaseGeneratorAtomicPredicates {
 			index++;
 		}
 		System.out.println();
+		System.out.println("Tuple before applying NAT");
 		for(Tuple<String, Node> tuple: lastAPs) {
-			System.out.println("CLIENT: " + tuple._1 + " -> " + tuple._2.getName());
+			System.out.println("TUPLE: " + tuple._1 + " -> " + tuple._2.getName());
 		}
 		System.out.println();
 		//END DEBUG
@@ -342,31 +374,134 @@ public class TestCaseGeneratorAtomicPredicates {
 		}
 		
 		//DEBUG
+		System.out.println("Tuple before applying last firewalls");
 		for(Tuple<String, Node> tuple: lastAPs) {
 			System.out.println("LAST AP: " + tuple._1 + " -> " + tuple._2.getName());
 		}
 		//END DEBUG
 		
+		//attach remaining firewalls
+		tmpTupleList = new ArrayList<Tuple<String, Node>>();
+		while(remainingFirewall > 0) {
+			for(Tuple<String, Node> tuple: lastAPs) {
+				if(remainingFirewall > 0) {
+					Node currentFirewall = allFirewalls.get(numberFirewall-remainingFirewall);
+					Neighbour neighForTuple = new Neighbour();
+					Neighbour neighForFirewall = new Neighbour();
+					neighForTuple.setName(currentFirewall.getName());
+					neighForFirewall.setName(tuple._2.getName());
+					tuple._2.getNeighbour().add(neighForTuple);
+					currentFirewall.getNeighbour().add(neighForFirewall);
+					tmpTupleList.add(new Tuple<String, Node>(currentFirewall.getName(), currentFirewall));
+					remainingFirewall--;
+				} else
+					tmpTupleList.add(new Tuple<String, Node>(tuple._1, tuple._2));
+			}
+			lastAPs = new ArrayList<Tuple<String, Node>>(tmpTupleList);
+			tmpTupleList = new ArrayList<Tuple<String, Node>>();
+		}
+
+		//DEBUG
+		System.out.println("\nTuple after applying last firewalls");
+		for(Tuple<String, Node> tuple: lastAPs) {
+			System.out.println("LAST AP: " + tuple._1 + " -> " + tuple._2.getName());
+		}
+		//END DEBUG
 		
-		//attach central node to NATs and APs
+		//attach all chains to central node
+		for(Tuple<String, Node> tuple: lastAPs) {
+			Neighbour neighForTuple = new Neighbour();
+			Neighbour neighForCentralNode  = new Neighbour();
+			neighForTuple.setName(central.getName());
+			neighForCentralNode.setName(tuple._2.getName());
+			tuple._2.getNeighbour().add(neighForTuple);
+			central.getNeighbour().add(neighForCentralNode);
+		}
 		
-	
+		//attach all servers to central node
+		for(Node server: allServers) {
+			Neighbour neighForServer = new Neighbour();
+			Neighbour neighForCentralNode  = new Neighbour();
+			neighForServer.setName(central.getName());
+			neighForCentralNode.setName(server.getName());
+			server.getNeighbour().add(neighForServer);
+			central.getNeighbour().add(neighForCentralNode);
+		}
+		
+		//generate firewall rules
+		//NOTE: rule for the firewall is randomly selected: set0=allClients, set1=allServers, set2=allNAT
+		int nRules;
+		for(Node firewall: allFirewalls) {
+			nRules = rand.nextInt(maxFWRules);
+			if(rand.nextBoolean())
+				firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.ALLOW);
+			else firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.DENY);
+			
+			for(int i=0; i<nRules; i++) {
+				String srcNode = ""; String dstNode = "";
+				switch(rand.nextInt(4)) {
+				case 0: 
+					srcNode = allClients.get(rand.nextInt(allClients.size())).getName(); break;
+				case 1: 
+					srcNode = allServers.get(rand.nextInt(allServers.size())).getName(); break;	
+				case 2: 
+					srcNode = allNATs.get(rand.nextInt(allNATs.size())).getName(); break;
+				case 3: 
+					srcNode = "*"; break;
+				}
+				switch(rand.nextInt(4)) {
+				case 0: 
+					dstNode = allClients.get(rand.nextInt(allClients.size())).getName(); break;
+				case 1: 
+					dstNode = allServers.get(rand.nextInt(allServers.size())).getName(); break;	
+				case 2: 
+					dstNode = allNATs.get(rand.nextInt(allNATs.size())).getName(); break;
+				case 3: 
+					dstNode = "*"; break;
+				}
+				Elements rule = new Elements();
+				if(rand.nextBoolean())
+					rule.setAction(ActionTypes.ALLOW);
+				else rule.setAction(ActionTypes.DENY);
+				rule.setSource(srcNode);
+				rule.setDestination(dstNode);
+				rule.setSrcPort("*");
+				rule.setDstPort("*");
+				rule.setProtocol(L4ProtocolTypes.ANY);
+				firewall.getConfiguration().getFirewall().getElements().add(rule);
+			}
+		}
+		
 		//add the nodes in the graph
 		graph.getNode().addAll(allClients);
 		graph.getNode().addAll(allServers);
 		graph.getNode().addAll(allAPs);
 		graph.getNode().addAll(allNATs);
-		//graph.getNode().addAll(allLBs);
+		graph.getNode().addAll(allFirewalls);
 		graph.getNode().add(central);
 
 		//create the policies
 		int numCP = 0;
 		for(int i = 0; i < numberIsPolicies; i++) {
-			createPolicy(PName.ISOLATION_PROPERTY, nfv, graph, allClients.get(numCP).getName(), allServers.get(0).getName());
+			String srcNode = "", dstNode = "";
+			if(rand.nextBoolean())
+				srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
+			else srcNode = allServers.get(rand.nextInt(allServers.size())).getName();
+			if(rand.nextBoolean())
+				dstNode = allClients.get(rand.nextInt(allClients.size())).getName();
+			else dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
+			createPolicy(PName.ISOLATION_PROPERTY, nfv, graph, srcNode, dstNode);
 			numCP++;
 		}
 		for(int i = 0; i < numberReachPolicies; i++) {
-			createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, allClients.get(numCP).getName(), allServers.get(1).getName());
+			String srcNode = "", dstNode = "";
+			if(rand.nextBoolean())
+				srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
+			else srcNode = allServers.get(rand.nextInt(allServers.size())).getName();
+			if(rand.nextBoolean())
+				dstNode = allClients.get(rand.nextInt(allClients.size())).getName();
+			else dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
+			createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, srcNode, dstNode);
 			numCP++;
 		}
 
