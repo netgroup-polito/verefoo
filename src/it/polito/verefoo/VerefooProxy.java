@@ -32,6 +32,7 @@ import it.polito.verefoo.solver.*;
 import it.polito.verefoo.solver.Checker.Prop;
 import it.polito.verefoo.utils.APUtils;
 import it.polito.verefoo.utils.GenerateFlowsTask;
+import it.polito.verefoo.utils.TestResults;
 import it.polito.verefoo.utils.VerificationResult;
 
 /**
@@ -57,6 +58,7 @@ public class VerefooProxy {
 	/* Atomic predicates */
 	private HashMap<Integer, Predicate> networkAtomicPredicates = new HashMap<>();
 	HashMap<String, Node> transformersNode = new HashMap<>();
+	private TestResults testResults = new TestResults();
 	
 	/**
 	 * Public constructor for the Verefoo proxy service
@@ -111,11 +113,20 @@ public class VerefooProxy {
 		
 		/* Atomic predicates */
 		aputils = new APUtils();
+		long t1 = System.currentTimeMillis();
 		trafficFlowsMap = generateFlowPaths();
+		long t2 = System.currentTimeMillis();
+		testResults.setGenPathTime(t2 - t1);
 		networkAtomicPredicates = generateAtomicPredicateNew();
+		t1 = System.currentTimeMillis();
+		testResults.setAtomicPredCompTime(t1-t2);
 		fillTransformationMap();
-		printTransformations(); //DEBUG
+		t2 =  System.currentTimeMillis();
+		testResults.setFillMapTime(t2-t1);
+		//printTransformations(); //DEBUG
 		computeAtomicFlows();
+		t1 =  System.currentTimeMillis();
+		testResults.setAtomicFlowsCompTime(t1-t2);
 		
 		//TODO: remove (Budapest)
 //		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
@@ -132,8 +143,11 @@ public class VerefooProxy {
 	private void computeAtomicFlows() {
 		ExecutorService threadPool = Executors.newFixedThreadPool(10);
 		List<Future<?>> tasks = new ArrayList<Future<?>>();
-				
+		
+		System.out.println("NUMBER OF REQUIREMENTS: " + securityRequirements.size());
+		System.out.println("Computing atomic flows:");
 		for(SecurityRequirement sr : securityRequirements.values()) {
+			System.out.print("*");
 			//Copy the map and Aputils in order to avoid concurrent modification exception, transformersNode should only be accessed in read mode
 			//NOTE: should be a deep copy, not a shallow copy
 			HashMap<Integer, Predicate> networkAtomicPredicatesNew = new HashMap<>();
@@ -153,42 +167,42 @@ public class VerefooProxy {
 				e.printStackTrace();
 			}
 		}
+		System.out.println();
 		
 		//DEBUG: print atomic flows for each requirement
-		for(SecurityRequirement sr : securityRequirements.values()) {
-			Property prop = sr.getOriginalProperty();
-			System.out.println("\nConsidering requirement {"+prop.getSrc()+","+prop.getSrcPort()+","+prop.getDst()+","+prop.getDstPort()+","+prop.getLv4Proto()+"}");   
-			for(Flow flow: sr.getFlowsMap().values()) {
-				List<List<Integer>> atomicFlows = sr.getAtomicFlowsForFlow(flow.getIdFlow());
-				List<List<Integer>> atomicFlowsToDiscard = sr.getAtomicFlowsToDiscardForFlow(flow.getIdFlow());
-				List<AllocationNode> path = flow.getPath().getNodes();
-				if(atomicFlows != null) {
-					System.out.println("Atomic flows accepted");
-					for(List<Integer> list: atomicFlows) {
-						int index = 0;
-						for(Integer ap: list) {
-							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
-							index++;
-						}
-						System.out.println(path.get(index).getIpAddress());
-					}
-					System.out.println("Atomic flows discarded");
-					for(List<Integer> list: atomicFlowsToDiscard) {
-						int index = 0;
-						for(Integer ap: list) {
-							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
-							index++;
-						}
-						System.out.println();
-					}
-				}
-			}
-		}
-		System.out.println();
+//		for(SecurityRequirement sr : securityRequirements.values()) {
+//			Property prop = sr.getOriginalProperty();
+//			System.out.println("\nConsidering requirement {"+prop.getSrc()+","+prop.getSrcPort()+","+prop.getDst()+","+prop.getDstPort()+","+prop.getLv4Proto()+"}");   
+//			for(Flow flow: sr.getFlowsMap().values()) {
+//				List<List<Integer>> atomicFlows = sr.getAtomicFlowsForFlow(flow.getIdFlow());
+//				List<List<Integer>> atomicFlowsToDiscard = sr.getAtomicFlowsToDiscardForFlow(flow.getIdFlow());
+//				List<AllocationNode> path = flow.getPath().getNodes();
+//				if(atomicFlows != null) {
+//					System.out.println("Atomic flows accepted");
+//					for(List<Integer> list: atomicFlows) {
+//						int index = 0;
+//						for(Integer ap: list) {
+//							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
+//							index++;
+//						}
+//						System.out.println(path.get(index).getIpAddress());
+//					}
+//					System.out.println("Atomic flows discarded");
+//					for(List<Integer> list: atomicFlowsToDiscard) {
+//						int index = 0;
+//						for(Integer ap: list) {
+//							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
+//							index++;
+//						}
+//						System.out.println();
+//					}
+//				}
+//			}
+//		}
+//		System.out.println();
 		//END DEBUG
 	}
 		
-	//DEBUG
 	private void printTransformations() {
 		for(String node: transformersNode.keySet()) {
 			AllocationNode allocNode = allocationNodes.get(node);
@@ -210,7 +224,6 @@ public class VerefooProxy {
 			System.out.println();
 		}
 	}
-	//END DEBUG
 	
 	/* Compute the structures of support for transformers: for each NAT compute the transforming map, for each FIREWALL its deny/allow lists 
 	 * i.e. a NAT will have a map of entry for example {10: 5} which means that the atomic predicates 10 arrives at the nat and it is transformed in
@@ -460,9 +473,9 @@ public class VerefooProxy {
 		}
 
 		//DEBUG: interesting predicates for requirements source and destination
-		System.out.println("INTERESTING PREDICATES");
-		for(Predicate p: predicates)
-			p.print();
+		System.out.println("INTERESTING PREDICATES: " + predicates.size());
+//		for(Predicate p: predicates)
+//			p.print();
 		//END DEBUG
 
 		//Now we have the list of predicates on which we have to compute the set of atomic predicates, so compute atomic predicates
@@ -476,11 +489,11 @@ public class VerefooProxy {
 		}
 		
 		//DEBUG: print atomic predicates
-		System.out.println("ATOMIC PREDICATES");
-		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
-			System.out.print(entry.getKey() + " ");
-			entry.getValue().print();
-		}
+		System.out.println("ATOMIC PREDICATES " + networkAtomicPredicates.size());
+//		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
+//			System.out.print(entry.getKey() + " ");
+//			entry.getValue().print();
+//		}
 		//END DEBUG
 	
 		return networkAtomicPredicates;
@@ -783,5 +796,9 @@ public class VerefooProxy {
 	 */
 	public Map<Integer, Flow> getTrafficFlowsMap(){
 		return trafficFlowsMap;
+	}
+	
+	public TestResults getTestTimeResults() {
+		return testResults;
 	}
 }

@@ -49,14 +49,10 @@ public class TestCaseGeneratorAtomicPredicates {
 	List<Node> allNATs;
 	List<Node> allFirewalls;
 	List<Tuple<String, Node>> lastAPs;
-	
-	/* Atomic predicates new */
-	int maxNATSrcs = 2;
-	int maxFWRules = 3;
-	
-	
+		
 	public TestCaseGeneratorAtomicPredicates(String name, int numberAllocationPlaces, int numberWebClients, int numberWebServers, 
-			int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberFirewall, int seed) {
+			int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, 
+			double percReqWithPorts, int seed) {
 		this.name = name;
 		this.rand = new Random(seed); 
 
@@ -68,13 +64,13 @@ public class TestCaseGeneratorAtomicPredicates {
 		lastAPs = new ArrayList<Tuple<String, Node>>();
 
 		allIPs = new HashSet<String>();
-		nfv = generateNFV(numberAllocationPlaces, numberWebClients, numberWebServers, numberReachPolicies, numberIsPolicies, numberNAT, numberFirewall, rand);
+		nfv = generateNFV(numberAllocationPlaces, numberWebClients, numberWebServers, numberReachPolicies, numberIsPolicies, numberNAT, numberFirewall, 
+				maxNATSrcs, maxFWRules, percReqWithPorts, rand);
 	}
 	
 	
-	
 	public NFV changeIP(int numberAllocationPlaces, int numberWebClients, int numberWebServers, int numberReachPolicies, int numberIsPolicies, 
-			int numberNAT, int numberFirewall, int seed) {
+			int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, double percReqWithPorts, int seed) {
 		this.rand = new Random(seed);
 		allClients = new ArrayList<Node>();
 		allServers = new ArrayList<Node>();
@@ -84,7 +80,8 @@ public class TestCaseGeneratorAtomicPredicates {
 		lastAPs = new ArrayList<Tuple<String, Node>>();
 
 		allIPs = new HashSet<String>();
-		return generateNFV(numberAllocationPlaces, numberWebClients, numberWebServers, numberReachPolicies, numberIsPolicies, numberNAT, numberFirewall, rand);
+		return generateNFV(numberAllocationPlaces, numberWebClients, numberWebServers, numberReachPolicies, numberIsPolicies, numberNAT, numberFirewall,
+				maxNATSrcs, maxFWRules, percReqWithPorts, rand);
 	}
 	
 	
@@ -128,9 +125,9 @@ public class TestCaseGeneratorAtomicPredicates {
 	}
 	
 	
-	public NFV generateNFV(int numberAllocationPlaces, int numberWebClients, int numberWebServers, int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberFirewall, Random rand) {
+	public NFV generateNFV(int numberAllocationPlaces, int numberWebClients, int numberWebServers, int numberReachPolicies, int numberIsPolicies, 
+			int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, double percReqWithPorts, Random rand) {
 		
-		int numberPolicies = numberReachPolicies + numberIsPolicies;
 		/* Creation of the test */
 		
 		NFV nfv = new NFV();
@@ -184,7 +181,6 @@ public class TestCaseGeneratorAtomicPredicates {
 		Node central = new Node();
 		String ipCentral = createRandomIP();
 		central.setName(ipCentral);
-		System.out.println("Central node "+ ipCentral);
 	
 		//creation of the others APs
 		for(int i = 0; i < numberAllocationPlaces-1; i++) {
@@ -261,11 +257,11 @@ public class TestCaseGeneratorAtomicPredicates {
 		}
 		
 		//DEBUG
-		System.out.println("TUPLE before attaching firewalls");
-		for(Tuple<String, Node> tuple: lastAPs) {
-			System.out.println("TUPLE before fw: " + tuple._1 + " -> " + tuple._2.getName());
-		}
-		System.out.println();
+//		System.out.println("TUPLE before attaching firewalls");
+//		for(Tuple<String, Node> tuple: lastAPs) {
+//			System.out.println("TUPLE before fw: " + tuple._1 + " -> " + tuple._2.getName());
+//		}
+//		System.out.println();
 		//END DEBUG
 		
 		//attach firewall to client chain (NOTE: some can ramain)
@@ -288,36 +284,36 @@ public class TestCaseGeneratorAtomicPredicates {
 		lastAPs = new ArrayList<Tuple<String, Node>>(tmpTupleList);
 		
 		//DEBUG:print tuple
-		int index = 0;
-		System.out.println("ALL CLIENTS");
-		for(Node node: allClients) {
-			System.out.println(index + " " + node.getName());
-			index++;
-		}
-		System.out.println();
-		System.out.println("ALL FIREWALLS");
-		for(Node node: allFirewalls) {
-			System.out.println(index + " " + node.getName());
-			index++;
-		}
-		System.out.println();
-		System.out.println("ALL APS");
-		for(Node node: allAPs) {
-			System.out.println(index + " " + node.getName());
-			index++;
-		}
-		System.out.println();
-		System.out.println("ALL NATS");
-		for(Node node: allNATs) {
-			System.out.println(index + " " + node.getName());
-			index++;
-		}
-		System.out.println();
-		System.out.println("Tuple before applying NAT");
-		for(Tuple<String, Node> tuple: lastAPs) {
-			System.out.println("TUPLE: " + tuple._1 + " -> " + tuple._2.getName());
-		}
-		System.out.println();
+//		int index = 0;
+//		System.out.println("ALL CLIENTS");
+//		for(Node node: allClients) {
+//			System.out.println(index + " " + node.getName());
+//			index++;
+//		}
+//		System.out.println();
+//		System.out.println("ALL FIREWALLS");
+//		for(Node node: allFirewalls) {
+//			System.out.println(index + " " + node.getName());
+//			index++;
+//		}
+//		System.out.println();
+//		System.out.println("ALL APS");
+//		for(Node node: allAPs) {
+//			System.out.println(index + " " + node.getName());
+//			index++;
+//		}
+//		System.out.println();
+//		System.out.println("ALL NATS");
+//		for(Node node: allNATs) {
+//			System.out.println(index + " " + node.getName());
+//			index++;
+//		}
+//		System.out.println();
+//		System.out.println("Tuple before applying NAT");
+//		for(Tuple<String, Node> tuple: lastAPs) {
+//			System.out.println("TUPLE: " + tuple._1 + " -> " + tuple._2.getName());
+//		}
+//		System.out.println();
 		//END DEBUG
 		
 		//attach the NATs
@@ -374,10 +370,10 @@ public class TestCaseGeneratorAtomicPredicates {
 		}
 		
 		//DEBUG
-		System.out.println("Tuple before applying last firewalls");
-		for(Tuple<String, Node> tuple: lastAPs) {
-			System.out.println("LAST AP: " + tuple._1 + " -> " + tuple._2.getName());
-		}
+//		System.out.println("Tuple before applying last firewalls");
+//		for(Tuple<String, Node> tuple: lastAPs) {
+//			System.out.println("LAST AP: " + tuple._1 + " -> " + tuple._2.getName());
+//		}
 		//END DEBUG
 		
 		//attach remaining firewalls
@@ -402,10 +398,10 @@ public class TestCaseGeneratorAtomicPredicates {
 		}
 
 		//DEBUG
-		System.out.println("\nTuple after applying last firewalls");
-		for(Tuple<String, Node> tuple: lastAPs) {
-			System.out.println("LAST AP: " + tuple._1 + " -> " + tuple._2.getName());
-		}
+//		System.out.println("\nTuple after applying last firewalls");
+//		for(Tuple<String, Node> tuple: lastAPs) {
+//			System.out.println("LAST AP: " + tuple._1 + " -> " + tuple._2.getName());
+//		}
 		//END DEBUG
 		
 		//attach all chains to central node
@@ -481,28 +477,40 @@ public class TestCaseGeneratorAtomicPredicates {
 		graph.getNode().add(central);
 
 		//create the policies
-		int numCP = 0;
+		int numberIPWithPorts = (int) (numberIsPolicies * percReqWithPorts);
 		for(int i = 0; i < numberIsPolicies; i++) {
-			String srcNode = "", dstNode = "";
+			String srcNode = "", dstNode = "", srcPort = "*", dstPort = "*";
 			if(rand.nextBoolean())
 				srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
 			else srcNode = allServers.get(rand.nextInt(allServers.size())).getName();
 			if(rand.nextBoolean())
 				dstNode = allClients.get(rand.nextInt(allClients.size())).getName();
 			else dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
-			createPolicy(PName.ISOLATION_PROPERTY, nfv, graph, srcNode, dstNode);
-			numCP++;
+			if(numberIPWithPorts > 0) {
+				if(rand.nextBoolean())
+					srcPort = String.valueOf(rand.nextInt(65535));
+				else dstPort = String.valueOf(rand.nextInt(65535));
+				numberIPWithPorts--;
+			}
+			createPolicy(PName.ISOLATION_PROPERTY, nfv, graph, srcNode, dstNode, srcPort, dstPort);
 		}
+		
+		int numberRPWithPorts = (int) (numberReachPolicies * percReqWithPorts);
 		for(int i = 0; i < numberReachPolicies; i++) {
-			String srcNode = "", dstNode = "";
+			String srcNode = "", dstNode = "", srcPort = "*", dstPort = "*";
 			if(rand.nextBoolean())
 				srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
 			else srcNode = allServers.get(rand.nextInt(allServers.size())).getName();
 			if(rand.nextBoolean())
 				dstNode = allClients.get(rand.nextInt(allClients.size())).getName();
 			else dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
-			createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, srcNode, dstNode);
-			numCP++;
+			if(numberRPWithPorts > 0) {
+				if(rand.nextBoolean())
+					srcPort = String.valueOf(rand.nextInt(65535));
+				else dstPort = String.valueOf(rand.nextInt(65535));
+				numberRPWithPorts--;
+			}
+			createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, srcNode, dstNode, srcPort, dstPort);
 		}
 
 		nfv.getGraphs().getGraph().add(graph);
@@ -511,13 +519,15 @@ public class TestCaseGeneratorAtomicPredicates {
 		return nfv;
 	}
 
-	private void createPolicy(PName type, NFV nfv, Graph graph, String IPClient, String IPServer) {
+	private void createPolicy(PName type, NFV nfv, Graph graph, String IPClient, String IPServer, String srcPort, String dstPort) {
 
 		Property property = new Property();
 		property.setName(type);
 		property.setGraph((long) 0);
 		property.setSrc(IPClient);
 		property.setDst(IPServer);
+		property.setSrcPort(srcPort);
+		property.setDstPort(dstPort);
 		nfv.getPropertyDefinition().getProperty().add(property);
 	}
 	

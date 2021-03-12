@@ -19,8 +19,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -30,8 +28,8 @@ import org.junit.Test;
 import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.extra.Package1LoggingClass;
 import it.polito.verefoo.extra.TestCaseGeneratorAtomicPredicates;
-import it.polito.verefoo.extra.TestCaseGeneratorBudapest;
 import it.polito.verefoo.jaxb.NFV;
+import it.polito.verefoo.utils.TestResults;
 
 /* Run some instances of TestCaseGeneratorAtomicPredicates. TestCaseGeneratorAtomicPredicates generates XML files for NFV, then this
  * class takes in input those files, for each of them runs Verefoo and print results and other statistics (time to complete, memory usage etc).
@@ -39,19 +37,21 @@ import it.polito.verefoo.jaxb.NFV;
 public class TestPerformanceScalabilityAtomicPredicates {
 	
 	public static void main(String[] args)  {	
-		int allocPlaces = 10;
-		int j = 2;
-		
-		seed  = 66361;
-		numberAP  = allocPlaces;
+		numberPR = 20;
 		numberWC = 5;
 		numberWS = 2;
-		numberIPR  = j/2;
-		numberRPR = j/2;
-		numberPR = numberIPR + numberRPR;
+		numberAP  = 10;
 		numberNAT = 4;
 		numberFW = 10;
-		runs = 1;
+		maxNATSrcs = 2;
+		maxFWRules = 3;
+		runs = 10;
+		percReqWithPorts = 0.0; //from 0.0 to 1.0
+		
+		seed  = 66361;
+		numberIPR  = numberPR/2;
+		numberRPR = numberPR/2;
+		numberPR = numberIPR + numberRPR;
 		testScalabilityPerformance();
 	}
 	
@@ -63,18 +63,10 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	String IPServer[] = new String[runs];
 	static int seed;
 	static Random rand;
-	
-	private static long condTime = 0;
-	private static long checkTimeSAT = 0;
-	private static long checkTimeUNSAT = 0;
-	private static long totTime = 0;
-	private static long maxCondTime = 0, maxCheckTimeSAT = 0, maxCheckTimeUNSAT = 0, maxTotTime = 0,minTotTime = 0;
-	private  static int nSAT = 0, nUNSAT = 0, i = 0, err = 0, nrOfConditions = 0, maxNrOfConditions = 0;
+
 	static NFV root;
 	static String pathfile;
 	private static ch.qos.logback.classic.Logger logger;
-	private Logger loggerModel = LogManager.getLogger("model");
-	private int newSeed;
 	private static int numberAP; //number allocation places
 	private static int numberWC; //number web clients
 	private static int numberWS; //number web servers
@@ -83,6 +75,9 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	private static int numberPR;  //total number of requirements
 	private static int numberNAT; //number of NATs
 	private static int numberFW; //number of Firewalls
+	private static int maxNATSrcs;
+	private static int maxFWRules;
+	private static double percReqWithPorts;
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -111,75 +106,49 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	public void tearDown() throws Exception {
 	}
 
-	
 	private static NFV testCoarse(NFV root) throws Exception{
 		long beginAll=System.currentTimeMillis();
 		VerefooSerializer test = new VerefooSerializer(root);
-		
 		long endAll=System.currentTimeMillis();
-		 if(test.isSat()){
-			nSAT++;
-			maxTotTime = maxTotTime<(endAll-beginAll)? (endAll-beginAll) : maxTotTime;
-			minTotTime = minTotTime>(endAll-beginAll)? (endAll-beginAll) : minTotTime;
-			logger.debug("time: " + (endAll-beginAll) + "ms;");
-			totTime += (endAll-beginAll);
-		 }
-	 	else{
-	 		logger.debug("UNSAT");	
-			nUNSAT++;
-	 	}
+		TestResults results = test.getTestTimeResults();
 		
+		long totalTime = endAll - beginAll;
+		long genPathTime = results.getGenPathTime();
+		long atomicPredCompTime = results.getAtomicPredCompTime();
+		long fillMapTime = results.getFillMapTime();
+		long atomicFlowsCompTime = results.getAtomicFlowsCompTime();
+		long otherTime = totalTime - genPathTime - atomicPredCompTime - fillMapTime - atomicFlowsCompTime;
+		String resString = new String("Total time " + totalTime + "ms: genPathTime: " + genPathTime + "ms, atomicPredCompTime " 
+				+ atomicPredCompTime + "ms, fillMapTime " + fillMapTime + "ms, atomicFlowsCompTime " 
+				+ atomicFlowsCompTime + "ms, other " + otherTime+"ms;");
+		
+		System.out.println(resString);
+		logger.info("TOT: " + totalTime + " GP "+ genPathTime + " GAP " + atomicPredCompTime + " FM " + fillMapTime + 
+				" GAF " + atomicFlowsCompTime + " OT " + otherTime);
         return test.getResult();
 	}
-	
-
-
 	
 	
 	@Test
 	public static void testScalabilityPerformance(){
 		    rand= new Random(seed);
-	        pathfile =  "VerefooMemory.log";
+		    pathfile =  "WC"+numberWC+"WS"+numberWS+"AP"+numberAP+"NAT"+numberNAT+"FW"+numberFW+"NATS"
+	        		+maxNATSrcs+"FWR"+maxFWRules+"NR"+numberPR+"PRP"+percReqWithPorts+"Logs.log";
 	        logger =  Package1LoggingClass.createLoggerFor(pathfile, "log/"+pathfile);
 
-	        Runtime rt = Runtime.getRuntime();
-	        long totalMem = rt.totalMemory();
-	        long maxMem = rt.maxMemory();
-	        long freeMem = rt.freeMemory();
-	        double megs = 1048576.0;
-
-	        System.out.println ("Total Memory: " + totalMem + " (" + (totalMem/megs) + " MiB)");
-	        System.out.println ("Max Memory:   " + maxMem + " (" + (maxMem/megs) + " MiB)");
-	        System.out.println ("Free Memory:  " + freeMem + " (" + (freeMem/megs) + " MiB)");
-
 	        int[] seeds = new int[runs];
-
 	        for(int m=0;m<runs;m++) { 
 	        	seeds[m]=Math.abs(rand.nextInt()); 
 	        }
 
-
 	        /* Switch between automatic and manul configuration of the IP*/
-	        int k=0;
+	        int k=0, i=0;
 	        try {
 	        	List<TestCaseGeneratorAtomicPredicates> nfv = new ArrayList<>();
-	        	nfv.add(new TestCaseGeneratorAtomicPredicates("Test case generator atomic predicates", numberAP, numberWC, numberWS, numberRPR, numberIPR, numberNAT, numberFW, 1));
+	        	nfv.add(new TestCaseGeneratorAtomicPredicates("Test case generator atomic predicates", numberAP, numberWC, numberWS, 
+	        			numberRPR, numberIPR, numberNAT, numberFW, maxNATSrcs, maxFWRules, percReqWithPorts, 1));
 
 	        	for(TestCaseGeneratorAtomicPredicates f : nfv){
-	        		condTime = 0;
-	        		checkTimeSAT = 0;
-	        		checkTimeUNSAT = 0;
-	        		totTime = 0;
-	        		maxCondTime = 0;
-	        		maxCheckTimeSAT = 0;
-	        		maxCheckTimeUNSAT = 0;
-	        		maxTotTime = 0;
-	        		minTotTime = Integer.MAX_VALUE;
-	        		nSAT = 0;
-	        		nUNSAT = 0;
-	        		i = 0;
-	        		err = 0;
-	        		logger.info("===========FILE " + f.getName() + "===========");
 
 	        		// create a JAXBContext capable of handling the generated classes
 	        		//long beginAll=System.currentTimeMillis();
@@ -204,17 +173,11 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	        					m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
 	        					m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
 
-	        					//no random
-	        					//root = f.changeIP(IPClient[k], IPAllocationPlace[k], IPServer[k]);
-	        					//random
-	        					root = f.changeIP(numberAP, numberWC, numberWS, numberRPR, numberIPR, numberNAT, numberFW,seeds[k]);
-
-	        					//random
-	        					logger.debug("Seed:" + seeds[k]);
-	        					System.out.println("Seed:" + seeds[k]);
+	        					root = f.changeIP(numberAP, numberWC, numberWS, numberRPR, numberIPR, numberNAT, numberFW,
+	        							maxNATSrcs, maxFWRules, percReqWithPorts, seeds[k]);
 
 	        					//for debug purpose 
-	        					m.marshal( root, System.out );  
+	        					//m.marshal( root, System.out );  
 	        					i++;
 	        					NFV resultNFV = testCoarse(root);
 	        					// StringWriter stringWriter = new StringWriter();
@@ -222,27 +185,10 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	        					//loggerModel.debug(stringWriter.toString());
 	        				} catch (Exception e) {
 	        					e.printStackTrace();
-	        					err++;
 	        				}
 
 	        			}
 	        		}while(i<1);
-
-	        		logger.info("Simulations -> " + k + " / Errors -> " + err);
-	        		//System.out.println("AVG Nr of Conditions -> " + (nrOfConditions/(i)) + " / MAX Nr Of Conditions -> " + maxNrOfConditions);
-	        		//System.out.println("AVG creating condition -> " + (condTime/(i-err)) + "ms");
-	        		//System.out.println("MAX creating condition -> " + (maxCondTime) + "ms");
-	        		//logger.debug("AVG creating condition -> " + (condTime/(i-err)) + "ms");
-	        		//logger.debug("MAX creating condition -> " + (maxCondTime) + "ms");
-	        		if(nSAT > 0) {
-	        			System.out.println("AVG total time -> " + (totTime/nSAT) + "ms");
-	        			logger.info("AVG total time -> " + (totTime/nSAT) + "ms");
-	        			logger.info("MAX total time -> " + (maxTotTime) + "ms");
-	        			logger.info("MIN total time -> " + (minTotTime) + "ms");
-	        		}
-
-	        		//logger.debug("=====================================");
-
 
 	        	}
 	        } catch (Exception e) {

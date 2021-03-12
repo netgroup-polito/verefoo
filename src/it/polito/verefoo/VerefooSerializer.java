@@ -14,6 +14,7 @@ import it.polito.verefoo.jaxb.NFV;
 import it.polito.verefoo.jaxb.Path;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.translator.Translator;
+import it.polito.verefoo.utils.TestResults;
 import it.polito.verefoo.utils.VerificationResult;
 
 /**
@@ -23,6 +24,7 @@ public class VerefooSerializer {
 	private NFV nfv, result;
 	private boolean sat = false;
 	private String z3Model;
+	private TestResults testResults;
 	
 	int time = 0;
 	
@@ -46,7 +48,6 @@ public class VerefooSerializer {
 		this.nfv = root;
 		AllocationGraphGenerator agg = new AllocationGraphGenerator(root);
 		root = agg.getAllocationGraph();
-		//TODO : remove (Budapest)
 		//VerefooNormalizer norm = new VerefooNormalizer(root);
 		//root = norm.getRoot();
 
@@ -62,29 +63,7 @@ public class VerefooSerializer {
 							EType.INVALID_PROPERTY_DEFINITION);
 				VerefooProxy test = new VerefooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(),
 						prop, paths);
-
-				//TODO: remove (Budapest)
-//				long beginAll = System.currentTimeMillis();
-//				VerificationResult res = test.checkNFFGProperty();
-//				long endAll = System.currentTimeMillis();
-//				//loggerResult.debug("Only checker: " + (endAll - beginAll) + "ms");
-//				//System.out.println("Only checker: " + (endAll - beginAll) + "ms");
-//				time =  (int) res.getTime(); 
-				
-//				if (res.result != Status.UNSATISFIABLE && res.result != Status.UNKNOWN) {
-//					Translator t = new Translator(res.model.toString(), root, g, test.getAllocationNodes(), test.getTrafficFlowsMap());
-//					z3Model = res.model.toString();
-//					t.setNormalizer(norm);
-//					result = t.convert();
-//					root = result;
-//					sat = true; 
-//				} else {
-//					sat = false;
-//					result = root;
-//				}
-//				root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph() == g.getId())
-//						.forEach(p -> p.setIsSat(res.result != Status.UNSATISFIABLE)); 
-				
+				testResults = test.getTestTimeResults();
 			} 
 		} catch (BadGraphError e) {
 			throw e;
@@ -121,6 +100,10 @@ public class VerefooSerializer {
 	 */
 	public boolean isSat() {
 		return sat;
+	}
+	
+	public TestResults getTestTimeResults() {
+		return testResults;
 	}
 
 }

@@ -22,7 +22,9 @@ public class APUtils {
 		List<Predicate> firstNeg = null;
 		int count = -1;
 		
+		System.out.println("Computing atomic predicates:");
 		for(Predicate sp: predicates) {
+			System.out.print("*");
 			//If sp is the first predicate to transform and atomicPredicates is empty
 			if(atomicPredicates.isEmpty() && count == -1) {
 				first = sp;
@@ -67,6 +69,7 @@ public class APUtils {
 				newAtomicPredicates = new ArrayList<>();
 			}
 		}
+		System.out.println();
 		if(count == 1) {
 			firstNeg.add(first);
 			return firstNeg;

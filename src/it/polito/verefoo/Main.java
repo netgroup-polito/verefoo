@@ -3,7 +3,6 @@ package it.polito.verefoo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
