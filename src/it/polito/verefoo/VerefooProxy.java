@@ -3,6 +3,7 @@ package it.polito.verefoo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,52 +91,55 @@ public class VerefooProxy {
 		this.paths = paths;
 		this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
 		
-		//Creation of the z3 context
-		HashMap<String, String> cfg = new HashMap<String, String>();
-		cfg.put("model", "true");
-		ctx = new Context(cfg);
-		aputils = new APUtils();
-				
-		//Creation of the NetContext (z3 variables)
-		nctx = nctxGenerate(ctx, nodes, prop, allocationNodes);
-		nctx.setWildcardManager(wildcardManager);
+		//TODO: remove (BUdapest)
+//		//Creation of the z3 context
+//		HashMap<String, String> cfg = new HashMap<String, String>();
+//		cfg.put("model", "true");
+//		ctx = new Context(cfg);
+//				
+//		//Creation of the NetContext (z3 variables)
+//		nctx = nctxGenerate(ctx, nodes, prop, allocationNodes);
+//		nctx.setWildcardManager(wildcardManager);
 		
 		/*
 		 * Main sequence of methods in VerefooProxy:
 		 * 1) given every requirement, all the possible paths of the related flows are computed;
-		 * 2) the existing functions are istanciated
-		 * 3) the functions to be allocated are associated to Allocation Places
-		 * 4) the possible traffic in input to each node is computed
-		 * 5) soft and hard constraints are defined for each function
-		 * 6) the hard constraints for the requirements are defined
+		 * 2) then starting from requirements and transformers, all relative atomic predicates for the network are computed
+		 * 3) the transformation map for each transformer is filled (e.g. NAT1 input ap 5 -> output ap 8)
+		 * 4) then all atomic flows are computed 
 		 */
 		
 		/* Atomic predicates */
+		aputils = new APUtils();
 		trafficFlowsMap = generateFlowPaths();
 		networkAtomicPredicates = generateAtomicPredicateNew();
 		fillTransformationMap();
 		printTransformations(); //DEBUG
 		computeAtomicFlows();
 		
-		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
-		allocationManager.instantiateFunctions();
-		allocateFunctions();
-		distributeTrafficFlows();
-		allocationManager.configureFunctions();
-		
-		check = new Checker(ctx, nctx, allocationNodes);
-		formalizeRequirements();
+		//TODO: remove (Budapest)
+//		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
+//		allocationManager.instantiateFunctions();
+//		allocateFunctions();
+//		distributeTrafficFlows();
+//		allocationManager.configureFunctions();
+//		
+//		check = new Checker(ctx, nctx, allocationNodes);
+//		formalizeRequirements();
 		
 	}
 	
 	private void computeAtomicFlows() {
-		ExecutorService threadPool = Executors.newCachedThreadPool();
+		ExecutorService threadPool = Executors.newFixedThreadPool(10);
 		List<Future<?>> tasks = new ArrayList<Future<?>>();
 				
 		for(SecurityRequirement sr : securityRequirements.values()) {
 			//Copy the map and Aputils in order to avoid concurrent modification exception, transformersNode should only be accessed in read mode
+			//NOTE: should be a deep copy, not a shallow copy
 			HashMap<Integer, Predicate> networkAtomicPredicatesNew = new HashMap<>();
-			networkAtomicPredicatesNew.putAll(networkAtomicPredicates);
+			for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
+				networkAtomicPredicatesNew.put(entry.getKey(), new Predicate(entry.getValue()));
+			}
 			APUtils aputilsNew = new APUtils(); 
 			tasks.add(threadPool.submit(new GenerateFlowsTask(sr, networkAtomicPredicatesNew, aputilsNew, transformersNode)));
 		}
@@ -180,7 +184,7 @@ public class VerefooProxy {
 				}
 			}
 		}
-		System.out.println("TOTAL NUMBER AP " + networkAtomicPredicates.size());
+		System.out.println();
 		//END DEBUG
 	}
 		

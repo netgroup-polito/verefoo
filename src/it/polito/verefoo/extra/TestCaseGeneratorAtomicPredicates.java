@@ -25,8 +25,8 @@ import org.xml.sax.SAXException;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.utils.Tuple;
 
-// Auxiliary class to generate  test cases for performance tests (used by TestPerformanceScalability)
-public class TestCaseGeneratorBudapest {
+// Auxiliary class to generate  test cases for performance tests (used by TestPerformanceScalabilityAtomicPredicates)
+public class TestCaseGeneratorAtomicPredicates {
 	NFV nfv;
 	String name;
 	
@@ -40,51 +40,50 @@ public class TestCaseGeneratorBudapest {
 	String IPC;
 	String IPAP;
 	String IPS;
-	 NFV originalNFV;
-	private int numberAllocationPlaces;
-	private int numberReachPolicies;
-	private int numberIsPolicies;
-	private int numberNAT;
-	private int numberLB;
+	NFV originalNFV;
 	
 	Set<String> allIPs;
 	List<Node> allClients;
 	List<Node> allServers;
 	List<Node> allAPs;
 	List<Node> allNATs;
-	List<Node> allLBs;
+	List<Node> allFirewalls;
 	List<Tuple<String, Node>> lastAPs;
 	
+	/* Atomic predicates new */
+	int maxNATSrcs = 2;
 	
-	public TestCaseGeneratorBudapest(String name, int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberLB, int seed) {
+	
+	public TestCaseGeneratorAtomicPredicates(String name, int numberAllocationPlaces, int numberWebClients, int numberWebServers, 
+			int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberFirewall, int seed) {
 		this.name = name;
 		this.rand = new Random(seed); 
-
 
 		allClients = new ArrayList<Node>();
 		allServers = new ArrayList<Node>();
 		allAPs = new ArrayList<Node>();
 		allNATs = new ArrayList<Node>();
-		allLBs = new ArrayList<Node>();
+		allFirewalls = new ArrayList<Node>();
 		lastAPs = new ArrayList<Tuple<String, Node>>();
 
 		allIPs = new HashSet<String>();
-		nfv = generateNFV(numberAllocationPlaces, numberReachPolicies, numberIsPolicies, numberNAT, numberLB, rand);
+		nfv = generateNFV(numberAllocationPlaces, numberWebClients, numberWebServers, numberReachPolicies, numberIsPolicies, numberNAT, numberFirewall, rand);
 	}
 	
 	
 	
-	public NFV changeIP(int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberLB, int seed) {
+	public NFV changeIP(int numberAllocationPlaces, int numberWebClients, int numberWebServers, int numberReachPolicies, int numberIsPolicies, 
+			int numberNAT, int numberFirewall, int seed) {
 		this.rand = new Random(seed);
 		allClients = new ArrayList<Node>();
 		allServers = new ArrayList<Node>();
 		allAPs = new ArrayList<Node>();
 		allNATs = new ArrayList<Node>();
-		allLBs = new ArrayList<Node>();
+		allFirewalls = new ArrayList<Node>();
 		lastAPs = new ArrayList<Tuple<String, Node>>();
 
 		allIPs = new HashSet<String>();
-		return generateNFV(numberAllocationPlaces, numberReachPolicies, numberIsPolicies, numberNAT, numberLB, rand);
+		return generateNFV(numberAllocationPlaces, numberWebClients, numberWebServers, numberReachPolicies, numberIsPolicies, numberNAT, numberFirewall, rand);
 	}
 	
 	
@@ -127,9 +126,8 @@ public class TestCaseGeneratorBudapest {
 		
 	}
 	
-
-
-	public NFV generateNFV(int numberAllocationPlaces, int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberLB, Random rand) {
+	
+	public NFV generateNFV(int numberAllocationPlaces, int numberWebClients, int numberWebServers, int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberFirewall, Random rand) {
 		
 		int numberPolicies = numberReachPolicies + numberIsPolicies;
 		
@@ -149,9 +147,8 @@ public class TestCaseGeneratorBudapest {
 		Graph graph = new Graph();
 		graph.setId((long) 0);
 		
-		
-		//creation of the servers 
-		for(int i = 0; i < 2; i++) {
+		//creation of servers 
+		for(int i = 0; i < numberWebServers; i++) {
 			String IPServer = createRandomIP();
 			Node server = new Node();
 			server.setFunctionalType(FunctionalTypes.WEBSERVER);
@@ -168,7 +165,7 @@ public class TestCaseGeneratorBudapest {
 		String firstIPServer = allServers.get(0).getName();
 		
 		//creation of the clients
-		for(int i = 0; i < numberPolicies; i++) {
+		for(int i = 0; i < numberWebClients; i++) {
 			String IPClient = createRandomIP();
 			Node client = new Node();
 			client.setFunctionalType(FunctionalTypes.WEBCLIENT);
@@ -183,11 +180,11 @@ public class TestCaseGeneratorBudapest {
 			allClients.add(client);
 		}
 		
-		
 		//central AP
 		Node central = new Node();
 		String ipCentral = createRandomIP();
 		central.setName(ipCentral);
+		System.out.println("Central node "+ ipCentral);
 	
 		//creation of the others APs
 		for(int i = 0; i < numberAllocationPlaces-1; i++) {
@@ -203,6 +200,7 @@ public class TestCaseGeneratorBudapest {
 			Node nat = new Node();
 			nat.setName(ip);
 			Configuration confN = new Configuration();
+			nat.setFunctionalType(FunctionalTypes.NAT);
 			confN.setName("confN");
 			Nat nt = new Nat();
 			confN.setNat(nt);
@@ -210,22 +208,24 @@ public class TestCaseGeneratorBudapest {
 			allNATs.add(nat);
 		}
 		
-		//creation of all the LBs
-		for(int i = 0; i < numberLB; i++) {
+		//creation of all the firewalls
+		for(int i = 0; i < numberFirewall; i++) {
 			String ip = createRandomIP();
-			Node loadBalancer = new Node();
-			loadBalancer.setName(ip);
-			Configuration confN = new Configuration();
-			confN.setName("confN");
-			Loadbalancer lb = new Loadbalancer();
-			confN.setLoadbalancer(lb);
-			loadBalancer.setConfiguration(confN);
-			allLBs.add(loadBalancer);
+			Node firewall = new Node();
+			firewall.setName(ip);
+			Configuration confF = new Configuration();
+			confF.setName("confF");
+			Firewall fw = new Firewall();
+			confF.setFirewall(fw);
+			firewall.setConfiguration(confF);
+			allFirewalls.add(firewall);
 		}
 		
+		//attach one firewall to each client
+		
 		//attach the APs
-		int factorPAP = numberAllocationPlaces/numberPolicies;
-		int resto = numberAllocationPlaces%numberPolicies;
+		int factorPAP = numberAllocationPlaces/numberWebClients;
+		int resto = numberAllocationPlaces%numberWebClients;
 		if(resto>0) factorPAP++;
 		//if(factorPAP==0) factorPAP++;
 		
@@ -252,129 +252,111 @@ public class TestCaseGeneratorBudapest {
 					break;
 				}
 			}
-			Tuple t = new Tuple(client.getName(), prev);
+			Tuple<String, Node> t = new Tuple<String, Node>(client.getName(), prev);
 			lastAPs.add(t);
 			numC++;
 		}
 		
+		for(int i=numC; i<numberWebClients; i++) {
+			Node client = allClients.get(i);
+			lastAPs.add(new Tuple<String, Node>(client.getName(), client));
+		}
+		
+		//DEBUG:print tuple
+		int index = 0;
+		System.out.println("ALL CLIENTS");
+		for(Node node: allClients) {
+			System.out.println(index + " " + node.getName());
+			index++;
+		}
+		System.out.println();
+		System.out.println("ALL APS");
+		for(Node node: allAPs) {
+			System.out.println(index + " " + node.getName());
+			index++;
+		}
+		System.out.println();
+		System.out.println("ALL NATS");
+		for(Node node: allNATs) {
+			System.out.println(index + " " + node.getName());
+			index++;
+		}
+		System.out.println();
+		for(Tuple<String, Node> tuple: lastAPs) {
+			System.out.println("CLIENT: " + tuple._1 + " -> " + tuple._2.getName());
+		}
+		System.out.println();
+		//END DEBUG
 		
 		//attach the NATs
-		int factorNAT = 0;
-		boolean attachedAllNats = false;
+		//maxNATSrcs = number of clients to assign to each NAT
+		int tupleIndex = 0;
+		int remainingNAT = numberNAT;
+		int n = 0;
+		ArrayList<Tuple<String, Node>> newTupleList = new ArrayList<Tuple<String, Node>>();
+		Node currentNAT;
 		
-		if(numberNAT!=0) factorNAT= numberPolicies/numberNAT;
-		else attachedAllNats = true;
-		if(factorNAT==0) factorNAT++;
-		
-		int numLastAP = 0;
-		int fromAttach = 0;
-		int numNAT = 0;
+		while(remainingNAT > 0) {
+			for(Tuple<String, Node> tuple: lastAPs) {
+				currentNAT = allNATs.get(numberNAT-remainingNAT);
 
-		while(!attachedAllNats) {
-			Tuple t = lastAPs.get(numLastAP);
-			Node lastAP = (Node) t._2;
-			String client = (String) t._1;
-			String prevString = client;
-			Node prevNode = lastAP;
-			for(int j = 0; j < factorNAT; j++) {
-				Node nat = allNATs.get(numNAT);
-				Neighbour nextNeigh = new Neighbour();
-				nextNeigh.setName(nat.getName());
-				prevNode.getNeighbour().add(nextNeigh);
-				Neighbour prevNeigh = new Neighbour();
-				prevNeigh.setName(prevNode.getName());
-				nat.getNeighbour().add(prevNeigh);
-				nat.getConfiguration().getNat().getSource().add(prevString);
-				numNAT++;
-				prevNode = nat;
-				prevString = nat.getName();
-				if(numNAT == numberNAT){
-					attachedAllNats = true;
-					break;
+				Neighbour neighForTuple = new Neighbour();
+				Neighbour neighForNat = new Neighbour();
+				neighForTuple.setName(currentNAT.getName());
+				neighForNat.setName(tuple._2.getName());
+				tuple._2.getNeighbour().add(neighForTuple);
+				currentNAT.getNeighbour().add(neighForNat);
+				//random selection if the client has to be added to NAT src (NOTE: NAT src list should contain at least one src)
+				if(rand.nextBoolean() || currentNAT.getConfiguration().getNat().getSource().size() == 0) {
+					currentNAT.getConfiguration().getNat().getSource().add(tuple._1);
 				}
+
+				if(n == 0) newTupleList.add(new Tuple<String, Node>(currentNAT.getName(), currentNAT));
+				n++;
+				if(n == maxNATSrcs) {
+					remainingNAT--;
+					if(remainingNAT == 0) break;
+					n = 0;
+				}
+				tupleIndex++;
 			}
-			fromAttach++;
-			numLastAP++;
+			
+			//tuple finished, but still NAT available
+			if(remainingNAT > 0) {
+				if(n != maxNATSrcs && n != 0) remainingNAT--;
+				n=0;
+				lastAPs = new ArrayList<Tuple<String, Node>>(newTupleList);
+				newTupleList =  new ArrayList<Tuple<String, Node>>();
+				tupleIndex = 0;
+			} else {
+				//NAT finished but there can be remaining tuple to process
+				tupleIndex++;
+				if(tupleIndex != lastAPs.size()) {
+					for(int j = tupleIndex; j < lastAPs.size(); j++) {
+						newTupleList.add(lastAPs.get(j));
+					}
+				}
+				lastAPs = new ArrayList<Tuple<String, Node>>(newTupleList);
+				newTupleList =  new ArrayList<Tuple<String, Node>>();
+			}
 		}
 		
-		
-		//attach the LBs
-		for(int i = 0; i < numberLB; i++) {
-			Node server = allServers.get(i);
-			Node lb = allLBs.get(i);
-			lb.getConfiguration().getLoadbalancer().getPool().add(server.getName());
-			
-			Neighbour nextNeigh = new Neighbour();
-			nextNeigh.setName(server.getName());
-			lb.getNeighbour().add(nextNeigh);
-			Neighbour prevNeigh = new Neighbour();
-			prevNeigh.setName(lb.getName());
-			server.getNeighbour().add(prevNeigh);
-			
-			Neighbour nextNeigh2 = new Neighbour();
-			nextNeigh.setName(lb.getName());
-			central.getNeighbour().add(nextNeigh2);
-			Neighbour prevNeigh2 = new Neighbour();
-			prevNeigh.setName(central.getName());
-			lb.getNeighbour().add(prevNeigh2);
+		//DEBUG
+		for(Tuple<String, Node> tuple: lastAPs) {
+			System.out.println("LAST AP: " + tuple._1 + " -> " + tuple._2.getName());
 		}
-		
-		for(int i = numberLB; i < 2; i++) {
-			Node server = allServers.get(i);
-			
-			Neighbour nextNeigh = new Neighbour();
-			nextNeigh.setName(server.getName());
-			central.getNeighbour().add(nextNeigh);
-			Neighbour prevNeigh = new Neighbour();
-			prevNeigh.setName(central.getName());
-			server.getNeighbour().add(prevNeigh);
-		}
+		//END DEBUG
 		
 		
 		//attach central node to NATs and APs
-		for(int i = 0; i < numberNAT; i++) {
-			Node node = allNATs.get(i);
 		
-			Neighbour nextNeigh = new Neighbour();
-			nextNeigh.setName(central.getName());
-			node.getNeighbour().add(nextNeigh);
-			Neighbour prevNeigh = new Neighbour();
-			prevNeigh.setName(node.getName());
-			central.getNeighbour().add(prevNeigh);
-		}
-		
-		int fA;
-		//System.out.println(lastAPs.size());
-		for(fA = fromAttach; fA < numberPolicies-1 && fA < lastAPs.size(); fA++) {
-			//System.out.println(fA);
-			Node node = lastAPs.get(fA)._2;
-			
-			Neighbour nextNeigh = new Neighbour();
-			nextNeigh.setName(central.getName());
-			node.getNeighbour().add(nextNeigh);
-			Neighbour prevNeigh = new Neighbour();
-			prevNeigh.setName(node.getName());
-			central.getNeighbour().add(prevNeigh);
-			
-		}
-		
-		for(; fA < numberPolicies; fA++) {
-			Node node = allClients.get(fA);
-			
-			Neighbour nextNeigh = new Neighbour();
-			nextNeigh.setName(central.getName());
-			node.getNeighbour().add(nextNeigh);
-			Neighbour prevNeigh = new Neighbour();
-			prevNeigh.setName(node.getName());
-			central.getNeighbour().add(prevNeigh);
-		}
 	
 		//add the nodes in the graph
 		graph.getNode().addAll(allClients);
 		graph.getNode().addAll(allServers);
 		graph.getNode().addAll(allAPs);
 		graph.getNode().addAll(allNATs);
-		graph.getNode().addAll(allLBs);
+		//graph.getNode().addAll(allLBs);
 		graph.getNode().add(central);
 
 		//create the policies

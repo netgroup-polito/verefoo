@@ -46,8 +46,9 @@ public class VerefooSerializer {
 		this.nfv = root;
 		AllocationGraphGenerator agg = new AllocationGraphGenerator(root);
 		root = agg.getAllocationGraph();
-		VerefooNormalizer norm = new VerefooNormalizer(root);
-		root = norm.getRoot();
+		//TODO : remove (Budapest)
+		//VerefooNormalizer norm = new VerefooNormalizer(root);
+		//root = norm.getRoot();
 
 		try {
 			List<Path> paths = null;
@@ -62,27 +63,29 @@ public class VerefooSerializer {
 				VerefooProxy test = new VerefooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(),
 						prop, paths);
 
-				long beginAll = System.currentTimeMillis();
-				VerificationResult res = test.checkNFFGProperty();
-				long endAll = System.currentTimeMillis();
-				//loggerResult.debug("Only checker: " + (endAll - beginAll) + "ms");
-				//System.out.println("Only checker: " + (endAll - beginAll) + "ms");
-				time =  (int) res.getTime(); 
+				//TODO: remove (Budapest)
+//				long beginAll = System.currentTimeMillis();
+//				VerificationResult res = test.checkNFFGProperty();
+//				long endAll = System.currentTimeMillis();
+//				//loggerResult.debug("Only checker: " + (endAll - beginAll) + "ms");
+//				//System.out.println("Only checker: " + (endAll - beginAll) + "ms");
+//				time =  (int) res.getTime(); 
 				
-				if (res.result != Status.UNSATISFIABLE && res.result != Status.UNKNOWN) {
-					Translator t = new Translator(res.model.toString(), root, g, test.getAllocationNodes(), test.getTrafficFlowsMap());
-					z3Model = res.model.toString();
-					t.setNormalizer(norm);
-					result = t.convert();
-					root = result;
-					sat = true; 
-				} else {
-					sat = false;
-					result = root;
-				}
-				root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph() == g.getId())
-						.forEach(p -> p.setIsSat(res.result != Status.UNSATISFIABLE));
-			}
+//				if (res.result != Status.UNSATISFIABLE && res.result != Status.UNKNOWN) {
+//					Translator t = new Translator(res.model.toString(), root, g, test.getAllocationNodes(), test.getTrafficFlowsMap());
+//					z3Model = res.model.toString();
+//					t.setNormalizer(norm);
+//					result = t.convert();
+//					root = result;
+//					sat = true; 
+//				} else {
+//					sat = false;
+//					result = root;
+//				}
+//				root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph() == g.getId())
+//						.forEach(p -> p.setIsSat(res.result != Status.UNSATISFIABLE)); 
+				
+			} 
 		} catch (BadGraphError e) {
 			throw e;
 		}

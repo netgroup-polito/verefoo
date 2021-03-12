@@ -29,6 +29,15 @@ public class Predicate {
 		protoTypeList.add(proto);
 	}
 	
+	//Copy constructor
+	public Predicate(Predicate toCopy) {
+		IPSrcList = new ArrayList<>(toCopy.getIPSrcList());
+		IPDstList = new ArrayList<>(toCopy.getIPDstList());
+		pSrcList = new ArrayList<>(toCopy.getpSrcList());
+		pDstList = new ArrayList<>(toCopy.getpDstList());
+		protoTypeList = new ArrayList<>(toCopy.getProtoTypeList());
+	}
+	
 	public List<IPAddress> getIPSrcList() {
 		return IPSrcList;
 	}
