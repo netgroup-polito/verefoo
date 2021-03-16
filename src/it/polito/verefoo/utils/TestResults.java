@@ -5,6 +5,7 @@ public class TestResults {
 	private long atomicFlowsCompTime;
 	private long fillMapTime;
 	private long genPathTime;
+	private int nAtomicPredicates;
 	
 	public TestResults() {	
 	}
@@ -40,7 +41,13 @@ public class TestResults {
 	public void setGenPathTime(long genPathTime) {
 		this.genPathTime = genPathTime;
 	}
-	
-	
+
+	public int getnAtomicPredicates() {
+		return nAtomicPredicates;
+	}
+
+	public void setnAtomicPredicates(int nAtomicPredicates) {
+		this.nAtomicPredicates = nAtomicPredicates;
+	}
 
 }

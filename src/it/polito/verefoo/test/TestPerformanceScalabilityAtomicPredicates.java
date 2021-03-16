@@ -37,14 +37,14 @@ import it.polito.verefoo.utils.TestResults;
 public class TestPerformanceScalabilityAtomicPredicates {
 	
 	public static void main(String[] args)  {	
-		numberPR = 1000;
-		numberWC = 1000;
-		numberWS = 1000;
-		numberAP  = 1000;
-		numberNAT = 100;
-		numberFW = 100;
-		maxNATSrcs = 50;
-		maxFWRules = 50;
+		numberPR = 10;
+		numberWC = 10;
+		numberWS = 10;
+		numberAP  = 10;
+		numberNAT = 10;
+		numberFW = 10;
+		maxNATSrcs = 2;
+		maxFWRules = 2;
 		runs = 1;
 		percReqWithPorts = 0.0; //from 0.0 to 1.0
 		
@@ -118,12 +118,13 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		long fillMapTime = results.getFillMapTime();
 		long atomicFlowsCompTime = results.getAtomicFlowsCompTime();
 		long otherTime = totalTime - genPathTime - atomicPredCompTime - fillMapTime - atomicFlowsCompTime;
+		int nAtomicPredicates = results.getnAtomicPredicates();
 		String resString = new String("Total time " + totalTime + "ms: genPathTime: " + genPathTime + "ms, atomicPredCompTime " 
 				+ atomicPredCompTime + "ms, fillMapTime " + fillMapTime + "ms, atomicFlowsCompTime " 
 				+ atomicFlowsCompTime + "ms, other " + otherTime+"ms;");
 		
 		System.out.println(resString);
-		logger.info("TOT: " + totalTime + " GP "+ genPathTime + " GAP " + atomicPredCompTime + " FM " + fillMapTime + 
+		logger.info("ATOMIC PREDICATES: " + nAtomicPredicates + " TIME TOT: " + totalTime + " GP "+ genPathTime + " GAP " + atomicPredCompTime + " FM " + fillMapTime + 
 				" GAF " + atomicFlowsCompTime + " OT " + otherTime);
         return test.getResult();
 	}

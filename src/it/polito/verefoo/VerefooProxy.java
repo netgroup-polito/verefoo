@@ -497,6 +497,7 @@ public class VerefooProxy {
 			networkAtomicPredicates.put(index, p);
 			index++;
 		}
+		testResults.setnAtomicPredicates(index);
 		
 		//DEBUG: print atomic predicates
 		System.out.println("ATOMIC PREDICATES " + networkAtomicPredicates.size());
