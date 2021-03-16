@@ -146,7 +146,13 @@ public class VerefooProxy {
 		
 		System.out.println("NUMBER OF REQUIREMENTS: " + securityRequirements.size());
 		System.out.println("Computing atomic flows:");
+		int debugIndex = 0;
 		for(SecurityRequirement sr : securityRequirements.values()) {
+			if(debugIndex == 150) {
+				debugIndex = 0;
+				System.out.println();
+			}
+			debugIndex++;
 			System.out.print("*");
 			//Copy the map and Aputils in order to avoid concurrent modification exception, transformersNode should only be accessed in read mode
 			//NOTE: should be a deep copy, not a shallow copy
@@ -231,7 +237,9 @@ public class VerefooProxy {
 	 * a firewall instead will have a list of id foe example [1,2,5,6,10 ...], that are the identifiers of atomic predicates allowed to cross the firewall,
 	 * all the other predicates will be dropped */
 	private void fillTransformationMap() {
+		System.out.println("Filling transformers map");
 		for(Node node: transformersNode.values()) {
+			System.out.print("*");
 			HashMap<Integer, List<Integer>> resultMap = allocationNodes.get(node.getName()).getTransformationMap();
 			if(node.getFunctionalType() == FunctionalTypes.NAT) {
 				HashMap<String, List<Integer>> shadowingMap = new HashMap<>(); //grouped by dest address
@@ -333,22 +341,24 @@ public class VerefooProxy {
 					toAdd.add(pred);
 					resultMap.put(pred, toAdd);
 				}
-			} else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
-				List<Predicate> allowedPredicates = allocationNodes.get(node.getName()).getForwardBehaviourPredicateList();
-				List<Integer> resultList = new ArrayList<>();
-				for(HashMap.Entry<Integer, Predicate> apEntry: networkAtomicPredicates.entrySet()) {
-					//check if the atomic predicate match at least one allowed rule
-					for(Predicate allowed: allowedPredicates) {
-						Predicate intersectionPredicate = aputils.computeIntersection(apEntry.getValue(), allowed);
-						if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, apEntry.getValue())) {
-							resultList.add(apEntry.getKey());
-							break;
-						}
-					}
-				}
-				allocationNodes.get(node.getName()).setForwardBehaviourList(resultList);
 			}
+//			else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
+//				List<Predicate> allowedPredicates = allocationNodes.get(node.getName()).getForwardBehaviourPredicateList();
+//				List<Integer> resultList = new ArrayList<>();
+//				for(HashMap.Entry<Integer, Predicate> apEntry: networkAtomicPredicates.entrySet()) {
+//					//check if the atomic predicate match at least one allowed rule
+//					for(Predicate allowed: allowedPredicates) {
+//						Predicate intersectionPredicate = aputils.computeIntersection(apEntry.getValue(), allowed);
+//						if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, apEntry.getValue())) {
+//							resultList.add(apEntry.getKey());
+//							break;
+//						}
+//					}
+//				}
+//				allocationNodes.get(node.getName()).setForwardBehaviourList(resultList);
+//			}
 		}
+		System.out.println();
 	}
 	
 	/* Starting from source and destination of each requirement, compute related atomic predicates. Then add to the computed set

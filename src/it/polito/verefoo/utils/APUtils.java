@@ -23,7 +23,13 @@ public class APUtils {
 		int count = -1;
 		
 		System.out.println("Computing atomic predicates:");
+		int debugIndex = 0;
 		for(Predicate sp: predicates) {
+			if(debugIndex == 150) {
+				debugIndex = 0;
+				System.out.println();
+			}
+			debugIndex++;
 			System.out.print("*");
 			//If sp is the first predicate to transform and atomicPredicates is empty
 			if(atomicPredicates.isEmpty() && count == -1) {
