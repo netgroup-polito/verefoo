@@ -37,22 +37,50 @@ import it.polito.verefoo.utils.TestResults;
 public class TestPerformanceScalabilityAtomicPredicates {
 	
 	public static void main(String[] args)  {	
-		numberPR = 10;
-		numberWC = 10;
-		numberWS = 10;
-		numberAP  = 10;
-		numberNAT = 10;
-		numberFW = 10;
-		maxNATSrcs = 2;
-		maxFWRules = 2;
-		runs = 1;
+		numberPR = 100;
+		numberWC = 100;
+		numberWS = 100;
+		numberAP  = 100;
+		numberNAT = 25;
+		numberFW = 25;
+		maxNATSrcs = 10;
+		maxFWRules = 10;
+		runs = 80;
 		percReqWithPorts = 0.0; //from 0.0 to 1.0
 		
 		seed  = 66361;
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
+		
 		testScalabilityPerformance();
+	
+		//testing progression on WC and WS
+		int vector[] = {300, 500, 1000, 10000};
+		for(int number: vector) {
+			numberWC = number;
+			numberWS = number;
+			testScalabilityPerformance();
+		}
+		
+		numberWC = 100;
+		numberWS = 100;
+		//testing progression on %
+		double vector2[] = {0.1};
+		for(double number2: vector2) {
+			percReqWithPorts = number2;
+			testScalabilityPerformance();
+		}
+		
+		percReqWithPorts = 0.0;
+		//testing progression number requirements
+		int vector3[] = {5000};
+		for(int number3: vector3) {
+			numberPR = number3;
+			testScalabilityPerformance();
+		}
+		
+		numberPR = 100;
 	}
 	
 	/* Variables to set if you want to automatically create the NFV */
