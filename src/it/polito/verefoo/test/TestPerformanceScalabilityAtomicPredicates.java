@@ -52,35 +52,22 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
-		
-		testScalabilityPerformance();
 	
-		//testing progression on WC and WS
-		int vector[] = {300, 500, 1000, 10000};
-		for(int number: vector) {
-			numberWC = number;
-			numberWS = number;
-			testScalabilityPerformance();
-		}
-		
-		numberWC = 100;
-		numberWS = 100;
-		//testing progression on %
-		double vector2[] = {0.1};
-		for(double number2: vector2) {
-			percReqWithPorts = number2;
-			testScalabilityPerformance();
-		}
-		
-		percReqWithPorts = 0.0;
 		//testing progression number requirements
-		int vector3[] = {5000};
-		for(int number3: vector3) {
-			numberPR = number3;
+		numberPR = 10000;
+		testScalabilityPerformance();
+		numberPR = 100;
+		
+		int vector[] = {50, 100, 200, 500};
+		for(int number: vector) {
+			numberNAT = number;
 			testScalabilityPerformance();
 		}
-		
-		numberPR = 100;
+		numberNAT = 25;
+		for(int number: vector) {
+			numberFW = number;
+			testScalabilityPerformance();
+		}
 	}
 	
 	/* Variables to set if you want to automatically create the NFV */
