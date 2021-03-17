@@ -37,37 +37,62 @@ import it.polito.verefoo.utils.TestResults;
 public class TestPerformanceScalabilityAtomicPredicates {
 	
 	public static void main(String[] args)  {	
-		numberPR = 100;
-		numberWC = 100;
-		numberWS = 100;
-		numberAP  = 100;
-		numberNAT = 25;
-		numberFW = 25;
-		maxNATSrcs = 10;
-		maxFWRules = 10;
-		runs = 80;
+		numberPR = 500;
+		numberWC = 1000;
+		numberWS = 1000;
+		numberAP  = 200;
+		numberNAT = 150;
+		numberFW = 150;
+		maxNATSrcs = 50;
+		maxFWRules = 50;
+		runs = 50;
 		percReqWithPorts = 0.0; //from 0.0 to 1.0
 		
 		seed  = 66361;
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
-	
-		//testing progression number requirements
-		numberPR = 10000;
-		testScalabilityPerformance();
-		numberPR = 100;
 		
-		int vector[] = {50, 100, 200, 500};
-		for(int number: vector) {
-			numberNAT = number;
+		int vector[] = {25, 50, 100, 200};
+		for(int n: vector) {
+			maxNATSrcs = n;
 			testScalabilityPerformance();
 		}
-		numberNAT = 25;
-		for(int number: vector) {
-			numberFW = number;
+		maxNATSrcs = 10;
+		for(int n: vector) {
+			maxFWRules = n;
 			testScalabilityPerformance();
 		}
+		
+		numberPR = 200;
+		numberWC = 200;
+		numberWS = 200;
+		numberAP  = 200;
+		numberNAT = 50;
+		numberFW = 50;
+		maxNATSrcs = 10;
+		maxFWRules = 10;
+		testScalabilityPerformance();
+		
+		numberPR = 350;
+		numberWC = 500;
+		numberWS = 500;
+		numberAP  = 200;
+		numberNAT = 100;
+		numberFW = 100;
+		maxNATSrcs = 25;
+		maxFWRules = 25;
+		testScalabilityPerformance();
+		
+		numberPR = 500;
+		numberWC = 1000;
+		numberWS = 1000;
+		numberAP  = 200;
+		numberNAT = 150;
+		numberFW = 150;
+		maxNATSrcs = 50;
+		maxFWRules = 50;
+		testScalabilityPerformance();
 	}
 	
 	/* Variables to set if you want to automatically create the NFV */
