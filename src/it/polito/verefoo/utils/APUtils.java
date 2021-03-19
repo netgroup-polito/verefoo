@@ -172,13 +172,11 @@ public class APUtils {
 		if(p1.getIPSrcList().size() != p2.getIPSrcList().size() || p1.getIPDstList().size() != p2.getIPDstList().size() 
 				|| p1.getpSrcList().size() != p2.getpSrcList().size() || p1.getpDstList().size() != p2.getpDstList().size())
 			return false;
-		Collections.sort(p1.getIPSrcList(), new IPAddressComparator());
-		Collections.sort(p2.getIPSrcList(), new IPAddressComparator());
-		if(!p1.getIPSrcList().equals(p2.getIPSrcList()))
+		//NOTE: since list1 and list2 have the same size and they don't contain duplicates, list1.containsAll(list2) is sufficient
+		//No need to call also list2.containsAll(list1)
+		if(!p1.getIPSrcList().containsAll(p2.getIPSrcList()))
 			return false;
-		Collections.sort(p1.getIPDstList(), new IPAddressComparator());
-		Collections.sort(p2.getIPDstList(), new IPAddressComparator());
-		if(!p1.getIPDstList().equals(p2.getIPDstList()))
+		if(!p1.getIPDstList().containsAll(p2.getIPDstList()))
 			return false;
 		if(!APComparePortList(p1.getpSrcList(), p2.getpSrcList()))
 			return false;
@@ -188,19 +186,15 @@ public class APUtils {
 	}
 	
 	public boolean APComparePrototypeList(List<L4ProtocolTypes> list1, List<L4ProtocolTypes> list2) {
-		Collections.sort(list1);
-		Collections.sort(list2);
-		if(list1.equals(list2))
-			return true;
-		return false;
+		if(!list1.containsAll(list2))
+			return false;
+		return true;
 	}
 	
 	public boolean APComparePortList(List<PortInterval> list1, List<PortInterval> list2) {
-		Collections.sort(list1, new PortIntervalComparator());
-		Collections.sort(list2, new PortIntervalComparator());
-		if(list1.equals(list2))
-			return true;
-		return false;
+		if(!list1.containsAll(list2))
+			return false;
+		return true;
 	}
 	
 	//Compute atomic predicates considering the neg list of a predicate

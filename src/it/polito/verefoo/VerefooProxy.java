@@ -154,14 +154,8 @@ public class VerefooProxy {
 			}
 			debugIndex++;
 			System.out.print("*");
-			//Copy the map and Aputils in order to avoid concurrent modification exception, transformersNode should only be accessed in read mode
-			//NOTE: should be a deep copy, not a shallow copy
-			HashMap<Integer, Predicate> networkAtomicPredicatesNew = new HashMap<>();
-			for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
-				networkAtomicPredicatesNew.put(entry.getKey(), new Predicate(entry.getValue()));
-			}
 			APUtils aputilsNew = new APUtils(); 
-			tasks.add(threadPool.submit(new GenerateFlowsTask(sr, networkAtomicPredicatesNew, aputilsNew, transformersNode)));
+			tasks.add(threadPool.submit(new GenerateFlowsTask(sr, networkAtomicPredicates, aputilsNew, transformersNode)));
 		}
 		
 		threadPool.shutdown();

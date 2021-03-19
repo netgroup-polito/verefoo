@@ -42,7 +42,7 @@ public class Main {
 				Marshaller m = jc.createMarshaller();
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "./xsd/nfvSchema.xsd");
-				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/AP/APtest05.xml")));
+				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/AP/NAT04.xml")));
 				//TODO: remove (Budapest)
 //				if (test.isSat()) {
 //					loggerResult.info("SAT");
