@@ -52,19 +52,8 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
-	
-		percReqWithPorts = 0.25;
-		testScalabilityPerformance();
-		percReqWithPorts = 0.0;
 		
-
-//		int vector[] = {100, 200};
-//		for(int n: vector) {
-//			maxFWRules = n;
-//			testScalabilityPerformance();
-//		}
-//		maxFWRules = 10;
-			
+		testScalabilityPerformance();	
 	}
 	
 	/* Variables to set if you want to automatically create the NFV */

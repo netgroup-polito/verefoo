@@ -6,7 +6,7 @@ Ottimizzazioni da fare:
 - cancellare atomic predicates con all negs
 - caso in cui ci sono le porte ma nessun trasformer che lavora sulle porte (da discutere a voce con daniele)
 - inserimento in lista già ordinato -> non serve fare la sort ogni volta che si chiama la compare e ai thread posso passare lo stesso elenco di predicates
-(in quanto non andranno a modificarlo)
+(in quanto non andranno a modificarlo) 
  
  Da commentare (parti di Budapest che non servono più)
  - VerefooNormalizer (non dovrebbe più essere necessario perchè ora il framework lavora con le wildcards)
