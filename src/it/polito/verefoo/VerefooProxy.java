@@ -141,7 +141,7 @@ public class VerefooProxy {
 	}
 	
 	private void computeAtomicFlows() {
-		ExecutorService threadPool = Executors.newFixedThreadPool(10);
+		ExecutorService threadPool = Executors.newCachedThreadPool();
 		List<Future<?>> tasks = new ArrayList<Future<?>>();
 		
 		System.out.println("NUMBER OF REQUIREMENTS: " + securityRequirements.size());
