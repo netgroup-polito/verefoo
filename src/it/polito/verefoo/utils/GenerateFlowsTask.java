@@ -3,6 +3,7 @@ package it.polito.verefoo.utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.graph.Flow;
@@ -19,12 +20,15 @@ public class GenerateFlowsTask implements Runnable {
 	HashMap<Integer, Predicate> networkAtomicPredicates;
 	APUtils aputils;
 	HashMap<String, Node> transformersNode;
+	AtomicInteger atomicId;
 	
-	public GenerateFlowsTask(SecurityRequirement requirement, HashMap<Integer, Predicate> networkAtomicPredicates, APUtils aputils, HashMap<String, Node> transformersNode) {
+	public GenerateFlowsTask(SecurityRequirement requirement, HashMap<Integer, Predicate> networkAtomicPredicates, 
+			APUtils aputils, HashMap<String, Node> transformersNode, AtomicInteger atomicId) {
 		this.requirement = requirement;
 		this.networkAtomicPredicates = networkAtomicPredicates;
 		this.aputils = aputils;
 		this.transformersNode = transformersNode;
+		this.atomicId = atomicId;
 	}
 	
 	
@@ -59,7 +63,7 @@ public class GenerateFlowsTask implements Runnable {
 		
 		//Generate atomic flows
 		for(Flow flow: requirement.getFlowsMap().values()) {
-			List<AllocationNode> path = flow.getPath().getNodes();
+			List<AllocationNode> path = flow.getPath();
 			List<List<Integer>> resultList = new ArrayList<>();
 			List<List<Integer>> resultListToDiscard = new ArrayList<>();
 			//now we have the requirement, the path and the list of source predicates -> call recursive function
@@ -69,8 +73,11 @@ public class GenerateFlowsTask implements Runnable {
 				recursiveGenerateAtomicPath(nodeIndex, requirement, path, ap, dstPredicateList, resultList, resultListToDiscard, currentList);
 			}
 			
-			//TODO: here we can insert the results into a map (or other structure)
-			requirement.addAtomicFlowsList(flow.getIdFlow(), resultList, resultListToDiscard);
+			for(List<Integer> atomicFlow: resultList) {
+				flow.addAtomicFlow(atomicId.incrementAndGet(), atomicFlow);
+			}
+			for(List<Integer> atomicFlowToDiscard: resultListToDiscard)
+				flow.addAtomicFlowToDiscard(atomicId.incrementAndGet(), atomicFlowToDiscard);
 		}
 		
 	}

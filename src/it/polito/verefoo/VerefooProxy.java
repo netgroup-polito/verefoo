@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.microsoft.z3.Context;
@@ -19,11 +20,9 @@ import it.polito.verefoo.allocation.AllocationManager;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
-import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.graph.IPAddress;
 import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.graph.SecurityRequirement;
-import it.polito.verefoo.graph.Traffic;
 import it.polito.verefoo.graph.Flow;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
@@ -93,7 +92,7 @@ public class VerefooProxy {
 		this.paths = paths;
 		this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
 		
-		//TODO: remove (BUdapest)
+		//TODO: remove (Budapest)
 //		//Creation of the z3 context
 //		HashMap<String, String> cfg = new HashMap<String, String>();
 //		cfg.put("model", "true");
@@ -123,7 +122,7 @@ public class VerefooProxy {
 		fillTransformationMap();
 		t2 =  System.currentTimeMillis();
 		testResults.setFillMapTime(t2-t1);
-		//printTransformations(); //DEBUG
+		printTransformations(); //DEBUG
 		computeAtomicFlows();
 		t1 =  System.currentTimeMillis();
 		testResults.setAtomicFlowsCompTime(t1-t2);
@@ -146,6 +145,7 @@ public class VerefooProxy {
 		
 		System.out.println("NUMBER OF REQUIREMENTS: " + securityRequirements.size());
 		System.out.println("Computing atomic flows:");
+		AtomicInteger atomicId = new AtomicInteger();
 		int debugIndex = 0;
 		for(SecurityRequirement sr : securityRequirements.values()) {
 			if(debugIndex == 150) {
@@ -155,7 +155,7 @@ public class VerefooProxy {
 			debugIndex++;
 			System.out.print("*");
 			APUtils aputilsNew = new APUtils(); 
-			tasks.add(threadPool.submit(new GenerateFlowsTask(sr, networkAtomicPredicates, aputilsNew, transformersNode)));
+			tasks.add(threadPool.submit(new GenerateFlowsTask(sr, networkAtomicPredicates, aputilsNew, transformersNode, atomicId)));
 		}
 		
 		threadPool.shutdown();
@@ -174,23 +174,25 @@ public class VerefooProxy {
 //			Property prop = sr.getOriginalProperty();
 //			System.out.println("\nConsidering requirement {"+prop.getSrc()+","+prop.getSrcPort()+","+prop.getDst()+","+prop.getDstPort()+","+prop.getLv4Proto()+"}");   
 //			for(Flow flow: sr.getFlowsMap().values()) {
-//				List<List<Integer>> atomicFlows = sr.getAtomicFlowsForFlow(flow.getIdFlow());
-//				List<List<Integer>> atomicFlowsToDiscard = sr.getAtomicFlowsToDiscardForFlow(flow.getIdFlow());
-//				List<AllocationNode> path = flow.getPath().getNodes();
-//				if(atomicFlows != null) {
+//				Map<Integer, List<Integer>> atomicFlowsMap = flow.getAtomicFlowsMap();
+//				Map<Integer, List<Integer>> atomicFlowsToDiscardMap = flow.getAtomicFlowsToDiscardMap();
+//				List<AllocationNode> path = flow.getPath();
+//				if(atomicFlowsMap != null) {
 //					System.out.println("Atomic flows accepted");
-//					for(List<Integer> list: atomicFlows) {
+//					for(Map.Entry<Integer, List<Integer>> entry: atomicFlowsMap.entrySet()) {
 //						int index = 0;
-//						for(Integer ap: list) {
+//						System.out.print(entry.getKey() + ": ");
+//						for(Integer ap: entry.getValue()) {
 //							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
 //							index++;
 //						}
 //						System.out.println(path.get(index).getIpAddress());
 //					}
 //					System.out.println("Atomic flows discarded");
-//					for(List<Integer> list: atomicFlowsToDiscard) {
+//					for(Map.Entry<Integer, List<Integer>> entry: atomicFlowsToDiscardMap.entrySet()) {
 //						int index = 0;
-//						for(Integer ap: list) {
+//						System.out.print(entry.getKey() + ": ");
+//						for(Integer ap: entry.getValue()) {
 //							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
 //							index++;
 //						}
@@ -478,8 +480,8 @@ public class VerefooProxy {
 
 		//DEBUG: interesting predicates for requirements source and destination
 		System.out.println("INTERESTING PREDICATES: " + predicates.size());
-//		for(Predicate p: predicates)
-//			p.print();
+		for(Predicate p: predicates)
+			p.print();
 		//END DEBUG
 
 		//Now we have the list of predicates on which we have to compute the set of atomic predicates, so compute atomic predicates
@@ -495,10 +497,10 @@ public class VerefooProxy {
 		
 		//DEBUG: print atomic predicates
 		System.out.println("ATOMIC PREDICATES " + networkAtomicPredicates.size());
-//		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
-//			System.out.print(entry.getKey() + " ");
-//			entry.getValue().print();
-//		}
+		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
+			System.out.print(entry.getKey() + " ");
+			entry.getValue().print();
+		}
 		//END DEBUG
 	
 		return networkAtomicPredicates;
@@ -510,7 +512,7 @@ public class VerefooProxy {
 	 */
 	private void allocateFunctions() {
 		for(Flow sr : trafficFlowsMap.values()) {
-			List<AllocationNode> nodes = sr.getPath().getNodes();
+			List<AllocationNode> nodes = sr.getPath();
 			int lengthList = nodes.size();
 			AllocationNode source = nodes.get(0);
 			AllocationNode last = nodes.get(lengthList-1);
@@ -545,82 +547,14 @@ public class VerefooProxy {
 
 
 	/**
-	 * This method distributes into each Allocation Node the traffic flows and computes the characteristics of each ingress traffic
-	 */
-	private void distributeTrafficFlows() {
-		for(Flow flow : trafficFlowsMap.values()) {
-			
-			boolean forwardUpdate = false;
-			boolean backwardUpdate = false;
-			
-			List<AllocationNode> nodesList = flow.getPath().getNodes();
-			
-			for(AllocationNode node : nodesList) {
-				node.addFlow(flow);
-				if((node.getTypeNF().equals(FunctionalTypes.NAT) && node.getNode().getConfiguration().getNat().getSource().contains(flow.getOriginalTraffic().getIPSrc())) || (node.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && node.getNode().getConfiguration().getLoadbalancer().getPool().contains(flow.getOriginalTraffic().getIPSrc()))){
-					forwardUpdate = true;
-				}
-				else if((node.getTypeNF().equals(FunctionalTypes.NAT) && node.getNode().getConfiguration().getNat().getSource().contains(flow.getOriginalTraffic().getIPDst()) ) 
-						|| (node.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && node.getNode().getConfiguration().getLoadbalancer().getPool().contains(flow.getOriginalTraffic().getIPDst()))) {
-					backwardUpdate = true;
-				}
-			}
-			
-			if(forwardUpdate || backwardUpdate) {
-				for(int i = 0; i < nodesList.size(); i++) {
-					Traffic t = Traffic.copyTraffic(flow.getOriginalTraffic());
-					AllocationNode current = nodesList.get(i);
-					flow.addModifiedTraffic(current.getNode().getName(), t);
-				}
-				
-				if(forwardUpdate) {
-					Traffic t = Traffic.copyTraffic(flow.getOriginalTraffic());
-					int listLength = nodesList.size();
-					String currentSrc = t.getIPSrc();
-					//loop for modifications of IP addresses from source to destination 
-					for(int i = 0; i < listLength; i++) {
-						AllocationNode currentNode = nodesList.get(i);
-						Traffic crossed = flow.getCrossedTraffic(currentNode.getNode().getName());
-						crossed.setIPSrc(currentSrc);
-						if((currentNode.getTypeNF().equals(FunctionalTypes.NAT) && currentNode.getNode().getConfiguration().getNat().getSource().contains(crossed.getIPSrc())) ||(currentNode.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && currentNode.getNode().getConfiguration().getLoadbalancer().getPool().contains(crossed.getIPSrc())) ){
-							currentSrc = currentNode.getNode().getName();
-						}
-					}
-				}
-				
-				
-				
-				if(backwardUpdate) {
-					Traffic t = Traffic.copyTraffic(flow.getOriginalTraffic());
-					int listLength = nodesList.size();
-					String currentDst = t.getIPDst();
-					//loop for modifications of IP addresses from destination to source
-					
-					for(int i = listLength-1; i >= 0; i--) {
-						AllocationNode currentNode = nodesList.get(i);
-						Traffic crossed = flow.getCrossedTraffic(currentNode.getNode().getName());
-						if((currentNode.getTypeNF().equals(FunctionalTypes.NAT) && currentNode.getNode().getConfiguration().getNat().getSource().contains(crossed.getIPDst())) ||(currentNode.getTypeNF().equals(FunctionalTypes.LOADBALANCER) && currentNode.getNode().getConfiguration().getLoadbalancer().getPool().contains(crossed.getIPDst())) ){
-							currentDst = currentNode.getNode().getName();
-						}
-						crossed.setIPDst(currentDst);
-					}
-				}
-			}
-		}
-	}
-
-
-	/**
 	 * For each requirement, this method identifies all the possible the paths of nodes that must be crossed by the traffic flows that are related to the requirement.
 	 * @return the map of all the traffic flows
 	 */
 	private HashMap<Integer, Flow> generateFlowPaths(){
-		
 		HashMap<Integer, Flow> flowsMap = new HashMap<>();
 		int id = 0;
 		
 		for(SecurityRequirement sr : securityRequirements.values()) {
-			
 			Property property = sr.getOriginalProperty();
 			
 			//first, this method finds if a forwarding path has been defined by the user for the requirement
@@ -662,8 +596,7 @@ public class VerefooProxy {
 			
 			if(found) {
 				for(List<AllocationNode> singlePath : allPaths) {
-					FlowPath fp = new FlowPath(singlePath);
-					Flow flow = new Flow(sr, fp, id);
+					Flow flow = new Flow(sr, singlePath, id);
 					flowsMap.put(id, flow);
 					sr.getFlowsMap().put(id, flow);
 					id++;

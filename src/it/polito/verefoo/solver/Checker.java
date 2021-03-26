@@ -160,7 +160,7 @@ public class Checker {
 		for(Flow flow : allFlows.values()) {
 			
 			List<BoolExpr> singleConstraints = new ArrayList<>();
-			for(AllocationNode node : flow.getPath().getNodes()) {
+			for(AllocationNode node : flow.getPath()) {
 				singleConstraints.add(ctx.mkImplies(node.getPlacedNF().getUsed(), ctx.mkEq( (BoolExpr)nctx.deny.apply(node.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse())));
 			}
 			
@@ -191,7 +191,7 @@ public class Checker {
 		for(Flow flow : allFlows.values()) {
 			List<BoolExpr> singleConstraints = new ArrayList<>();
 			
-			for(AllocationNode node : flow.getPath().getNodes()) {
+			for(AllocationNode node : flow.getPath()) {
 				singleConstraints.add(ctx.mkAnd(node.getPlacedNF().getUsed(), (BoolExpr) nctx.deny.apply(node.getZ3Name(), ctx.mkInt(flow.getIdFlow()))));
 			}
 			
