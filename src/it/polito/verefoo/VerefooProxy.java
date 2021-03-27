@@ -21,6 +21,7 @@ import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
 import it.polito.verefoo.graph.IPAddress;
+import it.polito.verefoo.graph.PortInterval;
 import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verefoo.graph.Flow;
@@ -122,7 +123,7 @@ public class VerefooProxy {
 		fillTransformationMap();
 		t2 =  System.currentTimeMillis();
 		testResults.setFillMapTime(t2-t1);
-		printTransformations(); //DEBUG
+		//printTransformations(); //DEBUG
 		computeAtomicFlows();
 		t1 =  System.currentTimeMillis();
 		testResults.setAtomicFlowsCompTime(t1-t2);
@@ -454,34 +455,81 @@ public class VerefooProxy {
 				List<Predicate> allowedList = new ArrayList<>();
 				List<Predicate> deniedList = new ArrayList<>();
 				
+				boolean deniedListChanged = false;
 				for(Elements rule: node.getConfiguration().getFirewall().getElements()) {
 					if(rule.getAction().equals(ActionTypes.DENY)) {
 						//deny <--- deny V rule-i
 						deniedList.add(new Predicate(rule.getSource(), false, rule.getDestination(), false, 
 								rule.getSrcPort(), false, rule.getDstPort(), false, rule.getProtocol()));
+						deniedListChanged = true;
 					} else {
 						//allowed <--- allowed V (rule-i AND !denied)
 						Predicate toAdd = new Predicate(rule.getSource(), false, rule.getDestination(), false, 
 								rule.getSrcPort(), false, rule.getDstPort(), false, rule.getProtocol());
-						List<Predicate> allowedToAdd = aputils.computeAllowedForRule(toAdd, deniedList);
-						allowedList.addAll(allowedToAdd);
+						List<Predicate> allowedToAdd = aputils.computeAllowedForRule(toAdd, deniedList, deniedListChanged);
+						for(Predicate allow: allowedToAdd) {
+							if(!aputils.isPredicateContainedIn(allow, allowedList))
+								allowedList.add(allow);
+						}
 					}
 				}
 				//Check default action: if DENY do nothing
 				if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
 					Predicate toAdd = new Predicate("*", false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY);
-					List<Predicate> allowedToAdd = aputils.computeAllowedForRule(toAdd, deniedList);
-					allowedList.addAll(allowedToAdd);
+					List<Predicate> allowedToAdd = aputils.computeAllowedForRule(toAdd, deniedList, deniedListChanged);
+					for(Predicate allow: allowedToAdd) {
+						if(!aputils.isPredicateContainedIn(allow, allowedList))
+							allowedList.add(allow);
+					}
 				}
+				
+				//Insert allowed list into predicates (with optimization)
+				for(Predicate p: allowedList) {
+					for(IPAddress IPSrc: p.getIPSrcList()) {
+						String ips = IPSrc.toString();
+						if(!srcList.contains(ips)) {
+							srcList.add(ips);
+							predicates.add(new Predicate(ips, false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(IPAddress IPDst: p.getIPDstList()) {
+						String ipd = IPDst.toString();
+						if(!dstList.contains(ipd)) {
+							dstList.add(ipd);
+							predicates.add(new Predicate("*", false, ipd, false, "*", false, "*", false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(PortInterval pSrc: p.getpSrcList()) {
+						String ps = pSrc.toString();
+						if(!srcPList.contains(ps)) {
+							srcPList.add(ps);
+							predicates.add(new Predicate("*", false, "*", false, ps, false, "*", false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(PortInterval pDst: p.getpDstList()) {
+						String pd = pDst.toString();
+						if(!dstPList.contains(pd)) {
+							dstPList.add(pd);
+							predicates.add(new Predicate("*", false, "*", false, "*", false, pd, false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(L4ProtocolTypes proto: p.getProtoTypeList()) {
+						if(!dstProtoList.contains(proto)) {
+							dstProtoList.add(proto);
+							predicates.add(new Predicate("*", false, "*", false, "*", false, "*", false, proto));
+						}
+					}
+				}
+				
 				//the algorithm returns the allowed predicates list (if we want also the denied predicates list, we can compute allowed list negation)
 				allocationNodes.get(node.getName()).setForwardBehaviourPredicateList(allowedList);
 			}
 		}
 
 		//DEBUG: interesting predicates for requirements source and destination
-		System.out.println("INTERESTING PREDICATES: " + predicates.size());
-		for(Predicate p: predicates)
-			p.print();
+//		System.out.println("INTERESTING PREDICATES: " + predicates.size());
+//		for(Predicate p: predicates)
+//			p.print();
 		//END DEBUG
 
 		//Now we have the list of predicates on which we have to compute the set of atomic predicates, so compute atomic predicates
@@ -496,11 +544,11 @@ public class VerefooProxy {
 		testResults.setnAtomicPredicates(index);
 		
 		//DEBUG: print atomic predicates
-		System.out.println("ATOMIC PREDICATES " + networkAtomicPredicates.size());
-		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
-			System.out.print(entry.getKey() + " ");
-			entry.getValue().print();
-		}
+//		System.out.println("ATOMIC PREDICATES " + networkAtomicPredicates.size());
+//		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
+//			System.out.print(entry.getKey() + " ");
+//			entry.getValue().print();
+//		}
 		//END DEBUG
 	
 		return networkAtomicPredicates;

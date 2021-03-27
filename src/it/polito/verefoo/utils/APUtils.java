@@ -167,6 +167,7 @@ public class APUtils {
 			return neg;
 	}
 	
+	//return true if the two predicates are equal
 	public boolean APCompare(Predicate p1, Predicate p2) {
 		//comparing lists size
 		if(p1.getIPSrcList().size() != p2.getIPSrcList().size() || p1.getIPDstList().size() != p2.getIPDstList().size() 
@@ -195,6 +196,14 @@ public class APUtils {
 		if(!list1.containsAll(list2))
 			return false;
 		return true;
+	}
+	
+	public boolean isPredicateContainedIn(Predicate p, List<Predicate> list) {
+		for(Predicate p2: list) {
+			if(APCompare(p, p2))
+				return true;
+		}
+		return false;
 	}
 	
 	//Compute atomic predicates considering the neg list of a predicate
@@ -459,7 +468,8 @@ public class APUtils {
 	/* Compute rules for firewall */
 	//toAdd is the ALLOW rule to insert, denied is the list of denied predicates
 	//return allowed = rule-i AND !denied
-	public List<Predicate> computeAllowedForRule(Predicate toAdd, List<Predicate> deniedList){
+	List<Predicate> negDeniedRuleList;
+	public List<Predicate> computeAllowedForRule(Predicate toAdd, List<Predicate> deniedList, boolean deniedListChanged){
 		List<Predicate> retList = new ArrayList<>();
 		List<Predicate> tmpList = new ArrayList<>();
 		retList.add(toAdd);
@@ -468,7 +478,8 @@ public class APUtils {
 		
 		for(Predicate deniedRule: deniedList) {
 			//compute !denied
-			List<Predicate> negDeniedRuleList = negForFirewallRules(deniedRule);
+			if(deniedListChanged)
+				negDeniedRuleList = neg(deniedRule);
 			for(Predicate p1: retList) {
 				for(Predicate p2: negDeniedRuleList) {
 					Predicate res = computeIntersection(p1, p2);
@@ -486,50 +497,6 @@ public class APUtils {
 			}
 		}
 		return retList;
-	}
-	
-	public List<Predicate> negForFirewallRules(Predicate ap){
-		List<Predicate> neg = new ArrayList<>();
-			//check IPSrc
-			for(IPAddress src: ap.getIPSrcList()) {
-				if(!src.equalsStar()) {
-					Predicate sp2 = new Predicate(src.toString(), !src.isNeg(), "*", false, "*", false, "*", false, L4ProtocolTypes.ANY);
-					neg.add(sp2);
-				}
-			}
-			//check IPDst
-			for(IPAddress dst: ap.getIPDstList()) {
-				if(!dst.equalsStar()) {
-					Predicate sp2 = new Predicate("*", false, dst.toString(), !dst.isNeg(), "*", false, "*", false, L4ProtocolTypes.ANY);
-					neg.add(sp2);
-				}
-			}
-			//check pSrc
-			for(PortInterval psrc: ap.getpSrcList()) {
-				if(!psrc.equalStar()) {
-					Predicate sp2 = new Predicate("*", false, "*", false, psrc.toString(), !psrc.isNeg(), "*", false, L4ProtocolTypes.ANY);
-					neg.add(sp2);
-				}
-			}
-			//check pDst
-			for(PortInterval pdst: ap.getpDstList()) {
-				if(!pdst.equalStar()) {
-					Predicate sp2 = new Predicate("*", false, "*", false,  "*", false, pdst.toString(), !pdst.isNeg(), L4ProtocolTypes.ANY);
-					neg.add(sp2);
-				}
-			}
-			//check protoType
-			List<L4ProtocolTypes> list = ap.getProtoTypeList();
-			//If different from ANY and different from the full set (all others L4ProtocolTypes without ANY) 
-			if(!list.contains(L4ProtocolTypes.ANY) && list.size() != L4ProtocolTypes.values().length-1) {
-				List<L4ProtocolTypes> negList = computeDifferenceL4ProtocolTypes(list);
-				if(!negList.isEmpty()) {
-					Predicate sp2 = new Predicate("*", false, "*", false,  "*", false, "*", false, L4ProtocolTypes.ANY);
-					sp2.setProtoTypeList(negList);
-					neg.add(sp2);
-				}
-			}
-			return neg;
 	}
 	
 	//compute the difference between two sets: the set of all possible values for L4ProtocolTypes - list (from params)
