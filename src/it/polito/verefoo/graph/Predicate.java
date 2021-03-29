@@ -146,6 +146,22 @@ public class Predicate {
 		return IPDst.toString();
 	}
 	
+	public boolean hasIPDstOnlyNegs() {
+		for(IPAddress ip: IPDstList) {
+			if(!ip.isNeg() && !ip.toString().equals("*"))
+				return false;
+		}
+		return true;
+	}
+	
+	public boolean hasIPSrcOnlyNegs() {
+		for(IPAddress ip: IPSrcList) {
+			if(!ip.isNeg() && !ip.toString().equals("*"))
+				return false;
+		}
+		return true;
+	}
+	
 	//Just for DEBUG
 	public void print() {
 		System.out.print(": {");

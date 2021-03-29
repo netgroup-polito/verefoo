@@ -123,7 +123,7 @@ public class VerefooProxy {
 		fillTransformationMap();
 		t2 =  System.currentTimeMillis();
 		testResults.setFillMapTime(t2-t1);
-		//printTransformations(); //DEBUG
+		printTransformations(); //DEBUG
 		computeAtomicFlows();
 		t1 =  System.currentTimeMillis();
 		testResults.setAtomicFlowsCompTime(t1-t2);
@@ -141,7 +141,7 @@ public class VerefooProxy {
 	}
 	
 	private void computeAtomicFlows() {
-		ExecutorService threadPool = Executors.newCachedThreadPool();
+		ExecutorService threadPool = Executors.newFixedThreadPool(1);
 		List<Future<?>> tasks = new ArrayList<Future<?>>();
 		
 		System.out.println("NUMBER OF REQUIREMENTS: " + securityRequirements.size());
@@ -170,39 +170,41 @@ public class VerefooProxy {
 		}
 		System.out.println();
 		
+		
+		
 		//DEBUG: print atomic flows for each requirement
-//		for(SecurityRequirement sr : securityRequirements.values()) {
-//			Property prop = sr.getOriginalProperty();
-//			System.out.println("\nConsidering requirement {"+prop.getSrc()+","+prop.getSrcPort()+","+prop.getDst()+","+prop.getDstPort()+","+prop.getLv4Proto()+"}");   
-//			for(Flow flow: sr.getFlowsMap().values()) {
-//				Map<Integer, List<Integer>> atomicFlowsMap = flow.getAtomicFlowsMap();
-//				Map<Integer, List<Integer>> atomicFlowsToDiscardMap = flow.getAtomicFlowsToDiscardMap();
-//				List<AllocationNode> path = flow.getPath();
-//				if(atomicFlowsMap != null) {
-//					System.out.println("Atomic flows accepted");
-//					for(Map.Entry<Integer, List<Integer>> entry: atomicFlowsMap.entrySet()) {
-//						int index = 0;
-//						System.out.print(entry.getKey() + ": ");
-//						for(Integer ap: entry.getValue()) {
-//							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
-//							index++;
-//						}
-//						System.out.println(path.get(index).getIpAddress());
-//					}
-//					System.out.println("Atomic flows discarded");
-//					for(Map.Entry<Integer, List<Integer>> entry: atomicFlowsToDiscardMap.entrySet()) {
-//						int index = 0;
-//						System.out.print(entry.getKey() + ": ");
-//						for(Integer ap: entry.getValue()) {
-//							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
-//							index++;
-//						}
-//						System.out.println();
-//					}
-//				}
-//			}
-//		}
-//		System.out.println();
+		for(SecurityRequirement sr : securityRequirements.values()) {
+			Property prop = sr.getOriginalProperty();
+			System.out.println("\nConsidering requirement {"+prop.getSrc()+","+prop.getSrcPort()+","+prop.getDst()+","+prop.getDstPort()+","+prop.getLv4Proto()+"}");   
+			for(Flow flow: sr.getFlowsMap().values()) {
+				Map<Integer, List<Integer>> atomicFlowsMap = flow.getAtomicFlowsMap();
+				Map<Integer, List<Integer>> atomicFlowsToDiscardMap = flow.getAtomicFlowsToDiscardMap();
+				List<AllocationNode> path = flow.getPath();
+				if(atomicFlowsMap != null) {
+					System.out.println("Atomic flows accepted");
+					for(Map.Entry<Integer, List<Integer>> entry: atomicFlowsMap.entrySet()) {
+						int index = 0;
+						System.out.print(entry.getKey() + ": ");
+						for(Integer ap: entry.getValue()) {
+							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
+							index++;
+						}
+						System.out.println(path.get(index).getIpAddress());
+					}
+					System.out.println("Atomic flows discarded");
+					for(Map.Entry<Integer, List<Integer>> entry: atomicFlowsToDiscardMap.entrySet()) {
+						int index = 0;
+						System.out.print(entry.getKey() + ": ");
+						for(Integer ap: entry.getValue()) {
+							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
+							index++;
+						}
+						System.out.println();
+					}
+				}
+			}
+		}
+		System.out.println();
 		//END DEBUG
 	}
 		
@@ -331,12 +333,6 @@ public class VerefooProxy {
 						}
 						resultMap.put(rcvion, result);
 					}
-				}
-				//Add predicates that are simply forwarded without being transformed
-				for(Integer pred: notChaingingPredicateList) {
-					List<Integer> toAdd = new ArrayList<>();
-					toAdd.add(pred);
-					resultMap.put(pred, toAdd);
 				}
 			}
 //			else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
@@ -544,11 +540,11 @@ public class VerefooProxy {
 		testResults.setnAtomicPredicates(index);
 		
 		//DEBUG: print atomic predicates
-//		System.out.println("ATOMIC PREDICATES " + networkAtomicPredicates.size());
-//		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
-//			System.out.print(entry.getKey() + " ");
-//			entry.getValue().print();
-//		}
+		System.out.println("ATOMIC PREDICATES " + networkAtomicPredicates.size());
+		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
+			System.out.print(entry.getKey() + " ");
+			entry.getValue().print();
+		}
 		//END DEBUG
 	
 		return networkAtomicPredicates;

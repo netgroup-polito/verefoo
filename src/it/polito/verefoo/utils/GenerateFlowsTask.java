@@ -35,20 +35,21 @@ public class GenerateFlowsTask implements Runnable {
 	@Override
 	public void run() {
 		Property prop = requirement.getOriginalProperty();
-		//System.out.println("\nSource predicates for requirement {"+prop.getSrc()+","+prop.getSrcPort()+","+prop.getDst()+","+prop.getDstPort()+","+prop.getLv4Proto()+"}");
+		System.out.println("\nSource predicates for requirement {"+prop.getSrc()+","+prop.getSrcPort()+","+prop.getDst()+","+prop.getDstPort()+","+prop.getLv4Proto()+"}");
 		String pSrc = prop.getSrcPort() != null &&  !prop.getSrcPort().equals("null") ? prop.getSrcPort() : "*";
 		//get all atomic predicates that match IPSrc and PSrc
 		Predicate srcPredicate = new Predicate(prop.getSrc(), false, "*", false, pSrc, false, "*", false, L4ProtocolTypes.ANY);
 		List<Integer> srcPredicateList = new ArrayList<>();
 		for(HashMap.Entry<Integer, Predicate> apEntry: networkAtomicPredicates.entrySet()) {
 			Predicate intersectionPredicate = aputils.computeIntersection(apEntry.getValue(), srcPredicate);
-			if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, apEntry.getValue())) {
-				//System.out.print(apEntry.getKey() + " "); apEntry.getValue().print();
+			if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, apEntry.getValue())
+					&& !apEntry.getValue().hasIPDstOnlyNegs()) {
+				System.out.print(apEntry.getKey() + " "); apEntry.getValue().print();
 				srcPredicateList.add(apEntry.getKey());
 			}
 		}
 		
-		//System.out.println("Destination predicates");
+		System.out.println("Destination predicates");
 		List<Integer> dstPredicateList = new ArrayList<>();
 		String pDst = prop.getDstPort() != null &&  !prop.getDstPort().equals("null") ? prop.getDstPort() : "*";
 		Predicate dstPredicate = new Predicate("*", false, prop.getDst(), false, "*", false, pDst, false, prop.getLv4Proto());
@@ -56,7 +57,7 @@ public class GenerateFlowsTask implements Runnable {
 		for(HashMap.Entry<Integer, Predicate> apEntry: networkAtomicPredicates.entrySet()) {
 			Predicate intersectionPredicate = aputils.computeIntersection(apEntry.getValue(), dstPredicate);
 			if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, apEntry.getValue())) {
-				//System.out.print(apEntry.getKey() + " "); apEntry.getValue().print();
+				System.out.print(apEntry.getKey() + " "); apEntry.getValue().print();
 				dstPredicateList.add(apEntry.getKey());
 			}
 		}
@@ -103,7 +104,8 @@ public class GenerateFlowsTask implements Runnable {
 		
 		Predicate intersectionPredicate = aputils.computeIntersection(currentPredicate, currentNodeDestPredicate);
 		if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, currentPredicate)
-				&& currentNode.getTransformationMap().isEmpty()) { //not NAT
+				&& (currentNode.getTransformationMap().isEmpty()  //not NAT
+						|| (!currentNode.getTransformationMap().containsKey(ap)))) { //is NAT but does not transform the predicate
 			//Discard path: destination reached without reaching destination of the path
 			currentList.add(ap);
 			atomicFlowsListToDiscard.add(currentList);
@@ -119,12 +121,12 @@ public class GenerateFlowsTask implements Runnable {
 					recursiveGenerateAtomicPath(nodeIndex+1, sr, path, newAp, dstPredicateList, atomicFlowsList, atomicFlowsListToDiscard, newCurrentList);
 				}
 			} else {
-				//Discard path: packet dropped
-				currentList.add(ap);
-				atomicFlowsListToDiscard.add(currentList);
-				return;
+				//simple forwarding
+				List<Integer> newCurrentList = new ArrayList<>(currentList);
+				newCurrentList.add(ap);
+				recursiveGenerateAtomicPath(nodeIndex+1, sr, path, ap, dstPredicateList, atomicFlowsList, atomicFlowsListToDiscard, newCurrentList);
 			}
-		} 
+		}
 		else { //normal node
 			List<Integer> newCurrentList = new ArrayList<>(currentList);
 			newCurrentList.add(ap);
