@@ -19,6 +19,10 @@ public class Flow {
 		this.requirement = requirement;
 		this.path = path;
 		this.idFlow = idFlow;
+		
+		for(AllocationNode node: path) {
+			node.addCrossingFlow(this);
+		}
 	}
 
 	public SecurityRequirement getRequirement() {

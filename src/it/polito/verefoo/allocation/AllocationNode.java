@@ -24,12 +24,13 @@ public class AllocationNode {
 	private String ipAddress;
 	private DatatypeExpr z3Name;
 	private DatatypeExpr z3Node;
-	private Map<Integer, Flow> crossingFlows = new HashMap<>();
 	
 	/* Atomic predicates */
 	HashMap<Integer, List<Integer>> transformationsMap = new HashMap<>();
 	List<Predicate> forwardBehaviourPredicateList = new ArrayList<>();
 	List<Integer> forwardBehaviourList = new ArrayList<>();
+	private Map<Integer, Flow> crossingFlows = new HashMap<>();
+	private Map<Integer, List<Integer>> mapFlowIdAtomicPredicatesInInput = new HashMap<>();
 	
 	/**
 	 * Public constructor for the AllocationNode class
@@ -175,19 +176,12 @@ public class AllocationNode {
 		}
 	}
 
-	/**
-	 * This method allows to distribute a requirement in this allocation node.
-	 * @param sr It is the requirement to store in the node
-	 */
-	public void addFlow(Flow sr) {
+	public void addCrossingFlow(Flow sr) {
 		crossingFlows.put(sr.getIdFlow(), sr);
 	}
 	
-	/**
-	 * Getter method for the map of requirements
-	 * @return the map of requirements
-	 */
-	public Map<Integer, Flow> getFlows() {
+	//return flows that cross this node
+	public Map<Integer, Flow> getCrossingFlows() {
 		return crossingFlows;
 	}
 
@@ -217,5 +211,31 @@ public class AllocationNode {
 	
 	public List<Integer> getForwardBehaviourList(){
 		return forwardBehaviourList;
+	}
+	
+	public boolean addAtomicPredicateInInput(int flowId, int ap) {
+		if(mapFlowIdAtomicPredicatesInInput.containsKey(flowId)) {
+			List<Integer> atomicPredicateList = mapFlowIdAtomicPredicatesInInput.get(flowId);
+			if(!atomicPredicateList.contains(ap)) {
+				atomicPredicateList.add(ap);
+				return true;
+			}
+		} else {
+			List<Integer> newList = new ArrayList<>();
+			newList.add(ap);
+			mapFlowIdAtomicPredicatesInInput.put(flowId, newList);
+			return true;
+		}
+		return false;
+	}
+	
+	public List<Integer> getAtomicPredicatesInInputForFlow(int flowId){
+		if(mapFlowIdAtomicPredicatesInInput.containsKey(flowId))
+			return mapFlowIdAtomicPredicatesInInput.get(flowId);
+		return null;
+	}
+	
+	public void addForwardingPredicate(int ap) {
+		forwardBehaviourList.add(ap);
 	}
 }

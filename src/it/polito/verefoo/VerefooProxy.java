@@ -141,7 +141,7 @@ public class VerefooProxy {
 	}
 	
 	private void computeAtomicFlows() {
-		ExecutorService threadPool = Executors.newFixedThreadPool(1);
+		ExecutorService threadPool = Executors.newFixedThreadPool(10);
 		List<Future<?>> tasks = new ArrayList<Future<?>>();
 		
 		System.out.println("NUMBER OF REQUIREMENTS: " + securityRequirements.size());
@@ -168,9 +168,7 @@ public class VerefooProxy {
 				e.printStackTrace();
 			}
 		}
-		System.out.println();
-		
-		
+		System.out.println();	
 		
 		//DEBUG: print atomic flows for each requirement
 		for(SecurityRequirement sr : securityRequirements.values()) {
@@ -206,6 +204,33 @@ public class VerefooProxy {
 		}
 		System.out.println();
 		//END DEBUG
+		
+		//built map that assign to each allocation node the set of atomic predicates in input
+		for(SecurityRequirement sr : securityRequirements.values()) {
+			for(Flow flow: sr.getFlowsMap().values()) {
+				List<AllocationNode> path = flow.getPath();
+				for(List<Integer> atomicFlow: flow.getAtomicFlowsMap().values()) {
+					//for source node don't add nothing
+					int index = 1;
+					boolean added;
+					for(Integer ap: atomicFlow) {
+						added = path.get(index).addAtomicPredicateInInput(flow.getIdFlow(), ap);
+						if(added && transformersNode.containsKey(path.get(index).getIpAddress()) 
+								&& transformersNode.get(path.get(index).getIpAddress()).getFunctionalType() == FunctionalTypes.FIREWALL) {
+							//If the node is a firewall, check if the predicate is allowed to pass or if it is dropped
+							for(Predicate allowed: path.get(index).getForwardBehaviourPredicateList()) {
+								Predicate intersectionPredicate = aputils.computeIntersection(networkAtomicPredicates.get(ap), allowed);
+								if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, networkAtomicPredicates.get(ap))) {
+									//the predicate is allowed to pass
+									path.get(index).addForwardingPredicate(ap);
+								}
+							}
+						}
+						index++;
+					}
+				}
+			}
+		}	
 	}
 		
 	private void printTransformations() {
@@ -223,10 +248,6 @@ public class VerefooProxy {
 					System.out.print(res + " ");
 				System.out.println();
 			}
-			System.out.println("Allowed predicates");
-			for(Integer i: allocNode.getForwardBehaviourList())
-				System.out.print(i + " ");
-			System.out.println();
 		}
 	}
 	
@@ -335,21 +356,6 @@ public class VerefooProxy {
 					}
 				}
 			}
-//			else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
-//				List<Predicate> allowedPredicates = allocationNodes.get(node.getName()).getForwardBehaviourPredicateList();
-//				List<Integer> resultList = new ArrayList<>();
-//				for(HashMap.Entry<Integer, Predicate> apEntry: networkAtomicPredicates.entrySet()) {
-//					//check if the atomic predicate match at least one allowed rule
-//					for(Predicate allowed: allowedPredicates) {
-//						Predicate intersectionPredicate = aputils.computeIntersection(apEntry.getValue(), allowed);
-//						if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, apEntry.getValue())) {
-//							resultList.add(apEntry.getKey());
-//							break;
-//						}
-//					}
-//				}
-//				allocationNodes.get(node.getName()).setForwardBehaviourList(resultList);
-//			}
 		}
 		System.out.println();
 	}
