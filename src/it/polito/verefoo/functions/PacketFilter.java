@@ -19,7 +19,7 @@ import com.microsoft.z3.Optimize;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
-import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.EType;
 import it.polito.verefoo.jaxb.FunctionalTypes;
@@ -186,7 +186,7 @@ public class PacketFilter extends GenericFunction{
   		 * This sections generates all the constraints to satisfy reachability and isolation requirements.
   		 */
   		
-  		for(Flow sr : source.getFlows().values()) {
+  		for(FlowPath sr : source.getFlows().values()) {
   		
   			generateManualSatifiabilityConstraint(sr);
   		}
@@ -383,7 +383,7 @@ public class PacketFilter extends GenericFunction{
   		 * This sections generates all the constraints to satisfy reachability and isolation requirements.
   		 */
   		
-  		for(Flow sr : source.getFlows().values()) {
+  		for(FlowPath sr : source.getFlows().values()) {
   			generateSatifiabilityConstraint(sr);
   		}
   	
@@ -396,14 +396,14 @@ public class PacketFilter extends GenericFunction{
 	 */
 private int minizimePlaceholderRules() {
 		
-		List<Flow> allProperties = source.getFlows().values().stream().collect(Collectors.toList());
-		List<Flow> interestedProperties = new ArrayList<>();
-		for(Flow p : allProperties) {
+		List<FlowPath> allProperties = source.getFlows().values().stream().collect(Collectors.toList());
+		List<FlowPath> interestedProperties = new ArrayList<>();
+		for(FlowPath p : allProperties) {
 				boolean pruning = (p.getCrossedTraffic(ipAddress).getType().value().equals("IsolationProperty") && blacklisting)
 						|| (p.getCrossedTraffic(ipAddress).getType().value().equals("ReachabilityProperty") && !blacklisting);
 				if(pruning) {
 					boolean toAdd = true;
-					for(Flow p2: interestedProperties) {
+					for(FlowPath p2: interestedProperties) {
 						if(p.getRequirement().getIdRequirement() == p2.getRequirement().getIdRequirement()) {
 							toAdd = false;
 						}
@@ -453,7 +453,7 @@ private int minizimePlaceholderRules() {
 	 * This method generates the hard constraint to satisfy a requirement for an automatically configured firewall.
 	 * @param sr it is the security requirement
 	 */
-	private void generateSatifiabilityConstraint(Flow sr) {
+	private void generateSatifiabilityConstraint(FlowPath sr) {
 		
 		BoolExpr firstA = used;
 		
@@ -490,7 +490,7 @@ private int minizimePlaceholderRules() {
 	 * This method generates the hard constraint to satisfy a requirement for an manually configured firewall.
 	 * @param sr it is the security requirement
 	 */
-	private void generateManualSatifiabilityConstraint(Flow sr) {
+	private void generateManualSatifiabilityConstraint(FlowPath sr) {
 		BoolExpr firstA = used;
 		BoolExpr secondA = sr.getCrossedTraffic(ipAddress).getType().equals(PName.ISOLATION_PROPERTY) ? 
 				ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdFlow())), ctx.mkTrue()):

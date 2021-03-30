@@ -19,7 +19,7 @@ import com.microsoft.z3.Optimize;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
-import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.graph.Traffic;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.EType;
@@ -185,7 +185,7 @@ public class PriorityPacketFilter extends GenericFunction{
   		 * This sections generates all the constraints to satisfy reachability and isolation requirements.
   		 */
   		
-  		for(Flow sr : source.getFlows().values()) {
+  		for(FlowPath sr : source.getFlows().values()) {
   		
   			generateManualSatifiabilityConstraint(sr);
   		}
@@ -198,7 +198,7 @@ public class PriorityPacketFilter extends GenericFunction{
 	 * This method generates the hard constraint to satisfy a requirement for an manually configured firewall.
 	 * @param sr it is the security requirement
 	 */
-	private void generateManualSatifiabilityConstraint(Flow sr) {
+	private void generateManualSatifiabilityConstraint(FlowPath sr) {
 		
 		//BoolExpr finalDecision = blacklisting? ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdFlow())), ctx.mkTrue()) : ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(sr.getIdFlow())), ctx.mkFalse());
 		BoolExpr constraint = recursiveGeneration(sr, 0);
@@ -206,7 +206,7 @@ public class PriorityPacketFilter extends GenericFunction{
 
 	}
 	
-	private BoolExpr recursiveGeneration(Flow flow, int i) {
+	private BoolExpr recursiveGeneration(FlowPath flow, int i) {
 
 		if(i == nRules) {
 			BoolExpr decision = blacklisting? ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse()) : ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkTrue());

@@ -24,7 +24,8 @@ import it.polito.verefoo.graph.IPAddress;
 import it.polito.verefoo.graph.PortInterval;
 import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.graph.SecurityRequirement;
-import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.AtomicFlow;
+import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verefoo.jaxb.Path.PathNode;
@@ -47,7 +48,7 @@ public class VerefooProxy {
 	private List<Path> paths;
 	private WildcardManager wildcardManager;
 	private HashMap<String, AllocationNode> allocationNodes;
-	private HashMap<Integer, Flow> trafficFlowsMap;
+	private HashMap<Integer, FlowPath> trafficFlowsMap;
 	private HashMap<Integer, SecurityRequirement> securityRequirements;
 	public Checker check;
 	private List<Node> nodes;
@@ -123,7 +124,7 @@ public class VerefooProxy {
 		fillTransformationMap();
 		t2 =  System.currentTimeMillis();
 		testResults.setFillMapTime(t2-t1);
-		printTransformations(); //DEBUG
+		//printTransformations(); //DEBUG
 		computeAtomicFlows();
 		t1 =  System.currentTimeMillis();
 		testResults.setAtomicFlowsCompTime(t1-t2);
@@ -171,58 +172,62 @@ public class VerefooProxy {
 		System.out.println();	
 		
 		//DEBUG: print atomic flows for each requirement
-		for(SecurityRequirement sr : securityRequirements.values()) {
-			Property prop = sr.getOriginalProperty();
-			System.out.println("\nConsidering requirement {"+prop.getSrc()+","+prop.getSrcPort()+","+prop.getDst()+","+prop.getDstPort()+","+prop.getLv4Proto()+"}");   
-			for(Flow flow: sr.getFlowsMap().values()) {
-				Map<Integer, List<Integer>> atomicFlowsMap = flow.getAtomicFlowsMap();
-				Map<Integer, List<Integer>> atomicFlowsToDiscardMap = flow.getAtomicFlowsToDiscardMap();
-				List<AllocationNode> path = flow.getPath();
-				if(atomicFlowsMap != null) {
-					System.out.println("Atomic flows accepted");
-					for(Map.Entry<Integer, List<Integer>> entry: atomicFlowsMap.entrySet()) {
-						int index = 0;
-						System.out.print(entry.getKey() + ": ");
-						for(Integer ap: entry.getValue()) {
-							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
-							index++;
-						}
-						System.out.println(path.get(index).getIpAddress());
-					}
-					System.out.println("Atomic flows discarded");
-					for(Map.Entry<Integer, List<Integer>> entry: atomicFlowsToDiscardMap.entrySet()) {
-						int index = 0;
-						System.out.print(entry.getKey() + ": ");
-						for(Integer ap: entry.getValue()) {
-							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
-							index++;
-						}
-						System.out.println();
-					}
-				}
-			}
-		}
-		System.out.println();
+//		for(SecurityRequirement sr : securityRequirements.values()) {
+//			Property prop = sr.getOriginalProperty();
+//			System.out.println("\nConsidering requirement {"+prop.getSrc()+","+prop.getSrcPort()+","+prop.getDst()+","+prop.getDstPort()+","+prop.getLv4Proto()+"}");   
+//			for(FlowPath flow: sr.getFlowsMap().values()) {
+//				Map<Integer, AtomicFlow> atomicFlowsMap = flow.getAtomicFlowsMap();
+//				Map<Integer, AtomicFlow> atomicFlowsToDiscardMap = flow.getAtomicFlowsToDiscardMap();
+//				List<AllocationNode> path = flow.getPath();
+//				if(atomicFlowsMap != null) {
+//					System.out.println("Atomic flows accepted");
+//					for(Map.Entry<Integer, AtomicFlow> entry: atomicFlowsMap.entrySet()) {
+//						int index = 0;
+//						System.out.print(entry.getKey() + ": ");
+//						for(Integer ap: entry.getValue().getAtomicPredicateList()) {
+//							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
+//							index++;
+//						}
+//						System.out.println(path.get(index).getIpAddress());
+//					}
+//					System.out.println("Atomic flows discarded");
+//					for(Map.Entry<Integer, AtomicFlow> entry: atomicFlowsToDiscardMap.entrySet()) {
+//						int index = 0;
+//						System.out.print(entry.getKey() + ": ");
+//						for(Integer ap: entry.getValue().getAtomicPredicateList()) {
+//							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
+//							index++;
+//						}
+//						System.out.println();
+//					}
+//				}
+//			}
+//		}
+//		System.out.println();
 		//END DEBUG
 		
 		//built map that assign to each allocation node the set of atomic predicates in input
 		for(SecurityRequirement sr : securityRequirements.values()) {
-			for(Flow flow: sr.getFlowsMap().values()) {
-				List<AllocationNode> path = flow.getPath();
-				for(List<Integer> atomicFlow: flow.getAtomicFlowsMap().values()) {
+			for(FlowPath flowPath: sr.getFlowsMap().values()) {
+				List<AllocationNode> path = flowPath.getPath();
+				for(AtomicFlow atomicFlow: flowPath.getAtomicFlowsMap().values()) {
 					//for source node don't add nothing
 					int index = 1;
-					boolean added;
-					for(Integer ap: atomicFlow) {
-						added = path.get(index).addAtomicPredicateInInput(flow.getIdFlow(), ap);
-						if(added && transformersNode.containsKey(path.get(index).getIpAddress()) 
+					for(Integer ap: atomicFlow.getAtomicPredicateList()) {
+						path.get(index).addAtomicPredicateInInput(flowPath.getIdFlow(), atomicFlow.getFlowId(), ap);
+						if(transformersNode.containsKey(path.get(index).getIpAddress()) 
 								&& transformersNode.get(path.get(index).getIpAddress()).getFunctionalType() == FunctionalTypes.FIREWALL) {
 							//If the node is a firewall, check if the predicate is allowed to pass or if it is dropped
+							if(path.get(index).getForwardBehaviourList().contains(ap) || path.get(index).getDroppedList().contains(ap))
+								continue; //already checked
 							for(Predicate allowed: path.get(index).getForwardBehaviourPredicateList()) {
 								Predicate intersectionPredicate = aputils.computeIntersection(networkAtomicPredicates.get(ap), allowed);
 								if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, networkAtomicPredicates.get(ap))) {
 									//the predicate is allowed to pass
 									path.get(index).addForwardingPredicate(ap);
+								} else {
+									//the predicate should be dropped
+									path.get(index).addDroppedPredicate(ap);
 								}
 							}
 						}
@@ -230,7 +235,7 @@ public class VerefooProxy {
 					}
 				}
 			}
-		}	
+		}
 	}
 		
 	private void printTransformations() {
@@ -529,7 +534,7 @@ public class VerefooProxy {
 		}
 
 		//DEBUG: interesting predicates for requirements source and destination
-//		System.out.println("INTERESTING PREDICATES: " + predicates.size());
+		System.out.println("INTERESTING PREDICATES: " + predicates.size());
 //		for(Predicate p: predicates)
 //			p.print();
 		//END DEBUG
@@ -547,10 +552,10 @@ public class VerefooProxy {
 		
 		//DEBUG: print atomic predicates
 		System.out.println("ATOMIC PREDICATES " + networkAtomicPredicates.size());
-		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
-			System.out.print(entry.getKey() + " ");
-			entry.getValue().print();
-		}
+//		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
+//			System.out.print(entry.getKey() + " ");
+//			entry.getValue().print();
+//		}
 		//END DEBUG
 	
 		return networkAtomicPredicates;
@@ -561,7 +566,7 @@ public class VerefooProxy {
 	 * At the moment only packet-filtering capability is allocated, in the future the decision will depend on the type of requirement.
 	 */
 	private void allocateFunctions() {
-		for(Flow sr : trafficFlowsMap.values()) {
+		for(FlowPath sr : trafficFlowsMap.values()) {
 			List<AllocationNode> nodes = sr.getPath();
 			int lengthList = nodes.size();
 			AllocationNode source = nodes.get(0);
@@ -600,8 +605,8 @@ public class VerefooProxy {
 	 * For each requirement, this method identifies all the possible the paths of nodes that must be crossed by the traffic flows that are related to the requirement.
 	 * @return the map of all the traffic flows
 	 */
-	private HashMap<Integer, Flow> generateFlowPaths(){
-		HashMap<Integer, Flow> flowsMap = new HashMap<>();
+	private HashMap<Integer, FlowPath> generateFlowPaths(){
+		HashMap<Integer, FlowPath> flowsMap = new HashMap<>();
 		int id = 0;
 		
 		for(SecurityRequirement sr : securityRequirements.values()) {
@@ -646,7 +651,7 @@ public class VerefooProxy {
 			
 			if(found) {
 				for(List<AllocationNode> singlePath : allPaths) {
-					Flow flow = new Flow(sr, singlePath, id);
+					FlowPath flow = new FlowPath(sr, singlePath, id);
 					flowsMap.put(id, flow);
 					sr.getFlowsMap().put(id, flow);
 					id++;
@@ -782,7 +787,7 @@ public class VerefooProxy {
 	/**
 	 * @return all the requirements
 	 */
-	public Map<Integer, Flow> getTrafficFlowsMap(){
+	public Map<Integer, FlowPath> getTrafficFlowsMap(){
 		return trafficFlowsMap;
 	}
 	

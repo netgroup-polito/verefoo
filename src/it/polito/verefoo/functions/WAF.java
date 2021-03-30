@@ -15,7 +15,7 @@ import com.microsoft.z3.Optimize;
 import com.microsoft.z3.SeqExpr;
 
 import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.jaxb.Node;
 import it.polito.verefoo.jaxb.WafElements;
 import it.polito.verefoo.solver.NetContext;
@@ -111,7 +111,7 @@ public class WAF extends GenericFunction{
   		 * This sections generates all the constraints to satisfy reachability and isolation requirements.
   		 */
   		
-  		for(Flow flow : source.getFlows().values()) {
+  		for(FlowPath flow : source.getFlows().values()) {
   		
   			BoolExpr decision;
   			if(flow.getCrossedTraffic(ipAddress).getUrl().equals("null") && flow.getCrossedTraffic(ipAddress).getDomain().equals("null")) {

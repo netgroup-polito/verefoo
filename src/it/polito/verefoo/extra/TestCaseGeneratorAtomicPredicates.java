@@ -52,7 +52,7 @@ public class TestCaseGeneratorAtomicPredicates {
 		
 	public TestCaseGeneratorAtomicPredicates(String name, int numberAllocationPlaces, int numberWebClients, int numberWebServers, 
 			int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, 
-			double percReqWithPorts, int seed) {
+			double percReqWithPorts, boolean hasFwRulesTakenFromReq, int seed) {
 		this.name = name;
 		this.rand = new Random(seed); 
 
@@ -65,12 +65,12 @@ public class TestCaseGeneratorAtomicPredicates {
 
 		allIPs = new HashSet<String>();
 		nfv = generateNFV(numberAllocationPlaces, numberWebClients, numberWebServers, numberReachPolicies, numberIsPolicies, numberNAT, numberFirewall, 
-				maxNATSrcs, maxFWRules, percReqWithPorts, rand);
+				maxNATSrcs, maxFWRules, percReqWithPorts, hasFwRulesTakenFromReq, rand);
 	}
 	
 	
 	public NFV changeIP(int numberAllocationPlaces, int numberWebClients, int numberWebServers, int numberReachPolicies, int numberIsPolicies, 
-			int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, double percReqWithPorts, int seed) {
+			int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, double percReqWithPorts, boolean hasFwRulesTakenFromReq, int seed) {
 		this.rand = new Random(seed);
 		allClients = new ArrayList<Node>();
 		allServers = new ArrayList<Node>();
@@ -81,7 +81,7 @@ public class TestCaseGeneratorAtomicPredicates {
 
 		allIPs = new HashSet<String>();
 		return generateNFV(numberAllocationPlaces, numberWebClients, numberWebServers, numberReachPolicies, numberIsPolicies, numberNAT, numberFirewall,
-				maxNATSrcs, maxFWRules, percReqWithPorts, rand);
+				maxNATSrcs, maxFWRules, percReqWithPorts, hasFwRulesTakenFromReq, rand);
 	}
 	
 	
@@ -126,7 +126,7 @@ public class TestCaseGeneratorAtomicPredicates {
 	
 	
 	public NFV generateNFV(int numberAllocationPlaces, int numberWebClients, int numberWebServers, int numberReachPolicies, int numberIsPolicies, 
-			int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, double percReqWithPorts, Random rand) {
+			int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, double percReqWithPorts, boolean hasFwRulesTakenFromReq, Random rand) {
 		
 		/* Creation of the test */
 		
@@ -424,57 +424,6 @@ public class TestCaseGeneratorAtomicPredicates {
 			central.getNeighbour().add(neighForCentralNode);
 		}
 		
-		//generate firewall rules
-		//NOTE: rule for the firewall is randomly selected: set0=allClients, set1=allServers, set2=allNAT
-		int nRules;
-		for(Node firewall: allFirewalls) {
-			nRules = rand.nextInt(maxFWRules);
-			if(rand.nextBoolean())
-				firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.ALLOW);
-			else firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.DENY);
-			
-			for(int i=0; i<nRules; i++) {
-				String srcNode = ""; String dstNode = "";
-				switch(rand.nextInt(4)) {
-				case 0: 
-					srcNode = allClients.get(rand.nextInt(allClients.size())).getName(); break;
-				case 1: 
-					srcNode = allServers.get(rand.nextInt(allServers.size())).getName(); break;	
-				case 2: 
-					srcNode = allNATs.get(rand.nextInt(allNATs.size())).getName(); break;
-				case 3: 
-					srcNode = "*"; break;
-				}
-				switch(rand.nextInt(4)) {
-				case 0: 
-					dstNode = allClients.get(rand.nextInt(allClients.size())).getName(); break;
-				case 1: 
-					dstNode = allServers.get(rand.nextInt(allServers.size())).getName(); break;	
-				case 2: 
-					dstNode = allNATs.get(rand.nextInt(allNATs.size())).getName(); break;
-				case 3: 
-					dstNode = "*"; break;
-				}
-				Elements rule = new Elements();
-				if(rand.nextBoolean())
-					rule.setAction(ActionTypes.ALLOW);
-				else rule.setAction(ActionTypes.DENY);
-				rule.setSource(srcNode);
-				rule.setDestination(dstNode);
-				rule.setSrcPort("*");
-				rule.setDstPort("*");
-				rule.setProtocol(L4ProtocolTypes.ANY);
-				firewall.getConfiguration().getFirewall().getElements().add(rule);
-			}
-		}
-		
-		//add the nodes in the graph
-		graph.getNode().addAll(allClients);
-		graph.getNode().addAll(allServers);
-		graph.getNode().addAll(allAPs);
-		graph.getNode().addAll(allNATs);
-		graph.getNode().addAll(allFirewalls);
-		graph.getNode().add(central);
 
 		//create the policies
 		int numberIPWithPorts = (int) (numberIsPolicies * percReqWithPorts);
@@ -513,6 +462,66 @@ public class TestCaseGeneratorAtomicPredicates {
 			createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, srcNode, dstNode, srcPort, dstPort);
 		}
 
+		
+		//generate firewall rules
+		//NOTE: rule for the firewall is randomly selected: set0=allClients, set1=allServers, set2=allNAT
+		int nRules;
+		for(Node firewall: allFirewalls) {
+			nRules = rand.nextInt(maxFWRules);
+			if(rand.nextBoolean())
+				firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.ALLOW);
+			else firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.DENY);
+
+			for(int i=0; i<nRules; i++) {
+				String srcNode = ""; String dstNode = "";
+				if(hasFwRulesTakenFromReq) {
+					Property p1 = nfv.getPropertyDefinition().getProperty().get(rand.nextInt(nfv.getPropertyDefinition().getProperty().size()));
+					Property p2 = nfv.getPropertyDefinition().getProperty().get(rand.nextInt(nfv.getPropertyDefinition().getProperty().size()));
+					srcNode = p1.getSrc();
+					dstNode = p2.getDst();
+				} else {
+					switch(rand.nextInt(4)) {
+					case 0: 
+						srcNode = allClients.get(rand.nextInt(allClients.size())).getName(); break;
+					case 1: 
+						srcNode = allServers.get(rand.nextInt(allServers.size())).getName(); break;	
+					case 2: 
+						srcNode = allNATs.get(rand.nextInt(allNATs.size())).getName(); break;
+					case 3: 
+						srcNode = "*"; break;
+					}
+					switch(rand.nextInt(4)) {
+					case 0: 
+						dstNode = allClients.get(rand.nextInt(allClients.size())).getName(); break;
+					case 1: 
+						dstNode = allServers.get(rand.nextInt(allServers.size())).getName(); break;	
+					case 2: 
+						dstNode = allNATs.get(rand.nextInt(allNATs.size())).getName(); break;
+					case 3: 
+						dstNode = "*"; break;
+					}
+				}
+				
+				Elements rule = new Elements();
+				if(rand.nextBoolean())
+					rule.setAction(ActionTypes.ALLOW);
+				else rule.setAction(ActionTypes.DENY);
+				rule.setSource(srcNode);
+				rule.setDestination(dstNode);
+				rule.setSrcPort("*");
+				rule.setDstPort("*");
+				rule.setProtocol(L4ProtocolTypes.ANY);
+				firewall.getConfiguration().getFirewall().getElements().add(rule);
+			}
+		}
+
+		//add the nodes in the graph
+		graph.getNode().addAll(allClients);
+		graph.getNode().addAll(allServers);
+		graph.getNode().addAll(allAPs);
+		graph.getNode().addAll(allNATs);
+		graph.getNode().addAll(allFirewalls);
+		graph.getNode().add(central);
 		nfv.getGraphs().getGraph().add(graph);
 			
 		

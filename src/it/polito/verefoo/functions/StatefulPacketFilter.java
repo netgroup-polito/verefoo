@@ -19,7 +19,7 @@ import com.microsoft.z3.Optimize;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
-import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.graph.Traffic;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.EType;
@@ -184,7 +184,7 @@ public class StatefulPacketFilter extends GenericFunction{
   		 * This sections generates all the constraints to satisfy reachability and isolation requirements.
   		 */
   		
-  		for(Flow sr : source.getFlows().values()) {
+  		for(FlowPath sr : source.getFlows().values()) {
   		
   			generateManualSatifiabilityConstraint(sr);
   		}
@@ -197,7 +197,7 @@ public class StatefulPacketFilter extends GenericFunction{
 	 * This method generates the hard constraint to satisfy a requirement for an manually configured firewall.
 	 * @param sr it is the security requirement
 	 */
-	private void generateManualSatifiabilityConstraint(Flow sr) {
+	private void generateManualSatifiabilityConstraint(FlowPath sr) {
 		
 		BoolExpr allowed1 = ctx.mkBoolConst(pf+"_allowed1"+sr.getIdFlow());
 		BoolExpr allowed2 = ctx.mkBoolConst(pf+"_allowed2"+sr.getIdFlow());
@@ -227,8 +227,8 @@ public class StatefulPacketFilter extends GenericFunction{
 		Traffic traffic = sr.getCrossedTraffic(source.getNode().getName());
 		
 		boolean statusFound = false;
-		Flow status = null;
-		for(Flow flow2 : source.getFlows().values()) {
+		FlowPath status = null;
+		for(FlowPath flow2 : source.getFlows().values()) {
 			Traffic traffic2 = flow2.getCrossedTraffic(source.getNode().getName());
 			if(traffic.getIPSrc().equals(traffic2.getIPDst()) && traffic.getIPDst().equals(traffic2.getIPSrc()) && traffic.getpSrc().equals(traffic2.getpDst())) {
 				statusFound = true;

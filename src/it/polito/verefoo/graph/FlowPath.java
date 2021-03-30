@@ -7,15 +7,15 @@ import java.util.Map;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.jaxb.*;
 
-public class Flow {
+public class FlowPath {
 	SecurityRequirement requirement;
 	int idFlow;
 	private List<AllocationNode> path;
 	//<id of atomic flow, atomic flow>
-	Map<Integer, List<Integer>> atomicFlowsMap = new HashMap<>();
-	Map<Integer, List<Integer>> atomicFlowsToDiscardMap = new HashMap<>();
+	Map<Integer, AtomicFlow> atomicFlowsMap = new HashMap<>();
+	Map<Integer, AtomicFlow> atomicFlowsToDiscardMap = new HashMap<>();
 	
-	public Flow(SecurityRequirement requirement, List<AllocationNode> path, int idFlow) {
+	public FlowPath(SecurityRequirement requirement, List<AllocationNode> path, int idFlow) {
 		this.requirement = requirement;
 		this.path = path;
 		this.idFlow = idFlow;
@@ -50,18 +50,21 @@ public class Flow {
 	}
 	
 	public void addAtomicFlow(int id, List<Integer> atomicFlow) {
-		this.atomicFlowsMap.put(id, atomicFlow);
+		AtomicFlow newFlow = new AtomicFlow(id, this, atomicFlow);
+		atomicFlowsMap.put(id, newFlow);
 	}
 	
 	public void addAtomicFlowToDiscard(int id, List<Integer> atomicFlow) {
-		this.atomicFlowsToDiscardMap.put(id, atomicFlow);
+		AtomicFlow newFlow = new AtomicFlow(id, this, atomicFlow);
+		atomicFlowsToDiscardMap.put(id, newFlow);
+		
 	}
 
-	public Map<Integer, List<Integer>> getAtomicFlowsMap() {
+	public Map<Integer, AtomicFlow> getAtomicFlowsMap() {
 		return atomicFlowsMap;
 	}
 
-	public Map<Integer, List<Integer>> getAtomicFlowsToDiscardMap() {
+	public Map<Integer, AtomicFlow> getAtomicFlowsToDiscardMap() {
 		return atomicFlowsToDiscardMap;
 	}
 	

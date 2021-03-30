@@ -6,7 +6,7 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Optimize;
 
 import it.polito.verefoo.functions.GenericFunction;
-import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.jaxb.*;
 
@@ -29,8 +29,10 @@ public class AllocationNode {
 	HashMap<Integer, List<Integer>> transformationsMap = new HashMap<>();
 	List<Predicate> forwardBehaviourPredicateList = new ArrayList<>();
 	List<Integer> forwardBehaviourList = new ArrayList<>();
-	private Map<Integer, Flow> crossingFlows = new HashMap<>();
-	private Map<Integer, List<Integer>> mapFlowIdAtomicPredicatesInInput = new HashMap<>();
+	List<Integer> droppedList = new ArrayList<>();
+	private Map<Integer, FlowPath> crossingFlows = new HashMap<>();
+	//<flowPathId, <atomicFlowId, atomicPredicate>>
+	private Map<Integer, Map<Integer, Integer>> mapFlowIdAtomicPredicatesInInput = new HashMap<>();
 	
 	/**
 	 * Public constructor for the AllocationNode class
@@ -176,12 +178,12 @@ public class AllocationNode {
 		}
 	}
 
-	public void addCrossingFlow(Flow sr) {
+	public void addCrossingFlow(FlowPath sr) {
 		crossingFlows.put(sr.getIdFlow(), sr);
 	}
 	
 	//return flows that cross this node
-	public Map<Integer, Flow> getCrossingFlows() {
+	public Map<Integer, FlowPath> getCrossingFlows() {
 		return crossingFlows;
 	}
 
@@ -189,7 +191,7 @@ public class AllocationNode {
 	 * Setter method for the map of requirements
 	 * @param requirements the map of requirements
 	 */
-	public void setFlows(Map<Integer, Flow> requirements) {
+	public void setFlows(Map<Integer, FlowPath> requirements) {
 		this.crossingFlows = requirements;
 	}
 	
@@ -213,23 +215,26 @@ public class AllocationNode {
 		return forwardBehaviourList;
 	}
 	
-	public boolean addAtomicPredicateInInput(int flowId, int ap) {
-		if(mapFlowIdAtomicPredicatesInInput.containsKey(flowId)) {
-			List<Integer> atomicPredicateList = mapFlowIdAtomicPredicatesInInput.get(flowId);
-			if(!atomicPredicateList.contains(ap)) {
-				atomicPredicateList.add(ap);
-				return true;
-			}
+	public List<Integer> getDroppedList() {
+		return droppedList;
+	}
+
+	public void setDroppedList(List<Integer> droppedList) {
+		this.droppedList = droppedList;
+	}
+
+	public void addAtomicPredicateInInput(int flowPathId, int atomicFlowId, int ap) {
+		if(mapFlowIdAtomicPredicatesInInput.containsKey(flowPathId)) {
+			Map<Integer, Integer> atomicPredicateMap = mapFlowIdAtomicPredicatesInInput.get(flowPathId);
+			atomicPredicateMap.put(atomicFlowId, ap);
 		} else {
-			List<Integer> newList = new ArrayList<>();
-			newList.add(ap);
-			mapFlowIdAtomicPredicatesInInput.put(flowId, newList);
-			return true;
+			Map<Integer, Integer> newMap = new HashMap<>();
+			newMap.put(atomicFlowId, ap);	
+			mapFlowIdAtomicPredicatesInInput.put(flowPathId, newMap);
 		}
-		return false;
 	}
 	
-	public List<Integer> getAtomicPredicatesInInputForFlow(int flowId){
+	public Map<Integer, Integer> getAtomicPredicatesInInputForFlow(int flowId){
 		if(mapFlowIdAtomicPredicatesInInput.containsKey(flowId))
 			return mapFlowIdAtomicPredicatesInInput.get(flowId);
 		return null;
@@ -237,5 +242,9 @@ public class AllocationNode {
 	
 	public void addForwardingPredicate(int ap) {
 		forwardBehaviourList.add(ap);
+	}
+	
+	public void addDroppedPredicate(int ap) {
+		droppedList.add(ap);
 	}
 }

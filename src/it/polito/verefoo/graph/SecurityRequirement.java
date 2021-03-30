@@ -11,7 +11,7 @@ public class SecurityRequirement {
 	
 	Property originalProperty;
 	int idRequirement;
-	Map<Integer, Flow> flowsMap;
+	Map<Integer, FlowPath> flowsMap;
 
 	public SecurityRequirement(Property originalProperty, int idRequirement) {
 		this.originalProperty = originalProperty;
@@ -35,11 +35,11 @@ public class SecurityRequirement {
 		this.idRequirement = idRequirement;
 	}
 
-	public Map<Integer, Flow> getFlowsMap() {
+	public Map<Integer, FlowPath> getFlowsMap() {
 		return flowsMap;
 	}
 
-	public void setFlowsMap(Map<Integer, Flow> flowsMap) {
+	public void setFlowsMap(Map<Integer, FlowPath> flowsMap) {
 		this.flowsMap = flowsMap;
 	}
 	

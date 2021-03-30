@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verefoo.jaxb.FunctionalTypes;
@@ -63,7 +63,7 @@ public class GenerateFlowsTask implements Runnable {
 		}
 		
 		//Generate atomic flows
-		for(Flow flow: requirement.getFlowsMap().values()) {
+		for(FlowPath flow: requirement.getFlowsMap().values()) {
 			List<AllocationNode> path = flow.getPath();
 			List<List<Integer>> resultList = new ArrayList<>();
 			List<List<Integer>> resultListToDiscard = new ArrayList<>();

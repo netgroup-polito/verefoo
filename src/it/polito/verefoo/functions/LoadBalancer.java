@@ -10,7 +10,7 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Optimize;
 
 import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.solver.NetContext;
 
 /**
@@ -46,7 +46,7 @@ public class LoadBalancer extends GenericFunction {
 	 */
 	public void loadBalancerConfiguration(DatatypeExpr lbIp) {
 		
-		for(Flow flow : source.getFlows().values()) {
+		for(FlowPath flow : source.getFlows().values()) {
     		constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse()));
     	}
 	}

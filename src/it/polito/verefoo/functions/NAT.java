@@ -11,7 +11,7 @@ import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Optimize;
 
 import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.graph.Traffic;
 import it.polito.verefoo.solver.NetContext;
 
@@ -52,7 +52,7 @@ public class NAT extends GenericFunction {
 	 */
 	public void natConfiguration(DatatypeExpr natIp) {
 		
-		for(Flow flow : source.getFlows().values()) {
+		for(FlowPath flow : source.getFlows().values()) {
 			Traffic traffic = flow.getCrossedTraffic(source.getNode().getName());
 			if(private_addresses.contains(traffic.getIPSrc())) {
 				
@@ -81,8 +81,8 @@ public class NAT extends GenericFunction {
 				Traffic traffic1 = flow.getCrossedTraffic(next.getNode().getName());
 				
 				boolean statusFound = false;
-				Flow status = null;
-				for(Flow flow2 : source.getFlows().values()) {
+				FlowPath status = null;
+				for(FlowPath flow2 : source.getFlows().values()) {
 	
 					Traffic traffic2 = flow2.getCrossedTraffic(source.getNode().getName());
 					if(traffic1.getIPSrc().equals(traffic2.getIPDst()) && traffic1.getIPDst().equals(traffic2.getIPSrc()) && traffic1.getpSrc().equals(traffic2.getpDst())) {

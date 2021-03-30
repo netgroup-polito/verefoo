@@ -37,16 +37,17 @@ import it.polito.verefoo.utils.TestResults;
 public class TestPerformanceScalabilityAtomicPredicates {
 	
 	public static void main(String[] args)  {	
-		numberPR = 350;
-		numberWC = 500;
-		numberWS = 500;
-		numberAP  = 498;
-		numberNAT = 100;
-		numberFW = 100;
-		maxNATSrcs = 25;
-		maxFWRules = 25;
+		numberPR = 100;
+		numberWC = 100;
+		numberWS = 100;
+		numberAP  = 100;
+		numberNAT = 25;
+		numberFW = 25;
+		maxNATSrcs = 10;
+		maxFWRules = 10;
 		runs = 50;
 		percReqWithPorts = 0.0; //from 0.0 to 1.0
+		hasFwRulesTakenFromReq = true;
 		
 		seed  = 66361;
 		numberIPR  = numberPR/2;
@@ -79,6 +80,7 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	private static int maxNATSrcs;
 	private static int maxFWRules;
 	private static double percReqWithPorts;
+	private static boolean hasFwRulesTakenFromReq;
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -148,7 +150,7 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	        try {
 	        	List<TestCaseGeneratorAtomicPredicates> nfv = new ArrayList<>();
 	        	nfv.add(new TestCaseGeneratorAtomicPredicates("Test case generator atomic predicates", numberAP, numberWC, numberWS, 
-	        			numberRPR, numberIPR, numberNAT, numberFW, maxNATSrcs, maxFWRules, percReqWithPorts, 1));
+	        			numberRPR, numberIPR, numberNAT, numberFW, maxNATSrcs, maxFWRules, percReqWithPorts, hasFwRulesTakenFromReq, 1));
 
 	        	for(TestCaseGeneratorAtomicPredicates f : nfv){
 
@@ -176,7 +178,7 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	        					m.setProperty( Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,"./xsd/nfvSchema.xsd");
 
 	        					root = f.changeIP(numberAP, numberWC, numberWS, numberRPR, numberIPR, numberNAT, numberFW,
-	        							maxNATSrcs, maxFWRules, percReqWithPorts, seeds[k]);
+	        							maxNATSrcs, maxFWRules, percReqWithPorts, hasFwRulesTakenFromReq, seeds[k]);
 
 	        					//for debug purpose 
 	        					//m.marshal( root, System.out );  

@@ -16,7 +16,7 @@ import it.polito.verefoo.VerefooNormalizer;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.functions.GenericFunction;
 import it.polito.verefoo.functions.PacketFilter;
-import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verefoo.utils.PortInterval;
@@ -35,7 +35,7 @@ public class Translator {
 	protected VerefooNormalizer norm;
 	protected List<Node> removedNodes;
 	private Map<String, AllocationNode> allocationNodes;
-	private Map<Integer, Flow> requirementsMap;
+	private Map<Integer, FlowPath> requirementsMap;
 
 	/**
 	 * Constructor
@@ -50,7 +50,7 @@ public class Translator {
 		this.g = g;
 	}
 
-	public Translator(String model, NFV nfv, Graph g, Map<String, AllocationNode> allocationNodes, Map<Integer, Flow> requirementsMap) {
+	public Translator(String model, NFV nfv, Graph g, Map<String, AllocationNode> allocationNodes, Map<Integer, FlowPath> requirementsMap) {
 		this.model = model;
 		this.nfv = nfv;
 		this.g = g;
@@ -496,7 +496,7 @@ public class Translator {
 			
 			while (matcher.find()) {
 
-				for(Flow sr : requirementsMap.values()) {
+				for(FlowPath sr : requirementsMap.values()) {
 					List<AllocationNode> nodesPath = sr.getPath().getNodes();
 					int opNodeIndex = -1;
 					for(int i = 0; i < nodesPath.size(); i++) {

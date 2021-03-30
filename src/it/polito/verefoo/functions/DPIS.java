@@ -13,7 +13,7 @@ import com.microsoft.z3.IntNum;
 import com.microsoft.z3.Optimize;
 
 import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.jaxb.Node;
 import it.polito.verefoo.solver.NetContext;
 import it.polito.verefoo.utils.PacketFilterRule;
@@ -97,7 +97,7 @@ public class DPIS extends GenericFunction{
   		 * This sections generates all the constraints to satisfy reachability and isolation requirements.
   		 */
   		
-  		for(Flow flow : source.getFlows().values()) {
+  		for(FlowPath flow : source.getFlows().values()) {
   		
   			BoolExpr decision;
   			if(flow.getCrossedTraffic(ipAddress).getBody().equals("null")) {

@@ -21,7 +21,7 @@ import com.microsoft.z3.Params;
 import com.microsoft.z3.Status;
 
 import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.graph.Flow;
+import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verefoo.utils.VerificationResult;
 
@@ -155,9 +155,9 @@ public class Checker {
 	private void createReachabilityConstraint(SecurityRequirement sr) {
 		
 		List<BoolExpr> pathConstraints = new ArrayList<>();
-		Map<Integer, Flow> allFlows = sr.getFlowsMap();
+		Map<Integer, FlowPath> allFlows = sr.getFlowsMap();
 		
-		for(Flow flow : allFlows.values()) {
+		for(FlowPath flow : allFlows.values()) {
 			
 			List<BoolExpr> singleConstraints = new ArrayList<>();
 			for(AllocationNode node : flow.getPath()) {
@@ -186,9 +186,9 @@ public class Checker {
 	private void createIsolationConstraints(SecurityRequirement sr) {
 		
 		List<BoolExpr> pathConstraints = new ArrayList<>();
-		Map<Integer, Flow> allFlows = sr.getFlowsMap();
+		Map<Integer, FlowPath> allFlows = sr.getFlowsMap();
 		
-		for(Flow flow : allFlows.values()) {
+		for(FlowPath flow : allFlows.values()) {
 			List<BoolExpr> singleConstraints = new ArrayList<>();
 			
 			for(AllocationNode node : flow.getPath()) {
