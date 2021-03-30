@@ -2,6 +2,7 @@ package it.polito.verefoo.functions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -64,9 +65,12 @@ public class EndHost extends GenericFunction {
     }
     
     public void configureEndHost() {
-    	for(FlowPath flow : source.getFlows().values()) {
-    		constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse()));
+    	for(Map<Integer, Integer> flowMap : source.getMapFlowIdAtomicPredicatesInInput().values()) {
+    		for(Integer traffic : flowMap.values()) {
+    			constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
+    		}
     	}
+    	constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(-1)), ctx.mkFalse()));
     }
 
 

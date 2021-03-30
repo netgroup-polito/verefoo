@@ -95,14 +95,14 @@ public class VerefooProxy {
 		this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
 		
 		//TODO: remove (Budapest)
-//		//Creation of the z3 context
-//		HashMap<String, String> cfg = new HashMap<String, String>();
-//		cfg.put("model", "true");
-//		ctx = new Context(cfg);
-//				
-//		//Creation of the NetContext (z3 variables)
-//		nctx = nctxGenerate(ctx, nodes, prop, allocationNodes);
-//		nctx.setWildcardManager(wildcardManager);
+		//Creation of the z3 context
+		HashMap<String, String> cfg = new HashMap<String, String>();
+		cfg.put("model", "true");
+		ctx = new Context(cfg);
+				
+		//Creation of the NetContext (z3 variables)
+		nctx = nctxGenerate(ctx, nodes, prop, allocationNodes);
+		nctx.setWildcardManager(wildcardManager);
 		
 		/*
 		 * Main sequence of methods in VerefooProxy:
@@ -130,14 +130,14 @@ public class VerefooProxy {
 		testResults.setAtomicFlowsCompTime(t1-t2);
 		
 		//TODO: remove (Budapest)
-//		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
-//		allocationManager.instantiateFunctions();
-//		allocateFunctions();
-//		distributeTrafficFlows();
-//		allocationManager.configureFunctions();
-//		
-//		check = new Checker(ctx, nctx, allocationNodes);
-//		formalizeRequirements();
+		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
+		allocationManager.instantiateFunctions();
+		allocateFunctions();
+		//distributeTrafficFlows();
+		allocationManager.configureFunctions();
+		
+		check = new Checker(ctx, nctx, allocationNodes);
+		formalizeRequirements();
 		
 	}
 	
@@ -552,10 +552,10 @@ public class VerefooProxy {
 		
 		//DEBUG: print atomic predicates
 		System.out.println("ATOMIC PREDICATES " + networkAtomicPredicates.size());
-//		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
-//			System.out.print(entry.getKey() + " ");
-//			entry.getValue().print();
-//		}
+		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
+			System.out.print(entry.getKey() + " ");
+			entry.getValue().print();
+		}
 		//END DEBUG
 	
 		return networkAtomicPredicates;

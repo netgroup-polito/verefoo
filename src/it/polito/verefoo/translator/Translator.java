@@ -497,7 +497,7 @@ public class Translator {
 			while (matcher.find()) {
 
 				for(FlowPath sr : requirementsMap.values()) {
-					List<AllocationNode> nodesPath = sr.getPath().getNodes();
+					List<AllocationNode> nodesPath = sr.getPath();
 					int opNodeIndex = -1;
 					for(int i = 0; i < nodesPath.size(); i++) {
 						if(nodesPath.get(i).getNode().getName().equals(opNode.getNode().getName()))

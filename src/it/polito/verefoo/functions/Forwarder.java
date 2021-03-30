@@ -1,6 +1,7 @@
 package it.polito.verefoo.functions;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -8,7 +9,6 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Optimize;
 
 import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.solver.NetContext;
 
 /** Represents a Forwarder
@@ -40,8 +40,11 @@ public class Forwarder extends GenericFunction{
      */
     public void forwarderSendRules (){
     	
-    	for(FlowPath flow : source.getFlows().values()) {
-    		constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse()));
+    	for(Map<Integer, Integer> flowMap : source.getMapFlowIdAtomicPredicatesInInput().values()) {
+    		for(Integer traffic : flowMap.values()) {
+    			constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
+    		}
+    		
     	}
     	
     }

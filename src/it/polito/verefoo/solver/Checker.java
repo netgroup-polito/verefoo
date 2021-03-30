@@ -21,6 +21,7 @@ import com.microsoft.z3.Params;
 import com.microsoft.z3.Status;
 
 import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.graph.AtomicFlow;
 import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verefoo.utils.VerificationResult;
@@ -157,18 +158,24 @@ public class Checker {
 		List<BoolExpr> pathConstraints = new ArrayList<>();
 		Map<Integer, FlowPath> allFlows = sr.getFlowsMap();
 		
-		for(FlowPath flow : allFlows.values()) {
-			
-			List<BoolExpr> singleConstraints = new ArrayList<>();
-			for(AllocationNode node : flow.getPath()) {
-				singleConstraints.add(ctx.mkImplies(node.getPlacedNF().getUsed(), ctx.mkEq( (BoolExpr)nctx.deny.apply(node.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse())));
-			}
-			
+		for(FlowPath flowPath : allFlows.values()) {
+			for(AtomicFlow flow : flowPath.getAtomicFlowsMap().values()) {
+				List<BoolExpr> singleConstraints = new ArrayList<>();
+				
+				for(AllocationNode node : flowPath.getPath()) {
+					int traffic;
+					if(node.getAtomicPredicatesInInputForFlow(flowPath.getIdFlow()) == null)
+						traffic = -1;
+					else
+						traffic = node.getAtomicPredicatesInInputForFlow(flowPath.getIdFlow()).get(flow.getFlowId());
+					singleConstraints.add(ctx.mkImplies(node.getPlacedNF().getUsed(), ctx.mkNot((BoolExpr) nctx.deny.apply(node.getZ3Name(), ctx.mkInt(traffic)))));
+				}
+				
 
-			BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
-			BoolExpr finalConstraint = ctx.mkAnd(singleConstraints.toArray(arrayConstraints));
-			pathConstraints.add(finalConstraint);
-			
+				BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
+				BoolExpr finalConstraint = ctx.mkAnd(singleConstraints.toArray(arrayConstraints));
+				pathConstraints.add(finalConstraint);
+			}
 		}
 		
 	
@@ -188,16 +195,24 @@ public class Checker {
 		List<BoolExpr> pathConstraints = new ArrayList<>();
 		Map<Integer, FlowPath> allFlows = sr.getFlowsMap();
 		
-		for(FlowPath flow : allFlows.values()) {
-			List<BoolExpr> singleConstraints = new ArrayList<>();
-			
-			for(AllocationNode node : flow.getPath()) {
-				singleConstraints.add(ctx.mkAnd(node.getPlacedNF().getUsed(), (BoolExpr) nctx.deny.apply(node.getZ3Name(), ctx.mkInt(flow.getIdFlow()))));
+		for(FlowPath flowPath : allFlows.values()) {
+			for(AtomicFlow flow : flowPath.getAtomicFlowsMap().values()) {
+				List<BoolExpr> singleConstraints = new ArrayList<>();
+				
+				for(AllocationNode node : flowPath.getPath()) {
+					int traffic;
+					if(node.getAtomicPredicatesInInputForFlow(flowPath.getIdFlow()) == null)
+						traffic = -1;
+					else
+						traffic = node.getAtomicPredicatesInInputForFlow(flowPath.getIdFlow()).get(flow.getFlowId());
+					singleConstraints.add(ctx.mkAnd(node.getPlacedNF().getUsed(), (BoolExpr) nctx.deny.apply(node.getZ3Name(), ctx.mkInt(traffic))));
+				}
+				
+				BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
+				BoolExpr finalConstraint = ctx.mkOr(singleConstraints.toArray(arrayConstraints));
+				pathConstraints.add(finalConstraint);
 			}
 			
-			BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
-			BoolExpr finalConstraint = ctx.mkOr(singleConstraints.toArray(arrayConstraints));
-			pathConstraints.add(finalConstraint);
 		}
 		
 		

@@ -35,7 +35,7 @@ import it.polito.verefoo.utils.Tuple;
 public class NetContext {
 	public Context ctx;
 	public WildcardManager wildcardManager;
-	public FuncDecl nodeHasAddr,addrToNode,send,recv,deny;
+	public FuncDecl nodeHasAddr,addrToNode,send,recv,deny,rule;
 	private HashMap<String, AllocationNode> allocationNodes;
 	
     public List<BoolExpr> constraints;
@@ -69,7 +69,7 @@ public class NetContext {
     // weights
     public final int WPROTOWILDCARD   = 1000;
     public final int WIPWILDCARD   = -10;
-    public final int WAUTOCONF   = 1000;
+    public final int WAUTOCONF   = 1;
     public final int WAUTOPLACEMENT   = 100000000;
     public final int WPORTS   = 1000;
 
@@ -163,10 +163,10 @@ public class NetContext {
         	DatatypeExpr fd = (DatatypeExpr) ctx.mkConst(new_port_ranges[i], portType);
             portMap.put(fd.toString().replace("|", ""),fd);
             try{
-            	constraints.add(equalPortRangeToInterval(fd, new PortInterval(new_port_ranges[i])));
+            	//constraints.add(equalPortRangeToInterval(fd, new PortInterval(new_port_ranges[i])));
             }catch(NumberFormatException e){
             	if(new_port_ranges[i].equals("null")){
-            		constraints.add(equalPortRangeToInterval(fd,  new PortInterval("0-"+this.MAX_PORT)));
+            		//constraints.add(equalPortRangeToInterval(fd,  new PortInterval("0-"+this.MAX_PORT)));
             	}else{
             		throw e;
             	}
@@ -211,27 +211,26 @@ public class NetContext {
              }
             addressMap.put(fd.toString().replace("|", ""),fd);
             try{
-            	constraints.add(equalIpToIntArray(fd, getIpFromString(new_addr[i])));
+            	//constraints.add(equalIpToIntArray(fd, getIpFromString(new_addr[i])));
             }catch(NumberFormatException e){
             	if(new_addr[i].equals("null")){
-            		constraints.add(equalIpToIntArray(fd, getIpFromString("0.0.0.0")));
+            		//constraints.add(equalIpToIntArray(fd, getIpFromString("0.0.0.0")));
             	}
             	else if(new_addr[i].equals("wildcard")){
-            		constraints.add(equalIpToIntArray(fd, getIpFromString("-1.-1.-1.-1")));
+            		//constraints.add(equalIpToIntArray(fd, getIpFromString("-1.-1.-1.-1")));
             	} else{
             		//251 is a prime number, to reduce collisions
             		int symbolicAddr = Math.abs(new_addr[i].hashCode()%251);
-            		constraints.add(equalIpToIntArray(fd, getIpFromString(symbolicAddr + "." + symbolicAddr + "." + symbolicAddr + "." + symbolicAddr)));
+            		//constraints.add(equalIpToIntArray(fd, getIpFromString(symbolicAddr + "." + symbolicAddr + "." + symbolicAddr + "." + symbolicAddr)));
             	}
             	
             }
         }
         
         nodeHasAddr = ctx.mkFuncDecl("nodeHasAddr", new Sort[]{nodeType, addressType},ctx.mkBoolSort());
-        // addrToNode: address -> node
         addrToNode = ctx.mkFuncDecl("addrToNode", addressType, nodeType);
-        // recv: node -> node -> packet-> int-> bool
         deny = ctx.mkFuncDecl("deny", new Sort[]{ nodeType, ctx.mkIntSort()},ctx.mkBoolSort());
+        rule = ctx.mkFuncDecl("rule", new Sort[]{ nodeType, ctx.mkIntSort()},ctx.mkBoolSort());
     }
     
     

@@ -247,4 +247,14 @@ public class AllocationNode {
 	public void addDroppedPredicate(int ap) {
 		droppedList.add(ap);
 	}
+
+	public Map<Integer, Map<Integer, Integer>> getMapFlowIdAtomicPredicatesInInput() {
+		return mapFlowIdAtomicPredicatesInInput;
+	}
+
+	public void setMapFlowIdAtomicPredicatesInInput(Map<Integer, Map<Integer, Integer>> mapFlowIdAtomicPredicatesInInput) {
+		this.mapFlowIdAtomicPredicatesInInput = mapFlowIdAtomicPredicatesInInput;
+	}
+	
+	
 }
