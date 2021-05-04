@@ -35,7 +35,7 @@ import it.polito.verefoo.utils.Tuple;
 public class NetContext {
 	public Context ctx;
 	public WildcardManager wildcardManager;
-	public FuncDecl nodeHasAddr,addrToNode,send,recv,deny,rule;
+	public FuncDecl nodeHasAddr,addrToNode,send,recv,deny;
 	private HashMap<String, AllocationNode> allocationNodes;
 	
     public List<BoolExpr> constraints;
@@ -137,43 +137,7 @@ public class NetContext {
      * @param dstp_ranges it is the array of destination ports
      */
     private void mkTypes (String[] nodes, String[] addresses, String[] srcp_ranges, String[] dstp_ranges){
-    	
-    	//----------- Port ranges for this network         
-        String[] new_port_ranges = new String[srcp_ranges.length+dstp_ranges.length+1];
-        for(int k=0;k<srcp_ranges.length;k++)
-        	new_port_ranges[k] = srcp_ranges[k];
-        for(int k=srcp_ranges.length;k<srcp_ranges.length+dstp_ranges.length;k++)
-        	new_port_ranges[k] = dstp_ranges[k-srcp_ranges.length];
-        
-        // creating sort for port type
-        new_port_ranges[new_port_ranges.length-1] = "null";
-        String[] portRangeFieldNames = new String[]{"start","end"};
-        // port type with two integers
-        Sort[] sortPort = new Sort[]{ctx.mkIntSort(),ctx.mkIntSort()};
-        Constructor portRangeCon = ctx.mkConstructor("port_range_constructor", "is_portRange", portRangeFieldNames, sortPort, null);
-        portType = ctx.mkDatatypeSort("PortRange", new Constructor[] {portRangeCon});
-
-        // port functions map filled 
-        for(int i=0;i<portRangeFieldNames.length;i++){
-        	portFunctionsMap.put(portRangeFieldNames[i], portType.getAccessors()[0][i]); // port_functions to get port's function declarations by name
-        }
-        
-        
-        for(int i=0;i<new_port_ranges.length;i++){
-        	DatatypeExpr fd = (DatatypeExpr) ctx.mkConst(new_port_ranges[i], portType);
-            portMap.put(fd.toString().replace("|", ""),fd);
-            try{
-            	//constraints.add(equalPortRangeToInterval(fd, new PortInterval(new_port_ranges[i])));
-            }catch(NumberFormatException e){
-            	if(new_port_ranges[i].equals("null")){
-            		//constraints.add(equalPortRangeToInterval(fd,  new PortInterval("0-"+this.MAX_PORT)));
-            	}else{
-            		throw e;
-            	}
-            	
-            }
-        }
-        
+    	  
         //----------- Nodes in this network
         nodeType = ctx.mkEnumSort("Node", nodes);
         for(int i=0;i<nodeType.getConsts().length;i++){
@@ -183,54 +147,8 @@ public class NetContext {
             n.setZ3Name(fd);
         }
         
-        
 
-        //----------- Addresses for this network         
-        String[] new_addr = new String[addresses.length+2];
-        for(int k=0;k<addresses.length;k++)
-            new_addr[k] = addresses[k];
-
-        new_addr[new_addr.length-2] = "null";
-        new_addr[new_addr.length-1] = "wildcard";
-        
-        //qui crea la variabile z3 addressType che è composta da 4 oggetti (ipAddr_1, ipAddr_2 ecc)
-        String[] ipfieldNames = new String[]{"ipAddr_1","ipAddr_2","ipAddr_3","ipAddr_4"};
-        Sort[] sort = new Sort[]{ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort(),ctx.mkIntSort()};
-        Constructor ipCon = ctx.mkConstructor("ip_constructor", "is_ip", ipfieldNames, sort, null);
-        addressType = ctx.mkDatatypeSort("Address", new Constructor[] {ipCon});
-        for(int i=0;i<ipfieldNames.length;i++){
-        	ipFunctionsMap.put(ipfieldNames[i], addressType.getAccessors()[0][i]); // ip_functions to get ip's function declarations by name
-        }
-        
-
-        for(int i=0;i<new_addr.length;i++){
-        	DatatypeExpr fd = (DatatypeExpr) ctx.mkConst(new_addr[i], addressType);
-        	 AllocationNode n = allocationNodes.get(fd.toString().replace("|", ""));
-             if(n != null) {
-            	 n.setZ3Node(fd);
-             }
-            addressMap.put(fd.toString().replace("|", ""),fd);
-            try{
-            	//constraints.add(equalIpToIntArray(fd, getIpFromString(new_addr[i])));
-            }catch(NumberFormatException e){
-            	if(new_addr[i].equals("null")){
-            		//constraints.add(equalIpToIntArray(fd, getIpFromString("0.0.0.0")));
-            	}
-            	else if(new_addr[i].equals("wildcard")){
-            		//constraints.add(equalIpToIntArray(fd, getIpFromString("-1.-1.-1.-1")));
-            	} else{
-            		//251 is a prime number, to reduce collisions
-            		int symbolicAddr = Math.abs(new_addr[i].hashCode()%251);
-            		//constraints.add(equalIpToIntArray(fd, getIpFromString(symbolicAddr + "." + symbolicAddr + "." + symbolicAddr + "." + symbolicAddr)));
-            	}
-            	
-            }
-        }
-        
-        nodeHasAddr = ctx.mkFuncDecl("nodeHasAddr", new Sort[]{nodeType, addressType},ctx.mkBoolSort());
-        addrToNode = ctx.mkFuncDecl("addrToNode", addressType, nodeType);
         deny = ctx.mkFuncDecl("deny", new Sort[]{ nodeType, ctx.mkIntSort()},ctx.mkBoolSort());
-        rule = ctx.mkFuncDecl("rule", new Sort[]{ nodeType, ctx.mkIntSort()},ctx.mkBoolSort());
     }
     
     
@@ -519,7 +437,7 @@ public class NetContext {
      * This methods maps each node to an address
      */
     public void setAddressMappings() {
-    	for (AllocationNode an : allocationNodes.values()) {
+    	/*for (AllocationNode an : allocationNodes.values()) {
 			Expr a_0 = ctx.mkConst(an.getZ3Name() + "_address_mapping_a_0", addressType);
 			ArrayList<BoolExpr> or_clause = new ArrayList<BoolExpr>();
 			// Constraint 1 addrToNode(foreach ad in addr) = node
@@ -535,7 +453,7 @@ public class NetContext {
 					ctx.mkEq(ctx.mkOr(or_clause.toArray(orClause)), nodeHasAddr.apply(an.getZ3Name(), a_0)), 1,
 					null, null, null, null));
 
-		}
+		}*/
     }
     
    
