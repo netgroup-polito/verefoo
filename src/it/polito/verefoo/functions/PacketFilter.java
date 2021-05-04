@@ -133,13 +133,20 @@ public class PacketFilter extends GenericFunction{
     	}
     	for(Map<Integer, Integer> flowMap : source.getMapFlowIdAtomicPredicatesInInput().values()) {
     		for(Integer traffic : flowMap.values()) {
-    			constraints.add(ctx.mkImplies(
-    					ctx.mkAnd((BoolExpr) nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), used, ctx.mkEq(whitelist, ctx.mkFalse())),
-    					ctx.mkEq(nctx.rule.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkTrue())));
-    			constraints.add(ctx.mkImplies(
-    					ctx.mkAnd(ctx.mkNot( (BoolExpr) nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic))), used, ctx.mkEq(whitelist, ctx.mkTrue())),
-    					ctx.mkEq(nctx.rule.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkTrue())));
-    			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq(nctx.rule.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()), "fw_auto_conf"));
+    			BoolExpr rule = (BoolExpr) ctx.mkConst(pf + "_rule_" + traffic, ctx.mkBoolSort());
+    			constraints.add(
+    					ctx.mkEq(
+    							(BoolExpr) nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)),
+    							ctx.mkAnd(
+    									used,
+    									ctx.mkOr(
+    											ctx.mkAnd(whitelist, ctx.mkNot(rule)),
+    											ctx.mkAnd(ctx.mkNot(whitelist), rule)
+    											)
+    									)
+    							)
+    					);
+    			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq(rule, ctx.mkFalse()), "fw_auto_conf"));
     		}
     	}
     
