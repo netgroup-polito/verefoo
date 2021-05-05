@@ -40,11 +40,8 @@ public class PacketFilter extends GenericFunction{
 	BoolExpr behaviour;
 	FuncDecl rule_func;
 	// blacklisting and defaultAction must match
-	private BoolExpr blacklisting_z3;
 	boolean blacklisting;
 	boolean defaultActionSet;
-	private WildcardManager wildcardManager;
-	private String ipAddress;
 	DatatypeExpr pf;
 	private BoolExpr whitelist;
 	
@@ -60,10 +57,8 @@ public class PacketFilter extends GenericFunction{
 		this.source = source;
 		this.ctx = ctx;
 		this.nctx = nctx;
-		this.wildcardManager = wildcardManager;
 		
 		pf = source.getZ3Name();
-		ipAddress = source.getNode().getName();
 		constraints = new ArrayList<BoolExpr>();
    		rules = new ArrayList<>();
 		isEndHost = false;
@@ -213,7 +208,6 @@ public class PacketFilter extends GenericFunction{
 	 * @param action The boolean is true for blacklisting, false for whitelisting.
 	 */
 	public void setDefaultAction(boolean action){
-		blacklisting_z3 = action? ctx.mkTrue(): ctx.mkFalse();
 		this.setBlacklisting(action);
 	}
 

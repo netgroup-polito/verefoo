@@ -20,6 +20,7 @@ import it.polito.verefoo.allocation.AllocationManager;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
+import it.polito.verefoo.functions.StatefulPacketFilter;
 import it.polito.verefoo.graph.IPAddress;
 import it.polito.verefoo.graph.PortInterval;
 import it.polito.verefoo.graph.Predicate;
@@ -221,8 +222,6 @@ public class VerefooProxy {
 								continue; //already checked
 							boolean foundIntersection = false;
 							for(Predicate allowed: path.get(index).getForwardBehaviourPredicateList()) {
-								System.out.println("Iterazione per Allowed Predicate ");
-								allowed.print();
 								Predicate intersectionPredicate = aputils.computeIntersection(networkAtomicPredicates.get(ap), allowed);
 								if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, networkAtomicPredicates.get(ap))) {
 									foundIntersection = true;	
@@ -537,6 +536,11 @@ public class VerefooProxy {
 				
 				//the algorithm returns the allowed predicates list (if we want also the denied predicates list, we can compute allowed list negation)
 				allocationNodes.get(node.getName()).setForwardBehaviourPredicateList(allowedList);
+			} else if(node.getFunctionalType() == FunctionalTypes.STATEFUL_FIREWALL) {
+				
+				AllocationNode an  = allocationNodes.get(node.getName());
+				StatefulPacketFilter spf = (StatefulPacketFilter) an.getPlacedNF();
+				
 			}
 		}
 
