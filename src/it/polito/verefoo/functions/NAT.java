@@ -55,7 +55,6 @@ public class NAT extends GenericFunction {
 		
 		for(Map<Integer, Integer> flowMap : source.getMapFlowIdAtomicPredicatesInInput().values()) {
     		for(Integer traffic : flowMap.values()) {
-    			System.out.println(traffic);
     			constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
     		}
     		

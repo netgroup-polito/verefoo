@@ -94,7 +94,6 @@ public class VerefooProxy {
 		this.paths = paths;
 		this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
 		
-		//TODO: remove (Budapest)
 		//Creation of the z3 context
 		HashMap<String, String> cfg = new HashMap<String, String>();
 		cfg.put("model", "true");
@@ -220,19 +219,27 @@ public class VerefooProxy {
 							//If the node is a firewall, check if the predicate is allowed to pass or if it is dropped
 							if(path.get(index).getForwardBehaviourList().contains(ap) || path.get(index).getDroppedList().contains(ap))
 								continue; //already checked
+							boolean foundIntersection = false;
 							for(Predicate allowed: path.get(index).getForwardBehaviourPredicateList()) {
+								System.out.println("Iterazione per Allowed Predicate ");
+								allowed.print();
 								Predicate intersectionPredicate = aputils.computeIntersection(networkAtomicPredicates.get(ap), allowed);
 								if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, networkAtomicPredicates.get(ap))) {
-									//the predicate is allowed to pass
-									path.get(index).addForwardingPredicate(ap);
-								} else {
-									//the predicate should be dropped
-									path.get(index).addDroppedPredicate(ap);
-								}
+									foundIntersection = true;	
+									break;
+								} 
+							}
+							
+							if(foundIntersection) {
+								path.get(index).addForwardingPredicate(ap);
+							} else {
+								path.get(index).addDroppedPredicate(ap);
 							}
 						}
 						index++;
 					}
+					
+					
 				}
 			}
 		}

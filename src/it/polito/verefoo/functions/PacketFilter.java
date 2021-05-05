@@ -93,11 +93,14 @@ public class PacketFilter extends GenericFunction{
 		
 		Node n = source.getNode();
 		if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
-			
+			System.out.println("Allowed");
 			for(Integer traffic : source.getForwardBehaviourList()) {
+				System.out.println(traffic);
 				constraints.add(ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
 			}
+			System.out.println("Dropped");
 			for(Integer traffic : source.getDroppedList()) {
+				System.out.println(traffic);
 				constraints.add(ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkTrue()));
 			}
 		}
