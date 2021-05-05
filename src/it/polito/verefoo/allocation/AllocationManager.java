@@ -265,7 +265,7 @@ public class AllocationManager {
 				endHost.configureEndHost();
 			}else if(node.getFunctionalType() == FunctionalTypes.NAT) {	
 				NAT nat = (NAT) no;
-				nat.natConfiguration(nctx.addressMap.get(node.getName()));	
+				nat.natConfiguration();	
 			}else if(node.getFunctionalType() == FunctionalTypes.LOADBALANCER) {	
 				LoadBalancer lb = (LoadBalancer) no;
 				lb.loadBalancerConfiguration(nctx.addressMap.get(node.getName()));		

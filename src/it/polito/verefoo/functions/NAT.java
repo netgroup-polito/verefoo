@@ -2,6 +2,7 @@ package it.polito.verefoo.functions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.microsoft.z3.BoolExpr;
@@ -39,7 +40,7 @@ public class NAT extends GenericFunction {
 		this.nctx = nctx;
 		nat = source.getZ3Name();
 		constraints = new ArrayList<BoolExpr>();
-		private_addr_func = ctx.mkFuncDecl(nat + "_nat_func", nctx.addressType, ctx.mkBoolSort()); 
+		//private_addr_func = ctx.mkFuncDecl(nat + "_nat_func", nctx.addressType, ctx.mkBoolSort()); 
 		used = ctx.mkTrue();
 		private_addresses = source.getNode().getConfiguration().getNat().getSource().stream().collect(Collectors.toList());	
 	}
@@ -50,24 +51,25 @@ public class NAT extends GenericFunction {
 	 * This method creates the hard constraints for the NAT configuration and status
 	 * @param natIp
 	 */
-	public void natConfiguration(DatatypeExpr natIp) {
+	public void natConfiguration() {
 		
-		for(FlowPath flow : source.getFlows().values()) {
+		for(Map<Integer, Integer> flowMap : source.getMapFlowIdAtomicPredicatesInInput().values()) {
+    		for(Integer traffic : flowMap.values()) {
+    			System.out.println(traffic);
+    			constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
+    		}
+    		
+    	}
+		
+		/*for(FlowPath flow : source.getFlows().values()) {
 			Traffic traffic = flow.getCrossedTraffic(source.getNode().getName());
 			if(private_addresses.contains(traffic.getIPSrc())) {
 				
-				/*
-				 * First case: the source IP address belongs to an internal node
-				 * In this case: deny(nat, t) = false
-				 */
+	
 				constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse()));
 			} else {
 				
-				/*
-				 * Second case: the source IP address does not belong to an internal node
-				 * A possible opposite flow is researched.
-				 */
-				
+
 				AllocationNode next = null;
 				boolean after = false;
 				for(AllocationNode an : flow.getPath().getNodes()) {
@@ -95,9 +97,7 @@ public class NAT extends GenericFunction {
 				
 				if(statusFound) {
 					
-					/*
-					 * It if is found, a hard constraint to check if the opposite traffic is not blocked must be defined.
-					 */
+			
 
 					List<BoolExpr> singleConstraints = new ArrayList<>();
 					for(AllocationNode node : status.getPath().getNodes()) {
@@ -117,7 +117,7 @@ public class NAT extends GenericFunction {
 				
 			}
 		
-		}
+		}*/
 	
 
 	}
