@@ -22,7 +22,7 @@ public class z3Translator {
 		return "define-fun .*"+n.getName()+".*_auto_src.* Address\n  \\(ip_constructor .*\\)\\)"; 
 	}
 	public static String stringToSearchFwDestination(Node n, String nrOfRule){
-		return "define-fun .*"+n.getName()+".*_auto_dst_"+nrOfRule+".* Address\n  \\(ip_constructor .*\\)\\)";
+		return "define-fun .*"+n.getName()+".*_auto_dst_"+nrOfRule+"(\\D)* Address\n  \\(ip_constructor .*\\)\\)";
 	}
 	public static String stringToSearchFwProtocol(Node n, String nrOfRule){
 		return "define-fun .*"+n.getName()+".*_auto_proto_"+nrOfRule+".* Int\n  .*\\)";
