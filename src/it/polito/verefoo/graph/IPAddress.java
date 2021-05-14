@@ -7,6 +7,25 @@ public class IPAddress {
 	String fourthByte;
 	boolean neg;
 	
+	public IPAddress(IPAddress toCopy) {
+		super();
+		this.firstByte = toCopy.getFirstByte();
+		this.secondByte = toCopy.getSecondByte();
+		this.thirdByte = toCopy.getThirdByte();
+		this.fourthByte = toCopy.getFourthByte();
+		this.neg = toCopy.isNeg();
+	}
+	
+	public IPAddress(IPAddress toCopy, boolean neg) {
+		super();
+		this.firstByte = toCopy.getFirstByte();
+		this.secondByte = toCopy.getSecondByte();
+		this.thirdByte = toCopy.getThirdByte();
+		this.fourthByte = toCopy.getFourthByte();
+		this.neg = neg;
+	}
+	
+	
 	public IPAddress(String fistByte, String secondByte, String thirdByte, String fourthByte, boolean neg) {
 		super();
 		this.firstByte = fistByte;
@@ -105,4 +124,45 @@ public class IPAddress {
 			return true;
 		return false;
 	}
+	
+	//This method is used to understand if the IPAddress has wildcards. It returns:
+		//1 if it has wildcards in byte 1,2,3,4 es *.*.*.*
+		//2 if it has wildcards in byte 2,3,4 es 10.*.*.*
+		//3 if it has wildcards in byte 3,4 es 10.0.*.*
+		//4 if it has wildcards in byte 4 es 10.0.0.*
+		//5 if it has no wildcards
+		public int hasWildcardsInByte() {
+			if(firstByte.equals("-1"))
+				return 1;
+			else if(secondByte.equals("-1"))
+				return 2;
+			else if(thirdByte.equals("-1"))
+				return 3;
+			else if(fourthByte.equals("-1"))
+				return 4;
+			else return 5;	
+		}
+
+		public int getByteNumber(int byteNumber) {
+			if(byteNumber == 1)
+				return Integer.valueOf(firstByte);
+			else if(byteNumber == 2)
+				return Integer.valueOf(secondByte);
+			else if(byteNumber == 3)
+				return Integer.valueOf(thirdByte);
+			else
+				return Integer.valueOf(fourthByte);
+		}
+		
+		public void setByteNumberWithValue(int byteNumber, int value) {
+			if(byteNumber == 1)
+				firstByte = String.valueOf(value);
+			else if(byteNumber == 2)
+				secondByte = String.valueOf(value);
+			else if(byteNumber == 3)
+				thirdByte = String.valueOf(value);
+			else
+				fourthByte = String.valueOf(value);
+		}
+
 }

@@ -73,7 +73,7 @@ public class VerefooSerializer {
 				time =  (int) res.getTime(); 
 				
 				if (res.result != Status.UNSATISFIABLE && res.result != Status.UNKNOWN) {
-					Translator t = new Translator(res.model.toString(), root, g, test.getAllocationNodes(), test.getTrafficFlowsMap());
+					Translator t = new Translator(res.model.toString(), root, g, test.getAllocationNodes(), test.getTrafficFlowsMap(), test.getNetworkAtomicPredicates());
 					z3Model = res.model.toString();
 					t.setNormalizer(norm);
 					result = t.convert();

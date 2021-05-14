@@ -21,6 +21,9 @@ public class z3Translator {
 	public static String stringToSearchNode(Node n){
 		return "define-fun .*"+n.getName()+".*_auto_src.* Address\n  \\(ip_constructor .*\\)\\)"; 
 	}
+	public static String stringToSearchRule(Node n){
+		return "define-fun .*"+n.getName()+".*_rule.* Bool\n  .*\\)"; 
+	}
 	public static String stringToSearchFwDestination(Node n, String nrOfRule){
 		return "define-fun .*"+n.getName()+".*_auto_dst_"+nrOfRule+".* Address\n  \\(ip_constructor .*\\)\\)";
 	}
@@ -29,6 +32,9 @@ public class z3Translator {
 	}	
 	public static String stringToSearchFwAction(Node n, String defAction){
 		return "define-fun .*"+n.getName()+".*_auto_"+defAction+".* Bool\n  .*\\)";
+	}
+	public static String stringToSearchWhitelisting(Node n){
+		return "define-fun .*"+n.getName()+".*_whitelist.* Bool\n  .*\\)";
 	}
 	public static String stringToSearchFwPort(Node n, String nrOfRule, String srcOrDest){
 		return "define-fun .*"+n.getName()+".*_auto_"+srcOrDest+"p_"+nrOfRule+".* PortRange\n  \\(port_range_constructor .*\\)\\)";
@@ -76,6 +82,10 @@ public class z3Translator {
 	public static String matchComplexAttribute(String match, Datatype datatype){
         match = match.replace("|", "");
 		return match.substring(match.lastIndexOf(datatype.name())+datatype.name().length()+1, match.lastIndexOf("))"));
+	}
+	
+	public static String matchRuleNumber(String match){
+		return match.substring(match.lastIndexOf("_")+1, match.lastIndexOf("|"));
 	}
 
 	public static String saneString(String s){

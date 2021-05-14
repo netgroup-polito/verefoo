@@ -112,6 +112,9 @@ public class VerefooProxy {
 		 * 4) then all atomic flows are computed 
 		 */
 		
+		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
+		allocationManager.instantiateFunctions();
+		
 		/* Atomic predicates */
 		aputils = new APUtils();
 		long t1 = System.currentTimeMillis();
@@ -129,11 +132,9 @@ public class VerefooProxy {
 		t1 =  System.currentTimeMillis();
 		testResults.setAtomicFlowsCompTime(t1-t2);
 		
-		//TODO: remove (Budapest)
-		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
-		allocationManager.instantiateFunctions();
-		allocateFunctions();
+
 		//distributeTrafficFlows();
+		allocateFunctions();
 		allocationManager.configureFunctions();
 		
 		check = new Checker(ctx, nctx, allocationNodes);
@@ -235,6 +236,58 @@ public class VerefooProxy {
 								path.get(index).addDroppedPredicate(ap);
 							}
 						}
+						
+						if(transformersNode.containsKey(path.get(index).getIpAddress()) 
+								&& transformersNode.get(path.get(index).getIpAddress()).getFunctionalType() == FunctionalTypes.STATEFUL_FIREWALL) {
+							StatefulPacketFilter spf = (StatefulPacketFilter) path.get(index).getPlacedNF();
+							if(spf.getAllowAtomicPredicates().values().contains(ap) || spf.getDenyAtomicPredicates().contains(ap) || spf.getAllowCondAtomicPredicates().values().contains(ap) || spf.getAllowCondInvAtomicPredicates().values().contains(ap))
+								continue; //already checked
+							
+							boolean foundIntersection = false;
+							System.out.println("ALLOWEDCOND: " );
+							for(Map.Entry<Integer,Predicate> allowedCond: spf.getAllowCondPredicates().entrySet()) {
+								allowedCond.getValue().print();
+								Predicate intersectionPredicate = aputils.computeIntersection(networkAtomicPredicates.get(ap), allowedCond.getValue());
+								if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, networkAtomicPredicates.get(ap))) {
+									foundIntersection = true;	
+									spf.addAllowCondAtomicPredicate(allowedCond.getKey(), ap);
+									break;
+								} 
+							}
+							if(!foundIntersection) {
+								System.out.println("ALLOWEDCONDINV: " );
+								for(Map.Entry<Integer,Predicate> allowedCondInv: spf.getAllowCondInvPredicates().entrySet()) {
+									allowedCondInv.getValue().print();
+									Predicate intersectionPredicate = aputils.computeIntersection(networkAtomicPredicates.get(ap), allowedCondInv.getValue());
+									if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, networkAtomicPredicates.get(ap))) {
+										foundIntersection = true;	
+										spf.addAllowCondInvAtomicPredicate(allowedCondInv.getKey(), ap);
+										break;
+									} 
+								}
+								if(!foundIntersection) {
+									System.out.println("ALLOWED: " );
+									for(Map.Entry<Integer,Predicate> allowed: spf.getAllowPredicates().entrySet()) {
+										allowed.getValue().print();
+										Predicate intersectionPredicate = aputils.computeIntersection(networkAtomicPredicates.get(ap), allowed.getValue());
+										if(intersectionPredicate != null && aputils.APCompare(intersectionPredicate, networkAtomicPredicates.get(ap))) {
+											foundIntersection = true;	
+											spf.addAllowAtomicPredicate(allowed.getKey(), ap);
+											break;
+										} 
+									}
+									if(!foundIntersection) {
+										System.out.println("DENIED: " );
+										System.out.println(ap);
+										spf.addDenyAtomicPredicate(ap);
+									}
+								}
+							}
+							
+						}
+						
+						
+						
 						index++;
 					}
 					
@@ -541,6 +594,145 @@ public class VerefooProxy {
 				AllocationNode an  = allocationNodes.get(node.getName());
 				StatefulPacketFilter spf = (StatefulPacketFilter) an.getPlacedNF();
 				
+				
+				List<Predicate> allowedList = new ArrayList<>();
+				List<Predicate> deniedList = new ArrayList<>();
+				int aIndex = 0;
+		   		int dIndex = 0;
+		   		int acIndex = 0;
+				
+				boolean deniedListChanged = false;
+				for(Elements rule: node.getConfiguration().getStatefulFirewall().getElements()) {
+					if(rule.getAction().equals(ActionTypes.DENY)) {
+						//deny <--- deny V rule-i
+						Predicate predicate = new Predicate(rule.getSource(), false, rule.getDestination(), false, 
+								rule.getSrcPort(), false, rule.getDstPort(), false, rule.getProtocol());
+						deniedList.add(predicate);
+						spf.addDenyPredicate(dIndex++, predicate);
+						deniedListChanged = true;
+					} else if (rule.getAction().equals(ActionTypes.ALLOW)) {
+						//allowed <--- allowed V (rule-i AND !denied)
+						Predicate toAdd = new Predicate(rule.getSource(), false, rule.getDestination(), false, 
+								rule.getSrcPort(), false, rule.getDstPort(), false, rule.getProtocol());
+						List<Predicate> allowedToAdd = aputils.computeAllowedForRule(toAdd, deniedList, deniedListChanged);
+						for(Predicate allow: allowedToAdd) {
+							if(!aputils.isPredicateContainedIn(allow, allowedList))
+								allowedList.add(allow);
+						}
+						//spf.addAllowPredicate(aIndex++, toAdd);
+					} else {
+						Predicate predicate = new Predicate(rule.getSource(), false, rule.getDestination(), false, 
+								rule.getSrcPort(), false, rule.getDstPort(), false, rule.getProtocol());
+						Predicate invPredicate = new Predicate(rule.getDestination(), false, rule.getSource(), false, 
+								rule.getDstPort(), false, rule.getSrcPort(), false, rule.getProtocol());
+						if(node.getConfiguration().getStatefulFirewall().getDefaultAction().equals(ActionTypes.DENY)) {
+							List<Predicate> allowedToAdd = aputils.computeAllowedForRule(predicate, deniedList, deniedListChanged);
+							for(Predicate allow: allowedToAdd) {
+								if(!aputils.isPredicateContainedIn(allow, allowedList))
+									allowedList.add(allow);
+							}
+						}
+						spf.addAllowCondPredicate(acIndex, predicate);
+						spf.addAllowCondInvPredicate(acIndex++, invPredicate);
+					}
+				}
+				//Check default action: if DENY do nothing
+				if(node.getConfiguration().getStatefulFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
+					Predicate toAdd = new Predicate("*", false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY);
+					List<Predicate> allowedToAdd = aputils.computeAllowedForRule(toAdd, deniedList, deniedListChanged);
+					for(Predicate allow: allowedToAdd) {
+						if(!aputils.isPredicateContainedIn(allow, allowedList))
+							allowedList.add(allow);
+					}
+				}
+				
+				//Insert allowed list into predicates (with optimization)
+				for(Predicate p: allowedList) {
+					
+					//insert allowed list in the map of SPF
+					spf.addAllowPredicate(aIndex++, p);
+					
+					
+					for(IPAddress IPSrc: p.getIPSrcList()) {
+						String ips = IPSrc.toString();
+						if(!srcList.contains(ips)) {
+							srcList.add(ips);
+							predicates.add(new Predicate(ips, false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(IPAddress IPDst: p.getIPDstList()) {
+						String ipd = IPDst.toString();
+						if(!dstList.contains(ipd)) {
+							dstList.add(ipd);
+							predicates.add(new Predicate("*", false, ipd, false, "*", false, "*", false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(PortInterval pSrc: p.getpSrcList()) {
+						String ps = pSrc.toString();
+						if(!srcPList.contains(ps)) {
+							srcPList.add(ps);
+							predicates.add(new Predicate("*", false, "*", false, ps, false, "*", false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(PortInterval pDst: p.getpDstList()) {
+						String pd = pDst.toString();
+						if(!dstPList.contains(pd)) {
+							dstPList.add(pd);
+							predicates.add(new Predicate("*", false, "*", false, "*", false, pd, false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(L4ProtocolTypes proto: p.getProtoTypeList()) {
+						if(!dstProtoList.contains(proto)) {
+							dstProtoList.add(proto);
+							predicates.add(new Predicate("*", false, "*", false, "*", false, "*", false, proto));
+						}
+					}
+				}
+				
+				//Insert predicates related to the "conditional allow" rules
+				List<Predicate> mergedList = new ArrayList<>();
+				mergedList.addAll(spf.getAllowCondPredicates().values());
+				mergedList.addAll(spf.getAllowCondInvPredicates().values());
+				for(Predicate p : mergedList) {
+					for(IPAddress IPSrc: p.getIPSrcList()) {
+						String ips = IPSrc.toString();
+						if(!srcList.contains(ips)) {
+							srcList.add(ips);
+							predicates.add(new Predicate(ips, false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(IPAddress IPDst: p.getIPDstList()) {
+						String ipd = IPDst.toString();
+						if(!dstList.contains(ipd)) {
+							dstList.add(ipd);
+							predicates.add(new Predicate("*", false, ipd, false, "*", false, "*", false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(PortInterval pSrc: p.getpSrcList()) {
+						String ps = pSrc.toString();
+						if(!srcPList.contains(ps)) {
+							srcPList.add(ps);
+							predicates.add(new Predicate("*", false, "*", false, ps, false, "*", false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(PortInterval pDst: p.getpDstList()) {
+						String pd = pDst.toString();
+						if(!dstPList.contains(pd)) {
+							dstPList.add(pd);
+							predicates.add(new Predicate("*", false, "*", false, "*", false, pd, false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(L4ProtocolTypes proto: p.getProtoTypeList()) {
+						if(!dstProtoList.contains(proto)) {
+							dstProtoList.add(proto);
+							predicates.add(new Predicate("*", false, "*", false, "*", false, "*", false, proto));
+						}
+					}
+				}
+				
+				//the algorithm returns the allowed predicates list (if we want also the denied predicates list, we can compute allowed list negation)
+				allocationNodes.get(node.getName()).setForwardBehaviourPredicateList(allowedList);
+				
 			}
 		}
 
@@ -700,7 +892,8 @@ public class VerefooProxy {
 			List<AllocationNode> pathToStore = new ArrayList<>();
 			for(int i = 0; i < currentPath.size(); i++) {
 				if((currentPath.get(i).getNode().getFunctionalType() == FunctionalTypes.NAT 
-						|| currentPath.get(i).getNode().getFunctionalType() == FunctionalTypes.FIREWALL)
+						|| currentPath.get(i).getNode().getFunctionalType() == FunctionalTypes.FIREWALL
+						|| currentPath.get(i).getNode().getFunctionalType() == FunctionalTypes.STATEFUL_FIREWALL)
 						&& !transformersNode.containsKey(currentPath.get(i).getNode().getName()))
 					transformersNode.put(currentPath.get(i).getNode().getName(), currentPath.get(i).getNode());
 				pathToStore.add(i, currentPath.get(i));
@@ -805,4 +998,58 @@ public class VerefooProxy {
 	public TestResults getTestTimeResults() {
 		return testResults;
 	}
+
+	public Context getCtx() {
+		return ctx;
+	}
+
+	public List<Property> getProperties() {
+		return properties;
+	}
+
+	public List<Path> getPaths() {
+		return paths;
+	}
+
+	public WildcardManager getWildcardManager() {
+		return wildcardManager;
+	}
+
+	public HashMap<Integer, SecurityRequirement> getSecurityRequirements() {
+		return securityRequirements;
+	}
+
+	public Checker getCheck() {
+		return check;
+	}
+
+	public List<Node> getNodes() {
+		return nodes;
+	}
+
+	public List<NodeMetrics> getNodeMetrics() {
+		return nodeMetrics;
+	}
+
+	public AllocationManager getAllocationManager() {
+		return allocationManager;
+	}
+
+	public APUtils getAputils() {
+		return aputils;
+	}
+
+	public HashMap<Integer, Predicate> getNetworkAtomicPredicates() {
+		return networkAtomicPredicates;
+	}
+
+	public HashMap<String, Node> getTransformersNode() {
+		return transformersNode;
+	}
+
+	public TestResults getTestResults() {
+		return testResults;
+	}
+	
+	
 }

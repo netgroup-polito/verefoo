@@ -2,6 +2,7 @@ package it.polito.verefoo.utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import it.polito.verefoo.graph.IPAddress;
@@ -511,4 +512,164 @@ public class APUtils {
 		}
 		return retList;
 	}
+	
+	
+	//This method transform a complex predicate in a list of simple tuple in OR
+		public List<Predicate> complexPredicatetoOrTuples(Predicate inputPredicate){
+			List<Predicate> returnList = new ArrayList<>();
+			
+			List<IPAddress> differentIPSrcAddressList = complexIPAddressListInAndToOr(inputPredicate.getIPSrcList());
+			List<IPAddress> differentIPDstAddressList = complexIPAddressListInAndToOr(inputPredicate.getIPDstList());
+			List<PortInterval> differentPSrcList = complexPortIntervalListInAndToOr(inputPredicate.getpSrcList());
+			List<PortInterval> differentPDstList = complexPortIntervalListInAndToOr(inputPredicate.getpDstList());
+			
+			for(IPAddress IPSrc: differentIPSrcAddressList) {
+				for(IPAddress IPDst: differentIPDstAddressList) {
+					for(PortInterval pSrc: differentPSrcList) {
+						for(PortInterval pDst: differentPDstList) {
+							for(L4ProtocolTypes proto: inputPredicate.getProtoTypeList()) {
+								returnList.add(new Predicate(IPSrc.toString(), false, IPDst.toString(), false, 
+										pSrc.toString(), false, pDst.toString(), false, proto));
+							}
+						}
+					}
+				}
+			}
+			
+			return returnList;
+		}
+		
+		public List<IPAddress> complexIPAddressListInAndToOr(List<IPAddress> list){
+			List<IPAddress> differentIPAddressList = new ArrayList<>();
+			HashMap<Integer, List<IPAddress>> IPSrcAddressWildcardsMap = new HashMap<>();
+			IPAddress startingIPAddress = null;
+			int firstByteWithWildcard = 5;
+			
+			for(IPAddress IPSrc: list) {
+				if(IPSrc.toString().equals("*"))
+					continue;
+				int n = IPSrc.hasWildcardsInByte();
+				if(n < firstByteWithWildcard) {
+					firstByteWithWildcard = n;
+					startingIPAddress = new IPAddress(IPSrc, false);
+				}
+				if(IPSrcAddressWildcardsMap.containsKey(n)) {
+					IPSrcAddressWildcardsMap.get(n).add(IPSrc);
+				} else {
+					List<IPAddress> newList = new ArrayList<>();
+					newList.add(IPSrc);
+					IPSrcAddressWildcardsMap.put(n, newList);
+				}
+			}
+			
+			if(firstByteWithWildcard == 5) {
+				//no wildcards in IPAddress
+				differentIPAddressList.add(list.get(0));
+			} else {
+				recursiveGenIPAddress(firstByteWithWildcard, startingIPAddress, IPSrcAddressWildcardsMap, differentIPAddressList);
+			}
+			
+			//DEBUG: print list
+//			System.out.println("IPAddress list size " + differentIPAddressList.size());
+//			for(IPAddress ip: differentIPAddressList) {
+//				System.out.println(ip.toString());
+//			}
+			//END DEBUG
+			
+			return differentIPAddressList; 
+		}
+		
+		public void recursiveGenIPAddress(int byteNumber, IPAddress startingAddress, HashMap<Integer, List<IPAddress>> IPWildcardsMap,
+				List<IPAddress> differentIPAddressList) {
+			
+			if(byteNumber == 5) {
+				//Agguingo e termino la ricorsione
+				differentIPAddressList.add(startingAddress);
+				return;
+			}
+			
+			//Get number to eliminate
+			List<Integer> toEliminateList = new ArrayList<>();
+			if(IPWildcardsMap.containsKey(byteNumber+1)) {
+				for(IPAddress ip: IPWildcardsMap.get(byteNumber+1)) {
+					if(ip.isIncludedIn(startingAddress)) {
+						toEliminateList.add(ip.getByteNumber(byteNumber));
+					}
+				}
+			}
+			List<Integer> toControlList = new ArrayList<>();
+			for(int z=byteNumber+2; z<=5; z++) {
+				if(IPWildcardsMap.containsKey(z)) {
+					for(IPAddress ip: IPWildcardsMap.get(z)) {
+						if(ip.isIncludedIn(startingAddress)) {
+							toControlList.add(ip.getByteNumber(byteNumber));
+						}
+					}
+				}
+			}
+			
+			if(toEliminateList.size() == 0 && toControlList.size() == 0) {
+				//Questo predicato viene aggiunto così com'è alla lista e posso terminare la ricorsione
+				differentIPAddressList.add(startingAddress);
+				return;
+			} else {
+				for(int i=0; i<256; i++) {
+					//continuo la ricorsione
+					if(!toEliminateList.contains(i)) {
+						IPAddress newIPAddress = new IPAddress(startingAddress, false);
+						newIPAddress.setByteNumberWithValue(byteNumber, i);
+						recursiveGenIPAddress(byteNumber+1, newIPAddress, IPWildcardsMap, differentIPAddressList);
+					}
+				}
+			}
+		}
+
+		public List<PortInterval> complexPortIntervalListInAndToOr(List<PortInterval> list){
+			List<PortInterval> returnList = new ArrayList<>();
+			PortInterval largestPI = null;
+			List<PortInterval> otherIntervalList = new ArrayList<>();
+			
+			//Compute largest interval
+			for(PortInterval pi: list) {
+				if(!pi.isNeg())
+					largestPI = pi;
+				else otherIntervalList.add(pi);
+			}
+			
+			if(otherIntervalList.size() == 0) {
+				returnList.add(largestPI);
+				return returnList;
+			}
+			
+			//Sort by increasing min
+			Collections.sort(otherIntervalList, new PortIntervalComparator());
+			
+			int index = 0;
+			for(PortInterval pi: otherIntervalList) {
+				if(index == 0) {
+					//first port interval
+					if(pi.getMin() > largestPI.getMin()) {
+						returnList.add(new PortInterval(largestPI.getMin(), pi.getMin()-1, false));
+					}
+				}
+				else {
+					PortInterval previousPI = otherIntervalList.get(index-1);
+					returnList.add(new PortInterval(previousPI.getMax()+1, pi.getMin()-1, false));
+				}
+				index++;
+			}
+			PortInterval last = otherIntervalList.get(index-1);
+			if(last.getMax() < largestPI.getMax())
+				returnList.add(new PortInterval(last.getMax()+1, largestPI.getMax(), false));
+			
+			//DEBUG: print list
+//			System.out.println("Lista Port Interval size " + returnList.size());
+//			for(PortInterval pi: returnList)
+//				System.out.println(pi.toString());
+//			System.out.println();
+			//END DEBUG
+			
+			return returnList;
+		}
+
 }
