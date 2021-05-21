@@ -467,7 +467,9 @@ public class TestCaseGeneratorAtomicPredicates {
 		//NOTE: rule for the firewall is randomly selected: set0=allClients, set1=allServers, set2=allNAT
 		int nRules;
 		for(Node firewall: allFirewalls) {
-			nRules = rand.nextInt(maxFWRules);
+			if(rand.nextBoolean())
+				nRules = maxFWRules; //rand.nextInt(maxFWRules);
+			else nRules = 0;
 			if(rand.nextBoolean())
 				firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.ALLOW);
 			else firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.DENY);
