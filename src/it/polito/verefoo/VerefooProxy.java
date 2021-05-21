@@ -795,6 +795,9 @@ public class VerefooProxy {
 			case REACHABILITY_PROPERTY:
 				check.createRequirementConstraints(sr, Prop.REACHABILITY);
 				break;
+			case COMPLETE_REACHABILITY_PROPERTY:
+				check.createRequirementConstraints(sr, Prop.COMPLETE_REACHABILITY);
+				break;
 			default:
 				throw new BadGraphError("Error in the property definition", EType.INVALID_PROPERTY_DEFINITION);
 			}

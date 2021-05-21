@@ -35,7 +35,7 @@ import it.polito.verefoo.utils.VerificationResult;
 	
 public class Checker {
 	public enum Prop {
-	    ISOLATION,REACHABILITY
+	    ISOLATION,REACHABILITY,COMPLETE_REACHABILITY
 	}
 	
 	Context ctx;
@@ -144,6 +144,9 @@ public class Checker {
 			case REACHABILITY:
 				createReachabilityConstraint(sr);
 				break;
+			case COMPLETE_REACHABILITY:
+				createCompleteReachabilityConstraint(sr);
+				break;
 		}
 	}
 
@@ -183,6 +186,43 @@ public class Checker {
 		BoolExpr finalConstraint = ctx.mkOr(pathConstraints.toArray(arrayConstraints));
 		constraintList.add(finalConstraint);
 	}
+	
+	
+	
+	private void createCompleteReachabilityConstraint(SecurityRequirement sr) {
+		
+		Map<Integer, FlowPath> allFlows = sr.getFlowsMap();
+		List<BoolExpr> pathConstraints = new ArrayList<>();
+		
+		for(FlowPath flowPath : allFlows.values()) {
+			List<BoolExpr> atomicFlowConstraintsInsideFlowPath = new ArrayList<>();
+			for(Map.Entry<Integer, AtomicFlow> atomicFlowEntry: flowPath.getAtomicFlowsMap().entrySet()) {
+				
+				List<BoolExpr> singleConstraints = new ArrayList<>();
+				for(AllocationNode node : flowPath.getPath()) {
+					int traffic;
+					if(node.getAtomicPredicatesInInputForFlow(flowPath.getIdFlow()) == null)
+						traffic = -1;
+					else
+						traffic = node.getAtomicPredicatesInInputForFlow(flowPath.getIdFlow()).get(atomicFlowEntry.getValue().getFlowId());
+					singleConstraints.add(ctx.mkImplies(node.getPlacedNF().getUsed(), ctx.mkEq( (BoolExpr)nctx.deny.apply(node.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse())));
+				}
+				
+				BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
+				BoolExpr maximalFlowConstraint = ctx.mkAnd(singleConstraints.toArray(arrayConstraints));
+				atomicFlowConstraintsInsideFlowPath.add(maximalFlowConstraint);
+			}
+			
+			BoolExpr[] tmp = new BoolExpr[atomicFlowConstraintsInsideFlowPath.size()];
+			BoolExpr pathConstraint = ctx.mkAnd(atomicFlowConstraintsInsideFlowPath.toArray(tmp));
+			pathConstraints.add(pathConstraint);
+		}
+	
+		BoolExpr[] arrayConstraints = new BoolExpr[pathConstraints.size()];
+		BoolExpr finalConstraint = ctx.mkOr(pathConstraints.toArray(arrayConstraints));
+		constraintList.add(finalConstraint);
+	}
+
 
 	
 	/**

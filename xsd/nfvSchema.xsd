@@ -205,6 +205,7 @@
 	    <xsd:restriction base="xsd:string">
 	      <xsd:enumeration value="IsolationProperty"/>
 	      <xsd:enumeration value="ReachabilityProperty"/>
+	      <xsd:enumeration value="CompleteReachabilityProperty"/>
 	 	</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:complexType name="Property">
