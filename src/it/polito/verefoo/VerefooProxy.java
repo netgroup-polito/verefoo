@@ -757,11 +757,11 @@ public class VerefooProxy {
 		testResults.setnAtomicPredicates(index);
 		
 		//DEBUG: print atomic predicates
-		System.out.println("ATOMIC PREDICATES " + networkAtomicPredicates.size());
-		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
-			System.out.print(entry.getKey() + " ");
-			entry.getValue().print();
-		}
+//		System.out.println("ATOMIC PREDICATES " + networkAtomicPredicates.size());
+//		for(HashMap.Entry<Integer, Predicate> entry: networkAtomicPredicates.entrySet()) {
+//			System.out.print(entry.getKey() + " ");
+//			entry.getValue().print();
+//		}
 		//END DEBUG
 	
 		return networkAtomicPredicates;

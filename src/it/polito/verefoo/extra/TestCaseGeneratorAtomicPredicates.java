@@ -22,7 +22,9 @@ import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 
+import it.polito.verefoo.graph.IPAddress;
 import it.polito.verefoo.jaxb.*;
+import it.polito.verefoo.utils.APUtils;
 import it.polito.verefoo.utils.Tuple;
 
 // Auxiliary class to generate  test cases for performance tests (used by TestPerformanceScalabilityAtomicPredicates)
@@ -43,12 +45,14 @@ public class TestCaseGeneratorAtomicPredicates {
 	NFV originalNFV;
 	
 	Set<String> allIPs;
+	List<String> allIPsWithWildcardsDecomposed;
 	List<Node> allClients;
 	List<Node> allServers;
 	List<Node> allAPs;
 	List<Node> allNATs;
 	List<Node> allFirewalls;
 	List<Tuple<String, Node>> lastAPs;
+	APUtils aputils = new APUtils();
 		
 	public TestCaseGeneratorAtomicPredicates(String name, int numberAllocationPlaces, int numberWebClients, int numberWebServers, 
 			int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, 
@@ -64,6 +68,7 @@ public class TestCaseGeneratorAtomicPredicates {
 		lastAPs = new ArrayList<Tuple<String, Node>>();
 
 		allIPs = new HashSet<String>();
+		allIPsWithWildcardsDecomposed = new ArrayList<String>();
 		nfv = generateNFV(numberAllocationPlaces, numberWebClients, numberWebServers, numberReachPolicies, numberIsPolicies, numberNAT, numberFirewall, 
 				maxNATSrcs, maxFWRules, percReqWithPorts, hasFwRulesTakenFromReq, rand);
 	}
@@ -109,19 +114,54 @@ public class TestCaseGeneratorAtomicPredicates {
 		return ip;
 	}
 	
-	private String createRandomIP() {
-		boolean notCreated = true;
+	private String createIPWithWildcards() {
+		String ip;
+		int first, second, third, forth;
+		first = rand.nextInt(256);
+		if(first == 0) first++;
+		second = rand.nextInt(256);
+		third = rand.nextInt(256);
+		forth = -1;
+		ip = new String(first + "." + second + "." + third + "." + forth);
+		return ip;
+	}
+	
+	private String createRandomIP(boolean canContainWildcards) {
+		
+		boolean notCreated = true, withWildcards = false;
+		int n;
 		String ip = null;
 		while(notCreated) {
-			ip = createIP();
-			if(!allIPs.contains(ip)) {
+			if(canContainWildcards) {
+				n = rand.nextInt(6);
+				if(n == 0) {
+					//Ovvero 1/6 probabilità che venga generato con le wildcards
+					ip = createIPWithWildcards();
+					withWildcards = true;
+				} else {
+					ip = createIP();
+				}
+			} else {
+				ip = createIP();
+			}
+			
+			if(!allIPs.contains(ip) && !allIPsWithWildcardsDecomposed.contains(ip)) {
 				notCreated = false;
 				allIPs.add(ip);
+				
+				if(withWildcards) {
+					String[] ipAddress = ip.split("\\.");
+					for(int i=1; i<256; i++) {
+						ipAddress[3] = String.valueOf(i);
+						String newIp = new String(ipAddress[0] + "." + ipAddress[1] + "." + ipAddress[2] + "." + ipAddress[3]);
+						allIPsWithWildcardsDecomposed.add(newIp);
+					}
+				}
 			}
 		}
 		
 		return ip;
-		
+	
 	}
 	
 	
@@ -146,7 +186,7 @@ public class TestCaseGeneratorAtomicPredicates {
 		
 		//creation of servers 
 		for(int i = 0; i < numberWebServers; i++) {
-			String IPServer = createRandomIP();
+			String IPServer = createRandomIP(true);
 			Node server = new Node();
 			server.setFunctionalType(FunctionalTypes.WEBSERVER);
 			server.setName(IPServer);
@@ -163,7 +203,7 @@ public class TestCaseGeneratorAtomicPredicates {
 		
 		//creation of the clients
 		for(int i = 0; i < numberWebClients; i++) {
-			String IPClient = createRandomIP();
+			String IPClient = createRandomIP(true);
 			Node client = new Node();
 			client.setFunctionalType(FunctionalTypes.WEBCLIENT);
 			client.setName(IPClient);
@@ -179,12 +219,12 @@ public class TestCaseGeneratorAtomicPredicates {
 		
 		//central AP
 		Node central = new Node();
-		String ipCentral = createRandomIP();
+		String ipCentral = createRandomIP(false);
 		central.setName(ipCentral);
 	
 		//creation of the others APs
 		for(int i = 0; i < numberAllocationPlaces-1; i++) {
-			String ip = createRandomIP();
+			String ip = createRandomIP(false);
 			Node ap = new Node();
 			ap.setName(ip);
 			allAPs.add(ap);
@@ -192,7 +232,7 @@ public class TestCaseGeneratorAtomicPredicates {
 		
 		//creation of all the NATs
 		for(int i = 0; i < numberNAT; i++) {
-			String ip = createRandomIP();
+			String ip = createRandomIP(false);
 			Node nat = new Node();
 			nat.setName(ip);
 			Configuration confN = new Configuration();
@@ -206,7 +246,7 @@ public class TestCaseGeneratorAtomicPredicates {
 		
 		//creation of all the firewalls
 		for(int i = 0; i < numberFirewall; i++) {
-			String ip = createRandomIP();
+			String ip = createRandomIP(false);
 			Node firewall = new Node();
 			firewall.setFunctionalType(FunctionalTypes.FIREWALL);
 			firewall.setName(ip);
@@ -336,7 +376,20 @@ public class TestCaseGeneratorAtomicPredicates {
 				currentNAT.getNeighbour().add(neighForNat);
 				//random selection if the client has to be added to NAT src (NOTE: NAT src list should contain at least one src)
 				if(rand.nextBoolean() || currentNAT.getConfiguration().getNat().getSource().size() == 0) {
-					currentNAT.getConfiguration().getNat().getSource().add(tuple._1);
+					if(tuple._1.contains("-1")) {
+						//The address contains a wildcard
+						//If the address contains a wildcard we can introduce as NAT src the address with wildcard or a specific IP inside the wildcard
+						String[] splittedIP = tuple._1.split("\\.");
+						String fourth;
+						if(rand.nextBoolean()) {
+							int x = rand.nextInt(254) + 1;
+							fourth = String.valueOf(x);
+						} else {
+							fourth = String.valueOf(-1);
+						}
+						currentNAT.getConfiguration().getNat().getSource().add(new String(splittedIP[0] + "." + splittedIP[1] + "." + splittedIP[2] + "." + fourth));
+					} else 
+						currentNAT.getConfiguration().getNat().getSource().add(tuple._1);
 				}
 
 				if(n == 0) newTupleList.add(new Tuple<String, Node>(currentNAT.getName(), currentNAT));
@@ -467,9 +520,11 @@ public class TestCaseGeneratorAtomicPredicates {
 		//NOTE: rule for the firewall is randomly selected: set0=allClients, set1=allServers, set2=allNAT
 		int nRules;
 		for(Node firewall: allFirewalls) {
+			//introducing some firewalls with zero rules, only with default action
 			if(rand.nextBoolean())
-				nRules = maxFWRules; //rand.nextInt(maxFWRules);
+				nRules =  maxFWRules; //rand.nextInt(maxFWRules);
 			else nRules = 0;
+			
 			if(rand.nextBoolean())
 				firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.ALLOW);
 			else firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.DENY);
@@ -482,7 +537,7 @@ public class TestCaseGeneratorAtomicPredicates {
 					srcNode = p1.getSrc();
 					dstNode = p2.getDst();
 				} else {
-					switch(rand.nextInt(4)) {
+					switch(rand.nextInt(5)) {
 					case 0: 
 						srcNode = allClients.get(rand.nextInt(allClients.size())).getName(); break;
 					case 1: 
@@ -491,8 +546,14 @@ public class TestCaseGeneratorAtomicPredicates {
 						srcNode = allNATs.get(rand.nextInt(allNATs.size())).getName(); break;
 					case 3: 
 						srcNode = "*"; break;
+					case 4: 
+						if(allIPsWithWildcardsDecomposed.size() > 0)
+							srcNode = allIPsWithWildcardsDecomposed.get(rand.nextInt(allIPsWithWildcardsDecomposed.size()));
+						else 
+							srcNode = "*"; 
+						break;
 					}
-					switch(rand.nextInt(4)) {
+					switch(rand.nextInt(5)) {
 					case 0: 
 						dstNode = allClients.get(rand.nextInt(allClients.size())).getName(); break;
 					case 1: 
@@ -501,6 +562,11 @@ public class TestCaseGeneratorAtomicPredicates {
 						dstNode = allNATs.get(rand.nextInt(allNATs.size())).getName(); break;
 					case 3: 
 						dstNode = "*"; break;
+					case 4: 
+						if(allIPsWithWildcardsDecomposed.size() > 0)
+							dstNode = allIPsWithWildcardsDecomposed.get(rand.nextInt(allIPsWithWildcardsDecomposed.size()));
+						else dstNode = "*"; 
+						break;
 					}
 				}
 				
@@ -516,6 +582,35 @@ public class TestCaseGeneratorAtomicPredicates {
 				firewall.getConfiguration().getFirewall().getElements().add(rule);
 			}
 		}
+		
+		//Create loop in the network: take couples of NAT and link them
+		//START CREATE LOOP
+//		boolean found;
+//		for(int i=0; i<2; i++) {
+//			found = false;
+//			Node node1 = allNATs.get(rand.nextInt(allNATs.size()));
+//			Node node2 = allNATs.get(rand.nextInt(allNATs.size()));
+//			
+//			if(!node1.getName().equals(node2.getName())) {
+//				//Check if the two node are already neighbours
+//				for(Neighbour tmpNeig: node1.getNeighbour()) {
+//					if(tmpNeig.getName().equals(node2.getName())) {
+//						found = true;
+//						break;
+//					}
+//				}
+//				if(!found) {
+//					Neighbour neig1 = new Neighbour();
+//					Neighbour neig2  = new Neighbour();
+//					neig1.setName(node2.getName());
+//					neig2.setName(node1.getName());
+//					node1.getNeighbour().add(neig1);
+//					node2.getNeighbour().add(neig2);
+//				} else i--;
+//					
+//			}else i--; //repeat iteration
+//		}
+		//END CREATE LOOP
 
 		//add the nodes in the graph
 		graph.getNode().addAll(allClients);
