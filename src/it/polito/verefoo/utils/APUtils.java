@@ -613,7 +613,7 @@ public class APUtils {
 				differentIPAddressList.add(startingAddress);
 				return;
 			} else {
-				for(int i=0; i<256; i++) {
+				for(int i=1; i<256; i++) {
 					//continuo la ricorsione
 					if(!toEliminateList.contains(i)) {
 						IPAddress newIPAddress = new IPAddress(startingAddress, false);

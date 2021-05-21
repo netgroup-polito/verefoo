@@ -220,7 +220,10 @@ public class VerefooProxy {
 								&& transformersNode.get(path.get(index).getIpAddress()).getFunctionalType() == FunctionalTypes.FIREWALL) {
 							//If the node is a firewall, check if the predicate is allowed to pass or if it is dropped
 							if(path.get(index).getForwardBehaviourList().contains(ap) || path.get(index).getDroppedList().contains(ap))
+								{
+								index++;
 								continue; //already checked
+								}
 							boolean foundIntersection = false;
 							for(Predicate allowed: path.get(index).getForwardBehaviourPredicateList()) {
 								Predicate intersectionPredicate = aputils.computeIntersection(networkAtomicPredicates.get(ap), allowed);
