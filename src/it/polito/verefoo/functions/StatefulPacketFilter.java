@@ -34,14 +34,13 @@ public class StatefulPacketFilter extends GenericFunction{
 	DatatypeExpr pf;
 	private BoolExpr whitelist;
 	
-	int aIndex, dIndex, acIndex;
 	Map<Integer, Predicate> allowPredicates = new HashMap<>();
 	Map<Integer, Predicate> denyPredicates = new HashMap<>();
 	Map<Integer, Predicate> allowCondPredicates = new HashMap<>();
 	Map<Integer, Predicate> allowCondInvPredicates = new HashMap<>();
 	
 	Map<Integer, List<Integer>> allowAtomicPredicates = new HashMap<>();
-	Map<Integer, List<Integer>> denyAtomicPredicates = new HashMap<>();
+	List<Integer> denyAtomicPredicates = new ArrayList<>();
 	Map<Integer, List<Integer>> allowCondAtomicPredicates = new HashMap<>();
 	Map<Integer, List<Integer>> allowCondInvAtomicPredicates = new HashMap<>();
 	
@@ -70,9 +69,8 @@ public class StatefulPacketFilter extends GenericFunction{
    		blacklisting = false;
    		defaultActionSet = false;
    		whitelist = ctx.mkBoolConst(pf+"_whitelist");
-   		aIndex = 0;
-   		dIndex = 0;
-   		acIndex = 0;
+   		used = ctx.mkBoolConst(pf+"_used");
+   		autoplace = false;
 	}
 
 	/**
@@ -83,16 +81,20 @@ public class StatefulPacketFilter extends GenericFunction{
 		if(!autoplace) constraints.add(ctx.mkEq(used, ctx.mkTrue()));
 		
 		Node n = source.getNode();
-		if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
-			System.out.println("Allowed");
-			for(Integer traffic : source.getForwardBehaviourList()) {
-				System.out.println(traffic);
-				constraints.add(ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
+		if(n.getFunctionalType().equals(FunctionalTypes.STATEFUL_FIREWALL)){
+			for(List<Integer> trafficList : allowAtomicPredicates.values()) {
+				for(Integer traffic : trafficList) {
+					constraints.add(ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
+				}		
 			}
-			System.out.println("Dropped");
-			for(Integer traffic : source.getDroppedList()) {
-				System.out.println(traffic);
+			for(Integer traffic : denyAtomicPredicates) {
 				constraints.add(ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkTrue()));
+			}
+			for(Map.Entry<Integer, List<Integer>> allowCondEntry : allowCondAtomicPredicates.entrySet()) {
+				List<Integer> allowCondInvEntry = allowCondInvAtomicPredicates.get(allowCondEntry.getKey());
+				for(Integer traffic : allowCondEntry.getValue()) {
+					
+				}
 			}
 		}
 	}
@@ -115,8 +117,80 @@ public class StatefulPacketFilter extends GenericFunction{
 		this.blacklisting = action;
 		defaultActionSet = true;
 	}
-
 	
+	
+	public void addAllowPredicate(int index, Predicate predicate) {
+		allowPredicates.put(index, predicate);
+		List<Integer> apList = new ArrayList<>();
+		allowAtomicPredicates.put(index, apList);
+	}
+	
+	public void addDenyPredicate(int index, Predicate predicate) {
+		denyPredicates.put(index, predicate);
+		//List<Integer> apList = new ArrayList<>();
+		//denyAtomicPredicates.put(index, apList);
+	}
+	
+	public void addAllowCondPredicate(int index, Predicate predicate) {
+		allowCondPredicates.put(index, predicate);
+		List<Integer> apList = new ArrayList<>();
+		allowCondAtomicPredicates.put(index, apList);
+	}
+	
+	public void addAllowCondInvPredicate(int index, Predicate predicate) {
+		allowCondInvPredicates.put(index, predicate);
+		List<Integer> apList = new ArrayList<>();
+		allowCondInvAtomicPredicates.put(index, apList);
+	}
+	
+	public void addAllowAtomicPredicate(int index, Integer predicate) {
+		allowAtomicPredicates.get(index).add(predicate);
+	}
+	
+	public void addDenyAtomicPredicate(Integer predicate) {
+		denyAtomicPredicates.add(predicate);
+	}
+	
+	public void addAllowCondAtomicPredicate(int index, Integer predicate) {
+		allowCondAtomicPredicates.get(index).add(predicate);
+	}
+	
+	public void addAllowCondInvAtomicPredicate(int index, Integer predicate) {
+		allowCondInvAtomicPredicates.get(index).add(predicate);
+	}
+	
+	public Map<Integer, Predicate> getAllowPredicates() {
+		return allowPredicates;
+	}
+
+	public Map<Integer, Predicate> getDenyPredicates() {
+		return denyPredicates;
+	}
+
+	public Map<Integer, Predicate> getAllowCondPredicates() {
+		return allowCondPredicates;
+	}
+
+	public Map<Integer, Predicate> getAllowCondInvPredicates() {
+		return allowCondInvPredicates;
+	}
+
+	public Map<Integer, List<Integer>> getAllowAtomicPredicates() {
+		return allowAtomicPredicates;
+	}
+
+	public List<Integer> getDenyAtomicPredicates() {
+		return denyAtomicPredicates;
+	}
+
+	public Map<Integer, List<Integer>> getAllowCondAtomicPredicates() {
+		return allowCondAtomicPredicates;
+	}
+
+	public Map<Integer, List<Integer>> getAllowCondInvAtomicPredicates() {
+		return allowCondInvAtomicPredicates;
+	}
+
 	/**
 	 * This method allows to wrap the method which adds the constraints inside Z3 solver
 	 * @param solver Istance of Z3 solver

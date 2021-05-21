@@ -217,11 +217,9 @@ public class Translator {
 			Pattern pattern = Pattern.compile(tosearch);
 			Matcher matcher = pattern.matcher(model);
 			while (matcher.find()) {
-				System.out.println(matcher.group());
 				String matchSrc = matcher.group();
 				String ruleConfigured = z3Translator.matchPlainAttribute(matchSrc);
 				String ruleNumber = z3Translator.saneString(z3Translator.matchRuleNumber(matchSrc));
-				System.out.println(ruleNumber);
 				if(ruleConfigured.equals("true")) {
 					Predicate atomicPredicate = networkAtomicPredicates.get(Integer.parseInt(ruleNumber));
 					List<Predicate> predicatesList = aputils.complexPredicatetoOrTuples(atomicPredicate);

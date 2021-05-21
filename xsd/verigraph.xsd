@@ -150,6 +150,7 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="ALLOW" />
             <xsd:enumeration value="DENY" />
+            <xsd:enumeration value="ALLOW_COND" />
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="L4ProtocolTypes">
