@@ -56,7 +56,7 @@ public class TestCaseGeneratorAtomicPredicates {
 		
 	public TestCaseGeneratorAtomicPredicates(String name, int numberAllocationPlaces, int numberWebClients, int numberWebServers, 
 			int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, 
-			double percReqWithPorts, boolean hasFwRulesTakenFromReq, int seed) {
+			double percReqWithPorts, int seed) {
 		this.name = name;
 		this.rand = new Random(seed); 
 
@@ -70,12 +70,12 @@ public class TestCaseGeneratorAtomicPredicates {
 		allIPs = new HashSet<String>();
 		allIPsWithWildcardsDecomposed = new ArrayList<String>();
 		nfv = generateNFV(numberAllocationPlaces, numberWebClients, numberWebServers, numberReachPolicies, numberIsPolicies, numberNAT, numberFirewall, 
-				maxNATSrcs, maxFWRules, percReqWithPorts, hasFwRulesTakenFromReq, rand);
+				maxNATSrcs, maxFWRules, percReqWithPorts, rand);
 	}
 	
 	
 	public NFV changeIP(int numberAllocationPlaces, int numberWebClients, int numberWebServers, int numberReachPolicies, int numberIsPolicies, 
-			int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, double percReqWithPorts, boolean hasFwRulesTakenFromReq, int seed) {
+			int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, double percReqWithPorts, int seed) {
 		this.rand = new Random(seed);
 		allClients = new ArrayList<Node>();
 		allServers = new ArrayList<Node>();
@@ -86,7 +86,7 @@ public class TestCaseGeneratorAtomicPredicates {
 
 		allIPs = new HashSet<String>();
 		return generateNFV(numberAllocationPlaces, numberWebClients, numberWebServers, numberReachPolicies, numberIsPolicies, numberNAT, numberFirewall,
-				maxNATSrcs, maxFWRules, percReqWithPorts, hasFwRulesTakenFromReq, rand);
+				maxNATSrcs, maxFWRules, percReqWithPorts, rand);
 	}
 	
 	
@@ -166,7 +166,7 @@ public class TestCaseGeneratorAtomicPredicates {
 	
 	
 	public NFV generateNFV(int numberAllocationPlaces, int numberWebClients, int numberWebServers, int numberReachPolicies, int numberIsPolicies, 
-			int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, double percReqWithPorts, boolean hasFwRulesTakenFromReq, Random rand) {
+			int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, double percReqWithPorts, Random rand) {
 		
 		/* Creation of the test */
 		
@@ -494,7 +494,9 @@ public class TestCaseGeneratorAtomicPredicates {
 				else dstPort = String.valueOf(rand.nextInt(65535));
 				numberIPWithPorts--;
 			}
-			createPolicy(PName.ISOLATION_PROPERTY, nfv, graph, srcNode, dstNode, srcPort, dstPort);
+			if(!srcNode.equals(dstNode))
+				createPolicy(PName.ISOLATION_PROPERTY, nfv, graph, srcNode, dstNode, srcPort, dstPort);
+			else i--;
 		}
 		
 		int numberRPWithPorts = (int) (numberReachPolicies * percReqWithPorts);
@@ -512,31 +514,39 @@ public class TestCaseGeneratorAtomicPredicates {
 				else dstPort = String.valueOf(rand.nextInt(65535));
 				numberRPWithPorts--;
 			}
-			createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, srcNode, dstNode, srcPort, dstPort);
+			if(!srcNode.equals(dstNode))
+				createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, srcNode, dstNode, srcPort, dstPort);
+			else i--;
 		}
 
 		
 		//generate firewall rules
-		//NOTE: rule for the firewall is randomly selected: set0=allClients, set1=allServers, set2=allNAT
 		int nRules;
 		for(Node firewall: allFirewalls) {
 			//introducing some firewalls with zero rules, only with default action
 			if(rand.nextBoolean())
-				nRules =  maxFWRules; //rand.nextInt(maxFWRules);
+				nRules = maxFWRules; //rand.nextInt(maxFWRules);
 			else nRules = 0;
 			
-			if(rand.nextBoolean())
+			if(rand.nextBoolean()) {
+				//Def.action = ALLOW: if rule has action DENY, it must not correspond to a requirement, otherwise if it is ALLOW it could be everything
 				firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.ALLOW);
-			else firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.DENY);
+				nRules = maxFWRules; //rand.nextInt(maxFWRules);
+			}
+			else {
+				//Def.action = DENY: don't configure any rule
+				firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.DENY);
+				nRules = 0;
+			}
 
+			//Generate rules
 			for(int i=0; i<nRules; i++) {
 				String srcNode = ""; String dstNode = "";
-				if(hasFwRulesTakenFromReq) {
-					Property p1 = nfv.getPropertyDefinition().getProperty().get(rand.nextInt(nfv.getPropertyDefinition().getProperty().size()));
-					Property p2 = nfv.getPropertyDefinition().getProperty().get(rand.nextInt(nfv.getPropertyDefinition().getProperty().size()));
-					srcNode = p1.getSrc();
-					dstNode = p2.getDst();
-				} else {
+				Elements rule = new Elements();
+				
+				if(rand.nextBoolean()) {
+					//ALLOW rule: rule is generated random
+					rule.setAction(ActionTypes.ALLOW);
 					switch(rand.nextInt(5)) {
 					case 0: 
 						srcNode = allClients.get(rand.nextInt(allClients.size())).getName(); break;
@@ -568,12 +578,26 @@ public class TestCaseGeneratorAtomicPredicates {
 						else dstNode = "*"; 
 						break;
 					}
+				} else {
+					//DENY rule: rule should not correspond to a requirement
+					rule.setAction(ActionTypes.DENY);
+					boolean different = false;
+					
+					while(!different) {
+						different = true;
+						srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
+						dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
+						
+						for(Property p: nfv.getPropertyDefinition().getProperty()) {
+							if(p.getSrc().equals(srcNode) && p.getDst().equals(dstNode)) {
+								//repeat the iteration
+								different = false;
+								break;
+							}
+						}
+					}
 				}
 				
-				Elements rule = new Elements();
-				if(rand.nextBoolean())
-					rule.setAction(ActionTypes.ALLOW);
-				else rule.setAction(ActionTypes.DENY);
 				rule.setSource(srcNode);
 				rule.setDestination(dstNode);
 				rule.setSrcPort("*");

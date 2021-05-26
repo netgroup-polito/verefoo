@@ -79,7 +79,9 @@ public class VerefooSerializer {
 					result = t.convert();
 					root = result;
 					sat = true; 
+					System.out.println("SAT\n");
 				} else {
+					System.out.println("UNSAT\n");
 					sat = false;
 					result = root;
 				}
