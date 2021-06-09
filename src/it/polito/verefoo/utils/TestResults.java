@@ -3,9 +3,8 @@ package it.polito.verefoo.utils;
 public class TestResults {
 	private long atomicPredCompTime;
 	private long atomicFlowsCompTime;
-	private long fillMapTime;
-	private long genPathTime;
-	private int nAtomicPredicates;
+	private long beginMaxSMTTime;
+	private String z3Result;
 	
 	public TestResults() {	
 	}
@@ -26,28 +25,19 @@ public class TestResults {
 		this.atomicFlowsCompTime = atomicFlowsCompTime;
 	}
 
-	public long getFillMapTime() {
-		return fillMapTime;
+	public long getBeginMaxSMTTime() {
+		return beginMaxSMTTime;
 	}
 
-	public void setFillMapTime(long fillMapTime) {
-		this.fillMapTime = fillMapTime;
+	public void setBeginMaxSMTTime(long beginMaxSMTTime) {
+		this.beginMaxSMTTime = beginMaxSMTTime;
 	}
 
-	public long getGenPathTime() {
-		return genPathTime;
+	public String getZ3Result() {
+		return z3Result;
 	}
 
-	public void setGenPathTime(long genPathTime) {
-		this.genPathTime = genPathTime;
+	public void setZ3Result(String z3Result) {
+		this.z3Result = z3Result;
 	}
-
-	public int getnAtomicPredicates() {
-		return nAtomicPredicates;
-	}
-
-	public void setnAtomicPredicates(int nAtomicPredicates) {
-		this.nAtomicPredicates = nAtomicPredicates;
-	}
-
 }

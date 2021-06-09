@@ -119,27 +119,21 @@ public class VerefooProxy {
 		aputils = new APUtils();
 		long t1 = System.currentTimeMillis();
 		trafficFlowsMap = generateFlowPaths();
-		long t2 = System.currentTimeMillis();
-		testResults.setGenPathTime(t2 - t1);
 		networkAtomicPredicates = generateAtomicPredicateNew();
-		t1 = System.currentTimeMillis();
-		testResults.setAtomicPredCompTime(t1-t2);
+		long t2 = System.currentTimeMillis();
+		testResults.setAtomicPredCompTime(t2-t1);
 		fillTransformationMap();
-		t2 =  System.currentTimeMillis();
-		testResults.setFillMapTime(t2-t1);
 		//printTransformations(); //DEBUG
 		computeAtomicFlows();
-		t1 =  System.currentTimeMillis();
+		t1 = System.currentTimeMillis();
 		testResults.setAtomicFlowsCompTime(t1-t2);
-		
-
+		testResults.setBeginMaxSMTTime(t1);
 		//distributeTrafficFlows();
 		allocateFunctions();
 		allocationManager.configureFunctions();
 		
 		check = new Checker(ctx, nctx, allocationNodes);
-		formalizeRequirements();
-		
+		formalizeRequirements();	
 	}
 	
 	private void computeAtomicFlows() {
@@ -754,7 +748,6 @@ public class VerefooProxy {
 			networkAtomicPredicates.put(index, p);
 			index++;
 		}
-		testResults.setnAtomicPredicates(index);
 		
 		//DEBUG: print atomic predicates
 //		System.out.println("ATOMIC PREDICATES " + networkAtomicPredicates.size());

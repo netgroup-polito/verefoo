@@ -11,20 +11,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-
-import org.xml.sax.SAXException;
-
-import it.polito.verefoo.graph.IPAddress;
 import it.polito.verefoo.jaxb.*;
-import it.polito.verefoo.utils.APUtils;
 import it.polito.verefoo.utils.Tuple;
 
 // Auxiliary class to generate  test cases for performance tests (used by TestPerformanceScalabilityAtomicPredicates)
@@ -45,14 +32,12 @@ public class TestCaseGeneratorAtomicPredicates {
 	NFV originalNFV;
 	
 	Set<String> allIPs;
-	List<String> allIPsWithWildcardsDecomposed;
 	List<Node> allClients;
 	List<Node> allServers;
 	List<Node> allAPs;
 	List<Node> allNATs;
 	List<Node> allFirewalls;
 	List<Tuple<String, Node>> lastAPs;
-	APUtils aputils = new APUtils();
 		
 	public TestCaseGeneratorAtomicPredicates(String name, int numberAllocationPlaces, int numberWebClients, int numberWebServers, 
 			int numberReachPolicies, int numberIsPolicies, int numberNAT, int numberFirewall, int maxNATSrcs, int maxFWRules, 
@@ -68,7 +53,6 @@ public class TestCaseGeneratorAtomicPredicates {
 		lastAPs = new ArrayList<Tuple<String, Node>>();
 
 		allIPs = new HashSet<String>();
-		allIPsWithWildcardsDecomposed = new ArrayList<String>();
 		nfv = generateNFV(numberAllocationPlaces, numberWebClients, numberWebServers, numberReachPolicies, numberIsPolicies, numberNAT, numberFirewall, 
 				maxNATSrcs, maxFWRules, percReqWithPorts, rand);
 	}
@@ -114,49 +98,14 @@ public class TestCaseGeneratorAtomicPredicates {
 		return ip;
 	}
 	
-	private String createIPWithWildcards() {
-		String ip;
-		int first, second, third, forth;
-		first = rand.nextInt(256);
-		if(first == 0) first++;
-		second = rand.nextInt(256);
-		third = rand.nextInt(256);
-		forth = -1;
-		ip = new String(first + "." + second + "." + third + "." + forth);
-		return ip;
-	}
-	
-	private String createRandomIP(boolean canContainWildcards) {
-		
-		boolean notCreated = true, withWildcards = false;
-		int n;
+	private String createRandomIP() {
+		boolean notCreated = true;
 		String ip = null;
 		while(notCreated) {
-			if(canContainWildcards) {
-				n = rand.nextInt(6);
-				if(n == 0) {
-					//Ovvero 1/6 probabilità che venga generato con le wildcards
-					ip = createIPWithWildcards();
-					withWildcards = true;
-				} else {
-					ip = createIP();
-				}
-			} else {
-				ip = createIP();
-			}
-			
-			if(!allIPs.contains(ip) && !allIPsWithWildcardsDecomposed.contains(ip)) {
+			ip = createIP();
+			if(!allIPs.contains(ip)) {
 				notCreated = false;
 				allIPs.add(ip);
-				
-				if(withWildcards) {
-					String[] ipAddress = ip.split("\\.");
-					for(int i=1; i<256; i++) {
-						ipAddress[3] = String.valueOf(i);
-						String newIp = new String(ipAddress[0] + "." + ipAddress[1] + "." + ipAddress[2] + "." + ipAddress[3]);
-						allIPsWithWildcardsDecomposed.add(newIp);
-					}
-				}
 			}
 		}
 		
@@ -186,7 +135,7 @@ public class TestCaseGeneratorAtomicPredicates {
 		
 		//creation of servers 
 		for(int i = 0; i < numberWebServers; i++) {
-			String IPServer = createRandomIP(true);
+			String IPServer = createRandomIP();
 			Node server = new Node();
 			server.setFunctionalType(FunctionalTypes.WEBSERVER);
 			server.setName(IPServer);
@@ -203,7 +152,7 @@ public class TestCaseGeneratorAtomicPredicates {
 		
 		//creation of the clients
 		for(int i = 0; i < numberWebClients; i++) {
-			String IPClient = createRandomIP(true);
+			String IPClient = createRandomIP();
 			Node client = new Node();
 			client.setFunctionalType(FunctionalTypes.WEBCLIENT);
 			client.setName(IPClient);
@@ -219,12 +168,12 @@ public class TestCaseGeneratorAtomicPredicates {
 		
 		//central AP
 		Node central = new Node();
-		String ipCentral = createRandomIP(false);
+		String ipCentral = createRandomIP();
 		central.setName(ipCentral);
 	
 		//creation of the others APs
 		for(int i = 0; i < numberAllocationPlaces-1; i++) {
-			String ip = createRandomIP(false);
+			String ip = createRandomIP();
 			Node ap = new Node();
 			ap.setName(ip);
 			allAPs.add(ap);
@@ -232,7 +181,7 @@ public class TestCaseGeneratorAtomicPredicates {
 		
 		//creation of all the NATs
 		for(int i = 0; i < numberNAT; i++) {
-			String ip = createRandomIP(false);
+			String ip = createRandomIP();
 			Node nat = new Node();
 			nat.setName(ip);
 			Configuration confN = new Configuration();
@@ -246,7 +195,7 @@ public class TestCaseGeneratorAtomicPredicates {
 		
 		//creation of all the firewalls
 		for(int i = 0; i < numberFirewall; i++) {
-			String ip = createRandomIP(false);
+			String ip = createRandomIP();
 			Node firewall = new Node();
 			firewall.setFunctionalType(FunctionalTypes.FIREWALL);
 			firewall.setName(ip);
@@ -376,20 +325,7 @@ public class TestCaseGeneratorAtomicPredicates {
 				currentNAT.getNeighbour().add(neighForNat);
 				//random selection if the client has to be added to NAT src (NOTE: NAT src list should contain at least one src)
 				if(rand.nextBoolean() || currentNAT.getConfiguration().getNat().getSource().size() == 0) {
-					if(tuple._1.contains("-1")) {
-						//The address contains a wildcard
-						//If the address contains a wildcard we can introduce as NAT src the address with wildcard or a specific IP inside the wildcard
-						String[] splittedIP = tuple._1.split("\\.");
-						String fourth;
-						if(rand.nextBoolean()) {
-							int x = rand.nextInt(254) + 1;
-							fourth = String.valueOf(x);
-						} else {
-							fourth = String.valueOf(-1);
-						}
-						currentNAT.getConfiguration().getNat().getSource().add(new String(splittedIP[0] + "." + splittedIP[1] + "." + splittedIP[2] + "." + fourth));
-					} else 
-						currentNAT.getConfiguration().getNat().getSource().add(tuple._1);
+					currentNAT.getConfiguration().getNat().getSource().add(tuple._1);
 				}
 
 				if(n == 0) newTupleList.add(new Tuple<String, Node>(currentNAT.getName(), currentNAT));
@@ -482,19 +418,29 @@ public class TestCaseGeneratorAtomicPredicates {
 		int numberIPWithPorts = (int) (numberIsPolicies * percReqWithPorts);
 		for(int i = 0; i < numberIsPolicies; i++) {
 			String srcNode = "", dstNode = "", srcPort = "*", dstPort = "*";
-			if(rand.nextBoolean())
-				srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
-			else srcNode = allServers.get(rand.nextInt(allServers.size())).getName();
-			if(rand.nextBoolean())
-				dstNode = allClients.get(rand.nextInt(allClients.size())).getName();
-			else dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
+//			if(rand.nextBoolean())
+//				srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
+//			else srcNode = allServers.get(rand.nextInt(allServers.size())).getName();
+			srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
+//			if(rand.nextBoolean())
+//				dstNode = allClients.get(rand.nextInt(allClients.size())).getName();
+//			else dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
+			dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
 			if(numberIPWithPorts > 0) {
 				if(rand.nextBoolean())
 					srcPort = String.valueOf(rand.nextInt(65535));
 				else dstPort = String.valueOf(rand.nextInt(65535));
 				numberIPWithPorts--;
 			}
-			if(!srcNode.equals(dstNode))
+			
+			boolean alreadyInserted = false;
+			for(Property prop: nfv.getPropertyDefinition().getProperty()) {
+				if(prop.getSrc().equals(srcNode) && prop.getDst().equals(dstNode)) {
+					alreadyInserted = true;
+					break;
+				}
+			}
+			if(!alreadyInserted && !srcNode.equals(dstNode))
 				createPolicy(PName.ISOLATION_PROPERTY, nfv, graph, srcNode, dstNode, srcPort, dstPort);
 			else i--;
 		}
@@ -514,96 +460,69 @@ public class TestCaseGeneratorAtomicPredicates {
 				else dstPort = String.valueOf(rand.nextInt(65535));
 				numberRPWithPorts--;
 			}
-			if(!srcNode.equals(dstNode))
+			
+			//control if the policy is not ready inserted
+			boolean alreadyInserted = false;
+			for(Property prop: nfv.getPropertyDefinition().getProperty()) {
+				if(prop.getSrc().equals(srcNode) && prop.getDst().equals(dstNode)) {
+					alreadyInserted = true;
+					break;
+				}
+			}
+			
+			if(!alreadyInserted && !srcNode.equals(dstNode))
 				createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, srcNode, dstNode, srcPort, dstPort);
 			else i--;
 		}
 
 		
 		//generate firewall rules
+		//NOTE: rule for the firewall is randomly selected: set0=allClients, set1=allServers, set2=allNAT
 		int nRules;
 		for(Node firewall: allFirewalls) {
 			//introducing some firewalls with zero rules, only with default action
 			if(rand.nextBoolean())
-				nRules = maxFWRules; //rand.nextInt(maxFWRules);
+				nRules =  maxFWRules; //rand.nextInt(maxFWRules);
 			else nRules = 0;
 			
-			if(rand.nextBoolean()) {
-				//Def.action = ALLOW: if rule has action DENY, it must not correspond to a requirement, otherwise if it is ALLOW it could be everything
-				firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.ALLOW);
-				nRules = maxFWRules; //rand.nextInt(maxFWRules);
-			}
-			else {
-				//Def.action = DENY: don't configure any rule
-				firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.DENY);
-				nRules = 0;
-			}
+			//default action set to oallow
+			firewall.getConfiguration().getFirewall().setDefaultAction(ActionTypes.ALLOW);
 
-			//Generate rules
 			for(int i=0; i<nRules; i++) {
 				String srcNode = ""; String dstNode = "";
-				Elements rule = new Elements();
 				
-				if(rand.nextBoolean()) {
-					//ALLOW rule: rule is generated random
-					rule.setAction(ActionTypes.ALLOW);
-					switch(rand.nextInt(5)) {
-					case 0: 
-						srcNode = allClients.get(rand.nextInt(allClients.size())).getName(); break;
-					case 1: 
-						srcNode = allServers.get(rand.nextInt(allServers.size())).getName(); break;	
-					case 2: 
-						srcNode = allNATs.get(rand.nextInt(allNATs.size())).getName(); break;
-					case 3: 
-						srcNode = "*"; break;
-					case 4: 
-						if(allIPsWithWildcardsDecomposed.size() > 0)
-							srcNode = allIPsWithWildcardsDecomposed.get(rand.nextInt(allIPsWithWildcardsDecomposed.size()));
-						else 
-							srcNode = "*"; 
-						break;
-					}
-					switch(rand.nextInt(5)) {
-					case 0: 
-						dstNode = allClients.get(rand.nextInt(allClients.size())).getName(); break;
-					case 1: 
-						dstNode = allServers.get(rand.nextInt(allServers.size())).getName(); break;	
-					case 2: 
-						dstNode = allNATs.get(rand.nextInt(allNATs.size())).getName(); break;
-					case 3: 
-						dstNode = "*"; break;
-					case 4: 
-						if(allIPsWithWildcardsDecomposed.size() > 0)
-							dstNode = allIPsWithWildcardsDecomposed.get(rand.nextInt(allIPsWithWildcardsDecomposed.size()));
-						else dstNode = "*"; 
-						break;
-					}
-				} else {
-					//DENY rule: rule should not correspond to a requirement
-					rule.setAction(ActionTypes.DENY);
-					boolean different = false;
+				switch(rand.nextInt(2)) {
+				case 0: 
+					srcNode = allClients.get(rand.nextInt(allClients.size())).getName(); break;
+				case 1: 
+					srcNode = allServers.get(rand.nextInt(allServers.size())).getName(); break;	
+				}
+				switch(rand.nextInt(2)) {
+				case 0: 
+					dstNode = allClients.get(rand.nextInt(allClients.size())).getName(); break;
+				case 1: 
+					dstNode = allServers.get(rand.nextInt(allServers.size())).getName(); break;	
+				}
 					
-					while(!different) {
-						different = true;
-						srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
-						dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
-						
-						for(Property p: nfv.getPropertyDefinition().getProperty()) {
-							if(p.getSrc().equals(srcNode) && p.getDst().equals(dstNode)) {
-								//repeat the iteration
-								different = false;
-								break;
-							}
-						}
+				//check that no reachability requirements match this DENY rule
+				boolean reqExists = false;
+				for(Property prop: nfv.getPropertyDefinition().getProperty()) {
+					if(prop.getSrc().equals(srcNode) && prop.getDst().equals(dstNode) && prop.getName().equals(PName.REACHABILITY_PROPERTY)) {
+						reqExists = true;
+						break;
 					}
 				}
 				
-				rule.setSource(srcNode);
-				rule.setDestination(dstNode);
-				rule.setSrcPort("*");
-				rule.setDstPort("*");
-				rule.setProtocol(L4ProtocolTypes.ANY);
-				firewall.getConfiguration().getFirewall().getElements().add(rule);
+				if(!reqExists) {
+					Elements rule = new Elements();
+					rule.setAction(ActionTypes.DENY);
+					rule.setSource(srcNode);
+					rule.setDestination(dstNode);
+					rule.setSrcPort("*");
+					rule.setDstPort("*");
+					rule.setProtocol(L4ProtocolTypes.ANY);
+					firewall.getConfiguration().getFirewall().getElements().add(rule);
+				} else i--;
 			}
 		}
 		
