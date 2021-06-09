@@ -37,16 +37,16 @@ import it.polito.verefoo.utils.TestResults;
 public class TestPerformanceScalabilityAtomicPredicates {
 	
 	public static void main(String[] args)  {	
-		numberPR = 50;
-		numberWC = 50;
-		numberWS = 50;
-		numberAP  = 50;
-		numberNAT = 20;
-		numberFW = 20;
-		maxNATSrcs = 10;
-		maxFWRules = 10;
+		numberPR = 10;
+		numberWC = 20;
+		numberWS = 20;
+		numberAP  = 20;
+		numberNAT = 10;
+		numberFW = 10;
+		maxNATSrcs = 5;
+		maxFWRules = 5;
 		runs = 50;
-		percReqWithPorts = 0.0; //from 0.0 to 1.0
+		percReqWithPorts = 0.25; //from 0.0 to 1.0
 		
 		seed  = 66361;
 		numberIPR  = numberPR/2;
@@ -114,19 +114,16 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		TestResults results = test.getTestTimeResults();
 		
 		long totalTime = endAll - beginAll;
-		long genPathTime = results.getGenPathTime();
 		long atomicPredCompTime = results.getAtomicPredCompTime();
-		long fillMapTime = results.getFillMapTime();
 		long atomicFlowsCompTime = results.getAtomicFlowsCompTime();
-		long otherTime = totalTime - genPathTime - atomicPredCompTime - fillMapTime - atomicFlowsCompTime;
-		int nAtomicPredicates = results.getnAtomicPredicates();
-		String resString = new String("Total time " + totalTime + "ms: genPathTime: " + genPathTime + "ms, atomicPredCompTime " 
-				+ atomicPredCompTime + "ms, fillMapTime " + fillMapTime + "ms, atomicFlowsCompTime " 
-				+ atomicFlowsCompTime + "ms, other " + otherTime+"ms;");
+		long maxSMTtime = endAll - results.getBeginMaxSMTTime();
+		
+		String resString = new String("Total time " + totalTime +  "ms, atomicPredCompTime " 
+				+ atomicPredCompTime +  "ms, atomicFlowsCompTime " 
+				+ atomicFlowsCompTime + "ms, maxSMT time " + maxSMTtime + "ms;");
 		
 		System.out.println(resString);
-		logger.info("ATOMIC PREDICATES: " + nAtomicPredicates + " TIME TOT: " + totalTime + " GP "+ genPathTime + " GAP " + atomicPredCompTime + " FM " + fillMapTime + 
-				" GAF " + atomicFlowsCompTime + " OT " + otherTime);
+		logger.info(totalTime + "\t" + atomicPredCompTime + "\t" + atomicFlowsCompTime + "\t" + maxSMTtime + "\t" + results.getZ3Result() + "\t");
         return test.getResult();
 	}
 	

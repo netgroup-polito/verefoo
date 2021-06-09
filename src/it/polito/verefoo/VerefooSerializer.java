@@ -80,8 +80,10 @@ public class VerefooSerializer {
 					root = result;
 					sat = true; 
 					System.out.println("SAT\n");
+					testResults.setZ3Result("SAT");
 				} else {
 					System.out.println("UNSAT\n");
+					testResults.setZ3Result("UNSAT");
 					sat = false;
 					result = root;
 				}
