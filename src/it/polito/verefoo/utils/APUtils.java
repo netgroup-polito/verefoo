@@ -609,7 +609,7 @@ public class APUtils {
 			}
 			
 			if(toEliminateList.size() == 0 && toControlList.size() == 0) {
-				//Questo predicato viene aggiunto così com'è alla lista e posso terminare la ricorsione
+				//Questo predicato viene aggiunto cosï¿½ com'ï¿½ alla lista e posso terminare la ricorsione
 				differentIPAddressList.add(startingAddress);
 				return;
 			} else {
@@ -634,6 +634,14 @@ public class APUtils {
 				if(!pi.isNeg())
 					largestPI = pi;
 				else otherIntervalList.add(pi);
+			}
+			
+			if(largestPI == null)
+				largestPI = new PortInterval("*", false);
+			
+			if(largestPI.getMin() == -1 && largestPI.getMax() == -1) {
+				largestPI.setMin(0);
+				largestPI.setMax(65535);
 			}
 			
 			if(otherIntervalList.size() == 0) {

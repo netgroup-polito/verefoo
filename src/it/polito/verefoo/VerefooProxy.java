@@ -133,7 +133,7 @@ public class VerefooProxy {
 		allocationManager.configureFunctions();
 		
 		check = new Checker(ctx, nctx, allocationNodes);
-		formalizeRequirements();	
+		formalizeRequirements();
 	}
 	
 	private void computeAtomicFlows() {

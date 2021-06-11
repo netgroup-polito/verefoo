@@ -37,14 +37,14 @@ import it.polito.verefoo.utils.TestResults;
 public class TestPerformanceScalabilityAtomicPredicates {
 	
 	public static void main(String[] args)  {	
-		numberPR = 10;
-		numberWC = 20;
-		numberWS = 20;
-		numberAP  = 20;
-		numberNAT = 10;
-		numberFW = 10;
-		maxNATSrcs = 5;
-		maxFWRules = 5;
+		numberPR = 30;
+		numberWC = 70;
+		numberWS = 70;
+		numberAP  = 71;
+		numberNAT = 50;
+		numberFW = 50;
+		maxNATSrcs = 25;
+		maxFWRules = 25;
 		runs = 50;
 		percReqWithPorts = 0.25; //from 0.0 to 1.0
 		
@@ -52,7 +52,6 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
-		
 		testScalabilityPerformance();	
 	}
 	
@@ -132,7 +131,7 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	public static void testScalabilityPerformance(){
 		    rand= new Random(seed);
 		    pathfile = "NR"+numberPR+"WC"+numberWC+"WS"+numberWS+"AP"+numberAP+"NAT"+numberNAT+"FW"+numberFW+"NATS"
-	        		+maxNATSrcs+"FWR"+maxFWRules+"PRP"+percReqWithPorts+"Logs.log";
+	        		+maxNATSrcs+"FWR"+maxFWRules+"PRP"+percReqWithPorts+"APLogs.log";
 	        logger =  Package1LoggingClass.createLoggerFor(pathfile, "log/"+pathfile);
 
 	        int[] seeds = new int[runs];
