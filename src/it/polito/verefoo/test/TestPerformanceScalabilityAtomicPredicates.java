@@ -37,7 +37,7 @@ import it.polito.verefoo.utils.TestResults;
 public class TestPerformanceScalabilityAtomicPredicates {
 	
 	public static void main(String[] args)  {	
-		numberPR = 10;
+		numberPR = 40;
 		numberWC = 25;
 		numberWS = 25;
 		numberAP  = 21;
@@ -46,81 +46,13 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		maxNATSrcs = 10;
 		maxFWRules = 10;
 		runs = 6;
-		percReqWithPorts = 0.25; //from 0.0 to 1.0
+		percReqWithPorts = 0.1; //from 0.0 to 1.0
 		
 		seed  = 66361;
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
 		
-//		//Progression ALL
-//		numberPR = 10;
-//		numberWC = 30;
-//		numberWS = 30;
-//		numberAP  = 31;
-//		numberNAT = 10;
-//		numberFW = 10;
-//		maxNATSrcs = 5;
-//		maxFWRules = 5;
-//		numberIPR  = numberPR/2;
-//		numberRPR = numberPR/2;
-//		numberPR = numberIPR + numberRPR;
-//		testScalabilityPerformance();
-//
-//		//Progression ALL
-//		numberPR = 15;
-//		numberWC = 40;
-//		numberWS = 40;
-//		numberAP  = 41;
-//		numberNAT = 20;
-//		numberFW = 20;
-//		maxNATSrcs = 10;
-//		maxFWRules = 10;
-//		numberIPR  = numberPR/2;
-//		numberRPR = numberPR/2;
-//		numberPR = numberIPR + numberRPR;
-//		testScalabilityPerformance();
-//
-//		//Progression ALL
-//		numberPR = 20;
-//		numberWC = 50;
-//		numberWS = 50;
-//		numberAP  = 51;
-//		numberNAT = 30;
-//		numberFW = 30;
-//		maxNATSrcs = 15;
-//		maxFWRules = 15;
-//		numberIPR  = numberPR/2;
-//		numberRPR = numberPR/2;
-//		numberPR = numberIPR + numberRPR;
-//		testScalabilityPerformance();
-//
-//		//Progression ALL
-//		numberPR = 25;
-//		numberWC = 60;
-//		numberWS = 60;
-//		numberAP  = 61;
-//		numberNAT = 40;
-//		numberFW = 40;
-//		maxNATSrcs = 20;
-//		maxFWRules = 20;
-//		numberIPR  = numberPR/2;
-//		numberRPR = numberPR/2;
-//		numberPR = numberIPR + numberRPR;
-//		testScalabilityPerformance();
-		
-		//Progression ALL
-		numberPR = 30;
-		numberWC = 70;
-		numberWS = 70;
-		numberAP  = 71;
-		numberNAT = 50;
-		numberFW = 50;
-		maxNATSrcs = 25;
-		maxFWRules = 25;
-		numberIPR  = numberPR/2;
-		numberRPR = numberPR/2;
-		numberPR = numberIPR + numberRPR;
 		testScalabilityPerformance();
 
 		System.out.println("TEST TERMINATI");
