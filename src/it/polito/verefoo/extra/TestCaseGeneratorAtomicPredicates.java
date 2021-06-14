@@ -471,7 +471,7 @@ public class TestCaseGeneratorAtomicPredicates {
 			}
 			
 			if(!alreadyInserted && !srcNode.equals(dstNode))
-				createPolicy(PName.REACHABILITY_PROPERTY, nfv, graph, srcNode, dstNode, srcPort, dstPort);
+				createPolicy(PName.COMPLETE_REACHABILITY_PROPERTY, nfv, graph, srcNode, dstNode, srcPort, dstPort);
 			else i--;
 		}
 
