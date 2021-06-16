@@ -324,9 +324,9 @@ public class TestCaseGeneratorAtomicPredicates {
 				tuple._2.getNeighbour().add(neighForTuple);
 				currentNAT.getNeighbour().add(neighForNat);
 				//random selection if the client has to be added to NAT src (NOTE: NAT src list should contain at least one src)
-				if(rand.nextBoolean() || currentNAT.getConfiguration().getNat().getSource().size() == 0) {
+				//if(rand.nextBoolean() || currentNAT.getConfiguration().getNat().getSource().size() == 0) {
 					currentNAT.getConfiguration().getNat().getSource().add(tuple._1);
-				}
+				//}
 
 				if(n == 0) newTupleList.add(new Tuple<String, Node>(currentNAT.getName(), currentNAT));
 				n++;
@@ -451,11 +451,11 @@ public class TestCaseGeneratorAtomicPredicates {
 			if(rand.nextBoolean())
 				srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
 			else srcNode = allServers.get(rand.nextInt(allServers.size())).getName();
-//			srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
+			//srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
 			if(rand.nextBoolean())
 				dstNode = allClients.get(rand.nextInt(allClients.size())).getName();
 			else dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
-//			dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
+			//dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
 			if(numberRPWithPorts > 0) {
 				if(rand.nextBoolean())
 					srcPort = String.valueOf(rand.nextInt(65535));

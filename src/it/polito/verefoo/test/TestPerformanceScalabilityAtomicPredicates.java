@@ -45,7 +45,7 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		numberFW = 10;
 		maxNATSrcs = 10;
 		maxFWRules = 10;
-		runs = 10;
+		runs = 6;
 		percReqWithPorts = 0.0; //from 0.0 to 1.0
 		
 		seed  = 66361;

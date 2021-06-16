@@ -66,7 +66,7 @@ public class Checker {
 		Params p = ctx.mkParams();
 		p.add("maxsat_engine", ctx.mkSymbol("wmax"));
 		p.add("maxres.wmax", true  );
-		p.add("timeout", 1800000);
+		p.add("timeout", 5400000);
 		solver.setParameters(p);
 	}
 	
