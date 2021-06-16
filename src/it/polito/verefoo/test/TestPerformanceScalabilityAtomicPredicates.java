@@ -37,16 +37,16 @@ import it.polito.verefoo.utils.TestResults;
 public class TestPerformanceScalabilityAtomicPredicates {
 	
 	public static void main(String[] args)  {	
-		numberPR = 40;
-		numberWC = 25;
-		numberWS = 25;
-		numberAP  = 21;
+		numberPR = 250;
+		numberWC = 50;
+		numberWS = 50;
+		numberAP  = 50;
 		numberNAT = 10;
 		numberFW = 10;
 		maxNATSrcs = 10;
 		maxFWRules = 10;
-		runs = 6;
-		percReqWithPorts = 0.1; //from 0.0 to 1.0
+		runs = 10;
+		percReqWithPorts = 0.0; //from 0.0 to 1.0
 		
 		seed  = 66361;
 		numberIPR  = numberPR/2;

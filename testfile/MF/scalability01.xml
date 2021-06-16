@@ -1,0 +1,836 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../xsd/nfvSchema.xsd">
+    <graphs>
+        <graph id="0">
+            <node name="135.242.217.197" functional_type="WEBCLIENT">
+                <neighbour name="37.37.37.37"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="46.46.46.46"/>
+                </configuration>
+            </node>
+            <node name="8.88.103.211" functional_type="WEBCLIENT">
+                <neighbour name="24.247.128.53"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="46.46.46.46"/>
+                </configuration>
+            </node>
+            <node name="62.62.62.62" functional_type="WEBCLIENT">
+                <neighbour name="63.63.63.63"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="46.46.46.46"/>
+                </configuration>
+            </node>
+            <node name="52.52.52.52" functional_type="WEBCLIENT">
+                <neighbour name="82.98.53.112"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="46.46.46.46"/>
+                </configuration>
+            </node>
+            <node name="49.22.16.46" functional_type="WEBCLIENT">
+                <neighbour name="84.84.84.84"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="46.46.46.46"/>
+                </configuration>
+            </node>
+            <node name="37.217.177.252" functional_type="WEBCLIENT">
+                <neighbour name="125.71.238.151"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="46.46.46.46"/>
+                </configuration>
+            </node>
+            <node name="144.139.175.36" functional_type="WEBCLIENT">
+                <neighbour name="198.113.161.163"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="46.46.46.46"/>
+                </configuration>
+            </node>
+            <node name="206.33.199.109" functional_type="WEBCLIENT">
+                <neighbour name="124.124.124.124"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="46.46.46.46"/>
+                </configuration>
+            </node>
+            <node name="81.86.209.125" functional_type="WEBCLIENT">
+                <neighbour name="80.80.80.80"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="46.46.46.46"/>
+                </configuration>
+            </node>
+            <node name="31.63.32.117" functional_type="WEBCLIENT">
+                <neighbour name="193.102.146.45"/>
+                <configuration name="confA">
+                    <webclient nameWebServer="46.46.46.46"/>
+                </configuration>
+            </node>
+            <node name="46.46.46.46" functional_type="WEBSERVER">
+                <neighbour name="215.215.215.215"/>
+                <configuration name="confB">
+                    <webserver>
+                        <name>46.46.46.46</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="225.198.216.21" functional_type="WEBSERVER">
+                <neighbour name="215.215.215.215"/>
+                <configuration name="confB">
+                    <webserver>
+                        <name>225.198.216.21</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="125.125.125.125" functional_type="WEBSERVER">
+                <neighbour name="215.215.215.215"/>
+                <configuration name="confB">
+                    <webserver>
+                        <name>125.125.125.125</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="218.218.218.218" functional_type="WEBSERVER">
+                <neighbour name="215.215.215.215"/>
+                <configuration name="confB">
+                    <webserver>
+                        <name>218.218.218.218</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="65.65.65.65" functional_type="WEBSERVER">
+                <neighbour name="215.215.215.215"/>
+                <configuration name="confB">
+                    <webserver>
+                        <name>65.65.65.65</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="168.176.159.202" functional_type="WEBSERVER">
+                <neighbour name="215.215.215.215"/>
+                <configuration name="confB">
+                    <webserver>
+                        <name>168.176.159.202</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="26.246.62.12" functional_type="WEBSERVER">
+                <neighbour name="215.215.215.215"/>
+                <configuration name="confB">
+                    <webserver>
+                        <name>26.246.62.12</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="22.135.215.76" functional_type="WEBSERVER">
+                <neighbour name="215.215.215.215"/>
+                <configuration name="confB">
+                    <webserver>
+                        <name>22.135.215.76</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="183.178.172.156" functional_type="WEBSERVER">
+                <neighbour name="215.215.215.215"/>
+                <configuration name="confB">
+                    <webserver>
+                        <name>183.178.172.156</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="235.0.16.31" functional_type="WEBSERVER">
+                <neighbour name="215.215.215.215"/>
+                <configuration name="confB">
+                    <webserver>
+                        <name>235.0.16.31</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="37.37.37.37">
+                <neighbour name="135.242.217.197"/>
+                <neighbour name="41.230.52.247"/>
+            </node>
+            <node name="24.247.128.53">
+                <neighbour name="8.88.103.211"/>
+                <neighbour name="195.231.170.31"/>
+            </node>
+            <node name="63.63.63.63">
+                <neighbour name="62.62.62.62"/>
+                <neighbour name="48.48.48.48"/>
+            </node>
+            <node name="82.98.53.112">
+                <neighbour name="52.52.52.52"/>
+                <neighbour name="228.228.228.228"/>
+            </node>
+            <node name="84.84.84.84">
+                <neighbour name="49.22.16.46"/>
+                <neighbour name="58.58.58.58"/>
+            </node>
+            <node name="125.71.238.151">
+                <neighbour name="37.217.177.252"/>
+                <neighbour name="29.29.29.29"/>
+            </node>
+            <node name="198.113.161.163">
+                <neighbour name="144.139.175.36"/>
+                <neighbour name="206.254.71.10"/>
+            </node>
+            <node name="124.124.124.124">
+                <neighbour name="206.33.199.109"/>
+                <neighbour name="192.137.73.198"/>
+            </node>
+            <node name="80.80.80.80">
+                <neighbour name="81.86.209.125"/>
+                <neighbour name="175.175.175.175"/>
+            </node>
+            <node name="38.197.66.157"/>
+            <node name="112.237.251.18" functional_type="NAT">
+                <neighbour name="41.230.52.247"/>
+                <neighbour name="195.231.170.31"/>
+                <neighbour name="48.48.48.48"/>
+                <neighbour name="228.228.228.228"/>
+                <neighbour name="58.58.58.58"/>
+                <neighbour name="29.29.29.29"/>
+                <neighbour name="206.254.71.10"/>
+                <neighbour name="192.137.73.198"/>
+                <neighbour name="175.175.175.175"/>
+                <neighbour name="193.102.146.45"/>
+                <neighbour name="84.150.124.99"/>
+                <configuration name="confN">
+                    <nat>
+                        <source>135.242.217.197</source>
+                        <source>8.88.103.211</source>
+                        <source>62.62.62.62</source>
+                        <source>52.52.52.52</source>
+                        <source>49.22.16.46</source>
+                        <source>37.217.177.252</source>
+                        <source>144.139.175.36</source>
+                        <source>206.33.199.109</source>
+                        <source>81.86.209.125</source>
+                        <source>31.63.32.117</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node name="84.150.124.99" functional_type="NAT">
+                <neighbour name="112.237.251.18"/>
+                <neighbour name="10.87.153.148"/>
+                <configuration name="confN">
+                    <nat>
+                        <source>112.237.251.18</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node name="10.87.153.148" functional_type="NAT">
+                <neighbour name="84.150.124.99"/>
+                <neighbour name="108.185.247.236"/>
+                <configuration name="confN">
+                    <nat>
+                        <source>84.150.124.99</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node name="108.185.247.236" functional_type="NAT">
+                <neighbour name="10.87.153.148"/>
+                <neighbour name="51.51.51.51"/>
+                <configuration name="confN">
+                    <nat>
+                        <source>10.87.153.148</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node name="51.51.51.51" functional_type="NAT">
+                <neighbour name="108.185.247.236"/>
+                <neighbour name="178.93.212.191"/>
+                <configuration name="confN">
+                    <nat>
+                        <source>108.185.247.236</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node name="178.93.212.191" functional_type="NAT">
+                <neighbour name="51.51.51.51"/>
+                <neighbour name="44.44.44.44"/>
+                <configuration name="confN">
+                    <nat>
+                        <source>51.51.51.51</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node name="44.44.44.44" functional_type="NAT">
+                <neighbour name="178.93.212.191"/>
+                <neighbour name="113.113.113.113"/>
+                <configuration name="confN">
+                    <nat>
+                        <source>178.93.212.191</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node name="113.113.113.113" functional_type="NAT">
+                <neighbour name="44.44.44.44"/>
+                <neighbour name="187.187.187.187"/>
+                <configuration name="confN">
+                    <nat>
+                        <source>44.44.44.44</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node name="187.187.187.187" functional_type="NAT">
+                <neighbour name="113.113.113.113"/>
+                <neighbour name="57.57.57.57"/>
+                <configuration name="confN">
+                    <nat>
+                        <source>113.113.113.113</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node name="57.57.57.57" functional_type="NAT">
+                <neighbour name="187.187.187.187"/>
+                <neighbour name="215.215.215.215"/>
+                <configuration name="confN">
+                    <nat>
+                        <source>187.187.187.187</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node name="41.230.52.247" functional_type="FIREWALL">
+                <neighbour name="37.37.37.37"/>
+                <neighbour name="112.237.251.18"/>
+                <configuration name="confF">
+                    <firewall defaultAction="ALLOW">
+                        <elements>
+                            <action>DENY</action>
+                            <source>52.52.52.52</source>
+                            <destination>31.63.32.117</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>135.242.217.197</source>
+                            <destination>206.33.199.109</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>22.135.215.76</source>
+                            <destination>125.125.125.125</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>135.242.217.197</source>
+                            <destination>135.242.217.197</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>218.218.218.218</source>
+                            <destination>52.52.52.52</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>52.52.52.52</source>
+                            <destination>26.246.62.12</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>168.176.159.202</source>
+                            <destination>144.139.175.36</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>46.46.46.46</source>
+                            <destination>183.178.172.156</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>49.22.16.46</source>
+                            <destination>183.178.172.156</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>22.135.215.76</source>
+                            <destination>65.65.65.65</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall>
+                </configuration>
+            </node>
+            <node name="195.231.170.31" functional_type="FIREWALL">
+                <neighbour name="24.247.128.53"/>
+                <neighbour name="112.237.251.18"/>
+                <configuration name="confF">
+                    <firewall defaultAction="ALLOW"/>
+                </configuration>
+            </node>
+            <node name="48.48.48.48" functional_type="FIREWALL">
+                <neighbour name="63.63.63.63"/>
+                <neighbour name="112.237.251.18"/>
+                <configuration name="confF">
+                    <firewall defaultAction="ALLOW"/>
+                </configuration>
+            </node>
+            <node name="228.228.228.228" functional_type="FIREWALL">
+                <neighbour name="82.98.53.112"/>
+                <neighbour name="112.237.251.18"/>
+                <configuration name="confF">
+                    <firewall defaultAction="ALLOW">
+                        <elements>
+                            <action>DENY</action>
+                            <source>81.86.209.125</source>
+                            <destination>65.65.65.65</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>8.88.103.211</source>
+                            <destination>125.125.125.125</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>65.65.65.65</source>
+                            <destination>22.135.215.76</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>218.218.218.218</source>
+                            <destination>46.46.46.46</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>206.33.199.109</source>
+                            <destination>31.63.32.117</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>225.198.216.21</source>
+                            <destination>49.22.16.46</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>135.242.217.197</source>
+                            <destination>235.0.16.31</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>183.178.172.156</source>
+                            <destination>65.65.65.65</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>183.178.172.156</source>
+                            <destination>125.125.125.125</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>65.65.65.65</source>
+                            <destination>168.176.159.202</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall>
+                </configuration>
+            </node>
+            <node name="58.58.58.58" functional_type="FIREWALL">
+                <neighbour name="84.84.84.84"/>
+                <neighbour name="112.237.251.18"/>
+                <configuration name="confF">
+                    <firewall defaultAction="ALLOW"/>
+                </configuration>
+            </node>
+            <node name="29.29.29.29" functional_type="FIREWALL">
+                <neighbour name="125.71.238.151"/>
+                <neighbour name="112.237.251.18"/>
+                <configuration name="confF">
+                    <firewall defaultAction="ALLOW">
+                        <elements>
+                            <action>DENY</action>
+                            <source>37.217.177.252</source>
+                            <destination>168.176.159.202</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>31.63.32.117</source>
+                            <destination>49.22.16.46</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>62.62.62.62</source>
+                            <destination>37.217.177.252</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>168.176.159.202</source>
+                            <destination>31.63.32.117</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>206.33.199.109</source>
+                            <destination>235.0.16.31</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>52.52.52.52</source>
+                            <destination>52.52.52.52</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>22.135.215.76</source>
+                            <destination>46.46.46.46</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>225.198.216.21</source>
+                            <destination>135.242.217.197</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>135.242.217.197</source>
+                            <destination>49.22.16.46</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>218.218.218.218</source>
+                            <destination>235.0.16.31</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall>
+                </configuration>
+            </node>
+            <node name="206.254.71.10" functional_type="FIREWALL">
+                <neighbour name="198.113.161.163"/>
+                <neighbour name="112.237.251.18"/>
+                <configuration name="confF">
+                    <firewall defaultAction="ALLOW">
+                        <elements>
+                            <action>DENY</action>
+                            <source>225.198.216.21</source>
+                            <destination>235.0.16.31</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>81.86.209.125</source>
+                            <destination>52.52.52.52</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>8.88.103.211</source>
+                            <destination>125.125.125.125</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>135.242.217.197</source>
+                            <destination>218.218.218.218</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>49.22.16.46</source>
+                            <destination>135.242.217.197</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>144.139.175.36</source>
+                            <destination>225.198.216.21</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>52.52.52.52</source>
+                            <destination>49.22.16.46</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>81.86.209.125</source>
+                            <destination>81.86.209.125</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>183.178.172.156</source>
+                            <destination>22.135.215.76</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>22.135.215.76</source>
+                            <destination>135.242.217.197</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall>
+                </configuration>
+            </node>
+            <node name="192.137.73.198" functional_type="FIREWALL">
+                <neighbour name="124.124.124.124"/>
+                <neighbour name="112.237.251.18"/>
+                <configuration name="confF">
+                    <firewall defaultAction="ALLOW"/>
+                </configuration>
+            </node>
+            <node name="175.175.175.175" functional_type="FIREWALL">
+                <neighbour name="80.80.80.80"/>
+                <neighbour name="112.237.251.18"/>
+                <configuration name="confF">
+                    <firewall defaultAction="ALLOW"/>
+                </configuration>
+            </node>
+            <node name="193.102.146.45" functional_type="FIREWALL">
+                <neighbour name="31.63.32.117"/>
+                <neighbour name="112.237.251.18"/>
+                <configuration name="confF">
+                    <firewall defaultAction="ALLOW">
+                        <elements>
+                            <action>DENY</action>
+                            <source>168.176.159.202</source>
+                            <destination>62.62.62.62</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>49.22.16.46</source>
+                            <destination>49.22.16.46</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>37.217.177.252</source>
+                            <destination>183.178.172.156</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>125.125.125.125</source>
+                            <destination>218.218.218.218</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>31.63.32.117</source>
+                            <destination>52.52.52.52</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>52.52.52.52</source>
+                            <destination>125.125.125.125</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>31.63.32.117</source>
+                            <destination>49.22.16.46</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>8.88.103.211</source>
+                            <destination>62.62.62.62</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>37.217.177.252</source>
+                            <destination>52.52.52.52</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>65.65.65.65</source>
+                            <destination>81.86.209.125</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall>
+                </configuration>
+            </node>
+            <node name="215.215.215.215">
+                <neighbour name="57.57.57.57"/>
+                <neighbour name="46.46.46.46"/>
+                <neighbour name="225.198.216.21"/>
+                <neighbour name="125.125.125.125"/>
+                <neighbour name="218.218.218.218"/>
+                <neighbour name="65.65.65.65"/>
+                <neighbour name="168.176.159.202"/>
+                <neighbour name="26.246.62.12"/>
+                <neighbour name="22.135.215.76"/>
+                <neighbour name="183.178.172.156"/>
+                <neighbour name="235.0.16.31"/>
+            </node>
+        </graph>
+    </graphs>
+    <Constraints>
+        <NodeConstraints/>
+        <LinkConstraints/>
+    </Constraints>
+    <PropertyDefinition>
+        <Property name="IsolationProperty" graph="0" src="144.139.175.36" dst="168.176.159.202" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="206.33.199.109" dst="125.125.125.125" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="62.62.62.62" dst="235.0.16.31" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="52.52.52.52" dst="26.246.62.12" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="135.242.217.197" dst="235.0.16.31" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="144.139.175.36" dst="235.0.16.31" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="206.33.199.109" dst="65.65.65.65" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="144.139.175.36" dst="218.218.218.218" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="31.63.32.117" dst="26.246.62.12" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="52.52.52.52" dst="46.46.46.46" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="135.242.217.197" dst="225.198.216.21" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="52.52.52.52" dst="168.176.159.202" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="49.22.16.46" dst="225.198.216.21" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="49.22.16.46" dst="125.125.125.125" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="37.217.177.252" dst="46.46.46.46" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="8.88.103.211" dst="183.178.172.156" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="81.86.209.125" dst="235.0.16.31" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="31.63.32.117" dst="168.176.159.202" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="37.217.177.252" dst="235.0.16.31" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="31.63.32.117" dst="183.178.172.156" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="135.242.217.197" dst="26.246.62.12" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="81.86.209.125" dst="46.46.46.46" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="81.86.209.125" dst="183.178.172.156" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="8.88.103.211" dst="22.135.215.76" src_port="*" dst_port="*"/>
+        <Property name="IsolationProperty" graph="0" src="37.217.177.252" dst="168.176.159.202" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="135.242.217.197" dst="65.65.65.65" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="62.62.62.62" dst="218.218.218.218" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="81.86.209.125" dst="218.218.218.218" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="49.22.16.46" dst="168.176.159.202" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="81.86.209.125" dst="22.135.215.76" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="49.22.16.46" dst="235.0.16.31" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="8.88.103.211" dst="65.65.65.65" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="8.88.103.211" dst="168.176.159.202" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="135.242.217.197" dst="218.218.218.218" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="62.62.62.62" dst="65.65.65.65" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="31.63.32.117" dst="225.198.216.21" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="62.62.62.62" dst="168.176.159.202" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="31.63.32.117" dst="22.135.215.76" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="37.217.177.252" dst="26.246.62.12" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="135.242.217.197" dst="183.178.172.156" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="52.52.52.52" dst="225.198.216.21" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="31.63.32.117" dst="46.46.46.46" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="81.86.209.125" dst="168.176.159.202" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="135.242.217.197" dst="168.176.159.202" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="135.242.217.197" dst="125.125.125.125" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="81.86.209.125" dst="65.65.65.65" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="144.139.175.36" dst="46.46.46.46" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="49.22.16.46" dst="65.65.65.65" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="37.217.177.252" dst="65.65.65.65" src_port="*" dst_port="*"/>
+        <Property name="CompleteReachabilityProperty" graph="0" src="62.62.62.62" dst="183.178.172.156" src_port="*" dst_port="*"/>
+    </PropertyDefinition>
+</NFV>

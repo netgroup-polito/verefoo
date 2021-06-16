@@ -172,7 +172,7 @@ public class TestCaseGeneratorAtomicPredicates {
 		central.setName(ipCentral);
 	
 		//creation of the others APs
-		for(int i = 0; i < numberAllocationPlaces-1; i++) {
+		for(int i = 0; i < numberAllocationPlaces; i++) {
 			String ip = createRandomIP();
 			Node ap = new Node();
 			ap.setName(ip);
@@ -230,7 +230,7 @@ public class TestCaseGeneratorAtomicPredicates {
 				ap.getNeighbour().add(prevNeigh);
 				numAP++;
 				prev = ap;
-				if(numAP == (numberAllocationPlaces-1)){
+				if(numAP == (numberAllocationPlaces)){
 					createdAllAPs = true;
 					break;
 				}
@@ -451,9 +451,11 @@ public class TestCaseGeneratorAtomicPredicates {
 			if(rand.nextBoolean())
 				srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
 			else srcNode = allServers.get(rand.nextInt(allServers.size())).getName();
+//			srcNode = allClients.get(rand.nextInt(allClients.size())).getName();
 			if(rand.nextBoolean())
 				dstNode = allClients.get(rand.nextInt(allClients.size())).getName();
 			else dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
+//			dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
 			if(numberRPWithPorts > 0) {
 				if(rand.nextBoolean())
 					srcPort = String.valueOf(rand.nextInt(65535));
