@@ -52,58 +52,6 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
-		testScalabilityPerformance();
-		
-		//ALL PROG
-		numberPR = 10;
-		numberWC = 30;
-		numberWS = 30;
-		numberAP  = 30;
-		numberNAT = 10;
-		numberFW = 10;
-		maxNATSrcs = 5;
-		maxFWRules = 5;
-		numberIPR  = numberPR/2;
-		numberRPR = numberPR/2;
-		numberPR = numberIPR + numberRPR;
-		percReqWithPorts = 0.0;
-		testScalabilityPerformance();
-		percReqWithPorts = 0.1;
-		testScalabilityPerformance();
-
-		//ALL PROG
-		numberPR = 15;
-		numberWC = 40;
-		numberWS = 40;
-		numberAP  = 40;
-		numberNAT = 20;
-		numberFW = 20;
-		maxNATSrcs = 10;
-		maxFWRules = 10;
-		numberIPR  = numberPR/2;
-		numberRPR = numberPR/2;
-		numberPR = numberIPR + numberRPR;
-		percReqWithPorts = 0.0;
-		testScalabilityPerformance();
-		percReqWithPorts = 0.1;
-		testScalabilityPerformance();
-
-		//ALL PROG
-		numberPR = 20;
-		numberWC = 50;
-		numberWS = 50;
-		numberAP  = 50;
-		numberNAT = 30;
-		numberFW = 30;
-		maxNATSrcs = 15;
-		maxFWRules = 15;
-		numberIPR  = numberPR/2;
-		numberRPR = numberPR/2;
-		numberPR = numberIPR + numberRPR;
-		percReqWithPorts = 0.0;
-		testScalabilityPerformance();
-		percReqWithPorts = 0.1;
-		testScalabilityPerformance();
 
 		//ALL PROG
 		numberPR = 25;
@@ -117,9 +65,7 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
-		percReqWithPorts = 0.0;
-		testScalabilityPerformance();
-		percReqWithPorts = 0.1;
+		percReqWithPorts = 0.50;
 		testScalabilityPerformance();
 
 		//ALL PROG
@@ -134,9 +80,7 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
-		percReqWithPorts = 0.0;
-		testScalabilityPerformance();
-		percReqWithPorts = 0.1;
+		percReqWithPorts = 0.50;
 		testScalabilityPerformance();
 		
 		
