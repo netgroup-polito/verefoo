@@ -427,9 +427,10 @@ public class TestCaseGeneratorAtomicPredicates {
 //			else dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
 			dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
 			if(numberIPWithPorts > 0) {
-				if(rand.nextBoolean())
-					srcPort = String.valueOf(rand.nextInt(65535));
-				else dstPort = String.valueOf(rand.nextInt(65535));
+				srcPort = String.valueOf(rand.nextInt(65535));
+//				if(rand.nextBoolean())
+//					srcPort = String.valueOf(rand.nextInt(65535));
+//				else dstPort = String.valueOf(rand.nextInt(65535));
 				numberIPWithPorts--;
 			}
 			
@@ -457,9 +458,10 @@ public class TestCaseGeneratorAtomicPredicates {
 			else dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
 			//dstNode = allServers.get(rand.nextInt(allServers.size())).getName();
 			if(numberRPWithPorts > 0) {
-				if(rand.nextBoolean())
-					srcPort = String.valueOf(rand.nextInt(65535));
-				else dstPort = String.valueOf(rand.nextInt(65535));
+				srcPort = String.valueOf(rand.nextInt(65535));
+//				if(rand.nextBoolean())
+//					srcPort = String.valueOf(rand.nextInt(65535));
+//				else dstPort = String.valueOf(rand.nextInt(65535));
 				numberRPWithPorts--;
 			}
 			
