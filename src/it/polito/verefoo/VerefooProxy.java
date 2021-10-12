@@ -201,15 +201,6 @@ public class VerefooProxy {
 //		System.out.println();
 		//END DEBUG
 		
-		//Total number of flows
-		long totalFlows = 0;
-		for(SecurityRequirement sr : securityRequirements.values()) {
-			for(FlowPath flowPath: sr.getFlowsMap().values()) {
-				totalFlows += flowPath.getAtomicFlowsMap().size();
-			}
-		}
-		testResults.setTotalFlows(totalFlows);
-		
 		//built map that assign to each allocation node the set of atomic predicates in input
 		for(SecurityRequirement sr : securityRequirements.values()) {
 			for(FlowPath flowPath: sr.getFlowsMap().values()) {

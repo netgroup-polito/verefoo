@@ -5,7 +5,6 @@ public class TestResults {
 	private long atomicFlowsCompTime;
 	private long beginMaxSMTTime;
 	private String z3Result;
-	private long totalFlows;
 	
 	public TestResults() {	
 	}
@@ -40,13 +39,5 @@ public class TestResults {
 
 	public void setZ3Result(String z3Result) {
 		this.z3Result = z3Result;
-	}
-
-	public long getTotalFlows() {
-		return totalFlows;
-	}
-
-	public void setTotalFlows(long totalFlows) {
-		this.totalFlows = totalFlows;
 	}
 }

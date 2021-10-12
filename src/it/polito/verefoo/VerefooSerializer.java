@@ -64,32 +64,31 @@ public class VerefooSerializer {
 				VerefooProxy test = new VerefooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(),
 						prop, paths);
 				testResults = test.getTestTimeResults();
-				testResults.setZ3Result("SAT");
 				
-//				long beginAll = System.currentTimeMillis();
-//				VerificationResult res = test.checkNFFGProperty();
-//				long endAll = System.currentTimeMillis();
-//				//loggerResult.debug("Only checker: " + (endAll - beginAll) + "ms");
-//				//System.out.println("Only checker: " + (endAll - beginAll) + "ms");
-//				time =  (int) res.getTime(); 
-//				
-//				if (res.result != Status.UNSATISFIABLE && res.result != Status.UNKNOWN) {
-//					Translator t = new Translator(res.model.toString(), root, g, test.getAllocationNodes(), test.getTrafficFlowsMap(), test.getNetworkAtomicPredicates());
-//					z3Model = res.model.toString();
-//					t.setNormalizer(norm);
-//					result = t.convert();
-//					root = result;
-//					sat = true; 
-//					System.out.println("SAT\n");
-//					testResults.setZ3Result("SAT");
-//				} else {
-//					System.out.println("UNSAT\n");
-//					testResults.setZ3Result("UNSAT");
-//					sat = false;
-//					result = root;
-//				}
-//				root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph() == g.getId())
-//						.forEach(p -> p.setIsSat(res.result != Status.UNSATISFIABLE));
+				long beginAll = System.currentTimeMillis();
+				VerificationResult res = test.checkNFFGProperty();
+				long endAll = System.currentTimeMillis();
+				//loggerResult.debug("Only checker: " + (endAll - beginAll) + "ms");
+				//System.out.println("Only checker: " + (endAll - beginAll) + "ms");
+				time =  (int) res.getTime(); 
+				
+				if (res.result != Status.UNSATISFIABLE && res.result != Status.UNKNOWN) {
+					Translator t = new Translator(res.model.toString(), root, g, test.getAllocationNodes(), test.getTrafficFlowsMap(), test.getNetworkAtomicPredicates());
+					z3Model = res.model.toString();
+					t.setNormalizer(norm);
+					result = t.convert();
+					root = result;
+					sat = true; 
+					System.out.println("SAT\n");
+					testResults.setZ3Result("SAT");
+				} else {
+					System.out.println("UNSAT\n");
+					testResults.setZ3Result("UNSAT");
+					sat = false;
+					result = root;
+				}
+				root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph() == g.getId())
+						.forEach(p -> p.setIsSat(res.result != Status.UNSATISFIABLE));
 
 			} 
 		} catch (BadGraphError e) {

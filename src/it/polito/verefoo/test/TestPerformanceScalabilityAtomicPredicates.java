@@ -37,15 +37,15 @@ import it.polito.verefoo.utils.TestResults;
 public class TestPerformanceScalabilityAtomicPredicates {
 	
 	public static void main(String[] args)  {	
-		numberPR = 100;
-		numberWC = 200;
-		numberWS = 200;
-		numberAP  = 200;
-		numberNAT = 50;
-		numberFW = 50;
-		maxNATSrcs = 20;
-		maxFWRules = 20;
-		runs = 20;
+		numberPR = 10;
+		numberWC = 20;
+		numberWS = 20;
+		numberAP  = 20;
+		numberNAT = 5;
+		numberFW = 5;
+		maxNATSrcs = 10;
+		maxFWRules = 10;
+		runs = 30;
 		percReqWithPorts = 0.0; //from 0.0 to 1.0
 		
 		seed  = 66361;
@@ -53,64 +53,80 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
 		
-		testScalabilityPerformance();
+		double vectorPerc[] = {0.0, 0.10, 0.25, 0.50, 1.0};
 		
-		//Prog ALL 2
-		numberPR = 150;
-		numberWC = 300;
-		numberWS = 300;
-		numberAP  = 300;
-		numberNAT = 75;
-		numberFW = 75;
-		maxNATSrcs = 30;
-		maxFWRules = 30;
+		//Prog ALL
+		numberPR = 25;
+		numberWC = 60;
+		numberWS = 60;
+		numberAP  = 60;
+		numberNAT = 20;
+		numberFW = 20;
+		maxNATSrcs = 20;
+		maxFWRules = 20;
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
-		testScalabilityPerformance();
-
-		// Prog ALL 3
-		numberPR = 200;
-		numberWC = 400;
-		numberWS = 400;
-		numberAP = 400;
-		numberNAT = 100;
-		numberFW = 100;
-		maxNATSrcs = 40;
-		maxFWRules = 40;
-		numberIPR = numberPR / 2;
-		numberRPR = numberPR / 2;
-		numberPR = numberIPR + numberRPR;
-		testScalabilityPerformance();
-
-		// Prog ALL 4
-		numberPR = 250;
-		numberWC = 500;
-		numberWS = 500;
-		numberAP = 500;
-		numberNAT = 125;
-		numberFW = 125;
-		maxNATSrcs = 50;
-		maxFWRules = 50;
-		numberIPR = numberPR / 2;
-		numberRPR = numberPR / 2;
-		numberPR = numberIPR + numberRPR;
-		testScalabilityPerformance();
-
-		// Prog ALL 5
-		numberPR = 300;
-		numberWC = 600;
-		numberWS = 600;
-		numberAP = 600;
-		numberNAT = 150;
-		numberFW = 150;
-		maxNATSrcs = 60;
-		maxFWRules = 60;
-		numberIPR = numberPR / 2;
-		numberRPR = numberPR / 2;
-		numberPR = numberIPR + numberRPR;
-		testScalabilityPerformance();
 		
+		for(double perc: vectorPerc) {
+			percReqWithPorts = perc;
+			testScalabilityPerformance();
+		}
+
+	
+		//Prog ALL
+		numberPR = 20;
+		numberWC = 50;
+		numberWS = 50;
+		numberAP  = 50;
+		numberNAT = 15;
+		numberFW = 15;
+		maxNATSrcs = 15;
+		maxFWRules = 15;
+		numberIPR  = numberPR/2;
+		numberRPR = numberPR/2;
+		numberPR = numberIPR + numberRPR;
+
+		for(double perc: vectorPerc) {
+			percReqWithPorts = perc;
+			testScalabilityPerformance();
+		}
+		
+		//Prog ALL
+		numberPR = 15;
+		numberWC = 40;
+		numberWS = 40;
+		numberAP  = 40;
+		numberNAT = 10;
+		numberFW = 10;
+		maxNATSrcs = 10;
+		maxFWRules = 10;
+		numberIPR  = numberPR/2;
+		numberRPR = numberPR/2;
+		numberPR = numberIPR + numberRPR;
+
+		for(double perc: vectorPerc) {
+			percReqWithPorts = perc;
+			testScalabilityPerformance();
+		}
+
+		//Prog ALL
+		numberPR = 10;
+		numberWC = 30;
+		numberWS = 30;
+		numberAP  = 30;
+		numberNAT = 5;
+		numberFW = 5;
+		maxNATSrcs = 5;
+		maxFWRules = 5;
+		numberIPR  = numberPR/2;
+		numberRPR = numberPR/2;
+		numberPR = numberIPR + numberRPR;
+
+		for(double perc: vectorPerc) {
+			percReqWithPorts = perc;
+			testScalabilityPerformance();
+		}
 		
 		System.out.println("TEST TERMINATI");
 	}
@@ -176,16 +192,13 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		long atomicPredCompTime = results.getAtomicPredCompTime();
 		long atomicFlowsCompTime = results.getAtomicFlowsCompTime();
 		long maxSMTtime = endAll - results.getBeginMaxSMTTime();
-		long totalFlows = results.getTotalFlows();
 		
 		String resString = new String("Total time " + totalTime +  "ms, atomicPredCompTime " 
 				+ atomicPredCompTime +  "ms, atomicFlowsCompTime " 
-				+ atomicFlowsCompTime + "ms, maxSMT time " 
-				+ maxSMTtime + "ms, total flows "
-				+ totalFlows);
+				+ atomicFlowsCompTime + "ms, maxSMT time " + maxSMTtime + "ms;");
 		
 		System.out.println(resString);
-		logger.info(totalTime + "\t" + atomicPredCompTime + "\t" + atomicFlowsCompTime + "\t" + maxSMTtime + "\t" + results.getZ3Result() + "\t" + totalFlows + "\t");
+		logger.info(totalTime + "\t" + atomicPredCompTime + "\t" + atomicFlowsCompTime + "\t" + maxSMTtime + "\t" + results.getZ3Result() + "\t");
         return test.getResult();
 	}
 	
