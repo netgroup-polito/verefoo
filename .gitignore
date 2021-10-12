@@ -2,7 +2,6 @@
 /target/
 /gen-src/
 /gen-protobuf/
-/log/
 /bin/
 /result.xml
 /testfile/tmp.xml
