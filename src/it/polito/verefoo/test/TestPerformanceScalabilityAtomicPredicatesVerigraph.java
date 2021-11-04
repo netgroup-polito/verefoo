@@ -27,14 +27,14 @@ import org.junit.Test;
 
 import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.extra.Package1LoggingClass;
-import it.polito.verefoo.extra.TestCaseGeneratorAtomicPredicates;
+import it.polito.verefoo.extra.TestCaseGeneratorAtomicPredicatesVerigraph;
 import it.polito.verefoo.jaxb.NFV;
 import it.polito.verefoo.utils.TestResults;
 
 /* Run some instances of TestCaseGeneratorAtomicPredicates. TestCaseGeneratorAtomicPredicates generates XML files for NFV, then this
  * class takes in input those files, for each of them runs Verefoo and print results and other statistics (time to complete, memory usage etc).
  * */
-public class TestPerformanceScalabilityAtomicPredicates {
+public class TestPerformanceScalabilityAtomicPredicatesVerigraph {
 	
 	public static void main(String[] args)  {	
 		numberPR = 10;
@@ -45,15 +45,15 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		numberFW = 5;
 		maxNATSrcs = 10;
 		maxFWRules = 10;
-		runs = 30;
+		runs = 10;
 		percReqWithPorts = 0.0; //from 0.0 to 1.0
 		
 		seed  = 66361;
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
-
-		//Prog ALL
+		
+		//NEW TESTS
 		numberPR = 30;
 		numberWC = 70;
 		numberWS = 70;
@@ -65,9 +65,9 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
-
+		percReqWithPorts = 0.5;
+		
 		testScalabilityPerformance();
-
 		System.out.println("TEST TERMINATI");
 	}
 	
@@ -158,11 +158,11 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	        /* Switch between automatic and manul configuration of the IP*/
 	        int k=0, i=0;
 	        try {
-	        	List<TestCaseGeneratorAtomicPredicates> nfv = new ArrayList<>();
-	        	nfv.add(new TestCaseGeneratorAtomicPredicates("Test case generator atomic predicates", numberAP, numberWC, numberWS, 
+	        	List<TestCaseGeneratorAtomicPredicatesVerigraph> nfv = new ArrayList<>();
+	        	nfv.add(new TestCaseGeneratorAtomicPredicatesVerigraph("Test case generator atomic predicates", numberAP, numberWC, numberWS, 
 	        			numberRPR, numberIPR, numberNAT, numberFW, maxNATSrcs, maxFWRules, percReqWithPorts, 1));
 
-	        	for(TestCaseGeneratorAtomicPredicates f : nfv){
+	        	for(TestCaseGeneratorAtomicPredicatesVerigraph f : nfv){
 
 	        		// create a JAXBContext capable of handling the generated classes
 	        		//long beginAll=System.currentTimeMillis();
