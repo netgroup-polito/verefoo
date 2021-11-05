@@ -500,31 +500,31 @@ public class TestCaseGeneratorAtomicPredicatesVerigraph {
 		
 		//Create loop in the network: take couples of NAT and link them
 		//START CREATE LOOP
-//		boolean found;
-//		for(int i=0; i<2; i++) {
-//			found = false;
-//			Node node1 = allNATs.get(rand.nextInt(allNATs.size()));
-//			Node node2 = allNATs.get(rand.nextInt(allNATs.size()));
-//			
-//			if(!node1.getName().equals(node2.getName())) {
-//				//Check if the two node are already neighbours
-//				for(Neighbour tmpNeig: node1.getNeighbour()) {
-//					if(tmpNeig.getName().equals(node2.getName())) {
-//						found = true;
-//						break;
-//					}
-//				}
-//				if(!found) {
-//					Neighbour neig1 = new Neighbour();
-//					Neighbour neig2  = new Neighbour();
-//					neig1.setName(node2.getName());
-//					neig2.setName(node1.getName());
-//					node1.getNeighbour().add(neig1);
-//					node2.getNeighbour().add(neig2);
-//				} else i--;
-//					
-//			}else i--; //repeat iteration
-//		}
+		boolean found;
+		for(int i=0; i<2; i++) {
+			found = false;
+			Node node1 = allNATs.get(rand.nextInt(allNATs.size()));
+			Node node2 = allNATs.get(rand.nextInt(allNATs.size()));
+			
+			if(!node1.getName().equals(node2.getName())) {
+				//Check if the two node are already neighbours
+				for(Neighbour tmpNeig: node1.getNeighbour()) {
+					if(tmpNeig.getName().equals(node2.getName())) {
+						found = true;
+						break;
+					}
+				}
+				if(!found) {
+					Neighbour neig1 = new Neighbour();
+					Neighbour neig2  = new Neighbour();
+					neig1.setName(node2.getName());
+					neig2.setName(node1.getName());
+					node1.getNeighbour().add(neig1);
+					node2.getNeighbour().add(neig2);
+				} else i--;
+					
+			}else i--; //repeat iteration
+		}
 		//END CREATE LOOP
 
 		//add the nodes in the graph
