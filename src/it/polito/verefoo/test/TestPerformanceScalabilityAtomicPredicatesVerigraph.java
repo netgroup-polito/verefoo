@@ -53,21 +53,8 @@ public class TestPerformanceScalabilityAtomicPredicatesVerigraph {
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
 		
-		//NEW TESTS
-		numberPR = 30;
-		numberWC = 70;
-		numberWS = 70;
-		numberAP  = 70;
-		numberNAT = 25;
-		numberFW = 25;
-		maxNATSrcs = 25;
-		maxFWRules = 25;
-		numberIPR  = numberPR/2;
-		numberRPR = numberPR/2;
-		numberPR = numberIPR + numberRPR;
-		percReqWithPorts = 0.5;
-		
 		testScalabilityPerformance();
+				
 		System.out.println("TEST TERMINATI");
 	}
 	
@@ -132,13 +119,15 @@ public class TestPerformanceScalabilityAtomicPredicatesVerigraph {
 		long atomicPredCompTime = results.getAtomicPredCompTime();
 		long atomicFlowsCompTime = results.getAtomicFlowsCompTime();
 		long maxSMTtime = endAll - results.getBeginMaxSMTTime();
+		long numberOfFlows = results.getTotalFlows();
 		
 		String resString = new String("Total time " + totalTime +  "ms, atomicPredCompTime " 
 				+ atomicPredCompTime +  "ms, atomicFlowsCompTime " 
-				+ atomicFlowsCompTime + "ms, maxSMT time " + maxSMTtime + "ms;");
+				+ atomicFlowsCompTime + "ms, maxSMT time " + maxSMTtime + "ms "
+				+ numberOfFlows + "flows;");
 		
 		System.out.println(resString);
-		logger.info(totalTime + "\t" + atomicPredCompTime + "\t" + atomicFlowsCompTime + "\t" + maxSMTtime + "\t" + results.getZ3Result() + "\t");
+		logger.info(totalTime + "\t" + atomicPredCompTime + "\t" + atomicFlowsCompTime + "\t" + maxSMTtime + "\t" + numberOfFlows + "\t" + results.getZ3Result() + "\t");
         return test.getResult();
 	}
 	
