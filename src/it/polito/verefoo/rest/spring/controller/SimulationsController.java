@@ -8,12 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +20,7 @@ import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.NFV;
 import it.polito.verefoo.rest.spring.ResourceWrapperWithLinks;
 import it.polito.verefoo.rest.spring.service.SimulationService;
+
 
 @RestController
 @RequestMapping(value = "/adp/simulations", produces = {"application/xml", "application/json" })
@@ -104,7 +100,7 @@ public class SimulationsController {
 	}
 
 
-
+	@CrossOrigin
 	@Operation(tags = "simulations", summary = "Get the result of a past simulation", description = "This API is not intended to run a new simulation.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = ""),
@@ -118,14 +114,16 @@ public class SimulationsController {
 
 		String url = request.getRequestURL().toString();
 		url = url.substring(0, url.lastIndexOf("/"));
-		return ResponseEntity.status(HttpStatus.OK).body(
+
+
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(
 				// wrap the response with the hyperlinks
 				new ResourceWrapperWithLinks<NFV>()
 						.addLink(url + "/" + smid, "self", RequestMethod.GET)
 						.addLink(url, "collection", RequestMethod.POST)
 						.wrap(result));
 	}
-
 
 
 	@Operation(tags = "simulations", summary = "Get the result of a past simulation", description = "This API is not intended to run a new simulation.")
@@ -136,6 +134,7 @@ public class SimulationsController {
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	public ResponseEntity<Resources<List<NFV>>> getSimulationResults() {
+
 
 		List<NFV> results = service.getSimulationResults();
 
