@@ -36,10 +36,13 @@ public class BPFFirewall {
 	private long id;
 	private Node node;
 	private List<Elements> policies;
+	private List<Elements> policiesWithPriority;
+	private List<Elements> policiesWithoutPriority;
 	private int startSrcPort;
 	private int endSrcPort;
 	private int startDstPort;
 	private int endDstPort;
+	private int temp;
 	private String filename;
 	private String srcAddresses;
 	private String dstAddresses;
@@ -64,8 +67,8 @@ public class BPFFirewall {
 	 */
 	public BPFFirewall(long id, Node node) throws Exception {
 		this.id = id;
-		// name of the script
-		filename = new String("bpfFirewall_" + this.id + ".sh");
+		// in the node description there is the fire wall number or name
+		filename = new String("bpfFirewall_"  + node.getConfiguration().getDescription() + "_" + this.id + ".sh");
 
 		this.node = node;
 
@@ -108,17 +111,21 @@ public class BPFFirewall {
 
 		if (!(policies = node.getConfiguration().getFirewall().getElements()).isEmpty()) {
 
-			if (!(policies.get(0).getPriority() == null)) {
-
-				if (!policies.get(0).getPriority().equals("*"))
-					policies = policies.stream().sorted(Comparator.comparing(Elements::getPriority).reversed())
-							.collect(Collectors.toList());
+	    	policiesWithPriority = policies.stream().filter(p -> (p.getPriority() != null && p.getPriority() != "*")).collect(Collectors.toList());
+			if(!policiesWithPriority.isEmpty()) {
+				policiesWithoutPriority = policies.stream().filter(p -> (p.getPriority() == null  || p.getPriority() == "*" )).collect(Collectors.toList());
+				policiesWithPriority = policiesWithPriority.stream().sorted((e1, e2) -> new Integer(e1.getPriority()).compareTo(new Integer(e2.getPriority())) )
+						.collect(Collectors.toList());
+				if(!policiesWithoutPriority.isEmpty())
+					policiesWithPriority.addAll(policiesWithoutPriority);
+				policies.clear(); // copy new list to original list
+				policies.addAll(policiesWithPriority); 
 			}
-
 			for (int index = 0; index < policies.size(); index++) {
 				srcAddresses = getAddressWithNetmask(policies.get(index).getSource(), 4);
 				dstAddresses = getAddressWithNetmask(policies.get(index).getDestination(), 4);
-
+				srcRanged = false;
+				dstRanged = false;
 				if (policies.get(index).getSrcPort().equals("*")) {
 					startSrcPort = -1;
 					endSrcPort = -1;
@@ -225,25 +232,28 @@ public class BPFFirewall {
 					+ protocol + sport + dport + " action=" + action + "\n");
 		}
 
-		if (isDirectional) {
-			insertRule(protocol, dstAddresses, srcAddresses, dstPort, srcPort, action, dstRangePort, srcRangePort,
-					false);
-			isDirectional = false;
-		}
 
 		if (srcRangePort) {
 			for (int port = srcPort + 1; port <= endSrcPort; port++) {
 				insertRule(protocol, srcAddresses, dstAddresses, port, dstPort, action, false, dstRangePort,
-						isDirectional);
+						false);
 			}
 			srcRangePort = false;
 		}
 		if (dstRangePort) {
 			for (int port = dstPort + 1; port <= endDstPort; port++) {
 				insertRule(protocol, srcAddresses, dstAddresses, srcPort, port, action, srcRangePort, false,
-						isDirectional);
+						false);
 			}
 
+		}
+		if (isDirectional) {
+			temp = endDstPort;
+			endDstPort =endSrcPort;
+			endSrcPort = temp;
+			insertRule(protocol, dstAddresses, srcAddresses, dstPort, srcPort, action, dstRangePort, srcRangePort,
+					false);
+			isDirectional = false;
 		}
 	}
 
@@ -274,6 +284,9 @@ public class BPFFirewall {
 		}
 
 		switch (netmask) {
+		case 0:
+			addressformatted = new String("0.0.0.0/0"); // for source/destination up that is ANY
+			break;
 		case 1:
 			addressformatted = new String(addrArray[0] + ".0.0.0/8");
 			break;

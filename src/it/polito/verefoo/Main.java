@@ -56,8 +56,8 @@ public class Main {
 					loggerResult.info("--------------------------------------------------");
 					
 					loggerResult.info("----------------------OUTPUTFIREWALL---------------");
-					//local debug
-					FirewallSerializer fs = new FirewallSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/Others/useCaseFirewallDeployment.xml")),FirewallDeploy.ALL);
+					//local debug ( note that EBPF fire wall type takes as input TestCases_bpf.xml not TestCases.xml or this will generate huge configuration file )
+					FirewallSerializer fs = new FirewallSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/Others/TestCases.xml")),FirewallDeploy.IPTABLES);
 					//uncomment for link to ADP module output
 					//FirewallSerializer fs = new FirewallSerializer((NFV) u.unmarshal(new StringReader(stringWriter.toString())));
 	

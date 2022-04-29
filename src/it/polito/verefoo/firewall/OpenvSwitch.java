@@ -53,8 +53,8 @@ public class OpenvSwitch {
 	 */
 	public OpenvSwitch(long id, Node node) throws Exception {
 		this.id = id;
-		// name of the script
-		filename = new String("ovsFirewall_" + this.id + ".sh");
+		// in the node description there is the fire wall number or name
+		filename = new String("ovsFirewall_" + node.getConfiguration().getDescription() + "_" + this.id + ".sh");
 
 		this.node = node;
 		// node.getId();
@@ -163,8 +163,8 @@ public class OpenvSwitch {
 
 			}
 		}
-		// last priority
-		addPolicy(-1, null, null, 65535,
+     // the default action is of priority 65534 to over ride the priority of default action on the open v switch which is 65535 ( can't be removed or it will affect open v switch functioning )
+		addPolicy(-1, null, null, 65534, 
 				(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) ? "NORMAL"
 						: "drop",
 				null, null, false);
@@ -314,6 +314,9 @@ public class OpenvSwitch {
 		}
 
 		switch (netmask) {
+		case 0:
+			addressformatted = new String("0.0.0.0/0"); // for source/destination up that is ANY
+			break;
 		case 1:
 			addressformatted = new String(addrArray[0] + ".0.0.0/8");
 			break;

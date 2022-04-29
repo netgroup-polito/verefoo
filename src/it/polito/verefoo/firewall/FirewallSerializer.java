@@ -25,7 +25,6 @@ import it.polito.verefoo.utils.VerificationResult;
 public class FirewallSerializer {
 
 	private NFV nfv;
-
 	// private List<Fortinet> Firewalls= new LinkedList<>();
 	// private List<IpFirewall> Firewalls= new LinkedList<>();
 	// private List<BPFFirewall> Firewalls= new LinkedList<>();
@@ -47,18 +46,23 @@ public class FirewallSerializer {
 		switch (type) {
 		case FORTINET:
 			IsFortinet = true;
+			break; // added break in order for the switch case work properly
 		case OPENVSWITCH:
 			IsOpenvSwitch = true;
+			break;
 		case IPFIREWALL:
 			IsIPFW = true;
+			break;
 		case IPTABLES:
 			IsIptables = true;
+			break;
 		case EBPF:
 			IsBPF = true;
+			break;
 		case ALL:
-			IsFortinet = true;
+			//IsFortinet = true; // Not Relevant for the Containerized virtual environment testing
 			IsOpenvSwitch = true;
-			IsIPFW = true;
+			//IsIPFW = true; // Not Relevant for the Containerized virtual environment
 			IsIptables = true;
 			IsBPF = true;
 		}
@@ -85,6 +89,7 @@ public class FirewallSerializer {
 					throw new Exception();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
+					 System.out.println("Firewall List Empty");
 					e.printStackTrace();
 				}
 			}

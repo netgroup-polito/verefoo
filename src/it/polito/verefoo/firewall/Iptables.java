@@ -1,5 +1,7 @@
 package it.polito.verefoo.firewall;
 
+import static java.util.stream.Collectors.toList;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,6 +11,7 @@ import java.util.stream.Collectors;
 
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.Elements;
+import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Node;
 
 /**
@@ -22,6 +25,8 @@ public class Iptables {
 	private long id;
 	private Node node;
 	private List<Elements> policies;
+	private List<Elements> policiesWithPriority;
+	private List<Elements> policiesWithoutPriority;
 	private int startSrcPort;
 	private int endSrcPort;
 	private int startDstPort;
@@ -31,7 +36,6 @@ public class Iptables {
 	private String dstAddresses;
 	private FileWriter configurationWriter;
 	private boolean isFirst = true;
-
 	/**
 	 * Create a script using:
 	 * 
@@ -48,8 +52,14 @@ public class Iptables {
 	 */
 	public Iptables(long id, Node node) throws Exception {
 		this.id = id;
-		// name of the script
-		filename = new String("iptablesFirewall_" + this.id + ".sh");
+		
+		if (node.getConfiguration() == null)
+			throw new IOException();
+		if (node.getConfiguration().getDescription() == null)
+			throw new IOException();
+		
+		// in the node description there is the fire wall number or name
+		filename = new String("iptablesFirewall_" + node.getConfiguration().getDescription() + "_" + this.id + ".sh");
 
 		this.node = node;
 		File configuration = new File(filename);
@@ -83,19 +93,23 @@ public class Iptables {
 
 		// set default action of INPUT and OUTPUT to deny and permit ssh traffic (?)
 		if (node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.DENY)) {
-			configurationWriter.write("${cmd} -P INPUT DROP\n${cmd} -P FORWARD DROP\n${cmd} -P OUTPUT DROP\n");
+			configurationWriter.write("${cmd} -P INPUT DROP\n${cmd} -P FORWARD DROP\n${cmd} -P OUTPUT DROP\n"); 
 		} else {
 			configurationWriter.write("${cmd} -P INPUT ACCEPT\n${cmd} -P FORWARD ACCEPT\n${cmd} -P OUTPUT ACCEPT\n");
 		}
 
-		if (!(policies = node.getConfiguration().getFirewall().getElements()).isEmpty()) {
-			if (policies.get(0).getPriority() != null) {
+		if (!(policies = node.getConfiguration().getFirewall().getElements()).isEmpty()) { //fixed 
 
-				if (!policies.get(0).getPriority().equals("*"))
-					policies = policies.stream().sorted(Comparator.comparing(Elements::getPriority).reversed())
-							.collect(Collectors.toList());
+	    	policiesWithPriority = policies.stream().filter(p -> (p.getPriority() != null && p.getPriority() != "*")).collect(Collectors.toList()); // order according to priority
+			if(!policiesWithPriority.isEmpty()) {
+				policiesWithoutPriority = policies.stream().filter(p -> (p.getPriority() == null  || p.getPriority() == "*" )).collect(Collectors.toList());
+				policiesWithPriority = policiesWithPriority.stream().sorted((e1, e2) -> new Integer(e1.getPriority()).compareTo(new Integer(e2.getPriority())) )
+						.collect(Collectors.toList());
+				if(!policiesWithoutPriority.isEmpty())
+					policiesWithPriority.addAll(policiesWithoutPriority);
+				policies.clear(); // copy new list to original list
+				policies.addAll(policiesWithPriority); 
 			}
-
 			for (int index = 0; index < policies.size(); index++) {
 				srcAddresses = getAddressWithNetmask(policies.get(index).getSource(), 4);
 				dstAddresses = getAddressWithNetmask(policies.get(index).getDestination(), 4);
@@ -213,7 +227,7 @@ public class Iptables {
 					+ sport + dport + " -j " + action + "\n");
 		}
 		if (isDirectional) {
-			insertRule(protocol, dstAddresses, dstAddresses, startDstPort, startSrcPort, endDstPort, endSrcPort, action,
+			insertRule(protocol, dstAddresses, srcAddresses, startDstPort, startSrcPort, endDstPort, endSrcPort, action,
 					false);
 
 		}
@@ -248,6 +262,9 @@ public class Iptables {
 		}
 
 		switch (netmask) {
+		case 0:
+			addressformatted = new String("0.0.0.0/0"); // for source/destination IP that is ANY ( common problem in all fire wall types )
+			break;
 		case 1:
 			addressformatted = new String(addrArray[0] + ".0.0.0/8");
 			break;

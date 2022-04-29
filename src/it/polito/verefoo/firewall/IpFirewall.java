@@ -47,8 +47,8 @@ public class IpFirewall {
 	 */
 	public IpFirewall(long id, Node node) throws Exception {
 		this.id = id;
-		// id da usare per il nome del file rc_id.rules
-		filename = new String("rc_" + this.id + ".rules");
+		// in the node description there is the fire wall number or name
+		filename = new String("rc_" + node.getConfiguration().getDescription() + "_" + this.id + ".rules");
 
 		this.node = node;
 		if (node.getConfiguration() == null)
@@ -89,7 +89,7 @@ public class IpFirewall {
 			for (int index = 0; index < policies.size(); index++) {
 				priority = 1;
 				if (!(policies.get(index).getPriority() == null))
-					if (!policies.get(0).getPriority().equals("*"))
+					if (!policies.get(index).getPriority().equals("*")) // fix error not .get(*) 
 						priority = Integer.valueOf(policies.get(index).getPriority());
 				srcAddresses = getAddressWithNetmask(policies.get(index).getSource(), 4);
 				dstAddresses = getAddressWithNetmask(policies.get(index).getDestination(), 4);
@@ -189,6 +189,9 @@ public class IpFirewall {
 		}
 
 		switch (netmask) {
+		case 0:
+			addressformatted = new String("0.0.0.0/0"); // for source/destination up that is ANY
+			break;
 		case 1:
 			addressformatted = new String(addrArray[0] + ".0.0.0/8");
 			break;
