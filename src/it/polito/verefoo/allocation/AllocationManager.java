@@ -6,18 +6,14 @@ import java.util.List;
 import com.microsoft.z3.Context;
 
 import it.polito.verefoo.extra.WildcardManager;
-import it.polito.verefoo.functions.DPI;
-import it.polito.verefoo.functions.DPIS;
 import it.polito.verefoo.functions.EndHost;
 import it.polito.verefoo.functions.Forwarder;
 import it.polito.verefoo.functions.GenericFunction;
 import it.polito.verefoo.functions.LoadBalancer;
 import it.polito.verefoo.functions.NAT;
 import it.polito.verefoo.functions.PacketFilter;
-import it.polito.verefoo.functions.PriorityPacketFilter;
 import it.polito.verefoo.functions.StatefulPacketFilter;
 import it.polito.verefoo.functions.TrafficMonitor;
-import it.polito.verefoo.functions.WAF;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Node;
@@ -161,64 +157,6 @@ public class AllocationManager {
 						}
 					}
 				}
-				
-				else if(node.getFunctionalType() == FunctionalTypes.PRIORITY_FIREWALL) {
-					PriorityPacketFilter ppf = new PriorityPacketFilter(allocationNode, ctx, nctx);
-					allocationNode.setPlacedNF(ppf);
-					allocationNode.setTypeNF(FunctionalTypes.PRIORITY_FIREWALL);
-					
-					if(node.getConfiguration().getFirewall().getDefaultAction() != null) {
-						if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
-							ppf.setDefaultAction(true);
-						}else if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.DENY)){
-							ppf.setDefaultAction(false);
-						}
-					}
-				}
-				
-				else if(node.getFunctionalType() == FunctionalTypes.WEB_APPLICATION_FIREWALL) {
-					WAF waf = new WAF(allocationNode, ctx, nctx);
-					allocationNode.setPlacedNF(waf);
-					allocationNode.setTypeNF(FunctionalTypes.WEB_APPLICATION_FIREWALL);
-					
-					if(node.getConfiguration().getWebApplicationFirewall().getDefaultAction() != null) {
-						if(node.getConfiguration().getWebApplicationFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
-							waf.setDefaultAction(true);
-						}else if(node.getConfiguration().getWebApplicationFirewall().getDefaultAction().equals(ActionTypes.DENY)){
-							waf.setDefaultAction(false);
-						}
-					}
-				}
-				
-				else if(node.getFunctionalType() == FunctionalTypes.DPI) {
-					DPI dpi = new DPI(allocationNode, ctx, nctx);
-					allocationNode.setPlacedNF(dpi);
-					allocationNode.setTypeNF(FunctionalTypes.DPI);
-					
-					if(node.getConfiguration().getDpi().getDefaultAction() != null) {
-						if(node.getConfiguration().getDpi().getDefaultAction().equals(ActionTypes.ALLOW)) {
-							dpi.setDefaultAction(true);
-						}else if(node.getConfiguration().getDpi().getDefaultAction().equals(ActionTypes.DENY)){
-							dpi.setDefaultAction(false);
-						}
-					}
-				}
-				
-				else if(node.getFunctionalType() == FunctionalTypes.DPI_S) {
-					DPIS dpi = new DPIS(allocationNode, ctx, nctx);
-					allocationNode.setPlacedNF(dpi);
-					allocationNode.setTypeNF(FunctionalTypes.DPI_S);
-					
-					if(node.getConfiguration().getDpi().getDefaultAction() != null) {
-						if(node.getConfiguration().getDpi().getDefaultAction().equals(ActionTypes.ALLOW)) {
-							dpi.setDefaultAction(true);
-						}else if(node.getConfiguration().getDpi().getDefaultAction().equals(ActionTypes.DENY)){
-							dpi.setDefaultAction(false);
-						}
-					}
-				}
-
-
 			}
 			
 		});
@@ -282,18 +220,6 @@ public class AllocationManager {
 			}else if(type.equals(FunctionalTypes.STATEFUL_FIREWALL)) {
 				StatefulPacketFilter fw = (StatefulPacketFilter) no;
 				fw.manualConfiguration();
-			}else if(type.equals(FunctionalTypes.PRIORITY_FIREWALL)) {
-				PriorityPacketFilter fw = (PriorityPacketFilter) no;
-				fw.manualConfiguration();
-			}else if(type.equals(FunctionalTypes.WEB_APPLICATION_FIREWALL)) {
-				WAF waf = (WAF) no;
-				waf.manualConfiguration();
-			}else if(type.equals(FunctionalTypes.DPI)) {
-				DPI dpi = (DPI) no;
-				dpi.manualConfiguration();
-			}else if(type.equals(FunctionalTypes.DPI_S)) {
-				DPIS dpi = (DPIS) no;
-				dpi.manualConfiguration();
 			}
 		});
 		

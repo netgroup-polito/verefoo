@@ -26,7 +26,6 @@ import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Node;
 import it.polito.verefoo.jaxb.PName;
 import it.polito.verefoo.solver.NetContext;
-import it.polito.verefoo.utils.PacketFilterRule;
 import it.polito.verefoo.utils.Tuple;
 
 /** Represents a Packet Filter with the associated Access Control List
@@ -35,7 +34,6 @@ import it.polito.verefoo.utils.Tuple;
 public class PacketFilter extends GenericFunction{
 
 	FuncDecl filtering_function;
-	ArrayList<PacketFilterRule> rules; 
 	boolean autoConfigured;
 	BoolExpr behaviour;
 	FuncDecl rule_func;
@@ -60,7 +58,6 @@ public class PacketFilter extends GenericFunction{
 		
 		pf = source.getZ3Name();
 		constraints = new ArrayList<BoolExpr>();
-   		rules = new ArrayList<>();
 		isEndHost = false;
 
    		// true for blacklisting, false for whitelisting

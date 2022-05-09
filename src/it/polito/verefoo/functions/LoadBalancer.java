@@ -2,6 +2,7 @@ package it.polito.verefoo.functions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.microsoft.z3.BoolExpr;
@@ -46,8 +47,12 @@ public class LoadBalancer extends GenericFunction {
 	 */
 	public void loadBalancerConfiguration(DatatypeExpr lbIp) {
 		
-		for(FlowPath flow : source.getFlows().values()) {
-    		constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(flow.getIdFlow())), ctx.mkFalse()));
+
+    	for(Map<Integer, Integer> flowMap : source.getMapFlowIdAtomicPredicatesInInput().values()) {
+    		for(Integer traffic : flowMap.values()) {
+    			constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
+    		}
+    		
     	}
 	}
 
