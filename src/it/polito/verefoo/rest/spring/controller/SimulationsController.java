@@ -43,7 +43,7 @@ public class SimulationsController {
 	})
 
 	@RequestMapping(value = "", consumes = { "application/xml", "application/json" }, method = RequestMethod.POST)
-	public ResponseEntity<Resources<Long>> runSimulationByNFV(@RequestBody NFV nfv, @RequestParam(value = "fid", required = false) List<FunctionalTypes> usableFunctionalTypes) {
+	public ResponseEntity<Resources<NFV>> runSimulationByNFV(@RequestBody NFV nfv, @RequestParam(value = "fid", required = false) List<FunctionalTypes> usableFunctionalTypes) {
 		try {
 			// the nfv is modified in place by VerefooSerializer
 			new VerefooSerializer(nfv);
@@ -53,14 +53,15 @@ public class SimulationsController {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 
-		Long simulationId = service.createSimulationResult(nfv);
+		//Long simulationId = service.createSimulationResult(nfv);
 
 		String url = request.getRequestURL().toString();
 		return ResponseEntity.status(HttpStatus.OK).body(
 				// wrap the response with the hyperlinks
-				new ResourceWrapperWithLinks<Long>()
-						.addLink(url + "/" + simulationId, "self", RequestMethod.GET)
-						.wrap(simulationId));
+				new ResourceWrapperWithLinks<NFV>()
+				.addLink(url + "/" + 1, "self", RequestMethod.GET)
+				.addLink(url, "collection", RequestMethod.POST)
+				.wrap(nfv));
 	}
 
 
