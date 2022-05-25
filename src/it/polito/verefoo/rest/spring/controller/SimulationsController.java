@@ -18,6 +18,8 @@ import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.NFV;
+import it.polito.verefoo.jaxb.Neighbour;
+import it.polito.verefoo.jaxb.Node;
 import it.polito.verefoo.rest.spring.ResourceWrapperWithLinks;
 import it.polito.verefoo.rest.spring.service.SimulationService;
 
@@ -46,6 +48,18 @@ public class SimulationsController {
 	public ResponseEntity<Resources<NFV>> runSimulationByNFV(@RequestBody NFV nfv, @RequestParam(value = "fid", required = false) List<FunctionalTypes> usableFunctionalTypes) {
 		try {
 			// the nfv is modified in place by VerefooSerializer
+			
+			Long index1 = (long) 1;
+			Long index2 = (long) 100;
+			for(Node node : nfv.getGraphs().getGraph().get(0).getNode()){
+				node.setId(index1);
+				index1++;
+				for(Neighbour neigh : node.getNeighbour()) {
+					neigh.setId(index2);
+					index2++;
+				}
+			}
+				
 			new VerefooSerializer(nfv);
 		} catch (BadGraphError e) {
 			throw verefooCoreExceptionBuilder(e);
