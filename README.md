@@ -75,14 +75,19 @@ You can find a full demonstration of the VEREFOO framework at the following link
 In this demo, VEREFOO has been used to automatically computed the firewall allocation scheme and configuration in a virtual network that is devoid of firewalling functionalities.
 
 The input Service Graph represents a ramified network, where multiple different function types are included, e.g., a load balancer, a web cache, a traffic monitor, a network address translators. Some end points are single hosts, whereas other ones are subnetworks representing the office networks of some companies.
+
 ![Service Graph](./resources/demo-images/SG.png)
+
 ![Service Graph functions](./resources/demo-images/SGfunctions.png)
 
 The input Network Security Requirements establish which traffic flows must be blocked because potentially malicioucs, and which other must be able tor each their destination to ansure network connectivity. 
+
 ![Network Security Requirements](./resources/demo-images/NSRs.png)
 
 After running the framework, VEREFOO produces two outputs. On the one hand, it establishes the optimal firewall allocation scheme, composed of the minimum number of firewall instances to be placed in the input Allocation Places. On the other hand, for each allocated instance, it computes the optimal configuration, composed of a default action and the smallest set of filtering rules. 
+
 ![Firewall Allocation Scheme](./resources/demo-images/FAS.png)
+
 ![Firewall Configuration](./resources/demo-images/FwRules.png)
 
 ## Resources
