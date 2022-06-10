@@ -1,4 +1,4 @@
-![](/resources/verefoo_icon.png)
+![](resources/verefoo_icon.png)
 
 ##### VEREFOO (VErified REFinement and Optimized Orchestrator) is a framework  designed to provide an automatic way to allocate packet filters – the most common and traditional firewall technology – in a Service Graph defined by the service designer and an auto-configuration technique to create firewall rules with respect to the specified security requirements.
 
@@ -67,6 +67,23 @@ The current version of the Neo4j server is 3.5.25 (Community Edition): it is com
 * The required JDK for more recent releases may be the JDK 11 at least, while the current compiler for Verifoo is Java 8; the migration to a newer JDK **must** be first agreed with all the developers of the project;
 * The configuration of Spring in the file SpringBootConfiguration should be changed because some classes are not available anymore;
 * The Neo4j annotations in the DAO classes (which start with *db*) may change formalism.
+
+## DEMO
+
+You can find a full demonstration of the VEREFOO framework at the following link: https://youtu.be/QCFNLE2gHgE
+
+In this demo, VEREFOO has been used to automatically computed the firewall allocation scheme and configuration in a virtual network that is devoid of firewalling functionalities.
+
+The input Service Graph represents a ramified network, where multiple different function types are included, e.g., a load balancer, a web cache, a traffic monitor, a network address translators. Some end points are single hosts, whereas other ones are subnetworks representing the office networks of some companies.
+![Service Graph](resources/demo-images/SG.png)
+![Service Graph functions](resources/demo-images/SGfunctions.png)
+
+The input Network Security Requirements establish which traffic flows must be blocked because potentially malicioucs, and which other must be able tor each their destination to ansure network connectivity. 
+![Network Security Requirements](resources/demo-images/NSRs.png)
+
+After running the framework, VEREFOO produces two outputs. On the one hand, it establishes the optimal firewall allocation scheme, composed of the minimum number of firewall instances to be placed in the input Allocation Places. On the other hand, for each allocated instance, it computes the optimal configuration, composed of a default action and the smallest set of filtering rules. 
+![Firewall Allocation Scheme](resources/demo-images/FAS.png)
+![Firewall Configuration](resources/demo-images/FwRules.png)
 
 ## Resources
 
