@@ -3,193 +3,459 @@
 	xsi:noNamespaceSchemaLocation="../../xsd/nfvSchema.xsd">
 	<graphs>
 		<graph id="0">
-			<node functional_type="WEBCLIENT" name="1.0.0.1">
-				<neighbour name="2.0.0.1" />
+			
+			<node functional_type="WEBCLIENT" name="10.0.0.1">
+				<neighbour name="20.0.0.1" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.2">
-				<neighbour name="2.0.0.2" />
+			<node functional_type="WEBCLIENT" name="10.0.0.2">
+				<neighbour name="20.0.0.2" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.3">
-				<neighbour name="2.0.0.3" />
+			<node functional_type="WEBCLIENT" name="10.0.0.3">
+				<neighbour name="20.0.0.3" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.4">
-				<neighbour name="2.0.0.4" />
+			<node functional_type="WEBCLIENT" name="10.0.0.4">
+				<neighbour name="20.0.0.4" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.5">
-				<neighbour name="2.0.0.5" />
+			<node functional_type="WEBCLIENT" name="10.0.0.5">
+				<neighbour name="20.0.0.5" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.6">
-				<neighbour name="2.0.0.6" />
+			<node functional_type="WEBCLIENT" name="10.0.0.6">
+				<neighbour name="20.0.0.6" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.7">
-				<neighbour name="2.0.0.7" />
+			<node functional_type="WEBCLIENT" name="10.0.0.7">
+				<neighbour name="20.0.0.7" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.8">
-				<neighbour name="2.0.0.8" />
+			<node functional_type="WEBCLIENT" name="10.0.0.8">
+				<neighbour name="20.0.0.8" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.9">
-				<neighbour name="2.0.0.9" />
+			<node functional_type="WEBCLIENT" name="10.0.0.9">
+				<neighbour name="20.0.0.9" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.10">
-				<neighbour name="2.0.0.10" />
+			<node functional_type="WEBCLIENT" name="10.0.0.10">
+				<neighbour name="20.0.0.10" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.11">
-				<neighbour name="2.0.0.11" />
+			<node functional_type="WEBCLIENT" name="10.0.0.11">
+				<neighbour name="20.0.0.11" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.12">
-				<neighbour name="2.0.0.12" />
+			<node functional_type="WEBCLIENT" name="10.0.0.12">
+				<neighbour name="20.0.0.12" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.13">
-				<neighbour name="2.0.0.13" />
+			<node functional_type="WEBCLIENT" name="10.0.0.13">
+				<neighbour name="20.0.0.13" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.14">
-				<neighbour name="2.0.0.14" />
+			<node functional_type="WEBCLIENT" name="10.0.0.14">
+				<neighbour name="20.0.0.14" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.15">
-				<neighbour name="2.0.0.15" />
+			<node functional_type="WEBCLIENT" name="10.0.0.15">
+				<neighbour name="20.0.0.15" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.16">
-				<neighbour name="2.0.0.16" />
+			<node functional_type="WEBCLIENT" name="10.0.0.16">
+				<neighbour name="20.0.0.16" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.17">
-				<neighbour name="2.0.0.17" />
+			<node functional_type="WEBCLIENT" name="10.0.0.17">
+				<neighbour name="20.0.0.17" />
 			</node>
-			<node functional_type="WEBCLIENT" name="1.0.0.18">
-				<neighbour name="2.0.0.18" />
+			<node functional_type="WEBCLIENT" name="10.0.0.18">
+				<neighbour name="20.0.0.18" />
+			</node>
+			<node functional_type="WEBCLIENT" name="10.0.0.19">
+				<neighbour name="20.0.0.19" />
+			</node>
+			<node functional_type="WEBCLIENT" name="10.0.0.20">
+				<neighbour name="20.0.0.20" />
+			</node>
+			<node functional_type="WEBCLIENT" name="10.0.0.21">
+				<neighbour name="20.0.0.21" />
+			</node>
+			<node functional_type="WEBCLIENT" name="10.0.0.22">
+				<neighbour name="20.0.0.22" />
+			</node>
+			<node functional_type="WEBCLIENT" name="10.0.0.23">
+				<neighbour name="20.0.0.23" />
+			</node>
+			<node functional_type="WEBCLIENT" name="10.0.0.24">
+				<neighbour name="20.0.0.24" />
+			</node>
+			<node functional_type="WEBCLIENT" name="10.0.0.25">
+				<neighbour name="20.0.0.25" />
+			</node>
+			<node functional_type="WEBCLIENT" name="10.0.0.26">
+				<neighbour name="20.0.0.26" />
+			</node>
+			<node functional_type="WEBCLIENT" name="10.0.0.27">
+				<neighbour name="20.0.0.27" />
 			</node>
 			
-			<node functional_type="FORWARDER" name="2.0.0.1">
-				<neighbour name="1.0.0.1" />
-				<neighbour name="3.0.0.1" />
+			<node name="20.0.0.1">
+				<neighbour name="10.0.0.1" />
+				<neighbour name="20.0.0.2" />
+				<neighbour name="20.0.0.27" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.2">
-				<neighbour name="1.0.0.2" />
-				<neighbour name="3.0.0.2" />
+			<node name="20.0.0.2">
+				<neighbour name="10.0.0.2" />
+				<neighbour name="20.0.0.1" />
+				<neighbour name="20.0.0.3" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.3">
-				<neighbour name="1.0.0.3" />
-				<neighbour name="3.0.0.3" />
+			<node functional_type="FORWARDER" name="20.0.0.3">
+				<neighbour name="10.0.0.3" />
+				<neighbour name="20.0.0.2" />
+				<neighbour name="30.0.0.1" />
+				<neighbour name="20.0.0.25" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.4">
-				<neighbour name="1.0.0.4" />
-				<neighbour name="3.0.0.4" />
-				<neighbour name="3.0.0.9" />
+			<node functional_type="FORWARDER" name="20.0.0.4">
+				<neighbour name="10.0.0.4" />
+				<neighbour name="30.0.0.1" />
+				<neighbour name="40.0.0.3" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.5">
-				<neighbour name="1.0.0.5" />
-				<neighbour name="3.0.0.5" />
+			<node name="20.0.0.5">
+				<neighbour name="10.0.0.5" />
+				<neighbour name="40.0.0.3" />
+				<neighbour name="20.0.0.6" />
+				<neighbour name="20.0.0.19" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.6">
-				<neighbour name="1.0.0.6" />
-				<neighbour name="3.0.0.5" />
+			<node name="20.0.0.6">
+				<neighbour name="10.0.0.6" />
+				<neighbour name="20.0.0.5" />
+				<neighbour name="20.0.0.7" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.7">
-				<neighbour name="1.0.0.7" />
-				<neighbour name="3.0.0.6" />
+			<node name="20.0.0.7">
+				<neighbour name="10.0.0.7" />
+				<neighbour name="20.0.0.6" />
+				<neighbour name="20.0.0.8" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.8">
-				<neighbour name="1.0.0.8" />
-				<neighbour name="3.0.0.7" />
+			<node functional_type="FORWARDER" name="20.0.0.8">
+				<neighbour name="10.0.0.8" />
+				<neighbour name="20.0.0.7" />
+				<neighbour name="20.0.0.9" />
+				<neighbour name="40.0.0.6" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.9">
-				<neighbour name="1.0.0.9" />
-				<neighbour name="3.0.0.8" />
+			<node name="20.0.0.9">
+				<neighbour name="10.0.0.9" />
+				<neighbour name="20.0.0.8" />
+				<neighbour name="20.0.0.10" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.10">
-				<neighbour name="1.0.0.10" />
-				<neighbour name="3.0.0.8" />
+			<node name="20.0.0.10">
+				<neighbour name="10.0.0.10" />
+				<neighbour name="20.0.0.9" />
+				<neighbour name="20.0.0.11" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.11">
-				<neighbour name="1.0.0.11" />
-				<neighbour name="3.0.0.10" />
+			<node name="20.0.0.11">
+				<neighbour name="10.0.0.11" />
+				<neighbour name="20.0.0.10" />
+				<neighbour name="20.0.0.12" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.12">
-				<neighbour name="1.0.0.12" />
-				<neighbour name="3.0.0.11" />
+			<node name="20.0.0.12">
+				<neighbour name="10.0.0.12" />
+				<neighbour name="40.0.0.6" />
+				<neighbour name="20.0.0.11" />
+				<neighbour name="20.0.0.13" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.13">
-				<neighbour name="1.0.0.13" />
-				<neighbour name="3.0.0.12" />
+			<node functional_type="FORWARDER" name="20.0.0.13">
+				<neighbour name="10.0.0.13" />
+				<neighbour name="20.0.0.12" />
+				<neighbour name="20.0.0.14" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.14">
-				<neighbour name="1.0.0.14" />
-				<neighbour name="3.0.0.11" />
+			<node name="20.0.0.14">
+				<neighbour name="10.0.0.14" />
+				<neighbour name="20.0.0.13" />
+				<neighbour name="40.0.0.5" />
+				<neighbour name="20.0.0.16" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.15">
-				<neighbour name="1.0.0.15" />
-				<neighbour name="3.0.0.15" />
-				<neighbour name="3.0.0.16" />
+			<node name="20.0.0.15">
+				<neighbour name="10.0.0.15" />
+				<neighbour name="40.0.0.5" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.16">
-				<neighbour name="1.0.0.16" />
-				<neighbour name="3.0.0.17" />
+			<node name="20.0.0.16">
+				<neighbour name="10.0.0.16" />
+				<neighbour name="20.0.0.14" />
+				<neighbour name="20.0.0.17" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.17">
-				<neighbour name="1.0.0.17" />
-				<neighbour name="3.0.0.14" />
+			<node name="20.0.0.17">
+				<neighbour name="10.0.0.17" />
+				<neighbour name="20.0.0.16" />
+				<neighbour name="20.0.0.18" />
+				<neighbour name="40.0.0.4" />
 			</node>
-			<node functional_type="FORWARDER" name="2.0.0.18">
-				<neighbour name="1.0.0.18" />
-				<neighbour name="3.0.0.13" />
+			<node name="20.0.0.18">
+				<neighbour name="10.0.0.18" />
+				<neighbour name="20.0.0.17" />
+			</node>
+			<node name="20.0.0.19">
+				<neighbour name="10.0.0.19" />
+				<neighbour name="20.0.0.5" />
+			</node>
+			<node functional_type="FORWARDER" name="20.0.0.20">
+				<neighbour name="10.0.0.20" />
+				<neighbour name="40.0.0.4" />
+				<neighbour name="40.0.0.2" />
+				<neighbour name="20.0.0.22" />
+			</node>
+			<node name="20.0.0.21">
+				<neighbour name="10.0.0.21" />
+				<neighbour name="40.0.0.1" />
+				<neighbour name="40.0.0.2" />
+			</node>
+			<node name="20.0.0.22">
+				<neighbour name="10.0.0.22" />
+				<neighbour name="20.0.0.20" />
+				<neighbour name="20.0.0.23" />
+			</node>
+			<node name="20.0.0.23">
+				<neighbour name="10.0.0.23" />
+				<neighbour name="20.0.0.22" />
+			</node>
+			<node name="20.0.0.24">
+				<neighbour name="10.0.0.24" />
+				<neighbour name="20.0.0.25" />
+				<neighbour name="20.0.0.26" />
+			</node>
+			<node name="20.0.0.25">
+				<neighbour name="10.0.0.25" />
+				<neighbour name="20.0.0.3" />
+				<neighbour name="20.0.0.24" />
+			</node>
+			<node name="20.0.0.26">
+				<neighbour name="10.0.0.26" />
+				<neighbour name="20.0.0.24" />
+				<neighbour name="20.0.0.27" />
+			</node>
+			<node name="20.0.0.27">
+				<neighbour name="10.0.0.27" />
+				<neighbour name="20.0.0.1" />
+				<neighbour name="20.0.0.26" />
 			</node>
 			
-			<node name="3.0.0.1">
-				<neighbour name="2.0.0.2" />
+			<node functional_type="NAT" name="30.0.0.1">
+				<neighbour name="20.0.0.3" />
+				<neighbour name="20.0.0.4" />
+				 <configuration description="A simple description" name="conf2">
+		          <nat>
+					<source>10.0.0.1</source>
+					<source>10.0.0.2</source>
+					<source>10.0.0.3</source>
+					<source>10.0.0.24</source>
+					<source>10.0.0.25</source>
+					<source>10.0.0.26</source>
+					<source>10.0.0.27</source>
+		          </nat>
+		        </configuration>
 			</node>
-			<node name="3.0.0.2">
-				<neighbour name="2.0.0.3" />
-				<neighbour name="2.0.0.6" />
+			
+			<node functional_type="FIREWALL" name="40.0.0.1">
+				<neighbour name="20.0.0.21" />
+				<configuration description="A simple description"
+					name="conf1">
+					<firewall defaultAction="DENY" />
+				</configuration>
 			</node>
-			<node name="3.0.0.3">
-				<neighbour name="2.0.0.4" />
-				<neighbour name="2.0.0.5" />
+			
+			<node functional_type="FIREWALL" name="40.0.0.2">
+				<neighbour name="20.0.0.20" />
+				<neighbour name="20.0.0.21" />
+				<configuration description="A simple description"
+					name="conf1">
+					<firewall defaultAction="DENY" />
+				</configuration>
 			</node>
-			<node name="3.0.0.4">
-				<neighbour name="2.0.0.9" />
+			
+			<node functional_type="FIREWALL" name="40.0.0.3">
+				<neighbour name="20.0.0.4" />
+				<neighbour name="20.0.0.5" />
+				<configuration description="A simple description"
+					name="conf1">
+					<firewall defaultAction="ALLOW" >
+					<elements>
+                            <action>DENY</action>
+                            <source>10.0.0.1</source>
+                            <destination>10.0.0.2</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.3</source>
+                            <destination>10.0.0.2</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.3</source>
+                            <destination>10.0.0.4</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.4</source>
+                            <destination>10.0.0.5</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.5</source>
+                            <destination>10.0.0.6</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall> 
+				</configuration>
 			</node>
-			<node name="3.0.0.5">
-				<neighbour name="2.0.0.1" />
-				<neighbour name="2.0.0.9" />
+			
+			<node functional_type="FIREWALL" name="40.0.0.4">
+				<neighbour name="20.0.0.17" />
+				<neighbour name="20.0.0.20" />
+				<configuration description="A simple description"
+					name="conf1">
+					<firewall defaultAction="ALLOW" >
+					<elements>
+                            <action>DENY</action>
+                            <source>10.0.0.1</source>
+                            <destination>10.0.0.2</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.3</source>
+                            <destination>10.0.0.2</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.3</source>
+                            <destination>10.0.0.4</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.4</source>
+                            <destination>10.0.0.5</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.5</source>
+                            <destination>10.0.0.6</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall> 
+				</configuration>
 			</node>
-			<node name="3.0.0.6">
-				<neighbour name="2.0.0.1" />
+			
+			<node functional_type="FIREWALL" name="40.0.0.5">
+				<neighbour name="20.0.0.14" />
+				<neighbour name="20.0.0.15" />
+				<configuration description="A simple description"
+					name="conf1">
+					<firewall defaultAction="ALLOW" >
+					<elements>
+                            <action>DENY</action>
+                            <source>10.0.0.1</source>
+                            <destination>10.0.0.2</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.3</source>
+                            <destination>10.0.0.2</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.3</source>
+                            <destination>10.0.0.4</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.4</source>
+                            <destination>10.0.0.5</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.5</source>
+                            <destination>10.0.0.6</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall> 
+				</configuration>
 			</node>
-			<node name="3.0.0.7">
-				<neighbour name="2.0.0.7" />
-			</node>
-			<node name="3.0.0.8">
-				<neighbour name="2.0.0.8" />
-				<neighbour name="2.0.0.18" />
-			</node>
-			<node name="3.0.0.9">
-				<neighbour name="2.0.0.10" />
-				<neighbour name="2.0.0.11" />
-				<neighbour name="2.0.0.13" />
-			</node>
-			<node name="3.0.0.10">
-				<neighbour name="2.0.0.12" />
-			</node>
-			<node name="3.0.0.11">
-				<neighbour name="2.0.0.15" />
-			</node>
-			<node name="3.0.0.12">
-				<neighbour name="2.0.0.14" />
-			</node>
-			<node name="3.0.0.13">
-				<neighbour name="2.0.0.14" />
-			</node>
-			<node name="3.0.0.14">
-				<neighbour name="2.0.0.8" />
-				<neighbour name="2.0.0.18" />
-			</node>
-			<node name="3.0.0.15">
-				<neighbour name="2.0.0.17" />
-			</node>
-			<node name="3.0.0.16">
-				<neighbour name="2.0.0.16" />
-			</node>
-			<node name="3.0.0.17">
-				<neighbour name="2.0.0.17" />
+			
+			<node functional_type="FIREWALL" name="40.0.0.6">
+				<neighbour name="20.0.0.8" />
+				<neighbour name="20.0.0.12" />
+				<configuration description="A simple description"
+					name="conf1">
+					<firewall defaultAction="ALLOW" >
+					<elements>
+                            <action>DENY</action>
+                            <source>10.0.0.1</source>
+                            <destination>10.0.0.2</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.3</source>
+                            <destination>10.0.0.2</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.3</source>
+                            <destination>10.0.0.4</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.4</source>
+                            <destination>10.0.0.5</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.5</source>
+                            <destination>10.0.0.6</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall> 
+				</configuration>
 			</node>
 			
 		</graph>
@@ -199,31 +465,48 @@
 		<LinkConstraints />
 	</Constraints>
 	<PropertyDefinition>
-		<Property graph="0" name="IsolationProperty" src="1.0.0.2" dst="1.0.0.15" />
-		<Property graph="0" name="IsolationProperty" src="1.0.0.4" dst="1.0.0.13" />
-		<Property graph="0" name="IsolationProperty" src="1.0.0.6" dst="1.0.0.1" />
-		<Property graph="0" name="IsolationProperty" src="1.0.0.8" dst="1.0.0.9" />
-		<Property graph="0" name="IsolationProperty" src="1.0.0.9" dst="1.0.0.6" />
-		<Property graph="0" name="IsolationProperty" src="1.0.0.2" dst="1.0.0.4" />
-		<Property graph="0" name="ReachabilityProperty" src="1.0.0.3" dst="1.0.0.16" />
-		<Property graph="0" name="ReachabilityProperty" src="1.0.0.4" dst="1.0.0.17" />
-		<Property graph="0" name="ReachabilityProperty" src="1.0.0.15" dst="1.0.0.1" />
-		<Property graph="0" name="ReachabilityProperty" src="1.0.0.13" dst="1.0.0.15" />
-		
-		
-		
-		<Property graph="0" name="IsolationProperty" dst="1.0.0.2" src="1.0.0.15" />
-		<Property graph="0" name="IsolationProperty" dst="1.0.0.4" src="1.0.0.13" />
-		<Property graph="0" name="IsolationProperty" dst="1.0.0.6" src="1.0.0.1" />
-		<Property graph="0" name="IsolationProperty" dst="1.0.0.8" src="1.0.0.9" />
-		<Property graph="0" name="IsolationProperty" dst="1.0.0.9" src="1.0.0.6" />
-		<Property graph="0" name="IsolationProperty" dst="1.0.0.2" src="1.0.0.4" />
-		<Property graph="0" name="ReachabilityProperty" dst="1.0.0.3" src="1.0.0.16" />
-		<Property graph="0" name="ReachabilityProperty" dst="1.0.0.4" src="1.0.0.17" />
-		<Property graph="0" name="ReachabilityProperty" dst="1.0.0.15" src="1.0.0.1" />
-		<Property graph="0" name="ReachabilityProperty" dst="1.0.0.13" src="1.0.0.15" />
-		
-		
+	
+		<Property graph="0" name="IsolationProperty" src="10.0.0.1" dst="10.0.0.2" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.1" dst="10.0.0.15" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.2" dst="10.0.0.1" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.2" dst="10.0.0.4" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.2" dst="10.0.0.19" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.3" dst="10.0.0.12" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.3" dst="10.0.0.16" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.4" dst="10.0.0.3" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.4" dst="10.0.0.17" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.4" dst="10.0.0.23" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.5" dst="10.0.0.4" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.7" dst="10.0.0.1" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.8" dst="10.0.0.9" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.8" dst="10.0.0.19" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.9" dst="10.0.0.6" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.9" dst="10.0.0.23" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.10" dst="10.0.0.6" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.10" dst="10.0.0.15" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.11" dst="10.0.0.6" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.12" dst="10.0.0.10" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.12" dst="10.0.0.11" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.13" dst="10.0.0.9" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.13" dst="10.0.0.18" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.15" dst="10.0.0.8" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.15" dst="10.0.0.17" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.16" dst="10.0.0.4" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.16" dst="10.0.0.9" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.16" dst="10.0.0.25" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.17" dst="10.0.0.5" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.17" dst="10.0.0.11" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.17" dst="10.0.0.13" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.17" dst="10.0.0.23" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.18" dst="10.0.0.2" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.19" dst="10.0.0.21" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.21" dst="10.0.0.7" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.21" dst="10.0.0.9" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.22" dst="10.0.0.5" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.22" dst="10.0.0.24" />
+		<Property graph="0" name="ReachabilityProperty" src="10.0.0.22" dst="10.0.0.25" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.23" dst="10.0.0.25" />
+		<Property graph="0" name="IsolationProperty" src="10.0.0.24" dst="10.0.0.25" />
 		
 	</PropertyDefinition>
 </NFV>

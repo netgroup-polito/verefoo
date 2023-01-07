@@ -12,6 +12,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import it.polito.verefoo.extra.Package1LoggingClass;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +29,8 @@ public class Main {
 	static Logger loggerInfo = LogManager.getLogger(Main.class);
 	static Logger loggerResult = LogManager.getLogger("result");
 	
+	static ch.qos.logback.classic.Logger loggerTest = Package1LoggingClass.createLoggerFor("results", "log/results");
+	
 	public static void main(String[] args) throws MalformedURLException {
 		System.setProperty("log4j.configuration", new File("resources", "log4j2.xml").toURI().toURL().toString());
 		try {
@@ -37,13 +40,15 @@ public class Main {
 			SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schema = sf.newSchema(new File("./xsd/nfvSchema.xsd"));
 			u.setSchema(schema);
+			
+			for(int i=0; i<20; i++) {
 
 			long beginAll = System.currentTimeMillis();
 			try {
 				Marshaller m = jc.createMarshaller();
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "./xsd/nfvSchema.xsd");
-				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/MF/scalability01.xml")));
+				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/NetworkTopology/Internet2.xml")));
 				//TODO: remove (Budapest)
 				if (test.isSat()) {
 					loggerResult.info("SAT");
@@ -70,6 +75,10 @@ public class Main {
 			}
 			long endAll = System.currentTimeMillis();
 			loggerResult.info("time: " + (endAll - beginAll) + "ms;");
+			loggerTest.info("time: " + (endAll - beginAll) + "ms;");
+			
+			}
+			
 		} catch (JAXBException je) {
 			loggerInfo.error("Error while unmarshalling or marshalling");
 			loggerInfo.error(je);
