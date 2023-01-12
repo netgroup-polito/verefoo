@@ -29,9 +29,9 @@ import it.polito.verefoo.solver.NetContext;
 import it.polito.verefoo.utils.Tuple;
 
 /** Represents a Packet Filter with the associated Access Control List
- *
+ * For Atomic Predicate Algorithm
  */
-public class PacketFilter extends GenericFunction{
+public class PacketFilterAP extends GenericFunction{
 
 	FuncDecl filtering_function;
 	boolean autoConfigured;
@@ -45,13 +45,13 @@ public class PacketFilter extends GenericFunction{
 	
 
 	/**
-	 * Public constructor for the Packet Filter
+	 * Public constructor for the Packet Filter AP
 	 * @param source It is the Allocation Node on which the packet filter is put
 	 * @param ctx It is the Z3 Context in which the model is generated
 	 * @param nctx It is the NetContext object to which constraints are sent
 	 * @param wildcardManager 
 	 */
-	public PacketFilter(AllocationNode source, Context ctx, NetContext nctx, WildcardManager wildcardManager) {
+	public PacketFilterAP(AllocationNode source, Context ctx, NetContext nctx, WildcardManager wildcardManager) {
 		this.source = source;
 		this.ctx = ctx;
 		this.nctx = nctx;

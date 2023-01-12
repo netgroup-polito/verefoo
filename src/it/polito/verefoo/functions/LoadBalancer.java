@@ -3,6 +3,7 @@ package it.polito.verefoo.functions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.microsoft.z3.BoolExpr;
@@ -13,6 +14,7 @@ import com.microsoft.z3.Optimize;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.graph.FlowPath;
 import it.polito.verefoo.solver.NetContext;
+import it.polito.verefoo.graph.MaximalFlow;
 
 /**
  * Load Balancer Model object
@@ -42,17 +44,29 @@ public class LoadBalancer extends GenericFunction {
 
 
 	/**
+	 * Atomic Predicate Algorithm
 	 * This method creates the z3 constraints.
 	 * @param lbIp it is the IP address of the load balancer
 	 */
-	public void loadBalancerConfiguration(DatatypeExpr lbIp) {
-		
-
+	public void loadBalancerConfigurationAP(DatatypeExpr lbIp) {
     	for(Map<Integer, Integer> flowMap : source.getMapFlowIdAtomicPredicatesInInput().values()) {
     		for(Integer traffic : flowMap.values()) {
     			constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
     		}
     		
+    	}
+	}
+
+	/**
+	 * Maximal Flows Algorithm
+	 * This method creates the z3 constraints.
+	 * @param lbIp it is the IP address of the load balancer
+	 */
+	public void loadBalancerConfigurationMF(DatatypeExpr lbIp) {
+		for(FlowPath flow : source.getCrossingFlows().values()) {
+    		for(Entry<Integer, MaximalFlow> maximalFlowEntry: flow.getMaximalFlowsMap().entrySet()) {
+    			constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey())), ctx.mkFalse()));
+    		}
     	}
 	}
 

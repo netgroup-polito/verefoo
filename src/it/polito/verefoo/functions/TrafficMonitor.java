@@ -2,6 +2,7 @@ package it.polito.verefoo.functions;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -9,6 +10,8 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Optimize;
 
 import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.graph.FlowPath;
+import it.polito.verefoo.graph.MaximalFlow;
 import it.polito.verefoo.solver.NetContext;
 
 /** Represents a Forwarder
@@ -34,10 +37,11 @@ public class TrafficMonitor extends GenericFunction{
 
 
     /**
+	 * Atomic Predicate Algorithm
      * This method creates the forwarding rules for the traffic monitor.
      * Since it does not provide any filtering behaviour, the traffic monitor sends all the received packets.
      */
-    public void trafficMonitorSendRules (){
+    public void trafficMonitorSendRulesAP (){
     	
     	for(Map<Integer, Integer> flowMap : source.getMapFlowIdAtomicPredicatesInInput().values()) {
     		for(Integer traffic : flowMap.values()) {
@@ -48,6 +52,20 @@ public class TrafficMonitor extends GenericFunction{
     	
     }
     
+    /**
+	 * Maximal Flows Algorithm
+     * This method creates the forwarding rules for the traffic monitor.
+     * Since it does not provide any filtering behaviour, the traffic monitor sends all the received packets.
+     */
+    public void trafficMonitorSendRulesMF (){
+    	
+    	for(FlowPath flow : source.getCrossingFlows().values()) {
+    		for(Entry<Integer, MaximalFlow> maximalFlowEntry: flow.getMaximalFlowsMap().entrySet()) {
+    			constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey())), ctx.mkFalse()));
+    		}
+    	}
+    	
+    }
  
 	/**
 	 * This method allows to wrap the method which adds the constraints inside Z3 solver
