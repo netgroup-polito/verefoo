@@ -27,6 +27,14 @@ public class PortInterval {
 		}
 		this.neg = neg;
 	}
+	// Maximal Flows Algorithm constructor
+	public PortInterval(PortInterval toCopy, boolean neg) {
+		super();
+		this.min = toCopy.getMin();
+		this.max = toCopy.getMax();
+		this.neg = neg;
+	}
+
 	public int getMin() {
 		return min;
 	}

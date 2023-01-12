@@ -140,6 +140,30 @@ public class Predicate {
 		return IPSrc.toString();
 	}
 	
+	public String firstPSrcToString() {
+		PortInterval pSrc = pSrcList.get(0);
+		return pSrc.toString();
+	}
+	
+	public String firstPDstToString() {
+		PortInterval pDst = pDstList.get(0);
+		return pDst.toString();
+	}
+	
+	public L4ProtocolTypes firstProto() {
+		return protoTypeList.get(0);
+	}
+	
+	public IPAddress firstIPSrc() {
+		IPAddress IPSrc = IPSrcList.get(0);
+		return IPSrc;
+	}
+	
+	public IPAddress firstIPDst() {
+		IPAddress IPDst = IPDstList.get(0);
+		return IPDst;
+	}
+
 	//Get the fist IPAddress from the IPDst list and convert it to string
 	public String firstIPDstToString() {
 		IPAddress IPDst = IPDstList.get(0);

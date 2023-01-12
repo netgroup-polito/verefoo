@@ -11,11 +11,13 @@ public class SecurityRequirement {
 	
 	Property originalProperty;
 	int idRequirement;
+	Map<String, Traffic> nodeTrafficMap;
 	Map<Integer, FlowPath> flowsMap;
 
 	public SecurityRequirement(Property originalProperty, int idRequirement) {
 		this.originalProperty = originalProperty;
 		this.idRequirement = idRequirement;
+		nodeTrafficMap = new HashMap<>();
 		flowsMap = new HashMap<>();
 	}
 
@@ -33,6 +35,14 @@ public class SecurityRequirement {
 
 	public void setIdRequirement(int idRequirement) {
 		this.idRequirement = idRequirement;
+	}
+
+	public Map<String, Traffic> getNodeTrafficMap() {
+		return nodeTrafficMap;
+	}
+
+	public void setNodeTrafficMap(Map<String, Traffic> nodeTrafficMap) {
+		this.nodeTrafficMap = nodeTrafficMap;
 	}
 
 	public Map<Integer, FlowPath> getFlowsMap() {

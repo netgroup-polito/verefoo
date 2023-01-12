@@ -1,5 +1,5 @@
 package it.polito.verefoo.graph;
-
+PacketFilter
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,7 +7,7 @@ import java.util.Map;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.jaxb.*;
 
-public class FlowPath {
+public class FlowPathAP {
 	SecurityRequirement requirement;
 	int idFlow;
 	private List<AllocationNode> path;
@@ -15,7 +15,7 @@ public class FlowPath {
 	Map<Integer, AtomicFlow> atomicFlowsMap = new HashMap<>();
 	Map<Integer, AtomicFlow> atomicFlowsToDiscardMap = new HashMap<>();
 	
-	public FlowPath(SecurityRequirement requirement, List<AllocationNode> path, int idFlow) {
+	public FlowPathAP(SecurityRequirement requirement, List<AllocationNode> path, int idFlow) {
 		this.requirement = requirement;
 		this.path = path;
 		this.idFlow = idFlow;
