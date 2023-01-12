@@ -7,3 +7,5 @@
 /result.xml
 /testfile/tmp.xml
 .settings
+pom.xml
+.classpath
