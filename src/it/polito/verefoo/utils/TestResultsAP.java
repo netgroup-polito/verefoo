@@ -1,13 +1,13 @@
 package it.polito.verefoo.utils;
 
-public class TestResults {
+public class TestResultsAP {
 	private long atomicPredCompTime;
 	private long atomicFlowsCompTime;
 	private long beginMaxSMTTime;
 	private String z3Result;
 	private long totalFlows;
 	
-	public TestResults() {	
+	public TestResultsAP() {	
 	}
 
 	public long getAtomicPredCompTime() {

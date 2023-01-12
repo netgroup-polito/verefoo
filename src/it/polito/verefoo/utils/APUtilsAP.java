@@ -10,9 +10,9 @@ import it.polito.verefoo.graph.PortInterval;
 import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.jaxb.L4ProtocolTypes;
 
-public class APUtils {
+public class APUtilsAP {
 	
-	public APUtils() {}
+	public APUtilsAP() {}
 	
 	//Given a list of already computed atomicPredicates and a list of new predicates to insert into the list, transfrom predicates into atomic
 	//predicates, add them to the list and return the new list
