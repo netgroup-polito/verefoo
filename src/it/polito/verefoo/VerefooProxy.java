@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
+import java.util.Collections;
 import com.microsoft.z3.Context;
 
 import it.polito.verefoo.allocation.AllocationManager;
@@ -36,6 +36,10 @@ import it.polito.verefoo.utils.APUtils;
 import it.polito.verefoo.utils.GenerateFlowsTask;
 import it.polito.verefoo.utils.TestResults;
 import it.polito.verefoo.utils.VerificationResult;
+import it.polito.verefoo.functions.Forwarder;
+import it.polito.verefoo.graph.FlowPath;
+import it.polito.verefoo.graph.MaximalFlow;
+import it.polito.verefoo.graph.Traffic;
 
 /**
  * 
@@ -56,12 +60,26 @@ public class VerefooProxy {
 	private List<NodeMetrics> nodeMetrics;
 	private AllocationManager allocationManager;
 	private APUtils aputils;
-	
+	private String AlgoUsed = "AP";
+
 	/* Atomic predicates */
 	private HashMap<Integer, Predicate> networkAtomicPredicates = new HashMap<>();
 	HashMap<String, Node> transformersNode = new HashMap<>();
-	private TestResults testResults = new TestResults();
+	private TestResultsAP testResults = new TestResultsAP();
 	
+	/* Maximal flows */
+	HashMap<String, List<Predicate>> natD1map = new HashMap<>();
+	HashMap<String, Predicate> natD2map = new HashMap<>();
+	HashMap<String, List<Predicate>> natD31map = new HashMap<>();
+	HashMap<String, Predicate> natD32map = new HashMap<>();
+	HashMap<String, List<Predicate>> natReconvertedMap = new HashMap<>();
+	HashMap<String, List<Predicate>> allowedFirewallPredicates = new HashMap<>();
+	HashMap<String, List<Predicate>> deniedFirewallPredicates = new HashMap<>();
+	private APUtils aputils;
+	private TestResultsMF testResults = new TestResultsMF();
+
+	int maximalFlowId = 0;
+
 	/**
 	 * Public constructor for the Verefoo proxy service
 	 * 
@@ -75,12 +93,18 @@ public class VerefooProxy {
 	 * @throws BadGraphError
 	 */
 	public VerefooProxy(Graph graph, Hosts hosts, Connections conns, Constraints constraints, List<Property> prop,
-			List<Path> paths) throws BadGraphError {
-		
+			List<Path> paths,String algo) throws BadGraphError {
+
+		// Determine what algorithm to be executed
+		this.AlgoUsed = algo;
+
 		// Initialitation of the variables related to the nodes
 		allocationNodes = new HashMap<>();
 		nodes = graph.getNode();
-		nodes.forEach(n -> allocationNodes.put(n.getName(), new AllocationNode(n)));
+		if(AlgoUsed.equals("AP"))
+		nodes.forEach(n -> allocationNodes.put(n.getName(), new AllocationNodeAP(n))); // class for AP
+		else
+		nodes.forEach(n -> allocationNodes.put(n.getName(), new AllocationNodeMF(n))); // class for MF
 		wildcardManager = new WildcardManager(allocationNodes);
 		
 		// Initialitation of the variables related to the requirements
@@ -94,7 +118,6 @@ public class VerefooProxy {
 		
 		this.paths = paths;
 		this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
-		
 		//Creation of the z3 context
 		HashMap<String, String> cfg = new HashMap<String, String>();
 		cfg.put("model", "true");
@@ -103,9 +126,11 @@ public class VerefooProxy {
 		//Creation of the NetContext (z3 variables)
 		nctx = nctxGenerate(ctx, nodes, prop, allocationNodes);
 		nctx.setWildcardManager(wildcardManager);
-		
+		aputils = new APUtils();  // for Maximal Flows
+
+		if(AlgoUsed.equals("AP")){
 		/*
-		 * Main sequence of methods in VerefooProxy:
+		 * Main sequence of methods in VerefooProxy for Atomic Predicates:
 		 * 1) given every requirement, all the possible paths of the related flows are computed;
 		 * 2) then starting from requirements and transformers, all relative atomic predicates for the network are computed
 		 * 3) the transformation map for each transformer is filled (e.g. NAT1 input ap 5 -> output ap 8)
@@ -113,10 +138,10 @@ public class VerefooProxy {
 		 */
 		
 		allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
-		allocationManager.instantiateFunctions();
+		allocationManager.instantiateFunctions("AP");
 		
 		/* Atomic predicates */
-		aputils = new APUtils();
+		aputils = new APUtilsAP();
 		long t1 = System.currentTimeMillis();
 		trafficFlowsMap = generateFlowPaths();
 		networkAtomicPredicates = generateAtomicPredicateNew();
@@ -130,12 +155,46 @@ public class VerefooProxy {
 		testResults.setBeginMaxSMTTime(t1);
 		//distributeTrafficFlows();
 		allocateFunctions();
-		allocationManager.configureFunctions();
+		// Change Execution depending on chosen algorithm
+		allocationManager.configureFunctionsAP(); // atomic predicate method
 		
 		check = new Checker(ctx, nctx, allocationNodes);
-		formalizeRequirements();
-	}
+		formalizeRequirementsAP();
+
+		}
+
+		if(AlgoUsed.equals("MF")){
+		/*
+		 * Main sequence of methods in VerefooProxy for Maximal Flows:
+		 * 1) given every requirement, all the possible paths of the related flows are computed;
+		 * 2) the existing functions are istanciated
+		 * 3) the functions to be allocated are associated to Allocation Places
+		 * 4) the possible traffic in input to each node is computed
+		 * 5) soft and hard constraints are defined for each function
+		 * 6) the hard constraints for the requirements are defined
+		 */
+		
+		 long beginComputingFlows = System.currentTimeMillis();
+		 System.out.println("Generating flow paths ...");
+		 trafficFlowsMap = generateFlowPaths();
+		 allocationManager = new AllocationManager(ctx, nctx, allocationNodes, nodeMetrics, prop, wildcardManager);
+		 allocationManager.instantiateFunctions("MF");
+		 allocateFunctions();
+		 System.out.print("Filling trasformers map ...");
+		 fillTrasformersMap();
+		 System.out.println("Generating maximal flows ...");
+		 generateMaximalFlows();
+		 long endComputingFlows = System.currentTimeMillis();
+		 testResults.setMaximalFlowsCompTime(endComputingFlows- beginComputingFlows);
+		 testResults.setStartMaxSMTtime(System.currentTimeMillis());
+		 allocationManager.configureFunctionsMF(); // MF method
+		 check = new Checker(ctx, nctx, allocationNodes);
+		 formalizeRequirementsMF();
 	
+		}
+
+	}
+/**************************************************Atomic Predicate Methods **************************************************************/
 	private void computeAtomicFlows() {
 		ExecutorService threadPool = Executors.newFixedThreadPool(10);
 		List<Future<?>> tasks = new ArrayList<Future<?>>();
@@ -151,7 +210,7 @@ public class VerefooProxy {
 			}
 			debugIndex++;
 			System.out.print("*");
-			APUtils aputilsNew = new APUtils(); 
+			APUtils aputilsNew = new APUtilsAP(); 
 			tasks.add(threadPool.submit(new GenerateFlowsTask(sr, networkAtomicPredicates, aputilsNew, transformersNode, atomicId)));
 		}
 		
@@ -780,7 +839,7 @@ public class VerefooProxy {
 			AllocationNode source = nodes.get(0);
 			AllocationNode last = nodes.get(lengthList-1);
 			for(int i = 1; i < lengthList-1; i++) {
-				allocationManager.chooseFunctions(nodes.get(i), source, last);
+				allocationManager.chooseFunctions(nodes.get(i), source, last, AlgoUsed);
 			}
 		}
 		
@@ -790,18 +849,18 @@ public class VerefooProxy {
 	/**
 	 * This method creates the hard constraints in the z3 model for reachability and isolation requirements.
 	 */
-	private void formalizeRequirements() {
+	private void formalizeRequirementsAP() {
 		
 		for(SecurityRequirement sr : securityRequirements.values()) {
 			switch (sr.getOriginalProperty().getName()) {
 			case ISOLATION_PROPERTY:
-				check.createRequirementConstraints(sr, Prop.ISOLATION);
+				check.createRequirementConstraintsAP(sr, Prop.ISOLATION);
 				break;
 			case REACHABILITY_PROPERTY:
-				check.createRequirementConstraints(sr, Prop.REACHABILITY);
+				check.createRequirementConstraintsAP(sr, Prop.REACHABILITY);
 				break;
 			case COMPLETE_REACHABILITY_PROPERTY:
-				check.createRequirementConstraints(sr, Prop.COMPLETE_REACHABILITY);
+				check.createRequirementConstraintsAP(sr, Prop.COMPLETE_REACHABILITY);
 				break;
 			default:
 				throw new BadGraphError("Error in the property definition", EType.INVALID_PROPERTY_DEFINITION);
@@ -862,7 +921,10 @@ public class VerefooProxy {
 			
 			if(found) {
 				for(List<AllocationNode> singlePath : allPaths) {
-					FlowPath flow = new FlowPath(sr, singlePath, id);
+					if(AlgoUsed.equals("AP"))
+					FlowPathAP flow = new FlowPathAP(sr, singlePath, id);
+					else
+					FlowPathMF flow = new FlowPathMF(sr, singlePath, id);
 					flowsMap.put(id, flow);
 					sr.getFlowsMap().put(id, flow);
 					id++;
@@ -901,7 +963,6 @@ public class VerefooProxy {
 			for(int i = 0; i < currentPath.size(); i++) {
 				if((currentPath.get(i).getNode().getFunctionalType() == FunctionalTypes.NAT 
 						|| currentPath.get(i).getNode().getFunctionalType() == FunctionalTypes.FIREWALL
-						|| currentPath.get(i).getNode().getFunctionalType() == FunctionalTypes.STATEFUL_FIREWALL)
 						&& !transformersNode.containsKey(currentPath.get(i).getNode().getName()))
 					transformersNode.put(currentPath.get(i).getNode().getName(), currentPath.get(i).getNode());
 				pathToStore.add(i, currentPath.get(i));
@@ -964,7 +1025,10 @@ public class VerefooProxy {
 		String[] dst_portRange = {};
 		dst_portRange = properties.stream().map(p -> p.getDstPort()).filter(p -> p != null)
 				.collect(Collectors.toCollection(ArrayList<String>::new)).toArray(dst_portRange);
-		return new NetContext(ctx, allocationNodes, nodesname, nodesip, src_portRange, dst_portRange);
+		if(AlgoUsed.equals("AP"))
+		return new NetContextAP(ctx, allocationNodes, nodesname, nodesip, src_portRange, dst_portRange);
+		else
+		return new NetContextMF(ctx, allocationNodes, nodesname, nodesip, src_portRange, dst_portRange);
 	}
 
 	/**
@@ -1058,6 +1122,628 @@ public class VerefooProxy {
 	public TestResults getTestResults() {
 		return testResults;
 	}
+/************************************************** Maximal Flows Methods (MF also uses some of AP methods) **************************************************************/
+
+	/**
+	 * This method creates the hard constraints in the z3 model for reachability and isolation requirements.
+	 */
+	private void formalizeRequirementsMF() {
+		
+		for(SecurityRequirement sr : securityRequirements.values()) {
+			switch (sr.getOriginalProperty().getName()) {
+			case ISOLATION_PROPERTY:
+				check.createRequirementConstraintsMF(sr, Prop.ISOLATION);
+				break;
+			case REACHABILITY_PROPERTY:
+				check.createRequirementConstraintsMF(sr, Prop.REACHABILITY);
+				break;
+			case COMPLETE_REACHABILITY_PROPERTY:
+				check.createRequirementConstraintsMF(sr, Prop.COMPLETE_REACHABILITY);
+				break;
+			default:
+				throw new BadGraphError("Error in the property definition", EType.INVALID_PROPERTY_DEFINITION);
+			}
+				
+		}
+		
+	}
+
+
+	private void fillTrasformersMap() {
+		int nCrossedFirewalls = 0;
+		int counter = 0;
+		
+		System.out.println(" ("+transformersNode.size() +" transformers)");
+		
+		//For each NAT/FIREWALL found in the paths, compute its input classes
+		for(Node node: transformersNode.values()) {
+			System.out.print("*");
+			counter++;
+			if(counter % 150 == 0) {
+				counter = 0;
+				System.out.println();
+			}
+			if(node.getFunctionalType() == FunctionalTypes.NAT) {
+				List<IPAddress> sourceNatIPAddressList = new ArrayList<>();
+				List<IPAddress> notSourceNatIPAddressList = new ArrayList<>();
+				for(String ipSrc: node.getConfiguration().getNat().getSource()) {
+					IPAddress natSrcAddress = new IPAddress(ipSrc, false);
+					sourceNatIPAddressList.add(natSrcAddress);
+					notSourceNatIPAddressList.add(new IPAddress(ipSrc, true));
+				}
+				notSourceNatIPAddressList.add(new IPAddress(node.getName(), true));
+				
+				//compute D1 transformation map
+				List<Predicate> D1List = new ArrayList<>();
+				for(IPAddress privateSrcAddress: sourceNatIPAddressList) {
+					Predicate newPredicate = new Predicate("*", false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY);
+					List<IPAddress> srcIPList = new ArrayList<>();
+					srcIPList.add(privateSrcAddress);
+					newPredicate.setIPSrcList(srcIPList);
+					newPredicate.setIPDstList(notSourceNatIPAddressList);
+					D1List.add(newPredicate);
+				}
+				natD1map.put(node.getName(), D1List);
+				
+				//compute D2 transformation map
+				Predicate D2Predicate = new Predicate("*", false, node.getName(), false, "*", false, "*", false, L4ProtocolTypes.ANY);
+				D2Predicate.setIPSrcList(notSourceNatIPAddressList);
+				natD2map.put(node.getName(), D2Predicate);
+				
+				//compute D31 transformation
+				List<Predicate> D31List = new ArrayList<>();
+				for(IPAddress privateSrcAddress1: sourceNatIPAddressList) {
+					for(IPAddress privateSrcAddress2: sourceNatIPAddressList) {
+						if(!privateSrcAddress1.equals(privateSrcAddress2)) {
+							List<IPAddress> srcList = new ArrayList<>();
+							List<IPAddress> dstList = new ArrayList<>();
+							srcList.add(privateSrcAddress1);
+							dstList.add(privateSrcAddress2);
+							Predicate newPredicate = new Predicate("*", false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY);
+							newPredicate.setIPSrcList(srcList);
+							newPredicate.setIPDstList(dstList);
+							D31List.add(newPredicate);
+						}
+					}
+				}
+				natD31map.put(node.getName(), D31List);
+				
+				//Compute reconverted predicates
+				List<Predicate> reconvertedList = new ArrayList<>();
+				for(IPAddress privateSrcAddress: sourceNatIPAddressList) {
+					List<IPAddress> dstList = new ArrayList<>();
+					dstList.add(privateSrcAddress);
+					Predicate newPredicate = new Predicate("*", false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY);
+					newPredicate.setIPSrcList(notSourceNatIPAddressList);
+					newPredicate.setIPDstList(dstList);
+					reconvertedList.add(newPredicate);
+				}
+				natReconvertedMap.put(node.getName(), reconvertedList);
+				
+				
+				//Compute D32 transformation
+				Predicate D32Predicate = new Predicate("*", false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY);
+				D32Predicate.setIPSrcList(notSourceNatIPAddressList);
+				D32Predicate.setIPDstList(notSourceNatIPAddressList);
+				natD32map.put(node.getName(), D32Predicate);
+				
+				//DEBUG: print all nat transformations
+//				System.out.println("D1 transformations");
+//				for(Predicate p: natD1map.get(node.getName()))
+//					p.print();
+//				System.out.println("D2 transformation");
+//				natD2map.get(node.getName()).print();
+//				System.out.println("D31 transformations");
+//				for(Predicate p: natD31map.get(node.getName()))
+//					p.print();
+//				System.out.println("D32 transformation");
+//				natD32map.get(node.getName()).print();
+//				System.out.println("Reconverted predicates");
+//				for(Predicate p: natReconvertedMap.get(node.getName()))
+//					p.print();
+//				System.out.println();
+				//END DEBUG
+				
+			}
+
+			else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
+				nCrossedFirewalls++;
+				List<Predicate> allowedList = new ArrayList<>();
+				List<Predicate> deniedList = new ArrayList<>();
+
+				for(Elements rule: node.getConfiguration().getFirewall().getElements()) {
+					if(rule.getAction().equals(ActionTypes.DENY)) {
+						//deny <--- deny V rule-i
+						deniedList.add(new Predicate(rule.getSource(), false, rule.getDestination(), false, 
+								rule.getSrcPort(), false, rule.getDstPort(), false, rule.getProtocol()));
+					} else {
+						//allowed <--- allowed V (rule-i AND !denied)
+						Predicate toAdd = new Predicate(rule.getSource(), false, rule.getDestination(), false, 
+								rule.getSrcPort(), false, rule.getDstPort(), false, rule.getProtocol());
+						List<Predicate> allowedToAdd = aputils.computeAllowedForRule(toAdd, deniedList);
+						for(Predicate allow: allowedToAdd) {
+							if(!aputils.isPredicateContainedIn(allow, allowedList))
+								allowedList.add(allow);
+						}
+					}
+				}
+				//Check default action: if DENY do nothing
+				if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
+					Predicate toAdd = new Predicate("*", false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY);
+					List<Predicate> allowedToAdd = aputils.computeAllowedForRule(toAdd, deniedList);
+					for(Predicate allow: allowedToAdd) {
+						if(!aputils.isPredicateContainedIn(allow, allowedList))
+							allowedList.add(allow);
+					}
+				}
+				
+				//Now we have the allowed list but it contains overlaps -> compute the atomic predicates
+				List<Predicate> atomicPredicates = new ArrayList<>();
+				List<Predicate> predicates = new ArrayList<>();
+				List<String> srcList = new ArrayList<>();
+				List<String> dstList = new ArrayList<>();
+				List<String> srcPList = new ArrayList<>();
+				List<String> dstPList = new ArrayList<>();
+				List<L4ProtocolTypes> dstProtoList = new ArrayList<>();
+				for(Predicate p: allowedList) {
+					for(IPAddress IPSrc: p.getIPSrcList()) {
+						String ips = IPSrc.toString();
+						if(!srcList.contains(ips)) {
+							srcList.add(ips);
+							predicates.add(new Predicate(ips, false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(IPAddress IPDst: p.getIPDstList()) {
+						String ipd = IPDst.toString();
+						if(!dstList.contains(ipd)) {
+							dstList.add(ipd);
+							predicates.add(new Predicate("*", false, ipd, false, "*", false, "*", false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(PortInterval pSrc: p.getpSrcList()) {
+						String ps = pSrc.toString();
+						if(!srcPList.contains(ps)) {
+							srcPList.add(ps);
+							predicates.add(new Predicate("*", false, "*", false, ps, false, "*", false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(PortInterval pDst: p.getpDstList()) {
+						String pd = pDst.toString();
+						if(!dstPList.contains(pd)) {
+							dstPList.add(pd);
+							predicates.add(new Predicate("*", false, "*", false, "*", false, pd, false, L4ProtocolTypes.ANY));
+						}
+					}
+					for(L4ProtocolTypes proto: p.getProtoTypeList()) {
+						if(!dstProtoList.contains(proto)) {
+							dstProtoList.add(proto);
+							predicates.add(new Predicate("*", false, "*", false, "*", false, "*", false, proto));
+						}
+					}
+				}
+				
+				atomicPredicates = aputils.computeAtomicPredicates(atomicPredicates, predicates);
+				
+				List<Predicate> newAllowedList = new ArrayList<>();
+				List<Predicate> newDeniedList = new ArrayList<>();
+				for(Predicate ap: atomicPredicates) {
+					boolean found = false;
+					for(Predicate allowed: allowedList) {
+						Predicate intersection = aputils.computeIntersection(allowed, ap);
+						if(intersection != null && aputils.APCompare(intersection, ap)) {
+							found = true;
+							break;
+						}
+					}
+					
+					if(found) 
+						newAllowedList.add(ap);
+					else newDeniedList.add(ap);
+				}
+				
+				allowedFirewallPredicates.put(node.getName(), newAllowedList);
+				deniedFirewallPredicates.put(node.getName(), newDeniedList);
+
+				//DEBUG: print firewall allowed list
+//				System.out.println("FIREWALL " + node.getName());
+//				for(Predicate allowedPred: allowedFirewallPredicates.get(node.getName())) {
+//					System.out.print("ALLOW "); allowedPred.print();
+//				}
+//				for(Predicate deniedPred: deniedFirewallPredicates.get(node.getName())) {
+//					System.out.print("DENY "); deniedPred.print();
+//				}
+//				System.out.println();
+				//END DEBUG
+			}
+		}
+		System.out.println();
+	}
+
+	private void generateMaximalFlows() {
+		System.out.println("Number of starting flows "+ trafficFlowsMap.size());
+		int counter = 0;
+		for(FlowPath flow : trafficFlowsMap.values()) {
+			counter++;
+			if(counter % 100 == 0) {
+				System.out.print("*");
+			}
+			if(counter % 10000 == 0) {
+				counter = 0;
+				System.out.println();
+			}
+			//System.out.print("*");
+			Property property = flow.getRequirement().getOriginalProperty();
+			String pSrc = property.getSrcPort() != null && !property.getSrcPort().equals("null") ? property.getSrcPort() : "*";
+			
+			//Generate source predicate
+			Predicate predicate = new Predicate(property.getSrc(), false, "*", false, pSrc, false, "*", false, L4ProtocolTypes.ANY);
+			List<Predicate> currentMaximalFlow = new ArrayList<>();
+			currentMaximalFlow.add(predicate);
+			//preallocate the maximal flow list
+			for(int i=1; i<flow.getPath().size(); i++) {
+				Predicate voidPredicate = new Predicate("*", false, "*", false, "*", false, "*", false, L4ProtocolTypes.ANY);
+				currentMaximalFlow.add(voidPredicate);
+			}
+			
+			if(flow.getPath().size() > 1) {
+				recursiveGenerateMaximalFlowsForwardUpdate(1, flow.getRequirement(), flow.getPath(), predicate, flow, currentMaximalFlow, false);
+			} else {
+				//The flow has only one node, so complete the predicate and add it to maximal flow list
+				String pDst = property.getDstPort() != null && !property.getDstPort().equals("null") ? property.getDstPort() : "*";
+				L4ProtocolTypes proto = property.getLv4Proto() != null ? property.getLv4Proto() : L4ProtocolTypes.ANY;
+				Predicate destPredicate = new Predicate("*", false, property.getDst(), false, "*", false, pDst, false, proto);
+				Predicate onlyPredicate = currentMaximalFlow.get(0);
+				onlyPredicate.setIPDstList(destPredicate.getIPDstList());
+				onlyPredicate.setpDstList(destPredicate.getpDstList());
+				onlyPredicate.setProtoTypeList(destPredicate.getProtoTypeList());
+				flow.addMaximalFlow(maximalFlowId, currentMaximalFlow);
+				maximalFlowId++;
+			}
+		}
+		
+		
+		for(FlowPath flow : trafficFlowsMap.values()) {
+			List<AllocationNode> path = flow.getPath();
+			for(MaximalFlow maximalFlow: flow.getMaximalFlowsMap().values()) {
+				int index = 0;
+				for(Predicate predicate: maximalFlow.getPredicateList()) {
+					AllocationNode currentNode = path.get(index);
+					
+					if(currentNode.getNode().getFunctionalType() == FunctionalTypes.FIREWALL) {
+						//Check if input predicate is dropped or allowed to pass
+						boolean allowed = false;
+						for(Predicate allowedPred: allowedFirewallPredicates.get(currentNode.getIpAddress())) {
+							if(aputils.computeIntersection(allowedPred, predicate) != null) {
+								allowed = true;
+								break;
+							}
+						}
+						if(allowed) 
+							currentNode.addForwardedPredicate(predicate);
+						else currentNode.addDroppedPredicate(predicate);
+					}
+					
+					currentNode.addPredicateInInput(flow.getIdFlow(), maximalFlow.getFlowId(), predicate);
+					index++;
+				}
+			}
+		}
+		
+		//DEBUG: print maximal flows
+//		for(FlowPath flow : trafficFlowsMap.values()) {
+//			for(MaximalFlow mf: flow.getMaximalFlowsMap().values()) {
+//				System.out.println("\nNuovo flow:");
+//				for(Predicate p: mf.getPredicateList())
+//					p.print();
+//			}
+//		}
+		//END DEBUG
+		testResults.setTotalNumberGeneratedFlows(maximalFlowId);
+		System.out.println();
+	}
 	
-	
+	private void recursiveGenerateMaximalFlowsForwardUpdate(int nodeIndex, SecurityRequirement sr, List<AllocationNode> path, Predicate inputPredicate,
+			FlowPath currentFlowPath, List<Predicate> currentList, boolean somethingChanged) {
+		
+		if(nodeIndex >= path.size()) {
+			return;
+		}
+		
+		AllocationNode node = path.get(nodeIndex);
+		
+		if(nodeIndex == path.size() -1) {
+			//We are in the last node of the path
+			//Compute intersection with destination
+			String dstPort = sr.getOriginalProperty().getDstPort() != null && !sr.getOriginalProperty().getDstPort().equals("null") ? sr.getOriginalProperty().getDstPort() : "*";
+			L4ProtocolTypes proto = sr.getOriginalProperty().getLv4Proto() != null ? sr.getOriginalProperty().getLv4Proto() : L4ProtocolTypes.ANY;
+			Predicate destPredicate = new Predicate("*", false, node.getIpAddress(), false, "*", false, dstPort, false, proto);
+			Predicate intersectionPredicate = aputils.computeIntersection(destPredicate, inputPredicate);
+			
+			if(intersectionPredicate != null) {
+				currentList.set(nodeIndex, intersectionPredicate);
+				//start backward traversal
+				recursiveGenerateMaximalFlowsBackwardUpdate(nodeIndex-1, sr, path, intersectionPredicate, currentFlowPath, currentList, false);
+			}
+			return;
+		}
+		
+		if(natD1map.containsKey(node.getIpAddress())) {
+			//Node is a NAT
+			//check if input Predicate has sourceIP == to nat IP
+			List<IPAddress> natIPAddressList = new ArrayList<>();
+			natIPAddressList.add(new IPAddress(node.getIpAddress(), false));
+			if(aputils.APCompareIPAddressList(inputPredicate.getIPSrcList(), natIPAddressList)) {
+				//the predicate has already been shadowed in previous traversals, so simply change destination and forward
+				Predicate newPredicate = new Predicate(currentList.get(nodeIndex));
+				newPredicate.setIPDstList(inputPredicate.getIPDstList());
+				newPredicate.setpDstList(inputPredicate.getpDstList());
+				newPredicate.setProtoTypeList(inputPredicate.getProtoTypeList());
+				currentList.set(nodeIndex, newPredicate);
+				recursiveGenerateMaximalFlowsForwardUpdate(nodeIndex+1, sr, path, newPredicate, currentFlowPath, currentList, somethingChanged);
+				return;
+			}
+			
+			//check if it is a reconverted predicate. In that case forward the input packet saved in this node changing only source
+			boolean isReconverted = false;
+			for(Predicate reconvertedPredicate: natReconvertedMap.get(node.getIpAddress())) {
+				Predicate intersection = aputils.computeIntersection(inputPredicate, reconvertedPredicate);
+				if(intersection != null && aputils.APCompare(intersection, inputPredicate)) {
+					if(aputils.APCompareIPAddressList(currentList.get(nodeIndex).getIPDstList(), natIPAddressList)) {
+						isReconverted = true;
+						break;
+					}
+				}
+			}
+			if(isReconverted) {
+				Predicate newPredicate = new Predicate(currentList.get(nodeIndex));
+				newPredicate.setIPSrcList(inputPredicate.getIPSrcList());
+				newPredicate.setpDstList(inputPredicate.getpDstList());
+				newPredicate.setProtoTypeList(inputPredicate.getProtoTypeList());
+				currentList.set(nodeIndex, newPredicate);
+				recursiveGenerateMaximalFlowsForwardUpdate(nodeIndex+1, sr, path, newPredicate, currentFlowPath, currentList, somethingChanged);
+				return;
+			}
+			
+			//Compute intersection with D1
+			for(Predicate D1Predicate: natD1map.get(node.getIpAddress())) {
+				Predicate intersectingD1Predicate = aputils.computeIntersection(D1Predicate, inputPredicate);
+				if(intersectingD1Predicate != null) {
+					//Do shadowing and generate a new flow
+					List<Predicate> newCurrentList = aputils.deepCopy(currentList);
+					//change this node new input
+					newCurrentList.set(nodeIndex, intersectingD1Predicate);
+					//Generate new recursion with shadowed predicate as next input predicate (to subsequent node)
+					Predicate shadowedPredicate = new Predicate(intersectingD1Predicate);
+					List<IPAddress> srcList = new ArrayList<>();
+					srcList.add(new IPAddress(node.getIpAddress(), false));
+					shadowedPredicate.setIPSrcList(srcList);
+					recursiveGenerateMaximalFlowsForwardUpdate(nodeIndex+1, sr, path, shadowedPredicate, currentFlowPath, newCurrentList, true);
+				}
+			}
+			//Compute intersection with D2
+			Predicate intersectingD2Predicate = aputils.computeIntersection(natD2map.get(node.getIpAddress()), inputPredicate);
+			if(intersectingD2Predicate != null) {
+				//Do reconversion and generate new flows
+				for(String natSrc: node.getNode().getConfiguration().getNat().getSource()) {
+					List<Predicate> newCurrentList = aputils.deepCopy(currentList);
+					//change this node new input
+					newCurrentList.set(nodeIndex, intersectingD2Predicate);
+					//Generate new recursion with reconverted predicate as next input predicate (to subsequent node)
+					Predicate reconvertedPredicate = new Predicate(intersectingD2Predicate);
+					IPAddress natSrcAddress = new IPAddress(natSrc, false);
+					List<IPAddress> dstList = new ArrayList<>();
+					dstList.add(natSrcAddress);
+					reconvertedPredicate.setIPDstList(dstList);
+					recursiveGenerateMaximalFlowsForwardUpdate(nodeIndex+1, sr, path, reconvertedPredicate, currentFlowPath, newCurrentList, true);
+				}
+			}
+			//Compute intersection with D31
+			for(Predicate D31Predicate: natD31map.get(node.getIpAddress())) {
+				Predicate intersectingD31Predicate = aputils.computeIntersection(D31Predicate, inputPredicate);
+				if(intersectingD31Predicate != null) {
+					//change this node with new input
+					List<Predicate> newCurrentList = aputils.deepCopy(currentList);
+					newCurrentList.set(nodeIndex, intersectingD31Predicate);
+					//continue recursion without transformation
+					recursiveGenerateMaximalFlowsForwardUpdate(nodeIndex+1, sr, path, intersectingD31Predicate, currentFlowPath, newCurrentList, somethingChanged);
+				}
+			}
+			//Compute intersection with D32
+			Predicate intersectingD32Predicate = aputils.computeIntersection(natD32map.get(node.getIpAddress()), inputPredicate);
+			if(intersectingD32Predicate != null) {
+				//change this node with new input
+				List<Predicate> newCurrentList = aputils.deepCopy(currentList);
+				newCurrentList.set(nodeIndex, intersectingD32Predicate);
+				//continue recursion without transformation
+				recursiveGenerateMaximalFlowsForwardUpdate(nodeIndex+1, sr, path, intersectingD32Predicate, currentFlowPath, newCurrentList, somethingChanged);
+			}
+		}
+		else if (allowedFirewallPredicates.containsKey(node.getIpAddress())) {
+			//Check intersection with allowed and denied list
+			List<Predicate> trasformedPredicates = new ArrayList<>();
+			for(Predicate allowedPredicate: allowedFirewallPredicates.get(node.getIpAddress())) {
+				Predicate intersectionAllowed = aputils.computeIntersection(allowedPredicate, inputPredicate);
+				if(intersectionAllowed != null && !aputils.APCompare(intersectionAllowed, inputPredicate))
+					trasformedPredicates.add(intersectionAllowed);
+			}
+			for(Predicate deniedPredicate: deniedFirewallPredicates.get(node.getIpAddress())) {
+				Predicate intersectionDenied = aputils.computeIntersection(deniedPredicate, inputPredicate);
+				if(intersectionDenied != null && !aputils.APCompare(intersectionDenied, inputPredicate)) 
+					trasformedPredicates.add(intersectionDenied);
+			}
+			
+			//Generate the new flows
+			if(trasformedPredicates.size() > 0) {
+				for(Predicate newPredicate:trasformedPredicates) {
+					List<Predicate> newCurrentList = aputils.deepCopy(currentList);
+					newCurrentList.set(nodeIndex, newPredicate);
+					//continue recursion without transformation
+					recursiveGenerateMaximalFlowsForwardUpdate(nodeIndex+1, sr, path, newPredicate, currentFlowPath, newCurrentList, somethingChanged);
+				
+				}
+			} else {
+				//simply forward the packet
+				currentList.set(nodeIndex, new Predicate(inputPredicate));
+				recursiveGenerateMaximalFlowsForwardUpdate(nodeIndex+1, sr, path, inputPredicate, currentFlowPath, currentList, somethingChanged);
+			}
+		}
+		else {
+			//node is a simple forwarder, just forward the predicate
+			currentList.set(nodeIndex, new Predicate(inputPredicate));
+			recursiveGenerateMaximalFlowsForwardUpdate(nodeIndex+1, sr, path, inputPredicate, currentFlowPath, currentList, somethingChanged);
+		}
+	}
+
+	private void recursiveGenerateMaximalFlowsBackwardUpdate(int nodeIndex, SecurityRequirement sr, List<AllocationNode> path, Predicate inputPredicate,
+			FlowPath currentFlowPath, List<Predicate> currentList, boolean somethingChanged) {
+		
+		if(nodeIndex < 0)
+			return;
+		
+		AllocationNode node = path.get(nodeIndex);
+		
+		if(nodeIndex == 0) {
+			//We are in the last first node of the path
+			Predicate newPredicate = new Predicate(inputPredicate);
+			currentList.set(nodeIndex, newPredicate);
+			if(somethingChanged) {
+				//start new forward update
+				recursiveGenerateMaximalFlowsForwardUpdate(1, sr, path, inputPredicate, currentFlowPath, currentList, false);
+			} else {
+				currentFlowPath.addMaximalFlow(maximalFlowId, currentList);
+				maximalFlowId++;
+			}
+
+			return;
+		}
+		
+		if(natD1map.containsKey(node.getIpAddress())) {
+			//Node is a NAT
+			//check if input Predicate has sourceIP == to nat IP
+			List<IPAddress> natIPAddressList = new ArrayList<>();
+			natIPAddressList.add(new IPAddress(node.getIpAddress(), false));
+			if(aputils.APCompareIPAddressList(inputPredicate.getIPSrcList(), natIPAddressList)) {
+				//the predicate has already been shadowed in previous traversals, so simply change destination and forward
+				Predicate newPredicate = new Predicate(currentList.get(nodeIndex));
+				newPredicate.setIPDstList(inputPredicate.getIPDstList());
+				newPredicate.setpDstList(inputPredicate.getpDstList());
+				newPredicate.setProtoTypeList(inputPredicate.getProtoTypeList());
+				currentList.set(nodeIndex, newPredicate);
+				recursiveGenerateMaximalFlowsBackwardUpdate(nodeIndex-1, sr, path, newPredicate, currentFlowPath, currentList, somethingChanged);
+				return;
+			}
+			
+			//check if it is a reconverted predicate. In that case forward the input packet saved in this node changing only source
+			boolean isReconverted = false;
+			for(Predicate reconvertedPredicate: natReconvertedMap.get(node.getIpAddress())) {
+				if(aputils.computeIntersection(inputPredicate, reconvertedPredicate) != null) {
+					if(aputils.APCompareIPAddressList(currentList.get(nodeIndex).getIPDstList(), natIPAddressList)) {
+						isReconverted = true;
+						break;
+					}
+				}
+			}
+			
+			if(isReconverted) {
+				Predicate newPredicate = new Predicate(currentList.get(nodeIndex));
+				newPredicate.setIPSrcList(inputPredicate.getIPSrcList());
+				newPredicate.setpDstList(inputPredicate.getpDstList());
+				newPredicate.setProtoTypeList(inputPredicate.getProtoTypeList());
+				currentList.set(nodeIndex, newPredicate);
+				recursiveGenerateMaximalFlowsBackwardUpdate(nodeIndex-1, sr, path, newPredicate, currentFlowPath, currentList, somethingChanged);
+				return;
+			}
+			
+			//Compute intersection with D1
+			for(Predicate D1Predicate: natD1map.get(node.getIpAddress())) {
+				Predicate intersectingD1Predicate = aputils.computeIntersection(D1Predicate, inputPredicate);
+				if(intersectingD1Predicate != null) {
+					//Do shadowing and generate a new flow
+					List<Predicate> newCurrentList = aputils.deepCopy(currentList);
+					//change this node new input
+					newCurrentList.set(nodeIndex, intersectingD1Predicate);
+					//Generate new recursion with shadowed predicate as next input predicate (to subsequent node)
+					Predicate shadowedPredicate = new Predicate(intersectingD1Predicate);
+					List<IPAddress> srcList = new ArrayList<>();
+					srcList.add(new IPAddress(node.getIpAddress(), false));
+					shadowedPredicate.setIPSrcList(srcList);
+					recursiveGenerateMaximalFlowsBackwardUpdate(nodeIndex-1, sr, path, shadowedPredicate, currentFlowPath, newCurrentList, true);
+				}
+			}
+			//Compute intersection with D2
+			Predicate intersectingD2Predicate = aputils.computeIntersection(natD2map.get(node.getIpAddress()), inputPredicate);
+			if(intersectingD2Predicate != null) {
+				//Do reconversion and generate new flows
+				for(String natSrc: node.getNode().getConfiguration().getNat().getSource()) {
+					List<Predicate> newCurrentList = aputils.deepCopy(currentList);
+					//change this node new input
+					newCurrentList.set(nodeIndex, intersectingD2Predicate);
+					//Generate new recursion with reconverted predicate as next input predicate (to subsequent node)
+					Predicate reconvertedPredicate = new Predicate(intersectingD2Predicate);
+					IPAddress natSrcAddress = new IPAddress(natSrc, false);
+					List<IPAddress> dstList = new ArrayList<>();
+					dstList.add(natSrcAddress);
+					reconvertedPredicate.setIPDstList(dstList);
+					recursiveGenerateMaximalFlowsBackwardUpdate(nodeIndex-1, sr, path, reconvertedPredicate, currentFlowPath, newCurrentList, true);
+				}
+			}
+			//Compute intersection with D31
+			for(Predicate D31Predicate: natD31map.get(node.getIpAddress())) {
+				Predicate intersectingD31Predicate = aputils.computeIntersection(D31Predicate, inputPredicate);
+				if(intersectingD31Predicate != null) {
+					//change this node with new input
+					List<Predicate> newCurrentList = aputils.deepCopy(currentList);
+					newCurrentList.set(nodeIndex, intersectingD31Predicate);
+					//continue recursion without transformation
+					recursiveGenerateMaximalFlowsBackwardUpdate(nodeIndex-1, sr, path, intersectingD31Predicate, currentFlowPath, newCurrentList, somethingChanged);
+				}
+			}
+			//Compute intersection with D32
+			Predicate intersectingD32Predicate = aputils.computeIntersection(natD32map.get(node.getIpAddress()), inputPredicate);
+			if(intersectingD32Predicate != null) {
+				//change this node with new input
+				List<Predicate> newCurrentList = aputils.deepCopy(currentList);
+				newCurrentList.set(nodeIndex, intersectingD32Predicate);
+				//continue recursion without transformation
+				recursiveGenerateMaximalFlowsBackwardUpdate(nodeIndex-1, sr, path, intersectingD32Predicate, currentFlowPath, newCurrentList, somethingChanged);
+			}
+		}
+		else if(allowedFirewallPredicates.containsKey(node.getIpAddress())) {
+			//we are in a firewall
+			//Check intersection with allowed and denied list
+			List<Predicate> trasformedPredicates = new ArrayList<>();
+			for(Predicate allowedPredicate: allowedFirewallPredicates.get(node.getIpAddress())) {
+				Predicate intersectionAllowed = aputils.computeIntersection(allowedPredicate, inputPredicate);
+				if(intersectionAllowed != null && !aputils.APCompare(intersectionAllowed, inputPredicate)) 
+					trasformedPredicates.add(intersectionAllowed);
+			}
+			for(Predicate deniedPredicate: deniedFirewallPredicates.get(node.getIpAddress())) {
+				Predicate intersectionDenied = aputils.computeIntersection(deniedPredicate, inputPredicate);
+				if(intersectionDenied != null && !aputils.APCompare(intersectionDenied, inputPredicate)) 
+					trasformedPredicates.add(intersectionDenied);
+			}
+			
+			//Generate the new flows
+			if(trasformedPredicates.size() > 0) {
+				for(Predicate newPredicate:trasformedPredicates) {
+					List<Predicate> newCurrentList = aputils.deepCopy(currentList);
+					newCurrentList.set(nodeIndex, newPredicate);
+					//continue recursion without transformation
+					recursiveGenerateMaximalFlowsBackwardUpdate(nodeIndex-1, sr, path, newPredicate, currentFlowPath, newCurrentList, somethingChanged);
+				}
+			} else {
+				//simply forward the packet
+				Predicate newPredicate = new Predicate(inputPredicate);
+				currentList.set(nodeIndex, newPredicate);
+				recursiveGenerateMaximalFlowsBackwardUpdate(nodeIndex-1, sr, path, newPredicate, currentFlowPath, currentList, somethingChanged);
+			}
+		}
+		else {
+			//Just forward the predicate
+			Predicate newPredicate = new Predicate(inputPredicate);
+			currentList.set(nodeIndex, newPredicate);
+			recursiveGenerateMaximalFlowsBackwardUpdate(nodeIndex-1, sr, path, newPredicate, currentFlowPath, currentList, somethingChanged);
+		}
+	}
+
 }
