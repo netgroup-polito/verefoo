@@ -1,10 +1,10 @@
 package it.polito.verefoo.graph;
-PacketFilter
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.allocation.AllocationNodeAP;
+import it.polito.verefoo.allocation.AllocationNodeMF;
 import it.polito.verefoo.jaxb.*;
 
 public class FlowPathAP {

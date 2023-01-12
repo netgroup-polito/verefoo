@@ -5,7 +5,8 @@ import com.microsoft.z3.Context;
 import com.microsoft.z3.Model;
 import com.microsoft.z3.Status;
 
-import it.polito.verefoo.solver.NetContext;
+import it.polito.verefoo.solver.NetContextAP;
+import it.polito.verefoo.solver.NetContextMF;
 
 
 /**

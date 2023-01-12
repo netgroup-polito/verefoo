@@ -11,14 +11,16 @@ import it.polito.verefoo.functions.Forwarder;
 import it.polito.verefoo.functions.GenericFunction;
 import it.polito.verefoo.functions.LoadBalancer;
 import it.polito.verefoo.functions.NAT;
-import it.polito.verefoo.functions.PacketFilter;
+import it.polito.verefoo.functions.PacketFilterAP;
+import it.polito.verefoo.functions.PacketFilterMF;
 import it.polito.verefoo.functions.TrafficMonitor;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Node;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
-import it.polito.verefoo.solver.NetContext;
+import it.polito.verefoo.solver.NetContextAP;
+import it.polito.verefoo.solver.NetContextMF;
 
 /**
  * This class has the key task to manage the allocation and deployment of Network Functions on the nodes of

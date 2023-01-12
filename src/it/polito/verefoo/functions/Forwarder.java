@@ -9,9 +9,12 @@ import com.microsoft.z3.Context;
 import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Optimize;
 
-import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.solver.NetContext;
-import it.polito.verefoo.graph.FlowPath;
+import it.polito.verefoo.allocation.AllocationNodeAP;
+import it.polito.verefoo.solver.NetContextAP;
+import it.polito.verefoo.graph.FlowPathAP;
+import it.polito.verefoo.allocation.AllocationNodeMF;
+import it.polito.verefoo.solver.NetContextMF;
+import it.polito.verefoo.graph.FlowPathMF;
 import it.polito.verefoo.graph.MaximalFlow;
 
 /** Represents a Forwarder

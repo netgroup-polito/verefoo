@@ -12,8 +12,10 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.Optimize;
 
-import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.solver.NetContext;
+import it.polito.verefoo.allocation.AllocationNodeAP;
+import it.polito.verefoo.solver.NetContextAP;
+import it.polito.verefoo.allocation.AllocationNodeMF;
+import it.polito.verefoo.solver.NetContextMF;
 
 /** Represents a generic Network Function.
  *

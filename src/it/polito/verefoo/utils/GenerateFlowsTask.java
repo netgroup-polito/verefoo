@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import it.polito.verefoo.allocation.AllocationNode;
-import it.polito.verefoo.graph.FlowPath;
+import it.polito.verefoo.allocation.AllocationNodeAP;
+import it.polito.verefoo.graph.FlowPathAP;
+import it.polito.verefoo.allocation.AllocationNodeMF;
+import it.polito.verefoo.graph.FlowPathMF;
 import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verefoo.jaxb.FunctionalTypes;

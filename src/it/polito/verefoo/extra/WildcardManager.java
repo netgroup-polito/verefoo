@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.allocation.AllocationNodeAP;
+import it.polito.verefoo.allocation.AllocationNodeMF;
 
 
 /**

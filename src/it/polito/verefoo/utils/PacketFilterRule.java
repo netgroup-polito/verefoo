@@ -7,7 +7,8 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.IntNum;
 
-import it.polito.verefoo.solver.NetContext;
+import it.polito.verefoo.solver.NetContextAP;
+import it.polito.verefoo.solver.NetContextMF;
 /**
  * This class abstracts the concept of a firewall rule
  * @author Antonio

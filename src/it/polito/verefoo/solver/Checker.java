@@ -20,9 +20,11 @@ import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Params;
 import com.microsoft.z3.Status;
 
-import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.allocation.AllocationNodeAP;
+import it.polito.verefoo.allocation.AllocationNodeMF;
 import it.polito.verefoo.graph.AtomicFlow;
-import it.polito.verefoo.graph.FlowPath;
+import it.polito.verefoo.graph.FlowPathAP;
+import it.polito.verefoo.graph.FlowPathMF;
 import it.polito.verefoo.graph.MaximalFlow;
 import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verefoo.utils.VerificationResult;

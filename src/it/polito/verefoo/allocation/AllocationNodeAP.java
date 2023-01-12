@@ -6,7 +6,8 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Optimize;
 
 import it.polito.verefoo.functions.GenericFunction;
-import it.polito.verefoo.graph.FlowPath;
+import it.polito.verefoo.graph.FlowPathAP;
+import it.polito.verefoo.graph.FlowPathMF;
 import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.jaxb.*;
 

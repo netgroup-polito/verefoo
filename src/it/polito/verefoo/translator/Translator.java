@@ -13,14 +13,18 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 
 import it.polito.verefoo.VerefooNormalizer;
-import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.allocation.AllocationNodeAP;
+import it.polito.verefoo.allocation.AllocationNodeMF;
 import it.polito.verefoo.functions.GenericFunction;
-import it.polito.verefoo.functions.PacketFilter;
-import it.polito.verefoo.graph.FlowPath;
+import it.polito.verefoo.functions.PacketFilterAP;
+import it.polito.verefoo.functions.PacketFilterMF;
+import it.polito.verefoo.graph.FlowPathAP;
+import it.polito.verefoo.graph.FlowPathMF;
 import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.jaxb.*;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
-import it.polito.verefoo.utils.APUtils;
+import it.polito.verefoo.utils.APUtilsAP;
+import it.polito.verefoo.utils.APUtilsMF;
 import it.polito.verefoo.utils.PortInterval;
 import it.polito.verefoo.utils.Tuple;
 

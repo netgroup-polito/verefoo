@@ -23,7 +23,8 @@ import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Optimize;
 import com.microsoft.z3.Sort;
 
-import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.allocation.AllocationNodeAP;
+import it.polito.verefoo.allocation.AllocationNodeMF;
 import it.polito.verefoo.extra.WildcardManager;
 import it.polito.verefoo.utils.PortInterval;
 import it.polito.verefoo.utils.Tuple;

@@ -3,8 +3,8 @@ package it.polito.verefoo.graph;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.polito.verefoo.utils.APUtils;
-
+import it.polito.verefoo.utils.APUtilsAP;
+import it.polito.verefoo.utils.APUtilsMF;
 
 public class SimplePredicate {
 	List<String> IPSrcList = new ArrayList<>();		//in AND

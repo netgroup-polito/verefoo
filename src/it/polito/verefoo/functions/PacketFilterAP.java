@@ -16,16 +16,19 @@ import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Optimize;
 
-import it.polito.verefoo.allocation.AllocationNode;
+import it.polito.verefoo.allocation.AllocationNodeAP;
+import it.polito.verefoo.allocation.AllocationNodeMF;
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.extra.WildcardManager;
-import it.polito.verefoo.graph.FlowPath;
+import it.polito.verefoo.graph.FlowPathAP;
+import it.polito.verefoo.graph.FlowPathMF;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.EType;
 import it.polito.verefoo.jaxb.FunctionalTypes;
 import it.polito.verefoo.jaxb.Node;
 import it.polito.verefoo.jaxb.PName;
-import it.polito.verefoo.solver.NetContext;
+import it.polito.verefoo.solver.NetContextAP;
+import it.polito.verefoo.solver.NetContextMF;
 import it.polito.verefoo.utils.Tuple;
 
 /** Represents a Packet Filter with the associated Access Control List
