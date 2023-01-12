@@ -23,6 +23,7 @@ import com.microsoft.z3.Status;
 import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.graph.AtomicFlow;
 import it.polito.verefoo.graph.FlowPath;
+import it.polito.verefoo.graph.MaximalFlow;
 import it.polito.verefoo.graph.SecurityRequirement;
 import it.polito.verefoo.utils.VerificationResult;
 
@@ -135,28 +136,49 @@ public class Checker {
 	 * @param sr It is the requirement that must be modeled in z3 language
 	 * @param propType It is the type of the security requirement
 	 */
-	public void createRequirementConstraints(SecurityRequirement sr, Prop propType) {
+	public void createRequirementConstraintsAP(SecurityRequirement sr, Prop propType) {
 		
 		switch (propType) {
 			case ISOLATION:
-				createIsolationConstraints(sr);
+				createIsolationConstraintsAP(sr);
 				break;
 			case REACHABILITY:
-				createReachabilityConstraint(sr);
+				createReachabilityConstraintAP(sr);
 				break;
 			case COMPLETE_REACHABILITY:
-				createCompleteReachabilityConstraint(sr);
+				createCompleteReachabilityConstraintAP(sr);
+				break;
+		}
+	}
+
+	/**
+	 * This method is invoked by VerefooProxy to generate the z3 constraints for each security requirement
+	 * @param sr It is the requirement that must be modeled in z3 language
+	 * @param propType It is the type of the security requirement
+	 */
+	public void createRequirementConstraintsMF(SecurityRequirement sr, Prop propType) {
+		
+		switch (propType) {
+			case ISOLATION:
+				createIsolationConstraintsMF(sr);
+				break;
+			case REACHABILITY:
+				createReachabilityConstraintMF(sr);
+				break;
+			case COMPLETE_REACHABILITY:
+				createCompleteReachabilityConstraintMF(sr);
 				break;
 		}
 	}
 
 
 	/**
+	 * Atomic Predicate Algorithm
 	 * This method generates the constraints for a reachability requirement
 	 * @param sr It is the requirement that must be modeled in z3 language
 	 * @param propType It is the type of the security requirement
 	 */
-	private void createReachabilityConstraint(SecurityRequirement sr) {
+	private void createReachabilityConstraintAP(SecurityRequirement sr) {
 		
 		List<BoolExpr> pathConstraints = new ArrayList<>();
 		Map<Integer, FlowPath> allFlows = sr.getFlowsMap();
@@ -187,9 +209,38 @@ public class Checker {
 		constraintList.add(finalConstraint);
 	}
 	
+	/**
+	 * Maximal Flows Algorithm
+	 * This method generates the constraints for a reachability requirement
+	 * @param sr It is the requirement that must be modeled in z3 language
+	 * @param propType It is the type of the security requirement
+	 */
+	private void createReachabilityConstraintMF(SecurityRequirement sr) {
+		
+		List<BoolExpr> pathConstraints = new ArrayList<>();
+		Map<Integer, FlowPath> allFlows = sr.getFlowsMap();
+		
+		for(FlowPath flow : allFlows.values()) {
+			for(Map.Entry<Integer, MaximalFlow> maximalFlowEntry: flow.getMaximalFlowsMap().entrySet()) {
+				
+				List<BoolExpr> singleConstraints = new ArrayList<>();
+				for(AllocationNode node : flow.getPath()) {
+					singleConstraints.add(ctx.mkImplies(node.getPlacedNF().getUsed(), ctx.mkEq( (BoolExpr)nctx.deny.apply(node.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey())), ctx.mkFalse())));
+				}
+				
+				BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
+				BoolExpr finalConstraint = ctx.mkAnd(singleConstraints.toArray(arrayConstraints));
+				pathConstraints.add(finalConstraint);
+			}
+		}
+		
 	
+		BoolExpr[] arrayConstraints = new BoolExpr[pathConstraints.size()];
+		BoolExpr finalConstraint = ctx.mkOr(pathConstraints.toArray(arrayConstraints));
+		constraintList.add(finalConstraint);
+	}
 	
-	private void createCompleteReachabilityConstraint(SecurityRequirement sr) {
+	private void createCompleteReachabilityConstraintAP(SecurityRequirement sr) {
 		
 		Map<Integer, FlowPath> allFlows = sr.getFlowsMap();
 		List<BoolExpr> pathConstraints = new ArrayList<>();
@@ -223,14 +274,42 @@ public class Checker {
 		constraintList.add(finalConstraint);
 	}
 
-
+	private void createCompleteReachabilityConstraintMF(SecurityRequirement sr) {
+		
+		Map<Integer, FlowPath> allFlows = sr.getFlowsMap();
+		List<BoolExpr> pathConstraints = new ArrayList<>();
+		
+		for(FlowPath flow : allFlows.values()) {
+			List<BoolExpr> maximalFlowConstraintsInsideFlowPath = new ArrayList<>();
+			for(Map.Entry<Integer, MaximalFlow> maximalFlowEntry: flow.getMaximalFlowsMap().entrySet()) {
+				
+				List<BoolExpr> singleConstraints = new ArrayList<>();
+				for(AllocationNode node : flow.getPath()) {
+					singleConstraints.add(ctx.mkImplies(node.getPlacedNF().getUsed(), ctx.mkEq( (BoolExpr)nctx.deny.apply(node.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey())), ctx.mkFalse())));
+				}
+				
+				BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
+				BoolExpr maximalFlowConstraint = ctx.mkAnd(singleConstraints.toArray(arrayConstraints));
+				maximalFlowConstraintsInsideFlowPath.add(maximalFlowConstraint);
+			}
+			
+			BoolExpr[] tmp = new BoolExpr[maximalFlowConstraintsInsideFlowPath.size()];
+			BoolExpr pathConstraint = ctx.mkAnd(maximalFlowConstraintsInsideFlowPath.toArray(tmp));
+			pathConstraints.add(pathConstraint);
+		}
+	
+		BoolExpr[] arrayConstraints = new BoolExpr[pathConstraints.size()];
+		BoolExpr finalConstraint = ctx.mkOr(pathConstraints.toArray(arrayConstraints));
+		constraintList.add(finalConstraint);
+	}
 	
 	/**
+	 * Atomic Predicate Algorithm
 	 * This method generates the constraints for an isolation requirement
 	 * @param sr It is the requirement that must be modeled in z3 language
 	 * @param propType It is the type of the security requirement
 	 */
-	private void createIsolationConstraints(SecurityRequirement sr) {
+	private void createIsolationConstraintsAP(SecurityRequirement sr) {
 		
 		List<BoolExpr> pathConstraints = new ArrayList<>();
 		Map<Integer, FlowPath> allFlows = sr.getFlowsMap();
@@ -253,6 +332,38 @@ public class Checker {
 				pathConstraints.add(finalConstraint);
 			}
 			
+		}
+		
+		
+		BoolExpr[] arrayConstraints = new BoolExpr[pathConstraints.size()];
+		BoolExpr finalConstraint = ctx.mkAnd(pathConstraints.toArray(arrayConstraints));
+		constraintList.add(finalConstraint);
+	}
+	
+	/**
+	 * Maximal Flow Algorithm
+	 * This method generates the constraints for an isolation requirement
+	 * @param sr It is the requirement that must be modeled in z3 language
+	 * @param propType It is the type of the security requirement
+	 */
+	private void createIsolationConstraintsMF(SecurityRequirement sr) {
+		
+		List<BoolExpr> pathConstraints = new ArrayList<>();
+		Map<Integer, FlowPath> allFlows = sr.getFlowsMap();
+		
+		for(FlowPath flow : allFlows.values()) {
+			for(Map.Entry<Integer, MaximalFlow> maximalFlowEntry: flow.getMaximalFlowsMap().entrySet()) {
+				
+				List<BoolExpr> singleConstraints = new ArrayList<>();
+				
+				for(AllocationNode node : flow.getPath()) {
+					singleConstraints.add(ctx.mkAnd(node.getPlacedNF().getUsed(), (BoolExpr) nctx.deny.apply(node.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey()))));
+				}
+				
+				BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
+				BoolExpr finalConstraint = ctx.mkOr(singleConstraints.toArray(arrayConstraints));
+				pathConstraints.add(finalConstraint);
+			}
 		}
 		
 		

@@ -32,7 +32,7 @@ import it.polito.verefoo.utils.Tuple;
  * Basic fields and other things required for model checking.
  *
  */
-public class NetContext {
+public class NetContextAP {
 	public Context ctx;
 	public WildcardManager wildcardManager;
 	public FuncDecl nodeHasAddr,addrToNode,send,recv,deny;
@@ -79,7 +79,7 @@ public class NetContext {
      * @param ctx
      * @param args
      */
-    public NetContext(Context ctx, HashMap<String, AllocationNode> allocationNodes, Object[]... args){
+    public NetContextAP(Context ctx, HashMap<String, AllocationNode> allocationNodes, Object[]... args){
           nodeMap = new HashMap<String,DatatypeExpr>(); //list of nodes, callable by node name
           addressMap = new HashMap<String,DatatypeExpr>(); // list of addresses, callable by address name
           portMap = new HashMap<String,DatatypeExpr>();
@@ -101,7 +101,7 @@ public class NetContext {
     
     
     /*
-     * Main Methods of NetContext class
+     * Main Methods of NetContextAP class
      */
 
     
