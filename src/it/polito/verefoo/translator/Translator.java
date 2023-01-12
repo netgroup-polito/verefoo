@@ -53,7 +53,7 @@ public class Translator {
 		this.nfv = nfv;
 		this.g = g;
 	}
-
+	// constructor used by AP algorithm
 	public Translator(String model, NFV nfv, Graph g, Map<String, AllocationNode> allocationNodes, Map<Integer, FlowPath> requirementsMap, HashMap<Integer, Predicate> networkAtomicPredicates) {
 		this.model = model;
 		this.nfv = nfv;
@@ -62,7 +62,16 @@ public class Translator {
 		this.requirementsMap = requirementsMap;
 		this.networkAtomicPredicates = networkAtomicPredicates;
 		this.removedNodes = new ArrayList<Node>();
-		this.aputils = new APUtils();
+		this.aputils = new APUtilsAP();
+	}
+	// Constructor for maximal flows
+	public Translator(String model, NFV nfv, Graph g, Map<String, AllocationNode> allocationNodes, Map<Integer, FlowPath> requirementsMap) {
+		this.model = model;
+		this.nfv = nfv;
+		this.g = g;
+		this.allocationNodes = allocationNodes;
+		this.requirementsMap = requirementsMap;
+		this.removedNodes = new ArrayList<Node>();
 	}
 
 	/**
@@ -71,11 +80,11 @@ public class Translator {
 	 * @return an NFV object that contains the new information retrieved in the z3
 	 *         model
 	 */
-	public NFV convert() {
+	public NFV convert(String algo) { // this produces an error in RestTranslator.put file --> To be fixef later
 		if (originalNfv.getHosts() != null)
 			originalNfv.getHosts().getHost().forEach(this::searchHost);
 		setAutoPlacement();
-		setAutoConfig();
+		setAutoConfig(algo);
 		removeOptionalNotUsed();
 		return originalNfv;
 	}
@@ -84,8 +93,11 @@ public class Translator {
 	 * Wraps the translation for all the VNFs that can be auto configurated by
 	 * Verefoo
 	 */
-	public void setAutoConfig() {
-		setPacketFilterAutoConfig();
+	public void setAutoConfig(String algo) {
+		if(algo.equals("AP"))
+		setPacketFilterAutoConfigAP();
+		else
+		setPacketFilterAutoConfigMF();
 	}
 
 	/**
@@ -184,10 +196,11 @@ public class Translator {
 	}
 
 	/**
+	 * Atomic Predicate Algorithm
 	 * Set the firewall auto-configurated rules in the XML according to the Verefoo
 	 * output
 	 */
-	public void setPacketFilterAutoConfig() {
+	public void setPacketFilterAutoConfigAP() {
 		List<Node> autoNodes = originalNfv.getGraphs().getGraph().stream().filter(graph -> graph.getId() == g.getId())
 				.flatMap(graph -> graph.getNode().stream())
 				.filter(n -> n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL)
@@ -237,6 +250,112 @@ public class Translator {
 				
 			}
 			n.getConfiguration().getFirewall().getElements().addAll(listOfRules);
+		});
+
+	}
+
+	/**
+	 * Maximal Flows Algorithm
+	 * Set the firewall auto-configurated rules in the XML according to the Verefoo
+	 * output
+	 */
+	public void setPacketFilterAutoConfigMF() {
+		List<Node> autoNodes = originalNfv.getGraphs().getGraph().stream().filter(graph -> graph.getId() == g.getId())
+				.flatMap(graph -> graph.getNode().stream())
+				.filter(n -> n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL)
+						&& n.getConfiguration().getFirewall().getElements().isEmpty())
+				.collect(Collectors.toList());
+		List<String> nodes = g.getNode().stream().map(n -> n.getName()).collect(Collectors.toList());
+		Map<String, String> nameToGroup = new HashMap<>();
+		g.getNode().forEach(n -> {
+			String name = n.getName();
+			if (norm.getFlowGroups().containsKey(n.getName())) {
+				name = norm.getFlowGroups().get(n.getName());
+
+			}
+			if (norm.getNetworkGroups().containsKey(name))
+				name = norm.getNetworkGroups().get(name);
+			nameToGroup.put(n.getName(), name);
+		});
+
+		autoNodes.forEach(n -> {
+			List<Elements> listOfRules = new ArrayList<>();
+			String defAction = firewallAutoConfigSearchPlainAttribute(
+					z3Translator.stringToSearchFwAction(n, "default_action"));
+			ActionTypes da = defAction.equals("true") ? ActionTypes.ALLOW : ActionTypes.DENY;
+			n.getConfiguration().getFirewall().setDefaultAction(da);
+
+			String tosearch = z3Translator.stringToSearchNode(n);
+			Pattern pattern = Pattern.compile(tosearch);
+			Matcher matcher = pattern.matcher(model);
+			while (matcher.find()) {
+				Elements e = new Elements();
+				e.setSource("");
+				e.setDestination("");
+				String matchSrc = matcher.group();
+				String srcRule = z3Translator.matchComplexAttribute(matchSrc, z3Translator.Datatype.ip_constructor);
+				tosearch = z3Translator.stringToSearchAddress(srcRule);
+				Pattern patternNodeScr = Pattern.compile(tosearch);
+				Matcher matcherNodeScr = patternNodeScr.matcher(model);
+				String nodeSrcName = "";
+				boolean srcFound = false;
+				while (matcherNodeScr.find()) {
+					String match = matcherNodeScr.group();
+					String nodeSrc = z3Translator.matchNodeName(match);
+					if (nodes.contains(nodeSrc)) {
+						nodeSrcName = nodeSrc;
+						srcFound = true;
+						break;
+					}
+				}
+				if (!srcFound) {
+					nodeSrcName = srcRule;
+				}
+				nodeSrcName = z3Translator.saneString(nodeSrcName);
+				
+				//if (nameToGroup.containsKey(nodeSrcName))
+					//nodeSrcName = nameToGroup.get(nodeSrcName);
+				e.setSource(nodeSrcName);
+				String nrOfRule = z3Translator.matchNrOfRule(matchSrc);
+				String nodeDstName = firewallAutoConfigSearchDst(n, nrOfRule);
+				if (nameToGroup.containsKey(nodeDstName))
+					nodeDstName = nameToGroup.get(nodeDstName);
+				e.setDestination(nodeDstName);
+
+				if (!e.getSource().equals("0.0.0.0") && !e.getDestination().equals("0.0.0.0")) {
+					String src_port = firewallAutoConfigSearchComplexAttribute(
+							z3Translator.stringToSearchFwPort(n, nrOfRule, "src"),
+							z3Translator.Datatype.port_range_constructor);
+					src_port = src_port.replace(" ", "-");
+					if (src_port.equals("null"))
+						src_port = new String("*");
+					e.setSrcPort((new PortInterval(src_port).toString()));
+
+					String dst_port = firewallAutoConfigSearchComplexAttribute(
+							z3Translator.stringToSearchFwPort(n, nrOfRule, "dst"),
+							z3Translator.Datatype.port_range_constructor);
+					dst_port = dst_port.replace(" ", "-");
+					if (dst_port.equals("null"))
+						dst_port = new String("*");
+					e.setDstPort((new PortInterval(dst_port).toString()));
+
+					String action = firewallAutoConfigSearchPlainAttribute(
+							z3Translator.stringToSearchFwAction(n, "action"));
+					ActionTypes a = action.equals("true") ? ActionTypes.ALLOW : ActionTypes.DENY;
+					e.setAction(a);
+
+					String protocol = firewallAutoConfigSearchPlainAttribute(
+							z3Translator.stringToSearchFwProtocol(n, nrOfRule));
+					if (!protocol.equals("null") && Integer.parseInt(protocol) < 4
+							&& !L4ProtocolTypes.values()[Integer.parseInt(protocol)].equals(L4ProtocolTypes.ANY))
+						e.setProtocol(L4ProtocolTypes.values()[Integer.parseInt(protocol)]);
+					else
+						e.setProtocol(L4ProtocolTypes.ANY);
+					listOfRules.add(e);
+				}
+			}
+			List<Elements> finalRules = mergeRules(listOfRules);
+			n.getConfiguration().getFirewall().getElements().addAll(finalRules);
 		});
 
 	}
