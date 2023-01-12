@@ -12,7 +12,6 @@ import it.polito.verefoo.functions.GenericFunction;
 import it.polito.verefoo.functions.LoadBalancer;
 import it.polito.verefoo.functions.NAT;
 import it.polito.verefoo.functions.PacketFilter;
-import it.polito.verefoo.functions.StatefulPacketFilter;
 import it.polito.verefoo.functions.TrafficMonitor;
 import it.polito.verefoo.jaxb.ActionTypes;
 import it.polito.verefoo.jaxb.FunctionalTypes;
@@ -62,7 +61,7 @@ public class AllocationManager {
 	  * For the moment it's able to instanciate web client/servers, firewalls and NATs. 
 	  * Each other NF can be added here following the same pattern (legacy class in older versions: NodeNetworkObject)
 	 */
-	public void instantiateFunctions() {
+	public void instantiateFunctions(String algo) {
 		
 		nodes.values().forEach(allocationNode -> {
 			Node node = allocationNode.getNode();
@@ -87,7 +86,11 @@ public class AllocationManager {
 				}
 				
 				else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
-					PacketFilter firewall = new PacketFilter(allocationNode, ctx, nctx, wildcardManager);
+					if(algo.equals("AP"))
+					PacketFilterAP firewall = new PacketFilterAP(allocationNode, ctx, nctx, wildcardManager);
+					else
+					PacketFilterMF firewall = new PacketFilterMF(allocationNode, ctx, nctx, wildcardManager);
+					
 					firewall.setAutoplace(false);
 					
 					if(node.getConfiguration().getFirewall().getDefaultAction() != null) {
@@ -143,22 +146,7 @@ public class AllocationManager {
 					allocationNode.setPlacedNF(tm);
 					allocationNode.setTypeNF(FunctionalTypes.FORWARDER);
 				}
-				
-				else if(node.getFunctionalType() == FunctionalTypes.STATEFUL_FIREWALL) {
-					StatefulPacketFilter spf = new StatefulPacketFilter(allocationNode, ctx, nctx);
-					allocationNode.setPlacedNF(spf);
-					allocationNode.setTypeNF(FunctionalTypes.STATEFUL_FIREWALL);
-					
-					if(node.getConfiguration().getStatefulFirewall().getDefaultAction() != null) { 
-						if(node.getConfiguration().getStatefulFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
-							spf.setDefaultAction(true);
-						}else if(node.getConfiguration().getStatefulFirewall().getDefaultAction().equals(ActionTypes.DENY)){
-							spf.setDefaultAction(false);
-						}
-					}
-				}
 			}
-			
 		});
 	}
 
@@ -169,16 +157,21 @@ public class AllocationManager {
 	 * The heuristic can be introduced here in the future.
 	 * For the moment it considers just one type of NF per time (e.g. packet filter, antispam, etc. accordingly to the tests in which the framework is used)
 	 */
-	public void chooseFunctions(AllocationNode source, AllocationNode origin, AllocationNode finalDest) {
+	public void chooseFunctions(AllocationNode source, AllocationNode origin, AllocationNode finalDest, String algo) {
 		if(source.getTypeNF() == null ) {
-					PacketFilter firewall = new PacketFilter(source, ctx, nctx, wildcardManager);
-					source.setPlacedNF(firewall);
-					source.setTypeNF(FunctionalTypes.FIREWALL);
+			if(algo.equals("AP"))		
+			PacketFilterAP firewall = new PacketFilterAP(source, ctx, nctx, wildcardManager);
+			else
+			PacketFilterMF firewall = new PacketFilterMF(source, ctx, nctx, wildcardManager);
+
+			source.setPlacedNF(firewall);
+			source.setTypeNF(FunctionalTypes.FIREWALL);
 		}
 	
 	}
 	
 	/**
+	 * Atomic Predicates Version of the method
 	 * This method is invoked in VerefooProxy before the creation of the Checker but after the recursive visit of the graph. 
 	 * It allows to create hard and soft contraints for each Network Function placed inside a node.
 	 * This way, creation of the Network Function and its installation are decoupled: 
@@ -186,7 +179,7 @@ public class AllocationManager {
 	 * 2) this method (NFinstall) after the recursive visit, when all the maps of the AllocationNode objects are built.
 	 */
 	
-	public void configureFunctions() {
+	public void configureFunctionsAP() {
 		
 		nodes.values().forEach(allocationNode -> { 
 			Node node = allocationNode.getNode();
@@ -203,23 +196,65 @@ public class AllocationManager {
 				endHost.configureEndHost();
 			}else if(node.getFunctionalType() == FunctionalTypes.NAT) {	
 				NAT nat = (NAT) no;
-				nat.natConfiguration();	
+				nat.natConfigurationAP();
 			}else if(node.getFunctionalType() == FunctionalTypes.LOADBALANCER) {	
 				LoadBalancer lb = (LoadBalancer) no;
-				lb.loadBalancerConfiguration(nctx.addressMap.get(node.getName()));		
+				lb.loadBalancerConfigurationAP(nctx.addressMap.get(node.getName()));		
 			}else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {	
 				Forwarder fw = (Forwarder) no;
-				fw.forwarderSendRules();
+				fw.forwarderSendRulesAP();
 			}else if(node.getFunctionalType() == FunctionalTypes.TRAFFIC_MONITOR) {	
 				TrafficMonitor tm = (TrafficMonitor) no;
-				tm.trafficMonitorSendRules();
+				tm.trafficMonitorSendRulesAP();
 			}else if(type.equals(FunctionalTypes.FIREWALL)) {
 				PacketFilter fw = (PacketFilter) no;
 				if(fw.isAutoconfigured()) fw.automaticConfiguration();
 				else fw.manualConfiguration();
-			}else if(type.equals(FunctionalTypes.STATEFUL_FIREWALL)) {
-				StatefulPacketFilter fw = (StatefulPacketFilter) no;
-				fw.manualConfiguration();
+			}
+		});
+		
+	}
+
+	/**
+	 * Maximal Flows Version of the method
+	 * This method is invoked in VerefooProxy before the creation of the Checker but after the recursive visit of the graph. 
+	 * It allows to create hard and soft contraints for each Network Function placed inside a node.
+	 * This way, creation of the Network Function and its installation are decoupled: 
+	 * 1) the first one (method instanciateDefineNF happens before the recursive visit;
+	 * 2) this method (NFinstall) after the recursive visit, when all the maps of the AllocationNode objects are built.
+	 */
+	
+	 public void configureFunctionsMF() {
+		
+		nodes.values().forEach(allocationNode -> { 
+			Node node = allocationNode.getNode();
+			FunctionalTypes type = allocationNode.getTypeNF();
+			GenericFunction no = allocationNode.getPlacedNF();
+
+			if(no == null) return; //it means no network function has been deployed on this node
+				
+			if(type.equals(FunctionalTypes.WEBCLIENT)) {
+				EndHost endHost = (EndHost) no;
+				endHost.configureEndHost();
+			}else if(type.equals(FunctionalTypes.WEBSERVER)) {
+				EndHost endHost = (EndHost) no;
+				endHost.configureEndHost();
+			}else if(node.getFunctionalType() == FunctionalTypes.NAT) {	
+				NAT nat = (NAT) no;
+				nat.natConfigurationMF(nctx.addressMap.get(node.getName()));
+			}else if(node.getFunctionalType() == FunctionalTypes.LOADBALANCER) {	
+				LoadBalancer lb = (LoadBalancer) no;
+				lb.loadBalancerConfigurationMF(nctx.addressMap.get(node.getName()));		
+			}else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {	
+				Forwarder fw = (Forwarder) no;
+				fw.forwarderSendRulesMF();
+			}else if(node.getFunctionalType() == FunctionalTypes.TRAFFIC_MONITOR) {	
+				TrafficMonitor tm = (TrafficMonitor) no;
+				tm.trafficMonitorSendRulesMF();
+			}else if(type.equals(FunctionalTypes.FIREWALL)) {
+				PacketFilter fw = (PacketFilter) no;
+				if(fw.isAutoconfigured()) fw.automaticConfiguration();
+				else fw.manualConfiguration();
 			}
 		});
 		

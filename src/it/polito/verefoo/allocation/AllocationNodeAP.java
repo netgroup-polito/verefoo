@@ -14,9 +14,10 @@ import it.polito.verefoo.jaxb.*;
 /*
  * This class is an extension of the JAXB-Annotated Node class.
  * It has additional features, like maps used to build forwarding rules and information about deployed Network Functions.
+ * This class is for atomic predicate algorithm
  */
 
-public class AllocationNode {
+public class AllocationNodeAP {
 
 	private Node node;
 	private GenericFunction placedNF;
@@ -35,10 +36,10 @@ public class AllocationNode {
 	private Map<Integer, Map<Integer, Integer>> mapFlowIdAtomicPredicatesInInput = new HashMap<>();
 	
 	/**
-	 * Public constructor for the AllocationNode class
+	 * Public constructor for the AllocationNodeAP class
 	 * @param node It is the JAXB Node object.
 	 */
-	public AllocationNode(Node node) {
+	public AllocationNodeAP(Node node) {
 		this.node = node;
 		placedNF = null;
 		typeNF = null;
@@ -158,7 +159,7 @@ public class AllocationNode {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AllocationNode other = (AllocationNode) obj;
+		AllocationNodeAP other = (AllocationNodeAP) obj;
 		if (ipAddress == null) {
 			if (other.ipAddress != null)
 				return false;
