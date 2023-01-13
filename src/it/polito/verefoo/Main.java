@@ -43,7 +43,7 @@ public class Main {
 			Scanner myObj = new Scanner(System.in);  // Create a Scanner object
 			System.out.println("Enter AP for atomic predicates algorithm Or MF for maximal flows algorithm");
 			String algo = myObj.nextLine();
-			while (!algo.equalsIgnoreCase("AP") || !algo.equalsIgnoreCase("MF")) { // input validation ignoring the case
+			while (!algo.equals("AP") || !algo.equals("MF")) { // input validation
 				System.out.println("Choose Correct Algorithms");
 				algo = myObj.nextLine();
 			}
