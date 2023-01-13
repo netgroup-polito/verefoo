@@ -32,7 +32,7 @@ public class AllocationNodeAP {
 	List<Predicate> forwardBehaviourPredicateList = new ArrayList<>();
 	List<Integer> forwardBehaviourList = new ArrayList<>();
 	List<Integer> droppedList = new ArrayList<>();
-	private Map<Integer, FlowPath> crossingFlows = new HashMap<>();
+	private Map<Integer, FlowPathAP> crossingFlows = new HashMap<>();
 	//<flowPathId, <atomicFlowId, atomicPredicate>>
 	private Map<Integer, Map<Integer, Integer>> mapFlowIdAtomicPredicatesInInput = new HashMap<>();
 	
@@ -180,12 +180,12 @@ public class AllocationNodeAP {
 		}
 	}
 
-	public void addCrossingFlow(FlowPath sr) {
+	public void addCrossingFlow(FlowPathAP sr) {
 		crossingFlows.put(sr.getIdFlow(), sr);
 	}
 	
 	//return flows that cross this node
-	public Map<Integer, FlowPath> getCrossingFlows() {
+	public Map<Integer, FlowPathAP> getCrossingFlows() {
 		return crossingFlows;
 	}
 
@@ -193,7 +193,7 @@ public class AllocationNodeAP {
 	 * Setter method for the map of requirements
 	 * @param requirements the map of requirements
 	 */
-	public void setFlows(Map<Integer, FlowPath> requirements) {
+	public void setFlows(Map<Integer, FlowPathAP> requirements) {
 		this.crossingFlows = requirements;
 	}
 	

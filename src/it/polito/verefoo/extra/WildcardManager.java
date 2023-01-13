@@ -30,15 +30,16 @@ public class WildcardManager {
 	private boolean nodesWithIPAddresses;
 	
 	/**
+	 * For Atmoic Predicate Constructor
 	 * Public constructor of WildcardManager class
 	 * It builds all the possible IP addresses with wildcards, dividing them in 4 levels.
 	 * @param allocationNodes It's the map of nodes of the Allocation Graph.
 	 */
-	public WildcardManager(HashMap<String, AllocationNode> allocationNodes) {
+	public WildcardManager(HashMap<String, AllocationNodeAP> allocationNodesAP) {
 		
 		nodesWithIPAddresses = true;
 		String addresses[] = {}; 
-		addresses = allocationNodes.values().stream().map((n)->n.getNode().getName()).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(addresses);
+		addresses = allocationNodesAP.values().stream().map((n)->n.getNode().getName()).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(addresses);
 		
 		wildcardLevel1 = new HashMap<String, HashSet<String>>();
 		wildcardLevel2 = new HashMap<String, HashSet<String>>();
@@ -93,6 +94,73 @@ public class WildcardManager {
 		}
 		
 	}
+	
+	/**
+	 * For Atmoic Predicate Constructor
+	 * Public constructor of WildcardManager class
+	 * It builds all the possible IP addresses with wildcards, dividing them in 4 levels.
+	 * @param allocationNodes It's the map of nodes of the Allocation Graph.
+	 */
+	public WildcardManager(HashMap<String, AllocationNodeMF> allocationNodesMF,String isMF) {
+		
+		nodesWithIPAddresses = true;
+		String addresses[] = {}; 
+		addresses = allocationNodesMF.values().stream().map((n)->n.getNode().getName()).collect(Collectors.toCollection(ArrayList<String>::new)).toArray(addresses);
+		
+		wildcardLevel1 = new HashMap<String, HashSet<String>>();
+		wildcardLevel2 = new HashMap<String, HashSet<String>>();
+		wildcardLevel3 = new HashMap<String, HashSet<String>>();
+		wildcardLevel4 = new HashMap<String, HashSet<String>>();
+		
+		
+		for(String address : addresses) {
+			
+			String[] parts = address.split("\\.");
+			
+			if(parts.length != 4) {
+				nodesWithIPAddresses = false;
+				return;
+			}
+			
+			if(wildcardLevel1.containsKey("-1.-1.-1.-1")) {
+				wildcardLevel1.get("-1.-1.-1.-1").add(address);
+			} else {
+				HashSet<String> set = new HashSet<>();
+				set.add(address);
+				wildcardLevel1.put("-1.-1.-1.-1", set);
+			}
+			
+			String l2 = parts[0] + ".-1.-1.-1";
+			if(wildcardLevel1.containsKey(l2)) {
+				wildcardLevel1.get(l2).add(address);
+			} else {
+				HashSet<String> set = new HashSet<>();
+				set.add(address);
+				wildcardLevel1.put(l2, set);
+			}
+			
+			String l3 = parts[0] + "." + parts[1] + ".-1.-1";
+			if(wildcardLevel1.containsKey(l3)) {
+				wildcardLevel1.get(l3).add(address);
+			} else {
+				HashSet<String> set = new HashSet<>();
+				set.add(address);
+				wildcardLevel1.put(l3, set);
+			}
+			
+			String l4 = parts[0] + "." + parts[1] + "." + parts[2] + ".-1";
+			if(wildcardLevel1.containsKey(l4)) {
+				wildcardLevel1.get(l4).add(address);
+			} else {
+				HashSet<String> set = new HashSet<>();
+				set.add(address);
+				wildcardLevel1.put(l4, set);
+			}
+			
+		}
+		
+	}
+	
 	
 	/**
 	 * This method allows to understand if it's possible, starting from a set of string (toAggregate),

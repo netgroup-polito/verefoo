@@ -30,10 +30,12 @@ import it.polito.verefoo.solver.NetContextMF;
 
 public class AllocationManager {
 	private Context ctx;
-    private NetContext nctx;
+    private NetContextAP nctxAP;
+    private NetContextMF nctxMF;
 	private List<NodeMetrics> nodeMetrics;
 	private List<Property> properties;
-	private HashMap<String, AllocationNode> nodes;
+	private HashMap<String, AllocationNodeAP> nodesAP;
+	private HashMap<String, AllocationNodeMF> nodesMF;
 	private WildcardManager wildcardManager;
 	
 	/**
@@ -45,18 +47,36 @@ public class AllocationManager {
 	 * @param properties It is the list of Middle Level Reachability and Isolation policies.
 	 * @param FWManager It is an instance of a class which manages the firewalls.
 	 */
-	 public AllocationManager(Context ctx, NetContext nctx, 
-	    		HashMap<String, AllocationNode> allocationNodes, List<NodeMetrics> nodeMetrics, List<Property> properties, WildcardManager wildcardManager) {
+	 public AllocationManager(Context ctx, NetContextAP nctx, 
+	    		HashMap<String, AllocationNodeAP> allocationNodes, List<NodeMetrics> nodeMetrics, List<Property> properties, WildcardManager wildcardManager) {
 			super();
 			this.ctx = ctx;
-			this.nctx = nctx;
+			this.nctxAP = nctx;
 			this.nodeMetrics = nodeMetrics;
 			this.properties = properties;
 			this.wildcardManager = wildcardManager;
-			this.nodes = allocationNodes;
+			this.nodesAP = allocationNodes;
 		}
 
-	 
+		/**
+		 * Public constructor for the NFAllocationManager class
+		 * @param ctx It is the Contect object which manages all the hard and soft contraints in Z3Opt.
+		 * @param nctx It is the NetContext object where Z3 objects and formulas are stored.
+		 * @param allocationNodes It is a map used to retrieve the nodes of the Allocation Graph by their name.
+		 * @param nodeMetrics It is a list of constraints about node (i.e. optionality of a node on the Allocation Graph)
+		 * @param properties It is the list of Middle Level Reachability and Isolation policies.
+		 * @param FWManager It is an instance of a class which manages the firewalls.
+		 */
+		 public AllocationManager(Context ctx, NetContextMF nctx, 
+		    		HashMap<String, AllocationNodeMF> allocationNodes, List<NodeMetrics> nodeMetrics, List<Property> properties, WildcardManager wildcardManager) {
+				super();
+				this.ctx = ctx;
+				this.nctxMF = nctx;
+				this.nodeMetrics = nodeMetrics;
+				this.properties = properties;
+				this.wildcardManager = wildcardManager;
+				this.nodesMF = allocationNodes;
+			}
 
 	 /**
 	  * This method is invoked by VerefooProxy to instantiate the Network Functions which have been specified in the input, processing the input nodes with a proper Configuration (i.e. node which isn't empty). 
@@ -65,11 +85,11 @@ public class AllocationManager {
 	 */
 	public void instantiateFunctions(String algo) {
 		
-		nodes.values().forEach(allocationNode -> {
+		nodesAP.values().forEach(allocationNode -> {
 			Node node = allocationNode.getNode();
 			if(node.getFunctionalType() != null) {
 				if(node.getFunctionalType() == FunctionalTypes.WEBCLIENT) {
-					EndHost client = new EndHost(allocationNode, ctx, nctx);
+					EndHost client = new EndHost(allocationNode, ctx, nctxAP);
 					Property prop =  properties.stream().filter(pr -> pr.getSrc().equals(node.getName())).findFirst().orElse(null);
 					
 					client.installEndHost();
@@ -79,7 +99,7 @@ public class AllocationManager {
 			
 			
 				else if(node.getFunctionalType() == FunctionalTypes.WEBSERVER) {
-					EndHost server = new EndHost(allocationNode, ctx, nctx);
+					EndHost server = new EndHost(allocationNode, ctx, nctxAP);
 					Property prop =  properties.stream().filter(pr -> pr.getDst().equals(node.getName())).findFirst().orElse(null);
 					
 					server.installEndHost();
@@ -88,10 +108,7 @@ public class AllocationManager {
 				}
 				
 				else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
-					if(algo.equals("AP"))
-					PacketFilterAP firewall = new PacketFilterAP(allocationNode, ctx, nctx, wildcardManager);
-					else
-					PacketFilterMF firewall = new PacketFilterMF(allocationNode, ctx, nctx, wildcardManager);
+					PacketFilterAP firewall = new PacketFilterAP(allocationNode, ctx, nctxAP, wildcardManager);
 					
 					firewall.setAutoplace(false);
 					
@@ -126,30 +143,31 @@ public class AllocationManager {
 				}
 				
 				else if(node.getFunctionalType() == FunctionalTypes.NAT) {
-					NAT nat = new NAT(allocationNode, ctx, nctx);
+					NAT nat = new NAT(allocationNode, ctx, nctxAP);
 					allocationNode.setPlacedNF(nat);
 					allocationNode.setTypeNF(FunctionalTypes.NAT);
 				}
 				
 				else if(node.getFunctionalType() == FunctionalTypes.LOADBALANCER) {
-					LoadBalancer lb = new LoadBalancer(allocationNode, ctx, nctx);
+					LoadBalancer lb = new LoadBalancer(allocationNode, ctx, nctxAP);
 					allocationNode.setPlacedNF(lb);
 					allocationNode.setTypeNF(FunctionalTypes.LOADBALANCER);
 				}
 				
 				else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {
-					Forwarder forwarder = new Forwarder(allocationNode, ctx, nctx);
+					Forwarder forwarder = new Forwarder(allocationNode, ctx, nctxAP);
 					allocationNode.setPlacedNF(forwarder);
 					allocationNode.setTypeNF(FunctionalTypes.FORWARDER);
 				}
 				
 				else if(node.getFunctionalType() == FunctionalTypes.TRAFFIC_MONITOR) {
-					TrafficMonitor tm = new TrafficMonitor(allocationNode, ctx, nctx);
+					TrafficMonitor tm = new TrafficMonitor(allocationNode, ctx, nctxAP);
 					allocationNode.setPlacedNF(tm);
 					allocationNode.setTypeNF(FunctionalTypes.FORWARDER);
 				}
 			}
 		});
+		
 	}
 
 	
@@ -159,18 +177,31 @@ public class AllocationManager {
 	 * The heuristic can be introduced here in the future.
 	 * For the moment it considers just one type of NF per time (e.g. packet filter, antispam, etc. accordingly to the tests in which the framework is used)
 	 */
-	public void chooseFunctions(AllocationNode source, AllocationNode origin, AllocationNode finalDest, String algo) {
+	public void chooseFunctionsAP(AllocationNodeAP source, AllocationNodeAP origin, AllocationNodeAP finalDest) {
+		if(source.getTypeNF() == null ) {	
+			PacketFilterAP firewall = new PacketFilterAP(source, ctx, nctxAP, wildcardManager);
+			source.setPlacedNF(firewall);
+			source.setTypeNF(FunctionalTypes.FIREWALL);
+		}
+	
+	}
+	
+	/**
+	 * This method is invoked in the recursive visit of the graph inside Verefoo Proxy. 
+	 * It features an heuristic algorithm to select which NF place on the node. 
+	 * The heuristic can be introduced here in the future.
+	 * For the moment it considers just one type of NF per time (e.g. packet filter, antispam, etc. accordingly to the tests in which the framework is used)
+	 */
+	public void chooseFunctionsMF(AllocationNodeMF source, AllocationNodeMF origin, AllocationNodeMF finalDest) {
 		if(source.getTypeNF() == null ) {
-			if(algo.equals("AP"))		
-			PacketFilterAP firewall = new PacketFilterAP(source, ctx, nctx, wildcardManager);
-			else
-			PacketFilterMF firewall = new PacketFilterMF(source, ctx, nctx, wildcardManager);
+			PacketFilterMF firewall = new PacketFilterMF(source, ctx, nctxMF, wildcardManager);
 
 			source.setPlacedNF(firewall);
 			source.setTypeNF(FunctionalTypes.FIREWALL);
 		}
 	
 	}
+	
 	
 	/**
 	 * Atomic Predicates Version of the method
@@ -183,7 +214,7 @@ public class AllocationManager {
 	
 	public void configureFunctionsAP() {
 		
-		nodes.values().forEach(allocationNode -> { 
+		nodesAP.values().forEach(allocationNode -> { 
 			Node node = allocationNode.getNode();
 			FunctionalTypes type = allocationNode.getTypeNF();
 			GenericFunction no = allocationNode.getPlacedNF();
@@ -192,16 +223,16 @@ public class AllocationManager {
 				
 			if(type.equals(FunctionalTypes.WEBCLIENT)) {
 				EndHost endHost = (EndHost) no;
-				endHost.configureEndHost();
+				endHost.configureEndHostAP();
 			}else if(type.equals(FunctionalTypes.WEBSERVER)) {
 				EndHost endHost = (EndHost) no;
-				endHost.configureEndHost();
+				endHost.configureEndHostAP();
 			}else if(node.getFunctionalType() == FunctionalTypes.NAT) {	
 				NAT nat = (NAT) no;
 				nat.natConfigurationAP();
 			}else if(node.getFunctionalType() == FunctionalTypes.LOADBALANCER) {	
 				LoadBalancer lb = (LoadBalancer) no;
-				lb.loadBalancerConfigurationAP(nctx.addressMap.get(node.getName()));		
+				lb.loadBalancerConfigurationAP(nctxAP.addressMap.get(node.getName()));		
 			}else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {	
 				Forwarder fw = (Forwarder) no;
 				fw.forwarderSendRulesAP();
@@ -209,7 +240,7 @@ public class AllocationManager {
 				TrafficMonitor tm = (TrafficMonitor) no;
 				tm.trafficMonitorSendRulesAP();
 			}else if(type.equals(FunctionalTypes.FIREWALL)) {
-				PacketFilter fw = (PacketFilter) no;
+				PacketFilterAP fw = (PacketFilterAP) no;
 				if(fw.isAutoconfigured()) fw.automaticConfiguration();
 				else fw.manualConfiguration();
 			}
@@ -228,7 +259,7 @@ public class AllocationManager {
 	
 	 public void configureFunctionsMF() {
 		
-		nodes.values().forEach(allocationNode -> { 
+		nodesMF.values().forEach(allocationNode -> { 
 			Node node = allocationNode.getNode();
 			FunctionalTypes type = allocationNode.getTypeNF();
 			GenericFunction no = allocationNode.getPlacedNF();
@@ -237,16 +268,16 @@ public class AllocationManager {
 				
 			if(type.equals(FunctionalTypes.WEBCLIENT)) {
 				EndHost endHost = (EndHost) no;
-				endHost.configureEndHost();
+				endHost.configureEndHostMF();
 			}else if(type.equals(FunctionalTypes.WEBSERVER)) {
 				EndHost endHost = (EndHost) no;
-				endHost.configureEndHost();
+				endHost.configureEndHostMF();
 			}else if(node.getFunctionalType() == FunctionalTypes.NAT) {	
 				NAT nat = (NAT) no;
-				nat.natConfigurationMF(nctx.addressMap.get(node.getName()));
+				nat.natConfigurationMF(nctxMF.addressMap.get(node.getName()));
 			}else if(node.getFunctionalType() == FunctionalTypes.LOADBALANCER) {	
 				LoadBalancer lb = (LoadBalancer) no;
-				lb.loadBalancerConfigurationMF(nctx.addressMap.get(node.getName()));		
+				lb.loadBalancerConfigurationMF(nctxMF.addressMap.get(node.getName()));		
 			}else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {	
 				Forwarder fw = (Forwarder) no;
 				fw.forwarderSendRulesMF();
@@ -254,7 +285,7 @@ public class AllocationManager {
 				TrafficMonitor tm = (TrafficMonitor) no;
 				tm.trafficMonitorSendRulesMF();
 			}else if(type.equals(FunctionalTypes.FIREWALL)) {
-				PacketFilter fw = (PacketFilter) no;
+				PacketFilterMF fw = (PacketFilterMF) no;
 				if(fw.isAutoconfigured()) fw.automaticConfiguration();
 				else fw.manualConfiguration();
 			}

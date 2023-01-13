@@ -24,9 +24,11 @@ import it.polito.verefoo.solver.NetContextMF;
 abstract public class GenericFunction {
 
 	protected List<BoolExpr> constraints; 
-    protected AllocationNode source;
+    protected AllocationNodeAP sourceAP;
+    protected AllocationNodeMF sourceMF;
     protected Context ctx;
-    protected NetContext nctx;
+    protected NetContextAP nctxAP;
+    protected NetContextMF nctxMF;
     protected DatatypeExpr z3Node;
     protected boolean isEndHost;
     protected BoolExpr used;
@@ -103,9 +105,9 @@ abstract public class GenericFunction {
      * @param function it is the network function
      * @return the BoolExpr expression = OR(recv)
      */
-    protected BoolExpr createOrRecv(Entry<AllocationNode, Set<AllocationNode>> entry, Expr p_0, DatatypeExpr function) {
+    protected BoolExpr createOrRecvAP(Entry<AllocationNodeAP, Set<AllocationNodeAP>> entry, Expr p_0, DatatypeExpr function) {
 			List<Expr> list = entry.getValue().stream().map(n -> n.getZ3Name()).collect(Collectors.toList());
-			List<Expr> recvNeighbours = list.stream().map(n -> (BoolExpr) nctx.recv.apply(n, function, p_0)).distinct().collect(Collectors.toList());
+			List<Expr> recvNeighbours = list.stream().map(n -> (BoolExpr) nctxAP.recv.apply(n, function, p_0)).distinct().collect(Collectors.toList());
 			BoolExpr[] tmp = new BoolExpr[list.size()];
 			// enumerateRecv = OR (recv(n,function,p_0) where n=leftNeighbours)
 	 		BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp));
@@ -119,14 +121,46 @@ abstract public class GenericFunction {
      * @param function it is the network function
      * @return the BoolExpr expression = AND(send)
      */
-    protected BoolExpr createAndSend(Entry<AllocationNode, Set<AllocationNode>> entry, Expr p_0, DatatypeExpr function) {
+    protected BoolExpr createAndSendAP(Entry<AllocationNodeAP, Set<AllocationNodeAP>> entry, Expr p_0, DatatypeExpr function) {
 			List<Expr> list = entry.getValue().stream().map(n -> n.getZ3Name()).collect(Collectors.toList());
-			List<Expr> sendNeighbours = list.stream().map(n -> (BoolExpr) nctx.send.apply(function, n, p_0)).distinct().collect(Collectors.toList());
+			List<Expr> sendNeighbours = list.stream().map(n -> (BoolExpr) nctxAP.send.apply(function, n, p_0)).distinct().collect(Collectors.toList());
 			BoolExpr[] tmp = new BoolExpr[list.size()];
 			// enumerateRecv = OR (recv(n,function,p_0) where n=leftNeighbours)
 			BoolExpr enumerateSend = ctx.mkAnd(sendNeighbours.toArray(tmp));
 			return enumerateSend;
 	}
+   
     
+    /**
+     * This method creates an OR of recv functions
+     * @param entry it is a Entry<AllocationNode, Set<AllocationNode>>
+     * @param p_0 it is a packet
+     * @param function it is the network function
+     * @return the BoolExpr expression = OR(recv)
+     */
+    protected BoolExpr createOrRecvMF(Entry<AllocationNodeMF, Set<AllocationNodeMF>> entry, Expr p_0, DatatypeExpr function) {
+			List<Expr> list = entry.getValue().stream().map(n -> n.getZ3Name()).collect(Collectors.toList());
+			List<Expr> recvNeighbours = list.stream().map(n -> (BoolExpr) nctxMF.recv.apply(n, function, p_0)).distinct().collect(Collectors.toList());
+			BoolExpr[] tmp = new BoolExpr[list.size()];
+			// enumerateRecv = OR (recv(n,function,p_0) where n=leftNeighbours)
+	 		BoolExpr enumerateRecv = ctx.mkOr(recvNeighbours.toArray(tmp));
+	 		return enumerateRecv;
+	}
+	
+    /**
+     * This method creates an AND of send functions
+     * @param entry it is a Entry<AllocationNode, Set<AllocationNode>>
+     * @param p_0 it is a packet
+     * @param function it is the network function
+     * @return the BoolExpr expression = AND(send)
+     */
+    protected BoolExpr createAndSendMF(Entry<AllocationNodeMF, Set<AllocationNodeMF>> entry, Expr p_0, DatatypeExpr function) {
+			List<Expr> list = entry.getValue().stream().map(n -> n.getZ3Name()).collect(Collectors.toList());
+			List<Expr> sendNeighbours = list.stream().map(n -> (BoolExpr) nctxMF.send.apply(function, n, p_0)).distinct().collect(Collectors.toList());
+			BoolExpr[] tmp = new BoolExpr[list.size()];
+			// enumerateRecv = OR (recv(n,function,p_0) where n=leftNeighbours)
+			BoolExpr enumerateSend = ctx.mkAnd(sendNeighbours.toArray(tmp));
+			return enumerateSend;
+	}
     
 }

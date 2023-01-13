@@ -5,10 +5,10 @@ import java.util.List;
 
 public class MaximalFlow {
 	private int flowId;
-	private FlowPath flowPath;
+	private FlowPathMF flowPath;
 	private List<Predicate> predicateList = new ArrayList<>();
 	
-	public MaximalFlow(int flowId, FlowPath flowPath, List<Predicate> predicateList) {
+	public MaximalFlow(int flowId, FlowPathMF flowPath, List<Predicate> predicateList) {
 		super();
 		this.flowId = flowId;
 		this.flowPath = flowPath;
@@ -23,11 +23,11 @@ public class MaximalFlow {
 		this.flowId = flowId;
 	}
 
-	public FlowPath getFlowPath() {
+	public FlowPathMF getFlowPath() {
 		return flowPath;
 	}
 
-	public void setFlowPath(FlowPath flowPath) {
+	public void setFlowPath(FlowPathMF flowPath) {
 		this.flowPath = flowPath;
 	}
 

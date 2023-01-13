@@ -3,6 +3,7 @@ package it.polito.verefoo.functions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
@@ -10,6 +11,7 @@ import com.microsoft.z3.DatatypeExpr;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.Optimize;
 
+import it.polito.verefoo.graph.MaximalFlow;
 import it.polito.verefoo.allocation.AllocationNodeAP;
 import it.polito.verefoo.graph.FlowPathAP;
 import it.polito.verefoo.solver.NetContextAP;
@@ -22,8 +24,10 @@ public class EndHost extends GenericFunction {
     List<BoolExpr> constraints = new ArrayList<BoolExpr>();
     Context ctx;
     DatatypeExpr politoEndHost;
-    NetContext nctx;
-    AllocationNode source;
+    NetContextAP nctxAP;
+    NetContextMF nctxMF;
+    AllocationNodeAP sourceAP;
+    AllocationNodeMF sourceMF;
     Expr n_0;
     Expr p_0;
 
@@ -33,10 +37,10 @@ public class EndHost extends GenericFunction {
      * @param ctx it is the z3 Context variable
      * @param nctx it is the NetContext object storing the needed information about z3 IP address variables
      */
-    public EndHost(AllocationNode source, Context ctx, NetContext nctx) { 
-    	 this.source = source;
+    public EndHost(AllocationNodeAP source, Context ctx, NetContextAP nctx) { 
+    	 this.sourceAP = source;
     	 this.ctx = ctx;
-    	 this.nctx = nctx;
+    	 this.nctxAP = nctx;
          this.isEndHost = true;
          politoEndHost = source.getZ3Name();
          n_0 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_n_0", nctx.nodeType);
@@ -44,6 +48,22 @@ public class EndHost extends GenericFunction {
  
     }
 
+    /**
+     * Public constructor of EndHost class
+     * @param source it is the AllocationNode on which a client or server is installed
+     * @param ctx it is the z3 Context variable
+     * @param nctx it is the NetContext object storing the needed information about z3 IP address variables
+     */
+    public EndHost(AllocationNodeMF source, Context ctx, NetContextMF nctx) { 
+    	 this.sourceMF = source;
+    	 this.ctx = ctx;
+    	 this.nctxMF = nctx;
+         this.isEndHost = true;
+         politoEndHost = source.getZ3Name();
+         n_0 = ctx.mkConst("PolitoEndHost_"+politoEndHost+"_n_0", nctx.nodeType);
+         used = ctx.mkTrue();
+ 
+    }
 
 	/* (non-Javadoc)
 	 * @see it.polito.verigraph.functions.GenericFunction#addContraints(com.microsoft.z3.Optimize)
@@ -67,15 +87,21 @@ public class EndHost extends GenericFunction {
         return;
     }
     
-    public void configureEndHost() {
-    	for(Map<Integer, Integer> flowMap : source.getMapFlowIdAtomicPredicatesInInput().values()) {
+    public void configureEndHostAP() {
+    	for(Map<Integer, Integer> flowMap : sourceAP.getMapFlowIdAtomicPredicatesInInput().values()) {
     		for(Integer traffic : flowMap.values()) {
-    			constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
+    			constraints.add(ctx.mkEq(nctxAP.deny.apply(sourceAP.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
     		}
     	}
-    	constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(-1)), ctx.mkFalse()));
+    	constraints.add(ctx.mkEq(nctxAP.deny.apply(sourceAP.getZ3Name(), ctx.mkInt(-1)), ctx.mkFalse()));
     }
 
-
+    public void configureEndHostMF() {
+    	for(FlowPathMF flow : sourceMF.getCrossingFlows().values()) {
+    		for(Entry<Integer, MaximalFlow> maximalFlowEntry: flow.getMaximalFlowsMap().entrySet()) {
+    			constraints.add(ctx.mkEq(nctxMF.deny.apply(sourceMF.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey())), ctx.mkFalse()));
+    		}
+    	}
+    }
 
 }

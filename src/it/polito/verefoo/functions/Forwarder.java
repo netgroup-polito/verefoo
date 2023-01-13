@@ -28,17 +28,32 @@ public class Forwarder extends GenericFunction{
 	 * @param ctx It is the Z3 Context in which the model is generated
 	 * @param nctx It is the NetContext object to which constraints are sent
 	 */
-	public Forwarder(AllocationNode source, Context ctx, NetContext nctx) {
+	public Forwarder(AllocationNodeAP source, Context ctx, NetContextAP nctx) {
 		forwarder = source.getZ3Name();
-		this.source = source;
+		this.sourceAP = source;
 		this.ctx = ctx;
-		this.nctx = nctx;
+		this.nctxAP = nctx;
 		constraints = new ArrayList<BoolExpr>();
 		isEndHost = false;
 		used = ctx.mkTrue();
 	}
 
-
+	/**
+	 * Public constructor for the Forwarder
+	 * @param source It is the Allocation Node on which the forwarder is put
+	 * @param ctx It is the Z3 Context in which the model is generated
+	 * @param nctx It is the NetContext object to which constraints are sent
+	 */
+	public Forwarder(AllocationNodeMF source, Context ctx, NetContextMF nctx) {
+		forwarder = source.getZ3Name();
+		this.sourceMF = source;
+		this.ctx = ctx;
+		this.nctxMF = nctx;
+		constraints = new ArrayList<BoolExpr>();
+		isEndHost = false;
+		used = ctx.mkTrue();
+	}
+	
     /**
 	 * Atomic Predicate algorithm.
      * This method creates the forwarding rules for the forwarder.
@@ -47,9 +62,9 @@ public class Forwarder extends GenericFunction{
      */
     public void forwarderSendRulesAP (){
     	
-    	for(Map<Integer, Integer> flowMap : source.getMapFlowIdAtomicPredicatesInInput().values()) {
+    	for(Map<Integer, Integer> flowMap : sourceAP.getMapFlowIdAtomicPredicatesInInput().values()) {
     		for(Integer traffic : flowMap.values()) {
-    			constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
+    			constraints.add(ctx.mkEq(nctxAP.deny.apply(sourceAP.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
     		}
     		
     	}
@@ -63,9 +78,9 @@ public class Forwarder extends GenericFunction{
      * deny(forwarder, t) = false
      */
     public void forwarderSendRulesMF (){
-    	for(FlowPath flow : source.getCrossingFlows().values()) {
+    	for(FlowPathMF flow : sourceMF.getCrossingFlows().values()) {
     		for(Entry<Integer, MaximalFlow> maximalFlowEntry: flow.getMaximalFlowsMap().entrySet()) {
-    			constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey())), ctx.mkFalse()));
+    			constraints.add(ctx.mkEq(nctxMF.deny.apply(sourceMF.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey())), ctx.mkFalse()));
     		}
     	}
     	

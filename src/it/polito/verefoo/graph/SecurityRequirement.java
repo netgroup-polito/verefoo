@@ -12,13 +12,15 @@ public class SecurityRequirement {
 	Property originalProperty;
 	int idRequirement;
 	Map<String, Traffic> nodeTrafficMap;
-	Map<Integer, FlowPath> flowsMap;
-
+	Map<Integer, FlowPathAP> flowsMapAP;
+	Map<Integer, FlowPathMF> flowsMapMF;
+	
 	public SecurityRequirement(Property originalProperty, int idRequirement) {
 		this.originalProperty = originalProperty;
 		this.idRequirement = idRequirement;
 		nodeTrafficMap = new HashMap<>();
-		flowsMap = new HashMap<>();
+		flowsMapAP = new HashMap<>();
+		flowsMapMF = new HashMap<>();
 	}
 
 	public Property getOriginalProperty() {
@@ -45,13 +47,20 @@ public class SecurityRequirement {
 		this.nodeTrafficMap = nodeTrafficMap;
 	}
 
-	public Map<Integer, FlowPath> getFlowsMap() {
-		return flowsMap;
+	public Map<Integer, FlowPathAP> getFlowsMapAP() {
+		return flowsMapAP;
 	}
 
-	public void setFlowsMap(Map<Integer, FlowPath> flowsMap) {
-		this.flowsMap = flowsMap;
+	public void setFlowsMapAP(Map<Integer, FlowPathAP> flowsMap) {
+		this.flowsMapAP = flowsMap;
 	}
 	
+	public Map<Integer, FlowPathMF> getFlowsMapMF() {
+		return flowsMapMF;
+	}
+
+	public void setFlowsMapMF(Map<Integer, FlowPathMF> flowsMap) {
+		this.flowsMapMF = flowsMap;
+	}
 	
 }

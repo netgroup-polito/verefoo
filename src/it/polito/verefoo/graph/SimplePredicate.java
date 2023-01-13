@@ -15,9 +15,9 @@ public class SimplePredicate {
 	boolean negPSrc;
 	List<String> pDstList = new ArrayList<>();
 	boolean negPDst;
-	APUtils aputils;
+	APUtilsAP aputils;
 	
-	public SimplePredicate(APUtils aputils, String IPSrc, boolean negIPSrc, String IPDst, boolean negIPDst,
+	public SimplePredicate(APUtilsAP aputils, String IPSrc, boolean negIPSrc, String IPDst, boolean negIPDst,
 			String pSrc, boolean negPSrc, String pDst, boolean negPDst) {
 		super();
 		IPSrcList.add(IPSrc);

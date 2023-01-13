@@ -14,7 +14,8 @@ import it.polito.verefoo.jaxb.NFV;
 import it.polito.verefoo.jaxb.Path;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.translator.Translator;
-import it.polito.verefoo.utils.TestResults;
+import it.polito.verefoo.utils.TestResultsAP;
+import it.polito.verefoo.utils.TestResultsMF;
 import it.polito.verefoo.utils.VerificationResult;
 
 /**
@@ -24,9 +25,11 @@ public class VerefooSerializer {
 	private NFV nfv, result;
 	private boolean sat = false;
 	private String z3Model;
-	private TestResults testResults;
+	private TestResultsAP testResultsAP;
+	private TestResultsMF testResultsMF;
 	private String AlgoUsed = "AP";
 	int time = 0;
+	VerificationResult res;
 	
 	public int getTime() {
 		return time;
@@ -51,7 +54,9 @@ public class VerefooSerializer {
 		root = agg.getAllocationGraph();
 		VerefooNormalizer norm = new VerefooNormalizer(root);
 		root = norm.getRoot();
-
+		//VerificationResult res;
+		Translator t;
+		
 		try {
 			List<Path> paths = null;
 			if (root.getNetworkForwardingPaths() != null)
@@ -64,39 +69,61 @@ public class VerefooSerializer {
 							EType.INVALID_PROPERTY_DEFINITION);
 				VerefooProxy test = new VerefooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(),
 						prop, paths, AlgoUsed);
-				testResults = test.getTestTimeResults();
-				
+				if(AlgoUsed.equals("AP")) {
+				testResultsAP = test.getTestTimeResultsAP();
 				long beginAll = System.currentTimeMillis();
-				VerificationResult res = test.checkNFFGProperty();
+				res = test.checkNFFGPropertyAP();
+				}
+				else {
+				testResultsMF = test.getTestTimeResultsMF();
+				long beginAll = System.currentTimeMillis();
+				res = test.checkNFFGPropertyMF();
+				}
+				
 				long endAll = System.currentTimeMillis();
 				//loggerResult.debug("Only checker: " + (endAll - beginAll) + "ms");
 				//System.out.println("Only checker: " + (endAll - beginAll) + "ms");
 				time =  (int) res.getTime(); 
 				
 				if (res.result != Status.UNSATISFIABLE && res.result != Status.UNKNOWN) {
-					// Execute Translator according to algorithm choosen
-					if(AlgoUsed.equals("AP"))
-					Translator t = new Translator(res.model.toString(), root, g, test.getAllocationNodes(), test.getTrafficFlowsMap(), test.getNetworkAtomicPredicates());
-					else
-					Translator t = new Translator(res.model.toString(), root, g, test.getAllocationNodes(), test.getTrafficFlowsMap());
-					
+					// Execute Translator according to algorithm chosen
+					if(AlgoUsed.equals("AP")) {
+					 t = new Translator(res.model.toString(), root, g, test.getAllocationNodesAP(), test.getTrafficFlowsMapAP(), test.getNetworkAtomicPredicates());
 					z3Model = res.model.toString();
 					t.setNormalizer(norm);
 					result = t.convert(AlgoUsed);
 					root = result;
 					sat = true; 
 					System.out.println("SAT\n");
-					testResults.setZ3Result("SAT");
+					testResultsAP.setZ3Result("SAT");
+					}
+					else {
+					 t = new Translator(res.model.toString(), root, g, test.getAllocationNodesMF(), test.getTrafficFlowsMapMF());
+					z3Model = res.model.toString();
+					t.setNormalizer(norm);
+					result = t.convert(AlgoUsed);
+					root = result;
+					sat = true; 
+					System.out.println("SAT\n");
+					testResultsMF.setZ3Result("SAT");
+					}
+					
 				} else {
 					System.out.println("UNSAT\n");
-					testResults.setZ3Result("UNSAT");
+				if(AlgoUsed.equals("AP")) {
+					testResultsAP.setZ3Result("UNSAT");
+					}
+					else {
+					testResultsMF.setZ3Result("UNSAT");
+					}
 					sat = false;
 					result = root;
 				}
-				root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph() == g.getId())
+			
+			root.getPropertyDefinition().getProperty().stream().filter(p -> p.getGraph() == g.getId())
 						.forEach(p -> p.setIsSat(res.result != Status.UNSATISFIABLE));
 
-			} 
+			}
 		} catch (BadGraphError e) {
 			throw e;
 		}
@@ -134,8 +161,12 @@ public class VerefooSerializer {
 		return sat;
 	}
 	
-	public TestResults getTestTimeResults() {
-		return testResults;
+	public TestResultsAP getTestTimeResultsAP() {
+		return testResultsAP;
 	}
 
+	public TestResultsMF getTestTimeResultsMF() {
+		return testResultsMF;
+	}
+	
 }

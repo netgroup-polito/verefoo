@@ -16,7 +16,7 @@ import it.polito.verefoo.solver.NetContextMF;
  */
 public class PacketFilterRule {
 	private Context ctx;
-	private NetContext nctx;
+	private NetContextMF nctx;
 	private BoolExpr action;
 	private DatatypeExpr source;
 	private DatatypeExpr destination;
@@ -38,7 +38,7 @@ public class PacketFilterRule {
 	 * @param protocol the level 4 protocol encoded as integer value (it is based on the enumeration class of the jaxb object)
 	 * @param directional if the rule needs to be considered also in reverse
 	 */
-	public PacketFilterRule(NetContext nctx, Context ctx, boolean action, DatatypeExpr source, DatatypeExpr destination, String string_src_port,
+	public PacketFilterRule(NetContextMF nctx, Context ctx, boolean action, DatatypeExpr source, DatatypeExpr destination, String string_src_port,
 			String string_dst_port, int protocol, boolean directional) {
 		this.nctx = nctx;
 		this.ctx = ctx;
@@ -92,7 +92,7 @@ public class PacketFilterRule {
 	 * @param protocol the level 4 protocol encoded as integer value (it is based on the enumeration class of the jaxb object)
 	 * @param directional if the rule needs to be considered also in reverse
 	 */
-	public PacketFilterRule(NetContext nctx, Context ctx, boolean action, String source, String destination,
+	public PacketFilterRule(NetContextMF nctx, Context ctx, boolean action, String source, String destination,
 			String string_src_port, String string_dst_port, int protocol, boolean directional) {
 		DatatypeExpr sourceExpr = nctx.createIpAddress(source);
 		DatatypeExpr destinationExpr = nctx.createIpAddress(destination);

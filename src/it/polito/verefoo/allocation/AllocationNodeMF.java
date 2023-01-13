@@ -30,7 +30,7 @@ public class AllocationNodeMF {
 	/* Maximal flows */
 	List<Predicate> forwardedPredicateList = new ArrayList<>();
 	List<Predicate> droppedPredicateList = new ArrayList<>();
-	private Map<Integer, FlowPath> crossingFlows = new HashMap<>();
+	private Map<Integer, FlowPathMF> crossingFlows = new HashMap<>();
 	//<flowPathId, <maximalFlowId, predicate>>
 	private Map<Integer, Map<Integer, Predicate>> mapFlowIdPredicatesInInput = new HashMap<>();
 	
@@ -178,12 +178,12 @@ public class AllocationNodeMF {
 		}
 	}
 
-	public void addCrossingFlow(FlowPath sr) {
+	public void addCrossingFlow(FlowPathMF sr) {
 		crossingFlows.put(sr.getIdFlow(), sr);
 	}
 	
 	//return flows that cross this node
-	public Map<Integer, FlowPath> getCrossingFlows() {
+	public Map<Integer, FlowPathMF> getCrossingFlows() {
 		return crossingFlows;
 	}
 
@@ -191,7 +191,7 @@ public class AllocationNodeMF {
 	 * Setter method for the map of requirements
 	 * @param requirements the map of requirements
 	 */
-	public void setFlows(Map<Integer, FlowPath> requirements) {
+	public void setFlows(Map<Integer, FlowPathMF> requirements) {
 		this.crossingFlows = requirements;
 	}
 	

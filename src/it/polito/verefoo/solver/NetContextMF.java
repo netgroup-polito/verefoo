@@ -38,7 +38,7 @@ public class NetContextMF {
 	public Context ctx;
 	public WildcardManager wildcardManager;
 	public FuncDecl nodeHasAddr,addrToNode,send,recv,deny;
-	private HashMap<String, AllocationNode> allocationNodes;
+	private HashMap<String, AllocationNodeMF> allocationNodes;
 	
     public List<BoolExpr> constraints;
     public List<Tuple<BoolExpr, String>> softConstrAutoConf;
@@ -81,7 +81,7 @@ public class NetContextMF {
      * @param ctx
      * @param args
      */
-    public NetContextMF(Context ctx, HashMap<String, AllocationNode> allocationNodes, Object[]... args){
+    public NetContextMF(Context ctx, HashMap<String, AllocationNodeMF> allocationNodes, Object[]... args){
           nodeMap = new HashMap<String,DatatypeExpr>(); //list of nodes, callable by node name
           addressMap = new HashMap<String,DatatypeExpr>(); // list of addresses, callable by address name
           portMap = new HashMap<String,DatatypeExpr>();
@@ -180,7 +180,7 @@ public class NetContextMF {
         for(int i=0;i<nodeType.getConsts().length;i++){
             DatatypeExpr fd  = (DatatypeExpr)nodeType.getConst(i);   
             nodeMap.put(fd.toString().replace("|", ""),fd);
-            AllocationNode n = allocationNodes.get(nodes[i]);
+            AllocationNodeMF n = allocationNodes.get(nodes[i]);
             n.setZ3Name(fd);
         }
         
@@ -205,7 +205,7 @@ public class NetContextMF {
 
         for(int i=0;i<new_addr.length;i++){
         	DatatypeExpr fd = (DatatypeExpr) ctx.mkConst(new_addr[i], addressType);
-        	 AllocationNode n = allocationNodes.get(fd.toString().replace("|", ""));
+        	 AllocationNodeMF n = allocationNodes.get(fd.toString().replace("|", ""));
              if(n != null) {
             	 n.setZ3Node(fd);
              }
@@ -515,7 +515,7 @@ public class NetContextMF {
      * This methods maps each node to an address
      */
     public void setAddressMappings() {
-    	for (AllocationNode an : allocationNodes.values()) {
+    	for (AllocationNodeMF an : allocationNodes.values()) {
 			Expr a_0 = ctx.mkConst(an.getZ3Name() + "_address_mapping_a_0", addressType);
 			ArrayList<BoolExpr> or_clause = new ArrayList<BoolExpr>();
 			// Constraint 1 addrToNode(foreach ad in addr) = node

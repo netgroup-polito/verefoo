@@ -15,7 +15,8 @@ import it.polito.verefoo.solver.NetContextMF;
  */
 public class VerificationResult {
     Context ctx;
-    public NetContext nctx;
+    public NetContextAP nctxAP;
+    public NetContextMF nctxMF;
     public Status result;
     public Model model;
     public BoolExpr [] assertions;
@@ -37,11 +38,28 @@ public class VerificationResult {
      * @param assertions it is the set of assertion of the result model
      * @param model it is the z3 model of the MaxSMT problem
      */
-    public VerificationResult(Context ctx,Status result, NetContext nctx, BoolExpr[] assertions, Model model){
+    public VerificationResult(Context ctx,Status result, NetContextAP nctx, BoolExpr[] assertions, Model model){
         this.ctx = ctx;
         this.result = result;
         this.model = model;
-        this.nctx = nctx;
+        this.nctxAP = nctx;
         this.assertions = assertions;
     }
+    
+	/**
+     * Public constructor of VerificationResult, whose instances wrap all the information about the z3 simulation result
+     * @param ctx it is the z3 Context instance
+     * @param result it is the result status
+     * @param nctx it is the NetContext instance defined in the z3 model
+     * @param assertions it is the set of assertion of the result model
+     * @param model it is the z3 model of the MaxSMT problem
+     */
+    public VerificationResult(Context ctx,Status result, NetContextMF nctx, BoolExpr[] assertions, Model model){
+        this.ctx = ctx;
+        this.result = result;
+        this.model = model;
+        this.nctxMF = nctx;
+        this.assertions = assertions;
+    }
+    
 }

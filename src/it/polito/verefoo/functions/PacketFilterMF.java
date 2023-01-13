@@ -52,7 +52,7 @@ public class PacketFilterMF extends GenericFunction{
 	boolean defaultActionSet;
 	private WildcardManager wildcardManager;
 	private String ipAddress;
-	APUtils aputils = new APUtilsMF();
+	APUtilsMF aputils = new APUtilsMF();
 	
 	DatatypeExpr pf;
 	Expr defaultAction;
@@ -69,13 +69,13 @@ public class PacketFilterMF extends GenericFunction{
 	 * Public constructor for the Packet Filter MF
 	 * @param source It is the Allocation Node on which the packet filter is put
 	 * @param ctx It is the Z3 Context in which the model is generated
-	 * @param nctx It is the NetContext object to which constraints are sent
+	 * @param nctxMF It is the NetContext object to which constraints are sent
 	 * @param wildcardManager 
 	 */
-	public PacketFilterMF(AllocationNode source, Context ctx, NetContext nctx, WildcardManager wildcardManager) {
-		this.source = source;
+	public PacketFilterMF(AllocationNodeMF source, Context ctx, NetContextMF nctx, WildcardManager wildcardManager) {
+		this.sourceMF = source;
 		this.ctx = ctx;
-		this.nctx = nctx;
+		this.nctxMF = nctx;
 		this.wildcardManager = wildcardManager;
 		
 		pf = source.getZ3Name();
@@ -104,7 +104,7 @@ public class PacketFilterMF extends GenericFunction{
 	 * This method allows to generate the filtering rules for a manually configured packet_filter
 	 */
 	public void manualConfiguration(){
-		Node n = source.getNode();
+		Node n = sourceMF.getNode();
 		if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
 				n.getConfiguration().getFirewall().getElements().forEach((e)->{
 						ArrayList<PacketFilterRule> rules_manual = new ArrayList<>();
@@ -126,12 +126,12 @@ public class PacketFilterMF extends GenericFunction{
 						}
 						try{
 
-							if(nctx.addressMap.get(e.getSource())!=null&&nctx.addressMap.get(e.getDestination())!=null){
-									PacketFilterRule rule=new PacketFilterRule(nctx, ctx, action, nctx.addressMap.get(e.getSource()),nctx.addressMap.get(e.getDestination()),
+							if(nctxMF.addressMap.get(e.getSource())!=null&&nctxMF.addressMap.get(e.getDestination())!=null){
+									PacketFilterRule rule=new PacketFilterRule(nctxMF, ctx, action, nctxMF.addressMap.get(e.getSource()),nctxMF.addressMap.get(e.getDestination()),
 																				src_port,dst_port, protocol, directional);
 									rules_manual.add(rule);
 							}else{ // #TODO check if it enters here
-									PacketFilterRule rule=new PacketFilterRule(nctx, ctx, action, e.getSource(),e.getDestination(),
+									PacketFilterRule rule=new PacketFilterRule(nctxMF, ctx, action, e.getSource(),e.getDestination(),
 																				src_port,dst_port, protocol, directional);
 									rules_manual.add(rule);
 							}
@@ -151,19 +151,19 @@ public class PacketFilterMF extends GenericFunction{
 		nRules = rules.size();
 		int i = 0;
 		for(PacketFilterRule rule : rules) {
-			Expr src = ctx.mkConst(pf + "_manual_src_"+i, nctx.addressType);
-  			Expr dst = ctx.mkConst(pf + "_manual_dst_"+i, nctx.addressType);
+			Expr src = ctx.mkConst(pf + "_manual_src_"+i, nctxMF.addressType);
+  			Expr dst = ctx.mkConst(pf + "_manual_dst_"+i, nctxMF.addressType);
   			Expr proto = ctx.mkConst(pf + "_manual_proto_"+i, ctx.mkIntSort());
-  			Expr srcp = ctx.mkConst(pf + "_manual_srcp_"+i, nctx.portType);
-  			Expr dstp = ctx.mkConst(pf + "_manual_dstp_"+i, nctx.portType);
+  			Expr srcp = ctx.mkConst(pf + "_manual_srcp_"+i, nctxMF.portType);
+  			Expr dstp = ctx.mkConst(pf + "_manual_dstp_"+i, nctxMF.portType);
  			
  	
  			constraints.add(ctx.mkEq(src, rule.getSource()));
  			constraints.add(ctx.mkEq(dst, rule.getDestination()));
- 			constraints.add(ctx.mkEq((IntExpr)nctx.portFunctionsMap.get("start").apply(srcp),(IntExpr)rule.getStart_src_port()));
- 			constraints.add(ctx.mkEq((IntExpr)nctx.portFunctionsMap.get("end").apply(srcp),(IntExpr)rule.getEnd_src_port()));
- 			constraints.add(ctx.mkEq((IntExpr)nctx.portFunctionsMap.get("start").apply(dstp),(IntExpr)rule.getStart_dst_port()));
- 			constraints.add(ctx.mkEq((IntExpr)nctx.portFunctionsMap.get("end").apply(dstp),(IntExpr)rule.getEnd_dst_port()));
+ 			constraints.add(ctx.mkEq((IntExpr)nctxMF.portFunctionsMap.get("start").apply(srcp),(IntExpr)rule.getStart_src_port()));
+ 			constraints.add(ctx.mkEq((IntExpr)nctxMF.portFunctionsMap.get("end").apply(srcp),(IntExpr)rule.getEnd_src_port()));
+ 			constraints.add(ctx.mkEq((IntExpr)nctxMF.portFunctionsMap.get("start").apply(dstp),(IntExpr)rule.getStart_dst_port()));
+ 			constraints.add(ctx.mkEq((IntExpr)nctxMF.portFunctionsMap.get("end").apply(dstp),(IntExpr)rule.getEnd_dst_port()));
  			constraints.add(ctx.mkEq(proto,rule.getProtocol()));
  			
  			srcConditions.put(i,  src);
@@ -195,7 +195,7 @@ public class PacketFilterMF extends GenericFunction{
   		 * This sections generates all the constraints to satisfy reachability and isolation requirements.
   		 */
   		
-  		for(FlowPath sr : source.getCrossingFlows().values()) {
+  		for(FlowPathMF sr : sourceMF.getCrossingFlows().values()) {
   			generateManualSatifiabilityConstraint(sr);
   		}
 		
@@ -225,18 +225,18 @@ public class PacketFilterMF extends GenericFunction{
   		
   		if(autoplace) {
   			// packet filter should not be used if possible
-  			nctx.softConstrAutoPlace.add(new Tuple<BoolExpr, String>(ctx.mkNot(used), "fw_auto_conf"));
+  			nctxMF.softConstrAutoPlace.add(new Tuple<BoolExpr, String>(ctx.mkNot(used), "fw_auto_conf"));
   		}else {
   			used = ctx.mkTrue();
   			constraints.add(ctx.mkEq(used, ctx.mkTrue()));
   		}
   		
   		for(int i = 0; i < nRules; i++){
-  			Expr src = ctx.mkConst(pf + "_auto_src_"+i, nctx.addressType);
-  			Expr dst = ctx.mkConst(pf + "_auto_dst_"+i, nctx.addressType);
+  			Expr src = ctx.mkConst(pf + "_auto_src_"+i, nctxMF.addressType);
+  			Expr dst = ctx.mkConst(pf + "_auto_dst_"+i, nctxMF.addressType);
   			Expr proto = ctx.mkConst(pf + "_auto_proto_"+i, ctx.mkIntSort());
-  			Expr srcp = ctx.mkConst(pf + "_auto_srcp_"+i, nctx.portType);
-  			Expr dstp = ctx.mkConst(pf + "_auto_dstp_"+i, nctx.portType);
+  			Expr srcp = ctx.mkConst(pf + "_auto_srcp_"+i, nctxMF.portType);
+  			Expr dstp = ctx.mkConst(pf + "_auto_dstp_"+i, nctxMF.portType);
   			IntExpr srcAuto1 = ctx.mkIntConst(pf + "_auto_src_ip_1_"+i);
   			IntExpr srcAuto2 = ctx.mkIntConst(pf + "_auto_src_ip_2_"+i);
   			IntExpr srcAuto3 = ctx.mkIntConst(pf + "_auto_src_ip_3_"+i);
@@ -254,10 +254,10 @@ public class PacketFilterMF extends GenericFunction{
   	    	 * Observation: maybe we can introduce the REVERSE rules!
   	    	 */
   			if(autoplace) {
-  				implications1.add(ctx.mkAnd(ctx.mkNot(ctx.mkEq( src, this.nctx.addressMap.get("null"))),
-  						ctx.mkNot(ctx.mkEq( dst, this.nctx.addressMap.get("null")))));
-  	  			implications2.add(ctx.mkAnd(ctx.mkEq( src, this.nctx.addressMap.get("null")),
-  						ctx.mkEq( dst, this.nctx.addressMap.get("null"))));
+  				implications1.add(ctx.mkAnd(ctx.mkNot(ctx.mkEq( src, this.nctxMF.addressMap.get("null"))),
+  						ctx.mkNot(ctx.mkEq( dst, this.nctxMF.addressMap.get("null")))));
+  	  			implications2.add(ctx.mkAnd(ctx.mkEq( src, this.nctxMF.addressMap.get("null")),
+  						ctx.mkEq( dst, this.nctxMF.addressMap.get("null"))));
   			}
   			/**
   	    	 * This section allows the creation of the following hard constraints:
@@ -265,14 +265,14 @@ public class PacketFilterMF extends GenericFunction{
   	    	 * It's used for a mapping useful only for Z3 model, not first-order logic behaviour of packet_filter.
   	    	 */
   			constraints.add(ctx.mkAnd(
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_1").apply(src), srcAuto1),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_2").apply(src), srcAuto2),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_3").apply(src), srcAuto3),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_4").apply(src), srcAuto4),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_1").apply(dst), dstAuto1),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_2").apply(dst), dstAuto2),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_3").apply(dst), dstAuto3),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_4").apply(dst), dstAuto4)
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_1").apply(src), srcAuto1),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_2").apply(src), srcAuto2),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_3").apply(src), srcAuto3),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_4").apply(src), srcAuto4),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_1").apply(dst), dstAuto1),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_2").apply(dst), dstAuto2),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_3").apply(dst), dstAuto3),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_4").apply(dst), dstAuto4)
 						)
 				); 
   			
@@ -281,14 +281,14 @@ public class PacketFilterMF extends GenericFunction{
   	    	 * If possible, the source/destination IP address components should be equal to the wildcard.
   	    	 * This way the rule is able to manage more than one property at the same time.
   	    	 */
-  			nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ipFunctionsMap.get("ipAddr_1").apply(nctx.addressMap.get("wildcard")),srcAuto1), "fw_auto_conf"));
-  			nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ipFunctionsMap.get("ipAddr_2").apply(nctx.addressMap.get("wildcard")),srcAuto2), "fw_auto_conf"));
-  			nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ipFunctionsMap.get("ipAddr_3").apply(nctx.addressMap.get("wildcard")),srcAuto3), "fw_auto_conf"));
-  			nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ipFunctionsMap.get("ipAddr_4").apply(nctx.addressMap.get("wildcard")),srcAuto4), "fw_auto_conf"));
-  			nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ipFunctionsMap.get("ipAddr_1").apply(nctx.addressMap.get("wildcard")),dstAuto1), "fw_auto_conf"));
-  			nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ipFunctionsMap.get("ipAddr_2").apply(nctx.addressMap.get("wildcard")),dstAuto2), "fw_auto_conf"));
-  			nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ipFunctionsMap.get("ipAddr_3").apply(nctx.addressMap.get("wildcard")),dstAuto3), "fw_auto_conf"));
-  			nctx.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctx.ipFunctionsMap.get("ipAddr_4").apply(nctx.addressMap.get("wildcard")),dstAuto4), "fw_auto_conf"));
+  			nctxMF.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctxMF.ipFunctionsMap.get("ipAddr_1").apply(nctxMF.addressMap.get("wildcard")),srcAuto1), "fw_auto_conf"));
+  			nctxMF.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctxMF.ipFunctionsMap.get("ipAddr_2").apply(nctxMF.addressMap.get("wildcard")),srcAuto2), "fw_auto_conf"));
+  			nctxMF.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctxMF.ipFunctionsMap.get("ipAddr_3").apply(nctxMF.addressMap.get("wildcard")),srcAuto3), "fw_auto_conf"));
+  			nctxMF.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctxMF.ipFunctionsMap.get("ipAddr_4").apply(nctxMF.addressMap.get("wildcard")),srcAuto4), "fw_auto_conf"));
+  			nctxMF.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctxMF.ipFunctionsMap.get("ipAddr_1").apply(nctxMF.addressMap.get("wildcard")),dstAuto1), "fw_auto_conf"));
+  			nctxMF.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctxMF.ipFunctionsMap.get("ipAddr_2").apply(nctxMF.addressMap.get("wildcard")),dstAuto2), "fw_auto_conf"));
+  			nctxMF.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctxMF.ipFunctionsMap.get("ipAddr_3").apply(nctxMF.addressMap.get("wildcard")),dstAuto3), "fw_auto_conf"));
+  			nctxMF.softConstrWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq((IntExpr)nctxMF.ipFunctionsMap.get("ipAddr_4").apply(nctxMF.addressMap.get("wildcard")),dstAuto4), "fw_auto_conf"));
   			
    			/**
   	    	 * This section allows the creation of the following soft constraints:
@@ -299,19 +299,19 @@ public class PacketFilterMF extends GenericFunction{
   		
   			
   			BoolExpr notConfiguredRule = ctx.mkAnd(
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_1").apply(nctx.addressMap.get("null")), srcAuto1),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_2").apply(nctx.addressMap.get("null")), srcAuto2),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_3").apply(nctx.addressMap.get("null")), srcAuto3),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_4").apply(nctx.addressMap.get("null")), srcAuto4),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_1").apply(nctx.addressMap.get("null")), dstAuto1),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_2").apply(nctx.addressMap.get("null")), dstAuto2),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_3").apply(nctx.addressMap.get("null")), dstAuto3),
-						ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_4").apply(nctx.addressMap.get("null")), dstAuto4)
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_1").apply(nctxMF.addressMap.get("null")), srcAuto1),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_2").apply(nctxMF.addressMap.get("null")), srcAuto2),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_3").apply(nctxMF.addressMap.get("null")), srcAuto3),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_4").apply(nctxMF.addressMap.get("null")), srcAuto4),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_1").apply(nctxMF.addressMap.get("null")), dstAuto1),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_2").apply(nctxMF.addressMap.get("null")), dstAuto2),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_3").apply(nctxMF.addressMap.get("null")), dstAuto3),
+						ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_4").apply(nctxMF.addressMap.get("null")), dstAuto4)
 						);
   			
   			
 
-  			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(notConfiguredRule, "fw_auto_conf"));
+  			nctxMF.softConstrAutoConf.add(new Tuple<BoolExpr, String>(notConfiguredRule, "fw_auto_conf"));
   			notConfiguredConditions.put(i, notConfiguredRule);
   			
   			/**
@@ -320,9 +320,9 @@ public class PacketFilterMF extends GenericFunction{
   	    	 * 2) use wildcards for source port if possible
   	    	 * 3) use wildcards for destination port if possible
   	    	 */
- 			nctx.softConstrProtoWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
- 			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(srcp, nctx.portMap.get("null")),"fw_auto_conf"));
- 			nctx.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(dstp, nctx.portMap.get("null")),"fw_auto_conf"));
+ 			nctxMF.softConstrProtoWildcard.add(new Tuple<BoolExpr, String>(ctx.mkEq( proto, ctx.mkInt(0)),"fw_auto_conf"));
+ 			nctxMF.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(srcp, nctxMF.portMap.get("null")),"fw_auto_conf"));
+ 			nctxMF.softConstrPorts.add(new Tuple<BoolExpr, String>(ctx.mkEq(dstp, nctxMF.portMap.get("null")),"fw_auto_conf"));
   			
  			/*
  			 * For each rule which must be potentially configured by z3,
@@ -345,11 +345,11 @@ public class PacketFilterMF extends GenericFunction{
   			for(int j = i+1; j < end; j++) {
   				//System.out.println(i + " " + j);
   				Expr ae = srcConditions.get(j);
-  				constraints.add(ctx.mkLe((ArithExpr)nctx.ipFunctionsMap.get("ipAddr_4").apply(be),(ArithExpr) nctx.ipFunctionsMap.get("ipAddr_4").apply(ae)));
-  				//constraints.add(ctx.mkImplies(ctx.mkNot(ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_4").apply(be), ctx.mkInt(0))), ctx.mkNot(ctx.mkEq(nctx.ipFunctionsMap.get("ipAddr_4").apply(ae), ctx.mkInt(0)))));
+  				constraints.add(ctx.mkLe((ArithExpr)nctxMF.ipFunctionsMap.get("ipAddr_4").apply(be),(ArithExpr) nctxMF.ipFunctionsMap.get("ipAddr_4").apply(ae)));
+  				//constraints.add(ctx.mkImplies(ctx.mkNot(ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_4").apply(be), ctx.mkInt(0))), ctx.mkNot(ctx.mkEq(nctxMF.ipFunctionsMap.get("ipAddr_4").apply(ae), ctx.mkInt(0)))));
   				
-  				//constraints.add(ctx.mkLe(ctx.mkAdd((ArithExpr)nctx.ipFunctionsMap.get("ipAddr_1").apply(be), (ArithExpr)nctx.ipFunctionsMap.get("ipAddr_2").apply(be), (ArithExpr)nctx.ipFunctionsMap.get("ipAddr_3").apply(be), (ArithExpr)nctx.ipFunctionsMap.get("ipAddr_4").apply(be)),
-  				//ctx.mkAdd((ArithExpr)nctx.ipFunctionsMap.get("ipAddr_1").apply(ae), (ArithExpr)nctx.ipFunctionsMap.get("ipAddr_2").apply(ae), (ArithExpr)nctx.ipFunctionsMap.get("ipAddr_3").apply(ae), (ArithExpr)nctx.ipFunctionsMap.get("ipAddr_4").apply(ae))));
+  				//constraints.add(ctx.mkLe(ctx.mkAdd((ArithExpr)nctxMF.ipFunctionsMap.get("ipAddr_1").apply(be), (ArithExpr)nctxMF.ipFunctionsMap.get("ipAddr_2").apply(be), (ArithExpr)nctxMF.ipFunctionsMap.get("ipAddr_3").apply(be), (ArithExpr)nctxMF.ipFunctionsMap.get("ipAddr_4").apply(be)),
+  				//ctx.mkAdd((ArithExpr)nctxMF.ipFunctionsMap.get("ipAddr_1").apply(ae), (ArithExpr)nctxMF.ipFunctionsMap.get("ipAddr_2").apply(ae), (ArithExpr)nctxMF.ipFunctionsMap.get("ipAddr_3").apply(ae), (ArithExpr)nctxMF.ipFunctionsMap.get("ipAddr_4").apply(ae))));
   			}
   		}
   		
@@ -389,7 +389,7 @@ public class PacketFilterMF extends GenericFunction{
   		 * This sections generates all the constraints to satisfy reachability and isolation requirements.
   		 */
   		
-  		for(FlowPath sr : source.getCrossingFlows().values()) {
+  		for(FlowPathMF sr : sourceMF.getCrossingFlows().values()) {
   			generateSatifiabilityConstraint(sr);
   		}
     }
@@ -400,15 +400,15 @@ public class PacketFilterMF extends GenericFunction{
 	 */
 private int minizimePlaceholderRules() {
 		
-		List<FlowPath> allProperties = source.getCrossingFlows().values().stream().collect(Collectors.toList());
-		List<FlowPath> interestedProperties = new ArrayList<>();
-		for(FlowPath p : allProperties) {
+		List<FlowPathMF> allProperties = sourceMF.getCrossingFlows().values().stream().collect(Collectors.toList());
+		List<FlowPathMF> interestedProperties = new ArrayList<>();
+		for(FlowPathMF p : allProperties) {
 				boolean pruning = (p.getRequirement().getOriginalProperty().getName().equals(PName.ISOLATION_PROPERTY) && blacklisting)
 						|| (p.getRequirement().getOriginalProperty().getName().equals(PName.REACHABILITY_PROPERTY) && !blacklisting)
 						|| (p.getRequirement().getOriginalProperty().getName().equals(PName.COMPLETE_REACHABILITY_PROPERTY) && !blacklisting);
 				if(pruning) {
 					boolean toAdd = true;
-					for(FlowPath p2: interestedProperties) {
+					for(FlowPathMF p2: interestedProperties) {
 						if(p.getRequirement().getIdRequirement() == p2.getRequirement().getIdRequirement()) {
 							toAdd = false;
 						}
@@ -433,16 +433,16 @@ private int minizimePlaceholderRules() {
 			
 			//Get all tuples for allProperties
 			List<Predicate> allTuples = new ArrayList<>();
-			for(FlowPath property: allProperties) {
-				for(Predicate complexPredicate: source.getPredicatesInInputForFlow(property.getIdFlow()).values()) {
+			for(FlowPathMF property: allProperties) {
+				for(Predicate complexPredicate: sourceMF.getPredicatesInInputForFlow(property.getIdFlow()).values()) {
 					allTuples.addAll(aputils.complexPredicateToOrTuples(complexPredicate));
 				}
 			}
 			
 			//Get all tuples for interestedProperties
 			List<Predicate> interestedTuples = new ArrayList<>();
-			for(FlowPath property: interestedProperties) {
-				for(Predicate complexPredicate: source.getPredicatesInInputForFlow(property.getIdFlow()).values()) {
+			for(FlowPathMF property: interestedProperties) {
+				for(Predicate complexPredicate: sourceMF.getPredicatesInInputForFlow(property.getIdFlow()).values()) {
 					interestedTuples.addAll(aputils.complexPredicateToOrTuples(complexPredicate));
 				}
 			}
@@ -484,15 +484,15 @@ private int minizimePlaceholderRules() {
 	 * This method generates the hard constraint to satisfy a requirement for an automatically configured firewall.
 	 * @param sr it is the security requirement
 	 */
-	private void generateSatifiabilityConstraint(FlowPath flowPath) {
-		Map<Integer, Predicate> predicatesInInputForMaximalFlow = source.getPredicatesInInputForFlow(flowPath.getIdFlow());
+	private void generateSatifiabilityConstraint(FlowPathMF flowPath) {
+		Map<Integer, Predicate> predicatesInInputForMaximalFlow = sourceMF.getPredicatesInInputForFlow(flowPath.getIdFlow());
 		
 		for(Map.Entry<Integer, Predicate> maximalFlowIdPredicateInInputEntry: predicatesInInputForMaximalFlow.entrySet()) {
 			BoolExpr firstA = used;
 			
 			BoolExpr secondA = flowPath.getRequirement().getOriginalProperty().getName().equals(PName.ISOLATION_PROPERTY) ? 
-					ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(maximalFlowIdPredicateInInputEntry.getKey())), ctx.mkTrue()):
-					ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(maximalFlowIdPredicateInInputEntry.getKey())), ctx.mkFalse());
+					ctx.mkEq((BoolExpr)nctxMF.deny.apply(sourceMF.getZ3Name(), ctx.mkInt(maximalFlowIdPredicateInInputEntry.getKey())), ctx.mkTrue()):
+					ctx.mkEq((BoolExpr)nctxMF.deny.apply(sourceMF.getZ3Name(), ctx.mkInt(maximalFlowIdPredicateInInputEntry.getKey())), ctx.mkFalse());
 					
 			BoolExpr firstC = blacklisting? ctx.mkEq(defaultAction, ctx.mkTrue()) : ctx.mkEq(defaultAction, ctx.mkFalse());
 			List<BoolExpr> listThirdC = new ArrayList<>();
@@ -502,7 +502,7 @@ private int minizimePlaceholderRules() {
 				
 				for(int i = 0; i < nRules; i++) {
 					BoolExpr component1 = ctx.mkNot(notConfiguredConditions.get(i));
-					BoolExpr component2 = nctx.matchAll(tuple, srcConditions.get(i), dstConditions.get(i), portSConditions.get(i), portDConditions.get(i), l4Conditions.get(i));
+					BoolExpr component2 = nctxMF.matchAll(tuple, srcConditions.get(i), dstConditions.get(i), portSConditions.get(i), portDConditions.get(i), l4Conditions.get(i));
 					
 					BoolExpr secondCPart = ((blacklisting && flowPath.getRequirement().getOriginalProperty().getName().equals(PName.ISOLATION_PROPERTY)) || 
 							(!blacklisting && (flowPath.getRequirement().getOriginalProperty().getName().equals(PName.REACHABILITY_PROPERTY) 
@@ -533,14 +533,14 @@ private int minizimePlaceholderRules() {
 	 * This method generates the hard constraint to satisfy a requirement for an manually configured firewall.
 	 * @param sr it is the security requirement
 	 */
-	private void generateManualSatifiabilityConstraint(FlowPath flowPath) {
+	private void generateManualSatifiabilityConstraint(FlowPathMF flowPath) {
 		
-		Map<Integer, Predicate> predicatesInInputForMaximalFlow = source.getPredicatesInInputForFlow(flowPath.getIdFlow());
+		Map<Integer, Predicate> predicatesInInputForMaximalFlow = sourceMF.getPredicatesInInputForFlow(flowPath.getIdFlow());
 		for(Map.Entry<Integer, Predicate> maximalFlowIdPredicateInInputEntry: predicatesInInputForMaximalFlow.entrySet()) {
 			BoolExpr firstA = used;
 			BoolExpr secondA = flowPath.getRequirement().getOriginalProperty().getName().equals(PName.ISOLATION_PROPERTY) ? 
-					ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(maximalFlowIdPredicateInInputEntry.getKey())), ctx.mkTrue()):
-					ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(maximalFlowIdPredicateInInputEntry.getKey())), ctx.mkFalse());
+					ctx.mkEq((BoolExpr)nctxMF.deny.apply(sourceMF.getZ3Name(), ctx.mkInt(maximalFlowIdPredicateInInputEntry.getKey())), ctx.mkTrue()):
+					ctx.mkEq((BoolExpr)nctxMF.deny.apply(sourceMF.getZ3Name(), ctx.mkInt(maximalFlowIdPredicateInInputEntry.getKey())), ctx.mkFalse());
 			BoolExpr firstC = blacklisting? ctx.mkEq(defaultAction, ctx.mkTrue()) : ctx.mkEq(defaultAction, ctx.mkFalse());
 			
 			List<BoolExpr> listThirdC = new ArrayList<>();
@@ -549,7 +549,7 @@ private int minizimePlaceholderRules() {
 				List<BoolExpr> listSecondC = new ArrayList<>();
 				
 				for(int i = 0; i < nRules; i++) {
-					BoolExpr component2 = nctx.matchAll(tuple, srcConditions.get(i), dstConditions.get(i), portSConditions.get(i), portDConditions.get(i), l4Conditions.get(i));
+					BoolExpr component2 = nctxMF.matchAll(tuple, srcConditions.get(i), dstConditions.get(i), portSConditions.get(i), portDConditions.get(i), l4Conditions.get(i));
 					BoolExpr secondCPart = ((blacklisting && flowPath.getRequirement().getOriginalProperty().getName().equals(PName.ISOLATION_PROPERTY)) 
 							|| (!blacklisting && (flowPath.getRequirement().getOriginalProperty().getName().equals(PName.REACHABILITY_PROPERTY)
 									|| flowPath.getRequirement().getOriginalProperty().getName().equals(PName.COMPLETE_REACHABILITY_PROPERTY)))) ?

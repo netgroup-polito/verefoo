@@ -54,10 +54,10 @@ public class PacketFilterAP extends GenericFunction{
 	 * @param nctx It is the NetContext object to which constraints are sent
 	 * @param wildcardManager 
 	 */
-	public PacketFilterAP(AllocationNode source, Context ctx, NetContext nctx, WildcardManager wildcardManager) {
-		this.source = source;
+	public PacketFilterAP(AllocationNodeAP source, Context ctx, NetContextAP nctx, WildcardManager wildcardManager) {
+		this.sourceAP = source;
 		this.ctx = ctx;
-		this.nctx = nctx;
+		this.nctxAP = nctx;
 		
 		pf = source.getZ3Name();
 		constraints = new ArrayList<BoolExpr>();
@@ -86,17 +86,17 @@ public class PacketFilterAP extends GenericFunction{
 		
 		if(!autoplace) constraints.add(ctx.mkEq(used, ctx.mkTrue()));
 		
-		Node n = source.getNode();
+		Node n = sourceAP.getNode();
 		if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
 			//System.out.println("Allowed");
-			for(Integer traffic : source.getForwardBehaviourList()) {
+			for(Integer traffic : sourceAP.getForwardBehaviourList()) {
 				//System.out.println(traffic);
-				constraints.add(ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
+				constraints.add(ctx.mkEq((BoolExpr)nctxAP.deny.apply(sourceAP.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
 			}
 			//System.out.println("Dropped");
-			for(Integer traffic : source.getDroppedList()) {
+			for(Integer traffic : sourceAP.getDroppedList()) {
 				//System.out.println(traffic);
-				constraints.add(ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkTrue()));
+				constraints.add(ctx.mkEq((BoolExpr)nctxAP.deny.apply(sourceAP.getZ3Name(), ctx.mkInt(traffic)), ctx.mkTrue()));
 			}
 		}
 			
@@ -115,7 +115,7 @@ public class PacketFilterAP extends GenericFunction{
     	//allocation
     	if(autoplace) {
   			// packet filter should not be used if possible
-  			nctx.softConstrAutoPlace.add(new Tuple<BoolExpr, String>(ctx.mkNot(used), "fw_auto_conf"));
+  			nctxAP.softConstrAutoPlace.add(new Tuple<BoolExpr, String>(ctx.mkNot(used), "fw_auto_conf"));
   		}else {
   			used = ctx.mkTrue();
   			constraints.add(ctx.mkEq(used, ctx.mkTrue()));
@@ -129,12 +129,12 @@ public class PacketFilterAP extends GenericFunction{
     			constraints.add(ctx.mkEq(whitelist, ctx.mkTrue()));
     		}
     	}
-    	for(Map<Integer, Integer> flowMap : source.getMapFlowIdAtomicPredicatesInInput().values()) {
+    	for(Map<Integer, Integer> flowMap : sourceAP.getMapFlowIdAtomicPredicatesInInput().values()) {
     		for(Integer traffic : flowMap.values()) {
     			BoolExpr rule = (BoolExpr) ctx.mkConst(pf + "_rule_" + traffic, ctx.mkBoolSort());
     			constraints.add(
     					ctx.mkEq(
-    							(BoolExpr) nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)),
+    							(BoolExpr) nctxAP.deny.apply(sourceAP.getZ3Name(), ctx.mkInt(traffic)),
     							ctx.mkAnd(
     									used,
     									ctx.mkOr(
@@ -144,7 +144,7 @@ public class PacketFilterAP extends GenericFunction{
     									)
     							)
     					);
-    			nctx.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq(rule, ctx.mkFalse()), "fw_auto_conf"));
+    			nctxAP.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq(rule, ctx.mkFalse()), "fw_auto_conf"));
     		}
     	}
     

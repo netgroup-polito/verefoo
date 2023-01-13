@@ -20,12 +20,12 @@ public class GenerateFlowsTask implements Runnable {
 
 	SecurityRequirement requirement;
 	HashMap<Integer, Predicate> networkAtomicPredicates;
-	APUtils aputils;
+	APUtilsAP aputils;
 	HashMap<String, Node> transformersNode;
 	AtomicInteger atomicId;
 	
 	public GenerateFlowsTask(SecurityRequirement requirement, HashMap<Integer, Predicate> networkAtomicPredicates, 
-			APUtils aputils, HashMap<String, Node> transformersNode, AtomicInteger atomicId) {
+			APUtilsAP aputils, HashMap<String, Node> transformersNode, AtomicInteger atomicId) {
 		this.requirement = requirement;
 		this.networkAtomicPredicates = networkAtomicPredicates;
 		this.aputils = aputils;
@@ -65,8 +65,8 @@ public class GenerateFlowsTask implements Runnable {
 		}
 		
 		//Generate atomic flows
-		for(FlowPath flow: requirement.getFlowsMap().values()) {
-			List<AllocationNode> path = flow.getPath();
+		for(FlowPathAP flow: requirement.getFlowsMapAP().values()) {
+			List<AllocationNodeAP> path = flow.getPath();
 			List<List<Integer>> resultList = new ArrayList<>();
 			List<List<Integer>> resultListToDiscard = new ArrayList<>();
 			//now we have the requirement, the path and the list of source predicates -> call recursive function
@@ -85,8 +85,8 @@ public class GenerateFlowsTask implements Runnable {
 		
 	}
 	
-	private void recursiveGenerateAtomicPath(int nodeIndex, SecurityRequirement sr, List<AllocationNode> path, int ap, List<Integer> dstPredicateList, List<List<Integer>> atomicFlowsList, List<List<Integer>> atomicFlowsListToDiscard, List<Integer> currentList) {
-		AllocationNode currentNode = path.get(nodeIndex);
+	private void recursiveGenerateAtomicPath(int nodeIndex, SecurityRequirement sr, List<AllocationNodeAP> path, int ap, List<Integer> dstPredicateList, List<List<Integer>> atomicFlowsList, List<List<Integer>> atomicFlowsListToDiscard, List<Integer> currentList) {
+		AllocationNodeAP currentNode = path.get(nodeIndex);
 		Predicate currentPredicate = networkAtomicPredicates.get(ap);
 		Predicate currentNodeDestPredicate = new Predicate("*", false, currentNode.getIpAddress(), false, "*", false, "*", false, L4ProtocolTypes.ANY);
 		

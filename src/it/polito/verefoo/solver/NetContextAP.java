@@ -37,7 +37,7 @@ public class NetContextAP {
 	public Context ctx;
 	public WildcardManager wildcardManager;
 	public FuncDecl nodeHasAddr,addrToNode,send,recv,deny;
-	private HashMap<String, AllocationNode> allocationNodes;
+	private HashMap<String, AllocationNodeAP> allocationNodes;
 	
     public List<BoolExpr> constraints;
     public List<Tuple<BoolExpr, String>> softConstrAutoConf;
@@ -80,7 +80,7 @@ public class NetContextAP {
      * @param ctx
      * @param args
      */
-    public NetContextAP(Context ctx, HashMap<String, AllocationNode> allocationNodes, Object[]... args){
+    public NetContextAP(Context ctx, HashMap<String, AllocationNodeAP> allocationNodes, Object[]... args){
           nodeMap = new HashMap<String,DatatypeExpr>(); //list of nodes, callable by node name
           addressMap = new HashMap<String,DatatypeExpr>(); // list of addresses, callable by address name
           portMap = new HashMap<String,DatatypeExpr>();
@@ -98,7 +98,7 @@ public class NetContextAP {
           this.allocationNodes = allocationNodes;
           mkTypes((String[])args[0],(String[])args[1], (String[])args[2], (String[])args[3]);
     }
-    
+
     
     
     /*
@@ -131,7 +131,7 @@ public class NetContextAP {
         for(int i=0;i<nodeType.getConsts().length;i++){
             DatatypeExpr fd  = (DatatypeExpr)nodeType.getConst(i);   
             nodeMap.put(fd.toString().replace("|", ""),fd);
-            AllocationNode n = allocationNodes.get(nodes[i]);
+            AllocationNodeAP n = allocationNodes.get(nodes[i]);
             n.setZ3Name(fd);
         }
 

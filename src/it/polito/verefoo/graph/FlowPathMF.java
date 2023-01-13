@@ -12,17 +12,17 @@ public class FlowPathMF {
 
 	SecurityRequirement requirement;
 	int idFlow;
-	List<AllocationNode> path;
+	List<AllocationNodeMF> path;
 	
 	//<id of maximal flow, maximal flow>
 	Map<Integer, MaximalFlow> maximalFlowsMap = new HashMap<>();
 	
-	public FlowPathMF(SecurityRequirement requirement, List<AllocationNode> path, int idFlow) {
+	public FlowPathMF(SecurityRequirement requirement, List<AllocationNodeMF> path, int idFlow) {
 		this.requirement = requirement;
 		this.path = path;
 		this.idFlow = idFlow;
 		
-		for(AllocationNode node: path) {
+		for(AllocationNodeMF node: path) {
 			node.addCrossingFlow(this);
 		}
 	}
@@ -44,11 +44,11 @@ public class FlowPathMF {
 		this.idFlow = idFlow;
 	}
 
-	public List<AllocationNode> getPath() {
+	public List<AllocationNodeMF> getPath() {
 		return path;
 	}
 
-	public void setPath(List<AllocationNode> path) {
+	public void setPath(List<AllocationNodeMF> path) {
 		this.path = path;
 	}
 

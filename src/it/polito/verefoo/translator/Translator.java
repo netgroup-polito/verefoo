@@ -40,11 +40,14 @@ public class Translator {
 	protected Graph g;
 	protected VerefooNormalizer norm;
 	protected List<Node> removedNodes;
-	private Map<String, AllocationNode> allocationNodes;
-	private Map<Integer, FlowPath> requirementsMap;
+	private Map<String, AllocationNodeAP> allocationNodesAP;
+	private Map<Integer, FlowPathAP> requirementsMapAP;
+	private Map<String, AllocationNodeMF> allocationNodesMF;
+	private Map<Integer, FlowPathMF> requirementsMapMF;
 	private HashMap<Integer, Predicate> networkAtomicPredicates;
-	private APUtils aputils;
-
+	private APUtilsAP aputilsAP;
+	private APUtilsMF aputilsMF;
+	
 	/**
 	 * Constructor
 	 * 
@@ -58,23 +61,23 @@ public class Translator {
 		this.g = g;
 	}
 	// constructor used by AP algorithm
-	public Translator(String model, NFV nfv, Graph g, Map<String, AllocationNode> allocationNodes, Map<Integer, FlowPath> requirementsMap, HashMap<Integer, Predicate> networkAtomicPredicates) {
+	public Translator(String model, NFV nfv, Graph g, Map<String, AllocationNodeAP> allocationNodes, Map<Integer, FlowPathAP> requirementsMap, HashMap<Integer, Predicate> networkAtomicPredicates) {
 		this.model = model;
 		this.nfv = nfv;
 		this.g = g;
-		this.allocationNodes = allocationNodes;
-		this.requirementsMap = requirementsMap;
+		this.allocationNodesAP = allocationNodes;
+		this.requirementsMapAP = requirementsMap;
 		this.networkAtomicPredicates = networkAtomicPredicates;
 		this.removedNodes = new ArrayList<Node>();
-		this.aputils = new APUtilsAP();
+		this.aputilsAP = new APUtilsAP();
 	}
 	// Constructor for maximal flows
-	public Translator(String model, NFV nfv, Graph g, Map<String, AllocationNode> allocationNodes, Map<Integer, FlowPath> requirementsMap) {
+	public Translator(String model, NFV nfv, Graph g, Map<String, AllocationNodeMF> allocationNodes, Map<Integer, FlowPathMF> requirementsMap) {
 		this.model = model;
 		this.nfv = nfv;
 		this.g = g;
-		this.allocationNodes = allocationNodes;
-		this.requirementsMap = requirementsMap;
+		this.allocationNodesMF = allocationNodes;
+		this.requirementsMapMF = requirementsMap;
 		this.removedNodes = new ArrayList<Node>();
 	}
 
@@ -87,9 +90,15 @@ public class Translator {
 	public NFV convert(String algo) { // this produces an error in RestTranslator.put file --> To be fixef later
 		if (originalNfv.getHosts() != null)
 			originalNfv.getHosts().getHost().forEach(this::searchHost);
-		setAutoPlacement();
+		if(algo.equals("AP"))
+		setAutoPlacementAP();
+		else
+		setAutoPlacementMF();
 		setAutoConfig(algo);
-		removeOptionalNotUsed();
+		if(algo.equals("AP"))
+		removeOptionalNotUsedAP();
+		else
+		removeOptionalNotUsedMF();
 		return originalNfv;
 	}
 
@@ -239,7 +248,7 @@ public class Translator {
 				String ruleNumber = z3Translator.saneString(z3Translator.matchRuleNumber(matchSrc));
 				if(ruleConfigured.equals("true")) {
 					Predicate atomicPredicate = networkAtomicPredicates.get(Integer.parseInt(ruleNumber));
-					List<Predicate> predicatesList = aputils.complexPredicatetoOrTuples(atomicPredicate);
+					List<Predicate> predicatesList = aputilsAP.complexPredicatetoOrTuples(atomicPredicate);
 					for(Predicate predicate : predicatesList) {
 						Elements e = new Elements();
 						e.setSource(predicate.getIPSrcList().get(0).toString());
@@ -455,8 +464,8 @@ public class Translator {
 	/**
 	 * Remove not used optional network objects from the XML for the Verefoo output
 	 */
-	public void setAutoPlacement() {
-		List<AllocationNode> usableNodes = allocationNodes.values().stream()
+	public void setAutoPlacementAP() {
+		List<AllocationNodeAP> usableNodes = allocationNodesAP.values().stream()
 				.filter(n -> n.getNode().getConfiguration() == null).collect(Collectors.toList());
 		usableNodes.forEach(allocationNode -> {
 			String tosearch = z3Translator.stringToSeachNetworkObjectUsed(allocationNode.getNode());
@@ -478,8 +487,8 @@ public class Translator {
 				Firewall f = new Firewall();
 
 				GenericFunction no = allocationNode.getPlacedNF();
-				if (no instanceof PacketFilter) {
-					PacketFilter aclf = (PacketFilter) no;
+				if (no instanceof PacketFilterAP) {
+					PacketFilterAP aclf = (PacketFilterAP) no;
 					if (!aclf.isBlacklisting())
 						f.setDefaultAction(ActionTypes.ALLOW);
 					else
@@ -518,6 +527,73 @@ public class Translator {
 
 	}
 
+	
+	/**
+	 * Remove not used optional network objects from the XML for the Verefoo output
+	 */
+	public void setAutoPlacementMF() {
+		List<AllocationNodeMF> usableNodes = allocationNodesMF.values().stream()
+				.filter(n -> n.getNode().getConfiguration() == null).collect(Collectors.toList());
+		usableNodes.forEach(allocationNode -> {
+			String tosearch = z3Translator.stringToSeachNetworkObjectUsed(allocationNode.getNode());
+			Pattern pattern = Pattern.compile(tosearch);
+			Matcher matcher = pattern.matcher(model);
+
+			while (matcher.find()) {
+				Node n = originalNfv.getGraphs().getGraph().stream().filter(graph -> graph.getId() == g.getId())
+						.flatMap(graph -> graph.getNode().stream())
+						.filter(node -> node.getName().equals(allocationNode.getNode().getName())).findFirst()
+						.orElse(null);
+
+				if (n == null)
+					continue;
+
+				Configuration configuration = new Configuration();
+				configuration.setName("AutoConf");
+				n.setFunctionalType(FunctionalTypes.FIREWALL);
+				Firewall f = new Firewall();
+
+				GenericFunction no = allocationNode.getPlacedNF();
+				if (no instanceof PacketFilterMF) {
+					PacketFilterMF aclf = (PacketFilterMF) no;
+					if (!aclf.isBlacklisting())
+						f.setDefaultAction(ActionTypes.ALLOW);
+					else
+						f.setDefaultAction(ActionTypes.DENY);
+				}
+
+				configuration.setFirewall(f);
+				n.setConfiguration(configuration);
+			}
+
+		});
+
+		usableNodes.forEach(allocationNode -> {
+			String tosearch = z3Translator.stringToSeachNetworkObjectNotUsed(allocationNode.getNode());
+			Pattern pattern = Pattern.compile(tosearch);
+			Matcher matcher = pattern.matcher(model);
+
+			while (matcher.find()) {
+				Node n = originalNfv.getGraphs().getGraph().stream().filter(graph -> graph.getId() == g.getId())
+						.flatMap(graph -> graph.getNode().stream())
+						.filter(node -> node.getName().equals(allocationNode.getNode().getName())).findFirst()
+						.orElse(null);
+
+				if (n == null)
+					continue;
+
+				Configuration configuration = new Configuration();
+				configuration.setName("ForwardConf");
+				n.setFunctionalType(FunctionalTypes.FORWARDER);
+				Forwarder f = new Forwarder();
+				f.setName("Forwarder");
+				configuration.setForwarder(f);
+				n.setConfiguration(configuration);
+			}
+		});
+
+	}
+	
 	/**
 	 * Reduces the host resources according to the node metrics
 	 * 
@@ -558,12 +634,12 @@ public class Translator {
 	 * Remove not used optional network objects from the XML for the Verefoo output
 	 */
 	
-	public void removeOptionalNotUsed() {
+	public void removeOptionalNotUsedAP() {
 		
 		List<NodeMetrics> nodeMetrics = originalNfv.getConstraints().getNodeConstraints().getNodeMetrics().stream()
 				.collect(Collectors.toList());
 
-		List<AllocationNode> optionalNodes = allocationNodes.values().stream().filter(n -> {
+		List<AllocationNodeAP> optionalNodes = allocationNodesAP.values().stream().filter(n -> {
 			for (NodeMetrics nm : nodeMetrics) {
 				if (n.getNode().getName().equals(nm.getNode()))
 					return true;
@@ -578,8 +654,113 @@ public class Translator {
 			
 			while (matcher.find()) {
 
-				for(FlowPath sr : requirementsMap.values()) {
-					List<AllocationNode> nodesPath = sr.getPath();
+				for(FlowPathAP sr : requirementsMapAP.values()) {
+					List<AllocationNodeAP> nodesPath = sr.getPath();
+					int opNodeIndex = -1;
+					for(int i = 0; i < nodesPath.size(); i++) {
+						if(nodesPath.get(i).getNode().getName().equals(opNode.getNode().getName()))
+							opNodeIndex = i;	
+					}
+					if(opNodeIndex != -1) {
+						
+						String prevName = null;
+						String nextName = null;
+						
+						for(int i = opNodeIndex-1; i >= 0; i--) {
+							int iLambda = i;
+							boolean alreadyRemoved = removedNodes.stream().anyMatch(rN -> rN.getName().equals(nodesPath.get(iLambda).getNode().getName()));
+							if(!alreadyRemoved) {
+								prevName = nodesPath.get(i).getNode().getName();
+								break;
+							}
+						}
+						
+						for(int i = opNodeIndex+1; i < nodesPath.size(); i++) {
+							int iLambda = i;
+							boolean alreadyRemoved = removedNodes.stream().anyMatch(rN -> rN.getName().equals(nodesPath.get(iLambda).getNode().getName()));
+							if(!alreadyRemoved) {
+								nextName = nodesPath.get(i).getNode().getName();
+								break;
+							}
+						}
+						
+						if(prevName != null && nextName != null) {
+							
+							String prevNameLambda = prevName;
+							String nextNameLambda = nextName;
+							
+							Node prevNode = originalNfv.getGraphs().getGraph().stream()
+									.filter(graph -> graph.getId() == g.getId()).flatMap(graph -> graph.getNode().stream())
+									.filter(node -> node.getName().equals(prevNameLambda)).findFirst().orElse(null);
+
+							List<Neighbour> neighboursPrec = prevNode.getNeighbour();
+							neighboursPrec.removeIf(neigh -> neigh.getName().equals(opNode.getNode().getName()));
+							boolean presentNext = neighboursPrec.stream()
+									.anyMatch(neigh -> neigh.getName().equals(nextNameLambda));
+							if (!presentNext) {
+								Neighbour neigh = new Neighbour();
+								neigh.setName(nextName);
+								neighboursPrec.add(neigh);
+							}
+							
+
+							Node nextNode = originalNfv.getGraphs().getGraph().stream()
+									.filter(graph -> graph.getId() == g.getId()).flatMap(graph -> graph.getNode().stream())
+									.filter(node -> node.getName().equals(nextNameLambda)).findFirst().orElse(null);
+							List<Neighbour> neighboursNext = nextNode.getNeighbour();
+							neighboursNext.removeIf(neigh -> neigh.getName().equals(opNode.getNode().getName()));
+							boolean presentPrev = neighboursNext.stream()
+									.anyMatch(neigh -> neigh.getName().equals(prevNameLambda));
+							if (!presentPrev) {
+								Neighbour neigh = new Neighbour();
+								neigh.setName(prevName);
+								neighboursNext.add(neigh);
+							}
+							
+						}
+						
+					}
+					
+					
+				}
+				
+				Graph graphWithOptional = originalNfv.getGraphs().getGraph().stream()
+						.filter(graph -> graph.getId() == g.getId()).findFirst().orElse(null);
+				List<Node> allNodes = graphWithOptional.getNode();
+				allNodes.removeIf(node -> node.getName().equals(opNode.getNode().getName()));
+				removedNodes.add(opNode.getNode());
+				
+			}
+			
+		});
+	}
+	
+	/**
+	 * Remove not used optional network objects from the XML for the Verefoo output
+	 */
+	
+	public void removeOptionalNotUsedMF() {
+		
+		List<NodeMetrics> nodeMetrics = originalNfv.getConstraints().getNodeConstraints().getNodeMetrics().stream()
+				.collect(Collectors.toList());
+
+		List<AllocationNodeMF> optionalNodes = allocationNodesMF.values().stream().filter(n -> {
+			for (NodeMetrics nm : nodeMetrics) {
+				if (n.getNode().getName().equals(nm.getNode()))
+					return true;
+			}
+			return false;
+		}).collect(Collectors.toList());
+		
+		optionalNodes.forEach(opNode -> {
+			String tosearch = z3Translator.stringToSeachNetworkObjectNotUsed(opNode.getNode());
+			Pattern pattern = Pattern.compile(tosearch);
+			Matcher matcher = pattern.matcher(model);
+			
+			while (matcher.find()) {
+
+				for(FlowPathMF sr : requirementsMapMF.values()) {
+					List<AllocationNodeMF> nodesPath = sr.getPath();
 					int opNodeIndex = -1;
 					for(int i = 0; i < nodesPath.size(); i++) {
 						if(nodesPath.get(i).getNode().getName().equals(opNode.getNode().getName()))

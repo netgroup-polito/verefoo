@@ -10,17 +10,17 @@ import it.polito.verefoo.jaxb.*;
 public class FlowPathAP {
 	SecurityRequirement requirement;
 	int idFlow;
-	private List<AllocationNode> path;
+	private List<AllocationNodeAP> path;
 	//<id of atomic flow, atomic flow>
 	Map<Integer, AtomicFlow> atomicFlowsMap = new HashMap<>();
 	Map<Integer, AtomicFlow> atomicFlowsToDiscardMap = new HashMap<>();
 	
-	public FlowPathAP(SecurityRequirement requirement, List<AllocationNode> path, int idFlow) {
+	public FlowPathAP(SecurityRequirement requirement, List<AllocationNodeAP> path, int idFlow) {
 		this.requirement = requirement;
 		this.path = path;
 		this.idFlow = idFlow;
 		
-		for(AllocationNode node: path) {
+		for(AllocationNodeAP node: path) {
 			node.addCrossingFlow(this);
 		}
 	}
@@ -41,11 +41,11 @@ public class FlowPathAP {
 		this.idFlow = idFlow;
 	}
 
-	public List<AllocationNode> getPath() {
+	public List<AllocationNodeAP> getPath() {
 		return path;
 	}
 
-	public void setPath(List<AllocationNode> path) {
+	public void setPath(List<AllocationNodeAP> path) {
 		this.path = path;
 	}
 	

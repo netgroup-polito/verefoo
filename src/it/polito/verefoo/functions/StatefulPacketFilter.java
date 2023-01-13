@@ -54,10 +54,10 @@ public class StatefulPacketFilter extends GenericFunction{
 	 * @param nctx It is the NetContext object to which constraints are sent
 	 * @param wildcardManager 
 	 */
-	public StatefulPacketFilter(AllocationNode source, Context ctx, NetContext nctx) {
-		this.source = source;
+	public StatefulPacketFilter(AllocationNodeAP source, Context ctx, NetContextAP nctx) {
+		this.sourceAP = source;
 		this.ctx = ctx;
-		this.nctx = nctx;
+		this.nctxAP = nctx;
 		
 		pf = source.getZ3Name();
 		constraints = new ArrayList<BoolExpr>();
@@ -79,15 +79,15 @@ public class StatefulPacketFilter extends GenericFunction{
 		
 		if(!autoplace) constraints.add(ctx.mkEq(used, ctx.mkTrue()));
 		
-		Node n = source.getNode();
+		Node n = sourceAP.getNode();
 		if(n.getFunctionalType().equals(FunctionalTypes.STATEFUL_FIREWALL)){
 			for(List<Integer> trafficList : allowAtomicPredicates.values()) {
 				for(Integer traffic : trafficList) {
-					constraints.add(ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
+					constraints.add(ctx.mkEq((BoolExpr)nctxAP.deny.apply(sourceAP.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
 				}		
 			}
 			for(Integer traffic : denyAtomicPredicates) {
-				constraints.add(ctx.mkEq((BoolExpr)nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkTrue()));
+				constraints.add(ctx.mkEq((BoolExpr)nctxAP.deny.apply(sourceAP.getZ3Name(), ctx.mkInt(traffic)), ctx.mkTrue()));
 			}
 			for(Map.Entry<Integer, List<Integer>> allowCondEntry : allowCondAtomicPredicates.entrySet()) {
 				List<Integer> allowCondInvEntry = allowCondInvAtomicPredicates.get(allowCondEntry.getKey());

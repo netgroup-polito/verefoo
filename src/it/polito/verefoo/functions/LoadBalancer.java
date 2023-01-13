@@ -33,18 +33,33 @@ public class LoadBalancer extends GenericFunction {
 	 * @param ctx it is the z3 context
 	 * @param nctx it is the NetContext object
 	 */
-	public LoadBalancer(AllocationNode source, Context ctx, NetContext nctx) {
+	public LoadBalancer(AllocationNodeAP source, Context ctx, NetContextAP nctx) {
 		isEndHost = false;
-		this.source = source;
+		this.sourceAP = source;
 		this.ctx = ctx;
-		this.nctx = nctx;
+		this.nctxAP = nctx;
 		nat = source.getZ3Name();
 		constraints = new ArrayList<BoolExpr>();
 		used = ctx.mkTrue();
 		serversIPAddresses = source.getNode().getConfiguration().getLoadbalancer().getPool().stream().collect(Collectors.toList());	
 	}
 
-
+	/**
+	 * Constructor method for the Load Balancer class
+	 * @param source it is the node where the load balancer functions is installed
+	 * @param ctx it is the z3 context
+	 * @param nctx it is the NetContext object
+	 */
+	public LoadBalancer(AllocationNodeMF source, Context ctx, NetContextMF nctx) {
+		isEndHost = false;
+		this.sourceMF = source;
+		this.ctx = ctx;
+		this.nctxMF = nctx;
+		nat = source.getZ3Name();
+		constraints = new ArrayList<BoolExpr>();
+		used = ctx.mkTrue();
+		serversIPAddresses = source.getNode().getConfiguration().getLoadbalancer().getPool().stream().collect(Collectors.toList());	
+	}
 
 	/**
 	 * Atomic Predicate Algorithm
@@ -52,9 +67,9 @@ public class LoadBalancer extends GenericFunction {
 	 * @param lbIp it is the IP address of the load balancer
 	 */
 	public void loadBalancerConfigurationAP(DatatypeExpr lbIp) {
-    	for(Map<Integer, Integer> flowMap : source.getMapFlowIdAtomicPredicatesInInput().values()) {
+    	for(Map<Integer, Integer> flowMap : sourceAP.getMapFlowIdAtomicPredicatesInInput().values()) {
     		for(Integer traffic : flowMap.values()) {
-    			constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
+    			constraints.add(ctx.mkEq(nctxAP.deny.apply(sourceAP.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
     		}
     		
     	}
@@ -66,9 +81,9 @@ public class LoadBalancer extends GenericFunction {
 	 * @param lbIp it is the IP address of the load balancer
 	 */
 	public void loadBalancerConfigurationMF(DatatypeExpr lbIp) {
-		for(FlowPath flow : source.getCrossingFlows().values()) {
+		for(FlowPathMF flow : sourceMF.getCrossingFlows().values()) {
     		for(Entry<Integer, MaximalFlow> maximalFlowEntry: flow.getMaximalFlowsMap().entrySet()) {
-    			constraints.add(ctx.mkEq(nctx.deny.apply(source.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey())), ctx.mkFalse()));
+    			constraints.add(ctx.mkEq(nctxMF.deny.apply(sourceMF.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey())), ctx.mkFalse()));
     		}
     	}
 	}
