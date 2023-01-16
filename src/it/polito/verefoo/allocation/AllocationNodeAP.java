@@ -13,7 +13,7 @@ import it.polito.verefoo.jaxb.*;
 
 
 /*
- * This class is an extension of the JAXB-Annotated Node class.
+ * This class is an extension of the JAXB-Annotated Node class, this class is specific for Atomic Predicates algorithm.
  * It has additional features, like maps used to build forwarding rules and information about deployed Network Functions.
  * This class is for atomic predicate algorithm
  */
@@ -179,12 +179,19 @@ public class AllocationNodeAP {
 			placedNF.addContraints(solver);
 		}
 	}
-
+	
+	/**
+	 * Method to add crossing flows specific to Atomic Predicate
+	 * @param FlowPathAP object
+	 */
 	public void addCrossingFlow(FlowPathAP sr) {
 		crossingFlows.put(sr.getIdFlow(), sr);
 	}
 	
-	//return flows that cross this node
+	/**
+	 * Getter method that returns flows that cross this node
+	 * @param crossing flows of this node
+	 */
 	public Map<Integer, FlowPathAP> getCrossingFlows() {
 		return crossingFlows;
 	}
@@ -197,30 +204,58 @@ public class AllocationNodeAP {
 		this.crossingFlows = requirements;
 	}
 	
+	/**
+	 * Getter method that returns the transformation Map
+	 * @return transformation map of this node
+	 */
 	public HashMap<Integer, List<Integer>> getTransformationMap(){
 		return transformationsMap;
 	}
 	
+	/**
+	 * Setter method for the forward behavior predicate list of this node
+	 * @param list of predicates.
+	 */
 	public void setForwardBehaviourPredicateList(List<Predicate> list) {
 		this.forwardBehaviourPredicateList = list;
 	}
 	
+	/**
+	 * Getter method that returns the list of forward behavior predicates
+	 * @return forward behavior predicate list
+	 */
 	public List<Predicate> getForwardBehaviourPredicateList(){
 		return forwardBehaviourPredicateList;
 	}
 	
+	/**
+	 * Setter method for the forward behavior list of this node
+	 * @param list of Integers presenting forward behavior list
+	 */
 	public void setForwardBehaviourList(List<Integer> list) {
 		forwardBehaviourList = list;
 	}
-	
+
+	/**
+	 * Getter method that returns the list of forward behavior
+	 * @return forward behavior Integer list
+	 */
 	public List<Integer> getForwardBehaviourList(){
 		return forwardBehaviourList;
 	}
-	
+
+	/**
+	 * Getter method that returns the Dropped list
+	 * @return Dropped behavior Integer list
+	 */
 	public List<Integer> getDroppedList() {
 		return droppedList;
 	}
 
+	/**
+	 * Setter method for the Dropped behavior list
+	 * @param list of Integers presenting Dropped behavior list
+	 */
 	public void setDroppedList(List<Integer> droppedList) {
 		this.droppedList = droppedList;
 	}
@@ -241,11 +276,17 @@ public class AllocationNodeAP {
 			return mapFlowIdAtomicPredicatesInInput.get(flowId);
 		return null;
 	}
-	
+	/**
+	 * Setter method for the forwarding behavior list
+	 * @param integer atomic predicate
+	 */	
 	public void addForwardingPredicate(int ap) {
 		forwardBehaviourList.add(ap);
 	}
-	
+	/**
+	 * Setter method for the Dropped behavior list
+	 * @param integer atomic predicate
+	 */
 	public void addDroppedPredicate(int ap) {
 		droppedList.add(ap);
 	}

@@ -13,7 +13,7 @@ import it.polito.verefoo.jaxb.*;
 
 
 /*
- * This class is an extension of the JAXB-Annotated Node class.
+ * This class is an extension of the JAXB-Annotated Node class, this class is specific for Maximal Flows Algorithm.
  * It has additional features, like maps used to build forwarding rules and information about deployed Network Functions.
  * This class is for maximal flows algorithm
  */

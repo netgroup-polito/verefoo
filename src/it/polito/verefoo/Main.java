@@ -31,6 +31,14 @@ public class Main {
 	
 	public static void main(String[] args) throws MalformedURLException {
 		System.setProperty("log4j.configuration", new File("resources", "log4j2.xml").toURI().toURL().toString());
+		// Let user input the choice of algorithm to execute
+		Scanner myObj = new Scanner(System.in);  // Create a Scanner object
+		System.out.println("Enter AP for atomic predicates algorithm Or MF for maximal flows algorithm");
+		String algo = myObj.nextLine();
+		while (!algo.equals("AP") && !algo.equals("MF")) { // input validation
+		System.out.println("Choose Correct Algorithms");
+		algo = myObj.nextLine();
+		}
 		try {
 			JAXBContext jc;
 			jc = JAXBContext.newInstance("it.polito.verefoo.jaxb");
@@ -39,19 +47,11 @@ public class Main {
 			Schema schema = sf.newSchema(new File("./xsd/nfvSchema.xsd"));
 			u.setSchema(schema);
 			long beginAll = System.currentTimeMillis();
-			// Let user input the choice of algorithm to execute
-			Scanner myObj = new Scanner(System.in);  // Create a Scanner object
-			System.out.println("Enter AP for atomic predicates algorithm Or MF for maximal flows algorithm");
-			String algo = myObj.nextLine();
-			while (!algo.equals("AP") || !algo.equals("MF")) { // input validation
-				System.out.println("Choose Correct Algorithms");
-				algo = myObj.nextLine();
-			}
 			try {
 				Marshaller m = jc.createMarshaller();
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "./xsd/nfvSchema.xsd");
-				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/MF/scalability01.xml")),algo);
+				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/Others/useCasev2.xml")),algo);
 				//TODO: remove (Budapest)
 				if (test.isSat()) {
 					loggerResult.info("SAT");
