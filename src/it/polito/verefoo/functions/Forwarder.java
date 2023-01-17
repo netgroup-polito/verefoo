@@ -23,8 +23,8 @@ import it.polito.verefoo.graph.MaximalFlow;
 public class Forwarder extends GenericFunction{
 	DatatypeExpr forwarder;
 	/**
-	 * Public constructor for the Forwarder
-	 * @param source It is the Allocation Node on which the forwarder is put
+	 * Public constructor for the Forwarder specific to Atomic Predicates
+	 * @param source It is the Atomic Predicates Allocation Node on which the forwarder is put
 	 * @param ctx It is the Z3 Context in which the model is generated
 	 * @param nctx It is the NetContext object to which constraints are sent
 	 */
@@ -39,8 +39,8 @@ public class Forwarder extends GenericFunction{
 	}
 
 	/**
-	 * Public constructor for the Forwarder
-	 * @param source It is the Allocation Node on which the forwarder is put
+	 * Public constructor for the Forwarder specific to Maximal Flows
+	 * @param source It is the Maximal Flow Allocation Node on which the forwarder is put
 	 * @param ctx It is the Z3 Context in which the model is generated
 	 * @param nctx It is the NetContext object to which constraints are sent
 	 */
@@ -88,7 +88,7 @@ public class Forwarder extends GenericFunction{
  
 	/**
 	 * This method allows to wrap the method which adds the constraints inside Z3 solver
-	 * @param solver Istance of Z3 solver
+	 * @param solver Instance of Z3 solver
 	 */
 	@Override
 	public void addContraints(Optimize solver) {

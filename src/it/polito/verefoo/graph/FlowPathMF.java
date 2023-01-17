@@ -8,6 +8,10 @@ import it.polito.verefoo.allocation.AllocationNodeAP;
 import it.polito.verefoo.allocation.AllocationNodeMF;
 import it.polito.verefoo.jaxb.*;
 
+/** Represents a Flow Path specific for Maximal Flows.
+*
+*
+*/
 public class FlowPathMF {
 
 	SecurityRequirement requirement;
@@ -17,6 +21,12 @@ public class FlowPathMF {
 	//<id of maximal flow, maximal flow>
 	Map<Integer, MaximalFlow> maximalFlowsMap = new HashMap<>();
 	
+	/**
+	    * Public constructor of Flow Path specific to Maximal Flows.
+	    * @param requirement
+	    * @param path
+	    * @param idFlow
+	    */
 	public FlowPathMF(SecurityRequirement requirement, List<AllocationNodeMF> path, int idFlow) {
 		this.requirement = requirement;
 		this.path = path;

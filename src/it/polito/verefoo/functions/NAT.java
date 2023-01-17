@@ -32,10 +32,9 @@ public class NAT extends GenericFunction {
 	List<String> private_addresses;
 	List<GenericFunction> private_node;
 	FuncDecl private_addr_func;
-	//APUtils aputils = new APUtils(); // not needed?
 	
 	/**
-	 * Constructor method of the NAT class
+	 * Constructor method of the NAT class specific to Atomic Predicates
 	 * @param source it is the node where the NAT is installed
 	 * @param ctx it is the z3 context
 	 * @param nctx it is the NetContext object
@@ -47,13 +46,12 @@ public class NAT extends GenericFunction {
 		this.nctxAP = nctx;
 		nat = source.getZ3Name();
 		constraints = new ArrayList<BoolExpr>();
-		//private_addr_func = ctx.mkFuncDecl(nat + "_nat_func", nctx.addressType, ctx.mkBoolSort()); 
 		used = ctx.mkTrue();
 		private_addresses = source.getNode().getConfiguration().getNat().getSource().stream().collect(Collectors.toList());	
 	}
 
 	/**
-	 * Constructor method of the NAT class
+	 * Constructor method of the NAT class specific to Maximal Flows
 	 * @param source it is the node where the NAT is installed
 	 * @param ctx it is the z3 context
 	 * @param nctx it is the NetContext object
@@ -65,14 +63,12 @@ public class NAT extends GenericFunction {
 		this.nctxMF = nctx;
 		nat = source.getZ3Name();
 		constraints = new ArrayList<BoolExpr>();
-		//private_addr_func = ctx.mkFuncDecl(nat + "_nat_func", nctx.addressType, ctx.mkBoolSort()); 
 		used = ctx.mkTrue();
 		private_addresses = source.getNode().getConfiguration().getNat().getSource().stream().collect(Collectors.toList());	
 	}
 
 	/**
-	 * Atomic Predicate Algorithm
-	 * This method creates the hard constraints for the NAT configuration and status
+	 * This method creates the hard constraints for the NAT configuration specific to Atomic Predicates.
 	 * @param natIp
 	 */
 	public void natConfigurationAP() {	
@@ -84,8 +80,7 @@ public class NAT extends GenericFunction {
 	}
 
 	/**
-	 * Maximal Flows Algorithm
-	 * This method creates the hard constraints for the NAT configuration and status
+	 * This method creates the hard constraints for the NAT configuration specific to Maximal Flows
 	 * @param natIp
 	 */
 	public void natConfigurationMF(DatatypeExpr natIp) {

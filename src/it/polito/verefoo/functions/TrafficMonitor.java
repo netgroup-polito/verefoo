@@ -23,7 +23,7 @@ import it.polito.verefoo.solver.NetContextMF;
 public class TrafficMonitor extends GenericFunction{
 	DatatypeExpr trafficMonitor;
 	/**
-	 * Public constructor for the Traffic Monitor
+	 * Public constructor for the Traffic Monitor specific to Atomic Predicates
 	 * @param source It is the Allocation Node on which the forwarder is put
 	 * @param ctx It is the Z3 Context in which the model is generated
 	 * @param nctx It is the NetContext object to which constraints are sent
@@ -39,7 +39,7 @@ public class TrafficMonitor extends GenericFunction{
 	}
 
 	/**
-	 * Public constructor for the Traffic Monitor
+	 * Public constructor for the Traffic Monitor specific to Maximal Flows
 	 * @param source It is the Allocation Node on which the forwarder is put
 	 * @param ctx It is the Z3 Context in which the model is generated
 	 * @param nctx It is the NetContext object to which constraints are sent
@@ -56,9 +56,8 @@ public class TrafficMonitor extends GenericFunction{
 
 
     /**
-	 * Atomic Predicate Algorithm
-     * This method creates the forwarding rules for the traffic monitor.
-     * Since it does not provide any filtering behaviour, the traffic monitor sends all the received packets.
+     * This method creates the forwarding rules for the traffic monitor specific to Atomic Predicates.
+     * Since it does not provide any filtering behavior, the traffic monitor sends all the received packets.
      */
     public void trafficMonitorSendRulesAP (){
     	
@@ -72,8 +71,7 @@ public class TrafficMonitor extends GenericFunction{
     }
     
     /**
-	 * Maximal Flows Algorithm
-     * This method creates the forwarding rules for the traffic monitor.
+     * This method creates the forwarding rules for the traffic monitor specific to Maximal Flows.
      * Since it does not provide any filtering behaviour, the traffic monitor sends all the received packets.
      */
     public void trafficMonitorSendRulesMF (){

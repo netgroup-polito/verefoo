@@ -284,7 +284,7 @@ public class AllocationNodeAP {
 		forwardBehaviourList.add(ap);
 	}
 	/**
-	 * Setter method for the Dropped behavior list
+	 * Setter method for the dropped behavior
 	 * @param integer atomic predicate
 	 */
 	public void addDroppedPredicate(int ap) {

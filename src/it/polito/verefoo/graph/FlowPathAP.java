@@ -7,6 +7,10 @@ import it.polito.verefoo.allocation.AllocationNodeAP;
 import it.polito.verefoo.allocation.AllocationNodeMF;
 import it.polito.verefoo.jaxb.*;
 
+/** Represents a Flow Path specific for Atomic Predicates.
+*
+*
+*/
 public class FlowPathAP {
 	SecurityRequirement requirement;
 	int idFlow;
@@ -15,6 +19,12 @@ public class FlowPathAP {
 	Map<Integer, AtomicFlow> atomicFlowsMap = new HashMap<>();
 	Map<Integer, AtomicFlow> atomicFlowsToDiscardMap = new HashMap<>();
 	
+	/**
+    * Public constructor of Flow Path specific to Atomic Predicates.
+    * @param requirement
+    * @param path
+    * @param idFlow
+    */
 	public FlowPathAP(SecurityRequirement requirement, List<AllocationNodeAP> path, int idFlow) {
 		this.requirement = requirement;
 		this.path = path;

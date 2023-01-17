@@ -37,7 +37,7 @@ import it.polito.verefoo.utils.PacketFilterRule;
 import it.polito.verefoo.utils.Tuple;
 
 /** Represents a Packet Filter with the associated Access Control List
- *	For Maximal Flows Algorithm
+ *	for Maximal Flows Algorithm
  */
 public class PacketFilterMF extends GenericFunction{
 
@@ -118,7 +118,7 @@ public class PacketFilterMF extends GenericFunction{
 							action = (e.getAction().equals(ActionTypes.ALLOW)) ? true : false;
 						}else{
 							// if not specified the action of the rule is the opposite of the 
-							// default behaviour otherwise the rule would not be necessary
+							// default behavior otherwise the rule would not be necessary
 							if(n.getConfiguration().getFirewall().getDefaultAction() == null){
 								action = false;
 							}else

@@ -97,7 +97,7 @@ abstract public class GenericFunction {
 	 */
 	abstract public void addContraints(Optimize solver);
     
-	
+/*****************************************************************Atomic Predicate Methods******************************************************************************************/
     /**
      * This method creates an OR of recv functions
      * @param entry it is a Entry<AllocationNode, Set<AllocationNode>>
@@ -130,7 +130,7 @@ abstract public class GenericFunction {
 			return enumerateSend;
 	}
    
-    
+/*****************************************************************Maximal Flows Methods******************************************************************************************/
     /**
      * This method creates an OR of recv functions
      * @param entry it is a Entry<AllocationNode, Set<AllocationNode>>

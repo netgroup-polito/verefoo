@@ -28,7 +28,7 @@ public class LoadBalancer extends GenericFunction {
 	List<String> serversIPAddresses;
 	
 	/**
-	 * Constructor method for the Load Balancer class
+	 * Constructor method for the Load Balancer class specific to Atomic Predicates
 	 * @param source it is the node where the load balancer functions is installed
 	 * @param ctx it is the z3 context
 	 * @param nctx it is the NetContext object
@@ -45,7 +45,7 @@ public class LoadBalancer extends GenericFunction {
 	}
 
 	/**
-	 * Constructor method for the Load Balancer class
+	 * Constructor method for the Load Balancer class specific to atomic predicates
 	 * @param source it is the node where the load balancer functions is installed
 	 * @param ctx it is the z3 context
 	 * @param nctx it is the NetContext object
@@ -62,8 +62,7 @@ public class LoadBalancer extends GenericFunction {
 	}
 
 	/**
-	 * Atomic Predicate Algorithm
-	 * This method creates the z3 constraints.
+	 * This method creates the z3 constraints specific to Atomic Predicates.
 	 * @param lbIp it is the IP address of the load balancer
 	 */
 	public void loadBalancerConfigurationAP(DatatypeExpr lbIp) {
@@ -76,8 +75,7 @@ public class LoadBalancer extends GenericFunction {
 	}
 
 	/**
-	 * Maximal Flows Algorithm
-	 * This method creates the z3 constraints.
+	 * This method creates the z3 constraints specific to Maximal Flows.
 	 * @param lbIp it is the IP address of the load balancer
 	 */
 	public void loadBalancerConfigurationMF(DatatypeExpr lbIp) {

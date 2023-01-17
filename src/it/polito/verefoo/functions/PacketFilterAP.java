@@ -32,7 +32,7 @@ import it.polito.verefoo.solver.NetContextMF;
 import it.polito.verefoo.utils.Tuple;
 
 /** Represents a Packet Filter with the associated Access Control List
- * For Atomic Predicate Algorithm
+ * for Atomic Predicate Algorithm
  */
 public class PacketFilterAP extends GenericFunction{
 
@@ -88,14 +88,10 @@ public class PacketFilterAP extends GenericFunction{
 		
 		Node n = sourceAP.getNode();
 		if(n.getFunctionalType().equals(FunctionalTypes.FIREWALL)){
-			//System.out.println("Allowed");
 			for(Integer traffic : sourceAP.getForwardBehaviourList()) {
-				//System.out.println(traffic);
 				constraints.add(ctx.mkEq((BoolExpr)nctxAP.deny.apply(sourceAP.getZ3Name(), ctx.mkInt(traffic)), ctx.mkFalse()));
 			}
-			//System.out.println("Dropped");
 			for(Integer traffic : sourceAP.getDroppedList()) {
-				//System.out.println(traffic);
 				constraints.add(ctx.mkEq((BoolExpr)nctxAP.deny.apply(sourceAP.getZ3Name(), ctx.mkInt(traffic)), ctx.mkTrue()));
 			}
 		}

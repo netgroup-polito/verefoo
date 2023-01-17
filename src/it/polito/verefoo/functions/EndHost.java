@@ -19,6 +19,12 @@ import it.polito.verefoo.allocation.AllocationNodeMF;
 import it.polito.verefoo.graph.FlowPathMF;
 import it.polito.verefoo.solver.NetContextMF;
 
+
+/** Represents a EndHost functionality
+*
+*
+*/
+
 public class EndHost extends GenericFunction {
 
     List<BoolExpr> constraints = new ArrayList<BoolExpr>();
@@ -32,10 +38,10 @@ public class EndHost extends GenericFunction {
     Expr p_0;
 
     /**
-     * Public constructor of EndHost class
+     * Public constructor of EndHost class specific to Atomic Predicates
      * @param source it is the AllocationNode on which a client or server is installed
      * @param ctx it is the z3 Context variable
-     * @param nctx it is the NetContext object storing the needed information about z3 IP address variables
+     * @param nctx it is the NetContext object storing the needed information about z3 IP address variables for Atomic Predicates
      */
     public EndHost(AllocationNodeAP source, Context ctx, NetContextAP nctx) { 
     	 this.sourceAP = source;
@@ -49,10 +55,10 @@ public class EndHost extends GenericFunction {
     }
 
     /**
-     * Public constructor of EndHost class
+     * Public constructor of EndHost class specific to Maximal Flows
      * @param source it is the AllocationNode on which a client or server is installed
      * @param ctx it is the z3 Context variable
-     * @param nctx it is the NetContext object storing the needed information about z3 IP address variables
+     * @param nctx it is the NetContext object storing the needed information about z3 IP address variables for Maximal Flows 
      */
     public EndHost(AllocationNodeMF source, Context ctx, NetContextMF nctx) { 
     	 this.sourceMF = source;
@@ -87,6 +93,9 @@ public class EndHost extends GenericFunction {
         return;
     }
     
+    /**
+     * Configuration for Endhost in Atomic Predicates by adding constraints
+     */
     public void configureEndHostAP() {
     	for(Map<Integer, Integer> flowMap : sourceAP.getMapFlowIdAtomicPredicatesInInput().values()) {
     		for(Integer traffic : flowMap.values()) {
@@ -96,6 +105,9 @@ public class EndHost extends GenericFunction {
     	constraints.add(ctx.mkEq(nctxAP.deny.apply(sourceAP.getZ3Name(), ctx.mkInt(-1)), ctx.mkFalse()));
     }
 
+    /**
+     * Configuration for Endhost in Maximal Flows by adding constraints
+     */
     public void configureEndHostMF() {
     	for(FlowPathMF flow : sourceMF.getCrossingFlows().values()) {
     		for(Entry<Integer, MaximalFlow> maximalFlowEntry: flow.getMaximalFlowsMap().entrySet()) {
