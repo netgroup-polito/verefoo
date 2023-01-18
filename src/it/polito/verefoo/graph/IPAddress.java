@@ -1,11 +1,24 @@
 package it.polito.verefoo.graph;
 
+/**
+ * This class models the IPv4 address representation following four fields
+ * approach.
+ * Each one
+ * of these four fields represent a byte of the IPv4 address and can have a
+ * value
+ * between 0 and 255 or can be represented
+ * by
+ * a wild card (“*” represents concisely the full range [0, 255]).
+ *
+ */
 public class IPAddress {
+	
 	String firstByte;
 	String secondByte;
 	String thirdByte;
 	String fourthByte;
 	boolean neg;
+
 	
 	public IPAddress(IPAddress toCopy) {
 		super();
@@ -25,7 +38,17 @@ public class IPAddress {
 		this.neg = neg;
 	}
 	
-	
+	/**
+	 * This constructor simply populates the IPv4 address of "this" object including
+	 * the negation status.
+	 * 
+	 * @param firstByte  firstByte of the IPv4 address having value in [0-255]
+	 * @param secondByte secondByte of the IPv4 address having value in [0-255]
+	 * @param thirdByte  thirdByte of the IPv4 address having value in [0-255]
+	 * @param fourthByte fourthByte of the IPv4 address having value in [0-255]
+	 * @param neg        Negation status of the IPv4 address that is equivalent to
+	 *                   "!"
+	 */
 	public IPAddress(String fistByte, String secondByte, String thirdByte, String fourthByte, boolean neg) {
 		super();
 		this.firstByte = fistByte;
@@ -35,6 +58,15 @@ public class IPAddress {
 		this.neg = neg;
 	}
 	
+
+	/**
+	 * This constructor simply populates the IPv4 address of "this" object including
+	 * the negation status.
+	 * 
+	 * @param ip  Contains IPv4 address in string format
+	 * @param neg Negation status of the IPv4 address that is equivalent to
+	 *            "!"
+	 */
 	public IPAddress(String ip, boolean neg) {
 		if(ip.equals("*")) {
 			this.firstByte = "-1";
@@ -50,40 +82,85 @@ public class IPAddress {
 		}
 		this.neg = neg;	
 	}
-
+	/**
+	 * Getter method for the first byte of IPV4 address
+	 * @return the first byte
+	 */
 	public String getFirstByte() {
 		return firstByte;
 	}
+	/**
+	 * Setter method for the first byte of the IPV4 address
+	 * @param fistByte It is the first byte of the IPV4 address
+	 */
 	public void setFirstByte(String fistByte) {
 		this.firstByte = fistByte;
 	}
+	/**
+	 * Getter method for the second byte of IPV4 address
+	 * @return the second byte
+	 */
 	public String getSecondByte() {
 		return secondByte;
 	}
+	/**
+	 * Setter method for the second byte of the IPV4 address
+	 * @param secondByte Is the second byte of the IPV4 address
+	 */
 	public void setSecondByte(String secondByte) {
 		this.secondByte = secondByte;
 	}
+	/**
+	 * Getter method for the third byte of IPV4 address
+	 * @return the third byte
+	 */
 	public String getThirdByte() {
 		return thirdByte;
 	}
+	/**
+	 * Setter method for the third byte of the IPV4 address
+	 * @param thirdByte Is the third byte of the IPV4 address
+	 */
 	public void setThirdByte(String thirdByte) {
 		this.thirdByte = thirdByte;
 	}
+	/**
+	 * Getter method for the fourth byte of IPV4 address
+	 * @return the fourth byte
+	 */
 	public String getFourthByte() {
 		return fourthByte;
 	}
+	/**
+	 * Setter method for the fourth byte of the IPV4 address
+	 * @param fourthByte Is the fourth byte of the IPV4 address
+	 */
 	public void setFourthByte(String fourthByte) {
 		this.fourthByte = fourthByte;
 	}
+	/**
+	 * Checks if the IPv4 negation status is true
+	 * @return True if negation exist, False otherwise.
+	 */
 	public boolean isNeg() {
 		return neg;
 	}
+	/**
+	 * Setter method for the negation status of IPv4
+	 * @param neg Is the negation status
+	 */
 	public void setNeg(boolean neg) {
 		this.neg = neg;
 	}
 
-	/* function that checks if "this" is included in ip (NOTE: ip should use wildcards)
-	   NOTE: here not considering if neg or not */
+	/**
+	 * Checks if "this" is included in the parameter 'ip' or equal to it. 'ip'
+	 * should use wildcards to represent a range of
+	 * IPv4 addresses and neg is not considered here.
+	 * 
+	 * @param ip Contains IPv4 address
+	 * @return True if "this" is included or equal to 'ip', False otherwise.
+	 */
 	public boolean isIncludedIn(IPAddress ip) {
 		if((firstByte.equals(ip.getFirstByte()) || ip.getFirstByte().equals("-1")) 
 				&& (secondByte.equals(ip.getSecondByte()) || ip.getSecondByte().equals("-1"))
@@ -93,7 +170,13 @@ public class IPAddress {
 		return false;
 	}
 	
-	
+	/**
+	 * Checks if all the bytes within the IPAddress ("this") are equal to the
+	 * wild card.
+	 * 
+	 * @return True if all the bytes within the IPAddress are equal to the wildcard,
+	 *         False otherwise.
+	 */	
 	public boolean equalsStar() {
 		if(firstByte.equals("-1") && secondByte.equals("-1") && thirdByte.equals("-1") && fourthByte.equals("-1"))
 			return true;
@@ -117,7 +200,13 @@ public class IPAddress {
 		return false;
 	}
 	
-	//fuction that checks if "this" is equal to ip, but without considering the neg attribute
+	/**
+	 * Checks if "this" is equal to 'ip' without considering the neg attribute
+	 * 
+	 * @param ip Contains IPv4 address
+	 * @return True if the two IPAddresses have the same values for all bytes, False
+	 *         otherwise.
+	 */
 	public boolean equalFileds(IPAddress ip) {
 		if(firstByte.equals(ip.getFirstByte()) && secondByte.equals(ip.getSecondByte()) &&
 				thirdByte.equals(ip.getThirdByte()) && fourthByte.equals(ip.getFourthByte()))

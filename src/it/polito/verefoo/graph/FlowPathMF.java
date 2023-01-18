@@ -17,7 +17,6 @@ public class FlowPathMF {
 	SecurityRequirement requirement;
 	int idFlow;
 	List<AllocationNodeMF> path;
-	
 	//<id of maximal flow, maximal flow>
 	Map<Integer, MaximalFlow> maximalFlowsMap = new HashMap<>();
 	

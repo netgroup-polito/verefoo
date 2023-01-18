@@ -22,7 +22,7 @@ import it.polito.verefoo.solver.NetContextMF;
 /** Represents a Packet Filter with the associated Access Control List
  *
  */
-public class StatefulPacketFilter extends GenericFunction{
+public class StatefulPacketFilter extends GenericFunction{ // This class is not used for now
 
 	FuncDecl filtering_function;
 	boolean autoConfigured;

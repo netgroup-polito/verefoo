@@ -17,7 +17,7 @@ import it.polito.verefoo.allocation.AllocationNodeMF;
 import it.polito.verefoo.graph.FlowPathMF;
 import it.polito.verefoo.solver.NetContextMF;
 
-/** Represents a Forwarder
+/** Represents a Traffic Monitor
  *
  */
 public class TrafficMonitor extends GenericFunction{

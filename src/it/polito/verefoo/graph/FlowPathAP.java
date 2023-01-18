@@ -12,6 +12,7 @@ import it.polito.verefoo.jaxb.*;
 *
 */
 public class FlowPathAP {
+	
 	SecurityRequirement requirement;
 	int idFlow;
 	private List<AllocationNodeAP> path;
@@ -34,11 +35,17 @@ public class FlowPathAP {
 			node.addCrossingFlow(this);
 		}
 	}
-
+	/**
+	 * Getter method for security requirement
+	 * @return the security requirement
+	 */
 	public SecurityRequirement getRequirement() {
 		return requirement;
 	}
-
+	/**
+	 * Setter method for the security requirement
+	 * @param requirement It is the security requirement.
+	 */
 	public void setRequirement(SecurityRequirement requirement) {
 		this.requirement = requirement;
 	}

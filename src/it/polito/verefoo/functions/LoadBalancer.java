@@ -45,7 +45,7 @@ public class LoadBalancer extends GenericFunction {
 	}
 
 	/**
-	 * Constructor method for the Load Balancer class specific to atomic predicates
+	 * Constructor method for the Load Balancer class specific to Maximal Flows
 	 * @param source it is the node where the load balancer functions is installed
 	 * @param ctx it is the z3 context
 	 * @param nctx it is the NetContext object
@@ -88,7 +88,7 @@ public class LoadBalancer extends GenericFunction {
 
 	/**
 	 * This method allows to wrap the method which adds the constraints inside Z3 solver
-	 * @param solver Istance of Z3 solver
+	 * @param solver Instance of Z3 solver
 	 */
 	@Override
 	public void addContraints(Optimize solver) {
