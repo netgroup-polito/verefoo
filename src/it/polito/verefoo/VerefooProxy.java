@@ -106,13 +106,13 @@ public class VerefooProxy {
 		
 		if(AlgoUsed.equals("AP")){
 			
-		// Initialitation of the variables related to the nodes
+		// Initialization of the variables related to the nodes
 		allocationNodesAP = new HashMap<>();
 		nodes = graph.getNode();
 		nodes.forEach(n -> allocationNodesAP.put(n.getName(), new AllocationNodeAP(n))); // class for AP
 		wildcardManager = new WildcardManager(allocationNodesAP);
 			
-		// Initialitation of the variables related to the requirements
+		// Initialization of the variables related to the requirements
 		properties = prop;
 		securityRequirements = new HashMap<>();
 		int idRequirement = 0;
@@ -1605,7 +1605,7 @@ public class VerefooProxy {
 		}
 		System.out.println();
 	}
-
+	// only for MF method
 	private void generateMaximalFlows() {
 		System.out.println("Number of starting flows "+ trafficFlowsMapMF.size());
 		int counter = 0;

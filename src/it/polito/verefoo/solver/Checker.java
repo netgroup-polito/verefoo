@@ -96,6 +96,9 @@ public class Checker {
 		solver.setParameters(p);
 	}
 	
+	
+/***************************************************************Atomic Predicates Methods*********************************************************************************************/
+	
 	/**
 	 * Thus method adds hard and soft constraints in the solver
 	 */
@@ -104,16 +107,7 @@ public class Checker {
 		constraintList.forEach(boolExpr->this.solver.Add(boolExpr));
 		nctxAP.addConstraints(solver);
 	}
-	
-	/**
-	 * Thus method adds hard and soft constraints in the solver
-	 */
-	public void addConstraintsMF() {
-		allocationNodesMF.values().forEach(node->node.addConstraints(solver));
-		constraintList.forEach(boolExpr->this.solver.Add(boolExpr));
-		nctxMF.addConstraints(solver);
-	}
-	
+		
 	/**
 	 * This method starts the z3 solver to solve the MaxSMT problem
 	 * @return
@@ -133,56 +127,7 @@ public class Checker {
 		solver.Pop();
 		return new VerificationResult(ctx, result, nctxAP, assertions, model);
 	}
-	
-	/**
-	 * This method starts the z3 solver to solve the MaxSMT problem
-	 * @return
-	 */
-	public VerificationResult propertyCheckMF(){
-		solver.Push();
-		addConstraintsMF();
-		  long startTime = System.currentTimeMillis();
 
-		result = this.solver.Check(); 
-		long stopTime = System.currentTimeMillis();
-	    long elapsedTime = stopTime - startTime;
-	     timeChecker = elapsedTime;
-	     System.out.println("single checker time " +timeChecker);
-		model = (result == Status.SATISFIABLE) ? this.solver.getModel() : null;
-		logAssertions();
-		solver.Pop();
-		return new VerificationResult(ctx, result, nctxMF, assertions, model);
-	}	
-	
-	public long getTimeChecker() {
-		return timeChecker;
-	}
-
-
-	public void setTimeChecker(long timeChecker) {
-		this.timeChecker = timeChecker;
-	}
-
-
-	/**
-	 * This method prints the assertions of the z3 model in the log.
-	 * old versions of z3 did not provide solver.getAssertions() method
-	 * so if you want to use, it has to be commented
-	 */
-	private void logAssertions()  {	
-		/*
-		Logger logger = LogManager.getLogger("assertions");
-		StringWriter stringWriter = new StringWriter();
-		assertions = solver.getAssertions();
-		Arrays.asList(assertions).forEach(t-> stringWriter.append(t+"\n\n"));
-		if(model!=null){
-			logger.debug("---------- Assertions: "+assertions.length);	
-		}
-		*/
-	}
-
-
-	
 	/**
 	 * This method is invoked by VerefooProxy to generate the z3 constraints for each security requirement
 	 * @param sr It is the requirement that must be modeled in z3 language
@@ -202,28 +147,7 @@ public class Checker {
 				break;
 		}
 	}
-
-	/**
-	 * This method is invoked by VerefooProxy to generate the z3 constraints for each security requirement
-	 * @param sr It is the requirement that must be modeled in z3 language
-	 * @param propType It is the type of the security requirement
-	 */
-	public void createRequirementConstraintsMF(SecurityRequirement sr, Prop propType) {
-		
-		switch (propType) {
-			case ISOLATION:
-				createIsolationConstraintsMF(sr);
-				break;
-			case REACHABILITY:
-				createReachabilityConstraintMF(sr);
-				break;
-			case COMPLETE_REACHABILITY:
-				createCompleteReachabilityConstraintMF(sr);
-				break;
-		}
-	}
-
-
+	
 	/**
 	 * Atomic Predicate Algorithm
 	 * This method generates the constraints for a reachability requirement
@@ -249,38 +173,6 @@ public class Checker {
 				}
 				
 
-				BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
-				BoolExpr finalConstraint = ctx.mkAnd(singleConstraints.toArray(arrayConstraints));
-				pathConstraints.add(finalConstraint);
-			}
-		}
-		
-	
-		BoolExpr[] arrayConstraints = new BoolExpr[pathConstraints.size()];
-		BoolExpr finalConstraint = ctx.mkOr(pathConstraints.toArray(arrayConstraints));
-		constraintList.add(finalConstraint);
-	}
-	
-
-	/**
-	 * Maximal flow algorithm
-	 * This method generates the constraints for a reachability requirement
-	 * @param sr It is the requirement that must be modeled in z3 language
-	 * @param propType It is the type of the security requirement
-	 */
-	private void createReachabilityConstraintMF(SecurityRequirement sr) {
-		
-		List<BoolExpr> pathConstraints = new ArrayList<>();
-		Map<Integer, FlowPathMF> allFlows = sr.getFlowsMapMF();
-		
-		for(FlowPathMF flow : allFlows.values()) {
-			for(Map.Entry<Integer, MaximalFlow> maximalFlowEntry: flow.getMaximalFlowsMap().entrySet()) {
-				
-				List<BoolExpr> singleConstraints = new ArrayList<>();
-				for(AllocationNodeMF node : flow.getPath()) {
-					singleConstraints.add(ctx.mkImplies(node.getPlacedNF().getUsed(), ctx.mkEq( (BoolExpr)nctxMF.deny.apply(node.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey())), ctx.mkFalse())));
-				}
-				
 				BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
 				BoolExpr finalConstraint = ctx.mkAnd(singleConstraints.toArray(arrayConstraints));
 				pathConstraints.add(finalConstraint);
@@ -326,35 +218,6 @@ public class Checker {
 		BoolExpr finalConstraint = ctx.mkOr(pathConstraints.toArray(arrayConstraints));
 		constraintList.add(finalConstraint);
 	}
-
-	private void createCompleteReachabilityConstraintMF(SecurityRequirement sr) {
-		
-		Map<Integer, FlowPathMF> allFlows = sr.getFlowsMapMF();
-		List<BoolExpr> pathConstraints = new ArrayList<>();
-		
-		for(FlowPathMF flow : allFlows.values()) {
-			List<BoolExpr> maximalFlowConstraintsInsideFlowPath = new ArrayList<>();
-			for(Map.Entry<Integer, MaximalFlow> maximalFlowEntry: flow.getMaximalFlowsMap().entrySet()) {
-				
-				List<BoolExpr> singleConstraints = new ArrayList<>();
-				for(AllocationNodeMF node : flow.getPath()) {
-					singleConstraints.add(ctx.mkImplies(node.getPlacedNF().getUsed(), ctx.mkEq( (BoolExpr)nctxMF.deny.apply(node.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey())), ctx.mkFalse())));
-				}
-				
-				BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
-				BoolExpr maximalFlowConstraint = ctx.mkAnd(singleConstraints.toArray(arrayConstraints));
-				maximalFlowConstraintsInsideFlowPath.add(maximalFlowConstraint);
-			}
-			
-			BoolExpr[] tmp = new BoolExpr[maximalFlowConstraintsInsideFlowPath.size()];
-			BoolExpr pathConstraint = ctx.mkAnd(maximalFlowConstraintsInsideFlowPath.toArray(tmp));
-			pathConstraints.add(pathConstraint);
-		}
-	
-		BoolExpr[] arrayConstraints = new BoolExpr[pathConstraints.size()];
-		BoolExpr finalConstraint = ctx.mkOr(pathConstraints.toArray(arrayConstraints));
-		constraintList.add(finalConstraint);
-	}
 	
 	/**
 	 * Atomic Predicate Algorithm
@@ -390,6 +253,145 @@ public class Checker {
 		
 		BoolExpr[] arrayConstraints = new BoolExpr[pathConstraints.size()];
 		BoolExpr finalConstraint = ctx.mkAnd(pathConstraints.toArray(arrayConstraints));
+		constraintList.add(finalConstraint);
+	}
+	
+	public long getTimeChecker() {
+		return timeChecker;
+	}
+
+
+	public void setTimeChecker(long timeChecker) {
+		this.timeChecker = timeChecker;
+	}
+
+	/**
+	 * This method prints the assertions of the z3 model in the log.
+	 * old versions of z3 did not provide solver.getAssertions() method
+	 * so if you want to use, it has to be commented
+	 */
+	private void logAssertions()  {	
+		/*
+		Logger logger = LogManager.getLogger("assertions");
+		StringWriter stringWriter = new StringWriter();
+		assertions = solver.getAssertions();
+		Arrays.asList(assertions).forEach(t-> stringWriter.append(t+"\n\n"));
+		if(model!=null){
+			logger.debug("---------- Assertions: "+assertions.length);	
+		}
+		*/
+	}
+
+/***********************************************************************Maximal Flows Methods*****************************************************************************************/
+	
+	/**
+	 * Thus method adds hard and soft constraints in the solver
+	 */
+	public void addConstraintsMF() {
+		allocationNodesMF.values().forEach(node->node.addConstraints(solver));
+		constraintList.forEach(boolExpr->this.solver.Add(boolExpr));
+		nctxMF.addConstraints(solver);
+	}
+	
+	/**
+	 * This method starts the z3 solver to solve the MaxSMT problem
+	 * @return
+	 */
+	public VerificationResult propertyCheckMF(){
+		solver.Push();
+		addConstraintsMF();
+		  long startTime = System.currentTimeMillis();
+
+		result = this.solver.Check(); 
+		long stopTime = System.currentTimeMillis();
+	    long elapsedTime = stopTime - startTime;
+	     timeChecker = elapsedTime;
+	     System.out.println("single checker time " +timeChecker);
+		model = (result == Status.SATISFIABLE) ? this.solver.getModel() : null;
+		logAssertions();
+		solver.Pop();
+		return new VerificationResult(ctx, result, nctxMF, assertions, model);
+	}	
+	
+	/**
+	 * This method is invoked by VerefooProxy to generate the z3 constraints for each security requirement
+	 * @param sr It is the requirement that must be modeled in z3 language
+	 * @param propType It is the type of the security requirement
+	 */
+	public void createRequirementConstraintsMF(SecurityRequirement sr, Prop propType) {
+		
+		switch (propType) {
+			case ISOLATION:
+				createIsolationConstraintsMF(sr);
+				break;
+			case REACHABILITY:
+				createReachabilityConstraintMF(sr);
+				break;
+			case COMPLETE_REACHABILITY:
+				createCompleteReachabilityConstraintMF(sr);
+				break;
+		}
+	}
+	
+
+	/**
+	 * Maximal flow algorithm
+	 * This method generates the constraints for a reachability requirement
+	 * @param sr It is the requirement that must be modeled in z3 language
+	 * @param propType It is the type of the security requirement
+	 */
+	private void createReachabilityConstraintMF(SecurityRequirement sr) {
+		
+		List<BoolExpr> pathConstraints = new ArrayList<>();
+		Map<Integer, FlowPathMF> allFlows = sr.getFlowsMapMF();
+		
+		for(FlowPathMF flow : allFlows.values()) {
+			for(Map.Entry<Integer, MaximalFlow> maximalFlowEntry: flow.getMaximalFlowsMap().entrySet()) {
+				
+				List<BoolExpr> singleConstraints = new ArrayList<>();
+				for(AllocationNodeMF node : flow.getPath()) {
+					singleConstraints.add(ctx.mkImplies(node.getPlacedNF().getUsed(), ctx.mkEq( (BoolExpr)nctxMF.deny.apply(node.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey())), ctx.mkFalse())));
+				}
+				
+				BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
+				BoolExpr finalConstraint = ctx.mkAnd(singleConstraints.toArray(arrayConstraints));
+				pathConstraints.add(finalConstraint);
+			}
+		}
+		
+	
+		BoolExpr[] arrayConstraints = new BoolExpr[pathConstraints.size()];
+		BoolExpr finalConstraint = ctx.mkOr(pathConstraints.toArray(arrayConstraints));
+		constraintList.add(finalConstraint);
+	}
+	
+
+	private void createCompleteReachabilityConstraintMF(SecurityRequirement sr) {
+		
+		Map<Integer, FlowPathMF> allFlows = sr.getFlowsMapMF();
+		List<BoolExpr> pathConstraints = new ArrayList<>();
+		
+		for(FlowPathMF flow : allFlows.values()) {
+			List<BoolExpr> maximalFlowConstraintsInsideFlowPath = new ArrayList<>();
+			for(Map.Entry<Integer, MaximalFlow> maximalFlowEntry: flow.getMaximalFlowsMap().entrySet()) {
+				
+				List<BoolExpr> singleConstraints = new ArrayList<>();
+				for(AllocationNodeMF node : flow.getPath()) {
+					singleConstraints.add(ctx.mkImplies(node.getPlacedNF().getUsed(), ctx.mkEq( (BoolExpr)nctxMF.deny.apply(node.getZ3Name(), ctx.mkInt(maximalFlowEntry.getKey())), ctx.mkFalse())));
+				}
+				
+				BoolExpr[] arrayConstraints = new BoolExpr[singleConstraints.size()];
+				BoolExpr maximalFlowConstraint = ctx.mkAnd(singleConstraints.toArray(arrayConstraints));
+				maximalFlowConstraintsInsideFlowPath.add(maximalFlowConstraint);
+			}
+			
+			BoolExpr[] tmp = new BoolExpr[maximalFlowConstraintsInsideFlowPath.size()];
+			BoolExpr pathConstraint = ctx.mkAnd(maximalFlowConstraintsInsideFlowPath.toArray(tmp));
+			pathConstraints.add(pathConstraint);
+		}
+	
+		BoolExpr[] arrayConstraints = new BoolExpr[pathConstraints.size()];
+		BoolExpr finalConstraint = ctx.mkOr(pathConstraints.toArray(arrayConstraints));
 		constraintList.add(finalConstraint);
 	}
 	
