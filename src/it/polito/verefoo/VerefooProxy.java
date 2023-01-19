@@ -169,14 +169,14 @@ public class VerefooProxy {
 
 		if(AlgoUsed.equals("MF")){
 			
-		// Initialitation of the variables related to the nodes
+		// Initialization of the variables related to the nodes
 		allocationNodesMF = new HashMap<>();
 		nodes = graph.getNode();
 		nodes.forEach(n -> allocationNodesMF.put(n.getName(), new AllocationNodeMF(n))); // class for MF
 		wildcardManager = new WildcardManager(allocationNodesMF,"MF"); // constructor for MF
 			
 		
-		// Initialitation of the variables related to the requirements
+		// Initialization of the variables related to the requirements
 		properties = prop;
 		securityRequirements = new HashMap<>();
 		int idRequirement = 0;
@@ -200,7 +200,7 @@ public class VerefooProxy {
 		/*
 		 * Main sequence of methods in VerefooProxy for Maximal Flows:
 		 * 1) given every requirement, all the possible paths of the related flows are computed;
-		 * 2) the existing functions are istanciated
+		 * 2) the existing functions are instantiated
 		 * 3) the functions to be allocated are associated to Allocation Places
 		 * 4) the possible traffic in input to each node is computed
 		 * 5) soft and hard constraints are defined for each function
@@ -228,6 +228,13 @@ public class VerefooProxy {
 
 	}
 /**************************************************Atomic Predicate Methods **************************************************************/
+	
+	/**
+	 * This function receives in input a set of already computed Atomic Predicates
+	 * (atomicPredicates) and a set of Predicates (predicates), not yet atomic, to convert
+	 * and add to the set.
+	 */
+	
 	private void computeAtomicFlows() {
 		ExecutorService threadPool = Executors.newFixedThreadPool(10);
 		List<Future<?>> tasks = new ArrayList<Future<?>>();
@@ -412,13 +419,15 @@ public class VerefooProxy {
 				System.out.println();
 			}
 		}
-	}
-	*
-	/* Compute the structures of support for transformers: for each NAT compute the transforming map, for each FIREWALL its deny/allow lists 
+	}*/
+
+	/**
+	 * Compute the structures of support for transformers: for each NAT compute the transforming map, for each FIREWALL its deny/allow lists 
 	 * i.e. a NAT will have a map of entry for example {10: 5} which means that the atomic predicates 10 arrives at the nat and it is transformed in
 	 * atomic predicate 5.
-	 * a firewall instead will have a list of id foe example [1,2,5,6,10 ...], that are the identifiers of atomic predicates allowed to cross the firewall,
-	 * all the other predicates will be dropped */
+	 * a fire wall instead will have a list of id for example [1,2,5,6,10 ...], that are the identifiers of atomic predicates allowed to cross the firewall,
+	 * all the other predicates will be dropped 
+	 */
 	private void fillTransformationMap() {
 		System.out.println("Filling transformers map");
 		for(Node node: transformersNode.values()) {
@@ -488,8 +497,8 @@ public class VerefooProxy {
 						notChaingingPredicateList.add(apEntry.getKey());
 					}
 				}
-				//Fill the map: to each shadowing predicate assign the corresponding shadowed predicate, to each reconversion predicate assign the corresponding
-				//list of reconverted predicates. NOTE: take also in consideration the ports and prototype of the predicate
+				//Fill the map: to each shadowing predicate assign the corresponding shadowed predicate, to each re conversion predicate assign the corresponding
+				//list of re converted predicates. NOTE: take also in consideration the ports and prototype of the predicate
 				for(HashMap.Entry<String, List<Integer>> entry: shadowingMap.entrySet()) {
 					for(Integer shing: entry.getValue()) {
 						List<Integer> result = new ArrayList<>();
@@ -523,8 +532,10 @@ public class VerefooProxy {
 		System.out.println();
 	}
 	
-	/* Starting from source and destination of each requirement, compute related atomic predicates. Then add to the computed set
-	 * also atomic predicates representing input packet classes for each transformer (here we are considering only NAT and firewall)*/
+	/** This function, starting from source and destination of each requirement, computes the related atomic predicates. Then add to the computed set
+	 * also atomic predicates representing input packet classes for each transformer (here we are considering only NAT and firewall)
+	 * @return HashMap<Integer,Predicate> mapping the predicates to integers
+	 * */
 	private HashMap<Integer, Predicate> generateAtomicPredicateNew(){
 		List<Predicate> predicates = new ArrayList<>();
 		List<Predicate> atomicPredicates = new ArrayList<>();
@@ -881,7 +892,7 @@ public class VerefooProxy {
 
 
 	/**
-	 * This method creates the hard constraints in the z3 model for reachability and isolation requirements.
+	 * This method creates the hard constraints in the z3 model for reach-ability and isolation requirements.
 	 */
 	private void formalizeRequirementsAP() {
 		
@@ -972,7 +983,7 @@ public class VerefooProxy {
 	}
 
 	/**
-	 * This method is recursively called to generate the path of nodes for each requirement.
+	 * This method is recursively called to generate the path of nodes for each requirement specific to Atomic Predicates.
 	 * @param allPaths it is the list of all the paths that have been computed for the requirement
 	 * @param currentPath it is the current path that the method is building 
 	 * @param source it is the source of the path
@@ -1032,7 +1043,7 @@ public class VerefooProxy {
 
 	
 	/**
-	 * This method generates the NetContext object for the initialization of z3 model.
+	 * This method generates the NetContext object for the initialization of z3 model specific to atomic Predicates.
 	 * @param ctx2 it is the z3 Context object
 	 * @param nodes2 is is the list of nodes of the Allocation Graph
 	 * @param prop it is the list of properties to be satisfied
@@ -1202,7 +1213,7 @@ public class VerefooProxy {
 
 	
 	/**
-	 * This method allocates the functions on allocation nodes that are empty.
+	 * This method allocates the functions on allocation nodes that are empty specific to Maximal Flows.
 	 * At the moment only packet-filtering capability is allocated, in the future the decision will depend on the type of requirement.
 	 */
 	private void allocateFunctionsMF() {
@@ -1219,7 +1230,7 @@ public class VerefooProxy {
 	}
 	
 	/**
-	 * This method is recursively called to generate the path of nodes for each requirement.
+	 * This method is recursively called to generate the path of nodes for each requirement specific to Maximal flows.
 	 * @param allPaths it is the list of all the paths that have been computed for the requirement
 	 * @param currentPath it is the current path that the method is building 
 	 * @param source it is the source of the path
@@ -1277,7 +1288,7 @@ public class VerefooProxy {
 	}
 	
 	/**
-	 * For each requirement, this method identifies all the possible the paths of nodes that must be crossed by the traffic flows that are related to the requirement.
+	 * For each requirement, this method identifies all the possible the paths of nodes that must be crossed by the traffic flows that are related to the requirement specific to Maximal Flows.
 	 * @return the map of all the traffic flows
 	 */
 	private HashMap<Integer, FlowPathMF> generateFlowPathsMF(){
@@ -1347,7 +1358,7 @@ public class VerefooProxy {
 	 * @param ctx2 it is the z3 Context object
 	 * @param nodes2 is is the list of nodes of the Allocation Graph
 	 * @param prop it is the list of properties to be satisfied
-	 * @param allocationNodes2 it is the list of allocation nodes
+	 * @param allocationNodes2 it is the list of Maximal flows allocation nodes
 	 * @return the NetContext object
 	 */
 	private NetContextMF nctxGenerateMF(Context ctx2, List<Node> nodes2, List<Property> prop,
@@ -1372,7 +1383,7 @@ public class VerefooProxy {
 	
 	
 	/**
-	 * This method creates the hard constraints in the z3 model for reachability and isolation requirements.
+	 * This method creates the hard constraints in the z3 model for reach-ability and isolation requirements.
 	 */
 	private void formalizeRequirementsMF() {
 		

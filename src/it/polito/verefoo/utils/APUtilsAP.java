@@ -10,6 +10,11 @@ import it.polito.verefoo.graph.PortInterval;
 import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.jaxb.L4ProtocolTypes;
 
+
+/**
+ * This class contains utilities used only by Atomic Predicates algorithm when calculating predicates.
+ */
+
 public class APUtilsAP {
 	
 	public APUtilsAP() {}
@@ -17,6 +22,15 @@ public class APUtilsAP {
 	//Given a list of already computed atomicPredicates and a list of new predicates to insert into the list, transfrom predicates into atomic
 	//predicates, add them to the list and return the new list
 	//Algorithm 3 Yang_Lam_2015
+	
+	/**
+	 * This function receives in input a set of already computed Atomic Predicates
+	 * (atomicPredicates) and a set of Predicates (predicates), not yet atomic, to convert
+	 * and add to the set.
+	 * @param atomicPredicates set of already computed Atomic Predicates.
+	 * @param predicates set of Predicates not yet atomic 
+	 * @return List<Predicate> list of atomic predicates
+	 */
 	public List<Predicate> computeAtomicPredicates(List<Predicate> atomicPredicates, List<Predicate> predicates){
 		List<Predicate> newAtomicPredicates = new ArrayList<>();
 		Predicate first = null;
@@ -84,8 +98,13 @@ public class APUtilsAP {
 		return atomicPredicates;
 	}
 
-	//function that checks if ip1 is included in ip2 (NOTE: ip should use wildcards)
 	//NOTE: here not considering if neg or not
+	/**
+	 * This function that checks if IP address one is included in IP address 2 (NOTE: IP should use wild cards)
+	 * @param ip1 the first IP address
+	 * @param ip2 the second IP address
+	 * @return True if IP1 included in IP2, false otherwise.
+	 */
 	public boolean isIncludedIPString(String ip1, String ip2) {
 		String fields1[] = ip1.split("\\.");
 		String fields2[] = ip2.split("\\.");
@@ -168,7 +187,12 @@ public class APUtilsAP {
 			return neg;
 	}
 	
-	//return true if the two predicates are equal
+	/**
+	 * This function that checks if Predicate one is equal to Predicate two (NOTE: IP should use wild cards)
+	 * @param p1 the first predicate
+	 * @param p2 the second predicate
+	 * @return True if p1 is equal to p2, false otherwise.
+	 */
 	public boolean APCompare(Predicate p1, Predicate p2) {
 		//comparing lists size
 		if(p1.getIPSrcList().size() != p2.getIPSrcList().size() || p1.getIPDstList().size() != p2.getIPDstList().size() 
@@ -186,19 +210,34 @@ public class APUtilsAP {
 			return false;
 		return APComparePrototypeList(p1.getProtoTypeList(), p2.getProtoTypeList());
 	}
-	
+	/**
+	 * This function that checks if Protocol list one is equal to Protocol list two
+	 * @param list1 is the first protocol list
+	 * @param list2 is the second protocol list
+	 * @return True if list1 is equal to list2, false otherwise.
+	 */
 	public boolean APComparePrototypeList(List<L4ProtocolTypes> list1, List<L4ProtocolTypes> list2) {
 		if(!list1.containsAll(list2))
 			return false;
 		return true;
 	}
-	
+	/**
+	 * This function that checks if PortInterval list one is equal to PortInterval list two
+	 * @param list1 is the first PortInterval list
+	 * @param list2 is the second PortInterval list
+	 * @return True if list1 is equal to list2, false otherwise.
+	 */
 	public boolean APComparePortList(List<PortInterval> list1, List<PortInterval> list2) {
 		if(!list1.containsAll(list2))
 			return false;
 		return true;
 	}
-	
+	/**
+	 * This function that checks if the Predicate is included in the Predicate list
+	 * @param p the predicate
+	 * @param list is the list of predicate
+	 * @return True if p is included in list, false otherwise.
+	 */
 	public boolean isPredicateContainedIn(Predicate p, List<Predicate> list) {
 		for(Predicate p2: list) {
 			if(APCompare(p, p2))
@@ -207,7 +246,11 @@ public class APUtilsAP {
 		return false;
 	}
 	
-	//Compute atomic predicates considering the neg list of a predicate
+	/**
+	 * This function atomic predicates considering the negation list of a predicate
+	 * @param predicates is the list of predicates
+	 * @return List of computed atomic predicates
+	 */
 	public List<Predicate> computeAtomicPredicatesForNeg(List<Predicate> predicates){
 		List<Predicate> retList = new ArrayList<>();
 		List<Predicate> tmpList = new ArrayList<>();
@@ -236,7 +279,12 @@ public class APUtilsAP {
 		return retList;
 	}
 	
-	//Compute the intersection of two IPAddress (if the intersection exists, otherwise it returns an empty list)
+	/**
+	 * This function computes the intersection between two IP addresses
+	 * @param ip1 first IP address
+	 * @param ip2 second IP address
+	 * @return List of intersection of IP addresses if intersection exist, empty list otherwise.
+	 */
 	public List<IPAddress> intersectionIPAddressNew(IPAddress ip1, IPAddress ip2){
 		List<IPAddress> retList = new ArrayList<>();
 		if(!ip1.isNeg() && !ip2.isNeg()) { //both not neg
@@ -290,7 +338,12 @@ public class APUtilsAP {
 		return retList;
 	}
 	
-	//Compute the intersection of two PortInterval (if the intersection exists, otherwise it returns an empty list)
+	/**
+	 * This function computes the intersection between two PortInterval
+	 * @param pi1 first PortInterval
+	 * @param pi2 second PortInterval
+	 * @return List of intersection of PortIntervals if intersection exist, empty list otherwise.
+	 */
 	public List<PortInterval> intersectionPortIntervalNew(PortInterval pi1, PortInterval pi2){
 		List<PortInterval> retList = new ArrayList<>();
 		if(!pi1.isNeg() && !pi2.isNeg()) { //both not neg
@@ -347,6 +400,12 @@ public class APUtilsAP {
 	}
 	
 	//Computes the intersection between two predicates and returns the resulting predicate or null 
+	/**
+	 * This function computes the intersection between two predicates
+	 * @param p1 the first predicate
+	 * @param p2 the second predicate
+	 * @return Predicate result if intersection exist, null otherwise.
+	 */
 	public Predicate computeIntersection(Predicate p1, Predicate p2){
 		//Check IPSrc
 		List<IPAddress> resultIPSrcList = p2.getIPSrcList();
@@ -465,11 +524,14 @@ public class APUtilsAP {
 		resultPredicate.setProtoTypeList(resultProtoList);
 		return resultPredicate;
 	}
-	
-	/* Compute rules for firewall */
-	//toAdd is the ALLOW rule to insert, denied is the list of denied predicates
-	//return allowed = rule-i AND !denied
+
 	List<Predicate> negDeniedRuleList;
+	/**
+	 * This function computes rules for firewall
+	 * @param toAdd is the Allow rule to insert
+	 * @param deniedList is the list of denied predicates
+	 * @return List of Predicates allowed rules computed as allowed = rule-i AND !denied
+	 */
 	public List<Predicate> computeAllowedForRule(Predicate toAdd, List<Predicate> deniedList, boolean deniedListChanged){
 		List<Predicate> retList = new ArrayList<>();
 		List<Predicate> tmpList = new ArrayList<>();
@@ -500,7 +562,12 @@ public class APUtilsAP {
 		return retList;
 	}
 	
-	//compute the difference between two sets: the set of all possible values for L4ProtocolTypes - list (from params)
+	/**
+	 * This function computes the difference between two sets: the set of all possible values for L4ProtocolTypes - list (from parameters)
+	 * @param toAdd is the Allow rule to insert
+	 * @param deniedList is the list of denied predicates
+	 * @return List of Predicates allowed rules computed as allowed = rule-i AND !denied
+	 */
 	public List<L4ProtocolTypes> computeDifferenceL4ProtocolTypes(List<L4ProtocolTypes> list){
 		List<L4ProtocolTypes> retList = new ArrayList<>();
 		if(list.contains(L4ProtocolTypes.ANY))
@@ -513,8 +580,11 @@ public class APUtilsAP {
 		return retList;
 	}
 	
-	
-	//This method transform a complex predicate in a list of simple tuple in OR
+	/**
+	 * This method transform a complex predicate in to a list of simple tuple in OR
+	 * @param inputPredicate
+	 * @return List of simple Predicates in OR
+	 */
 		public List<Predicate> complexPredicatetoOrTuples(Predicate inputPredicate){
 			List<Predicate> returnList = new ArrayList<>();
 			
@@ -539,6 +609,11 @@ public class APUtilsAP {
 			return returnList;
 		}
 		
+		/**
+		* This method transform a list of IP addresses in AND to a list of IP addresses in OR
+		* @param list of IP addresses in AND
+		* @return List of IP addresses in OR
+		*/
 		public List<IPAddress> complexIPAddressListInAndToOr(List<IPAddress> list){
 			List<IPAddress> differentIPAddressList = new ArrayList<>();
 			HashMap<Integer, List<IPAddress>> IPSrcAddressWildcardsMap = new HashMap<>();
@@ -623,7 +698,12 @@ public class APUtilsAP {
 				}
 			}
 		}
-
+		
+		/**
+		* This method transform a list of PortInterval in AND to a list of PortIntervals in OR
+		* @param list of PortInterval in AND
+		* @return List of PortIntervals in OR
+		*/
 		public List<PortInterval> complexPortIntervalListInAndToOr(List<PortInterval> list){
 			List<PortInterval> returnList = new ArrayList<>();
 			PortInterval largestPI = null;

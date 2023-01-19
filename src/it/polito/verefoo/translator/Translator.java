@@ -87,7 +87,7 @@ public class Translator {
 	 * @return an NFV object that contains the new information retrieved in the z3
 	 *         model
 	 */
-	public NFV convert(String algo) { // this produces an error in RestTranslator.put file --> To be fixef later
+	public NFV convert(String algo) { // this produces an error in RestTranslator.put file --> To be fixed later
 		if (originalNfv.getHosts() != null)
 			originalNfv.getHosts().getHost().forEach(this::searchHost);
 		if(algo.equals("AP"))

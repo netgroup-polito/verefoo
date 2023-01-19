@@ -31,10 +31,10 @@ public class VerificationResult {
 	}
 
 	/**
-     * Public constructor of VerificationResult, whose instances wrap all the information about the z3 simulation result
+     * Public constructor of VerificationResult, whose instances wrap all the information about the z3 simulation result, this constructor is specific to Atomic Predicates
      * @param ctx it is the z3 Context instance
      * @param result it is the result status
-     * @param nctx it is the NetContext instance defined in the z3 model
+     * @param nctx it is the NetContext Atomic Predicate instance defined in the z3 model
      * @param assertions it is the set of assertion of the result model
      * @param model it is the z3 model of the MaxSMT problem
      */
@@ -50,7 +50,7 @@ public class VerificationResult {
      * Public constructor of VerificationResult, whose instances wrap all the information about the z3 simulation result
      * @param ctx it is the z3 Context instance
      * @param result it is the result status
-     * @param nctx it is the NetContext instance defined in the z3 model
+     * @param nctx it is the NetContext Maximal Flows instance defined in the z3 model
      * @param assertions it is the set of assertion of the result model
      * @param model it is the z3 model of the MaxSMT problem
      */
