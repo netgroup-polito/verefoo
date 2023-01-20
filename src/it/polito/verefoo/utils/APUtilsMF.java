@@ -11,6 +11,9 @@ import it.polito.verefoo.graph.PortInterval;
 import it.polito.verefoo.graph.Predicate;
 import it.polito.verefoo.jaxb.L4ProtocolTypes;
 
+/**
+ * This class contains utilities used only by Maximal Flows algorithm when calculating predicates.
+ */
 public class APUtilsMF {
 	
 	public APUtilsMF() {}
