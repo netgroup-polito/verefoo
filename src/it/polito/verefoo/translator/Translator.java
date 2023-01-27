@@ -248,7 +248,7 @@ public class Translator {
 				String ruleNumber = z3Translator.saneString(z3Translator.matchRuleNumber(matchSrc));
 				if(ruleConfigured.equals("true")) {
 					Predicate atomicPredicate = networkAtomicPredicates.get(Integer.parseInt(ruleNumber));
-					List<Predicate> predicatesList = aputilsAP.complexPredicatetoOrTuples(atomicPredicate);
+					List<Predicate> predicatesList = aputilsAP.complexPredicateToOrTuples(atomicPredicate);
 					for(Predicate predicate : predicatesList) {
 						Elements e = new Elements();
 						e.setSource(predicate.getIPSrcList().get(0).toString());

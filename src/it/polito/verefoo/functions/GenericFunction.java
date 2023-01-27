@@ -32,6 +32,7 @@ abstract public class GenericFunction {
     protected DatatypeExpr z3Node;
     protected boolean isEndHost;
     protected BoolExpr used;
+    
     public BoolExpr getUsed() {
 		return used;
 	}
