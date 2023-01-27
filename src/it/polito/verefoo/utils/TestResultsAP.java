@@ -1,10 +1,9 @@
 package it.polito.verefoo.utils;
 
-public class TestResultsAP {
+public class TestResultsAP extends TestResults{
 	private long atomicPredCompTime;
 	private long atomicFlowsCompTime;
 	private long beginMaxSMTTime;
-	private String z3Result;
 	private long totalFlows;
 	
 	public TestResultsAP() {	
@@ -32,14 +31,6 @@ public class TestResultsAP {
 
 	public void setBeginMaxSMTTime(long beginMaxSMTTime) {
 		this.beginMaxSMTTime = beginMaxSMTTime;
-	}
-
-	public String getZ3Result() {
-		return z3Result;
-	}
-
-	public void setZ3Result(String z3Result) {
-		this.z3Result = z3Result;
 	}
 	
 	public long getTotalFlows() {

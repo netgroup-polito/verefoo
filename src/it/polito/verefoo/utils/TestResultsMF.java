@@ -1,12 +1,11 @@
 package it.polito.verefoo.utils;
 
-public class TestResultsMF {
+public class TestResultsMF extends TestResults {
 	private long maximalFlowsCompTime;
 	private long startMaxSMTtime;
 	private long endMaxSMTtims;
 	private int totalNumberGeneratedFlows;
 	
-	private String z3Result;
 
 	public TestResultsMF() {	
 	}
@@ -41,14 +40,6 @@ public class TestResultsMF {
 
 	public void setTotalNumberGeneratedFlows(int totalNumberGeneratedFlows) {
 		this.totalNumberGeneratedFlows = totalNumberGeneratedFlows;
-	}
-
-	public String getZ3Result() {
-		return z3Result;
-	}
-
-	public void setZ3Result(String z3Result) {
-		this.z3Result = z3Result;
 	}
 
 	
