@@ -21,6 +21,7 @@ import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.jaxb.NodeConstraints.NodeMetrics;
 import it.polito.verefoo.solver.NetContextAP;
 import it.polito.verefoo.solver.NetContextMF;
+import it.polito.verefoo.solver.NetContext;
 
 /**
  * This class has the key task to manage the allocation and deployment of Network Functions on the nodes of
@@ -37,7 +38,7 @@ public class AllocationManager {
 	private HashMap<String, AllocationNodeAP> nodesAP;
 	private HashMap<String, AllocationNodeMF> nodesMF;
 	private WildcardManager wildcardManager;
-	
+
 	/**
 	 * Public constructor for the AllocationManager class for Atomic Predicate Algorithm execution
 	 * @param ctx It is the Context object which manages all the hard and soft constraints in Z3Opt.
@@ -58,46 +59,46 @@ public class AllocationManager {
 			this.nodesAP = allocationNodes;
 		}
 
-		/**
-		 * Public constructor for the AllocationManager class for Maximal Flow Algorithm execution
-		 * @param ctx It is the Context object which manages all the hard and soft contraints in Z3Opt.
-		 * @param nctx It is the NetContext object where Z3 objects and formulas are stored specifically for Maximal Flows.
-		 * @param allocationNodes It is a map used to retrieve the nodes of the Allocation Graph by their name specifically for Maximal Flows.
-		 * @param nodeMetrics It is a list of constraints about node (i.e. optionality of a node on the Allocation Graph)
-		 * @param properties It is the list of Middle Level Reachability and Isolation policies.
-		 * @param FWManager It is an instance of a class which manages the firewalls.
-		 */
-		 public AllocationManager(Context ctx, NetContextMF nctx, 
-		    		HashMap<String, AllocationNodeMF> allocationNodes, List<NodeMetrics> nodeMetrics, List<Property> properties, WildcardManager wildcardManager) {
-				super();
-				this.ctx = ctx;
-				this.nctxMF = nctx;
-				this.nodeMetrics = nodeMetrics;
-				this.properties = properties;
-				this.wildcardManager = wildcardManager;
-				this.nodesMF = allocationNodes;
-			}
+	/**
+	 * Public constructor for the AllocationManager class for Maximal Flow Algorithm execution
+	 * @param ctx It is the Context object which manages all the hard and soft contraints in Z3Opt.
+	 * @param nctx It is the NetContext object where Z3 objects and formulas are stored specifically for Maximal Flows.
+	 * @param allocationNodes It is a map used to retrieve the nodes of the Allocation Graph by their name specifically for Maximal Flows.
+	 * @param nodeMetrics It is a list of constraints about node (i.e. optionality of a node on the Allocation Graph)
+	 * @param properties It is the list of Middle Level Reachability and Isolation policies.
+	 * @param FWManager It is an instance of a class which manages the firewalls.
+	 */
+	 public AllocationManager(Context ctx, NetContextMF nctx, 
+	    		HashMap<String, AllocationNodeMF> allocationNodes, List<NodeMetrics> nodeMetrics, List<Property> properties, WildcardManager wildcardManager) {
+			super();
+			this.ctx = ctx;
+			this.nctxMF = nctx;
+			this.nodeMetrics = nodeMetrics;
+			this.properties = properties;
+			this.wildcardManager = wildcardManager;
+			this.nodesMF = allocationNodes;
+		}
 
 	 /**
 	  * This method is invoked by VerefooProxy to instantiate the Network Functions which have been specified in the input, processing the input nodes with a proper Configuration (i.e. node which isn't empty). 
-	  * For the moment it's able to instanciate web client/servers, firewalls and NATs.
+	  * For the moment it's able to instantiate web client/servers, firewalls and NATs.
 	  * Each other NF can be added here following the same pattern (legacy class in older versions: NodeNetworkObject)
 	 */
 	public void instantiateFunctions(String algo) {
+	//( (algo.equals("AP")) ? nodesAP : nodesMF)
 	if(algo.equals("AP")) {	// In case execution is for Atomic Predicates
-		nodesAP.values().forEach(allocationNode -> {
+	  nodesAP.values().forEach(allocationNode -> {
 			Node node = allocationNode.getNode();
-			if(node.getFunctionalType() != null) {
+			if(node.getFunctionalType() != null) {	
 				if(node.getFunctionalType() == FunctionalTypes.WEBCLIENT) {
-					EndHost client = new EndHost(allocationNode, ctx, nctxAP);
+					EndHost client = new EndHost( allocationNode , ctx, nctxAP );
 					Property prop =  properties.stream().filter(pr -> pr.getSrc().equals(node.getName())).findFirst().orElse(null);
-					
+	
 					client.installEndHost();
 					allocationNode.setPlacedNF(client);
 					allocationNode.setTypeNF(FunctionalTypes.WEBCLIENT);
 				}
-			
-			
+
 				else if(node.getFunctionalType() == FunctionalTypes.WEBSERVER) {
 					EndHost server = new EndHost(allocationNode, ctx, nctxAP);
 					Property prop =  properties.stream().filter(pr -> pr.getDst().equals(node.getName())).findFirst().orElse(null);
@@ -108,6 +109,7 @@ public class AllocationManager {
 				}
 				
 				else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
+
 					PacketFilterAP firewall = new PacketFilterAP(allocationNode, ctx, nctxAP, wildcardManager);
 					
 					firewall.setAutoplace(false);
@@ -256,7 +258,98 @@ public class AllocationManager {
 	}
 		
 	}
+	
+	public <T extends AllocationNode,E extends NetContext> void instantiateFunctionsHelper(HashMap<String,T> nodes,E nctx,String algo) {
 
+		
+		nodes.values().forEach( allocationNode -> {
+	
+			Node node = allocationNode.getNode();
+				if(node.getFunctionalType() != null) {	
+					if(node.getFunctionalType() == FunctionalTypes.WEBCLIENT) {
+						
+						EndHost client = new EndHost( allocationNode , ctx, nctx );
+						Property prop =  properties.stream().filter(pr -> pr.getSrc().equals(node.getName())).findFirst().orElse(null);
+		
+						client.installEndHost();
+						allocationNode.setPlacedNF(client);
+						allocationNode.setTypeNF(FunctionalTypes.WEBCLIENT);
+					}
+
+					else if(node.getFunctionalType() == FunctionalTypes.WEBSERVER) {
+						EndHost server = new EndHost(allocationNode, ctx, nctx);
+						Property prop =  properties.stream().filter(pr -> pr.getDst().equals(node.getName())).findFirst().orElse(null);
+						
+						server.installEndHost();
+						allocationNode.setPlacedNF(server);
+						allocationNode.setTypeNF(FunctionalTypes.WEBSERVER);
+					}
+					
+					else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
+
+						PacketFilterAP firewall = new PacketFilterAP(allocationNode, ctx, nctx, wildcardManager);
+						
+						firewall.setAutoplace(false);
+						
+						if(node.getConfiguration().getFirewall().getDefaultAction() != null) {
+							
+							//This part is used to determine the default action of the packet filter: allow or deny
+							if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
+								firewall.setDefaultAction(true);
+							}else if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.DENY)){
+								firewall.setDefaultAction(false);
+							}
+						}
+						
+						/*
+						 * This part is used to generate the Access Control Lists for Low Level Configurations specified in the input XML file.
+						 * In this case, no auto-configuration will be required.
+						 */
+						if(!node.getConfiguration().getFirewall().getElements().isEmpty()) {
+							firewall.setAutoconfigured(false);
+						} 
+						
+						/*
+						 * This part is used to understand if the firewall configured should be optional or not.
+						 * It makes sense only if low-level configuration is already specified.
+						 * This way the framework can eliminate a wrong configuration, if necessary.
+						 */
+						
+						boolean optional = nodeMetrics.stream().anyMatch(nm -> nm.getNode().equals(node.getName()));
+						if(optional) firewall.setAutoplace(true);
+						allocationNode.setPlacedNF(firewall);
+						allocationNode.setTypeNF(FunctionalTypes.FIREWALL);
+					}
+					
+					else if(node.getFunctionalType() == FunctionalTypes.NAT) {
+						NAT nat = new NAT(allocationNode, ctx, nctx);
+						allocationNode.setPlacedNF(nat);
+						allocationNode.setTypeNF(FunctionalTypes.NAT);
+					}
+					
+					else if(node.getFunctionalType() == FunctionalTypes.LOADBALANCER) {
+						LoadBalancer lb = new LoadBalancer(allocationNode, ctx, nctx);
+						allocationNode.setPlacedNF(lb);
+						allocationNode.setTypeNF(FunctionalTypes.LOADBALANCER);
+					}
+					
+					else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {
+						Forwarder forwarder = new Forwarder(allocationNode, ctx, nctx);
+						allocationNode.setPlacedNF(forwarder);
+						allocationNode.setTypeNF(FunctionalTypes.FORWARDER);
+					}
+					
+					else if(node.getFunctionalType() == FunctionalTypes.TRAFFIC_MONITOR) {
+						TrafficMonitor tm = new TrafficMonitor(allocationNode, ctx, nctx);
+						allocationNode.setPlacedNF(tm);
+						allocationNode.setTypeNF(FunctionalTypes.FORWARDER);
+					}
+				}
+			});
+		
+	}
+
+	
 /****************************************************************Atomic Predicate Methods*****************************************************************************************/
 	
 	/**
@@ -331,7 +424,6 @@ public class AllocationManager {
 	public void chooseFunctionsMF(AllocationNodeMF source, AllocationNodeMF origin, AllocationNodeMF finalDest) {
 		if(source.getTypeNF() == null ) {
 			PacketFilterMF firewall = new PacketFilterMF(source, ctx, nctxMF, wildcardManager);
-
 			source.setPlacedNF(firewall);
 			source.setTypeNF(FunctionalTypes.FIREWALL);
 		}
