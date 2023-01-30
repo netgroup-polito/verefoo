@@ -86,6 +86,7 @@ public class AllocationManager {
 	 */
 	public void instantiateFunctions(String algo) {
 	//( (algo.equals("AP")) ? nodesAP : nodesMF)
+
 	if(algo.equals("AP")) {	// In case execution is for Atomic Predicates
 	  nodesAP.values().forEach(allocationNode -> {
 			Node node = allocationNode.getNode();
@@ -259,96 +260,6 @@ public class AllocationManager {
 		
 	}
 	
-	public <T extends AllocationNode,E extends NetContext> void instantiateFunctionsHelper(HashMap<String,T> nodes,E nctx,String algo) {
-
-		
-		nodes.values().forEach( allocationNode -> {
-	
-			Node node = allocationNode.getNode();
-				if(node.getFunctionalType() != null) {	
-					if(node.getFunctionalType() == FunctionalTypes.WEBCLIENT) {
-						
-						EndHost client = new EndHost( allocationNode , ctx, nctx );
-						Property prop =  properties.stream().filter(pr -> pr.getSrc().equals(node.getName())).findFirst().orElse(null);
-		
-						client.installEndHost();
-						allocationNode.setPlacedNF(client);
-						allocationNode.setTypeNF(FunctionalTypes.WEBCLIENT);
-					}
-
-					else if(node.getFunctionalType() == FunctionalTypes.WEBSERVER) {
-						EndHost server = new EndHost(allocationNode, ctx, nctx);
-						Property prop =  properties.stream().filter(pr -> pr.getDst().equals(node.getName())).findFirst().orElse(null);
-						
-						server.installEndHost();
-						allocationNode.setPlacedNF(server);
-						allocationNode.setTypeNF(FunctionalTypes.WEBSERVER);
-					}
-					
-					else if(node.getFunctionalType() == FunctionalTypes.FIREWALL) {
-
-						PacketFilterAP firewall = new PacketFilterAP(allocationNode, ctx, nctx, wildcardManager);
-						
-						firewall.setAutoplace(false);
-						
-						if(node.getConfiguration().getFirewall().getDefaultAction() != null) {
-							
-							//This part is used to determine the default action of the packet filter: allow or deny
-							if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.ALLOW)) {
-								firewall.setDefaultAction(true);
-							}else if(node.getConfiguration().getFirewall().getDefaultAction().equals(ActionTypes.DENY)){
-								firewall.setDefaultAction(false);
-							}
-						}
-						
-						/*
-						 * This part is used to generate the Access Control Lists for Low Level Configurations specified in the input XML file.
-						 * In this case, no auto-configuration will be required.
-						 */
-						if(!node.getConfiguration().getFirewall().getElements().isEmpty()) {
-							firewall.setAutoconfigured(false);
-						} 
-						
-						/*
-						 * This part is used to understand if the firewall configured should be optional or not.
-						 * It makes sense only if low-level configuration is already specified.
-						 * This way the framework can eliminate a wrong configuration, if necessary.
-						 */
-						
-						boolean optional = nodeMetrics.stream().anyMatch(nm -> nm.getNode().equals(node.getName()));
-						if(optional) firewall.setAutoplace(true);
-						allocationNode.setPlacedNF(firewall);
-						allocationNode.setTypeNF(FunctionalTypes.FIREWALL);
-					}
-					
-					else if(node.getFunctionalType() == FunctionalTypes.NAT) {
-						NAT nat = new NAT(allocationNode, ctx, nctx);
-						allocationNode.setPlacedNF(nat);
-						allocationNode.setTypeNF(FunctionalTypes.NAT);
-					}
-					
-					else if(node.getFunctionalType() == FunctionalTypes.LOADBALANCER) {
-						LoadBalancer lb = new LoadBalancer(allocationNode, ctx, nctx);
-						allocationNode.setPlacedNF(lb);
-						allocationNode.setTypeNF(FunctionalTypes.LOADBALANCER);
-					}
-					
-					else if(node.getFunctionalType() == FunctionalTypes.FORWARDER) {
-						Forwarder forwarder = new Forwarder(allocationNode, ctx, nctx);
-						allocationNode.setPlacedNF(forwarder);
-						allocationNode.setTypeNF(FunctionalTypes.FORWARDER);
-					}
-					
-					else if(node.getFunctionalType() == FunctionalTypes.TRAFFIC_MONITOR) {
-						TrafficMonitor tm = new TrafficMonitor(allocationNode, ctx, nctx);
-						allocationNode.setPlacedNF(tm);
-						allocationNode.setTypeNF(FunctionalTypes.FORWARDER);
-					}
-				}
-			});
-		
-	}
-
 	
 /****************************************************************Atomic Predicate Methods*****************************************************************************************/
 	
