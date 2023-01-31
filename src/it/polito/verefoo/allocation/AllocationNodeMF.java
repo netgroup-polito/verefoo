@@ -57,12 +57,20 @@ public class AllocationNodeMF extends AllocationNode {
 		return true;
 	}
 
-
+	/**
+	 * Set the Crossing Flows
+	 * 
+	 * @param the FlowPath for Maximal Flows
+	 */
 	public void addCrossingFlow(FlowPathMF sr) {
 		crossingFlows.put(sr.getIdFlow(), sr);
 	}
 	
-	//return flows that cross this node
+	/**
+	 * Get the Crossing Flows that cross this node
+	 * 
+	 * @return the Map of FlowPath for Maximal Flows with integer mapping
+	 */
 	public Map<Integer, FlowPathMF> getCrossingFlows() {
 		return crossingFlows;
 	}

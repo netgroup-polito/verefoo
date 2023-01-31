@@ -398,7 +398,7 @@ public class PacketFilterMF extends GenericFunction{
 	 * This method exploits pruning strategies to minimize the number of placeholder rules in a firewall to be automatically configured
 	 * @return the maximum number of placeholder rules that are needed after the pruning
 	 */
-private int minizimePlaceholderRules() {
+    	private int minizimePlaceholderRules() {
 		
 		List<FlowPathMF> allProperties = sourceMF.getCrossingFlows().values().stream().collect(Collectors.toList());
 		List<FlowPathMF> interestedProperties = new ArrayList<>();

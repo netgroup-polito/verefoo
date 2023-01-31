@@ -185,6 +185,11 @@ public class Checker {
 		constraintList.add(finalConstraint);
 	}
 	
+	/**
+	 * Atomic Predicate Algorithm
+	 * This method generates the constraints for an Complete Reachability requirement
+	 * @param sr It is the requirement that must be modeled in z3 language
+	 */
 	private void createCompleteReachabilityConstraintAP(SecurityRequirement sr) {
 		
 		Map<Integer, FlowPathAP> allFlows = sr.getFlowsMapAP();
@@ -223,7 +228,6 @@ public class Checker {
 	 * Atomic Predicate Algorithm
 	 * This method generates the constraints for an isolation requirement
 	 * @param sr It is the requirement that must be modeled in z3 language
-	 * @param propType It is the type of the security requirement
 	 */
 	private void createIsolationConstraintsAP(SecurityRequirement sr) {
 		
@@ -365,7 +369,11 @@ public class Checker {
 		constraintList.add(finalConstraint);
 	}
 	
-
+	/**
+	 * Maximal flow algorithm
+	 * This method generates the constraints for a Complete Reachability requirement
+	 * @param sr It is the requirement that must be modeled in z3 language
+	 */
 	private void createCompleteReachabilityConstraintMF(SecurityRequirement sr) {
 		
 		Map<Integer, FlowPathMF> allFlows = sr.getFlowsMapMF();
@@ -399,7 +407,6 @@ public class Checker {
 	 * Maximal Flow Algorithm
 	 * This method generates the constraints for an isolation requirement
 	 * @param sr It is the requirement that must be modeled in z3 language
-	 * @param propType It is the type of the security requirement
 	 */
 	private void createIsolationConstraintsMF(SecurityRequirement sr) {
 		

@@ -1142,54 +1142,118 @@ public class VerefooProxy {
 		return trafficFlowsMapMF;
 	}
 	
+	/**
+	 * Get Time Results
+	 * 
+	 * @return the Time Results
+	 */
 	public TestResults getTestTimeResults() {
 		return testResults;
 	}
 	
+	/**
+	 * Get Context
+	 * 
+	 * @return the context
+	 */
 	public Context getCtx() {
 		return ctx;
 	}
 
+	/**
+	 * Get the list of properties
+	 * 
+	 * @return the property list
+	 */
 	public List<Property> getProperties() {
 		return properties;
 	}
 
+	/**
+	 * Get the list of paths
+	 * 
+	 * @return the path list
+	 */
 	public List<Path> getPaths() {
 		return paths;
 	}
 
+	/**
+	 * Get the wildCardManager object
+	 * 
+	 * @return the Wild Card Manager object
+	 */
 	public WildcardManager getWildcardManager() {
 		return wildcardManager;
 	}
 
+	/**
+	 * Get the Security Requirements and there integer mapping
+	 * 
+	 * @return the HashMap containing Security Requirements with there integer mapping
+	 */
 	public HashMap<Integer, SecurityRequirement> getSecurityRequirements() {
 		return securityRequirements;
 	}
 
+	/**
+	 * Get the Checker
+	 * 
+	 * @return the Checker object
+	 */
 	public Checker getCheck() {
 		return check;
 	}
 
+	/**
+	 * Get the list of Nodes
+	 * 
+	 * @return the Nodes list
+	 */
 	public List<Node> getNodes() {
 		return nodes;
 	}
 
+	/**
+	 * Get the list of Node Metrics
+	 * 
+	 * @return the Node Metrics list
+	 */
 	public List<NodeMetrics> getNodeMetrics() {
 		return nodeMetrics;
 	}
 
+	/**
+	 * Get the list of properties
+	 * 
+	 * @return the property list
+	 */
 	public AllocationManager getAllocationManager() {
 		return allocationManager;
 	}
 
+	/**
+	 * Get the APUtilsAP
+	 * 
+	 * @return the APUtilsAP class Object
+	 */
 	public APUtilsAP getAputilsAP() {
 		return aputilsAP;
 	}
-
+	/**
+	 * Get the APUtilsMF
+	 * 
+	 * @return the APUtilsMF class Object
+	 */
 	public APUtilsMF getAputilsMF() {
 		return aputilsMF;
 	}
 	
+	/**
+	 * Get the Network Atomic Predicates
+	 * 
+	 * @return the HashMap of Network Atomic Predicates with integer mapping
+	 */
 	public HashMap<Integer, Predicate> getNetworkAtomicPredicates() {
 		return networkAtomicPredicates;
 	}

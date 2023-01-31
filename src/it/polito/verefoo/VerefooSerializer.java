@@ -123,11 +123,20 @@ public class VerefooSerializer {
 	}
 
 
+	/**
+	 * Get the Z3 object
+	 * 
+	 * @return the Z3 Model Object
+	 */
 	public String getZ3Model() {
 		return z3Model;
 	}
 
-
+	/**
+	 * Set the Z3 object
+	 * 
+	 * @param the Z3 Model Object
+	 */
 	public void setZ3Model(String z3Model) {
 		this.z3Model = z3Model;
 	}
