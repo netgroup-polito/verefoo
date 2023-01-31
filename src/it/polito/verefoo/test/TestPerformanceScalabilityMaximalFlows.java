@@ -27,23 +27,22 @@ import org.junit.Test;
 
 import it.polito.verefoo.VerefooSerializer;
 import it.polito.verefoo.extra.Package1LoggingClass;
-import it.polito.verefoo.extra.TestCaseGeneratorAtomicPredicates;
+import it.polito.verefoo.extra.TestCaseGeneratorMaximalFlows;
 import it.polito.verefoo.jaxb.NFV;
 import it.polito.verefoo.utils.TestResults;
-
 
 /* Run some instances of TestCaseGeneratorAtomicPredicates. TestCaseGeneratorAtomicPredicates generates XML files for NFV, then this
  * class takes in input those files, for each of them runs Verefoo and print results and other statistics (time to complete, memory usage etc).
  * */
-public class TestPerformanceScalabilityAtomicPredicates {
-	
+public class TestPerformanceScalabilityMaximalFlows {
+
 	public static void main(String[] args)  {	
 		numberPR = 10;
-		numberWC = 20;
-		numberWS = 20;
-		numberAP  = 20;
-		numberNAT = 5;
-		numberFW = 5;
+		numberWC = 25;
+		numberWS = 25;
+		numberAP  = 25;
+		numberNAT = 10;
+		numberFW = 10;
 		maxNATSrcs = 10;
 		maxFWRules = 10;
 		runs = 30;
@@ -53,7 +52,22 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
-
+		
+		
+		//Prog ALL
+		numberPR = 25;
+		numberWC = 60;
+		numberWS = 60;
+		numberAP  = 60;
+		numberNAT = 20;
+		numberFW = 20;
+		maxNATSrcs = 20;
+		maxFWRules = 20;
+		numberIPR  = numberPR/2;
+		numberRPR = numberPR/2;
+		numberPR = numberIPR + numberRPR;
+		testScalabilityPerformance();
+		
 		//Prog ALL
 		numberPR = 30;
 		numberWC = 70;
@@ -66,10 +80,51 @@ public class TestPerformanceScalabilityAtomicPredicates {
 		numberIPR  = numberPR/2;
 		numberRPR = numberPR/2;
 		numberPR = numberIPR + numberRPR;
-
+		testScalabilityPerformance();
+	
+		//Prog ALL
+		numberPR = 20;
+		numberWC = 50;
+		numberWS = 50;
+		numberAP  = 50;
+		numberNAT = 15;
+		numberFW = 15;
+		maxNATSrcs = 15;
+		maxFWRules = 15;
+		numberIPR  = numberPR/2;
+		numberRPR = numberPR/2;
+		numberPR = numberIPR + numberRPR;
+		testScalabilityPerformance();
+		
+		//Prog ALL
+		numberPR = 15;
+		numberWC = 40;
+		numberWS = 40;
+		numberAP  = 40;
+		numberNAT = 10;
+		numberFW = 10;
+		maxNATSrcs = 10;
+		maxFWRules = 10;
+		numberIPR  = numberPR/2;
+		numberRPR = numberPR/2;
+		numberPR = numberIPR + numberRPR;
 		testScalabilityPerformance();
 
-		System.out.println("TEST TERMINATI");
+		//Prog ALL
+		numberPR = 10;
+		numberWC = 30;
+		numberWS = 30;
+		numberAP  = 30;
+		numberNAT = 5;
+		numberFW = 5;
+		maxNATSrcs = 5;
+		maxFWRules = 5;
+		numberIPR  = numberPR/2;
+		numberRPR = numberPR/2;
+		numberPR = numberIPR + numberRPR;
+		testScalabilityPerformance();
+		
+		System.out.println("TESTS SUCCESSFULY COMPLETED");
 	}
 	
 	/* Variables to set if you want to automatically create the NFV */
@@ -95,6 +150,7 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	private static int maxNATSrcs;
 	private static int maxFWRules;
 	private static double percReqWithPorts;
+	private static boolean hasFwRulesTakenFromReq;
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -125,21 +181,22 @@ public class TestPerformanceScalabilityAtomicPredicates {
 
 	private static NFV testCoarse(NFV root) throws Exception{
 		long beginAll=System.currentTimeMillis();
-		VerefooSerializer test = new VerefooSerializer(root,"AP"); // change to choose algo.
+		VerefooSerializer test = new VerefooSerializer(root,"MF");
 		long endAll=System.currentTimeMillis();
 		TestResults results = test.getTestTimeResults();
 		
 		long totalTime = endAll - beginAll;
-		long atomicPredCompTime = results.getAtomicPredCompTime();
-		long atomicFlowsCompTime = results.getAtomicFlowsCompTime();
-		long maxSMTtime = endAll - results.getBeginMaxSMTTime();
+		long maximalFlowsCompTime = results.getMaximalFlowsCompTime();
+		int totalNumberOfFlows = results.getTotalNumberGeneratedFlows();
+		long maxSMTTime = endAll - results.getStartMaxSMTtime();
+		String z3Result = results.getZ3Result();
 		
-		String resString = new String("Total time " + totalTime +  "ms, atomicPredCompTime " 
-				+ atomicPredCompTime +  "ms, atomicFlowsCompTime " 
-				+ atomicFlowsCompTime + "ms, maxSMT time " + maxSMTtime + "ms;");
+		String resString = new String("Total time " + totalTime + "ms, maximalFlowsCompTime " 
+				+ maximalFlowsCompTime + "ms, maxSMT time " + maxSMTTime + "ms, total number of generated flows " + totalNumberOfFlows + "\n");
 		
 		System.out.println(resString);
-		logger.info(totalTime + "\t" + atomicPredCompTime + "\t" + atomicFlowsCompTime + "\t" + maxSMTtime + "\t" + results.getZ3Result() + "\t");
+		
+		logger.info(totalTime + "\t"+ maximalFlowsCompTime + "\t" + maxSMTTime + "\t" + totalNumberOfFlows + "\t" + z3Result + "\t");
         return test.getResult();
 	}
 	
@@ -148,7 +205,7 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	public static void testScalabilityPerformance(){
 		    rand= new Random(seed);
 		    pathfile = "NR"+numberPR+"WC"+numberWC+"WS"+numberWS+"AP"+numberAP+"NAT"+numberNAT+"FW"+numberFW+"NATS"
-	        		+maxNATSrcs+"FWR"+maxFWRules+"PRP"+percReqWithPorts+"APLogs.log";
+	        		+maxNATSrcs+"FWR"+maxFWRules+"PRP"+percReqWithPorts+"MFLogs.log";
 	        logger =  Package1LoggingClass.createLoggerFor(pathfile, "log/"+pathfile);
 
 	        int[] seeds = new int[runs];
@@ -159,11 +216,11 @@ public class TestPerformanceScalabilityAtomicPredicates {
 	        /* Switch between automatic and manul configuration of the IP*/
 	        int k=0, i=0;
 	        try {
-	        	List<TestCaseGeneratorAtomicPredicates> nfv = new ArrayList<>();
-	        	nfv.add(new TestCaseGeneratorAtomicPredicates("Test case generator atomic predicates", numberAP, numberWC, numberWS, 
+	        	List<TestCaseGeneratorMaximalFlows> nfv = new ArrayList<>();
+	        	nfv.add(new TestCaseGeneratorMaximalFlows("Test case generator atomic predicates", numberAP, numberWC, numberWS, 
 	        			numberRPR, numberIPR, numberNAT, numberFW, maxNATSrcs, maxFWRules, percReqWithPorts, 1));
 
-	        	for(TestCaseGeneratorAtomicPredicates f : nfv){
+	        	for(TestCaseGeneratorMaximalFlows f : nfv){
 
 	        		// create a JAXBContext capable of handling the generated classes
 	        		//long beginAll=System.currentTimeMillis();

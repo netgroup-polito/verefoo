@@ -37,8 +37,7 @@ import it.polito.verefoo.solver.Checker.Prop;
 import it.polito.verefoo.utils.APUtilsAP;
 import it.polito.verefoo.utils.APUtilsMF;
 import it.polito.verefoo.utils.GenerateFlowsTask;
-import it.polito.verefoo.utils.TestResultsAP;
-import it.polito.verefoo.utils.TestResultsMF;
+import it.polito.verefoo.utils.TestResults;
 import it.polito.verefoo.utils.VerificationResult;
 import it.polito.verefoo.functions.Forwarder;
 import it.polito.verefoo.graph.MaximalFlow;
@@ -71,7 +70,7 @@ public class VerefooProxy {
 	/* Atomic predicates */
 	private HashMap<Integer, Predicate> networkAtomicPredicates = new HashMap<>();
 	HashMap<String, Node> transformersNode = new HashMap<>();
-	private TestResultsAP testResultsAP = new TestResultsAP(); // duplicate variables
+	private TestResults testResults = new TestResults(); // duplicate variables
 	
 	/* Maximal flows */
 	HashMap<String, List<Predicate>> natD1map = new HashMap<>();
@@ -82,7 +81,6 @@ public class VerefooProxy {
 	HashMap<String, List<Predicate>> allowedFirewallPredicates = new HashMap<>();
 	HashMap<String, List<Predicate>> deniedFirewallPredicates = new HashMap<>();
 	private APUtilsMF aputilsMF;
-	private TestResultsMF testResultsMF = new TestResultsMF();
 
 	int maximalFlowId = 0;
 
@@ -150,13 +148,13 @@ public class VerefooProxy {
 		trafficFlowsMapAP = generateFlowPathsAP();
 		networkAtomicPredicates = generateAtomicPredicateNew();
 		long t2 = System.currentTimeMillis();
-		testResultsAP.setAtomicPredCompTime(t2-t1);
+		testResults.setAtomicPredCompTime(t2-t1);
 		fillTransformationMap();
 		//printTransformations(); //DEBUG
 		computeAtomicFlows();
 		t1 = System.currentTimeMillis();
-		testResultsAP.setAtomicFlowsCompTime(t1-t2);
-		testResultsAP.setBeginMaxSMTTime(t1);
+		testResults.setAtomicFlowsCompTime(t1-t2);
+		testResults.setBeginMaxSMTTime(t1);
 		//distributeTrafficFlows();
 		allocateFunctionsAP();
 		// Change Execution depending on chosen algorithm
@@ -218,8 +216,8 @@ public class VerefooProxy {
 		 System.out.println("Generating maximal flows ...");
 		 generateMaximalFlows();
 		 long endComputingFlows = System.currentTimeMillis();
-		 testResultsMF.setMaximalFlowsCompTime(endComputingFlows- beginComputingFlows);
-		 testResultsMF.setStartMaxSMTtime(System.currentTimeMillis());
+		 testResults.setMaximalFlowsCompTime(endComputingFlows- beginComputingFlows);
+		 testResults.setStartMaxSMTtime(System.currentTimeMillis());
 		 allocationManager.configureFunctionsMF(); // MF method
 		 check = new Checker(ctx, nctxMF, allocationNodesMF);
 		 formalizeRequirementsMF();
@@ -307,7 +305,7 @@ public class VerefooProxy {
 				totalFlows += flowPath.getAtomicFlowsMap().size();
 			}
 		}
-		testResultsAP.setTotalFlows(totalFlows);
+		testResults.setTotalFlows(totalFlows);
 		
 		//built map that assign to each allocation node the set of atomic predicates in input
 		for(SecurityRequirement sr : securityRequirements.values()) {
@@ -1106,9 +1104,6 @@ public class VerefooProxy {
 		return trafficFlowsMapAP;
 	}
 	
-	public TestResultsAP getTestTimeResultsAP() {
-		return testResultsAP;
-	}
 
 	/**
 	 * Checks if the service graph satisfies all the imposed conditions
@@ -1146,8 +1141,8 @@ public class VerefooProxy {
 		return trafficFlowsMapMF;
 	}
 	
-	public TestResultsMF getTestTimeResultsMF() {
-		return testResultsMF;
+	public TestResults getTestTimeResults() {
+		return testResults;
 	}
 	
 	public Context getCtx() {
@@ -1202,13 +1197,10 @@ public class VerefooProxy {
 		return transformersNode;
 	}
 
-	public TestResultsMF getTestResultsMF() {
-		return testResultsMF;
+	public TestResults getTestResults() {
+		return testResults;
 	}
 	
-	public TestResultsAP getTestResultsAP() {
-		return testResultsAP;
-	}
 /************************************************** Maximal Flows Methods (MF also uses some of AP methods) **************************************************************/
 
 	
@@ -1696,7 +1688,7 @@ public class VerefooProxy {
 //			}
 //		}
 		//END DEBUG
-		testResultsMF.setTotalNumberGeneratedFlows(maximalFlowId);
+		testResults.setTotalNumberGeneratedFlows(maximalFlowId);
 		System.out.println();
 	}
 	

@@ -211,7 +211,7 @@ public class TestTopologyValidation {
 
 	private static NFV testCoarse(NFV root) throws Exception{
 		long beginAll=System.currentTimeMillis();
-		VerefooSerializer test = new VerefooSerializer(root);
+		VerefooSerializer test = new VerefooSerializer(root,"AP"); // change to choose algo.
 		
 		JAXBContext jc;
 		jc = JAXBContext.newInstance("it.polito.verefoo.jaxb");

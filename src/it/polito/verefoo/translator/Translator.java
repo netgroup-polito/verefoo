@@ -595,6 +595,7 @@ public class Translator {
 
 	}
 	
+	
 	/**
 	 * Reduces the host resources according to the node metrics
 	 * 

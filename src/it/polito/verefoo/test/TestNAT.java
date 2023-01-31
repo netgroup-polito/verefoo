@@ -69,7 +69,7 @@ public class TestNAT {
         Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
         u.setSchema(schema);
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
-        VerefooSerializer test = new VerefooSerializer(root);
+        VerefooSerializer test = new VerefooSerializer(root,"AP"); // change to "AP" or "MF" to choose algo.
         
         
         if(test.isSat()){

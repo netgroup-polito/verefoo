@@ -14,8 +14,7 @@ import it.polito.verefoo.jaxb.NFV;
 import it.polito.verefoo.jaxb.Path;
 import it.polito.verefoo.jaxb.Property;
 import it.polito.verefoo.translator.Translator;
-import it.polito.verefoo.utils.TestResultsAP;
-import it.polito.verefoo.utils.TestResultsMF;
+import it.polito.verefoo.utils.TestResults;
 import it.polito.verefoo.utils.VerificationResult;
 
 /**
@@ -25,8 +24,7 @@ public class VerefooSerializer {
 	private NFV nfv, result;
 	private boolean sat = false;
 	private String z3Model;
-	private TestResultsAP testResultsAP;
-	private TestResultsMF testResultsMF;
+	private TestResults testResults;
 	private String AlgoUsed = "AP";
 	int time = 0;
 	VerificationResult res;
@@ -70,12 +68,12 @@ public class VerefooSerializer {
 				VerefooProxy test = new VerefooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(),
 						prop, paths, AlgoUsed);
 				if(AlgoUsed.equals("AP")) {
-				testResultsAP = test.getTestTimeResultsAP();
+				testResults = test.getTestTimeResults();
 				long beginAll = System.currentTimeMillis();
 				res = test.checkNFFGPropertyAP();
 				}
 				else {
-				testResultsMF = test.getTestTimeResultsMF();
+				testResults = test.getTestTimeResults();
 				long beginAll = System.currentTimeMillis();
 				res = test.checkNFFGPropertyMF();
 				}
@@ -95,7 +93,7 @@ public class VerefooSerializer {
 					root = result;
 					sat = true; 
 					System.out.println("SAT\n");
-					testResultsAP.setZ3Result("SAT");
+					testResults.setZ3Result("SAT");
 					}
 					else {
 					 t = new Translator(res.model.toString(), root, g, test.getAllocationNodesMF(), test.getTrafficFlowsMapMF());
@@ -105,17 +103,12 @@ public class VerefooSerializer {
 					root = result;
 					sat = true; 
 					System.out.println("SAT\n");
-					testResultsMF.setZ3Result("SAT");
+					testResults.setZ3Result("SAT");
 					}
 					
 				} else {
 					System.out.println("UNSAT\n");
-				if(AlgoUsed.equals("AP")) {
-					testResultsAP.setZ3Result("UNSAT");
-					}
-					else {
-					testResultsMF.setZ3Result("UNSAT");
-					}
+					testResults.setZ3Result("UNSAT");
 					sat = false;
 					result = root;
 				}
@@ -161,12 +154,9 @@ public class VerefooSerializer {
 		return sat;
 	}
 	
-	public TestResultsAP getTestTimeResultsAP() {
-		return testResultsAP;
+	public TestResults getTestTimeResults() {
+		return testResults;
 	}
 
-	public TestResultsMF getTestTimeResultsMF() {
-		return testResultsMF;
-	}
 	
 }
