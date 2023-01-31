@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 
 import it.polito.verefoo.VerefooNormalizer;
+import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.allocation.AllocationNodeAP;
 import it.polito.verefoo.allocation.AllocationNodeMF;
 import it.polito.verefoo.functions.GenericFunction;
@@ -91,9 +92,9 @@ public class Translator {
 		if (originalNfv.getHosts() != null)
 			originalNfv.getHosts().getHost().forEach(this::searchHost);
 		if(algo.equals("AP"))
-		setAutoPlacementAP();
+		setAutoPlacement("AP");
 		else
-		setAutoPlacementMF();
+		setAutoPlacement("MF");
 		setAutoConfig(algo);
 		if(algo.equals("AP"))
 		removeOptionalNotUsedAP();
@@ -465,7 +466,7 @@ public class Translator {
 	/**
 	 * Remove not used optional network objects from the XML for the Verefoo output
 	 */
-	public void setAutoPlacementAP() {
+	/*public void setAutoPlacementAP() {
 		List<AllocationNodeAP> usableNodes = allocationNodesAP.values().stream()
 				.filter(n -> n.getNode().getConfiguration() == null).collect(Collectors.toList());
 		usableNodes.forEach(allocationNode -> {
@@ -526,13 +527,12 @@ public class Translator {
 			}
 		});
 
-	}
+	}*/
 
-	
 	/**
 	 * Remove not used optional network objects from the XML for the Verefoo output
 	 */
-	public void setAutoPlacementMF() {
+	/*public void setAutoPlacementMF() {
 		List<AllocationNodeMF> usableNodes = allocationNodesMF.values().stream()
 				.filter(n -> n.getNode().getConfiguration() == null).collect(Collectors.toList());
 		usableNodes.forEach(allocationNode -> {
@@ -593,8 +593,95 @@ public class Translator {
 			}
 		});
 
+	}*/
+	
+	/**
+	 * Remove not used optional network objects from the XML for the Verefoo output
+	 * @param algo The algorithm used
+	 */
+	public void setAutoPlacement(String algo) {
+		if(algo.equals("AP")) {
+		List<AllocationNodeAP> usableNodes = allocationNodesAP.values().stream()
+				.filter(n -> n.getNode().getConfiguration() == null).collect(Collectors.toList());
+		setAutoPlacementHelper(usableNodes,algo);
+		}else {
+		List<AllocationNodeMF> usableNodes = allocationNodesMF.values().stream()
+				.filter(n -> n.getNode().getConfiguration() == null).collect(Collectors.toList());
+		setAutoPlacementHelper(usableNodes,algo);
+		}
 	}
 	
+	
+	public <T extends AllocationNode > void setAutoPlacementHelper(List<T> usableNodes,String algo) { // using Generics to avoid code duplication
+		
+		usableNodes.forEach(allocationNode -> {
+			String tosearch = z3Translator.stringToSeachNetworkObjectUsed(allocationNode.getNode());
+			Pattern pattern = Pattern.compile(tosearch);
+			Matcher matcher = pattern.matcher(model);
+
+			while (matcher.find()) {
+				Node n = originalNfv.getGraphs().getGraph().stream().filter(graph -> graph.getId() == g.getId())
+						.flatMap(graph -> graph.getNode().stream())
+						.filter(node -> node.getName().equals(allocationNode.getNode().getName())).findFirst()
+						.orElse(null);
+
+				if (n == null)
+					continue;
+
+				Configuration configuration = new Configuration();
+				configuration.setName("AutoConf");
+				n.setFunctionalType(FunctionalTypes.FIREWALL);
+				Firewall f = new Firewall();
+
+				GenericFunction no = allocationNode.getPlacedNF();
+				if(algo.equals("AP")) {
+				if (no instanceof PacketFilterMF) {
+					PacketFilterMF aclf = (PacketFilterMF) no;
+					if (!aclf.isBlacklisting())
+						f.setDefaultAction(ActionTypes.ALLOW);
+					else
+						f.setDefaultAction(ActionTypes.DENY);
+				 }
+				}else {
+					if (no instanceof PacketFilterAP) {
+						PacketFilterAP aclf = (PacketFilterAP) no;
+						if (!aclf.isBlacklisting())
+							f.setDefaultAction(ActionTypes.ALLOW);
+						else
+							f.setDefaultAction(ActionTypes.DENY);
+					 }
+				}
+				configuration.setFirewall(f);
+				n.setConfiguration(configuration);
+			}
+
+		});
+
+		usableNodes.forEach(allocationNode -> {
+			String tosearch = z3Translator.stringToSeachNetworkObjectNotUsed(allocationNode.getNode());
+			Pattern pattern = Pattern.compile(tosearch);
+			Matcher matcher = pattern.matcher(model);
+
+			while (matcher.find()) {
+				Node n = originalNfv.getGraphs().getGraph().stream().filter(graph -> graph.getId() == g.getId())
+						.flatMap(graph -> graph.getNode().stream())
+						.filter(node -> node.getName().equals(allocationNode.getNode().getName())).findFirst()
+						.orElse(null);
+
+				if (n == null)
+					continue;
+
+				Configuration configuration = new Configuration();
+				configuration.setName("ForwardConf");
+				n.setFunctionalType(FunctionalTypes.FORWARDER);
+				Forwarder f = new Forwarder();
+				f.setName("Forwarder");
+				configuration.setForwarder(f);
+				n.setConfiguration(configuration);
+			}
+		});
+		
+	}
 	
 	/**
 	 * Reduces the host resources according to the node metrics

@@ -52,7 +52,6 @@ public class Main {
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "./xsd/nfvSchema.xsd");
 				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/Murcia/scenario_simple_01.xml")),algo);
-				//TODO: remove (Budapest)
 				if (test.isSat()) {
 					loggerResult.info("SAT");
 					loggerResult.info("----------------------OUTPUT----------------------");

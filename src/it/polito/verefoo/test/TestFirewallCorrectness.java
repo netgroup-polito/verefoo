@@ -77,7 +77,7 @@ public class TestFirewallCorrectness {
         Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
         u.setSchema(schema);
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
-        VerefooSerializer test = new VerefooSerializer(root,"MF"); // Change to "AP" or "MF" to choose algorithm
+        VerefooSerializer test = new VerefooSerializer(root,"AP"); // Change to "AP" or "MF" to choose algorithm
         
         
         if(test.isSat()){

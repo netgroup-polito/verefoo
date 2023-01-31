@@ -85,7 +85,7 @@ public class VerefooProxy {
 	int maximalFlowId = 0;
 
 	/**
-	 * Public constructor for the Verefoo proxy service
+	 * Public constructor for the Verefoo proxy service it executes according to the algorithm chosen
 	 * 
 	 * @param graph              The graph that will be deployed on the network
 	 * @param hosts              The list of hosts in the network
@@ -94,6 +94,7 @@ public class VerefooProxy {
 	 *                           follow
 	 * @param capacityDefinition The list of the capacity for each node that will be
 	 *                           deployed
+	 * @param algo 				 The chosen Algorithm "MF" or "AP"
 	 * @throws BadGraphError
 	 */
 	public VerefooProxy(Graph graph, Hosts hosts, Connections conns, Constraints constraints, List<Property> prop,
