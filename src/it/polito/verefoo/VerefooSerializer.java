@@ -67,16 +67,13 @@ public class VerefooSerializer {
 							EType.INVALID_PROPERTY_DEFINITION);
 				VerefooProxy test = new VerefooProxy(g, root.getHosts(), root.getConnections(), root.getConstraints(),
 						prop, paths, AlgoUsed);
-				if(AlgoUsed.equals("AP")) {
 				testResults = test.getTestTimeResults();
 				long beginAll = System.currentTimeMillis();
+				
+				if(AlgoUsed.equals("AP")) 
 				res = test.checkNFFGPropertyAP();
-				}
-				else {
-				testResults = test.getTestTimeResults();
-				long beginAll = System.currentTimeMillis();
+				else 
 				res = test.checkNFFGPropertyMF();
-				}
 				
 				long endAll = System.currentTimeMillis();
 				//loggerResult.debug("Only checker: " + (endAll - beginAll) + "ms");
@@ -85,18 +82,11 @@ public class VerefooSerializer {
 				
 				if (res.result != Status.UNSATISFIABLE && res.result != Status.UNKNOWN) {
 					// Execute Translator according to algorithm chosen
-					if(AlgoUsed.equals("AP")) {
+					if(AlgoUsed.equals("AP")) 
 					 t = new Translator(res.model.toString(), root, g, test.getAllocationNodesAP(), test.getTrafficFlowsMapAP(), test.getNetworkAtomicPredicates());
-					z3Model = res.model.toString();
-					t.setNormalizer(norm);
-					result = t.convert(AlgoUsed);
-					root = result;
-					sat = true; 
-					System.out.println("SAT\n");
-					testResults.setZ3Result("SAT");
-					}
-					else {
+					else 
 					 t = new Translator(res.model.toString(), root, g, test.getAllocationNodesMF(), test.getTrafficFlowsMapMF());
+		
 					z3Model = res.model.toString();
 					t.setNormalizer(norm);
 					result = t.convert(AlgoUsed);
@@ -104,7 +94,6 @@ public class VerefooSerializer {
 					sat = true; 
 					System.out.println("SAT\n");
 					testResults.setZ3Result("SAT");
-					}
 					
 				} else {
 					System.out.println("UNSAT\n");

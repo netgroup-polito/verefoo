@@ -331,7 +331,7 @@ public class VerefooProxy {
 								if(intersectionPredicate != null && aputilsAP.APCompare(intersectionPredicate, networkAtomicPredicates.get(ap))) {
 									foundIntersection = true;	
 									break;
-								} 
+								}
 							}
 							
 							if(foundIntersection) {
