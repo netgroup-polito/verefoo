@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 
@@ -58,11 +59,21 @@ public class TestPerformanceAutoConfigurationFW {
 	NFV root;
 	private List<Host> pastClients = new ArrayList<>(), pastServers = new ArrayList<>();
 	private Logger logger = LogManager.getLogger("result");
+	private static String algo;
 	/** 
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+        // Ask for algorithm to test MF or AP
+		Scanner myObj = new Scanner(System.in);
+		System.out.println("Enter AP for atomic predicates algorithm Or MF for maximal flows algorithm");
+		algo = myObj.nextLine();
+		while (!algo.equals("AP") && !algo.equals("MF")) { // input validation
+		System.out.println("Choose Correct Algorithms");
+		algo = myObj.nextLine();
+		}
+		System.out.println("The value of algo is : " + algo);
 	}
 
 	/**
@@ -91,7 +102,7 @@ public class TestPerformanceAutoConfigurationFW {
 	private void testCoarse(NFV root) throws Exception{
 		//System.out.println("===========FILE " + file + "===========");
 		long beginAll=System.currentTimeMillis();
-		VerefooSerializer test = new VerefooSerializer(root,"AP"); // change to "AP" or "MF" to choose algo.
+		VerefooSerializer test = new VerefooSerializer(root,algo);
 		long endAll=System.currentTimeMillis();
 		 if(test.isSat()){
 			nSAT++;

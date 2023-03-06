@@ -48,7 +48,7 @@ public class VerefooNormalizer {
 	}
 
 	/**
-	 * Translates properties with a wildcard in a list of properties with the
+	 * Translates properties with a wild card in a list of properties with the
 	 * explicit enumeration of the nodes present in the graph
 	 */
 	private void normalizeProperties() {

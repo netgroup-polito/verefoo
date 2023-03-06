@@ -9,8 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-
+import java.util.Scanner;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -35,8 +34,20 @@ import it.polito.verefoo.utils.TestResults;
  * class takes in input those files, for each of them runs Verefoo and print results and other statistics (time to complete, memory usage etc).
  * */
 public class TestPerformanceScalabilityAtomicPredicatesVerigraphAP {
+	private static String algo;
 	
 	public static void main(String[] args)  {	
+		
+        // Ask for algorithm to test MF or AP
+		Scanner myObj = new Scanner(System.in);
+		System.out.println("Enter AP for atomic predicates algorithm Or MF for maximal flows algorithm");
+		algo = myObj.nextLine();
+		while (!algo.equals("AP") && !algo.equals("MF")) { // input validation
+		System.out.println("Choose Correct Algorithms");
+		algo = myObj.nextLine();
+		}
+		System.out.println("The value of algo is : " + algo);
+		
 		numberPR = 10;
 		numberWC = 20;
 		numberWS = 20;
@@ -111,7 +122,7 @@ public class TestPerformanceScalabilityAtomicPredicatesVerigraphAP {
 
 	private static NFV testCoarse(NFV root) throws Exception{
 		long beginAll=System.currentTimeMillis();
-		VerefooSerializer test = new VerefooSerializer(root,"AP"); // only AP
+		VerefooSerializer test = new VerefooSerializer(root,algo); // only AP
 		long endAll=System.currentTimeMillis();
 		TestResults results = test.getTestTimeResults();
 		

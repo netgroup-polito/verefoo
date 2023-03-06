@@ -111,11 +111,11 @@ public class SimulationsController {
 	                                		"		<Property graph=\"0\" name=\"IsolationProperty\" src=\"10.0.0.2\" dst=\"20.0.0.1\"/> 		 				\r\n" + 
 	                                		"  </PropertyDefinition>\r\n" + 
 	                                		"  <ParsingString></ParsingString>\r\n" + 
-	                                		"</NFV>")})) */ @RequestBody NFV nfv) {
+	                                		"</NFV>")})) */ @RequestBody NFV nfv, String algo) { // user must send also the algorithm to be used
 		StringBuffer url = request.getRequestURL();
 		VerefooSerializer test = null;
 		try {
-			test = new VerefooSerializer(nfv);
+			test = new VerefooSerializer(nfv,algo);
 		} catch (Exception e) {
 			throw new ResponseStatusException(
 					  HttpStatus.BAD_REQUEST, "bad request"

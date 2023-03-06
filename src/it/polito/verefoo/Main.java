@@ -20,9 +20,10 @@ import org.xml.sax.SAXException;
 
 import it.polito.verefoo.extra.BadGraphError;
 import it.polito.verefoo.jaxb.*;
+
+
 /**
  * This is the main class only for testing the Verefoo execution
- *
  */
 
 public class Main {
@@ -39,7 +40,7 @@ public class Main {
 		System.out.println("Choose Correct Algorithms");
 		algo = myObj.nextLine();
 		}
-		try {
+		try { // Preparation of input
 			JAXBContext jc;
 			jc = JAXBContext.newInstance("it.polito.verefoo.jaxb");
 			Unmarshaller u = jc.createUnmarshaller();
@@ -51,6 +52,7 @@ public class Main {
 				Marshaller m = jc.createMarshaller();
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "./xsd/nfvSchema.xsd");
+				// VerefooSearializer takes as parameter the type of algorithm to be used
 				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/Murcia/scenario_simple_02.xml")),algo);
 				if (test.isSat()) {
 					loggerResult.info("SAT");

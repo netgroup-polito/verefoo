@@ -2,6 +2,7 @@ package it.polito.verefoo.allocation;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.microsoft.z3.Context;
 
@@ -275,7 +276,6 @@ public class AllocationManager {
 			source.setPlacedNF(firewall);
 			source.setTypeNF(FunctionalTypes.FIREWALL);
 		}
-	
 	}
 	
 	
@@ -323,6 +323,7 @@ public class AllocationManager {
 		});
 		
 	}
+	
 
 /***********************************************************************Maximal Flows Methods**********************************************************************************/
 	

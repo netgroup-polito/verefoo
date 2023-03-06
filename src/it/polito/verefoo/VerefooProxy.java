@@ -50,27 +50,27 @@ import it.polito.verefoo.graph.Traffic;
  */
 public class VerefooProxy {
 	private Context ctx;
-	private NetContextAP nctxAP; // duplicate variables
+	private NetContextAP nctxAP;
 	private NetContextMF nctxMF;
 	private List<Property> properties;
 	private List<Path> paths;
 	private WildcardManager wildcardManager;
-	private HashMap<String, AllocationNodeAP> allocationNodesAP; // duplicate variables
+	private HashMap<String, AllocationNodeAP> allocationNodesAP;
 	private HashMap<String, AllocationNodeMF> allocationNodesMF;
-	private HashMap<Integer, FlowPathAP> trafficFlowsMapAP; // duplicate variables
+	private HashMap<Integer, FlowPathAP> trafficFlowsMapAP;
 	private HashMap<Integer, FlowPathMF> trafficFlowsMapMF;
 	private HashMap<Integer, SecurityRequirement> securityRequirements;
 	public Checker check;
 	private List<Node> nodes;
 	private List<NodeMetrics> nodeMetrics;
 	private AllocationManager allocationManager;
-	private APUtilsAP aputilsAP; // duplicate variables
+	private APUtilsAP aputilsAP;
 	private String AlgoUsed = "AP";
 
 	/* Atomic predicates */
 	private HashMap<Integer, Predicate> networkAtomicPredicates = new HashMap<>();
 	HashMap<String, Node> transformersNode = new HashMap<>();
-	private TestResults testResults = new TestResults(); // duplicate variables
+	private TestResults testResults = new TestResults();
 	
 	/* Maximal flows */
 	HashMap<String, List<Predicate>> natD1map = new HashMap<>();
@@ -103,7 +103,7 @@ public class VerefooProxy {
 		// Determine what algorithm to be executed
 		this.AlgoUsed = algo;
 		
-		if(AlgoUsed.equals("AP")){
+		if(AlgoUsed.equals("AP")){ // Atomic Predicate algo execution
 			
 		// Initialization of the variables related to the nodes
 		allocationNodesAP = new HashMap<>();
@@ -166,7 +166,7 @@ public class VerefooProxy {
 
 		}
 
-		if(AlgoUsed.equals("MF")){
+		if(AlgoUsed.equals("MF")){ // Maximal flows algorithm execution
 			
 		// Initialization of the variables related to the nodes
 		allocationNodesMF = new HashMap<>();
@@ -264,40 +264,40 @@ public class VerefooProxy {
 		}
 		System.out.println();	
 		
-		//DEBUG: print atomic flows for each requirement
-//		for(SecurityRequirement sr : securityRequirements.values()) {
-//			Property prop = sr.getOriginalProperty();
-//			System.out.println("\nConsidering requirement {"+prop.getSrc()+","+prop.getSrcPort()+","+prop.getDst()+","+prop.getDstPort()+","+prop.getLv4Proto()+"}");   
-//			for(FlowPath flow: sr.getFlowsMap().values()) {
-//				Map<Integer, AtomicFlow> atomicFlowsMap = flow.getAtomicFlowsMap();
-//				Map<Integer, AtomicFlow> atomicFlowsToDiscardMap = flow.getAtomicFlowsToDiscardMap();
-//				List<AllocationNode> path = flow.getPath();
-//				if(atomicFlowsMap != null) {
-//					System.out.println("Atomic flows accepted");
-//					for(Map.Entry<Integer, AtomicFlow> entry: atomicFlowsMap.entrySet()) {
-//						int index = 0;
-//						System.out.print(entry.getKey() + ": ");
-//						for(Integer ap: entry.getValue().getAtomicPredicateList()) {
-//							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
-//							index++;
-//						}
-//						System.out.println(path.get(index).getIpAddress());
-//					}
-//					System.out.println("Atomic flows discarded");
-//					for(Map.Entry<Integer, AtomicFlow> entry: atomicFlowsToDiscardMap.entrySet()) {
-//						int index = 0;
-//						System.out.print(entry.getKey() + ": ");
-//						for(Integer ap: entry.getValue().getAtomicPredicateList()) {
-//							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
-//							index++;
-//						}
-//						System.out.println();
-//					}
-//				}
-//			}
-//		}
-//		System.out.println();
-		//END DEBUG
+	/*	//DEBUG: print atomic flows for each requirement
+		for(SecurityRequirement sr : securityRequirements.values()) {
+			Property prop = sr.getOriginalProperty();
+			System.out.println("\nConsidering requirement {"+prop.getSrc()+","+prop.getSrcPort()+","+prop.getDst()+","+prop.getDstPort()+","+prop.getLv4Proto()+"}");   
+			for(FlowPath flow: sr.getFlowsMap().values()) {
+				Map<Integer, AtomicFlow> atomicFlowsMap = flow.getAtomicFlowsMap();
+				Map<Integer, AtomicFlow> atomicFlowsToDiscardMap = flow.getAtomicFlowsToDiscardMap();
+				List<AllocationNode> path = flow.getPath();
+				if(atomicFlowsMap != null) {
+					System.out.println("Atomic flows accepted");
+					for(Map.Entry<Integer, AtomicFlow> entry: atomicFlowsMap.entrySet()) {
+						int index = 0;
+						System.out.print(entry.getKey() + ": ");
+						for(Integer ap: entry.getValue().getAtomicPredicateList()) {
+							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
+							index++;
+						}
+						System.out.println(path.get(index).getIpAddress());
+					}
+					System.out.println("Atomic flows discarded");
+					for(Map.Entry<Integer, AtomicFlow> entry: atomicFlowsToDiscardMap.entrySet()) {
+						int index = 0;
+						System.out.print(entry.getKey() + ": ");
+						for(Integer ap: entry.getValue().getAtomicPredicateList()) {
+							System.out.print(path.get(index).getIpAddress() + ", " + ap + ", ");
+							index++;
+						}
+						System.out.println();
+					}
+				}
+			}
+		}
+		System.out.println();
+		//END DEBUG*/
 		
 		//Total number of flows
 		long totalFlows = 0;
@@ -389,9 +389,7 @@ public class VerefooProxy {
 							}
 							
 						}
-						
-						
-						
+												
 						index++;
 					}
 					
@@ -400,6 +398,7 @@ public class VerefooProxy {
 			}
 		}
 	}
+	
 // For debugging purposes must have two classes of it one for AP and one for MF
 	/*
 	private void printTransformations() {
@@ -872,6 +871,7 @@ public class VerefooProxy {
 		return networkAtomicPredicates;
 	}
 	
+/*****************************************************AP duplicated methods**************************************************************************/
 	/**
 	 * This method allocates the functions on allocation nodes that are empty.
 	 * At the moment only packet-filtering capability is allocated, in the future the decision will depend on the type of requirement.
@@ -1105,42 +1105,6 @@ public class VerefooProxy {
 		return trafficFlowsMapAP;
 	}
 	
-
-	/**
-	 * Checks if the service graph satisfies all the imposed conditions
-	 * 
-	 * @return
-	 */
-	public VerificationResult checkNFFGPropertyMF() {
-		VerificationResult ret = this.check.propertyCheckMF();
-		ret.time = this.check.getTimeChecker();
-		return ret;
-	}
-
-	/**
-	 * Get Net Context
-	 * 
-	 * @return the net context
-	 */
-	public NetContextMF getNctxMF() {
-		return nctxMF;
-	}
-
-
-	/**
-	 * @return all the allocation nodes
-	 */
-	public Map<String, AllocationNodeMF> getAllocationNodesMF() {
-		return allocationNodesMF;
-	}
-
-	
-	/**
-	 * @return all the requirements
-	 */
-	public Map<Integer, FlowPathMF> getTrafficFlowsMapMF(){
-		return trafficFlowsMapMF;
-	}
 	
 	/**
 	 * Get Time Results
@@ -1240,14 +1204,6 @@ public class VerefooProxy {
 	public APUtilsAP getAputilsAP() {
 		return aputilsAP;
 	}
-	/**
-	 * Get the APUtilsMF
-	 * 
-	 * @return the APUtilsMF class Object
-	 */
-	public APUtilsMF getAputilsMF() {
-		return aputilsMF;
-	}
 	
 	/**
 	 * Get the Network Atomic Predicates
@@ -1265,8 +1221,51 @@ public class VerefooProxy {
 	public TestResults getTestResults() {
 		return testResults;
 	}
+/*****************************************************MF duplicate methods***************************************************************************/
+	/**
+	 * Checks if the service graph satisfies all the imposed conditions
+	 * 
+	 * @return
+	 */
+	public VerificationResult checkNFFGPropertyMF() {
+		VerificationResult ret = this.check.propertyCheckMF();
+		ret.time = this.check.getTimeChecker();
+		return ret;
+	}
+
+	/**
+	 * Get Net Context
+	 * 
+	 * @return the net context
+	 */
+	public NetContextMF getNctxMF() {
+		return nctxMF;
+	}
+
+
+	/**
+	 * @return all the allocation nodes
+	 */
+	public Map<String, AllocationNodeMF> getAllocationNodesMF() {
+		return allocationNodesMF;
+	}
+
 	
-/************************************************** Maximal Flows Methods (MF also uses some of AP methods) **************************************************************/
+	/**
+	 * @return all the requirements
+	 */
+	public Map<Integer, FlowPathMF> getTrafficFlowsMapMF(){
+		return trafficFlowsMapMF;
+	}
+	
+	/**
+	 * Get the APUtilsMF
+	 * 
+	 * @return the APUtilsMF class Object
+	 */
+	public APUtilsMF getAputilsMF() {
+		return aputilsMF;
+	}
 
 	
 	/**
@@ -1462,7 +1461,8 @@ public class VerefooProxy {
 		}
 		
 	}
-
+/***************************************************************** Maximal Flows Methods**************************************************************/
+	
  // only for MF method
 	private void fillTrasformersMap() {
 		int nCrossedFirewalls = 0;

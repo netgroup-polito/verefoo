@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
@@ -36,12 +37,22 @@ import it.polito.verefoo.utils.VerificationResult;
  *
  */
 public class TestFirewallCorrectness {
-
+	private static String algo;
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
+	public static void setUpBeforeClass() throws Exception { // run once before all tests to enter the algorithm used
+        // Ask for algorithm to test MF or AP
+		Scanner myObj = new Scanner(System.in);
+		System.out.println("Enter AP for atomic predicates algorithm Or MF for maximal flows algorithm");
+		algo = myObj.nextLine();
+		while (!algo.equals("AP") && !algo.equals("MF")) { // input validation
+		System.out.println("Choose Correct Algorithms");
+		algo = myObj.nextLine();
+		}
+		System.out.println("The value of algo is : " + algo);
 	}
 
 	/**
@@ -77,7 +88,8 @@ public class TestFirewallCorrectness {
         Schema schema = sf.newSchema( new File( "./xsd/nfvSchema.xsd" )); 
         u.setSchema(schema);
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
-        VerefooSerializer test = new VerefooSerializer(root,"AP"); // Change to "AP" or "MF" to choose algorithm
+        
+		VerefooSerializer test = new VerefooSerializer(root,algo);
         
         
         if(test.isSat()){

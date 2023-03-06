@@ -13,6 +13,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 
@@ -60,8 +61,19 @@ import it.polito.verefoo.utils.VerificationResult;
  */
 public class TestTopologyValidation {
 
+	private static String algo;
 	public static void main(String[] args)  {
 
+        // Ask for algorithm to test MF or AP
+		Scanner myObj = new Scanner(System.in);
+		System.out.println("Enter AP for atomic predicates algorithm Or MF for maximal flows algorithm");
+		algo = myObj.nextLine();
+		while (!algo.equals("AP") && !algo.equals("MF")) { // input validation
+		System.out.println("Choose Correct Algorithms");
+		algo = myObj.nextLine();
+		}
+		System.out.println("The value of algo is : " + algo);
+		
 		String path = "./testfile/NetworkTopology/Internet2.xml";
 		//seed = 95485;
 		//seed = 1413;
@@ -211,7 +223,7 @@ public class TestTopologyValidation {
 
 	private static NFV testCoarse(NFV root) throws Exception{
 		long beginAll=System.currentTimeMillis();
-		VerefooSerializer test = new VerefooSerializer(root,"AP"); // change to choose algo.
+		VerefooSerializer test = new VerefooSerializer(root,algo); // change to choose algo.
 		
 		JAXBContext jc;
 		jc = JAXBContext.newInstance("it.polito.verefoo.jaxb");
