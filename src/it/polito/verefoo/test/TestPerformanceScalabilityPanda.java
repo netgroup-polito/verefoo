@@ -77,7 +77,7 @@ public class TestPerformanceScalabilityPanda {
 		//if(args.length!=4) return;
 		
 		//783327
-		seed=Integer.parseInt(System.getProperty("it.polito.verefoo.test.seed"));
+		seed=Integer.parseInt("783327");
 		Random random=new Random(seed);
         numberAP  = 0;
         

@@ -33,26 +33,16 @@ import it.polito.verefoo.translator.Translator;
 import it.polito.verefoo.utils.VerificationResult;
 /**
  * 
- * This class runs some tests in order to check the correctness of the auto-configuration module
+ * This class runs some tests in order to check the correctness of the auto-configuration module of Both Algorithm Maximal Flows and Atomic Predicates
  *
  */
 public class TestFirewallCorrectness {
-	private static String algo;
 	
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception { // run once before all tests to enter the algorithm used
-        // Ask for algorithm to test MF or AP
-		Scanner myObj = new Scanner(System.in);
-		System.out.println("Enter AP for atomic predicates algorithm Or MF for maximal flows algorithm");
-		algo = myObj.nextLine();
-		while (!algo.equals("AP") && !algo.equals("MF")) { // input validation
-		System.out.println("Choose Correct Algorithms");
-		algo = myObj.nextLine();
-		}
-		System.out.println("The value of algo is : " + algo);
 	}
 
 	/**
@@ -76,7 +66,7 @@ public class TestFirewallCorrectness {
 	public void tearDown() throws Exception {
 	}
 	
-	private VerefooSerializer test(String file) throws Exception{
+	private VerefooSerializer test(String file,String alg) throws Exception{ // alg is the algorithm used
 		List<Node> tmp = new ArrayList<>();
 		// create a JAXBContext capable of handling the generated classes
         System.out.println("===========FILE " + file + "===========");
@@ -89,7 +79,7 @@ public class TestFirewallCorrectness {
         u.setSchema(schema);
         NFV root = (NFV) u.unmarshal( new FileInputStream( file ) );
         
-		VerefooSerializer test = new VerefooSerializer(root,algo);
+		VerefooSerializer test = new VerefooSerializer(root,alg);
         
         
         if(test.isSat()){
@@ -108,9 +98,22 @@ public class TestFirewallCorrectness {
 	 * This test checks if a manually configured firewall correctly blocks all the packets.
 	 */
 	@Test
-	public void testFWCorrectness01(){
+	public void testFWCorrectness01AP(){
 		try {
-			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect01.xml"); 
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect01.xml","AP"); 
+			assertTrue(!result.isSat());
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if a manually configured firewall correctly blocks all the packets.
+	 */
+	@Test
+	public void testFWCorrectness01MF(){
+		try {
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect01.xml","MF"); 
 			assertTrue(!result.isSat());
 		} catch (Exception e) {
 			fail(e.toString());
@@ -122,23 +125,36 @@ public class TestFirewallCorrectness {
 	 * It should be UNSAT
 	 */
 	@Test
-	public void testFWCorrectness02(){
+	public void testFWCorrectness02AP(){
 		try {
-			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect02.xml"); 
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect02.xml","AP"); 
 			assertTrue(!result.isSat());
 		} catch (Exception e) {
 			fail(e.toString());
 		}
 	}
 	
+	/**
+	 * This test checks if a manually configured firewall correctly - with a wrong configuration - is not able to block the packets. 
+	 * It should be UNSAT
+	 */
+	@Test
+	public void testFWCorrectness02MF(){
+		try {
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect02.xml","MF"); 
+			assertTrue(!result.isSat());
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
 	
 	/**
 	 * This test checks if an auto-configured firewall configures only a rule which allows only a communication.
 	 */
 	@Test
-	public void testFWCorrectness03(){
+	public void testFWCorrectness03AP(){
 		try {
-			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect03.xml"); 
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect03.xml","AP"); 
 			assertTrue(result.isSat());
 			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
 			assertTrue(listFW.size() == 2);
@@ -153,14 +169,34 @@ public class TestFirewallCorrectness {
 		}
 	}
 	
+	/**
+	 * This test checks if an auto-configured firewall configures only a rule which allows only a communication.
+	 */
+	@Test
+	public void testFWCorrectness03MF(){
+		try {
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect03.xml","MF"); 
+			assertTrue(result.isSat());
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
+			assertTrue(listFW.size() == 2);
+			Node node = listFW.get(0);
+		
+			assertTrue(node.getConfiguration().getFirewall().getElements().size() == 1);
+			Elements element =node.getConfiguration().getFirewall().getElements().get(0);
+			assertTrue(element.getSource().equals("10.0.0.1"));
+			assertTrue(element.getDestination().equals("20.0.0.1"));
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
 	
 	/**
 	 * This test checks if an auto-configured firewall configures only a rule which blocks traffic coming ONLY from 10.0.0.1
 	 */
 	@Test
-	public void testFWCorrectness04(){
+	public void testFWCorrectness04AP(){
 		try {
-			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect04.xml"); 
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect04.xml","AP"); 
 			assertTrue(result.isSat());
 			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
 			assertTrue(listFW.size() == 1);
@@ -175,6 +211,26 @@ public class TestFirewallCorrectness {
 		}
 	}
 	
+	/**
+	 * This test checks if an auto-configured firewall configures only a rule which blocks traffic coming ONLY from 10.0.0.1
+	 */
+	@Test
+	public void testFWCorrectness04MF(){
+		try {
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect04.xml","MF"); 
+			assertTrue(result.isSat());
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
+			assertTrue(listFW.size() == 1);
+			Node node = listFW.get(0);
+		
+			assertTrue(node.getConfiguration().getFirewall().getElements().size() == 1);
+			Elements element =node.getConfiguration().getFirewall().getElements().get(0);
+			assertTrue(element.getSource().equals("10.0.0.1"));
+			assertTrue(element.getDestination().equals("20.0.0.1"));
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
 	
 	/**
 	 * Test about policies from clients and from server at the same time
@@ -183,7 +239,7 @@ public class TestFirewallCorrectness {
 	@Test
 	public void testFWCorrectness05(){
 		try {
-			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect05.xml"); 
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect05.xml","MF"); 
 			assertTrue(result.isSat());
 			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
 			assertTrue(listFW.size() == 1);
@@ -207,9 +263,9 @@ public class TestFirewallCorrectness {
 	 * Only a firewall configures an ALLOW rule, the other is simply in DENY mode
 	 */
 	@Test
-	public void testFWCorrectness06(){
+	public void testFWCorrectness06AP(){
 		try {
-			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect06.xml"); 
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect06.xml","AP"); 
 			assertTrue(result.isSat());
 			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
 			assertTrue(listFW.size() == 2);
@@ -238,16 +294,66 @@ public class TestFirewallCorrectness {
 		}
 	}
 	
-	
+	/**
+	 * Test about two alternative paths
+	 * Only a firewall configures an ALLOW rule, the other is simply in DENY mode
+	 */
+	@Test
+	public void testFWCorrectness06MF(){
+		try {
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect06.xml","MF"); 
+			assertTrue(result.isSat());
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
+			assertTrue(listFW.size() == 2);
+			
+			boolean correct1 = false;
+			boolean correct2 = false;
+		
+			for(Node fw : listFW) {
+				List<Elements> elements = fw.getConfiguration().getFirewall().getElements();
+				if(elements.size() == 0) {
+					correct1 = true;
+				} else if(elements.size() == 1) {
+					Elements element = elements.get(0);
+					if(
+						(element.getSource().equals("-1.-1.-1.-1") && element.getDestination().equals("10.-1.-1.-1")) ||
+						(element.getSource().equals("20.0.0.1") && element.getDestination().equals("10.0.0.1"))
+						) {
+						correct2 = true;
+					}
+				}
+			}
+		
+			assertTrue(correct1 && correct2);
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
 	
 	/**
 	 * Test about placement
 	 * There are two paths, but now firewall must be placed
 	 */
 	@Test
-	public void testFWCorrectness07(){
+	public void testFWCorrectness07AP(){
 		try {
-			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect07.xml"); 
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect07.xml","AP"); 
+			assertTrue(result.isSat());
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
+			assertTrue(listFW.size() == 0);
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * Test about placement
+	 * There are two paths, but now firewall must be placed
+	 */
+	@Test
+	public void testFWCorrectness07MF(){
+		try {
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect07.xml","MF"); 
 			assertTrue(result.isSat());
 			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
 			assertTrue(listFW.size() == 0);
@@ -261,9 +367,9 @@ public class TestFirewallCorrectness {
 	 * Only a firewall is removed, because it was optional
 	 */
 	@Test
-	public void testFWCorrectness08(){
+	public void testFWCorrectness08AP(){
 		try {
-			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect08.xml"); 
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect08.xml","AP"); 
 			assertTrue(result.isSat());
 			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
 			assertTrue(listFW.size() == 2);
@@ -290,16 +396,48 @@ public class TestFirewallCorrectness {
 		}
 	}
 	
-	
+	/**
+	 * Test about removal of firewall
+	 * Only a firewall is removed, because it was optional
+	 */
+	@Test
+	public void testFWCorrectness08MF(){
+		try {
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect08.xml","MF"); 
+			assertTrue(result.isSat());
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
+			assertTrue(listFW.size() == 2);
+			
+			boolean correct1 = false;
+			boolean correct2 = false;
+			boolean correct3 = true;
+			
+			for(Node fw : listFW) {
+				if(fw.getName().equals("30.0.0.1")) {
+					correct1 = true;
+				}
+				if(fw.getName().equals("30.0.0.3")) {
+					correct2 = true;
+				}
+				if(fw.getName().equals("30.0.0.2")) {
+					correct3 = false;
+				}
+			}
+		
+			assertTrue(correct1 && correct2 && correct3);
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
 	
 	/**
 	 * Test about removal of firewall
 	 * All the firewalls are removed, except one, and a client becomes directly connected to the server
 	 */
 	@Test
-	public void testFWCorrectness09(){
+	public void testFWCorrectness09AP(){
 		try {
-			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect09.xml"); 
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect09.xml","AP"); 
 			assertTrue(result.isSat());
 			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
 			assertTrue(listFW.size() == 1);
@@ -322,5 +460,34 @@ public class TestFirewallCorrectness {
 		}
 	}
 	
+	/**
+	 * Test about removal of firewall
+	 * All the firewalls are removed, except one, and a client becomes directly connected to the server
+	 */
+	@Test
+	public void testFWCorrectness09MF(){
+		try {
+			VerefooSerializer result = test( "./testfile/FWCorrectness/FWCorrect09.xml","MF"); 
+			assertTrue(result.isSat());
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
+			assertTrue(listFW.size() == 1);
+			
+			boolean correct = false;
+			
+			for(Node fw : listFW) {
+				if(fw.getName().equals("30.0.0.2")) {
+					correct = true;
+				}
+			}
+		
+			assertTrue(correct);
+			
+			Node client = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getName().equals("10.0.0.1")).findAny().orElse(null);
+			assertTrue(client != null);
+			assertTrue(client.getNeighbour().get(0).getName().equals("20.0.0.1"));
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
 	
 }

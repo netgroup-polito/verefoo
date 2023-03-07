@@ -50,7 +50,7 @@ import it.polito.verefoo.utils.VerificationResult;
 /**
  * 
  * This class runs some tests to collect some data about the performance of the tool 
- *
+ *  TO BE REMOVED, THIS TEST IS NOT USEFULL
  */
 public class TestPerformanceAutoConfigurationFW {
 	private long condTime = 0, checkTimeSAT = 0, checkTimeUNSAT = 0, totTime = 0;
