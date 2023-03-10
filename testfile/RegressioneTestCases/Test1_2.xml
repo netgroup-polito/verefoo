@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../xsd/nfvSchema.xsd">
+	<!-- 2 Web Clients - 1 Web Server - 1 Forwarder -->
+	<graphs>
+		<graph id="0">
+
+			<node functional_type="WEBCLIENT" name="40.40.41.1"> <!-- End point -->
+				<neighbour name="1.0.0.1" />
+				<configuration description="e1" name="endpoint1">
+					<webclient nameWebServer="130.10.0.1" />
+				</configuration>
+			</node>
+            
+			<node functional_type="WEBCLIENT" name="40.40.42.1"> <!-- End point -->
+				<neighbour name="1.0.0.2" />
+				<configuration description="e2" name="endpoint2">
+					<webclient nameWebServer="130.10.0.1" />
+				</configuration>
+			</node>
+
+			<node functional_type="WEBSERVER" name="130.10.0.1"> <!-- web server 1 -->
+				<neighbour name="1.0.0.3" />
+				<configuration description="e3" name="httpserver1">
+					<webserver>
+						<name>130.10.0.1</name>
+					</webserver>
+				</configuration>
+			</node>
+
+			<node functional_type="FORWARDER" name="33.33.33.2"> <!-- Forwarder  -->
+				<neighbour name="1.0.0.1" />
+				<neighbour name="1.0.0.2" />
+                <neighbour name="1.0.0.3" />
+				 <configuration name="ForwardConf">
+					<forwarder>
+						<name>Forwarder</name>
+					</forwarder>
+				</configuration>
+			</node>
+
+			<node name="1.0.0.1"> <!-- a1 -->
+				<neighbour name="40.40.41.1" />
+				<neighbour name="33.33.33.2" />
+			</node>
+			
+			<node name="1.0.0.2"> <!-- a2 -->
+				<neighbour name="40.40.42.1" />
+				<neighbour name="33.33.33.2" />
+			</node>
+
+			<node name="1.0.0.3"> <!-- a3 -->
+				<neighbour name="130.10.0.1" />
+				<neighbour name="33.33.33.2" />
+			</node>
+
+		</graph>
+	</graphs>
+	<Constraints>
+		<NodeConstraints/>
+		<LinkConstraints />
+	</Constraints>
+	<PropertyDefinition>
+			<!-- policy 1 -->
+			<Property graph="0" name="ReachabilityProperty" src="40.40.41.1" dst="130.10.0.1" /> 
+			<Property graph="0" name="ReachabilityProperty" src="130.10.0.1" dst="40.40.41.1" /> 
+			<!-- policy 2-->
+			<Property graph="0" name="IsolationProperty" src="40.40.42.1" dst="130.10.0.1" /> 
+			<Property graph="0" name="IsolationProperty" src="130.10.0.1" dst="40.40.42.1" /> 
+
+	</PropertyDefinition>
+</NFV>
