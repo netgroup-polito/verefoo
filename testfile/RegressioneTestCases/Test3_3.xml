@@ -176,7 +176,7 @@
 		<NodeConstraints/>
 		<LinkConstraints />
 	</Constraints>
-	<PropertyDefinition> <!-- This is a good test case for Maximal Flows, but leads to un-determinstic results using Atomic Predicates -->
+	<PropertyDefinition> <!-- This is a good test case for Maximal Flows -->
 			<!-- Policy One -->
 			<Property graph="0" name="IsolationProperty" src="40.40.42.-1" dst="130.10.0.1" dst_port="0-79" lv4proto="TCP" /> <!-- Deny != 80 -->
 			<Property graph="0" name="IsolationProperty" src="40.40.42.-1" dst="130.10.0.1" dst_port="81-65535" lv4proto="TCP"/> 

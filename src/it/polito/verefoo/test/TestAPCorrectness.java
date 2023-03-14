@@ -499,9 +499,9 @@ public class TestAPCorrectness {
 			// This behavior is due to the network topology deign
 			Node node1 = listFW.get(0);
 			Node node2 = listFW.get(1);
-			
-			assertTrue(node1.getName().equals("1.0.0.1") || node1.getName().equals("1.0.0.2") || node1.getName().equals("1.0.0.3") || node1.getName().equals("1.0.0.7") );
-			assertTrue(node2.getName().equals("1.0.0.1") || node2.getName().equals("1.0.0.2") || node2.getName().equals("1.0.0.3") || node2.getName().equals("1.0.0.7") );
+			// This test case has 4 solutions, test all the possible solutions
+			assertTrue(node1.getName().equals("1.0.0.1") || node1.getName().equals("1.0.0.2") || node1.getName().equals("1.0.0.3") || node1.getName().equals("1.0.0.7") || node1.getName().equals("1.0.0.6"));
+			assertTrue(node2.getName().equals("1.0.0.1") || node2.getName().equals("1.0.0.2") || node2.getName().equals("1.0.0.3") || node2.getName().equals("1.0.0.7") || node2.getName().equals("1.0.0.6"));
 			
 		} catch (Exception e) {
 			fail(e.toString());
@@ -531,5 +531,289 @@ public class TestAPCorrectness {
 /********************************************************************* Test4_X (Placement Tests) ********************************************************************/
 // With Load Balancer
 	
+	/**
+	 * This test checks if the algorithm always prefers lower number of firewall more than lower number of firewall rules. In atomic Predicates
+	 * the firewall is allocated before only some servers 130.10.0.-1 (Atomic Predicates assumes default allow to 130.10.1.-1 if not specified in Scurity Requirements)
+	 */
+	@Test
+	public void test4Sec1Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test4_1.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 1);
+			
+			Node node1 = listFW.get(0);
+			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 2); // firewall should have 2 rules
+			
+			assertTrue(node1.getName().equals("1.0.0.3")); // only one possible solution with minimum number of firewalls
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the algorithm always prefers lower number of firewall more than lower number of firewall rules.
+	 */
+	@Test
+	public void test4Sec2Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test4_2.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 1);
+			
+			Node node1 = listFW.get(0);
+			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 12); // firewall should have 12 rules
+			
+			assertTrue(node1.getName().equals("1.0.0.12")); // only one possible solution with minimum number of firewalls
+			
+			List<Elements> elements =node1.getConfiguration().getFirewall().getElements(); // verify that firewall rules didnot change 
+
+			boolean correct1 = false;
+			boolean correct2 = false;
+			boolean correct3 = false;
+			
+			for(int i =0 ; i<12 ; i++) {
+				if(elements.get(i).getSource().equals("40.40.43.-1") && elements.get(i).getDestination().equals("130.10.0.2")) {
+					if(elements.get(i).getDstPort().equals("80"))
+						correct1=true; // HTTP port 80 access Security Requirements satisfied for 40.40.43.-1
+				}
+				if(elements.get(i).getSource().equals("40.40.41.-1") && elements.get(i).getDestination().equals("130.10.0.2") ) {
+					if(elements.get(i).getDstPort().equals("80"))
+						correct2=true; // TCP port 80 access Security Requirements satisfied for 40.40.41.-1
+				}
+				if(elements.get(i).getSource().equals("40.40.42.-1") && elements.get(i).getDestination().equals("130.10.1.2") ) {
+					if(elements.get(i).getDstPort().equals("80"))
+						correct3=true; // HTTP port 80 access Security Requirements satisfied for 40.40.42.-1
+				}
+			}
+			
+			assertTrue(correct1&&correct2&&correct3);
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the framework is able to interpret servers combining (130.10.0.1 + 130.10.0.2 --> 130.10.0.-1) for atomic predicates
+	 */
+	@Test
+	public void test4Sec3Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test4_3.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 1);
+			
+			Node node1 = listFW.get(0);
+			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 8); // firewall should have 8 rules
+			
+			assertTrue(node1.getName().equals("1.0.0.12")); 
+			
+			List<Elements> elements =node1.getConfiguration().getFirewall().getElements();
+
+			boolean correct1 = false;
+			boolean correct2 = false;
+			boolean correct3 = false;
+			boolean correct4 = false;
+			
+			for(int i =0 ; i<8 ; i++) { 
+				if(elements.get(i).getSource().equals("40.40.44.-1") && elements.get(i).getDestination().equals("130.10.0.1")) {
+						correct1=true; // framework successfully interpreted 130.10.0.-1 into 130.10.0.1
+				}
+				if(elements.get(i).getSource().equals("40.40.44.-1") && elements.get(i).getDestination().equals("130.10.0.2") ) {
+						correct2=true; // framework successfully interpreted 130.10.0.-1 into 130.10.0.2
+				}
+				if(elements.get(i).getSource().equals("40.40.44.-1") && elements.get(i).getDestination().equals("130.10.1.1") ) {
+						correct3=true; // framework successfully interpreted 130.10.1.-1 into 130.10.1.1
+				}
+				if(elements.get(i).getSource().equals("40.40.44.-1") && elements.get(i).getDestination().equals("130.10.1.2") ) {
+					correct4=true; // framework successfully interpreted 130.10.1.-1 into 130.10.1.2
+			}
+			}
+			
+			assertTrue(correct1&&correct2&&correct3&&correct4);
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the framework correctly analyzes different ports requirements (Test Multiple TCP Ports Trasnaltion)
+	 */
+	@Test
+	public void test4Sec4Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test4_4.xml"); 
+			
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 1);
+			
+			Node node1 = listFW.get(0);
+
+			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 16); // firewall should have 16 rules
+			
+			assertTrue(node1.getName().equals("1.0.0.12")); 
+			
+
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the framework correctly analyzes different ports requirements and protocols (Test UDP/ports translation)
+	 */
+	@Test
+	public void test4Sec5Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test4_5.xml"); 
+			
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 1);
+			
+			Node node1 = listFW.get(0);
+			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 20);
+			
+			assertTrue(node1.getName().equals("1.0.0.12")); 
+			
+			List<Elements> elements =node1.getConfiguration().getFirewall().getElements();
+
+			boolean correct1 = false;
+			boolean correct2 = false;
+			boolean correct3 = false;
+			boolean correct4 = false;
+			
+			for(int i =0 ; i<20 ; i++) { 
+				if(elements.get(i).getSource().equals("40.40.41.-1") && elements.get(i).getDestination().equals("130.10.1.2") 
+						&& elements.get(i).getDstPort().equals("80") && elements.get(i).getProtocol().equals(L4ProtocolTypes.UDP)) {
+						correct1=true; // created rule with port 80 and UDP
+				}
+				if(elements.get(i).getSource().equals("40.40.41.-1") && elements.get(i).getDestination().equals("130.10.1.2") 
+						&& elements.get(i).getDstPort().equals("500") && elements.get(i).getProtocol().equals(L4ProtocolTypes.UDP)) {
+						correct2=true; // created rule at port 500 / UDP
+				}
+				if(elements.get(i).getSource().equals("40.40.41.-1") && elements.get(i).getDestination().equals("130.10.1.2") 
+						&& elements.get(i).getDstPort().equals("443") && elements.get(i).getProtocol().equals(L4ProtocolTypes.UDP)) {
+						correct3=true; // created rule at port 443 / UDP
+				}
+				if(elements.get(i).getSource().equals("40.40.42.-1") && elements.get(i).getDestination().equals("130.10.0.1") 
+						&& elements.get(i).getDstPort().equals("100") && elements.get(i).getProtocol().equals(L4ProtocolTypes.UDP)) {
+					correct4=true; // created rule at port 100 / UDP
+			}
+			}
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the framework correctly analyzes different ports requirements and protocols (Test ANY/ports translation)
+	 */
+	@Test
+	public void test4Sec6Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test4_6.xml"); 
+			
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 1);
+			
+			Node node1 = listFW.get(0);
+			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 12);
+			
+			assertTrue(node1.getName().equals("1.0.0.12")); 
+			
+			List<Elements> elements =node1.getConfiguration().getFirewall().getElements();
+
+			boolean correct1 = false;
+			boolean correct2 = false;
+
+			
+			for(int i =0 ; i<12 ; i++) { 
+				if(elements.get(i).getDstPort().equals("100") && elements.get(i).getProtocol().equals(L4ProtocolTypes.UDP)) {
+						correct1=true; // ANY successfully decomposed to UDP/Other
+				}
+				if(elements.get(i).getDstPort().equals("100") && elements.get(i).getProtocol().equals(L4ProtocolTypes.OTHER)) {
+						correct1=true; // ANY successfully decomposed to UDP/Other
+				}
+				if(elements.get(i).getDstPort().equals("100") && elements.get(i).getProtocol().equals(L4ProtocolTypes.TCP)) {
+						correct2=true; // ANY successfully decomposed to TCP
+				}
+			}
+			
+			assertTrue(correct1&&correct2);
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
 	
 }

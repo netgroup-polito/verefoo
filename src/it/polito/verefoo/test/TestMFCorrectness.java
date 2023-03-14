@@ -502,6 +502,7 @@ public class TestMFCorrectness {
 			//Correctness 3
 			Node node1 = listFW.get(0);
 			Node node2 = listFW.get(1);
+			System.out.println("The number of firewall rules is :  "+ node1.getConfiguration().getFirewall().getElements().size() + node2.getConfiguration().getFirewall().getElements().size());
 			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 2); // firewall should have 2 rules
 			assertTrue(node2.getConfiguration().getFirewall().getElements().size() == 2); // firewall should have 2 rules
 			
@@ -576,6 +577,229 @@ public class TestMFCorrectness {
 /********************************************************************* Test4_X (Placement Tests) ********************************************************************/
 // With Load Balancer
 	
+	/**
+	 * This test checks if the algorithm always prefers lower number of firewall more than lower number of firewall rules. In Maximal Flows 
+	 * the firewall is allocated before all servers, including servers 130.10.1.-1
+	 */
+	@Test
+	public void test4Sec1Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test4_1.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 1);
+			
+			Node node1 = listFW.get(0);
+			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 1); // firewall should have 1 rules
+			
+			assertTrue(node1.getName().equals("1.0.0.12")); // only one possible solution with minimum number of firewalls
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
 	
+	
+	/**
+	 * This test case have security requirements too generic for maximal flows, the result will be too generic.
+	 */
+	@Test
+	public void test4Sec2Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test4_2.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 1);
+			
+			Node node1 = listFW.get(0);
+			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 1); // firewall should have 1 rules
+			
+			assertTrue(node1.getName().equals("1.0.0.12")); // only one possible solution with minimum number of firewalls
+			
+			
+			List<Elements> elements =node1.getConfiguration().getFirewall().getElements(); // verify that firewall rules didnot change 
+
+			boolean correct1 = false;
+			
+				if(elements.get(0).getSource().equals("-1.-1.-1.-1") && elements.get(0).getDestination().equals("-1.-1.-1.-1")) {
+					if(elements.get(0).getDstPort().equals("80"))
+						correct1=true; 
+				}
+
+			
+			assertTrue(correct1);
+			
+			
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	
+	/**
+	 * This test checks if the framework is able to interpret servers combining (130.10.0.1 + 130.10.0.2 --> 130.10.0.-1) for maximal flows
+	 * Maximal flows combines the servers while atomic predicates decomposes them
+	 */
+	@Test
+	public void test4Sec3Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test4_3.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 1);
+			
+			Node node1 = listFW.get(0);
+			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 2); // firewall should have 8 rules
+			
+			assertTrue(node1.getName().equals("1.0.0.12")); 
+			
+			List<Elements> elements =node1.getConfiguration().getFirewall().getElements();
+
+			boolean correct1 = false;
+			boolean correct2 = false;
+			
+			for(int i =0 ; i<2 ; i++) { 
+				if(elements.get(i).getSource().equals("130.10.-1.-1") && elements.get(i).getDestination().equals("40.40.44.-1")) {
+						correct1=true; // Maximal flows do not decompose 130.10.0.-1 and 130.10.1.-1 but combines them into 130.10.-1.-1 (unlike atomic predicates)
+				}
+				if(elements.get(i).getSource().equals("40.40.44.-1") && elements.get(i).getDestination().equals("130.10.-1.-1") ) {
+						correct2=true; 
+				}
+			}
+			
+			assertTrue(correct1&&correct2);
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the framework is able to interpret servers combining and several ports interpretation (TCP)
+	 */
+	@Test
+	public void test4Sec7Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test4_7.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 1);
+			
+			Node node1 = listFW.get(0);
+			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 4); // firewall should have 8 rules
+			
+			assertTrue(node1.getName().equals("1.0.0.12")); 
+			
+			List<Elements> elements =node1.getConfiguration().getFirewall().getElements();
+
+			boolean correct1 = false;
+			boolean correct2 = false;
+			
+			for(int i =0 ; i<4 ; i++) { 
+				if(elements.get(i).getSource().equals("40.40.-1.-1") && elements.get(i).getDestination().equals("130.10.-1.-1")
+						&& elements.get(i).getDstPort().equals("80")) {
+						correct1=true; 
+				}
+				if(elements.get(i).getSource().equals("40.40.41.-1") && elements.get(i).getDestination().equals("130.10.1.-1") 
+						&& elements.get(i).getDstPort().equals("443") && elements.get(i).getProtocol().equals(L4ProtocolTypes.ANY)) {
+						correct2=true; 
+				}
+			}
+			
+			assertTrue(correct1&&correct2);
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the framework is able to interpret servers combining and several ports interpretation (TCP/UDP/ANY)
+	 */
+	@Test
+	public void test4Sec8Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test4_8.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 1);
+			
+			Node node1 = listFW.get(0);
+			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 4); // firewall should have 8 rules
+			
+			assertTrue(node1.getName().equals("1.0.0.12")); 
+			
+			List<Elements> elements =node1.getConfiguration().getFirewall().getElements();
+
+			boolean correct1 = false;
+			boolean correct2 = false;
+			
+			for(int i =0 ; i<4 ; i++) { 
+				if(elements.get(i).getSource().equals("40.40.41.-1") && elements.get(i).getDestination().equals("130.10.1.-1")
+						&& elements.get(i).getDstPort().equals("80")) {
+						correct1=true; 
+				}
+				if(elements.get(i).getSource().equals("40.40.42.-1") && elements.get(i).getDestination().equals("130.10.0.-1") 
+						&& elements.get(i).getDstPort().equals("100") && elements.get(i).getProtocol().equals(L4ProtocolTypes.ANY)) {
+						correct2=true; 
+				}
+			}	
+			assertTrue(correct1&&correct2);
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
 	
 }
