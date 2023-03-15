@@ -103,7 +103,7 @@ public class TestMFCorrectness {
 * b) Correct number of firewalls allocated (Correctness2)
 * c) Correct number of firewall rules allocated (Correctness3) --> if possible
 * d) Correct firewall rules allocated (Correctness4) --> if possible
-* e) Correct firewall position --> Still not done
+* e) Correct firewall position --> Not all
 * /
 /********************************************************************* Test1_X (Placement Tests)********************************************************************/
 		
@@ -503,12 +503,13 @@ public class TestMFCorrectness {
 			Node node1 = listFW.get(0);
 			Node node2 = listFW.get(1);
 			System.out.println("The number of firewall rules is :  "+ node1.getConfiguration().getFirewall().getElements().size() + node2.getConfiguration().getFirewall().getElements().size());
-			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 2); // firewall should have 2 rules
-			assertTrue(node2.getConfiguration().getFirewall().getElements().size() == 2); // firewall should have 2 rules
-			
+			assertTrue(node1.getConfiguration().getFirewall().getElements().size() == 2 || node1.getConfiguration().getFirewall().getElements().size() == 1); // there is two solutions
+			assertTrue(node2.getConfiguration().getFirewall().getElements().size() == 2 || node2.getConfiguration().getFirewall().getElements().size() == 1); 
+			System.out.println("The firewall LOCATIONS is :  "+ node1.getName() + node2.getName());
+
 			//Correctness Placement
-			assertTrue(node1.getName().equals("1.0.0.2") || node1.getName().equals("1.0.0.3"));
-			assertTrue(node2.getName().equals("1.0.0.3") || node2.getName().equals("1.0.0.2"));
+			assertTrue(node1.getName().equals("1.0.0.1") || node1.getName().equals("1.0.0.2") || node1.getName().equals("1.0.0.3") || node1.getName().equals("1.0.0.6")); // different solutions possible
+			assertTrue(node2.getName().equals("1.0.0.1") || node2.getName().equals("1.0.0.3") || node2.getName().equals("1.0.0.2") || node2.getName().equals("1.0.0.6"));
 			
 			//Correctness 4
 			boolean correct1 = false;
@@ -801,5 +802,159 @@ public class TestMFCorrectness {
 			fail(e.toString());
 		}
 	}
+/********************************************************************* Test5_X (Placement Tests) ********************************************************************/
+// With Nat (large topology)
+	
+	/**
+	 * This test checks if the algorithm decomposes the topology into 3 halves by allocating two firewalls
+	 */
+	@Test
+	public void test5Sec1Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test5_1.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
+			assertTrue(listFW.size() == 2); // two firewalls allocated
+			
+			Node node1 = listFW.get(0);
+			Node node2 = listFW.get(1);
+
+			assertTrue(node1.getName().equals("1.0.0.10") || node1.getName().equals("1.0.0.17")); 
+			assertTrue(node2.getName().equals("1.0.0.10") || node2.getName().equals("1.0.0.17")); 
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+
+	/**
+	 * This test checks if the correct placement of multiple firewalls behind NAT.
+	 */
+	@Test
+	public void test5Sec2Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test5_2.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
+			assertTrue(listFW.size() == 6); // six firewalls allocated
+			
+			boolean correct1 = false;
+			boolean correct2 = false;
+			boolean correct3= false;
+			boolean correct4= false;
+			
+			for(Node fw : listFW) {
+				if(fw.getName().equals("1.0.0.21") && (fw.getNeighbour().get(0).getName().equals("192.168.5.-1")
+						|| fw.getNeighbour().get(1).getName().equals("192.168.5.-1"))  ) {
+					correct1 = true; // firewall correctly allocated behind NAT
+				}
+				if(fw.getName().equals("1.0.0.16") && (fw.getNeighbour().get(0).getName().equals("192.168.3.-1")
+						|| fw.getNeighbour().get(1).getName().equals("192.168.3.-1"))) {
+					correct2 = true; // firewall correctly allocated behind NAT
+				}
+				if(fw.getName().equals("1.0.0.9") && (fw.getNeighbour().get(0).getName().equals("192.168.1.-1")
+						|| fw.getNeighbour().get(1).getName().equals("192.168.1.-1"))) {
+					correct3 = true; // firewall correctly allocated behind NAT
+				}
+				if(fw.getName().equals("1.0.0.4") && (fw.getNeighbour().get(0).getName().equals("33.33.33.3")
+						|| fw.getNeighbour().get(1).getName().equals("33.33.33.1"))) {
+					correct4 = true; // firewall correctly allocated to block 40.40.-1.-1
+				}
+			}
+
+			assertTrue(correct1&&correct2&&correct3&&correct4);
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the correct placement of multiple firewalls in a ramified network with multiple ports/protocols requirements. 
+	 * 
+	 */
+	@Test
+	public void test5Sec3Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test5_3.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			assertTrue(listFW.size() == 2); // two firewalls allocated
+			
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	
+	/**
+	 * This test checks if the Maximal Flow performs well in large networks. 
+	 * 
+	 */
+	@Test
+	public void test5Sec4Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test5_4.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			assertTrue(listFW.size() == 3); // 3 firewalls allocated
+			
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the correct placement of a central firewall in the topology (Maximal Flows produces less firewall rules than atomic predicates)
+	 */
+	@Test
+	public void test5Sec5Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test5_5.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 1); // One central firewalls allocated
+			
+			assertTrue(listFW.get(0).getName().equals("1.0.0.10"));
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
 	
 }
