@@ -68,7 +68,8 @@ public class TestCasesController {
 							@RequestParam(value="seed", required = true) Integer seed,
 							@RequestParam(value="i", required = true) Integer i,
 							@RequestParam(value="j", required = true) Integer j,
-							@RequestParam(value="logfile", required = true) String logfile
+							@RequestParam(value="logfile", required = true) String logfile,
+							@RequestParam(name = "Algorithm") String alg
 							) {
 		String pathfile = "/home/verefoo/log/" + logfile;
 		logger = Package1LoggingClass.createLoggerFor(logfile, pathfile);
@@ -120,7 +121,7 @@ public class TestCasesController {
 					             //for debug purpose 
 								 //m.marshal( testCoarse(root), System.out );  
 								 i++;
-								 NFV resultNFV = testCoarse(root);
+								 NFV resultNFV = testCoarse(root,alg);
 							} catch (Exception e) {
 								e.printStackTrace();
 								err++;
@@ -148,9 +149,9 @@ public class TestCasesController {
 	
 	
 	
-	private NFV testCoarse(NFV root) throws Exception{
+	private NFV testCoarse(NFV root,String alg) throws Exception{
 		long beginAll=System.currentTimeMillis();
-		VerefooSerializer test = new VerefooSerializer(root);
+		VerefooSerializer test = new VerefooSerializer(root,alg);
 		
 		long endAll=System.currentTimeMillis();
 		 if(test.isSat()){

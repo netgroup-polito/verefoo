@@ -14,6 +14,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.microsoft.z3.Status;
 
 import io.swagger.annotations.*;
@@ -48,9 +51,10 @@ public class RestFoo {
 	    				@ApiResponse(code = 503, message = "Service temporarily unavailable")})
 	    @Consumes(MediaType.APPLICATION_XML)
 		@Produces(MediaType.APPLICATION_XML)
-	    public NFV put(@Context HttpServletRequest req,@ApiParam(value = "Complete or Tiny Response")@DefaultValue("true")@QueryParam("complete") Boolean complete,@ApiParam(value = "Network Schema", required = true) NFV root) throws MalformedURLException {
+	    public NFV put(@Context HttpServletRequest req,@ApiParam(value = "Complete or Tiny Response")@DefaultValue("true")@QueryParam("complete") Boolean complete,@ApiParam(value = "Network Schema", required = true) NFV root, 
+	    		@RequestParam(name = "Algorithm") String alg) throws MalformedURLException { // add @RequestParam to let the user send the algorithm to be used
 				String z3model = new String();
-				VerefooSerializer test = new VerefooSerializer(root);
+				VerefooSerializer test = new VerefooSerializer(root,alg); // added algorithm
 				NFV rootResult = test.getResult();
 				return rootResult;
 	    }

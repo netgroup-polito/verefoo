@@ -55,6 +55,7 @@ public class SimulationsController {
 
 	/**
 	 * @param nfv it is the NFV object on which the simulation must be performed
+	 * @param alg it is the algorithm used to execute Verefoo, can be AP (Atomic Predicates) or MF (Maximal Flows)
 	 * @return the result of the simulation
 	 */
 	@ApiOperation(value = "runSimulationByNFV", notes = "run a simulation providing a complete NFV",hidden=false)
@@ -111,11 +112,11 @@ public class SimulationsController {
 	                                		"		<Property graph=\"0\" name=\"IsolationProperty\" src=\"10.0.0.2\" dst=\"20.0.0.1\"/> 		 				\r\n" + 
 	                                		"  </PropertyDefinition>\r\n" + 
 	                                		"  <ParsingString></ParsingString>\r\n" + 
-	                                		"</NFV>")})) */ @RequestBody NFV nfv) { // user must send also the algorithm to be used
+	                                		"</NFV>")})) */ @RequestBody NFV nfv, @RequestParam(name = "Algorithm") String alg) {
 		StringBuffer url = request.getRequestURL();
 		VerefooSerializer test = null;
 		try {
-			test = new VerefooSerializer(nfv);
+			test = new VerefooSerializer(nfv,alg);
 		} catch (Exception e) {
 			throw new ResponseStatusException(
 					  HttpStatus.BAD_REQUEST, "bad request"
@@ -155,7 +156,7 @@ public class SimulationsController {
     		@ApiResponse(code = 404, message = "Not Found"),
     		})
     
-	public ResponseEntity<NFV> runSimulationByParams(@RequestParam(value="gid", required = false) Long gid, @RequestParam(value="rid", required = false) Long rid, @RequestParam(value="sid", required = false) Long sid, @RequestParam(value="fid", required = false) List<String> fid)
+	public ResponseEntity<NFV> runSimulationByParams(@RequestParam(value="gid", required = false) Long gid, @RequestParam(value="rid", required = false) Long rid, @RequestParam(value="sid", required = false) Long sid, @RequestParam(value="fid", required = false) List<String> fid, @RequestParam(name = "Algorithm") String alg)
 	{
     	StringBuffer url = request.getRequestURL();
 		VerefooSerializer test = null;
@@ -189,7 +190,7 @@ public class SimulationsController {
 		
 		
 		try {
-			test = new VerefooSerializer(nfv);
+			test = new VerefooSerializer(nfv,alg);
 		} catch (Exception e) {
 			throw new ResponseStatusException(
 					  HttpStatus.BAD_REQUEST, "bad request"

@@ -9,6 +9,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.springframework.web.bind.annotation.RequestParam;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -41,10 +43,11 @@ public class RestTranslator {
 	    
 	    @Consumes(MediaType.APPLICATION_XML)
 		@Produces(MediaType.APPLICATION_XML)
-	    public NFV put(@ApiParam(value = "Complete or Tiny Response")@DefaultValue("true")@QueryParam("complete") Boolean complete,@ApiParam(value = "Network Schema with parsing string", required = true)NFV root) throws MalformedURLException {
+	    public NFV put(@ApiParam(value = "Complete or Tiny Response")@DefaultValue("true")@QueryParam("complete") Boolean complete,@ApiParam(value = "Network Schema with parsing string", required = true)NFV root, 
+	    		@RequestParam(name = "Algorithm") String alg) throws MalformedURLException { // added @RequestParam to let the user input the name of the algorithm to be used
 	    	if(root.getParsingString()!=null && !root.getParsingString().isEmpty()){
 	    		root.getGraphs().getGraph().forEach(g -> {
-		            new Translator(root.getParsingString(),root,g).convert(); 
+		            new Translator(root.getParsingString(),root,g).convert(alg); // specify the algorithm to be used
 	    		});
 	            root.setParsingString("");
 	            if(complete!=true) {
