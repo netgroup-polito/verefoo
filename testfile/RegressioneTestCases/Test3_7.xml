@@ -176,7 +176,7 @@
 		<NodeConstraints/>
 		<LinkConstraints />
 	</Constraints>
-	<PropertyDefinition> <!-- Atomic Predicate Security Requirements, Test TCP and UDP ports open-->
+	<PropertyDefinition> 
 			<!-- Policy One -->
 
 

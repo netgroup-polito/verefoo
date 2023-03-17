@@ -25,7 +25,7 @@ import it.polito.verefoo.translator.Translator;
 /**
  * 
  * This class implements the web service that deals with the converter requests
- *
+ * @param alg is is the algorithm to be used in Verefoo execution (AP or MF)
  */
 @Path("/converter")
 @Api("/converter")

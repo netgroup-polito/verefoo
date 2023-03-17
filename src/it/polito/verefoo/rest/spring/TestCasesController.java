@@ -69,7 +69,7 @@ public class TestCasesController {
 							@RequestParam(value="i", required = true) Integer i,
 							@RequestParam(value="j", required = true) Integer j,
 							@RequestParam(value="logfile", required = true) String logfile,
-							@RequestParam(name = "Algorithm") String alg
+							@RequestParam(name = "Algorithm") String alg //  @param alg is is the algorithm to be used in Verefoo execution (AP or MF)
 							) {
 		String pathfile = "/home/verefoo/log/" + logfile;
 		logger = Package1LoggingClass.createLoggerFor(logfile, pathfile);

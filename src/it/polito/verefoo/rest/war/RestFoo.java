@@ -35,7 +35,7 @@ import it.polito.verefoo.utils.VerificationResult;
 /**
  * 
  * This class implements the web service that deals with the deployment requests
- *
+ * @param alg is is the algorithm to be used in Verefoo execution (AP or MF)
  */
 @Path("/deployment")
 @Api("/deployment")

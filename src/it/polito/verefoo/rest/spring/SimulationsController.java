@@ -145,6 +145,7 @@ public class SimulationsController {
      * @param rid it is the id of the requirements set
      * @param sid it is the id of the substrate network
      * @param fid it is a list of functions name
+     * @param alg is is the algorithm to be used in Verefoo execution (AP or MF)
      * @return the simulation result
      */
     @ApiOperation(value = "runSimulationByParams", notes = "run a simulation by a set of parameters",hidden=true
