@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../xsd/nfvSchema.xsd">
+	<!-- 3 Web Clients - 2 Web Server - 3 Forwarder -->
+	<graphs>
+		<graph id="0">
+
+			<node functional_type="WEBCLIENT" name="40.40.41.-1"> <!-- End point -->
+				<neighbour name="1.0.0.4" />
+				<configuration description="e1" name="endpoint1">
+					<webclient nameWebServer="130.10.0.1" />
+				</configuration>
+			</node>
+            
+			<node functional_type="WEBCLIENT" name="40.40.42.-1"> <!-- End point -->
+				<neighbour name="1.0.0.1" />
+				<configuration description="e2" name="endpoint2">
+					<webclient nameWebServer="130.10.0.1" />
+				</configuration>
+			</node>
+
+			<node functional_type="WEBCLIENT" name="40.40.43.-1"> <!-- End point -->
+				<neighbour name="1.0.0.2" />
+				<configuration description="e3" name="endpoint3">
+					<webclient nameWebServer="130.10.0.1" />
+				</configuration>
+			</node>
+
+			<node functional_type="WEBSERVER" name="130.10.0.1"> <!-- web server 1 -->
+				<neighbour name="1.0.0.6" />
+				<configuration description="e3" name="httpserver1">
+					<webserver>
+						<name>130.10.0.1</name>
+					</webserver>
+				</configuration>
+			</node>
+
+			<node functional_type="WEBSERVER" name="130.10.0.2"> <!-- web server 2 -->
+				<neighbour name="1.0.0.7" />
+				<configuration description="e4" name="httpserver2">
+					<webserver>
+						<name>130.10.0.2</name>
+					</webserver>
+				</configuration>
+			</node>
+
+			<node functional_type="FORWARDER" name="33.33.33.1"> <!-- Forwarder  -->
+				<neighbour name="1.0.0.5" />
+				<neighbour name="1.0.0.6" />
+                <neighbour name="1.0.0.7" />
+				 <configuration name="ForwardConf">
+					<forwarder>
+						<name>Forwarder</name>
+					</forwarder>
+				</configuration>
+			</node>
+
+			<node functional_type="FORWARDER" name="33.33.33.2"> <!-- Forwarder  -->
+				<neighbour name="1.0.0.3" />
+				<neighbour name="1.0.0.4" />
+                <neighbour name="1.0.0.5" />
+				 <configuration name="ForwardConf">
+					<forwarder>
+						<name>Forwarder</name>
+					</forwarder>
+				</configuration>
+			</node>
+
+			<node functional_type="FORWARDER" name="33.33.33.3"> <!-- Forwarder  -->
+				<neighbour name="1.0.0.1" />
+				<neighbour name="1.0.0.2" />
+                <neighbour name="1.0.0.3" />
+				 <configuration name="ForwardConf">
+					<forwarder>
+						<name>Forwarder</name>
+					</forwarder>
+				</configuration>
+			</node>
+
+			<node name="1.0.0.1"> <!-- a1 -->
+				<neighbour name="40.40.42.-1" />
+				<neighbour name="33.33.33.3" />
+			</node>
+			
+			<node name="1.0.0.2"> <!-- a2 -->
+				<neighbour name="40.40.43.-1" />
+				<neighbour name="33.33.33.3" />
+			</node>
+
+
+			<node name="1.0.0.3" functional_type="FIREWALL">
+                <neighbour name="33.33.33.3"/>
+                <neighbour name="33.33.33.2"/>
+                <configuration name="AutoConf">
+                    <firewall defaultAction="DENY">
+                    </firewall>
+                </configuration>
+            </node>
+
+            <node name="1.0.0.4" functional_type="FIREWALL">
+                <neighbour name="40.40.41.-1"/>
+                <neighbour name="33.33.33.2"/>
+                <configuration name="AutoConf">
+                    <firewall defaultAction="DENY">
+                    </firewall>
+                </configuration>
+            </node>
+
+            <node name="1.0.0.5" functional_type="FIREWALL">
+                <neighbour name="33.33.33.1"/>
+                <neighbour name="33.33.33.2"/>
+                <configuration name="AutoConf">
+                    <firewall defaultAction="DENY">
+                    </firewall>
+                </configuration>
+            </node>
+
+			<node name="1.0.0.6"> <!-- a6 -->
+				<neighbour name="33.33.33.1" />
+				<neighbour name="130.10.0.1" />
+			</node>
+
+			<node name="1.0.0.7"> <!-- a7 -->
+				<neighbour name="33.33.33.1" />
+				<neighbour name="130.10.0.2" />
+			</node>
+
+		</graph>
+	</graphs>
+	<Constraints>
+		<NodeConstraints/>
+		<LinkConstraints />
+	</Constraints>
+	<PropertyDefinition>
+			<!-- policy 1 -->
+			<Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.1" /> <!-- Deny 40.40.41.-1 -->
+			<Property graph="0" name="IsolationProperty" src="130.10.0.1" dst="40.40.41.-1" /> 
+			<Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.2" /> 
+			<Property graph="0" name="IsolationProperty" src="130.10.0.2" dst="40.40.41.-1" /> 
+			<!-- policy 2 -->
+			<Property graph="0" name="ReachabilityProperty" src="40.40.42.-1" dst="130.10.0.1" dst_port="80" lv4proto="TCP"/> <!-- Allow only port 80 40.40.42.-1-->
+			<Property graph="0" name="ReachabilityProperty" src="130.10.0.1" dst="40.40.42.-1" dst_port="80" lv4proto="TCP"/>
+			<Property graph="0" name="ReachabilityProperty" src="40.40.42.-1" dst="130.10.0.2" dst_port="80" lv4proto="TCP"/> 
+			<Property graph="0" name="ReachabilityProperty" src="130.10.0.2" dst="40.40.42.-1" dst_port="80" lv4proto="TCP"/> 
+
+			<Property graph="0" name="IsolationProperty" src="40.40.42.-1" dst="130.10.0.1" dst_port="0-79" lv4proto="TCP" /> <!-- Deny != 80 -->
+			<Property graph="0" name="IsolationProperty" src="130.10.0.1" dst="40.40.42.-1" dst_port="0-79" lv4proto="TCP"/>
+			<Property graph="0" name="IsolationProperty" src="40.40.42.-1" dst="130.10.0.2" dst_port="81-65535" lv4proto="TCP"/> 
+			<Property graph="0" name="IsolationProperty" src="130.10.0.2" dst="40.40.42.-1" dst_port="81-65535" lv4proto="TCP"/> 
+			<!-- policy 3 -->
+			<Property graph="0" name="IsolationProperty" src="40.40.43.-1" dst="130.10.0.1" />  <!-- Deny 40.40.43.-1 -->
+			<Property graph="0" name="IsolationProperty" src="130.10.0.1" dst="40.40.43.-1" /> 
+			<Property graph="0" name="IsolationProperty" src="40.40.43.-1" dst="130.10.0.2" /> 
+			<Property graph="0" name="IsolationProperty" src="130.10.0.2" dst="40.40.43.-1" /> 
+
+	</PropertyDefinition>
+</NFV>

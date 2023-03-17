@@ -574,6 +574,56 @@ public class TestMFCorrectness {
 		}
 	}
 	
+	/**
+	 * This test checks if having conflict in Security Requirements generate UNSAT result
+	 */
+	@Test
+	public void test3Sec6Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test3_6.xml"); 
+			//Correctness 1
+			assertTrue(!result.isSat());
+			
+
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if having only reachability requirements no firewalls are allocated 
+	 */
+	@Test
+	public void test3Sec7Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test3_7.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> n.getFunctionalType().equals(FunctionalTypes.FIREWALL)).collect(Collectors.toList());
+			assertTrue(listFW.size() == 0);
+			
+
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks even if there is port conflicts DENY/ALLOW result is SAT in Maximal Flows
+	 */
+	@Test
+	public void test3Sec8Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test3_8.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			
+
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
 	
 /********************************************************************* Test4_X (Placement Tests) ********************************************************************/
 // With Load Balancer
@@ -956,5 +1006,243 @@ public class TestMFCorrectness {
 		}
 	}
 	
+/********************************************************************Firewall Removal Tests and wrong Manual Configuration**********************************************************************/
+
+	/**
+	 * This test checks if the predefined firewalls are changed according to security requirements
+	 */
+	@Test
+	public void test6Sec1Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test6_1.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 2);
+			
+			
+			boolean correct1 = false;
+			boolean correct2 = false;
+			
+			for(Node fw : listFW) {
+			  if(fw.getConfiguration().getFirewall().getElements().size() !=0 ) {
+				 correct1=true; 
+			  }
+			  if(fw.getConfiguration().getFirewall().getElements().size() !=0 ) {
+				 correct2=true; 
+			  }
+			}
+
+			assertTrue(correct1&&correct2);
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the predefined firewalls are changed according to security requirements and predfined firewalls that are 
+	 * defined outside the scope of security requirements remain un-altered
+	 */
+	@Test
+	public void test6Sec2Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test6_2.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 3);
+			
+			
+			boolean correct1 = false;
+			
+			for(Node fw : listFW) {
+					if(fw.getName().equals("1.0.0.4")) {
+						if(fw.getConfiguration().getFirewall().getElements().size() == 0) {
+							correct1=true; // make sure that the firewall is not altered (outside scope of security requirements)
+						}
+					}
+			  }
+			
+
+			assertTrue(correct1);
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the predefined firewalls are changed according to security requirements and predfined firewalls that are 
+	 * defined outside the scope of security requirements remain un-altered
+	 */
+	@Test
+	public void test7Sec1Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test7_1.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 4);
+			
+			
+			boolean correct1 = false;
+			boolean correct2 = false;
+			boolean correct3 = false;
+			boolean correct4 = false;
+			
+			for(Node fw : listFW) {
+			  if(fw.getName().equals("1.0.0.1") ) {
+				  if(fw.getConfiguration().getFirewall().getElements().size() !=0)
+				 correct1=true; 
+			  }
+			  if(fw.getName().equals("1.0.0.2") ) {
+				  if(fw.getConfiguration().getFirewall().getElements().size() !=0)
+				 correct2=true; 
+			  }
+			  if(fw.getName().equals("1.0.0.3") ) {
+				  if(fw.getConfiguration().getFirewall().getElements().size() !=0)
+				 correct3=true; 
+			  }
+			  if(fw.getName().equals("1.0.0.6") ) {
+				  if(fw.getConfiguration().getFirewall().getElements().size() ==0)
+				 correct4=true; 
+			  }
+			}
+
+			assertTrue(correct1&&correct2&&correct3&&correct4);
+			
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	
+	/**
+	 * This test checks if the predefined firewalls are removed if constraints are optional (there placement was optional)
+	 */
+	@Test
+	public void test7Sec2Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test7_2.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 2); // verify that 2 firewalls were removed
+			
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the Security requirement ports present a conflict the problem should return UNSAT
+	 */
+	@Test
+	public void test8Sec1Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test8_1.xml"); 
+			//Correctness 1
+			assertTrue(!result.isSat());
+			
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the optional firewalls are removed and not optional ones are preserved
+	 */
+	@Test
+	public void test8Sec2Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test8_2.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 3); // verify that 2 firewalls were removed
+			
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
+	/**
+	 * This test checks if the optional firewalls are removed and not optional ones are preserved
+	 */
+	@Test
+	public void test9Sec1Correctness(){
+		try {
+			VerefooSerializer result = test("./testfile/RegressioneTestCases/Test9_1.xml"); 
+			//Correctness 1
+			assertTrue(result.isSat());
+			
+			//Correctness 2
+			List<Node> listFW = result.getNfv().getGraphs().getGraph().get(0).getNode().stream().filter(n -> 
+			{ 
+			if(n.getFunctionalType() != null && n.getFunctionalType().equals(FunctionalTypes.FIREWALL) )
+				return true;
+			else 
+				return false;
+
+			} ).collect(Collectors.toList());
+			
+			assertTrue(listFW.size() == 4); 
+			
+			
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
 	
 }
