@@ -35,7 +35,7 @@ import it.polito.verefoo.utils.VerificationResult;
 /**
  * 
  * This class runs some tests in order to check the correctness of the auto-configuration module of Algorithm Maximal Flows
- *
+ * NOTE: These tests are done for Z3 Versions: Z3 version 4.8.8 and Z3 version 4.4.14
  */
 public class TestMFCorrectness {
 	
