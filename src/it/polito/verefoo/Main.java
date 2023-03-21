@@ -52,7 +52,7 @@ public class Main {
 				Marshaller m = jc.createMarshaller();
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "./xsd/nfvSchema.xsd");
-				// VerefooSearializer takes as parameter the type of algorithm to be used
+				// VerefooSerializer takes as parameter the type of algorithm to be used
 				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/RegressioneTestCases/Test9_1.xml")),algo);
 				if (test.isSat()) {
 					loggerResult.info("SAT");
