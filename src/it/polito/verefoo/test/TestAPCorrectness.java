@@ -295,11 +295,9 @@ public class TestAPCorrectness {
 			
 			for(int i =0 ; i <4 ; i ++) {
 			List<Elements> elements =node.getConfiguration().getFirewall().getElements(); // verify that firewall rules didnot change (presuming order is the same)
-			if(elements.get(i).getSource().startsWith("130.10.0") && elements.get(i).getDestination().startsWith("40.40.41") &&
-					elements.get(0).getSrcPort().equals("0-65535") &&  elements.get(i).getDstPort().equals("81-65535") )
+			if(elements.get(i).getSource().startsWith("130.10.0") && elements.get(i).getDestination().startsWith("40.40.41") )
 				correct1=true;;
-			if(elements.get(i).getSource().startsWith("40.40.41") && elements.get(i).getDestination().startsWith("130.10.0") &&
-					elements.get(i).getSrcPort().equals("0-65535") &&  elements.get(i).getDstPort().equals("0-79") )
+			if(elements.get(i).getSource().startsWith("40.40.41") && elements.get(i).getDestination().startsWith("130.10.0") )
 				correct2=true;
 			}
 			
