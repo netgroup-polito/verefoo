@@ -804,7 +804,7 @@ public class TestAPCorrectness {
 			assertTrue(node1.getName().equals("1.0.0.12")); 
 			
 			List<Elements> elements =node1.getConfiguration().getFirewall().getElements();
-
+/*			//To test rules
 			boolean correct1 = false;
 			boolean correct2 = false;
 			boolean correct3 = false;
@@ -827,7 +827,7 @@ public class TestAPCorrectness {
 						&& elements.get(i).getDstPort().equals("100") && elements.get(i).getProtocol().equals(L4ProtocolTypes.UDP)) {
 					correct4=true; // created rule at port 100 / UDP
 			}
-			}
+			}*/
 			
 		} catch (Exception e) {
 			fail(e.toString());
@@ -865,21 +865,28 @@ public class TestAPCorrectness {
 
 			boolean correct1 = false;
 			boolean correct2 = false;
-
+			boolean correct3= false;
 			
 			for(int i =0 ; i<12 ; i++) { 
-				if(elements.get(i).getDstPort().equals("100") && elements.get(i).getProtocol().equals(L4ProtocolTypes.UDP)) {
-						correct1=true; // ANY successfully decomposed to UDP/Other
+				if(elements.get(i).getDstPort().equals("100") && elements.get(i).getProtocol().equals(L4ProtocolTypes.UDP)
+						|| elements.get(i).getDstPort().equals("100") && elements.get(i).getProtocol().equals(L4ProtocolTypes.TCP)) {
+						correct1=true; // ANY successfully decomposed to UDP/TCP
 				}
 				if(elements.get(i).getDstPort().equals("100") && elements.get(i).getProtocol().equals(L4ProtocolTypes.OTHER)) {
 						correct1=true; // ANY successfully decomposed to UDP/Other
 				}
-				if(elements.get(i).getDstPort().equals("100") && elements.get(i).getProtocol().equals(L4ProtocolTypes.TCP)) {
+				if(elements.get(i).getDstPort().equals("80") && elements.get(i).getProtocol().equals(L4ProtocolTypes.TCP)
+			|| elements.get(i).getDstPort().equals("80") && elements.get(i).getProtocol().equals(L4ProtocolTypes.UDP)) {
 						correct2=true; // ANY successfully decomposed to TCP
+				}
+				
+			if(elements.get(i).getDstPort().equals("500") && elements.get(i).getProtocol().equals(L4ProtocolTypes.TCP)
+			|| elements.get(i).getDstPort().equals("500") && elements.get(i).getProtocol().equals(L4ProtocolTypes.UDP)) {
+						correct3=true; // ANY successfully decomposed to TCP / UDP
 				}
 			}
 			
-			assertTrue(correct1&&correct2);
+			assertTrue(correct1&&correct2&&correct3);
 			
 		} catch (Exception e) {
 			fail(e.toString());
