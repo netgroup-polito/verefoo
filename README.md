@@ -49,7 +49,7 @@ In order to access the core of Verefoo, some REST APIs are available. Follow the
 * Run Tomcat: open another shell in the project root folder and type the following two commands: ```mvn clean package``` and ```java -jar target/verifoo-0.0.1-SNAPSHOT.jar```;
 * Interact with the REST APIs: start doing requests to Verefoo by means of a RESTful client; for any doubt about the REST APIs, their documentation can be found at [localhost:8085/verefoo](localhost:8085/verefoo).
 
-## Verefoo Interaction
+### Verefoo Interaction
 In order to interact with Verefoo, it is necessary to specify the algorithm used. Currently, this version of Verefoo is equipped with two algorithms: Maximal Flows (MF) and Atomic Predicates (AP), each of which is suitable for distinct use cases. To select the algorithm utilized, the query parameter that specifies the algorithm should be included in the REST API request, subsequent to the framework's launch.
 
 > Example:
@@ -77,6 +77,6 @@ The current version of the Neo4j server is 3.5.25 (Community Edition): it is com
 * The configuration of Spring in the file SpringBootConfiguration should be changed because some classes are not available anymore;
 * The Neo4j annotations in the DAO classes (which start with *db*) may change formalism.
 
-## Resources
+## Regression Tests
 
-* [VerifooDocs.pdf](https://github.com/netgroup-polito/verifoo/blob/master/docs/VerifooDocs.pdf) for documentation.
+Kindly note that the regression tests performed on the framework have been executed using the Z3 library versions 4.8.8 and 4.8.14.
