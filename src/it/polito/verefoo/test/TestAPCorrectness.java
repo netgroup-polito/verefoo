@@ -290,11 +290,22 @@ public class TestAPCorrectness {
 			Node node = listFW.get(0);
 			assertTrue(node.getConfiguration().getFirewall().getElements().size() == 4); // firewall should have 4 deny rules and default allow
 			
+			boolean correct1=false;
+			boolean correct2=false;
+			
+			for(int i =0 ; i <4 ; i ++) {
 			List<Elements> elements =node.getConfiguration().getFirewall().getElements(); // verify that firewall rules didnot change (presuming order is the same)
-			assertTrue(elements.get(0).getSource().startsWith("130.10.0") && elements.get(0).getDestination().startsWith("40.40.41") &&
-					elements.get(0).getSrcPort().equals("0-65535") &&  elements.get(0).getDstPort().equals("81-65535") );
-			assertTrue(elements.get(2).getSource().startsWith("40.40.41") && elements.get(2).getDestination().startsWith("130.10.0") &&
-					elements.get(2).getSrcPort().equals("0-65535") &&  elements.get(2).getDstPort().equals("0-79") );
+			if(elements.get(i).getSource().startsWith("130.10.0") && elements.get(i).getDestination().startsWith("40.40.41") &&
+					elements.get(0).getSrcPort().equals("0-65535") &&  elements.get(i).getDstPort().equals("81-65535") )
+				correct1=true;;
+			if(elements.get(i).getSource().startsWith("40.40.41") && elements.get(i).getDestination().startsWith("130.10.0") &&
+					elements.get(i).getSrcPort().equals("0-65535") &&  elements.get(i).getDstPort().equals("0-79") )
+				correct2=true;
+			}
+			
+			assertTrue(correct1&correct2);
+			
+			
 			
 		} catch (Exception e) {
 			fail(e.toString());
@@ -342,10 +353,20 @@ public class TestAPCorrectness {
 			assertTrue(node.getConfiguration().getFirewall().getElements().size() == 4); // firewall should have 4 rules
 			//Correctness 4
 			List<Elements> elements =node.getConfiguration().getFirewall().getElements(); // verify that firewall rules didnot change (presuming order is the same)
-			assertTrue(elements.get(0).getSource().startsWith("130.10.0") && elements.get(0).getDestination().startsWith("40.40.42") &&
-					elements.get(0).getSrcPort().equals("0-65535") &&  elements.get(0).getDstPort().equals("80") );
-			assertTrue(elements.get(2).getSource().startsWith("40.40.42") && elements.get(2).getDestination().startsWith("130.10.0") &&
-					elements.get(2).getSrcPort().equals("0-65535") &&  elements.get(2).getDstPort().equals("80") );
+			
+			boolean correct1=false;
+			boolean correct2=false;
+			
+			for(int i =0 ; i <4 ; i ++) {
+			if(elements.get(i).getSource().startsWith("130.10.0") && elements.get(i).getDestination().startsWith("40.40.42") &&
+					elements.get(i).getSrcPort().equals("0-65535") &&  elements.get(i).getDstPort().equals("80") )
+				correct1=true;
+			if(elements.get(i).getSource().startsWith("40.40.42") && elements.get(i).getDestination().startsWith("130.10.0") &&
+					elements.get(i).getSrcPort().equals("0-65535") &&  elements.get(i).getDstPort().equals("80") )
+			correct2=true;
+			}
+			
+			assertTrue(correct1&&correct2);
 			
 		} catch (Exception e) {
 			fail(e.toString());
