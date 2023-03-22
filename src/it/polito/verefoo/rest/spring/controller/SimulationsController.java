@@ -45,7 +45,7 @@ public class SimulationsController {
 	})
 
 	@RequestMapping(value = "", consumes = { "application/xml", "application/json" }, method = RequestMethod.POST)
-	public ResponseEntity<Resources<NFV>> runSimulationByNFV(@RequestBody NFV nfv, @RequestParam(value = "fid", required = false) List<FunctionalTypes> usableFunctionalTypes) {
+	public ResponseEntity<Resources<NFV>> runSimulationByNFV(@RequestBody NFV nfv, @RequestParam(value = "fid", required = false) List<FunctionalTypes> usableFunctionalTypes,@RequestParam(name = "Algorithm") String alg) {
 		try {
 			// the nfv is modified in place by VerefooSerializer
 			
@@ -60,7 +60,7 @@ public class SimulationsController {
 				}
 			}
 				
-			new VerefooSerializer(nfv);
+			new VerefooSerializer(nfv,alg);
 		} catch (BadGraphError e) {
 			throw verefooCoreExceptionBuilder(e);
 		} catch (Exception e) {
@@ -90,13 +90,14 @@ public class SimulationsController {
 	public ResponseEntity<Resources<Long>> runSimulationByParams(@RequestParam(value = "gid", required = true) Long gid,
 			@RequestParam(value = "rid", required = false) Long rid,
 			@RequestParam(value = "sid", required = false) Long sid,
-			@RequestParam(value = "fid", required = false) List<FunctionalTypes> usableFunctionalTypes)  {
+			@RequestParam(value = "fid", required = false) List<FunctionalTypes> usableFunctionalTypes,
+			@RequestParam(name = "Algorithm") String alg)  {
 
 		NFV nfv = service.buildNFVFromParams(gid, rid, sid);
 
 		try {
 			// the nfv is modified in place by VerefooSerializer
-			new VerefooSerializer(nfv);
+			new VerefooSerializer(nfv,alg);
 		} catch (BadGraphError e) {
 			throw verefooCoreExceptionBuilder(e);
 		} catch (Exception e) {
