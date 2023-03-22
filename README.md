@@ -82,7 +82,7 @@ The current version of the Neo4j server is 3.5.25 (Community Edition): it is com
 Kindly note that the regression tests performed on the framework have been executed using the Z3 library versions 4.8.8.
 
 
-## DEMO
+## Demo
 
 You can find a full demonstration of the VEREFOO framework at the following link: https://youtu.be/QCFNLE2gHgE
 
