@@ -1,5 +1,5 @@
 /build/
-/gen-src/it/polito/verefoo/jaxb
+/gen-src/
 /target/
 /gen-protobuf/
 /log/
