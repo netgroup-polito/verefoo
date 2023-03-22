@@ -4,7 +4,7 @@
 
 ## Z3 library support
 
-[Download](https://github.com/Z3Prover/z3/releases) the correct version of Z3 according to your OS and your JVM endianness. For the correct functioning of the application, you must have the Z3 native library and include it to Java Library Path. The most convenient way to do this is add the path that the library to the dynamic linking library path.
+[Download](https://github.com/Z3Prover/z3/releases) the correct version of Z3 according to your OS and your JVM endianness. The recommended Z3 version number is 4.8.8. For the correct functioning of the application, you must have the Z3 native library and include it to Java Library Path. The most convenient way to do this is add the path that the library to the dynamic linking library path.
 
 * In Linux is `LD_LIBRARY_PATH`
 * In MacOS is `DYLD_LIBRARY_PATH`
@@ -79,4 +79,27 @@ The current version of the Neo4j server is 3.5.25 (Community Edition): it is com
 
 ## Regression Tests
 
-Kindly note that the regression tests performed on the framework have been executed using the Z3 library versions 4.8.8 and 4.8.14.
+Kindly note that the regression tests performed on the framework have been executed using the Z3 library versions 4.8.8.
+
+
+## DEMO
+
+You can find a full demonstration of the VEREFOO framework at the following link: https://youtu.be/QCFNLE2gHgE
+
+In this demo, VEREFOO has been used to automatically computed the firewall allocation scheme and configuration in a virtual network that is devoid of firewalling functionalities.
+
+The input Service Graph represents a ramified network, where multiple different function types are included, e.g., a load balancer, a web cache, a traffic monitor, a network address translators. Some end points are single hosts, whereas other ones are subnetworks representing the office networks of some companies.
+
+![Service Graph](./resources/images-demo/SG.png)
+
+![Service Graph functions](./resources/images-demo/SGfunctions.png)
+
+The input Network Security Requirements establish which traffic flows must be blocked because potentially malicioucs, and which other must be able tor each their destination to ansure network connectivity. 
+
+![Network Security Requirements](./resources/images-demo/NSRs.png)
+
+After running the framework, VEREFOO produces two outputs. On the one hand, it establishes the optimal firewall allocation scheme, composed of the minimum number of firewall instances to be placed in the input Allocation Places. On the other hand, for each allocated instance, it computes the optimal configuration, composed of a default action and the smallest set of filtering rules. 
+
+![Firewall Allocation Scheme](./resources/images-demo/FAS.png)
+
+![Firewall Configuration](./resources/images-demo/FwRules.png)
