@@ -1,0 +1,334 @@
+{
+  "$schema" : "http://json-schema.org/draft-07/schema#",
+  "definitions" : {
+    "ActionTypes" : {
+      "type" : "string",
+      "enum" : [ "ALLOW", "DENY" ]
+    },
+    "Elements" : {
+      "type" : "object",
+      "properties" : {
+        "action" : {
+          "$ref" : "#/definitions/ActionTypes"
+        },
+        "destination" : {
+          "type" : "string"
+        },
+        "directional" : {
+          "type" : "boolean"
+        },
+        "dstPort" : {
+          "type" : "string"
+        },
+        "protocol" : {
+          "type" : "string",
+          "enum" : [ "ANY", "TCP", "UDP", "OTHER" ]
+        },
+        "source" : {
+          "type" : "string"
+        },
+        "srcPort" : {
+          "type" : "string"
+        }
+      },
+      "additionalProperties" : false
+    }
+  },
+  "type" : "object",
+  "properties" : {
+    "id" : {
+      "type" : "integer"
+    },
+    "node" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "configuration" : {
+            "type" : "object",
+            "properties" : {
+              "antispam" : {
+                "type" : "object",
+                "properties" : {
+                  "source" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "cache" : {
+                "type" : "object",
+                "properties" : {
+                  "resource" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "description" : {
+                "type" : "string"
+              },
+              "dpi" : {
+                "type" : "object",
+                "properties" : {
+                  "defaultAction" : {
+                    "$ref" : "#/definitions/ActionTypes"
+                  },
+                  "dpiElements" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "object",
+                      "properties" : {
+                        "action" : {
+                          "$ref" : "#/definitions/ActionTypes"
+                        },
+                        "condition" : {
+                          "type" : "string"
+                        }
+                      },
+                      "additionalProperties" : false
+                    }
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "endhost" : {
+                "type" : "object",
+                "properties" : {
+                  "body" : {
+                    "type" : "string"
+                  },
+                  "destination" : {
+                    "type" : "string"
+                  },
+                  "emailFrom" : {
+                    "type" : "string"
+                  },
+                  "options" : {
+                    "type" : "string"
+                  },
+                  "protocol" : {
+                    "type" : "string",
+                    "enum" : [ "HTTP_REQUEST", "HTTP_RESPONSE", "POP_3_REQUEST", "POP_3_RESPONSE" ]
+                  },
+                  "sequence" : {
+                    "type" : "integer"
+                  },
+                  "url" : {
+                    "type" : "string"
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "endpoint" : {
+                "type" : "object",
+                "properties" : {
+                  "name" : {
+                    "type" : "string"
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "fieldmodifier" : {
+                "type" : "object",
+                "properties" : {
+                  "name" : {
+                    "type" : "string"
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "firewall" : {
+                "type" : "object",
+                "properties" : {
+                  "defaultAction" : {
+                    "$ref" : "#/definitions/ActionTypes"
+                  },
+                  "elements" : {
+                    "type" : "array",
+                    "items" : {
+                      "$ref" : "#/definitions/Elements"
+                    }
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "forwarder" : {
+                "type" : "object",
+                "properties" : {
+                  "name" : {
+                    "type" : "string"
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "id" : {
+                "type" : "integer"
+              },
+              "loadbalancer" : {
+                "type" : "object",
+                "properties" : {
+                  "pool" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "mailclient" : {
+                "type" : "object",
+                "properties" : {
+                  "mailserver" : {
+                    "type" : "string"
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "mailserver" : {
+                "type" : "object",
+                "properties" : {
+                  "name" : {
+                    "type" : "string"
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "name" : {
+                "type" : "string"
+              },
+              "nat" : {
+                "type" : "object",
+                "properties" : {
+                  "source" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "string"
+                    }
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "statefulFirewall" : {
+                "type" : "object",
+                "properties" : {
+                  "defaultAction" : {
+                    "$ref" : "#/definitions/ActionTypes"
+                  },
+                  "elements" : {
+                    "type" : "array",
+                    "items" : {
+                      "$ref" : "#/definitions/Elements"
+                    }
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "vpnaccess" : {
+                "type" : "object",
+                "properties" : {
+                  "vpnexit" : {
+                    "type" : "string"
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "vpnexit" : {
+                "type" : "object",
+                "properties" : {
+                  "vpnaccess" : {
+                    "type" : "string"
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "webApplicationFirewall" : {
+                "type" : "object",
+                "properties" : {
+                  "defaultAction" : {
+                    "$ref" : "#/definitions/ActionTypes"
+                  },
+                  "wafElements" : {
+                    "type" : "array",
+                    "items" : {
+                      "type" : "object",
+                      "properties" : {
+                        "action" : {
+                          "$ref" : "#/definitions/ActionTypes"
+                        },
+                        "domain" : {
+                          "type" : "string"
+                        },
+                        "url" : {
+                          "type" : "string"
+                        }
+                      },
+                      "additionalProperties" : false
+                    }
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "webclient" : {
+                "type" : "object",
+                "properties" : {
+                  "nameWebServer" : {
+                    "type" : "string"
+                  }
+                },
+                "additionalProperties" : false
+              },
+              "webserver" : {
+                "type" : "object",
+                "properties" : {
+                  "name" : {
+                    "type" : "string"
+                  }
+                },
+                "additionalProperties" : false
+              }
+            },
+            "additionalProperties" : false
+          },
+          "functionalType" : {
+            "type" : "string",
+            "enum" : [ "FIREWALL", "ENDHOST", "ENDPOINT", "ANTISPAM", "CACHE", "DPI", "DPI_S", "MAILCLIENT", "MAILSERVER", "NAT", "VPNACCESS", "VPNEXIT", "WEBCLIENT", "WEBSERVER", "FIELDMODIFIER", "FORWARDER", "LOADBALANCER", "STATEFUL_FIREWALL", "PRIORITY_FIREWALL", "WEB_APPLICATION_FIREWALL", "TRAFFIC_MONITOR" ]
+          },
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "neighbour" : {
+            "type" : "array",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "id" : {
+                  "type" : "integer"
+                },
+                "name" : {
+                  "type" : "string"
+                }
+              },
+              "additionalProperties" : false
+            }
+          }
+        },
+        "additionalProperties" : false
+      }
+    },
+    "serviceGraph" : {
+      "type" : "boolean"
+    }
+  },
+  "additionalProperties" : false
+}

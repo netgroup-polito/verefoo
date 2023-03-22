@@ -1,0 +1,92 @@
+{
+  "$schema" : "http://json-schema.org/draft-07/schema#",
+  "type" : "object",
+  "properties" : {
+    "allocationConstraints" : {
+      "type" : "object",
+      "properties" : {
+        "allocationConstraint" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "nodeA" : {
+                "type" : "string"
+              },
+              "nodeB" : {
+                "type" : "string"
+              },
+              "type" : {
+                "type" : "string",
+                "enum" : [ "FORBIDDEN", "FORCED" ]
+              }
+            },
+            "additionalProperties" : false
+          }
+        }
+      },
+      "additionalProperties" : false
+    },
+    "linkConstraints" : {
+      "type" : "object",
+      "properties" : {
+        "linkMetrics" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "dst" : {
+                "type" : "string"
+              },
+              "reqLatency" : {
+                "type" : "integer"
+              },
+              "src" : {
+                "type" : "string"
+              }
+            },
+            "additionalProperties" : false
+          }
+        }
+      },
+      "additionalProperties" : false
+    },
+    "nodeConstraints" : {
+      "type" : "object",
+      "properties" : {
+        "nodeMetrics" : {
+          "type" : "array",
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "cores" : {
+                "type" : "integer"
+              },
+              "maxNodeLatency" : {
+                "type" : "integer"
+              },
+              "memory" : {
+                "type" : "integer"
+              },
+              "node" : {
+                "type" : "string"
+              },
+              "nrOfOperations" : {
+                "type" : "integer"
+              },
+              "optional" : {
+                "type" : "boolean"
+              },
+              "reqStorage" : {
+                "type" : "integer"
+              }
+            },
+            "additionalProperties" : false
+          }
+        }
+      },
+      "additionalProperties" : false
+    }
+  },
+  "additionalProperties" : false
+}

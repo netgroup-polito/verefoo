@@ -1,10 +1,12 @@
 /build/
+/gen-src/it/polito/verefoo/jaxb
 /target/
-/gen-src/
 /gen-protobuf/
-/bin/
 /log/
+/neo4j-server/neo4j-community-3.5.25/data/
+/bin/
 /result.xml
 /testfile/tmp.xml
 .settings
 .classpath
+*.log

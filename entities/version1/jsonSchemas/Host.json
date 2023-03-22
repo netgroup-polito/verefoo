@@ -1,0 +1,60 @@
+{
+  "$schema" : "http://json-schema.org/draft-07/schema#",
+  "type" : "object",
+  "properties" : {
+    "active" : {
+      "type" : "boolean"
+    },
+    "cores" : {
+      "type" : "integer"
+    },
+    "cpu" : {
+      "type" : "integer"
+    },
+    "diskStorage" : {
+      "type" : "integer"
+    },
+    "fixedEndpoint" : {
+      "type" : "string"
+    },
+    "maxVNF" : {
+      "type" : "integer"
+    },
+    "memory" : {
+      "type" : "integer"
+    },
+    "name" : {
+      "type" : "string"
+    },
+    "nodeRef" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "node" : {
+            "type" : "string"
+          }
+        },
+        "additionalProperties" : false
+      }
+    },
+    "supportedVNF" : {
+      "type" : "array",
+      "items" : {
+        "type" : "object",
+        "properties" : {
+          "functionalType" : {
+            "type" : "string",
+            "enum" : [ "FIREWALL", "ENDHOST", "ENDPOINT", "ANTISPAM", "CACHE", "DPI", "DPI_S", "MAILCLIENT", "MAILSERVER", "NAT", "VPNACCESS", "VPNEXIT", "WEBCLIENT", "WEBSERVER", "FIELDMODIFIER", "FORWARDER", "LOADBALANCER", "STATEFUL_FIREWALL", "PRIORITY_FIREWALL", "WEB_APPLICATION_FIREWALL", "TRAFFIC_MONITOR" ]
+          }
+        },
+        "additionalProperties" : false
+      }
+    },
+    "type" : {
+      "type" : "string",
+      "enum" : [ "CLIENT", "SERVER", "MIDDLEBOX" ]
+    }
+  },
+  "additionalProperties" : false
+}

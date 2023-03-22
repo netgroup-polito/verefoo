@@ -1,0 +1,33 @@
+{
+    "name": "singleHost",
+    "type": "MIDDLEBOX",
+    "cpu": 2,
+    "cores": 8,
+    "nodeRef": [
+        {
+            "node": "10.0.0.2"
+        },
+        {
+            "node": "10.0.0.3"
+        }
+    ],
+    "active": true,
+    "memory": 1000,
+    "diskStorage": 10000,
+    "fixedEndpoint": "endpoint",
+    "maxVNF": 2,
+    "supportedVNF": [
+        {
+            "functionalType": "CACHE"
+        },
+        {
+            "functionalType": "VPNEXIT"
+        },
+        {
+            "functionalType": "VPNACCESS"
+        },
+        {
+            "functionalType": "NAT"
+        }
+    ]
+}

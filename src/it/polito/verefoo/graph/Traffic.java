@@ -2,7 +2,6 @@ package it.polito.verefoo.graph;
 
 import it.polito.verefoo.jaxb.L4ProtocolTypes;
 import it.polito.verefoo.jaxb.PName;
-import it.polito.verefoo.jaxb.Property;
 
 public class Traffic {
 	

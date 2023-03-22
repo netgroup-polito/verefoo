@@ -1,0 +1,22 @@
+{
+    "body": "test body",
+    "dst": "10.0.0.16",
+    "dstPort": "1546",
+    "graph": 102,
+    "httpdefinition": {
+        "domain": "test domain",
+        "options": "-l -t",
+        "url": "test URL"
+    },
+    "lv4Proto": "OTHER",
+    "name": "ISOLATION_PROPERTY",
+    "pop3Definition": {
+        "contentType": "text/plain",
+        "from": "*@verifoo.com",
+        "sender": "me@verifoo.com",
+        "subject": "test subject",
+        "to": "test to"
+    },
+    "src": "10.0.4.1",
+    "srcPort": "1342"
+}

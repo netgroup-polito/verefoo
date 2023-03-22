@@ -1,0 +1,52 @@
+{
+    "allocationConstraints": {
+        "allocationConstraint": [
+            {
+                "nodeA": "10.0.0.1",
+                "nodeB": "10.0.0.2",
+                "type": "FORBIDDEN"
+            },
+            {
+                "nodeA": "30.0.0.3",
+                "nodeB": "30.0.0.4",
+                "type": "FORCED"
+            }
+        ]
+    },
+    "linkConstraints": {
+        "linkMetrics": [
+            {
+                "src": "10.0.0.2",
+                "dst": "10.0.0.3",
+                "reqLatency": 500
+            },
+            {
+                "src": "10.0.0.4",
+                "dst": "10.0.0.5",
+                "reqLatency": 1000
+            }
+        ]
+    },
+    "nodeConstraints": {
+        "nodeMetrics": [
+            {
+                "cores": 4,
+                "maxNodeLatency": 200,
+                "memory": 500,
+                "node": "10.0.0.2",
+                "nrOfOperations": 4,
+                "optional": false,
+                "reqStorage": 1000
+            },
+            {
+                "cores": 2,
+                "maxNodeLatency": 1500,
+                "memory": 1500,
+                "node": "10.0.0.1",
+                "nrOfOperations": 8,
+                "optional": true,
+                "reqStorage": 2000
+            }
+        ]
+    }
+}

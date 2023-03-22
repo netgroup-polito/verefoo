@@ -1,0 +1,48 @@
+{
+    "property": [
+        {
+            "body": "This is an example of body",
+            "dst": "10.0.0.3",
+            "dstPort": "1002",
+            "graph": 232,
+            "httpdefinition": {
+                "domain": "verifoo",
+                "options": "-l -a",
+                "url": "https://localhost:8080/verifoo"
+            },
+            "lv4Proto": "TCP",
+            "name": "ISOLATION_PROPERTY",
+            "pop3Definition": {
+                "contentType": "An example of content",
+                "from": "verifoo.sender@mail.com",
+                "sender": "verifoo user agent",
+                "subject": "read it",
+                "to": "verifoo.addressee@mail.com"
+            },
+            "src": "10.0.0.4",
+            "srcPort": "1002"
+        },
+        {
+            "body": "This is another example of body",
+            "dst": "10.0.0.2",
+            "dstPort": "2342",
+            "graph": 112,
+            "httpdefinition": {
+                "domain": "verefoo",
+                "options": "-p -g --fallback",
+                "url": "https://localhost:8080/verefoo"
+            },
+            "lv4Proto": "OTHER",
+            "name": "REACHABILITY_PROPERTY",
+            "pop3Definition": {
+                "contentType": "Another example of content",
+                "from": "verefoo.sender@mail.com",
+                "sender": "verefoo user agent",
+                "subject": "read it now",
+                "to": "verefoo.addressee@mail.com"
+            },
+            "src": "10.0.2.7",
+            "srcPort": "1002"
+        }
+    ]
+}
