@@ -1,4 +1,4 @@
-![](./resources/VEREFOO_icon.png)
+![](./resources/verefoo_icon.png)
 
 ##### VEREFOO (VErified REFinement and Optimized Orchestrator) is a framework designed to automatically allocate and configure packet filtering firewalls in a service graph defined by the network administrator, so as to fulfill the user-specified security connectivity requirements. VEREFOO combines automation, formal verification and optimization by formulating the firewall configuration problem with constraint programming, as a Maximum Satisfiability Modulo Theories (MaxSMT) problem.
 
