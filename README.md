@@ -89,10 +89,6 @@ To select the algorithm utilized, the query parameter that specifies the algorit
 
 The primary API is `/adp/simulations` as it serves as the API where the algorithm is executed. The Service Graph written in XML must be incorporated in the body of a POST request. It should be noted that the specification of the algorithm, as shown above, is mandatory, otherwise, the framework will return an error.
 
-### Launching the integration tests
-
-
-
 ### Neo4j compatibility recommendations
 
 The framework was tested with the the Neo4j server version 3.5.25 (Community Edition): it is compatible with the Neo4j Spring Data dependency in use. It is advisable to avoid employing newer versions of the server or Spring Data, despite available, for three main reasons:
