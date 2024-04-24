@@ -41,6 +41,7 @@ import it.polito.verefoo.utils.GenerateFlowsTask;
 import it.polito.verefoo.utils.TestResults;
 import it.polito.verefoo.utils.VerificationResult;
 import it.polito.verefoo.functions.Forwarder;
+import it.polito.verefoo.functions.PacketFilterAP;
 import it.polito.verefoo.graph.MaximalFlow;
 import it.polito.verefoo.graph.Traffic;
 
@@ -331,10 +332,10 @@ public class VerefooProxy {
 		List<AllocationNodeAP> nodesToBeReconfigured = computeReconfiguredNetwork();
 		for(AllocationNodeAP n: nodesToBeReconfigured) {
 			if(n.getTypeNF().value().equals("FIREWALL")) {
-//				PacketFilterAP fw = (PacketFilterAP) n.getPlacedNF();
-//				fw.reConfigure();
-				n.setTypeNF(null);
-				n.setPlacedNF(null);
+				PacketFilterAP fw = (PacketFilterAP) n.getPlacedNF();
+				fw.reConfigure();
+//				n.setTypeNF(null);
+//				n.setPlacedNF(null);
 				n.getNode().setFunctionalType(null);
 				n.getNode().setConfiguration(null);
 			} else if(n.getTypeNF().value().equals("FORWARDER")) {

@@ -39,6 +39,9 @@ public class NetContextAP extends NetContext {
 	
     // weights
     public final int WAUTOCONF   = 1;
+    //REACT_VEREFOO
+    public final int WMAINTAINSTATECONF = WAUTOCONF / 2;
+    public final int WMAINTAINSTATEPLACEMENT = WAUTOPLACEMENT/10;
 
  
     /**
@@ -56,9 +59,11 @@ public class NetContextAP extends NetContext {
           constraints = new ArrayList<BoolExpr>();
           softConstrAutoConf = new ArrayList<>();
           softConstrAutoPlace = new ArrayList<>();
+          softConstrMaintainStatePlacement = new ArrayList<>();
+          softConstrMaintainStateConfiguration = new ArrayList<>();
           softConstrWildcard = new ArrayList<>(); 
           softConstrProtoWildcard = new ArrayList<>(); 
-          softConstrPorts = new ArrayList<>(); 
+          softConstrPorts = new ArrayList<>();
 
     	  this.ctx = ctx;
           this.allocationNodes = allocationNodes;
@@ -81,6 +86,8 @@ public class NetContextAP extends NetContext {
         solver.Add(constraints.toArray(constr));
         softConstrAutoConf.forEach(t->solver.AssertSoft(t._1, WAUTOCONF, t._2));
         softConstrAutoPlace.forEach(t->solver.AssertSoft(t._1, WAUTOPLACEMENT, t._2));
+        softConstrMaintainStatePlacement.forEach(t->solver.AssertSoft(t._1, WMAINTAINSTATEPLACEMENT, t._2));
+        softConstrMaintainStateConfiguration.forEach(t->solver.AssertSoft(t._1, WMAINTAINSTATECONF, t._2));
     }
     
     /**
