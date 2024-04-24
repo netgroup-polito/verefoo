@@ -284,10 +284,15 @@ public class VerefooProxy {
 				idRequirement++;
 			}
 		} else {
-			for(Property p : properties) {
-				securityRequirements.put(idRequirement, new SecurityRequirement(p, idRequirement));
+			//Create a map about the updated security requirements
+			toAddSecurityRequirements = new HashMap<>();
+			for(Property p : toAddProperties) {
+				toAddSecurityRequirements.put(idRequirement, new SecurityRequirement(p,idRequirement));
 				idRequirement++;
 			}
+			
+			//Fill the map with target set of security requirements
+			securityRequirements.putAll(toAddSecurityRequirements);
 		}	
 		
 		this.paths = paths;
