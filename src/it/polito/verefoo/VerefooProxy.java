@@ -53,13 +53,15 @@ public class VerefooProxy {
 	private NetContextAP nctxAP;
 	private NetContextMF nctxMF;
 	private List<Property> properties;
+	private List<Property> initialProperties;
+	private List<Property> toAddProperties,toKeptProperties;
 	private List<Path> paths;
 	private WildcardManager wildcardManager;
 	private HashMap<String, AllocationNodeAP> allocationNodesAP;
 	private HashMap<String, AllocationNodeMF> allocationNodesMF;
 	private HashMap<Integer, FlowPathAP> trafficFlowsMapAP;
 	private HashMap<Integer, FlowPathMF> trafficFlowsMapMF;
-	private HashMap<Integer, SecurityRequirement> securityRequirements;
+	private HashMap<Integer, SecurityRequirement> securityRequirements, toAddSecurityRequirements;
 	public Checker check;
 	private List<Node> nodes;
 	private List<NodeMetrics> nodeMetrics;
@@ -226,8 +228,120 @@ public class VerefooProxy {
 		}
 
 	}
+	
+	/**
+	 * Alternative version for REACT-VEREFOO
+     *
+     */
+	public VerefooProxy(Graph graph, Hosts hosts, Connections conns, Constraints constraints, List<Property> initialProp, 
+			List<Property> targetProp, List<Path> paths,String algo) throws BadGraphError {
+
+		// Determine what algorithm to be executed
+		this.AlgoUsed = algo;
+		
+		if(AlgoUsed.equals("AP")){ // Atomic Predicate algo execution
+			
+		// Initialization of the variables related to the nodes
+		allocationNodesAP = new HashMap<>();
+		nodes = graph.getNode();
+		nodes.forEach(n -> allocationNodesAP.put(n.getName(), new AllocationNodeAP(n))); // class for AP
+		wildcardManager = new WildcardManager(allocationNodesAP);
+			
+		// Initialization of the variables related to the requirements
+		properties = targetProp;
+		initialProperties = initialProp;
+		toAddProperties = new ArrayList<>(targetProp);
+		
+		securityRequirements = new HashMap<>();
+		int idRequirement = 0;
+		//Create map for requirements
+		if(initialProperties != null) {
+			
+			//Compute intersection between initialProp and targetProp, then remove it from "targetProp" to find out "toAddProperties"
+			toKeptProperties = computeKeptList(initialProperties, properties);
+			toKeptProperties.forEach(e -> {
+				for(Property p: toAddProperties) {
+					if(propertyCompare(p,e)) {
+						toAddProperties.remove(p);
+						break;
+					}
+				}
+			});
+			
+			//Create a map about the updated security requirements
+			toAddSecurityRequirements = new HashMap<>();
+			for(Property p : toAddProperties) {
+				toAddSecurityRequirements.put(idRequirement, new SecurityRequirement(p,idRequirement));
+				idRequirement++;
+			}
+			
+			//Fill the map with target set of security requirements
+			securityRequirements.putAll(toAddSecurityRequirements);
+			for(Property p: toKeptProperties) {
+				securityRequirements.put(idRequirement, new SecurityRequirement(p,idRequirement));
+				idRequirement++;
+			}
+		} else {
+			for(Property p : properties) {
+				securityRequirements.put(idRequirement, new SecurityRequirement(p, idRequirement));
+				idRequirement++;
+			}
+		}	
+		
+		this.paths = paths;
+		this.nodeMetrics = constraints.getNodeConstraints().getNodeMetrics();
+		//Creation of the z3 context
+		HashMap<String, String> cfg = new HashMap<String, String>();
+		cfg.put("model", "true");
+		ctx = new Context(cfg);
+				
+		//Creation of the NetContext (z3 variables)
+		nctxAP = nctxGenerateAP(ctx, nodes, targetProp, allocationNodesAP);
+		nctxAP.setWildcardManager(wildcardManager);
+		aputilsAP = new APUtilsAP(); 
+		
+		
+		/*
+		 * Main sequence of methods in VerefooProxy for Atomic Predicates:
+		 * 1) given every requirement, all the possible paths of the related flows are computed;
+		 * 2) then starting from requirements and transformers, all relative atomic predicates for the network are computed
+		 * 3) the transformation map for each transformer is filled (e.g. NAT1 input ap 5 -> output ap 8)
+		 * 4) then all atomic flows are computed 
+		 */
+		
+		allocationManager = new AllocationManager(ctx, nctxAP, allocationNodesAP, nodeMetrics, targetProp, wildcardManager);
+		allocationManager.instantiateFunctions("AP");
+		
+		/* Atomic predicates */
+		aputilsAP = new APUtilsAP();
+		long t1 = System.currentTimeMillis();
+		trafficFlowsMapAP = generateFlowPathsAP();
+		networkAtomicPredicates = generateAtomicPredicateNew();
+		long t2 = System.currentTimeMillis();
+		testResults.setAtomicPredCompTime(t2-t1);
+		fillTransformationMap();
+		//printTransformations(); //DEBUG
+		computeAtomicFlows();
+		t1 = System.currentTimeMillis();
+		testResults.setAtomicFlowsCompTime(t1-t2);
+		testResults.setBeginMaxSMTTime(t1);
+		//distributeTrafficFlows();
+		allocateFunctionsAP();
+		// Change Execution depending on chosen algorithm
+		allocationManager.configureFunctionsAP(); // atomic predicate method
+		
+		check = new Checker(ctx, nctxAP, allocationNodesAP);
+		formalizeRequirementsAP();
+
+		}
+
+		if(AlgoUsed.equals("MF")){ // Maximal flows algorithm execution
+			//Not yet implemented.
+		}
+	}
 /**************************************************Atomic Predicate Methods **************************************************************/
 	
+
 	/**
 	 * This function receives in input a set of already computed Atomic Predicates
 	 * (atomicPredicates) and a set of Predicates (predicates), not yet atomic, to convert
@@ -870,6 +984,36 @@ public class VerefooProxy {
 	
 		return networkAtomicPredicates;
 	}
+	
+	private List<Property> computeKeptList(List<Property> set1, List<Property> set2){
+		List<Property> kept = new ArrayList<Property>();
+		for(Property p1: set1) {
+			for(Property p2: set2) {
+				if(propertyCompare(p1,p2)) {
+					kept.add(p1);
+					break;
+				}
+			}
+		}
+		return kept;
+	}
+	
+	private boolean propertyCompare(Property p1, Property p2) {
+		if(!p1.getName().value().equals(p2.getName().value()))
+			return false;
+		if(!p1.getSrc().equals(p2.getSrc()))
+			return false;
+		if(!p1.getDst().equals(p2.getDst()))
+			return false;
+		if(p1.getSrcPort()== null ? !(p2.getSrcPort() == null) : !p1.getSrcPort().equals(p2.getSrcPort()))
+			return false;
+		if(p1.getDstPort()== null ? !(p2.getDstPort() == null) : !p1.getDstPort().equals(p2.getDstPort()))
+			return false;
+		if(p1.getLv4Proto()== null ? !(p2.getLv4Proto() == null) : !p1.getLv4Proto().equals(p2.getLv4Proto()))
+			return false;
+		return true;
+	}
+
 	
 /*****************************************************AP duplicated methods**************************************************************************/
 	/**
