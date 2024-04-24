@@ -17,6 +17,7 @@ import java.util.Collections;
 import com.microsoft.z3.Context;
 
 import it.polito.verefoo.allocation.AllocationManager;
+import it.polito.verefoo.allocation.AllocationNode;
 import it.polito.verefoo.allocation.AllocationNodeAP;
 import it.polito.verefoo.allocation.AllocationNodeMF;
 import it.polito.verefoo.extra.BadGraphError;
@@ -256,7 +257,7 @@ public class VerefooProxy {
 		int idRequirement = 0;
 		//Create map for requirements
 		if(initialProperties != null) {
-			
+
 			//Compute intersection between initialProp and targetProp, then remove it from "targetProp" to find out "toAddProperties"
 			toKeptProperties = computeKeptList(initialProperties, properties);
 			toKeptProperties.forEach(e -> {
@@ -307,6 +308,7 @@ public class VerefooProxy {
 		 * 2) then starting from requirements and transformers, all relative atomic predicates for the network are computed
 		 * 3) the transformation map for each transformer is filled (e.g. NAT1 input ap 5 -> output ap 8)
 		 * 4) then all atomic flows are computed 
+		 * 5) using atomic flows, network's components that must be reconfigured are detected
 		 */
 		
 		allocationManager = new AllocationManager(ctx, nctxAP, allocationNodesAP, nodeMetrics, targetProp, wildcardManager);
@@ -324,7 +326,36 @@ public class VerefooProxy {
 		computeAtomicFlows();
 		t1 = System.currentTimeMillis();
 		testResults.setAtomicFlowsCompTime(t1-t2);
-		testResults.setBeginMaxSMTTime(t1);
+		
+		/* REACT Algorithm */
+		List<AllocationNodeAP> nodesToBeReconfigured = computeReconfiguredNetwork();
+		for(AllocationNodeAP n: nodesToBeReconfigured) {
+			if(n.getTypeNF().value().equals("FIREWALL")) {
+//				PacketFilterAP fw = (PacketFilterAP) n.getPlacedNF();
+//				fw.reConfigure();
+				n.setTypeNF(null);
+				n.setPlacedNF(null);
+				n.getNode().setFunctionalType(null);
+				n.getNode().setConfiguration(null);
+			} else if(n.getTypeNF().value().equals("FORWARDER")) {
+				n.setTypeNF(null);
+				n.setPlacedNF(null);
+				n.getNode().setFunctionalType(null);
+				n.getNode().setConfiguration(null);
+			}
+		}
+		t2 = System.currentTimeMillis();
+		//testResults.setReconfiguredNetworkCompTime(t2-t1);
+		
+		if(nodesToBeReconfigured.isEmpty()) {
+			System.out.println("There are no nodes which needs to be reconfigured.");
+		} else {
+			System.out.println("The nodes to be reconfigured are ["+nodesToBeReconfigured.size()+"]:");
+			for(AllocationNode an : nodesToBeReconfigured)
+				System.out.println(an.getIpAddress());
+		}
+		
+		testResults.setBeginMaxSMTTime(t2);
 		//distributeTrafficFlows();
 		allocateFunctionsAP();
 		// Change Execution depending on chosen algorithm
@@ -1012,6 +1043,126 @@ public class VerefooProxy {
 		if(p1.getLv4Proto()== null ? !(p2.getLv4Proto() == null) : !p1.getLv4Proto().equals(p2.getLv4Proto()))
 			return false;
 		return true;
+	}
+	
+	private List<AllocationNodeAP> computeReconfiguredNetwork() {
+		List<AllocationNodeAP> nodes;
+		List<AllocationNodeAP> toBeReconfigured = new ArrayList<>();
+		Set<AllocationNodeAP> tmpToBeReconfigured;
+		List<AllocationNodeAP> tmpFlowNodes;
+		Boolean found,foundTmp,NAT;
+		Integer index;
+		
+		for(SecurityRequirement sr : toAddSecurityRequirements.values()) {
+			if(sr.getOriginalProperty().getName().toString().equals("ISOLATION_PROPERTY")) {
+				//Iterate over all of the correlated Atomic Flows
+				for(FlowPathAP p : sr.getFlowsMapAP().values()) {
+					nodes = p.getPath();
+					for(AtomicFlow af : p.getAtomicFlowsMap().values()) {
+						found = false;
+						index = 0;
+						for(AllocationNodeAP n : nodes.subList(1, nodes.size()-1)) {
+							//check if the node blocks the traffic
+							if(n.getNode().getFunctionalType() != null) {
+								if(n.getNode().getFunctionalType().value().equals("FIREWALL") 
+										&& n.getDroppedList().contains(af.getAtomicPredicateList().get(index))) {
+									found = true;
+									break;
+								}
+							}
+							index++;
+						}
+						//if the traffic is not blocked the nodes should be reconfigured
+						if(!found) {
+							//We reconfigure both FWs and FORWARDERS
+							toBeReconfigured.addAll(nodes.stream()
+									.filter(n -> !toBeReconfigured.contains(n)) //not already inserted
+									.filter(n -> transformersNode.containsKey(n.getIpAddress())) //is an already configured transformed node
+									.filter(n -> transformersNode.get(n.getIpAddress()).getFunctionalType().value().equals("FIREWALL")) //is a FW (it handles only FW reconfiguration at the moment)
+									.collect(Collectors.toList()));
+							toBeReconfigured.addAll(nodes.stream()
+									.filter(n-> !toBeReconfigured.contains(n))
+									.filter(n-> n.getTypeNF()!=null && n.getTypeNF().value().equals("FORWARDER"))
+									.collect(Collectors.toList()));
+						}
+					}
+				}
+			} else if(sr.getOriginalProperty().getName().toString().equals("REACHABILITY_PROPERTY")) {
+				tmpToBeReconfigured = new HashSet<>();
+				found = false;
+				for(FlowPathAP p : sr.getFlowsMapAP().values()) {
+					nodes = p.getPath();
+					for(AtomicFlow af : p.getAtomicFlowsMap().values()) {
+						index = 0;
+						tmpFlowNodes = new ArrayList<>();
+						NAT = false;
+						for(AllocationNodeAP n : nodes.subList(1, nodes.size()-1)) {
+							//check if there is a NAT on the path
+							if(!NAT && n.getNode().getFunctionalType() != null 
+									&& n.getNode().getFunctionalType().value().equals("NAT")) {
+								NAT = true;
+							//check if the node blocks the traffic
+							} else if (n.getNode().getFunctionalType() != null 
+									&& n.getNode().getFunctionalType().value().equals("FIREWALL") 
+									&& n.getDroppedList().contains(af.getAtomicPredicateList().get(index))) {
+
+								tmpFlowNodes.add(n);
+								/*
+								 * Check for special case: with NAT, extra nodes need to be selected
+								 */
+								if(NAT) {
+									//scan all the FlowPaths crossing the current node n
+									for(FlowPathAP fp : n.getCrossingFlows().values()) {
+										//consider only FlowPaths associated with opposite requirements, otherwise there could be no conflict
+										if(fp.getRequirement().getOriginalProperty().getName().toString().equals("ISOLATION_PROPERTY")) {
+											//scan all the AP in input for current node and current FlowPath
+											for(int ap : n.getAtomicPredicatesInInputForFlow(fp.getIdFlow()).values()) {
+												if(ap == af.getAtomicPredicateList().get(index)) {
+													//Reconfigure also all FORWARDERS on the Isolation's FlowPath before each NAT and before reaching current node n
+													AllocationNodeAP an;
+													for(int i=0; i<fp.getPath().size(); i++) {
+														an = fp.getPath().get(i);
+														//Search for the node when ap1 != ap2
+														if(an.getNode().getFunctionalType() != null 
+																&& an.getNode().getFunctionalType().value().equals("NAT")) {
+															//reconfigure previous node (if it is a FORWARDER)
+															if(fp.getPath().get(i-1).getNode().getFunctionalType() != null && fp.getPath().get(i-1).getNode().getFunctionalType().value().equals("FORWARDER"))
+																tmpFlowNodes.add(fp.getPath().get(i-1));
+															
+														}
+														if(an.getIpAddress().equals(n.getIpAddress()))
+																break;
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+							index++;
+						}
+						//if it found a flow which can pass from source to destination there is no need of reconfiguration
+						if(tmpFlowNodes.isEmpty()) {
+							found = true;
+							break;
+						} else {
+							tmpToBeReconfigured.addAll(tmpFlowNodes);
+						}
+					}
+					//found a flow which satisfy the requirement, could stop here
+					if(found) {
+						break;
+					}
+				}
+				if(!found) {
+					//add all blocking nodes to the list of reconfigured nodes
+					toBeReconfigured.addAll(tmpToBeReconfigured.stream()
+							.filter(n -> !toBeReconfigured.contains(n))
+							.collect(Collectors.toList()));
+				}
+			}
+		}
+		return toBeReconfigured;
 	}
 
 	
