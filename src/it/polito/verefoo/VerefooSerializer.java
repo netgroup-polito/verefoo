@@ -117,7 +117,7 @@ public class VerefooSerializer {
 		this.nfv = root;
 		this.AlgoUsed = algo;
 		this.REACT = react;
-		AllocationGraphGenerator agg = new AllocationGraphGenerator(root);
+		AllocationGraphGenerator agg = new AllocationGraphGenerator(root, react);
 		root = agg.getAllocationGraph();
 		VerefooNormalizer norm = new VerefooNormalizer(root);
 		root = norm.getRoot();
