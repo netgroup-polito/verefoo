@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="../xsd/nfvSchema.xsd">
+ 	<graphs>
+		<graph id="0" serviceGraph="false">
+            <node name="10.0.0.1" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.1"/>
+                <configuration name="confA" description="A simple description">
+                    <webclient nameWebServer="10.0.0.3"/>
+                </configuration>
+            </node>
+            <node name="10.0.0.2" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.2"/>
+                <configuration name="confA" description="A simple description">
+                    <webclient nameWebServer="10.0.0.3"/>
+                </configuration>
+            </node>
+            <node name="10.0.0.3" functional_type="WEBSERVER">
+                <neighbour name="20.0.0.3"/>
+                <configuration name="confA" description="A simple description">
+                    <webserver>
+                        <name>10.0.0.3</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="10.0.0.4" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.4"/>
+                <configuration name="confA" description="A simple description">
+                    <webclient nameWebServer="10.0.0.3"/>
+                </configuration>
+            </node>
+            <node name="10.0.0.5" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.5"/>
+                <configuration name="confA" description="A simple description">
+                    <webclient nameWebServer="10.0.0.3"/>
+                </configuration>
+            </node>
+            <node name="10.0.0.6" functional_type="WEBCLIENT">
+                <neighbour name="20.0.0.6"/>
+                <configuration name="confA" description="A simple description">
+                    <webclient nameWebServer="10.0.0.3"/>
+                </configuration>
+            </node>
+            <node name="40.0.0.1" functional_type="NAT">
+                <neighbour name="20.0.0.1"/>
+                <neighbour name="20.0.0.2"/>
+                <neighbour name="20.0.0.7"/>
+                <configuration name="confAutoGen">
+                    <nat>
+                        <source>10.0.0.1</source>
+                        <source>10.0.0.2</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node name="40.0.0.2" functional_type="NAT">
+                <neighbour name="20.0.0.5"/>
+                <neighbour name="20.0.0.6"/>
+                <neighbour name="20.0.0.8"/>
+                <configuration name="confAutoGen">
+                    <nat>
+                        <source>10.0.0.5</source>
+                        <source>10.0.0.6</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node name="50.0.0.1" functional_type="TRAFFIC_MONITOR">
+                <neighbour name="20.0.0.3"/>
+                <neighbour name="20.0.0.4"/>
+                <neighbour name="20.0.0.7"/>
+                <neighbour name="20.0.0.8"/>
+                <configuration name="50.0.0.1">
+                    <forwarder>
+                        <name>Traffic Monitor</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="20.0.0.1" functional_type="FORWARDER">
+                <neighbour name="40.0.0.1"/>
+                <neighbour name="10.0.0.1"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="20.0.0.2" functional_type="FORWARDER">
+                <neighbour name="40.0.0.1"/>
+                <neighbour name="10.0.0.2"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="20.0.0.3" functional_type="FIREWALL">
+                <neighbour name="50.0.0.1"/>
+                <neighbour name="10.0.0.3"/>
+                <configuration name="AutoConf">
+                    <firewall defaultAction="ALLOW">
+                        <elements>
+                            <action>DENY</action>
+                            <source>40.0.0.1</source>
+                            <destination>10.0.0.3</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall>
+                </configuration>
+            </node>
+            <node name="20.0.0.4" functional_type="FORWARDER">
+                <neighbour name="50.0.0.1"/>
+                <neighbour name="10.0.0.4"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="20.0.0.5" functional_type="FIREWALL">
+                <neighbour name="40.0.0.2"/>
+                <neighbour name="10.0.0.5"/>
+                <configuration name="AutoConf">
+                    <firewall defaultAction="ALLOW">
+                        <elements>
+                            <action>DENY</action>
+                            <source>10.0.0.5</source>
+                            <destination>10.0.0.4</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall>
+                </configuration>
+            </node>
+            <node name="20.0.0.6" functional_type="FIREWALL">
+                <neighbour name="40.0.0.2"/>
+                <neighbour name="10.0.0.6"/>
+                <configuration name="AutoConf">
+                    <firewall defaultAction="DENY"/>
+                </configuration>
+            </node>
+            <node name="20.0.0.7" functional_type="FORWARDER">
+                <neighbour name="50.0.0.1"/>
+                <neighbour name="40.0.0.1"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="20.0.0.8" functional_type="FORWARDER">
+                <neighbour name="50.0.0.1"/>
+                <neighbour name="40.0.0.2"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+		</graph>
+	</graphs>
+	<Constraints>
+		<NodeConstraints>
+		</NodeConstraints>
+		<LinkConstraints />
+	</Constraints>
+	<PropertyDefinition>
+        <Property graph="0" name="IsolationProperty" src="10.0.0.1" dst="10.0.0.3" /> 
+        <Property graph="0" name="IsolationProperty" src="10.0.0.2" dst="10.0.0.3" />
+        <Property graph="0" name="IsolationProperty" src="10.0.0.6" dst="10.0.0.4" />
+        <Property graph="0" name="IsolationProperty" src="10.0.0.5" dst="10.0.0.4" />
+        <Property graph="0" name="IsolationProperty" src="10.0.0.6" dst="10.0.0.3" />
+        <Property graph="0" name="IsolationProperty" src="10.0.0.5" dst="10.0.0.3" />        
+        <Property graph="0" name="IsolationProperty" src="10.0.0.4" dst="10.0.0.3" />  
+        <Property graph="0" name="ReachabilityProperty" src="10.0.0.1" dst="10.0.0.4" />
+        <Property graph="0" name="ReachabilityProperty" src="10.0.0.3" dst="10.0.0.2" />
+        <Property graph="0" name="ReachabilityProperty" src="10.0.0.3" dst="10.0.0.4" />
+        <Property graph="0" name="ReachabilityProperty" src="10.0.0.5" dst="10.0.0.2" />
+    </PropertyDefinition>
+	<InitialProperty>
+        <Property graph="0" name="IsolationProperty" src="10.0.0.1" dst="10.0.0.3" /> 
+        <Property graph="0" name="IsolationProperty" src="10.0.0.2" dst="10.0.0.3" />
+        <Property graph="0" name="IsolationProperty" src="10.0.0.6" dst="10.0.0.4" />
+        <Property graph="0" name="IsolationProperty" src="10.0.0.5" dst="10.0.0.4" />
+        <Property graph="0" name="IsolationProperty" src="10.0.0.6" dst="10.0.0.3" />
+        <Property graph="0" name="ReachabilityProperty" src="10.0.0.5" dst="10.0.0.3" />     
+        <Property graph="0" name="ReachabilityProperty" src="10.0.0.1" dst="10.0.0.4" />
+        <Property graph="0" name="ReachabilityProperty" src="10.0.0.3" dst="10.0.0.2" />
+        <Property graph="0" name="ReachabilityProperty" src="10.0.0.5" dst="10.0.0.1" />
+        <Property graph="0" name="ReachabilityProperty" src="10.0.0.3" dst="10.0.0.4" /> 
+	</InitialProperty>
+	<ParsingString></ParsingString>
+</NFV>
