@@ -111,6 +111,16 @@ In case of failure, the detailed report can be found at */target/failsafe-report
 
 All the regression tests performed on the framework have been executed using the Z3 library version 4.8.8.
 
+## REACT VEREFOO
+
+REACT VEREFOO is a custom version of VEREFOO with additional support for the reconfiguration of packet filtering firewalls, so as to fulfill the user-specified security connectivity requirements. REACT VEREFOO maintains the core principles of VEREFOO (i.e., automation, formal correctness assurance, optimization) and adds the capability of reusing any previously computed configuration instead of forcing the reconfiguration of the whole network from scratch.
+
+To interact with REACT VEREFOO, it is necessary to express this with an additional query parameter. For the moment the implementation supports only the AP algorithm.
+
+> Example:
+> * `http://localhost:8085/VEREFOO/adp/simulations?Algorithm=AP&REACT=true`
+
+It should be noted that this parameter is optional, to maintain full compatibility with the previous version and APIs.
 
 ## Demo
 
