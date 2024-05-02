@@ -42,6 +42,8 @@ abstract public class NetContext {
     public List<BoolExpr> constraints;
     public List<Tuple<BoolExpr, String>> softConstrAutoConf;
     public List<Tuple<BoolExpr, String>> softConstrAutoPlace;
+    public List<Tuple<BoolExpr, String>> softConstrMaintainStatePlacement;
+    public List<Tuple<BoolExpr, String>> softConstrMaintainStateConfiguration;
     public List<Tuple<BoolExpr, String>> softConstrWildcard;
     public List<Tuple<BoolExpr, String>> softConstrProtoWildcard;
     public List<Tuple<BoolExpr, String>> softConstrPorts;

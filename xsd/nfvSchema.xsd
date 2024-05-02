@@ -16,6 +16,7 @@
 				<xsd:element ref="graphs" minOccurs="1" maxOccurs="1"/>
 				<xsd:element ref="Constraints" minOccurs="0" maxOccurs="1"/>
 				<xsd:element ref="PropertyDefinition" minOccurs="1" maxOccurs="1"/>
+				<xsd:element ref="InitialProperty" minOccurs="0" maxOccurs="1" />
 				<xsd:element ref="Hosts" minOccurs="0"/>
 				<xsd:element ref="Connections" minOccurs="0"/>
 				<xsd:element ref="NetworkForwardingPaths" minOccurs="0" maxOccurs="1"/>
@@ -67,6 +68,13 @@
 	    </xsd:keyref>
 	</xsd:element>
 	<xsd:element name="PropertyDefinition">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Property" type="Property" minOccurs="1" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="InitialProperty">
 		<xsd:complexType>
 			<xsd:sequence>
 				<xsd:element name="Property" type="Property" minOccurs="1" maxOccurs="unbounded"/>

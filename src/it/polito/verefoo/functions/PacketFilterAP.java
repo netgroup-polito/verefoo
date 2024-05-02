@@ -38,6 +38,7 @@ public class PacketFilterAP extends GenericFunction{
 
 	FuncDecl filtering_function;
 	boolean autoConfigured;
+	boolean reconfigured;
 	BoolExpr behaviour;
 	FuncDecl rule_func;
 	// blacklisting and defaultAction must match
@@ -62,6 +63,7 @@ public class PacketFilterAP extends GenericFunction{
 		pf = source.getZ3Name();
 		constraints = new ArrayList<BoolExpr>();
 		isEndHost = false;
+		reconfigured = false;
 
    		// true for blacklisting, false for whitelisting
    		// this is the default, but it can be changed
@@ -110,8 +112,13 @@ public class PacketFilterAP extends GenericFunction{
     	
     	//allocation
     	if(autoplace) {
-  			// packet filter should not be used if possible
-  			nctxAP.softConstrAutoPlace.add(new Tuple<BoolExpr, String>(ctx.mkNot(used), "fw_auto_conf"));
+    		if(reconfigured) {
+      			//Prefer a previously configured FW with respect to a new allocation point
+      	    	nctxAP.softConstrMaintainStatePlacement.add(new Tuple<BoolExpr, String>(ctx.mkNot(used), "fw_auto_conf"));
+    		} else {
+    			// packet filter should not be used if possible
+    			nctxAP.softConstrAutoPlace.add(new Tuple<BoolExpr, String>(ctx.mkNot(used), "fw_auto_conf"));
+    		}
   		}else {
   			used = ctx.mkTrue();
   			constraints.add(ctx.mkEq(used, ctx.mkTrue()));
@@ -140,7 +147,16 @@ public class PacketFilterAP extends GenericFunction{
     									)
     							)
     					);
-    			nctxAP.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq(rule, ctx.mkFalse()), "fw_auto_conf"));
+    			//For reconfigured FWs, maintaining its configuration should be preferred
+    			if(!reconfigured) {
+    				nctxAP.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq(rule, ctx.mkFalse()), "fw_auto_conf"));
+    			} else {
+    				if(this.sourceAP.getDroppedList().contains(traffic) || this.sourceAP.getForwardBehaviourList().contains(traffic))
+    					nctxAP.softConstrMaintainStateConfiguration.add(new Tuple<BoolExpr, String>(ctx.mkEq(rule, ctx.mkFalse()), "fw_auto_conf"));
+    				else {
+    					nctxAP.softConstrAutoConf.add(new Tuple<BoolExpr, String>(ctx.mkEq(rule, ctx.mkFalse()), "fw_auto_conf"));
+    				} 
+    			}
     		}
     	}
     
@@ -218,4 +234,12 @@ public class PacketFilterAP extends GenericFunction{
 	    solver.Add(constraints.toArray(constr));
 	    //additionalConstraints(solver);
 	}
+	
+    public void reConfigure() {
+    	//Set automatic placement and configuration
+    	autoplace = true;
+    	autoConfigured = true;
+    	defaultActionSet = false;
+    	reconfigured = true;
+    }
 }

@@ -32,8 +32,14 @@ public class Main {
 	
 	public static void main(String[] args) throws MalformedURLException {
 		System.setProperty("log4j.configuration", new File("resources", "log4j2.xml").toURI().toURL().toString());
-		// Let user input the choice of algorithm to execute
+		// Let user input the choice of algorithm to execute and version of VEREFOO
 		Scanner myObj = new Scanner(System.in);  // Create a Scanner object
+		System.out.println("Enable REACT version (Y/N)?");
+		String reactChoice = myObj.nextLine().toUpperCase();
+		while (!reactChoice.equals("Y") && !reactChoice.equals("N")) { // input validation
+		System.out.println("Enter a correct input (Y/N)");
+		reactChoice = myObj.nextLine();
+		}
 		System.out.println("Enter AP for atomic predicates algorithm Or MF for maximal flows algorithm");
 		String algo = myObj.nextLine();
 		while (!algo.equals("AP") && !algo.equals("MF")) { // input validation
@@ -52,8 +58,14 @@ public class Main {
 				Marshaller m = jc.createMarshaller();
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 				m.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, "./xsd/nfvSchema.xsd");
-				// VerefooSerializer takes as parameter the type of algorithm to be used
-				VerefooSerializer test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/RegressioneTestCases/Test2_2.xml")),algo);
+				VerefooSerializer test;
+				if(reactChoice.equals("Y")) {
+					 test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/NetworkTopology/Internet2.xml")),algo, true);
+				} else {
+					// VerefooSerializer takes as parameter the type of algorithm to be used
+					test = new VerefooSerializer((NFV) u.unmarshal(new FileInputStream("./testfile/NetworkTopology/Internet2.xml")),algo);
+				}
+				
 				if (test.isSat()) {
 					loggerResult.info("SAT");
 					loggerResult.info("----------------------OUTPUT----------------------");

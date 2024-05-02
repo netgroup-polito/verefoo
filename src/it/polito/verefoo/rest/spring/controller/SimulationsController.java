@@ -45,7 +45,7 @@ public class SimulationsController {
 	})
 
 	@RequestMapping(value = "", consumes = { "application/xml", "application/json" }, method = RequestMethod.POST)
-	public ResponseEntity<Resources<NFV>> runSimulationByNFV(@RequestBody NFV nfv, @RequestParam(value = "fid", required = false) List<FunctionalTypes> usableFunctionalTypes,@RequestParam(name = "Algorithm") String alg) {
+	public ResponseEntity<Resources<NFV>> runSimulationByNFV(@RequestBody NFV nfv, @RequestParam(value = "fid", required = false) List<FunctionalTypes> usableFunctionalTypes,@RequestParam(name = "Algorithm") String alg, @RequestParam(value = "REACT", required = false) boolean REACT) {
 		try {
 			// the nfv is modified in place by VerefooSerializer
 			
@@ -59,8 +59,13 @@ public class SimulationsController {
 					index2++;
 				}
 			}
-				
-			new VerefooSerializer(nfv,alg);
+			
+			// being a primitive data type, not possible to be null. If not specified is false
+			if(REACT) {
+				new VerefooSerializer(nfv,alg,true);
+			} else {
+				new VerefooSerializer(nfv,alg);
+			}
 		} catch (BadGraphError e) {
 			throw verefooCoreExceptionBuilder(e);
 		} catch (Exception e) {
@@ -91,13 +96,18 @@ public class SimulationsController {
 			@RequestParam(value = "rid", required = false) Long rid,
 			@RequestParam(value = "sid", required = false) Long sid,
 			@RequestParam(value = "fid", required = false) List<FunctionalTypes> usableFunctionalTypes,
+			@RequestParam(value = "REACT", required = false) boolean REACT,
 			@RequestParam(name = "Algorithm") String alg)  {
 
 		NFV nfv = service.buildNFVFromParams(gid, rid, sid);
 
 		try {
 			// the nfv is modified in place by VerefooSerializer
-			new VerefooSerializer(nfv,alg);
+			if(REACT) {
+				new VerefooSerializer(nfv,alg,true);
+			} else {
+				new VerefooSerializer(nfv,alg);
+			}
 		} catch (BadGraphError e) {
 			throw verefooCoreExceptionBuilder(e);
 		} catch (Exception e) {
