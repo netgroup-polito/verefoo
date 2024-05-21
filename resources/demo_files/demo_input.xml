@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NFV xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../../xsd/nfvSchema.xsd">
+	<graphs>
+		<graph id="0">
+			<!-- End points (Web servers ) -->
+			<node functional_type="WEBSERVER" name="130.10.0.1"> <!-- web server 1 -->
+				<neighbour name="1.0.0.1" />
+				<configuration description="e1" name="httpserver1">
+					<webserver>
+						<name>130.10.0.1</name>
+					</webserver>
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBSERVER" name="130.10.0.2"> <!-- web server 2 -->
+				<neighbour name="1.0.0.2" />
+				<configuration description="e2" name="httpserver2">
+					<webserver>
+						<name>130.10.0.2</name>
+					</webserver>
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBSERVER" name="130.10.0.3"> <!-- web server 3 -->
+				<neighbour name="1.0.0.3" />
+				<configuration description="e3" name="httpserver3">
+					<webserver>
+						<name>130.10.0.3</name>
+					</webserver>
+				</configuration>
+			</node>
+
+			<node name="1.0.0.1"> <!-- a13 -->
+				<neighbour name="130.10.0.1" />
+				<neighbour name="130.10.0.4" />
+			</node>
+			
+			<node name="1.0.0.2"> <!-- a14 -->
+				<neighbour name="130.10.0.2" />
+				<neighbour name="130.10.0.4" />
+			</node>
+			
+			<node name="1.0.0.3"> <!-- a15 -->
+				<neighbour name="130.10.0.3" />
+				<neighbour name="130.10.0.4" />
+			</node>
+
+			<node functional_type="LOADBALANCER" name="130.10.0.4">
+				<neighbour name="1.0.0.1" />
+				<neighbour name="1.0.0.2" />
+                <neighbour name="1.0.0.3" />
+                <neighbour name="1.0.0.4" />
+				 <configuration description="s9" name="loadbalancer">
+		          <loadbalancer>
+					<pool>130.10.0.1</pool>
+                    <pool>130.10.0.2</pool>
+                    <pool>130.10.0.3</pool>
+		          </loadbalancer>
+		        </configuration>
+			</node>
+
+			<node name="1.0.0.4"> <!-- a16 -->
+				<neighbour name="130.10.0.4" />
+				<neighbour name="33.33.33.2" />
+			</node>
+
+			<node functional_type="FORWARDER" name="33.33.33.2"> <!-- Cache  -->
+				<neighbour name="1.0.0.4" />
+				<neighbour name="1.0.0.5" />
+                <neighbour name="1.0.0.6" />
+                <neighbour name="1.0.0.7" />
+				 <configuration name="ForwardConf">
+					<forwarder>
+						<name>Forwarder</name>
+					</forwarder>
+				</configuration>
+			</node>
+
+            <node name="1.0.0.5"> <!-- a17 -->
+				<neighbour name="33.33.33.2" />
+				<neighbour name="40.40.41.-1" />
+			</node>
+
+            <node name="1.0.0.6"> <!-- a18 -->
+				<neighbour name="33.33.33.2" />
+				<neighbour name="40.40.42.-1" />
+			</node>
+
+			<node functional_type="WEBCLIENT" name="40.40.41.-1"> <!-- e4 endpoint network -->
+				<neighbour name="1.0.0.5" />
+				<configuration description="e4" name="officeA">
+					<webclient nameWebServer="130.10.0.1" />
+				</configuration>
+			</node>
+            
+			<node functional_type="WEBCLIENT" name="40.40.42.-1"> <!-- e5 endpoint network -->
+				<neighbour name="1.0.0.6" />
+				<configuration description="e5" name="businessofficeA">
+					<webclient nameWebServer="130.10.0.1" />
+				</configuration>
+			</node>
+
+            <node name="1.0.0.7"> <!-- a19 -->
+				<neighbour name="33.33.33.2" />
+				<neighbour name="33.33.33.3" />
+			</node>
+
+			<node functional_type="FORWARDER" name="33.33.33.3"> <!-- Traffic monitor -->
+				<neighbour name="1.0.0.7" />
+				<neighbour name="1.0.0.8" />
+                <neighbour name="1.0.0.9" />
+                <configuration name="ForwardConf">
+					<forwarder>
+						<name>Forwarder</name>
+					</forwarder>
+				</configuration>
+			</node>
+
+            <node name="1.0.0.8"> <!-- a20 -->
+				<neighbour name="33.33.33.3" />
+				<neighbour name="88.80.84.-1" />
+			</node>
+
+			<node functional_type="WEBCLIENT" name="88.80.84.-1"> <!-- e6 endpoint network -->
+				<neighbour name="1.0.0.8" />
+				<configuration description="e6" name="companyB">
+					<webclient nameWebServer="130.10.0.1" />
+				</configuration>
+			</node>
+
+            <node name="1.0.0.9"> <!-- a21 -->
+				<neighbour name="33.33.33.3" />
+				<neighbour name="220.124.30.1" />
+			</node>
+
+			<node functional_type="NAT" name="220.124.30.1">
+				<neighbour name="1.0.0.9" />
+				<neighbour name="1.0.0.10" />
+                <neighbour name="1.0.0.11" />
+				 <configuration description="s12" name="nat">
+		          <nat>
+					<source>192.168.3.-1</source> <!-- e7 -->
+					<source>192.168.2.-1</source> <!-- e8 -->
+		          </nat>
+		        </configuration>
+			</node>
+
+
+            <node name="1.0.0.10"> <!-- a22 -->
+				<neighbour name="220.124.30.1" />
+				<neighbour name="192.168.3.-1" />
+			</node>
+            
+            <node name="1.0.0.11"> <!-- a23 -->
+				<neighbour name="220.124.30.1" />
+				<neighbour name="192.168.2.-1" />
+			</node>
+
+			<node functional_type="WEBCLIENT" name="192.168.3.-1"> <!-- e7 endpoint network -->
+				<neighbour name="1.0.0.10" />
+				<configuration description="e7" name="officeC">
+					<webclient nameWebServer="130.10.0.1" />
+				</configuration>
+			</node>
+			
+			<node functional_type="WEBCLIENT" name="192.168.2.-1"> <!-- e8 endpoint network -->
+				<neighbour name="1.0.0.11" />
+				<configuration description="e8" name="businessofficeC">
+					<webclient nameWebServer="130.10.0.1" />
+				</configuration>
+			</node>
+
+
+			
+		</graph>
+	</graphs>
+	<Constraints>
+		<NodeConstraints/>
+		<LinkConstraints />
+	</Constraints>
+	<PropertyDefinition>
+			<!-- policy 1 -->
+			<Property graph="0" name="ReachabilityProperty" src="192.168.3.-1" dst="192.168.2.-1" /> 
+			<!-- policy 2 -->
+			<Property graph="0" name="ReachabilityProperty" src="192.168.2.-1" dst="192.168.3.-1" /> 
+			<!-- policy 3 -->
+		    <Property graph="0" name="ReachabilityProperty" src="192.168.3.-1" dst="130.10.0.1"  dst_port="80" lv4proto="TCP"/>
+		    <Property graph="0" name="ReachabilityProperty" src="192.168.3.-1" dst="130.10.0.2"  dst_port="80" lv4proto="TCP"/>
+		    <Property graph="0" name="ReachabilityProperty" src="192.168.3.-1" dst="130.10.0.3"  dst_port="80" lv4proto="TCP"/>
+		    <Property graph="0" name="ReachabilityProperty" src="192.168.3.-1" dst="130.10.0.4"  dst_port="80" lv4proto="TCP"/>
+			<!-- policy 4 -->
+		    <Property graph="0" name="IsolationProperty" src="192.168.3.-1" dst="130.10.0.1" dst_port="0-79" lv4proto="TCP" /> <!-- deny traffic != 80 -->
+		    <Property graph="0" name="IsolationProperty" src="192.168.3.-1" dst="130.10.0.1" dst_port="81-65535" lv4proto="TCP"/>
+		    <Property graph="0" name="IsolationProperty" src="192.168.3.-1" dst="130.10.0.2" dst_port="0-79" lv4proto="TCP" /> <!-- deny traffic != 80 -->
+		    <Property graph="0" name="IsolationProperty" src="192.168.3.-1" dst="130.10.0.2" dst_port="81-65535" lv4proto="TCP"/>
+		    <Property graph="0" name="IsolationProperty" src="192.168.3.-1" dst="130.10.0.3" dst_port="0-79" lv4proto="TCP" /> <!-- deny traffic != 80 -->
+		    <Property graph="0" name="IsolationProperty" src="192.168.3.-1" dst="130.10.0.3" dst_port="81-65535" lv4proto="TCP"/>
+		    <Property graph="0" name="IsolationProperty" src="192.168.3.-1" dst="130.10.0.4" dst_port="0-79" lv4proto="TCP" /> <!-- deny traffic != 80 -->
+		    <Property graph="0" name="IsolationProperty" src="192.168.3.-1" dst="130.10.0.4" dst_port="81-65535" lv4proto="TCP"/>
+			<!-- policy 5 -->
+		    <Property graph="0" name="IsolationProperty" src="192.168.3.-1" dst="130.10.0.1" lv4proto="UDP" />
+		    <Property graph="0" name="IsolationProperty" src="192.168.3.-1" dst="130.10.0.2"  lv4proto="UDP" />
+		    <Property graph="0" name="IsolationProperty" src="192.168.3.-1" dst="130.10.0.3"  lv4proto="UDP" />
+		    <Property graph="0" name="IsolationProperty" src="192.168.3.-1" dst="130.10.0.4"  lv4proto="UDP" />
+			<!-- policy 6 -->
+            <Property graph="0" name="IsolationProperty" src="192.168.2.-1" dst="130.10.0.1" />
+            <Property graph="0" name="IsolationProperty" src="192.168.2.-1" dst="130.10.0.2" />
+            <Property graph="0" name="IsolationProperty" src="192.168.2.-1" dst="130.10.0.3" />
+            <Property graph="0" name="IsolationProperty" src="192.168.2.-1" dst="130.10.0.4" />
+			<!-- policy 7 -->
+			<Property graph="0" name="ReachabilityProperty" src="130.10.0.1" dst="192.168.3.-1" />  
+			<Property graph="0" name="ReachabilityProperty" src="130.10.0.2" dst="192.168.3.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="130.10.0.3" dst="192.168.3.-1" />
+			<Property graph="0" name="ReachabilityProperty" src="130.10.0.4" dst="192.168.3.-1" />
+			<!-- policy 8 -->
+		    <Property graph="0" name="ReachabilityProperty" src="40.40.41.-1" dst="130.10.0.1"  dst_port="80" lv4proto="TCP"/> 
+		    <Property graph="0" name="ReachabilityProperty" src="40.40.41.-1" dst="130.10.0.2"  dst_port="80" lv4proto="TCP"/>
+		    <Property graph="0" name="ReachabilityProperty" src="40.40.41.-1" dst="130.10.0.3"  dst_port="80" lv4proto="TCP"/>
+		    <Property graph="0" name="ReachabilityProperty" src="40.40.41.-1" dst="130.10.0.4"  dst_port="80" lv4proto="TCP"/>
+			<!-- policy 9 -->
+		    <Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.1" dst_port="0-79" lv4proto="TCP" /> <!-- deny traffic != 80 -->
+		    <Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.1" dst_port="81-65535" lv4proto="TCP"/>
+		    <Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.2" dst_port="0-79" lv4proto="TCP" /> <!-- deny traffic != 80 -->
+		    <Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.2" dst_port="81-65535" lv4proto="TCP"/>
+		    <Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.3" dst_port="0-79" lv4proto="TCP" /> <!-- deny traffic != 80 -->
+		    <Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.3" dst_port="81-65535" lv4proto="TCP"/>
+		    <Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.4" dst_port="0-79" lv4proto="TCP" /> <!-- deny traffic != 80 -->
+		    <Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.4" dst_port="81-65535" lv4proto="TCP"/>
+			<!-- policy 10 -->
+            <Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.1" lv4proto="UDP" />
+            <Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.2" lv4proto="UDP" />
+            <Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.3" lv4proto="UDP" />
+            <Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="130.10.0.4" lv4proto="UDP" />
+			<!-- policy 11 -->
+            <Property graph="0" name="IsolationProperty" src="40.40.42.-1" dst="130.10.0.1" />
+            <Property graph="0" name="IsolationProperty" src="40.40.42.-1" dst="130.10.0.2" />
+            <Property graph="0" name="IsolationProperty" src="40.40.42.-1" dst="130.10.0.3" />
+            <Property graph="0" name="IsolationProperty" src="40.40.42.-1" dst="130.10.0.4" />
+			<!-- policy 12 -->
+			<Property graph="0" name="ReachabilityProperty" src="130.10.0.1" dst="40.40.41.-1" />
+            <Property graph="0" name="ReachabilityProperty" src="130.10.0.2" dst="40.40.41.-1" />
+            <Property graph="0" name="ReachabilityProperty" src="130.10.0.3" dst="40.40.41.-1" /> 
+			<Property graph="0" name="ReachabilityProperty" src="130.10.0.4" dst="40.40.41.-1" />
+			<!-- policy 13 -->
+			<Property graph="0" name="ReachabilityProperty" src="40.40.42.-1" dst="40.40.41.-1" />
+            <Property graph="0" name="IsolationProperty" src="40.40.41.-1" dst="40.40.42.-1" />
+			<!-- policy 14 -->
+            <Property graph="0" name="ReachabilityProperty" src="88.80.84.-1" dst="40.40.41.-1" />
+            <Property graph="0" name="ReachabilityProperty" src="88.80.84.-1" dst="40.40.42.-1" />
+			<!-- policy 15 -->
+            <Property graph="0" name="IsolationProperty" src="88.80.84.-1" dst="130.10.0.1" />
+            <Property graph="0" name="IsolationProperty" src="88.80.84.-1" dst="130.10.0.2" />
+            <Property graph="0" name="IsolationProperty" src="88.80.84.-1" dst="130.10.0.3" />
+			<Property graph="0" name="IsolationProperty" src="88.80.84.-1" dst="130.10.0.4" />
+
+	</PropertyDefinition>
+</NFV>
