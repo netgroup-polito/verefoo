@@ -9,7 +9,7 @@ VEREFOO (VErified REFinement and Optimized Orchestrator) is a framework designed
 
 ### Input and Output
 
-The VEREFOO framework takes as inputs a Service Graph (SG) and a list of Network Security Requirements (NSR) that a SG should satisfy, like data protection and isolation. The input is in the form of a single XML file which contains both the SG and the NSRs. After receiving the SG and the NSRs, the
+The VEREFOO framework takes as inputs a Service Graph (SG) and a list of Network Security Requirements (NSR) that a SG should satisfy, like data reachability and isolation (data protection requirements are planned to be supported in future versions of VEREFOO). The input is in the form of a single XML file which contains both the SG and the NSRs. After receiving the SG and the NSRs, the
 automatic security enforcement problem is solved, which leads to two possible outcomes:
 * A positive output, provided as an XML configuration file, easily deployable into the virtual network, composed by:
   * the allocation scheme of the distributed firewall
