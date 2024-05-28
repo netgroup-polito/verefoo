@@ -208,9 +208,9 @@ After running the framework, VEREFOO produces two outputs. On the one hand, it e
 ## VEREFOO Main Papers
 
 If you are interested in deepen your knowledge on the subject, the following links will guide you through the four Verefoo versions which followed one another:
-* [Amsterdam](https://ieeexplore.ieee.org/abstract/document/9110402) : D. Bringhetti, G. Marchetto, R. Sisto, F. Valenza, J. Yusupov, "_Automated optimal firewall orchestration and configuration in virtualized networks_", in Proc. of IEEE/IFIP Network Operations and Management Symposium, Budapest, Hungary, June 2020. 
-* [Budapest](https://ieeexplore.ieee.org/abstract/document/9737389) : D. Bringhetti, G. Marchetto, R. Sisto, F. Valenza, J. Yusupov, "_Automated Firewall Configuration in Virtual Networks_", IEEE Transactions on Dependable and Secure Computing ( Volume: 20, Issue: 2, 01 March-April 2023, Pages: 1559 - 1576) , March 2022.
-* [Copenhagen](https://ieeexplore.ieee.org/abstract/document/9844025) : S. Bussa, R. Sisto, F. Valenza, "_Security Automation using Traffic Flow Modeling_", in Proc. of 2022 IEEE 8th International Conference on Network Softwarization (NetSoft), Milan, Italy, June-July 2022.
+* [Amsterdam](https://ieeexplore.ieee.org/abstract/document/9110402) : D. Bringhenti, G. Marchetto, R. Sisto, F. Valenza, J. Yusupov, "_Automated optimal firewall orchestration and configuration in virtualized networks_", in Proc. of IEEE/IFIP Network Operations and Management Symposium, Budapest, Hungary, June 2020. 
+* [Budapest](https://ieeexplore.ieee.org/abstract/document/9737389) : D. Bringhenti, G. Marchetto, R. Sisto, F. Valenza, J. Yusupov, "_Automated Firewall Configuration in Virtual Networks_", IEEE Transactions on Dependable and Secure Computing ( Volume: 20, Issue: 2, 01 March-April 2023, Pages: 1559 - 1576) , March 2022.
+* [Copenhagen] : D. Bringhenti, S. Bussa, R. Sisto, F. Valenza, "A two-fold traffic flow model for network security management", IEEE Transactions on Network and Service Management, in press.
 * Dublin :  F. Pizzato, D. Bringhenti, R. Sisto, and F. Valenza, “_Automatic and optimized firewall reconfiguration_” in Proc. of IEEE/IFIP Network Operations and Management Symposium, Seoul, South Korea, May 2024, in press.
 
 ## Support
