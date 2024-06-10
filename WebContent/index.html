@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Verifoo web service</title>
+</head>
+<body>
+<h2>Verifoo RESTful Web Service</h2>
+This web service has the following resources
+<ul>
+	<li> <a href="rest/deployment">deployment</a> 
+	<li> <a href="rest/converter">converter</a>
+	<li> <a href="rest/simulation">simulation</a>
+</ul>
+The deployment resource recives an XML file containing a NFV element that describes some service chains and a physical netwok. It returns the correspondent deployment. 
+The converter resource recives also an XML file containing a NFV element with a ParsingString element which is the model returned by z3. The simulation resource allows the interaction with SONATA.
+</p>
+<p><a id="swaggerdocs" href="_swagger-ui/index.html?url=http://127.0.0.1:8080/verifoo/rest/swagger.json">Swagger documentation</a>
+<p><a href="VerifooDocs.pdf">Verifoo PDF documentation</a>
+<p><a href="verigraph_doc.pdf">Verigraph PDF documentation</a>
+</p>
+</body>
+<script type="text/javascript">
+	document.getElementById('swaggerdocs').href = '_swagger-ui/index.html?url='+window.location.href.replace('index.html','')+'rest/swagger.json';
+</script>
+</html>
