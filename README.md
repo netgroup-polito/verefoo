@@ -210,8 +210,8 @@ After running the framework, VEREFOO produces two outputs. On the one hand, it e
 If you are interested in deepen your knowledge on the subject, the following links will guide you through the four Verefoo versions which followed one another:
 * [Amsterdam](https://ieeexplore.ieee.org/abstract/document/9110402) : D. Bringhenti, G. Marchetto, R. Sisto, F. Valenza, J. Yusupov, "_Automated optimal firewall orchestration and configuration in virtualized networks_", in Proc. of IEEE/IFIP Network Operations and Management Symposium, Budapest, Hungary, June 2020. 
 * [Budapest](https://ieeexplore.ieee.org/abstract/document/9737389) : D. Bringhenti, G. Marchetto, R. Sisto, F. Valenza, J. Yusupov, "_Automated Firewall Configuration in Virtual Networks_", IEEE Transactions on Dependable and Secure Computing ( Volume: 20, Issue: 2, 01 March-April 2023, Pages: 1559 - 1576) , March 2022.
-* [Copenhagen] : D. Bringhenti, S. Bussa, R. Sisto, F. Valenza, "_A two-fold traffic flow model for network security management_", IEEE Transactions on Network and Service Management, in press.
-* Dublin :  F. Pizzato, D. Bringhenti, R. Sisto, and F. Valenza, “_Automatic and optimized firewall reconfiguration_” in Proc. of IEEE/IFIP Network Operations and Management Symposium, Seoul, South Korea, May 2024, in press.
+* [Copenhagen](https://ieeexplore.ieee.org/document/10542398) : D. Bringhenti, S. Bussa, R. Sisto, F. Valenza, "_A two-fold traffic flow model for network security management_", IEEE Transactions on Network and Service Management, in press.
+* [Dublin](https://ieeexplore.ieee.org/document/10575212) :  F. Pizzato, D. Bringhenti, R. Sisto, and F. Valenza, “_Automatic and optimized firewall reconfiguration_” in Proc. of IEEE/IFIP Network Operations and Management Symposium, Seoul, South Korea, May 2024.
 
 ## Support
-If you need any kind of clarification, or you want to report a bug found in the code, you can contact us at: _<first.last@polito.it>_.
+If you need any kind of clarification, or you want to report a bug found in the code, you can contact us at: _<daniele.bringhenti@polito.it>_.
