@@ -1,0 +1,313 @@
+<NFV xsi:noNamespaceSchemaLocation="./xsd/nfvSchema.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <graphs>
+        <graph id="0">
+            <node name="130.10.0.1" functional_type="WEBSERVER">
+                <neighbour name="1.0.0.1"/>
+                <configuration name="httpserver1" description="e1">
+                    <webserver>
+                        <name>130.10.0.1</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="130.10.0.2" functional_type="WEBSERVER">
+                <neighbour name="1.0.0.2"/>
+                <configuration name="httpserver2" description="e2">
+                    <webserver>
+                        <name>130.10.0.2</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="130.10.0.3" functional_type="WEBSERVER">
+                <neighbour name="1.0.0.3"/>
+                <configuration name="httpserver3" description="e3">
+                    <webserver>
+                        <name>130.10.0.3</name>
+                    </webserver>
+                </configuration>
+            </node>
+            <node name="1.0.0.1" functional_type="FORWARDER">
+                <neighbour name="130.10.0.1"/>
+                <neighbour name="130.10.0.4"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="1.0.0.2" functional_type="FORWARDER">
+                <neighbour name="130.10.0.2"/>
+                <neighbour name="130.10.0.4"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="1.0.0.3" functional_type="FORWARDER">
+                <neighbour name="130.10.0.3"/>
+                <neighbour name="130.10.0.4"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="130.10.0.4" functional_type="LOADBALANCER">
+                <neighbour name="1.0.0.1"/>
+                <neighbour name="1.0.0.2"/>
+                <neighbour name="1.0.0.3"/>
+                <neighbour name="1.0.0.4"/>
+                <configuration name="loadbalancer" description="s9">
+                    <loadbalancer>
+                        <pool>130.10.0.1</pool>
+                        <pool>130.10.0.2</pool>
+                        <pool>130.10.0.3</pool>
+                    </loadbalancer>
+                </configuration>
+            </node>
+            <node name="1.0.0.4" functional_type="FIREWALL">
+                <neighbour name="130.10.0.4"/>
+                <neighbour name="33.33.33.2"/>
+                <configuration name="AutoConf" description="1"> <!-- description in firewalls was added manually, it should be output of VEREFOO-->
+                    <firewall defaultAction="DENY">
+                        <elements>
+                            <action>ALLOW</action>
+                            <source>220.124.30.1</source>
+                            <destination>130.10.0.4</destination>
+                            <protocol>TCP</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>80</dst_port>
+                        </elements>
+                        <elements>
+                            <action>ALLOW</action>
+                            <source>40.40.41.-1</source>
+                            <destination>130.10.0.4</destination>
+                            <protocol>TCP</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>80</dst_port>
+                        </elements>
+                        <elements>
+                            <action>ALLOW</action>
+                            <source>130.10.0.4</source>
+                            <destination>-1.-1.-1.-1</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall>
+                </configuration>
+            </node>
+            <node name="33.33.33.2" functional_type="FORWARDER">
+                <neighbour name="1.0.0.4"/>
+                <neighbour name="1.0.0.5"/>
+                <neighbour name="1.0.0.6"/>
+                <neighbour name="1.0.0.7"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="1.0.0.5" functional_type="FORWARDER">
+                <neighbour name="33.33.33.2"/>
+                <neighbour name="40.40.41.-1"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="1.0.0.6" functional_type="FIREWALL">
+                <neighbour name="33.33.33.2"/>
+                <neighbour name="40.40.42.-1"/>
+                <configuration name="AutoConf" description="2">
+                    <firewall defaultAction="DENY">
+                        <elements>
+                            <action>ALLOW</action>
+                            <source>40.40.42.-1</source>
+                            <destination>40.40.41.-1</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                        <elements>
+                            <action>ALLOW</action>
+                            <source>88.80.84.-1</source>
+                            <destination>40.40.42.-1</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall>
+                </configuration>
+            </node>
+            <node name="40.40.41.-1" functional_type="WEBCLIENT">
+                <neighbour name="1.0.0.5"/>
+                <configuration name="officeA" description="e4">
+                    <webclient nameWebServer="130.10.0.1"/>
+                </configuration>
+            </node>
+            <node name="40.40.42.-1" functional_type="WEBCLIENT">
+                <neighbour name="1.0.0.6"/>
+                <configuration name="businessofficeA" description="e5">
+                    <webclient nameWebServer="130.10.0.1"/>
+                </configuration>
+            </node>
+            <node name="1.0.0.7" functional_type="FORWARDER">
+                <neighbour name="33.33.33.2"/>
+                <neighbour name="33.33.33.3"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="33.33.33.3" functional_type="FORWARDER">
+                <neighbour name="1.0.0.7"/>
+                <neighbour name="1.0.0.8"/>
+                <neighbour name="1.0.0.9"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="1.0.0.8" functional_type="FORWARDER">
+                <neighbour name="33.33.33.3"/>
+                <neighbour name="88.80.84.-1"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="88.80.84.-1" functional_type="WEBCLIENT">
+                <neighbour name="1.0.0.8"/>
+                <configuration name="companyB" description="e6">
+                    <webclient nameWebServer="130.10.0.1"/>
+                </configuration>
+            </node>
+            <node name="1.0.0.9" functional_type="FORWARDER">
+                <neighbour name="33.33.33.3"/>
+                <neighbour name="220.124.30.1"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="220.124.30.1" functional_type="NAT">
+                <neighbour name="1.0.0.9"/>
+                <neighbour name="1.0.0.10"/>
+                <neighbour name="1.0.0.11"/>
+                <configuration name="nat" description="s12">
+                    <nat>
+                        <source>192.168.3.-1</source>
+                        <source>192.168.2.-1</source>
+                    </nat>
+                </configuration>
+            </node>
+            <node name="1.0.0.10" functional_type="FORWARDER">
+                <neighbour name="220.124.30.1"/>
+                <neighbour name="192.168.3.-1"/>
+                <configuration name="ForwardConf">
+                    <forwarder>
+                        <name>Forwarder</name>
+                    </forwarder>
+                </configuration>
+            </node>
+            <node name="1.0.0.11" functional_type="FIREWALL">
+                <neighbour name="220.124.30.1"/>
+                <neighbour name="192.168.2.-1"/>
+                <configuration name="AutoConf" description="3">
+                    <firewall defaultAction="DENY">
+                        <elements>
+                            <action>ALLOW</action>
+                            <source>-1.-1.-1.-1</source>
+                            <destination>192.168.-1.-1</destination>
+                            <protocol>ANY</protocol>
+                            <src_port>*</src_port>
+                            <dst_port>*</dst_port>
+                        </elements>
+                    </firewall>
+                </configuration>
+            </node>
+            <node name="192.168.3.-1" functional_type="WEBCLIENT">
+                <neighbour name="1.0.0.10"/>
+                <configuration name="officeC" description="e7">
+                    <webclient nameWebServer="130.10.0.1"/>
+                </configuration>
+            </node>
+            <node name="192.168.2.-1" functional_type="WEBCLIENT">
+                <neighbour name="1.0.0.11"/>
+                <configuration name="businessofficeC" description="e8">
+                    <webclient nameWebServer="130.10.0.1"/>
+                </configuration>
+            </node>
+        </graph>
+    </graphs>
+    <Constraints>
+        <NodeConstraints/>
+        <LinkConstraints/>
+    </Constraints>
+    <PropertyDefinition>
+        <Property name="IsolationProperty" graph="0" src="88.80.84.-1" dst="130.10.0.1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="88.80.84.-1" dst="130.10.0.2" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="88.80.84.-1" dst="130.10.0.3" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="88.80.84.-1" dst="130.10.0.4" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.42.-1" dst="130.10.0.1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.42.-1" dst="130.10.0.2" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.42.-1" dst="130.10.0.3" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.42.-1" dst="130.10.0.4" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="40.40.41.-1" dst="130.10.0.1" lv4proto="TCP" src_port="null" dst_port="80" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="40.40.41.-1" dst="130.10.0.2" lv4proto="TCP" src_port="null" dst_port="80" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="40.40.41.-1" dst="130.10.0.3" lv4proto="TCP" src_port="null" dst_port="80" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="40.40.41.-1" dst="130.10.0.4" lv4proto="TCP" src_port="null" dst_port="80" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.41.-1" dst="130.10.0.1" lv4proto="TCP" src_port="null" dst_port="0-79" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.41.-1" dst="130.10.0.1" lv4proto="TCP" src_port="null" dst_port="81-65535" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.41.-1" dst="130.10.0.2" lv4proto="TCP" src_port="null" dst_port="0-79" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.41.-1" dst="130.10.0.2" lv4proto="TCP" src_port="null" dst_port="81-65535" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.41.-1" dst="130.10.0.3" lv4proto="TCP" src_port="null" dst_port="0-79" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.41.-1" dst="130.10.0.3" lv4proto="TCP" src_port="null" dst_port="81-65535" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.41.-1" dst="130.10.0.4" lv4proto="TCP" src_port="null" dst_port="0-79" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.41.-1" dst="130.10.0.4" lv4proto="TCP" src_port="null" dst_port="81-65535" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.41.-1" dst="130.10.0.1" lv4proto="UDP" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.41.-1" dst="130.10.0.2" lv4proto="UDP" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.41.-1" dst="130.10.0.3" lv4proto="UDP" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.41.-1" dst="130.10.0.4" lv4proto="UDP" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.2.-1" dst="130.10.0.1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.2.-1" dst="130.10.0.2" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.2.-1" dst="130.10.0.3" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.2.-1" dst="130.10.0.4" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="192.168.3.-1" dst="130.10.0.1" lv4proto="TCP" src_port="null" dst_port="80" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="192.168.3.-1" dst="130.10.0.2" lv4proto="TCP" src_port="null" dst_port="80" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="192.168.3.-1" dst="130.10.0.3" lv4proto="TCP" src_port="null" dst_port="80" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="192.168.3.-1" dst="130.10.0.4" lv4proto="TCP" src_port="null" dst_port="80" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.3.-1" dst="130.10.0.1" lv4proto="TCP" src_port="null" dst_port="0-79" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.3.-1" dst="130.10.0.1" lv4proto="TCP" src_port="null" dst_port="81-65535" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.3.-1" dst="130.10.0.2" lv4proto="TCP" src_port="null" dst_port="0-79" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.3.-1" dst="130.10.0.2" lv4proto="TCP" src_port="null" dst_port="81-65535" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.3.-1" dst="130.10.0.3" lv4proto="TCP" src_port="null" dst_port="0-79" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.3.-1" dst="130.10.0.3" lv4proto="TCP" src_port="null" dst_port="81-65535" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.3.-1" dst="130.10.0.4" lv4proto="TCP" src_port="null" dst_port="0-79" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.3.-1" dst="130.10.0.4" lv4proto="TCP" src_port="null" dst_port="81-65535" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.3.-1" dst="130.10.0.1" lv4proto="UDP" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.3.-1" dst="130.10.0.2" lv4proto="UDP" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.3.-1" dst="130.10.0.3" lv4proto="UDP" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="192.168.3.-1" dst="130.10.0.4" lv4proto="UDP" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="88.80.84.-1" dst="40.40.42.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="IsolationProperty" graph="0" src="40.40.41.-1" dst="40.40.42.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="130.10.0.1" dst="40.40.41.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="130.10.0.2" dst="40.40.41.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="130.10.0.3" dst="40.40.41.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="130.10.0.4" dst="40.40.41.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="88.80.84.-1" dst="40.40.41.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="40.40.42.-1" dst="40.40.41.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="192.168.3.-1" dst="192.168.2.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="130.10.0.1" dst="192.168.3.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="130.10.0.2" dst="192.168.3.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="130.10.0.3" dst="192.168.3.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="130.10.0.4" dst="192.168.3.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+        <Property name="ReachabilityProperty" graph="0" src="192.168.2.-1" dst="192.168.3.-1" lv4proto="ANY" src_port="null" dst_port="null" isSat="true"/>
+    </PropertyDefinition>
+</NFV>
